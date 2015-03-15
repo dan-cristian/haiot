@@ -1,11 +1,11 @@
 # crud.py
 
-from flask import Blueprint, request, g, redirect, url_for, abort, \
-                  render_template
+from flask import Blueprint, request, g, redirect, url_for, abort, render_template
 from flask.views import MethodView
 from wtforms.ext.sqlalchemy.orm import model_form
 from main import db
-from .models import Blog, Comment, Zone, SchedulePattern, HeatSchedule, Sensor
+from common import constant
+from pydispatch import dispatcher
 
 admin = Blueprint('admin', __name__, template_folder='templates')
 user = Blueprint('user', __name__, template_folder='templates')
@@ -93,7 +93,7 @@ class CRUDView(MethodView):
 
         db.session.add(obj)
         db.session.commit()
-
+        dispatcher.send(signal=constant.SIGNAL_SENSOR_DB_POST, model=self.model, row=obj)
         return redirect(self.path)
 
 def register_crud(app, url, endpoint, model, decorators=[], **kwargs):
@@ -106,24 +106,31 @@ def register_crud(app, url, endpoint, model, decorators=[], **kwargs):
     app.add_url_rule('%s/<operation>/<int:obj_id>/' % url, view_func=view, methods=['GET'])
     app.add_url_rule('%s/<operation>/<filter_name>/' % url, view_func=view, methods=['GET'])
 
-
 blog_filters = {
-'created_asc': lambda model: model.query.order_by(model.created_on.asc()),
-'updated_desc': lambda model: model.query.order_by(model.updated_on.desc()),
-'last_3': lambda model: model.query.order_by(model.created_on.desc()).limit(3)
+    'created_asc': lambda model: model.query.order_by(model.created_on.asc()),
+    'updated_desc': lambda model: model.query.order_by(model.updated_on.desc()),
+    'last_3': lambda model: model.query.order_by(model.created_on.desc()).limit(3)
 }
 
 comment_filters = {
-        'invisible': lambda model: model.query.filter_by(visible=False).all(),
-        'visible': lambda model: model.query.filter_by(visible=True).all()
-    }
+    'invisible': lambda model: model.query.filter_by(visible=False).all(),
+    'visible': lambda model: model.query.filter_by(visible=True).all()
+}
+
 simple_filters = {
-        'id_asc': lambda model: model.query.order_by(model.id.asc()),
-        'id_desc': lambda model: model.query.order_by(model.id.desc())
-    }
+    'id_asc': lambda model: model.query.order_by(model.id.asc()),
+    'id_desc': lambda model: model.query.order_by(model.id.desc())
+}
+
+from .models import Blog, Comment, Zone, SchedulePattern, HeatSchedule, Sensor
+from .models import Module, Parameter, TemperatureTarget
+
 register_crud(admin, '/blog', 'blog', Blog, filters=blog_filters)
 register_crud(admin, '/comments', 'comments', Comment, filters=comment_filters)
+register_crud(admin, '/module', 'module', Module, filters=simple_filters)
+register_crud(admin, '/parameter', 'parameter', Parameter, filters=simple_filters)
 register_crud(user, '/zone', 'zone', Zone, filters=simple_filters)
 register_crud(user, '/schedulepattern', 'schedulepattern', SchedulePattern, filters=simple_filters)
 register_crud(user, '/heatschedule', 'heatschedule', HeatSchedule, filters=simple_filters)
-register_crud(user, '/sesnor', 'sensor', Sensor, filters=simple_filters)
+register_crud(user, '/temperaturetarget', 'temperaturetarget', TemperatureTarget, filters=simple_filters)
+register_crud(user, '/sensor', 'sensor', Sensor, filters=simple_filters)

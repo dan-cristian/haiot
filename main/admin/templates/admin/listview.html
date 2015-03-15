@@ -1,7 +1,5 @@
 {% extends 'admin/admin.html' %}
-
 {% block body %}
-
 	<div class="listview">
 	<a class="pure-button pure-button-primary" href="{{path + 'new'}}">Create new</a>
 		{% if filters %}
@@ -28,5 +26,4 @@
 			</div>
 		{% endfor %}
 	</div>
-
 {% endblock %}

@@ -1,6 +1,8 @@
 from datetime import datetime
 
 from main import db
+from sensor.owsensor import SensorOw
+
 
 class Blog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -35,60 +37,110 @@ class Comment(db.Model):
     def __repr__(self):
         return '<Comment: blog {}, {}>'.format(self.blog_id, self.comment[:20])
 
+
+class Module(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50))
+    active = db.Column(db.Boolean(), default=False)
+
+    def __init__(self, id='', name=''):
+        if id:
+            self.id = id
+        self.name = name
+
+    def __repr__(self):
+        return 'Module id {}, {}'.format(self.id, self.name[:50])
+
+
 class Zone(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
+
     def __init__(self, id='', name=''):
         if id:
-            self.id= id
-        self.name= name
+            self.id = id
+        self.name = name
 
     def __repr__(self):
         return '<Zone: id {}, {}>'.format(self.id, self.name[:20])
+
 
 class SchedulePattern(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
     pattern = db.Column(db.String(24))
+
     def __init__(self, id='', name=''):
         if id:
-            self.id= id
-        self.name= name
+            self.id = id
+        self.name = name
+
     def __repr__(self):
         return self.name[:24]
 
 
-class HeatSchedule(db.Model):
+class TemperatureTarget(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'))
-    zone = db.relationship('Zone', backref=db.backref('zone', lazy='dynamic'))
-    pattern_id = db.Column(db.Integer, db.ForeignKey('schedule_pattern.id'))
-    pattern = db.relationship('SchedulePattern', backref=db.backref('schedule_pattern', lazy='dynamic'))
-    is_week = db.Column(db.Boolean)
-    is_weekend = db.Column(db.Boolean)
+    code = db.Column(db.String(1))
+    target = db.Column(db.Float)
 
     def __repr__(self):
-        return '<Zone {}, Pattern {}>'.format(self.zone.name, self.pattern.name)
+        return '{} code {}={}'.format(self.id, self.code, self.target)
 
-import sensors
+
+class HeatSchedule(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'), nullable=False)
+    zone = db.relationship('Zone', backref=db.backref('zone', lazy='dynamic'))
+    pattern_week_id = db.Column(db.Integer, db.ForeignKey('schedule_pattern.id'), nullable=False)
+    pattern_weekend_id = db.Column(db.Integer, db.ForeignKey('schedule_pattern.id'), nullable=False)
+    pattern_week = db.relationship('SchedulePattern', foreign_keys='[HeatSchedule.pattern_week_id]',
+                                   backref=db.backref('schedule_pattern_week', lazy='dynamic'))
+    pattern_weekend = db.relationship('SchedulePattern', foreign_keys='[HeatSchedule.pattern_weekend_id]',
+                                    backref=db.backref('schedule_pattern_weekend', lazy='dynamic'))
+    active = db.Column(db.Boolean, default=True)
+
+    def __repr__(self):
+        return 'Zone {}, Active {}, Week {}, Weekend {}'.format(self.zone.name, self.active,
+                self.pattern_week.name, self.pattern_weekend.name)
+
 
 class Sensor(db.Model):
-    id = db.Column(db.String(50), primary_key=True)
-    type=db.Column(db.String(50))
-    temperature=db.Column(db.Float)
-    humidity=db.Column(db.Float)
-    counter_a=db.Column(db.BigInteger)
-    counter_b=db.Column(db.BigInteger)
+    id = db.Column(db.Integer, primary_key=True)
+    address = db.Column(db.String(50), unique=True)
+    type = db.Column(db.String(50))
+    temperature = db.Column(db.Float)
+    humidity = db.Column(db.Float)
+    counter_a = db.Column(db.BigInteger)
+    counter_b = db.Column(db.BigInteger)
+    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def update(self, sensor):
-        assert isinstance(sensor, sensors.Sensor)
-        self.id= sensor.address
+        assert isinstance(sensor, SensorOw)
+        self.address = sensor.address
         self.type = sensor.type
         self.temperature = sensor.temperature
         self.humidity = sensor.humidity
-        self.counter_a=sensor.counters_A
-        self.counter_b=sensor.counters_B
+        self.counter_a = sensor.counters_A
+        self.counter_b = sensor.counters_B
+
     def __init__(self, sensor):
         self.update(sensor)
+
     def __repr__(self):
-        return self.id
+        return 'Sensor id {}, {}'.format(self.id, self.type)
+
+
+class Parameter(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True)
+    value = db.Column(db.String(255))
+
+    def __init__(self, id='', name='', value=''):
+        if id:
+            self.id = id
+        self.name = name
+        self.value = value
+
+    def __repr__(self):
+        return '{}, {}'.format(self.name, self.value)
