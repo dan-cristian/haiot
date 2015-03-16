@@ -1,6 +1,6 @@
 # project/__init__.py
 
-from flask import Flask, render_template, request, session
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy #workaround for resolve issue
 #from flask.ext.sqlalchemy import SQLAlchemy
 import logging
@@ -45,6 +45,8 @@ for mod in module_list:
 from admin import event
 event.init()
 
+from admin import thread_pool
+thread_pool.main()
 
 #a = Blog('my first post', 'some looooong body')
 #db.session.add(a)

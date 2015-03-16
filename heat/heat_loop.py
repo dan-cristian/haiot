@@ -1,4 +1,6 @@
 __author__ = 'dcristian'
+import logging
 
 def main():
-    pass
+    logging.info('Processing heat')
+    return 'Heat ok'

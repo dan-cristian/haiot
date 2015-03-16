@@ -3,7 +3,6 @@ __author__ = 'dcristian'
 # ! /usr/bin/env python
 import paho.mqtt.client as mqtt
 import time
-import sys, getopt, uuid
 import json
 import socket
 from collections import namedtuple
@@ -28,13 +27,14 @@ def json2obj(data): return json.loads(data, object_hook=_json_object_hook)
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
-    print("Connected with result code " + str(rc))
-
+    logging.info("Connected to mqtt with result code " + str(rc))
+    client_connected = True
 
 def on_disconnect(client, userdata, rc):
     if rc != 0:
-        print("Unexpected disconnection.")
-    print ("Disconnected")
+        logging.warning("Unexpected disconnection from mqtt")
+    logging.warning("Disconnected from mqtt")
+    client_connected = False
 
 
 def do_line(line):
@@ -82,11 +82,11 @@ def main():
     client = mqtt.Client()
     client_connected=False
     retry_count=0
-    while client_connected or retry_count> constant.ERROR_CONNECT_MAX_RETRY_COUNT:
+    while (not client_connected) and (retry_count < constant.ERROR_CONNECT_MAX_RETRY_COUNT):
         try:
+            client.on_connect = on_connect
             client.connect(model_helper.get_param(constant.PARAM_MQTT_HOST), 1883, 60)
             client_connected = True
-            client.on_connect = on_connect
             #client.on_message = on_message
             client.on_disconnect = on_disconnect
             #client.on_subscribe = on_subscribe
@@ -96,31 +96,33 @@ def main():
             client.loop_start()
         except socket.error:
             logging.error('mqtt client not connected, pause and retry')
-            time.sleep(constant.ERROR_CONNECT_PAUSE_SECOND)
             retry_count += 1
+            time.sleep(constant.ERROR_CONNECT_PAUSE_SECOND)
 
+    logging.info('MQTT loop ended')
     try:
-        f = subprocess.Popen(['tail', '-f', gpio_file], \
+        f = subprocess.Popen(['tail', '-f', gpio_file],
                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if constant.OS == constant.OS_LINUX:
+            p = select.poll()
+            p.register(f.stdout)
+            print "Watching file " + gpio_file
+
+            while True:
+                if p.poll(1):
+                    do_line(f.stdout.readline())
+
+            p.terminate()
+            print "Exit while loop"
+
+            # Blocking call that processes network traffic, dispatches callbacks and
+            # handles reconnecting.
+            # Other loop*() functions are available that give a threaded interface and a
+            # manual interface.
+            client.loop_stop()
     except WindowsError:
         logging.warning('Cannot open tail, maybe not running on Linux, os='+ constant.OS)
-    if constant.OS == constant.OS_LINUX:
-        p = select.poll()
-        p.register(f.stdout)
-        print "Watching file " + gpio_file
 
-        while True:
-            if p.poll(1):
-                do_line(f.stdout.readline())
-
-        p.terminate()
-        print "Exit while loop"
-
-        # Blocking call that processes network traffic, dispatches callbacks and
-        # handles reconnecting.
-        # Other loop*() functions are available that give a threaded interface and a
-        # manual interface.
-        client.loop_stop()
     else:
         logging.critical('Publish GPIO not available in OS ' + constant.OS)
 

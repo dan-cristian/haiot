@@ -4,7 +4,6 @@ __author__ = 'dcristian'
 
 
 import threading
-import datetime
 import signal
 import sys
 
