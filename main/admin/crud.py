@@ -123,7 +123,7 @@ simple_filters = {
 }
 
 from .models import Blog, Comment, Zone, SchedulePattern, HeatSchedule, Sensor
-from .models import Module, Parameter, TemperatureTarget
+from .models import Module, Parameter, TemperatureTarget, ZoneSensor
 
 register_crud(admin, '/blog', 'blog', Blog, filters=blog_filters)
 register_crud(admin, '/comments', 'comments', Comment, filters=comment_filters)
@@ -134,3 +134,4 @@ register_crud(user, '/schedulepattern', 'schedulepattern', SchedulePattern, filt
 register_crud(user, '/heatschedule', 'heatschedule', HeatSchedule, filters=simple_filters)
 register_crud(user, '/temperaturetarget', 'temperaturetarget', TemperatureTarget, filters=simple_filters)
 register_crud(user, '/sensor', 'sensor', Sensor, filters=simple_filters)
+register_crud(user, '/zonesensor', 'zonesensor', ZoneSensor, filters=simple_filters)

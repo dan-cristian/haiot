@@ -18,6 +18,8 @@ topic = "mzp/iot/alarm"
 gpio_file = "/tmp/gpio_input.txt"
 client = None
 client_connected = False
+tailproc = None
+tailpipe = None
 #http://stackoverflow.com/questions/6578986/how-to-convert-json-data-into-a-python-object
 def _json_object_hook(d): return namedtuple('X', d.keys())(*d.values())
 
@@ -78,8 +80,10 @@ def alert(pinindex, status):
         print e
 
 
-def main():
+def init():
+    global client
     client = mqtt.Client()
+    global client_connected
     client_connected=False
     retry_count=0
     while (not client_connected) and (retry_count < constant.ERROR_CONNECT_MAX_RETRY_COUNT):
@@ -98,33 +102,34 @@ def main():
             logging.error('mqtt client not connected, pause and retry')
             retry_count += 1
             time.sleep(constant.ERROR_CONNECT_PAUSE_SECOND)
-
-    logging.info('MQTT loop ended')
     try:
-        f = subprocess.Popen(['tail', '-f', gpio_file],
-                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        global tailproc, tailpipe
+        logging.info('Watching file ' + gpio_file)
+        tailproc = subprocess.Popen(['tail', '-f', gpio_file], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if constant.OS == constant.OS_LINUX:
-            p = select.poll()
-            p.register(f.stdout)
-            print "Watching file " + gpio_file
+            tailpipe = select.poll()
+            tailpipe.register(tailproc.stdout)
+        else:
+            logging.critical('Publish GPIO via tail -f not available in OS ' + constant.OS)
 
-            while True:
-                if p.poll(1):
-                    do_line(f.stdout.readline())
-
-            p.terminate()
-            print "Exit while loop"
-
-            # Blocking call that processes network traffic, dispatches callbacks and
-            # handles reconnecting.
-            # Other loop*() functions are available that give a threaded interface and a
-            # manual interface.
-            client.loop_stop()
     except WindowsError:
         logging.warning('Cannot open tail, maybe not running on Linux, os='+ constant.OS)
 
-    else:
-        logging.critical('Publish GPIO not available in OS ' + constant.OS)
+def unload():
+    # Blocking call that processes network traffic, dispatches callbacks and
+    # handles reconnecting.
+    # Other loop*() functions are available that give a threaded interface and a
+    # manual interface.
+    global client, tailpipe
+    client.loop_stop()
+    tailpipe.terminate()
 
-if __name__ == "__main__":
-    main()
+def thread_run():
+    if constant.OS == constant.OS_LINUX:
+        global tailpipe, tailproc
+        if tailpipe.poll(1):
+            do_line(tailproc.stdout.readline())
+    else:
+        logging.warning('Ignoring read alarm tail file in OS ' + constant.OS)
+    return 'Alarm ok'
+

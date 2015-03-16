@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from main import db
-from sensor.owsensor import SensorOw
+from sensor.owsensor_loop import SensorOw
 
 
 class Blog(db.Model):
@@ -144,3 +144,19 @@ class Parameter(db.Model):
 
     def __repr__(self):
         return '{}, {}'.format(self.name, self.value)
+
+class ZoneSensor(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    sensor_name = db.Column(db.String(50))
+    zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'))
+    zone = db.relationship('Zone', backref=db.backref('zonesensor_zone', lazy='dynamic'))
+    sensor_address = db.Column(db.Integer, db.ForeignKey('sensor.address'))
+    sensor = db.relationship('Sensor', backref=db.backref('zonesensor_sensor', lazy='dynamic'))
+
+    def __init__(self, id='', sensor_name =''):
+        if id:
+            self.id = id
+        self.sensor_name = sensor_name
+
+    def __repr__(self):
+        return 'ZoneSensor ' + self.sensor_name

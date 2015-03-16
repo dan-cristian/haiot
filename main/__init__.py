@@ -26,8 +26,6 @@ app.register_blueprint(admin, url_prefix='/admin')
 app.register_blueprint(user, url_prefix='/user')
 db.create_all()
 
-
-
 import admin.model_helper
 admin.model_helper.populate_tables()
 
@@ -46,7 +44,11 @@ from admin import event
 event.init()
 
 from admin import thread_pool
-thread_pool.main()
+import threading
+t = threading.Thread(target=thread_pool.main)
+t.daemon = True
+t.start()
+#thread_pool.main()
 
 #a = Blog('my first post', 'some looooong body')
 #db.session.add(a)

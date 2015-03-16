@@ -43,16 +43,6 @@ class SensorOw(object):
     def __repr__(self):
         return str(self.address) + "-" + str(self.type)
 
-def loop_read():
-    print ("Started owssensor loop")
-    #try:
-    owproxy = pyownet.protocol.proxy(host=model_helper.get_param(constant.PARAM_OWSERVER_HOST_1), port=4304)
-    while True:
-        do_device(owproxy)
-        time.sleep(1)
-    #except:
-    #    print "Unexpected error:", sys.exc_info()[0]
-    print ("Exit while loop")
 
 
 def do_device (owproxy):
@@ -60,26 +50,27 @@ def do_device (owproxy):
     for sensor in sensors:
         try:
             sensortype = owproxy.read(sensor+'type')
-        except pyownet.protocol.OwnetError:
+            if sensortype == 'DS2423':
+                dev = get_counter(sensor, owproxy)
+            elif sensortype == 'DS2413':
+                dev=get_io(sensor, owproxy)
+            elif sensortype == 'DS18B20':
+                dev=get_temperature(sensor, owproxy)
+            elif sensortype == 'DS2438':
+                dev=get_temperature(sensor, owproxy)
+                dev=get_voltage(sensor, owproxy)
+                dev=get_humidity(sensor, owproxy)
+            elif sensortype=='DS2401':
+                dev=get_bus(sensor, owproxy)
+            else:
+                dev=get_unknown(sensor, owproxy)
+            dispatcher.send(signal=common.constant.SIGNAL_SENSOR, sender=dev)
+            SensorOw.list.update({str(dev.address):dev})
+        except pyownet.protocol.ConnError:
             logging.warning('Connection error owserver')
-        if sensortype == 'DS2423':
-            dev = get_counter(sensor, owproxy)
-        elif sensortype == 'DS2413':
-            dev=get_io(sensor, owproxy)
-        elif sensortype == 'DS18B20':
-            dev=get_temperature(sensor, owproxy)
-        elif sensortype == 'DS2438':
-            dev=get_temperature(sensor, owproxy)
-            dev=get_voltage(sensor, owproxy)
-            dev=get_humidity(sensor, owproxy)
-        elif sensortype=='DS2401':
-            dev=get_bus(sensor, owproxy)
-        else:
-            dev=get_unknown(sensor, owproxy)
-        dispatcher.send(signal=common.constant.SIGNAL_SENSOR, sender=dev)
-        SensorOw.list.update({str(dev.address):dev})
         time.sleep(1)
         #print ("Sensor count is " + str(len(SensorOw.list)) + " on thread " + threading.current_thread().name)
+    return 'Read {} sensors'.format(len(sensors))
 
 def get_prefix(sensor, owproxy):
     #prefix =  '{"host_origin":"%s", "command":"sensorupdate", "datetime":"%s", "sensor_address":"%s", "type":"%s"' % (socket.gethostname(),
@@ -145,6 +136,24 @@ def get_unknown (sensor, owproxy):
     dev = get_prefix(sensor, owproxy)
     #client.publish(topic, message)
     return dev
+
+owproxy=None
+def init():
+    logging.info('Initialising owssensor')
+    #try:
+    global owproxy
+    owproxy = pyownet.protocol.proxy(host=model_helper.get_param(constant.PARAM_OWSERVER_HOST_1), port=4304)
+    #while True:
+    #do_device(owproxy)
+    #    time.sleep(1)
+    #except:
+    #    print "Unexpected error:", sys.exc_info()[0]
+    #print ("Exit while loop")
+
+
+def thread_run():
+    logging.info('Processing sensors')
+    return do_device(owproxy)
 
 if __name__ == '__main__':
     pass
