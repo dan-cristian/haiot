@@ -27,3 +27,8 @@ def populate_tables():
         commit(db.session)
         db.session.add(models.Parameter(3, constant.PARAM_MQTT_HOST, '192.168.0.9'))
         commit(db.session)
+
+    if len(models.Node.query.all()) == 0:
+        logging.info('Populating Node with default values')
+        db.session.add(models.Node(1, 'localhost', '127.0.0.1', has_sensor=True, sensor_port=4304))
+        commit(db.session)
