@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="7b8a0c34-195e-4bae-a6ef-524be964b4d7" name="Default" comment="heat and threads improvs">
+    <list default="true" id="7b8a0c34-195e-4bae-a6ef-524be964b4d7" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/database.db" afterPath="$PROJECT_DIR$/database.db" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/alarm/__init__.py" afterPath="$PROJECT_DIR$/alarm/__init__.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sensor/__init__.py" afterPath="$PROJECT_DIR$/sensor/__init__.py" />
@@ -478,7 +478,13 @@
       <option name="project" value="LOCAL" />
       <updated>1426630899880</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="heat and threads improvs">
+      <created>1426630946969</created>
+      <option name="number" value="00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1426630946969</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="ToolWindowManager">
