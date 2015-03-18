@@ -34,6 +34,10 @@ def main():
                     last_exec_date = exec_last_date_list.get(func, None)
                     elapsed_seconds = (datetime.now() - last_exec_date).total_seconds()
                 if future_obj.done():
+                    try:
+                        future_obj.result()
+                    except Exception as exc:
+                        logging.critical('Exception [{}] in {}'.format(exc, print_name))
                     #print('%s=%s' % (print_name, future_obj.result()))
                     if elapsed_seconds and elapsed_seconds > exec_interval:
                         del dict_future_func[future_obj]

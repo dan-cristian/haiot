@@ -106,7 +106,7 @@ def init():
         global tailproc, tailpipe
         logging.info('Watching file ' + gpio_file)
         tailproc = subprocess.Popen(['tail', '-f', gpio_file], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        if constant.OS == constant.OS_LINUX:
+        if constant.OS in constant.OS_LINUX:
             tailpipe = select.poll()
             tailpipe.register(tailproc.stdout)
         else:
@@ -125,7 +125,7 @@ def unload():
     tailpipe.terminate()
 
 def thread_run():
-    if constant.OS == constant.OS_LINUX:
+    if constant.OS in constant.OS_LINUX:
         global tailpipe, tailproc
         if tailpipe.poll(1):
             do_line(tailproc.stdout.readline())

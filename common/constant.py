@@ -6,7 +6,7 @@ SIGNAL_SENSOR_DB_POST = 'signal-from-db-post'
 ERROR_CONNECT_MAX_RETRY_COUNT = 10
 ERROR_CONNECT_PAUSE_SECOND = 1
 OS = 'not initialised'
-OS_LINUX='Linux'
+OS_LINUX={'Linux', 'posix'}
 OS_WINDOWS={'Windows', 'nt'}
 
 SCRIPT_RESPONSE_OK='RESULTOK'
@@ -23,3 +23,4 @@ SMARTCTL_STATUS='SMART overall-health self-assessment test result:'
 SMARTCTL_ERROR_SECTORS='198 Offline_Uncorrectable'
 SMARTCTL_ERROR_NO_DISK='Unable to detect device type'
 HDPARM_STATUS='drive state is:'
+DISK_DEV_MAIN='/dev/sd'
