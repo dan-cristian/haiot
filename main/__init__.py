@@ -2,6 +2,7 @@
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy #workaround for resolve issue
+
 #from flask.ext.sqlalchemy import SQLAlchemy
 import logging
 
@@ -30,7 +31,7 @@ import admin.model_helper
 admin.model_helper.populate_tables()
 
 import admin.models
-module_list = admin.models.Module.query.all()
+module_list = admin.models.Module.query.order_by(admin.models.Module.start_order).all()
 for mod in module_list:
     assert isinstance(mod, admin.models.Module)
     if mod.active:

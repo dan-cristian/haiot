@@ -42,11 +42,14 @@ class Module(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
     active = db.Column(db.Boolean(), default=False)
+    start_order = db.Column(db.Integer)
 
-    def __init__(self, id='', name=''):
+    def __init__(self, id='', name='', active=False, start_order='999'):
         if id:
             self.id = id
         self.name = name
+        self.active = active
+        self.start_order = start_order
 
     def __repr__(self):
         return 'Module id {}, {}'.format(self.id, self.name[:50])
