@@ -55,6 +55,8 @@ class Module(db.Model):
         return 'Module id {}, {}'.format(self.id, self.name[:50])
 
 
+
+
 class Zone(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))

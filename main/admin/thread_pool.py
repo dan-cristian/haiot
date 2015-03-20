@@ -6,23 +6,25 @@ callable_list=[]
 exec_interval_list={}
 exec_last_date_list={}
 
-def add_callable(func):
+
+def add_callable(func, run_interval_second=60):
     print_name = func.func_globals['__name__']+'.'+ func.func_name
     logging.info('Added for processing callable ' + print_name)
     callable_list.append(func)
     exec_last_date_list[func]=datetime.now()
+    exec_interval_list[func]=run_interval_second
 
 def set_exec_interval(func, seconds):
     exec_interval_list[func]=seconds
 
 def main():
     #https://docs.python.org/3.3/library/concurrent.futures.html
+    dict_future_func={}
     with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-
-        # Start the load operations and mark each future with its id
-        dict_future_func = {executor.submit(call_obj): call_obj for call_obj in callable_list}
-
         while True:
+            if len(callable_list) != len(dict_future_func):
+                logging.info('Initialising thread processing with {} functions'.format(len(callable_list)))
+                dict_future_func = {executor.submit(call_obj): call_obj for call_obj in callable_list}
             for future_obj in dict_future_func :
                 func=dict_future_func [future_obj]
                 print_name = func.func_globals['__name__']+'.'+ func.func_name

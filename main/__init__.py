@@ -2,9 +2,11 @@
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy #workaround for resolve issue
-
-#from flask.ext.sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import models_committed
 import logging
+import sys
+
+
 
 def my_import(name):
     #http://stackoverflow.com/questions/547829/how-to-dynamically-load-a-python-class
@@ -13,6 +15,26 @@ def my_import(name):
     for comp in components[1:]:
         mod = getattr(mod, comp)
     return mod
+
+def init_modules():
+    import admin.models
+    module_list = admin.models.Module.query.order_by(admin.models.Module.start_order).all()
+    for mod in module_list:
+        assert isinstance(mod, admin.models.Module)
+        dynclass = my_import(mod.name)
+        if mod.active:
+            print "Module {} is active".format(mod.name)
+            if not dynclass.initialised:
+                logging.info('Module {} initialising'.format(mod.name))
+                dynclass.init()
+            else:
+                logging.info('Module {} already initialised'.format(mod.name))
+        else:
+            print "Module {} is not active".format(mod.name)
+            if dynclass.initialised:
+                logging.info('Module {} has been deactivated, unloading'.format(mod.name))
+                dynclass.unload()
+                del dynclass
 
 logging.basicConfig(format='%(levelname)s:%(module)s:%(funcName)s:%(threadName)s:%(message)s', level=logging.DEBUG)
 import common
@@ -30,35 +52,31 @@ db.create_all()
 import admin.model_helper
 admin.model_helper.populate_tables()
 
-import admin.models
-module_list = admin.models.Module.query.order_by(admin.models.Module.start_order).all()
-for mod in module_list:
-    assert isinstance(mod, admin.models.Module)
-    if mod.active:
-        print "Module {} is active".format(mod.name)
-        dynclass = my_import(mod.name)
-        dynclass.init()
-    else:
-        print "Module {} is not active".format(mod.name)
-
 from admin import event
 event.init()
+init_modules()
 
 from admin import thread_pool
 import threading
 t = threading.Thread(target=thread_pool.main)
 t.daemon = True
 t.start()
-#thread_pool.main()
-
-#a = Blog('my first post', 'some looooong body')
-#db.session.add(a)
-#db.session.commit()
-
-if __name__ == '__main__':
-    app.run(debug=True, use_reloader=False)
 
 @app.route('/')
 def home():
     return 'Blog be here'
 
+from main.admin import model_helper
+import mqtt_io.sender
+
+@models_committed.connect_via(app)
+def on_models_committed(sender, changes):
+    try:
+        for obj, change in changes:
+            txt = model_helper.model_row_to_json(obj, operation=change)
+            mqtt_io.sender.send_message(txt)
+    except Exception:
+        logging.critical('Error in DB commit hook, {}'.format(sys.exc_info()[0]))
+
+if __name__ == '__main__':
+    app.run(debug=True, use_reloader=False)

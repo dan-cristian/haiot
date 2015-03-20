@@ -88,7 +88,7 @@ def get_bus( sensor , owproxy):
 def get_temperature( sensor , owproxy):
     #message = get_prefix(sensor, owproxy) + ', "temperature":"%s"}' % (owproxy.read(sensor+'temperature').strip())
     dev = get_prefix(sensor, owproxy)
-    dev.temperature = owproxy.read(sensor+'temperature').strip()
+    dev.temperature = str(owproxy.read(sensor+'temperature')).strip()
     #client.publish(topic, message)
     return dev
 
@@ -96,7 +96,7 @@ def get_humidity( sensor , owproxy):
     #message = get_prefix(sensor, owproxy)+', "humidity":"%s"}' % (owproxy.read(sensor+'humidity').strip())
     #client.publish(topic, message)
     dev = get_prefix(sensor, owproxy)
-    dev.humidity = owproxy.read(sensor+'humidity').strip()
+    dev.humidity = str(owproxy.read(sensor+'humidity')).strip()
     return dev
 
 def get_voltage(sensor, owproxy):

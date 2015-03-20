@@ -10,7 +10,7 @@ import select
 import urllib2, urllib
 from common import constant
 from main.admin import model_helper
-from mqtt_publisher import mqtt_client
+from mqtt_io import mqtt_client
 
 #http://owfs.sourceforge.net/owpython.html
 topic = "mzp/iot/alarm"

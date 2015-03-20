@@ -4,8 +4,12 @@ from flask import request
 import logging
 from common import constant
 
+initialised=False
+
 def init():
     logging.info("Relay initialised")
+    global initialised
+    initialised = True
 
 @app.route('/relay/get')
 def relay_get():

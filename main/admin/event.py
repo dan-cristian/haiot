@@ -5,8 +5,10 @@ import json
 import common.constant
 import common.utils
 import models
+import main
 
 from main import db
+from common import utils
 
 def handle_event_sensor(sender):
     #print "Signal was sent by ", sender
@@ -24,6 +26,11 @@ def handle_event_db_model_post(model, row):
         logging.info('Detected Parameter change ' + row)
     elif str(models.Module) in str(model):
         logging.info('Detected Module change')
+        main.init_modules()
+
+    #print model_row_to_json(row._sa_instance_state.dict)
+
+
 
 
 def init():
