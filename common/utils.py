@@ -2,15 +2,25 @@ __author__ = 'dcristian'
 import sys
 import os
 import json
+import re
+import datetime
 from collections import namedtuple
 
 #http://stackoverflow.com/questions/6578986/how-to-convert-json-data-into-a-python-object
 def _json_object_hook(d):
     return namedtuple('X', d.keys())(*d.values())
+def date_deserialiser(json):
+    if re.search("....-..-..T..:..:..\.......", json):
+        return datetime.datetime.strptime(json, "%Y-%m-%d %H:%M:%S.%f")
+    else:
+        return json
+def date_serialised(obj):
+    return obj.isoformat() if hasattr(obj, 'isoformat') else obj
 def json2obj(data):
-    return json.loads(data, object_hook=_json_object_hook)
+    #return json.loads(data, object_pairs_hook=date_deserialiser)
+    return json.loads(data)
 def obj2json(obj):
-    return json.dumps(obj)
+    return json.dumps(obj, default=date_serialised)
 
 def restart_program():
     """Restarts the current program.

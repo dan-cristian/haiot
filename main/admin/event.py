@@ -2,10 +2,14 @@ from pydispatch import dispatcher
 import logging
 import paho.mqtt.client as mqtt
 import json
+import sys
 import common.constant
 import common.utils
 import models
 import main
+import model_helper
+import mqtt_io
+import graph_plotly
 
 from main import db
 from common import utils
@@ -27,13 +31,23 @@ def handle_event_db_model_post(model, row):
     elif str(models.Module) in str(model):
         logging.info('Detected Module change')
         main.init_modules()
-
     #print model_row_to_json(row._sa_instance_state.dict)
 
+def handle_event_mqtt_received(client, userdata, topic, obj):
 
+    if graph_plotly.initialised:
+        graph_plotly.upload_data(obj)
 
+def on_models_committed(sender, changes):
+    try:
+        for obj, change in changes:
+            txt = model_helper.model_row_to_json(obj, operation=change)
+            mqtt_io.sender.send_message(txt)
+    except Exception:
+        logging.critical('Error in DB commit hook, {}'.format(sys.exc_info()[0]))
 
 def init():
     #http://pydispatcher.sourceforge.net/
     dispatcher.connect(handle_event_sensor, signal=common.constant.SIGNAL_SENSOR, sender=dispatcher.Any)
     dispatcher.connect(handle_event_db_model_post, signal=common.constant.SIGNAL_SENSOR_DB_POST, sender=dispatcher.Any)
+    dispatcher.connect(handle_event_mqtt_received, signal=common.constant.SIGNAL_MQTT_RECEIVED, sender=dispatcher.Any)

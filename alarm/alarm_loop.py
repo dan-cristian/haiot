@@ -48,7 +48,7 @@ def get_prefix(pinindex, value):
 
 
 def alert(pinindex, status):
-    host = model_helper.get_param(constant.PARAM_MZP_SERVER_URL)
+    host = model_helper.get_param(constant.P_MZP_SERVER_URL)
     request = host + 'cmd?command=alarmevent&pinindex=' + pinindex \
               + '&status=' + status + '&datetime=' + urllib.quote(str(datetime.datetime.now())) + '&action=none'
     #request=urllib.quote(request)

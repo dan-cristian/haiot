@@ -1,8 +1,7 @@
 from datetime import datetime
 
+from flask_sqlalchemy import SQLAlchemy #workaround for resolve issue
 from main import db
-from sensor.owsensor_loop import SensorOw
-
 
 class Blog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -116,21 +115,31 @@ class Sensor(db.Model):
     type = db.Column(db.String(50))
     temperature = db.Column(db.Float)
     humidity = db.Column(db.Float)
-    counter_a = db.Column(db.BigInteger)
-    counter_b = db.Column(db.BigInteger)
+    counters_a = db.Column(db.BigInteger)
+    counters_b = db.Column(db.BigInteger)
+    iad = db.Column(db.Float)
+    vdd = db.Column(db.Float)
+    vad = db.Column(db.Float)
+    pio_a = db.Column(db.Boolean)
+    pio_b = db.Column(db.Boolean)
+    sensed_a = db.Column(db.Boolean)
+    sensed_b = db.Column(db.Boolean)
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    def update(self, sensor):
-        assert isinstance(sensor, SensorOw)
-        self.address = sensor.address
-        self.type = sensor.type
-        self.temperature = sensor.temperature
-        self.humidity = sensor.humidity
-        self.counter_a = sensor.counters_A
-        self.counter_b = sensor.counters_B
+    @staticmethod
+    def graph_x_():
+        return 'updated_on'
+    @staticmethod
+    def graph_y_():
+        fields = ["temperature", "humidity"]
+        return fields
+    @staticmethod
+    def graph_id_():
+        return 'address'
 
-    def __init__(self, sensor):
-        self.update(sensor)
+    graph_x_ = graph_x_.__func__()
+    graph_y_ = graph_y_.__func__()
+    graph_id_ = graph_id_.__func__()
 
     def __repr__(self):
         return 'Sensor id {}, {}'.format(self.id, self.type)

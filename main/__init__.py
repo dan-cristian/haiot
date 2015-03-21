@@ -6,8 +6,6 @@ from flask_sqlalchemy import models_committed
 import logging
 import sys
 
-
-
 def my_import(name):
     #http://stackoverflow.com/questions/547829/how-to-dynamically-load-a-python-class
     mod = __import__(name)
@@ -66,17 +64,10 @@ t.start()
 def home():
     return 'Blog be here'
 
-from main.admin import model_helper
-import mqtt_io.sender
-
 @models_committed.connect_via(app)
 def on_models_committed(sender, changes):
-    try:
-        for obj, change in changes:
-            txt = model_helper.model_row_to_json(obj, operation=change)
-            mqtt_io.sender.send_message(txt)
-    except Exception:
-        logging.critical('Error in DB commit hook, {}'.format(sys.exc_info()[0]))
+    logging.info('Model commit detected sender {} change {}'.format(sender, changes))
+    event.on_models_committed(sender, changes)
 
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=False)

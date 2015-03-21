@@ -37,10 +37,10 @@ def unload():
     mqtt_client.loop_stop()
 
 def init():
-    host=model_helper.get_param(constant.PARAM_MQTT_HOST)
-    port=int(model_helper.get_param(constant.PARAM_MQTT_PORT))
+    host=model_helper.get_param(constant.P_MQTT_HOST)
+    port=int(model_helper.get_param(constant.P_MQTT_PORT))
     global topic
-    topic=str(model_helper.get_param(constant.PARAM_MQTT_TOPIC))
+    topic=str(model_helper.get_param(constant.P_MQTT_TOPIC))
     logging.info('MQTT publisher module initialising, host={} port={}'.format(host, port))
     global mqtt_client
     mqtt_client = mqtt.Client()
