@@ -204,3 +204,18 @@ class Node(db.Model):
 
     def __repr__(self):
         return 'Node {} ip {}'.format(self.name,  self.ip)
+
+class GraphPlotly(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True)
+    url = db.Column(db.String(255))
+    field_list = db.Column(db.String(255))
+
+    def __init__(self, id='', name ='', url=''):
+        if id:
+            self.id = id
+        self.name = name
+        self.url = url
+
+    def __repr__(self):
+        return 'GraphPlotly {} ip {}'.format(self.name,  self.url)

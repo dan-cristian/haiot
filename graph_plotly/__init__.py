@@ -11,10 +11,33 @@ from plotly import graph_objs
 import plotly.tools as tls
 from main.admin import model_helper
 from common import constant
+from main import db
+from main.admin import models
 
 initialised = False
 stream_ids = None
-series_name_list=[]
+
+figure_list = {}
+series_name_list={}
+
+def download_graph_config(graph_name):
+    graph_rows = models.GraphPlotly.query.filter_by(name=graph_name).all()
+    for graph_row in graph_rows:
+        series_name_list[graph_row.name] = graph_row.field_list.split(',')
+
+def add_new_serie(graph_name, url, series_id):
+    graph_row = models.GraphPlotly.query.filter_by(name=graph_name).first()
+    if graph_row:
+        if graph_row.field_list:
+            graph_row.field_list = graph_row.field_list + ',' + series_id
+        else:
+            graph_row.field_list = series_id
+    else:
+        graph_row = models.GraphPlotly(name=graph_name, url=url)
+        graph_row.field_list = series_id
+        logging.info('Created new graph plotly {} serie {}'.format(graph_name, series_id))
+        db.session.add(graph_row)
+    db.session.commit()
 
 def upload_data(obj):
     #FIXME: Add caching and multiple series on same graph
@@ -37,7 +60,11 @@ def upload_data(obj):
                     if axis_y in obj:
                         y=[obj[axis_y]]
                         graph_name=str(table+' '+axis_y)
+                        if not figure_list.has_key(graph_name):
+                            download_graph_config(graph_name)
                         trace = graph_objs.Scatter(x=x, y=y, name=series_id)
+                        if not series_name_list.has_key(graph_name):
+                           series_name_list[graph_name] = []
                         if series_id in series_name_list:
                             '''series list must be completely filled'''
                             fileopt = 'extend'
@@ -49,13 +76,16 @@ def upload_data(obj):
                             for i in range (trace_pos + 1, len(series_name_list) - 1):
                                 trace_list.append(trace_empty)
                         else:
-                            series_name_list.append(series_id)
+                            series_name_list[graph_name].append(series_id)
                             fileopt = 'append'
                             trace_list = [trace]
 
-                        #logging.info('Uploading new graph serie {}'.format(series_id))
+                        logging.debug('Uploading new graph serie {}'.format(series_id))
                         data = graph_objs.Data(trace_list)
-                        py.plot(data, filename=graph_name, fileopt=fileopt, auto_open=False)
+                        url = py.plot(data, filename=graph_name, fileopt=fileopt, auto_open=False)
+                        if fileopt=='append':
+                            add_new_serie(graph_name, url, series_id)
+
             else:
                 logging.critical('Graphable object missing axis X or ID {}'.format(axis_x))
         else:
