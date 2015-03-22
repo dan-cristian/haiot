@@ -81,6 +81,7 @@ def save_to_db(dev):
         if dev.has_key('sensed_b'): sensor.sensed_b = dev['sensed_b']
 
         #assert isinstance(old_value, models.Sensor)
+        db.session.autoflush=False
         if key_compare != sensor.comparator():
             if record_is_new:
                 db.session.add(sensor)
@@ -95,6 +96,8 @@ def save_to_db(dev):
             #tuple = (sensor, 'update')
             #changes.append(tuple)
             #event.on_models_committed(sensor, changes)
+    except Exception, ex:
+        logging.warning('Error saving sensor to DB, err {}'.format(ex))
     finally:
         db_lock.release()
 

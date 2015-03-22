@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7b8a0c34-195e-4bae-a6ef-524be964b4d7" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sensor/owsensor_loop.py" afterPath="$PROJECT_DIR$/sensor/owsensor_loop.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="blog_app.iws" />
@@ -29,8 +30,8 @@
       <file leaf-file-name="owsensor_loop.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/sensor/owsensor_loop.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.9522241" vertical-offset="680" max-vertical-offset="2805">
-              <caret line="74" column="54" selection-start-line="74" selection-start-column="54" selection-end-line="74" selection-end-column="54" />
+            <state vertical-scroll-proportion="0.4398682" vertical-offset="1127" max-vertical-offset="2856">
+              <caret line="82" column="34" selection-start-line="82" selection-start-column="34" selection-end-line="82" selection-end-column="34" />
               <folding>
                 <element signature="e#51#74#0" expanded="true" />
               </folding>
@@ -515,7 +516,13 @@
       <option name="project" value="LOCAL" />
       <updated>1427055939249</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="lock db">
+      <created>1427055944093</created>
+      <option name="number" value="00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1427055944093</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -741,6 +748,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-4.300562" vertical-offset="12530" max-vertical-offset="14807">
           <caret line="667" column="77" selection-start-line="667" selection-start-column="77" selection-end-line="667" selection-end-column="77" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -919,6 +927,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.085427135" vertical-offset="561" max-vertical-offset="1292">
           <caret line="39" column="0" selection-start-line="39" selection-start-column="0" selection-end-line="39" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -947,8 +956,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/sensor/owsensor_loop.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.9522241" vertical-offset="680" max-vertical-offset="2805">
-          <caret line="74" column="54" selection-start-line="74" selection-start-column="54" selection-end-line="74" selection-end-column="54" />
+        <state vertical-scroll-proportion="0.4398682" vertical-offset="1127" max-vertical-offset="2856">
+          <caret line="82" column="34" selection-start-line="82" selection-start-column="34" selection-end-line="82" selection-end-column="34" />
           <folding>
             <element signature="e#51#74#0" expanded="true" />
           </folding>
