@@ -44,6 +44,7 @@ def add_new_serie(graph_name, url, series_id):
 def upload_data(obj):
     #FIXME: Add caching and multiple series on same graph
     try:
+        logging.info('Trying to upload plotly obj {}'.format(obj))
         if constant.JSON_PUBLISH_GRAPH_X in obj:
             axis_x_field = obj[constant.JSON_PUBLISH_GRAPH_X]
             graph_id_field = obj[constant.JSON_PUBLISH_GRAPH_ID]
@@ -85,6 +86,7 @@ def upload_data(obj):
                             trace_list = [trace]
                             logging.debug('Appending new graph serie {}'.format(graph_legend))
                         data = graph_objs.Data(trace_list)
+
                         url = py.plot(data, filename=graph_name, fileopt=fileopt, auto_open=False)
                         if fileopt=='append':
                             add_new_serie(graph_name, url, graph_legend)

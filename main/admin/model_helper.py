@@ -27,7 +27,7 @@ def model_row_to_json(obj, operation=''):
                     and attr != 'query' and not callable(getattr(obj, attr))\
                     and attr != 'metadata':
                 value=getattr(obj, attr)
-                if value: safe_obj[attr] = value
+                if value is not None: safe_obj[attr] = value
         return utils.obj2json(safe_obj)
     except Exception, ex:
         logging.critical('Error convert model obj to json, err {}'.format(ex))

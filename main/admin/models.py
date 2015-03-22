@@ -128,7 +128,7 @@ class Sensor(db.Model):
     #FIXME: now filled manually, try relations
     zone_name = db.Column(db.String(50))
     sensor_name = db.Column(db.String(50))
-
+    save_to_graph = db.Column(db.Boolean, default=False)
 
     @staticmethod
     def graph_x_():
@@ -153,9 +153,10 @@ class Sensor(db.Model):
         if id:
             self.id = id
         self.address= address
+        self.save_to_graph = False
 
     def __repr__(self):
-        return 'Sensor {}, {}'.format(self.type, self.address)
+        return 'Sensor {}, {}{}'.format(self.type, self.sensor_name, self.address)
     
     def comparator(self):
         return str(self.temperature)+str(self.humidity)+str(self.counters_a)+str(self.counters_b) \

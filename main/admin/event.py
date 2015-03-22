@@ -34,9 +34,17 @@ def handle_event_db_model_post(model, row):
     #print model_row_to_json(row._sa_instance_state.dict)
 
 def handle_event_mqtt_received(client, userdata, topic, obj):
-    if constant.JSON_PUBLISH_GRAPH_X in obj:
-        if graph_plotly.initialised:
-            graph_plotly.upload_data(obj)
+    if constant.JSON_PUBLISH_SAVE_TO_GRAPH in obj:
+        if obj[constant.JSON_PUBLISH_SAVE_TO_GRAPH]:
+            if graph_plotly.initialised:
+                graph_plotly.upload_data(obj)
+            else:
+                logging.debug('Graph not initialised on obj upload to graph')
+        else:
+            logging.debug('Ignoring mqtt event {} for graph upload'.format(obj))
+    else:
+        logging.debug('Mqtt event without graphing capabilities {}'.format(obj))
+
 
 def on_models_committed(sender, changes):
     try:
