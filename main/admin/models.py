@@ -95,7 +95,7 @@ class TemperatureTarget(db.Model):
 class HeatSchedule(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'), nullable=False)
-    zone = db.relationship('Zone', backref=db.backref('zone', lazy='dynamic'))
+    zone = db.relationship('Zone', backref=db.backref('heat schedule zone', lazy='dynamic'))
     pattern_week_id = db.Column(db.Integer, db.ForeignKey('schedule_pattern.id'), nullable=False)
     pattern_weekend_id = db.Column(db.Integer, db.ForeignKey('schedule_pattern.id'), nullable=False)
     pattern_week = db.relationship('SchedulePattern', foreign_keys='[HeatSchedule.pattern_week_id]',
@@ -125,6 +125,10 @@ class Sensor(db.Model):
     sensed_a = db.Column(db.Integer)
     sensed_b = db.Column(db.Integer)
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+    #FIXME: now filled manually, try relations
+    zone_name = db.Column(db.String(50))
+    sensor_name = db.Column(db.String(50))
+
 
     @staticmethod
     def graph_x_():
@@ -136,10 +140,14 @@ class Sensor(db.Model):
     @staticmethod
     def graph_id_():
         return 'address'
+    @staticmethod
+    def graph_legend_():
+        return 'sensor_name'
 
     graph_x_ = graph_x_.__func__()
     graph_y_ = graph_y_.__func__()
     graph_id_ = graph_id_.__func__()
+    graph_legend_ = graph_legend_.__func__()
 
     def __init__(self, id='', address=''):
         if id:
@@ -147,7 +155,7 @@ class Sensor(db.Model):
         self.address= address
 
     def __repr__(self):
-        return 'Sensor id {}, {}'.format(self.id, self.type)
+        return 'Sensor {}, {}'.format(self.type, self.address)
     
     def comparator(self):
         return str(self.temperature)+str(self.humidity)+str(self.counters_a)+str(self.counters_b) \
@@ -209,7 +217,7 @@ class GraphPlotly(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True)
     url = db.Column(db.String(255))
-    field_list = db.Column(db.String(255))
+    field_list = db.Column(db.String(2000))
 
     def __init__(self, id='', name ='', url=''):
         if id:

@@ -54,19 +54,21 @@ def get_mod_name(module):
 def populate_tables():
     if len(models.Parameter.query.all()) < 3:
         logging.info('Populating Parameter with default values')
-        db.session.add(models.Parameter(1, constant.P_MZP_SERVER_URL, 'http://192.168.0.10'))
+        db.session.add(models.Parameter('', constant.P_MZP_SERVER_URL, 'http://192.168.0.10'))
         commit(db.session)
-        db.session.add(models.Parameter(2, constant.P_OWSERVER_HOST_1, '192.168.0.113'))
+        db.session.add(models.Parameter('', constant.P_OWSERVER_HOST_1, '192.168.0.113'))
         commit(db.session)
-        db.session.add(models.Parameter(3, constant.P_MQTT_HOST, '192.168.0.9'))
+        db.session.add(models.Parameter('', constant.P_OWSERVER_PORT_1, '4304'))
         commit(db.session)
-        db.session.add(models.Parameter(4, constant.P_MQTT_PORT, '1883'))
+        db.session.add(models.Parameter('', constant.P_MQTT_HOST, '192.168.0.9'))
         commit(db.session)
-        db.session.add(models.Parameter(5, constant.P_MQTT_TOPIC, 'iot/main'))
+        db.session.add(models.Parameter('', constant.P_MQTT_PORT, '1883'))
         commit(db.session)
-        db.session.add(models.Parameter(6, constant.P_PLOTLY_USERNAME, 'dancri77'))
+        db.session.add(models.Parameter('', constant.P_MQTT_TOPIC, 'iot/main'))
         commit(db.session)
-        db.session.add(models.Parameter(7, constant.P_PLOTLY_APIKEY, 'lw2w6fz9xk'))
+        db.session.add(models.Parameter('', constant.P_PLOTLY_USERNAME, 'dancri77'))
+        commit(db.session)
+        db.session.add(models.Parameter('', constant.P_PLOTLY_APIKEY, 'lw2w6fz9xk'))
         commit(db.session)
 
 

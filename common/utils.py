@@ -22,6 +22,12 @@ def json2obj(data):
 def obj2json(obj):
     return json.dumps(obj, default=date_serialised)
 
+def parse_to_date(strdate):
+    if re.search("....-..-..T..:..:..\.......",  strdate):
+        strdate= strdate.replace('T',' ')
+        strdate = datetime.datetime.strptime(strdate, "%Y-%m-%d %H:%M:%S.%f")
+    return strdate
+
 def restart_program():
     """Restarts the current program.
     Note: this function does not return. Any cleanup action (like

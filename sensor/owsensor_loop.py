@@ -9,6 +9,7 @@ import datetime
 import socket
 import threading
 import logging
+import math
 from pydispatch import dispatcher
 import common.constant
 import sys
@@ -32,7 +33,9 @@ def do_device (owproxy):
                 dev=get_temperature(sensor, owproxy)
             elif sensortype == 'DS2438':
                 dev=get_temperature(sensor, owproxy)
+                save_to_db(dev)
                 dev=get_voltage(sensor, owproxy)
+                save_to_db(dev)
                 dev=get_humidity(sensor, owproxy)
             elif sensortype=='DS2401':
                 dev=get_bus(sensor, owproxy)
@@ -46,11 +49,17 @@ def do_device (owproxy):
 def save_to_db(dev):
     address=dev['address']
     sensor = models.Sensor.query.filter_by(address=address).first()
+    zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=address).first()
     if sensor == None:
         sensor = models.Sensor(address=address)
         record_is_new = True
     else:
         record_is_new = False
+
+    if zone_sensor:
+        sensor.sensor_name = zone_sensor.sensor_name
+    else:
+        sensor.sensor_name = '(not defined) ' + address
     key_compare = sensor.comparator()
     sensor.type = dev['type']
     sensor.updated_on = datetime.datetime.now()
@@ -71,7 +80,7 @@ def save_to_db(dev):
         if record_is_new:
             db.session.add(sensor)
         else:
-            logging.info('Sensor value change detected, old=[{}] new=[{}]'.format(key_compare, sensor.comparator()))
+            logging.info('Sensor {} change, old={} new={}'.format(sensor.sensor_name, key_compare, sensor.comparator()))
         db.session.commit()
     else:
         logging.debug('Ignoring sensor read {}, no value change'.format(key_compare))
@@ -94,12 +103,13 @@ def get_bus( sensor , owproxy):
 
 def get_temperature( sensor , owproxy):
     dev = get_prefix(sensor, owproxy)
-    dev['temperature'] = float(owproxy.read(sensor+'temperature'))
+    # 2 digits round
+    dev['temperature'] = math.ceil(float(owproxy.read(sensor+'temperature'))*100)/100
     return dev
 
 def get_humidity( sensor , owproxy):
     dev = get_prefix(sensor, owproxy)
-    dev['humidity'] = float(owproxy.read(sensor+'humidity'))
+    dev['humidity'] = math.ceil(float(owproxy.read(sensor+'humidity'))*100)/100
     return dev
 
 def get_voltage(sensor, owproxy):
@@ -132,7 +142,8 @@ owproxy=None
 def init():
     logging.info('Initialising owssensor')
     global owproxy
-    owproxy = pyownet.protocol.proxy(host=model_helper.get_param(constant.P_OWSERVER_HOST_1), port=4304)
+    owproxy = pyownet.protocol.proxy(host=model_helper.get_param(constant.P_OWSERVER_HOST_1),
+                                     port=str(model_helper.get_param(constant.P_OWSERVER_PORT_1)))
 
 def thread_run():
     logging.info('Processing sensors')

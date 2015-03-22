@@ -23,6 +23,7 @@ def on_message(client, userdata, msg):
         end = msg.payload.find('}')
         json = msg.payload[start:end + 1]
         x = json2obj(json)
+
         dispatcher.send(signal=constant.SIGNAL_MQTT_RECEIVED, client=client, userdata=userdata, topic=msg.topic, obj=x)
         if hasattr(x, 'command') and hasattr(x, 'command_id') and hasattr(x, 'host_target'):
             if x.host_target == socket.gethostname():

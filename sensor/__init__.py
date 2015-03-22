@@ -3,7 +3,8 @@ __author__ = 'dcristian'
 #! venv/bin/python
 
 from main.admin import thread_pool
-import owsensor_loop, logging
+import logging
+import owsensor_loop
 initialised=False
 
 def init():
