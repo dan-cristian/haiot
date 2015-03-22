@@ -10,7 +10,7 @@ initialised=False
 def init():
     logging.info('Sensor module initialising')
     owsensor_loop.init()
-    thread_pool.add_callable(owsensor_loop.thread_run, run_interval_second=15)
+    thread_pool.add_callable(owsensor_loop.thread_run, run_interval_second=30)
     global initialised
     initialised = True
 
