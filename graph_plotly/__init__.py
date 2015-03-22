@@ -44,7 +44,8 @@ def add_new_serie(graph_name, url, series_id):
 def upload_data(obj):
     #FIXME: Add caching and multiple series on same graph
     try:
-        logging.info('Trying to upload plotly obj {}'.format(obj))
+        #logging.info('Trying to upload plotly obj {}'.format(obj))
+        logging.info('Trying to upload plotly obj')
         if constant.JSON_PUBLISH_GRAPH_X in obj:
             axis_x_field = obj[constant.JSON_PUBLISH_GRAPH_X]
             graph_id_field = obj[constant.JSON_PUBLISH_GRAPH_ID]
