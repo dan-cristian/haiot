@@ -9,3 +9,5 @@ PyDispatcher>=2.0.5
 WTForms-Alchemy>=0.13.0
 blinker>=0.0
 plotly>=0.0
+#fix for ssl warning
+requests==2.5.3

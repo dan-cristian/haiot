@@ -10,6 +10,7 @@ import socket
 import threading
 import logging
 import math
+import threading
 from pydispatch import dispatcher
 import common.constant
 import sys
@@ -46,50 +47,56 @@ def do_device (owproxy):
             logging.warning('Connection error owserver')
     return 'Read {} sensors'.format(len(sensors))
 
+db_lock = threading.Lock()
 def save_to_db(dev):
-    address=dev['address']
-    sensor = models.Sensor.query.filter_by(address=address).first()
-    zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=address).first()
-    if sensor == None:
-        sensor = models.Sensor(address=address)
-        record_is_new = True
-    else:
-        record_is_new = False
-
-    if zone_sensor:
-        sensor.sensor_name = zone_sensor.sensor_name
-    else:
-        sensor.sensor_name = '(not defined) ' + address
-    key_compare = sensor.comparator()
-    sensor.type = dev['type']
-    sensor.updated_on = datetime.datetime.now()
-    if dev.has_key('counters_a'): sensor.counters_a = dev['counters_a']
-    if dev.has_key('counters_b'): sensor.counters_b = dev['counters_b']
-    if dev.has_key('temperature'): sensor.temperature = dev['temperature']
-    if dev.has_key('humidity'): sensor.humidity = dev['humidity']
-    if dev.has_key('iad'): sensor.iad = dev['iad']
-    if dev.has_key('vad'): sensor.vad = dev['vad']
-    if dev.has_key('vdd'): sensor.vdd = dev['vdd']
-    if dev.has_key('pio_a'): sensor.pio_a = dev['pio_a']
-    if dev.has_key('pio_b'): sensor.pio_b = dev['pio_b']
-    if dev.has_key('sensed_a'): sensor.sensed_a = dev['sensed_a']
-    if dev.has_key('sensed_b'): sensor.sensed_b = dev['sensed_b']
-
-    #assert isinstance(old_value, models.Sensor)
-    if key_compare != sensor.comparator():
-        if record_is_new:
-            db.session.add(sensor)
+    global db_lock
+    db_lock.acquire()
+    try:
+        address=dev['address']
+        sensor = models.Sensor.query.filter_by(address=address).first()
+        zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=address).first()
+        if sensor == None:
+            sensor = models.Sensor(address=address)
+            record_is_new = True
         else:
-            logging.info('Sensor {} change, old={} new={}'.format(sensor.sensor_name, key_compare, sensor.comparator()))
-        db.session.commit()
-    else:
-        logging.debug('Ignoring sensor read {}, no value change'.format(key_compare))
-        
-        #DONE: Normally a db commit event should be triggered automatically, forcing the event below manually
-        #changes = []
-        #tuple = (sensor, 'update')
-        #changes.append(tuple)
-        #event.on_models_committed(sensor, changes)
+            record_is_new = False
+
+        if zone_sensor:
+            sensor.sensor_name = zone_sensor.sensor_name
+        else:
+            sensor.sensor_name = '(not defined) ' + address
+        key_compare = sensor.comparator()
+        sensor.type = dev['type']
+        sensor.updated_on = datetime.datetime.now()
+        if dev.has_key('counters_a'): sensor.counters_a = dev['counters_a']
+        if dev.has_key('counters_b'): sensor.counters_b = dev['counters_b']
+        if dev.has_key('temperature'): sensor.temperature = dev['temperature']
+        if dev.has_key('humidity'): sensor.humidity = dev['humidity']
+        if dev.has_key('iad'): sensor.iad = dev['iad']
+        if dev.has_key('vad'): sensor.vad = dev['vad']
+        if dev.has_key('vdd'): sensor.vdd = dev['vdd']
+        if dev.has_key('pio_a'): sensor.pio_a = dev['pio_a']
+        if dev.has_key('pio_b'): sensor.pio_b = dev['pio_b']
+        if dev.has_key('sensed_a'): sensor.sensed_a = dev['sensed_a']
+        if dev.has_key('sensed_b'): sensor.sensed_b = dev['sensed_b']
+
+        #assert isinstance(old_value, models.Sensor)
+        if key_compare != sensor.comparator():
+            if record_is_new:
+                db.session.add(sensor)
+            else:
+                logging.info('Sensor {} change, old={} new={}'.format(sensor.sensor_name, key_compare, sensor.comparator()))
+            db.session.commit()
+        else:
+            logging.debug('Ignoring sensor read {}, no value change'.format(key_compare))
+
+            #DONE: Normally a db commit event should be triggered automatically, forcing the event below manually
+            #changes = []
+            #tuple = (sensor, 'update')
+            #changes.append(tuple)
+            #event.on_models_committed(sensor, changes)
+    finally:
+        db_lock.release()
 
 def get_prefix(sensor, owproxy):
     dev = {}
