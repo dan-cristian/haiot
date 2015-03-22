@@ -17,6 +17,7 @@ from main.admin import model_helper
 from main import db
 from main.admin import models
 from main.admin import event
+from wtforms.ext.sqlalchemy.orm import model_form
 
 def do_device (owproxy):
     sensors = owproxy.dir('/', slash=True, bus=False)
@@ -43,8 +44,14 @@ def do_device (owproxy):
     return 'Read {} sensors'.format(len(sensors))
 
 def save_to_db(dev):
-    sensor = models.Sensor()
-    sensor.address = dev['address']
+    address=dev['address']
+    sensor = models.Sensor.query.filter_by(address=address).first()
+    if sensor == None:
+        sensor = models.Sensor(address=address)
+        record_is_new = True
+    else:
+        record_is_new = False
+    key_compare = sensor.comparator()
     sensor.type = dev['type']
     sensor.updated_on = datetime.datetime.now()
     if dev.has_key('counters_a'): sensor.counters_a = dev['counters_a']
@@ -58,13 +65,22 @@ def save_to_db(dev):
     if dev.has_key('pio_b'): sensor.pio_b = dev['pio_b']
     if dev.has_key('sensed_a'): sensor.sensed_a = dev['sensed_a']
     if dev.has_key('sensed_b'): sensor.sensed_b = dev['sensed_b']
-    db.session.add(sensor)
-    db.session.commit
-    #FIXME: Normally a db commit event should be triggered automatically, forcing the event below manually
-    changes = []
-    tuple = (sensor, 'update')
-    changes.append(tuple)
-    event.on_models_committed(sensor, changes)
+
+    #assert isinstance(old_value, models.Sensor)
+    if key_compare != sensor.comparator():
+        if record_is_new:
+            db.session.add(sensor)
+        else:
+            logging.info('Sensor value change detected, old=[{}] new=[{}]'.format(key_compare, sensor.comparator()))
+        db.session.commit()
+    else:
+        logging.debug('Ignoring sensor read {}, no value change'.format(key_compare))
+        
+        #DONE: Normally a db commit event should be triggered automatically, forcing the event below manually
+        #changes = []
+        #tuple = (sensor, 'update')
+        #changes.append(tuple)
+        #event.on_models_committed(sensor, changes)
 
 def get_prefix(sensor, owproxy):
     dev = {}

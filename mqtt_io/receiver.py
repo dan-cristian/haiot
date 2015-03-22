@@ -14,7 +14,7 @@ def on_subscribe(client, userdata, mid, granted_qos):
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
-    logging.info('Received from client [{}] userdata [{}] topic [{}] msgsize {} '.format(client._client_id,
+    logging.debug('Received from client [{}] userdata [{}] topic [{}] msgsize {} '.format(client._client_id,
                                                                                          userdata, msg.topic,
                                                                                          len(msg.payload)))
     try:

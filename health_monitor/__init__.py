@@ -5,6 +5,11 @@ import health_monitor_loop, logging
 
 initialised=False
 
+def unload():
+    global initialised
+    initialised = False
+    thread_pool.remove_callable(health_monitor_loop.thread_run)
+
 def init():
     logging.info('Monitor module initialising')
     health_monitor_loop.init()

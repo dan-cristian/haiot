@@ -120,10 +120,10 @@ class Sensor(db.Model):
     iad = db.Column(db.Float)
     vdd = db.Column(db.Float)
     vad = db.Column(db.Float)
-    pio_a = db.Column(db.Boolean)
-    pio_b = db.Column(db.Boolean)
-    sensed_a = db.Column(db.Boolean)
-    sensed_b = db.Column(db.Boolean)
+    pio_a = db.Column(db.Integer)
+    pio_b = db.Column(db.Integer)
+    sensed_a = db.Column(db.Integer)
+    sensed_b = db.Column(db.Integer)
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
     @staticmethod
@@ -141,8 +141,18 @@ class Sensor(db.Model):
     graph_y_ = graph_y_.__func__()
     graph_id_ = graph_id_.__func__()
 
+    def __init__(self, id='', address=''):
+        if id:
+            self.id = id
+        self.address= address
+
     def __repr__(self):
         return 'Sensor id {}, {}'.format(self.id, self.type)
+    
+    def comparator(self):
+        return str(self.temperature)+str(self.humidity)+str(self.counters_a)+str(self.counters_b) \
+               + str(self.iad) + str(self.vad) + str(self.vdd) + str(self.pio_a) + str(self.pio_b) \
+                + str(self.sensed_a) + str(self.sensed_b)
 
 
 class Parameter(db.Model):

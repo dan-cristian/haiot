@@ -75,6 +75,12 @@ def populate_tables():
         db.session.add(models.Node(1, 'localhost', '127.0.0.1', has_sensor=True, sensor_port=4304))
         commit(db.session)
 
+    if len(models.Sensor.query.all()) == 0:
+        logging.info('Populating Sensor with a test value')
+        sens = models.Sensor(address='ADDRESSTEST')
+        #db.session.add(models.Sensor(0, address='ADDRESSTEST'))
+        db.session.add(sens)
+        commit(db.session)
 
 
     import alarm, heat, sensor, relay, mqtt_io, health_monitor, graph_plotly

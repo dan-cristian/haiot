@@ -17,6 +17,9 @@ def add_callable(func, run_interval_second=60):
 def set_exec_interval(func, seconds):
     exec_interval_list[func]=seconds
 
+def remove_callable(func):
+    pass
+
 def main():
     #https://docs.python.org/3.3/library/concurrent.futures.html
     dict_future_func={}

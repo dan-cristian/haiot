@@ -4,6 +4,11 @@ import heat_loop
 from main.admin import thread_pool
 initialised=False
 
+def unload():
+    global initialised
+    initialised = False
+    thread_pool.remove_callable(heat_loop.thread_run)
+
 def init():
     print "Heat module initialising"
     heat_loop.init()

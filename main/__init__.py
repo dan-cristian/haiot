@@ -34,18 +34,20 @@ def init_modules():
                 dynclass.unload()
                 del dynclass
 
-logging.basicConfig(format='%(levelname)s:%(module)s:%(funcName)s:%(threadName)s:%(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(levelname)s:%(module)s:%(funcName)s:%(threadName)s:%(message)s', level=logging.INFO)
 import common
 common.init()
 
 app = Flask('main')
-app.config.update(DEBUG=True, SQLALCHEMY_DATABASE_URI='sqlite:///../database.db')
+app.config.update(DEBUG=True, SQLALCHEMY_ECHO = False, SQLALCHEMY_DATABASE_URI='sqlite:///../database.db')
 db = SQLAlchemy(app)
+
 
 from admin import admin, user
 app.register_blueprint(admin, url_prefix='/admin')
 app.register_blueprint(user, url_prefix='/user')
 db.create_all()
+
 
 import admin.model_helper
 admin.model_helper.populate_tables()
@@ -66,7 +68,7 @@ def home():
 
 @models_committed.connect_via(app)
 def on_models_committed(sender, changes):
-    logging.info('Model commit detected sender {} change {}'.format(sender, changes))
+    logging.debug('Model commit detected sender {} change {}'.format(sender, changes))
     event.on_models_committed(sender, changes)
 
 if __name__ == '__main__':
