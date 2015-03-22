@@ -114,12 +114,12 @@ def get_bus( sensor , owproxy):
 def get_temperature( sensor , owproxy):
     dev = get_prefix(sensor, owproxy)
     # 2 digits round
-    dev['temperature'] = math.ceil(float(owproxy.read(sensor+'temperature'))*100)/100
+    dev['temperature'] = math.ceil(float(owproxy.read(sensor+'temperature'))*10)/10
     return dev
 
 def get_humidity( sensor , owproxy):
     dev = get_prefix(sensor, owproxy)
-    dev['humidity'] = math.ceil(float(owproxy.read(sensor+'humidity'))*100)/100
+    dev['humidity'] = math.ceil(float(owproxy.read(sensor+'humidity'))*10)/10
     return dev
 
 def get_voltage(sensor, owproxy):
