@@ -59,7 +59,7 @@ def read_all_hdd_smart():
             sector_error_count = -1
             #disk_dev=get_device_name_linux_style(part.device)
             power_status = read_hddparm(disk_dev=disk_dev)
-            smart_out = subprocess.check_output('smartctl -a ' + disk_dev, stderr=subprocess.STDOUT)
+            smart_out = subprocess.check_output('sudo smartctl -a ' + disk_dev, stderr=subprocess.STDOUT)
             output.reset()
             output.write(smart_out)
             output.seek(0)
@@ -116,7 +116,7 @@ def get_device_name_linux_style(dev):
 def read_hddparm(disk_dev=''):
     output = cStringIO.StringIO()
     try:
-        hddparm_out = subprocess.check_output('hdparm -C '+ disk_dev, stderr=subprocess.STDOUT)
+        hddparm_out = subprocess.check_output('sudo hdparm -C '+ disk_dev, stderr=subprocess.STDOUT)
         output.reset()
         output.write(hddparm_out)
         output.seek(0)
