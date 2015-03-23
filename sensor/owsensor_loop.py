@@ -63,7 +63,7 @@ def save_to_db(dev):
             sensor.sensor_name = zone_sensor.sensor_name
         else:
             sensor.sensor_name = '(not defined) ' + address
-        key_compare = sensor.comparator()
+        key_compare = sensor.comparator_unique_graph_record()
         sensor.type = dev['type']
         sensor.updated_on = datetime.datetime.now()
         if dev.has_key('counters_a'): sensor.counters_a = dev['counters_a']
@@ -80,12 +80,12 @@ def save_to_db(dev):
 
         #assert isinstance(old_value, models.Sensor)
         db.session.autoflush=False
-        if key_compare != sensor.comparator():
+        if key_compare != sensor.comparator_unique_graph_record():
             if record_is_new:
                 db.session.add(sensor)
             else:
                 logging.info('Sensor {} change, old={} new={}'.format(sensor.sensor_name, key_compare,
-                                                                      sensor.comparator()))
+                                                                      sensor.comparator_unique_graph_record()))
             sensor.save_to_graph = True
             db.session.commit()
         else:

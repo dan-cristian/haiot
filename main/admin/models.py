@@ -2,6 +2,7 @@ from datetime import datetime
 
 from flask_sqlalchemy import SQLAlchemy #workaround for resolve issue
 from main import db
+import graphs
 
 class Blog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -109,7 +110,7 @@ class HeatSchedule(db.Model):
                 self.pattern_week.name, self.pattern_weekend.name)
 
 
-class Sensor(db.Model):
+class Sensor(db.Model, graphs.SensorGraph):
     id = db.Column(db.Integer, primary_key=True)
     address = db.Column(db.String(50), unique=True)
     type = db.Column(db.String(50))
@@ -128,37 +129,16 @@ class Sensor(db.Model):
     #FIXME: now filled manually, try relations
     zone_name = db.Column(db.String(50))
     sensor_name = db.Column(db.String(50))
-    save_to_graph = db.Column(db.Boolean, default=False)
-
-    @staticmethod
-    def graph_x_():
-        return 'updated_on'
-    @staticmethod
-    def graph_y_():
-        fields = ["temperature", "humidity"]
-        return fields
-    @staticmethod
-    def graph_id_():
-        return 'address'
-    @staticmethod
-    def graph_legend_():
-        return 'sensor_name'
-
-    graph_x_ = graph_x_.__func__()
-    graph_y_ = graph_y_.__func__()
-    graph_id_ = graph_id_.__func__()
-    graph_legend_ = graph_legend_.__func__()
 
     def __init__(self, id='', address=''):
         if id:
             self.id = id
         self.address= address
-        self.save_to_graph = False
 
     def __repr__(self):
         return 'Sensor {}, {}{}'.format(self.type, self.sensor_name, self.address)
     
-    def comparator(self):
+    def comparator_unique_graph_record(self):
         return str(self.temperature)+str(self.humidity)+str(self.counters_a)+str(self.counters_b) \
                + str(self.iad) + str(self.vad) + str(self.vdd) + str(self.pio_a) + str(self.pio_b) \
                 + str(self.sensed_a) + str(self.sensed_b)
@@ -228,3 +208,29 @@ class GraphPlotly(db.Model):
 
     def __repr__(self):
         return 'GraphPlotly {} ip {}'.format(self.name,  self.url)
+
+class SystemMonitor(db.Model, graphs.SystemMonitorGraph):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True)
+    cpu_usage_percent = db.Column(db.Float)
+    memory_available_percent = db.Column(db.Float)
+    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def comparator_unique_graph_record(self):
+        return str(self.cpu_usage_percent) + str(self.memory_available_percent)
+
+class SystemDisk(db.Model, graphs.SystemDiskGraph):
+    id = db.Column(db.Integer, primary_key=True)
+    serial = db.Column(db.String(50), unique=True)
+    system_name = db.Column(db.String(50))
+    hdd_name = db.Column(db.String(50))
+    hdd_disk_dev = db.Column(db.String(50))
+    temperature = db.Column(db.Float)
+    sector_error_count = db.Column(db.Integer)
+    smart_status = db.Column(db.String(50))
+    power_status = db.Column(db.Integer)
+    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def comparator_unique_graph_record(self):
+        return str(self.temperature) + str(self.sector_error_count) + str(self.smart_status) \
+               + str(self.power_status) + str(self.hdd_disk_dev)
