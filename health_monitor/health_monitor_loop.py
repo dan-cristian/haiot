@@ -18,24 +18,23 @@ def save_hdd_to_db(serial, power_status, temperature, sector_error_count, smart_
                    start_stop_count, load_cycle_count):
     try:
         system_name=socket.gethostname()
-        disk = models.SystemDisk.query.filter_by(serial=serial).first()
+        disk = models.SystemDisk.query.filter_by(hdd_disk_dev=disk_dev, system_name=system_name).first()
         if disk is None:
             disk = models.SystemDisk()
             disk.system_name = system_name
-            disk.hdd_name = family + ' ' + device + ' ' + serial
+            disk.hdd_disk_dev = disk_dev
             record_is_new = True
         else:
             record_is_new = False
         key_compare = disk.comparator_unique_graph_record()
-
-        disk.serial = serial
-        disk.hdd_disk_dev = disk_dev
-        disk.power_status = power_status
-        disk.temperature = float(temperature)#important to make it float as it is read as int from SMART table
-        disk.sector_error_count = sector_error_count
-        disk.smart_status = smart_status
-        disk.start_stop_count = start_stop_count
-        disk.load_cycle_count = load_cycle_count
+        if not serial is None: disk.serial = serial
+        if not device is None: disk.hdd_name = device + ' ' + serial + ' ' + disk_dev
+        if not power_status is None: disk.power_status = power_status
+        if not temperature is None: disk.temperature = float(temperature)#important to make it float as it is read as int from SMART table
+        if not sector_error_count is None: disk.sector_error_count = sector_error_count
+        if not smart_status is None: disk.smart_status = smart_status
+        if not start_stop_count is None: disk.start_stop_count = start_stop_count
+        if not load_cycle_count is None: disk.load_cycle_count  = load_cycle_count
         disk.updated_on = datetime.datetime.now()
         db.session.autoflush=False
         if key_compare != disk.comparator_unique_graph_record():
@@ -49,6 +48,7 @@ def save_hdd_to_db(serial, power_status, temperature, sector_error_count, smart_
         else:
             logging.debug('Ignoring disk read {}, no value change'.format(key_compare))
             disk.save_to_graph = False
+            db.session.rollback
     except Exception, ex:
         logging.warning('Error saving disk to DB, err {}'.format(ex))
 
