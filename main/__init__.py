@@ -34,7 +34,7 @@ def init_modules():
                 dynclass.unload()
                 del dynclass
 
-logging.basicConfig(format='%(levelname)s:%(module)s:%(funcName)s:%(threadName)s:%(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(levelname)s:%(module)s:%(funcName)s:%(threadName)s:%(message)s', level=logging.INFO)
 import common
 common.init()
 

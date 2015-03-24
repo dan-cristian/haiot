@@ -110,7 +110,7 @@ def read_all_hdd_smart():
                            disk_dev)
             disk_letter = chr(ord(disk_letter) + 1)
         except subprocess.CalledProcessError, ex:
-            logging.debug('Invalid disk {} err {}'.format(disk_dev, ex))
+            logging.info('Invalid disk {} err {}'.format(disk_dev, ex))
             current_disk_valid = False
         except Exception as exc:
             logging.warning('Disk read error {} dev {}'.format(exc, disk_dev))
