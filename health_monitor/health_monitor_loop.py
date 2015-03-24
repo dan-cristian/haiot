@@ -64,22 +64,28 @@ def read_all_hdd_smart():
         try:
             disk_dev=constant.DISK_DEV_MAIN + disk_letter
             logging.debug('Processing disk {}'.format(disk_dev))
-            sector_error_count = -1
-            start_stop_count = -1
-            load_cycle_count = -1
             #disk_dev=get_device_name_linux_style(part.device)
             power_status = read_hddparm(disk_dev=disk_dev)
             try:
                 if constant.OS in constant.OS_LINUX:
-                    smart_out = subprocess.check_output(['sudo', 'smartctl', '-a', disk_dev, '-n', 'standby'],
+                    smart_out = subprocess.check_output(['sudo', 'smartctl', '-a', disk_dev, '-n', 'sleep'],
                                                 stderr=subprocess.STDOUT)
                 else:
-                    smart_out = subprocess.check_output(['smartctl', '-a', disk_dev, '-n', 'standby'],
+                    smart_out = subprocess.check_output(['smartctl', '-a', disk_dev, '-n', 'sleep'],
                                                 stderr=subprocess.STDOUT)
             except subprocess.CalledProcessError, exc:
                 smart_out = exc.output
                 if ERR_TEXT_NO_DEV in smart_out:
                     raise exc
+
+            temperature = None
+            sector_error_count = None
+            device = None
+            family = None
+            serial = None
+            smart_status = None
+            load_cycle_count = None
+            start_stop_count = None
             output.reset()
             output.write(smart_out)
             output.seek(0)
