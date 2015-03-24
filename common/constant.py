@@ -33,6 +33,7 @@ SMARTCTL_ERROR_SECTORS='198 Offline_Uncorrectable'
 SMARTCTL_START_STOP_COUNT='4 Start_Stop_Count'
 SMARTCTL_LOAD_CYCLE_COUNT='193 Load_Cycle_Count'
 SMARTCTL_ERROR_NO_DISK='Unable to detect device type'
+SMARTCTL_DEVICE_IN_STANDBY='Device is in STANDBY mode'
 HDPARM_STATUS='drive state is:'
 DISK_DEV_MAIN='/dev/sd'
 
