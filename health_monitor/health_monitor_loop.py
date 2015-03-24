@@ -49,11 +49,14 @@ def save_hdd_to_db(serial, power_status, temperature, sector_error_count, smart_
     except Exception, ex:
         logging.warning('Error saving disk to DB, err {}'.format(ex))
 
+ERR_TEXT_NO_DEV = 'returned non-zero exit status 2'
+
 def read_all_hdd_smart():
     output = cStringIO.StringIO()
     current_disk_valid = True
     disk_letter='a'
     disk_dev=''
+    global ERR_TEXT_NO_DEV
     while current_disk_valid:
         try:
             disk_dev=constant.DISK_DEV_MAIN + disk_letter
@@ -61,7 +64,13 @@ def read_all_hdd_smart():
             sector_error_count = -1
             #disk_dev=get_device_name_linux_style(part.device)
             power_status = read_hddparm(disk_dev=disk_dev)
-            smart_out = subprocess.check_output(['sudo', 'smartctl', '-a', disk_dev], stderr=subprocess.STDOUT)
+            try:
+                smart_out = subprocess.check_output(['sudo', 'smartctl', '-a', disk_dev, '-n', 'standby'],
+                                                stderr=subprocess.STDOUT)
+            except subprocess.CalledProcessError, exc:
+                smart_out = exc.output
+                if ERR_TEXT_NO_DEV in smart_out:
+                    raise subprocess.CalledProcessError('Probably invalid disk on smartctl {}'.format(disk_dev))
             output.reset()
             output.write(smart_out)
             output.seek(0)
@@ -117,8 +126,14 @@ def get_device_name_linux_style(dev):
 
 def read_hddparm(disk_dev=''):
     output = cStringIO.StringIO()
+    global ERR_TEXT_NO_DEV
     try:
-        hddparm_out = subprocess.check_output(['sudo', 'hdparm', '-C', disk_dev], stderr=subprocess.STDOUT)
+        try:
+            hddparm_out = subprocess.check_output(['sudo', 'hdparm', '-C', disk_dev], stderr=subprocess.STDOUT)
+        except subprocess.CalledProcessError, exc:
+            smart_out = exc.output
+            if ERR_TEXT_NO_DEV in smart_out:
+                raise subprocess.CalledProcessError('Probably invalid disk on hdparm {}'.format(disk_dev))
         output.reset()
         output.write(hddparm_out)
         output.seek(0)
