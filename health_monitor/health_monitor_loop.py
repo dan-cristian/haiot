@@ -65,7 +65,11 @@ def read_all_hdd_smart():
             #disk_dev=get_device_name_linux_style(part.device)
             power_status = read_hddparm(disk_dev=disk_dev)
             try:
-                smart_out = subprocess.check_output(['sudo', 'smartctl', '-a', disk_dev, '-n', 'standby'],
+                if constant.OS in constant.OS_LINUX:
+                    smart_out = subprocess.check_output(['sudo', 'smartctl', '-a', disk_dev, '-n', 'standby'],
+                                                stderr=subprocess.STDOUT)
+                else:
+                    smart_out = subprocess.check_output(['smartctl', '-a', disk_dev, '-n', 'standby'],
                                                 stderr=subprocess.STDOUT)
             except subprocess.CalledProcessError, exc:
                 smart_out = exc.output
@@ -129,11 +133,14 @@ def read_hddparm(disk_dev=''):
     global ERR_TEXT_NO_DEV
     try:
         try:
-            hddparm_out = subprocess.check_output(['sudo', 'hdparm', '-C', disk_dev], stderr=subprocess.STDOUT)
-        except subprocess.CalledProcessError, exc:
-            hddparm_out = exc.output
+            if constant.OS in constant.OS_LINUX:
+                hddparm_out = subprocess.check_output(['sudo', 'hdparm', '-C', disk_dev], stderr=subprocess.STDOUT)
+            else:
+                hddparm_out = subprocess.check_output(['hdparm', '-C', disk_dev], stderr=subprocess.STDOUT)
+        except subprocess.CalledProcessError, ex1:
+            hddparm_out = ex1.output
             if ERR_TEXT_NO_DEV in hddparm_out:
-                raise exc
+                raise ex1
         output.reset()
         output.write(hddparm_out)
         output.seek(0)
@@ -143,8 +150,8 @@ def read_hddparm(disk_dev=''):
             line=output.readline()
             if constant.HDPARM_STATUS in line:
                 words = line.split(': ')
-                status = words[1].replace('\r','').replace('\n','').lstrip()
-                return status
+                power_status = words[1].replace('\r','').replace('\n','').replace('/','-').lstrip()
+                return power_status
     except subprocess.CalledProcessError, ex:
         logging.info('Invalid disk {} err {}'.format(disk_dev, ex))
     except Exception as exc:
