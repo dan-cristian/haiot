@@ -131,8 +131,8 @@ def read_hddparm(disk_dev=''):
         try:
             hddparm_out = subprocess.check_output(['sudo', 'hdparm', '-C', disk_dev], stderr=subprocess.STDOUT)
         except subprocess.CalledProcessError, exc:
-            smart_out = exc.output
-            if ERR_TEXT_NO_DEV in smart_out:
+            hddparm_out = exc.output
+            if ERR_TEXT_NO_DEV in hddparm_out:
                 raise exc
         output.reset()
         output.write(hddparm_out)
@@ -149,6 +149,7 @@ def read_hddparm(disk_dev=''):
         logging.info('Invalid disk {} err {}'.format(disk_dev, ex))
     except Exception as exc:
         logging.warning('Disk read error {} disk was {} err {}'.format(exc.message, disk_dev, exc))
+    return ''
 
 def read_system_attribs():
     cpu_percent = psutil.cpu_percent(interval=1)
