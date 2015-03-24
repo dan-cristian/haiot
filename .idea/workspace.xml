@@ -82,8 +82,8 @@
       <file leaf-file-name="health_monitor_loop.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/health_monitor/health_monitor_loop.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.77922076" vertical-offset="864" max-vertical-offset="3417">
-              <caret line="72" column="91" selection-start-line="72" selection-start-column="91" selection-end-line="72" selection-end-column="91" />
+            <state vertical-scroll-proportion="0.33116883" vertical-offset="816" max-vertical-offset="3417">
+              <caret line="57" column="15" selection-start-line="57" selection-start-column="15" selection-end-line="57" selection-end-column="15" />
               <folding>
                 <element signature="e#25#42#0" expanded="true" />
               </folding>
@@ -732,7 +732,13 @@
       <option name="project" value="LOCAL" />
       <updated>1427156228479</updated>
     </task>
-    <option name="localTasksCounter" value="35" />
+    <task id="LOCAL-00035" summary="sudo">
+      <created>1427157455916</created>
+      <option name="number" value="00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1427157455916</updated>
+    </task>
+    <option name="localTasksCounter" value="36" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -1183,8 +1189,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/health_monitor/health_monitor_loop.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.77922076" vertical-offset="864" max-vertical-offset="3417">
-          <caret line="72" column="91" selection-start-line="72" selection-start-column="91" selection-end-line="72" selection-end-column="91" />
+        <state vertical-scroll-proportion="0.33116883" vertical-offset="816" max-vertical-offset="3417">
+          <caret line="57" column="15" selection-start-line="57" selection-start-column="15" selection-end-line="57" selection-end-column="15" />
           <folding>
             <element signature="e#25#42#0" expanded="true" />
           </folding>

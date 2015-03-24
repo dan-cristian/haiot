@@ -49,7 +49,7 @@ def save_hdd_to_db(serial, power_status, temperature, sector_error_count, smart_
     except Exception, ex:
         logging.warning('Error saving disk to DB, err {}'.format(ex))
 
-ERR_TEXT_NO_DEV = 'returned non-zero exit status 2'
+ERR_TEXT_NO_DEV = 'failed: No such device'
 
 def read_all_hdd_smart():
     output = cStringIO.StringIO()
