@@ -132,7 +132,7 @@ def read_hddparm(disk_dev=''):
     except subprocess.CalledProcessError, ex:
         logging.info('Invalid disk {} err {}'.format(disk_dev, ex))
     except Exception as exc:
-        logging.warning('Disk read error {} disk was {} err {} path {}'.format(exc.message, disk_dev, exc, sys.path))
+        logging.warning('Disk read error {} disk was {} err {}'.format(exc.message, disk_dev, exc))
 
 def read_system_attribs():
     cpu_percent = psutil.cpu_percent(interval=1)
