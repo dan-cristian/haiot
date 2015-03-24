@@ -57,6 +57,7 @@ def read_all_hdd_smart():
     while current_disk_valid:
         try:
             disk_dev=constant.DISK_DEV_MAIN + disk_letter
+            logging.debug('Processing disk {}'.format(disk_dev))
             sector_error_count = -1
             #disk_dev=get_device_name_linux_style(part.device)
             power_status = read_hddparm(disk_dev=disk_dev)
