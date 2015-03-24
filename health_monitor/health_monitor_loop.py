@@ -70,7 +70,7 @@ def read_all_hdd_smart():
             except subprocess.CalledProcessError, exc:
                 smart_out = exc.output
                 if ERR_TEXT_NO_DEV in smart_out:
-                    raise subprocess.CalledProcessError('Probably invalid disk on smartctl {}'.format(disk_dev))
+                    raise exc
             output.reset()
             output.write(smart_out)
             output.seek(0)
@@ -133,7 +133,7 @@ def read_hddparm(disk_dev=''):
         except subprocess.CalledProcessError, exc:
             smart_out = exc.output
             if ERR_TEXT_NO_DEV in smart_out:
-                raise subprocess.CalledProcessError('Probably invalid disk on hdparm {}'.format(disk_dev))
+                raise exc
         output.reset()
         output.write(hddparm_out)
         output.seek(0)
