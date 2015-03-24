@@ -27,6 +27,6 @@ class SystemMonitorGraph(BaseGraph):
 
 class SystemDiskGraph(BaseGraph):
     graph_x_ = 'updated_on'
-    graph_y_ = ['temperature', 'power_status', 'sector_error_count']
+    graph_y_ = ['temperature', 'power_status', 'sector_error_count', 'load_cycle_count', 'start_stop_count']
     graph_id_ = 'serial'
     graph_legend_ = 'hdd_name'

@@ -14,7 +14,8 @@ from main import db
 g_cpu_percent = float(0)
 g_memory_available_percent = float(0)
 
-def save_hdd_to_db(serial, power_status, temperature, sector_error_count, smart_status, device, family, disk_dev):
+def save_hdd_to_db(serial, power_status, temperature, sector_error_count, smart_status, device, family, disk_dev,
+                   start_stop_count, load_cycle_count):
     try:
         system_name=socket.gethostname()
         disk = models.SystemDisk.query.filter_by(serial=serial).first()
@@ -33,6 +34,8 @@ def save_hdd_to_db(serial, power_status, temperature, sector_error_count, smart_
         disk.temperature = float(temperature)#important to make it float as it is read as int from SMART table
         disk.sector_error_count = sector_error_count
         disk.smart_status = smart_status
+        disk.start_stop_count = start_stop_count
+        disk.load_cycle_count = load_cycle_count
         disk.updated_on = datetime.datetime.now()
         db.session.autoflush=False
         if key_compare != disk.comparator_unique_graph_record():
@@ -62,6 +65,8 @@ def read_all_hdd_smart():
             disk_dev=constant.DISK_DEV_MAIN + disk_letter
             logging.debug('Processing disk {}'.format(disk_dev))
             sector_error_count = -1
+            start_stop_count = -1
+            load_cycle_count = -1
             #disk_dev=get_device_name_linux_style(part.device)
             power_status = read_hddparm(disk_dev=disk_dev)
             try:
@@ -93,6 +98,12 @@ def read_all_hdd_smart():
                     words=line.split(None)
                     sector_error_count = words[9]
                     #print 'Offline sectors with error is {}'.format(errcount)
+                if constant.SMARTCTL_START_STOP_COUNT in line:
+                    words=line.split(None)
+                    start_stop_count = words[9]
+                if constant.SMARTCTL_LOAD_CYCLE_COUNT in line:
+                    words=line.split(None)
+                    load_cycle_count = words[9]
                 if constant.SMARTCTL_STATUS in line:
                     words = line.split(': ')
                     smart_status = words[1].replace('\r','').replace('\n','').strip()
@@ -111,7 +122,7 @@ def read_all_hdd_smart():
                     #print 'Serial is {}'.format(serial)
             #print ('Disk dev is {}'.format(disk_dev))
             save_hdd_to_db(serial, power_status, temperature, sector_error_count, smart_status, device, family,
-                           disk_dev)
+                           disk_dev, start_stop_count, load_cycle_count)
             disk_letter = chr(ord(disk_letter) + 1)
         except subprocess.CalledProcessError, ex:
             logging.info('Invalid disk {} err {}'.format(disk_dev, ex))
@@ -156,7 +167,7 @@ def read_hddparm(disk_dev=''):
         logging.info('Invalid disk {} err {}'.format(disk_dev, ex))
     except Exception as exc:
         logging.warning('Disk read error {} disk was {} err {}'.format(exc.message, disk_dev, exc))
-    return ''
+    raise Exception('No power status obtained on hdparm, output={}'.format(hddparm_out))
 
 def read_system_attribs():
     cpu_percent = psutil.cpu_percent(interval=1)

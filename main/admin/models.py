@@ -228,9 +228,13 @@ class SystemDisk(db.Model, graphs.SystemDiskGraph):
     temperature = db.Column(db.Float)
     sector_error_count = db.Column(db.Integer)
     smart_status = db.Column(db.String(50))
-    power_status = db.Column(db.Integer)
+    power_status = db.Column(db.String(50))
+    load_cycle_count = db.Column(db.Integer)
+    start_stop_count = db.Column(db.Integer)
+
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def comparator_unique_graph_record(self):
         return str(self.temperature) + str(self.sector_error_count) + str(self.smart_status) \
-               + str(self.power_status) + str(self.hdd_disk_dev)
+               + str(self.power_status) + str(self.hdd_disk_dev) + str(self.load_cycle_count) \
+                + str(self.start_stop_count)
