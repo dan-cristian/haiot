@@ -5,6 +5,7 @@ import logging
 import psutil
 import socket
 import os
+import sys
 import datetime
 from common import constant
 from main.admin import models
@@ -102,7 +103,7 @@ def read_all_hdd_smart():
             logging.debug('Invalid disk {} err {}'.format(disk_dev, ex))
             current_disk_valid = False
         except Exception as exc:
-            logging.warning('Disk read error {} dev {}'.format(exc, disk_dev))
+            logging.warning('Disk read error {} dev {} path {}'.format(exc, disk_dev, sys.path))
             current_disk_valid = False
 
 
@@ -131,7 +132,7 @@ def read_hddparm(disk_dev=''):
     except subprocess.CalledProcessError, ex:
         logging.info('Invalid disk {} err {}'.format(disk_dev, ex))
     except Exception as exc:
-        logging.warning('Disk read error {} disk was {} err {}'.format(exc.message, disk_dev, exc))
+        logging.warning('Disk read error {} disk was {} err {} path {}'.format(exc.message, disk_dev, exc, sys.path))
 
 def read_system_attribs():
     cpu_percent = psutil.cpu_percent(interval=1)
