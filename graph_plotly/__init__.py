@@ -56,9 +56,9 @@ def upload_data(obj):
                 x_val = utils.parse_to_date(x_val)
                 x = [x_val]
                 list_axis_y = obj[constant.JSON_PUBLISH_GRAPH_Y]
-                trace_list = []
                 for axis_y in list_axis_y:
                     if axis_y in obj:
+                        trace_list = []
                         y=[obj[axis_y]]
                         graph_name=str(table+' '+axis_y)
                         trace = graph_objs.Scatter(x=x, y=y, name=graph_legend)
