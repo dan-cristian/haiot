@@ -72,8 +72,8 @@
       <file leaf-file-name="health_monitor_loop.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/health_monitor/health_monitor_loop.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.33116883" vertical-offset="2142" max-vertical-offset="3145">
-              <caret line="135" column="0" selection-start-line="135" selection-start-column="0" selection-end-line="135" selection-end-column="0" />
+            <state vertical-scroll-proportion="1.4718615" vertical-offset="1020" max-vertical-offset="3145">
+              <caret line="100" column="51" selection-start-line="100" selection-start-column="51" selection-end-line="100" selection-end-column="51" />
               <folding>
                 <element signature="e#25#42#0" expanded="true" />
               </folding>
@@ -692,7 +692,13 @@
       <option name="project" value="LOCAL" />
       <updated>1427155020995</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="sudo">
+      <created>1427155260682</created>
+      <option name="number" value="00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1427155260682</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -1143,8 +1149,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/health_monitor/health_monitor_loop.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.33116883" vertical-offset="2142" max-vertical-offset="3145">
-          <caret line="135" column="0" selection-start-line="135" selection-start-column="0" selection-end-line="135" selection-end-column="0" />
+        <state vertical-scroll-proportion="1.4718615" vertical-offset="1020" max-vertical-offset="3145">
+          <caret line="100" column="51" selection-start-line="100" selection-start-column="51" selection-end-line="100" selection-end-column="51" />
           <folding>
             <element signature="e#25#42#0" expanded="true" />
           </folding>

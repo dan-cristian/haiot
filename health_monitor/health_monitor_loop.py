@@ -103,7 +103,7 @@ def read_all_hdd_smart():
             logging.debug('Invalid disk {} err {}'.format(disk_dev, ex))
             current_disk_valid = False
         except Exception as exc:
-            logging.warning('Disk read error {} dev {} path {}'.format(exc, disk_dev, sys.path))
+            logging.warning('Disk read error {} dev {}'.format(exc, disk_dev))
             current_disk_valid = False
 
 
