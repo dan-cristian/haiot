@@ -46,7 +46,7 @@ def save_hdd_to_db(serial, power_status, temperature, sector_error_count, smart_
         else:
             logging.debug('Ignoring disk read {}, no value change'.format(key_compare))
             disk.save_to_graph = False
-            db.session.rollback
+            db.session.rollback()
     except Exception, ex:
         logging.warning('Error saving disk to DB, err {}'.format(ex))
 
@@ -129,7 +129,7 @@ def read_all_hdd_smart():
                            disk_dev, start_stop_count, load_cycle_count)
             disk_letter = chr(ord(disk_letter) + 1)
         except subprocess.CalledProcessError, ex:
-            logging.info('Invalid disk {} err {}'.format(disk_dev, ex))
+            logging.debug('Invalid disk {} err {}'.format(disk_dev, ex))
             current_disk_valid = False
         except Exception as exc:
             logging.warning('Disk read error {} dev {}'.format(exc, disk_dev))
@@ -168,10 +168,10 @@ def read_hddparm(disk_dev=''):
                 power_status = words[1].replace('\r','').replace('\n','').replace('/','-').lstrip()
                 return power_status
     except subprocess.CalledProcessError, ex:
-        logging.info('Invalid disk {} err {}'.format(disk_dev, ex))
+        logging.debug('Invalid disk {} err {}'.format(disk_dev, ex))
     except Exception as exc:
         logging.warning('Disk read error {} disk was {} err {}'.format(exc.message, disk_dev, exc))
-    raise Exception('No power status obtained on hdparm, output={}'.format(hddparm_out))
+    raise subprocess.CalledProcessError(1, 'No power status obtained on hdparm, output={}'.format(hddparm_out))
 
 def read_system_attribs():
     cpu_percent = psutil.cpu_percent(interval=1)
@@ -189,9 +189,9 @@ def save_system_attribs_to_db(cpu_percent='', memory_available_percent=''):
         else:
             record_is_new = False
 
+        key_compare = system.comparator_unique_graph_record()
         system.cpu_usage_percent = cpu_percent
         system.memory_available_percent = memory_available_percent
-        key_compare = system.comparator_unique_graph_record()
 
         system.updated_on = datetime.datetime.now()
         db.session.autoflush=False
@@ -206,6 +206,7 @@ def save_system_attribs_to_db(cpu_percent='', memory_available_percent=''):
         else:
             logging.debug('Ignoring system read {}, no value change'.format(key_compare))
             system.save_to_graph = False
+            db.session.rollback()
     except Exception, ex:
         logging.warning('Error saving system to DB, err {}'.format(ex))
 

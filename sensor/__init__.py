@@ -7,6 +7,12 @@ import logging
 import owsensor_loop
 initialised=False
 
+def unload():
+    #...
+    thread_pool.remove_callable(owsensor_loop.thread_run)
+    global initialised
+    initialised = False
+
 def init():
     logging.info('Sensor module initialising')
     owsensor_loop.init()
