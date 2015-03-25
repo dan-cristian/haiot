@@ -124,6 +124,8 @@ simple_filters = {
 
 from .models import Blog, Comment, Zone, SchedulePattern, HeatSchedule, Sensor
 from .models import Module, Parameter, TemperatureTarget, ZoneSensor, Node, GraphPlotly
+from .models import SystemMonitor, SystemDisk
+
 
 register_crud(admin, '/blog', 'blog', Blog, filters=blog_filters)
 register_crud(admin, '/comments', 'comments', Comment, filters=comment_filters)
@@ -137,3 +139,5 @@ register_crud(user, '/sensor', 'sensor', Sensor, filters=simple_filters)
 register_crud(user, '/zonesensor', 'zonesensor', ZoneSensor, filters=simple_filters)
 register_crud(user, '/node', 'node', Node, filters=simple_filters)
 register_crud(user, '/graphplotly', 'graphplotly', GraphPlotly, filters=simple_filters)
+register_crud(user, '/systemmonitor', 'systemmonitor', SystemMonitor, filters=simple_filters)
+register_crud(user, '/systemdisk', 'systemdisk', SystemDisk, filters=simple_filters)

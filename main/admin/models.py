@@ -216,6 +216,9 @@ class SystemMonitor(db.Model, graphs.SystemMonitorGraph):
     memory_available_percent = db.Column(db.Float)
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    def __repr__(self):
+        return '{} {} {}'.format(self.id, self.name, self.updated_on)
+
     def comparator_unique_graph_record(self):
         return str(self.cpu_usage_percent) + str(self.memory_available_percent)
 
@@ -231,8 +234,10 @@ class SystemDisk(db.Model, graphs.SystemDiskGraph):
     power_status = db.Column(db.String(50))
     load_cycle_count = db.Column(db.Integer)
     start_stop_count = db.Column(db.Integer)
-
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return '{} {} {} {} {}'.format(self.id, self.serial,  self.system_name, self.hdd_name, self.hdd_disk_dev)
 
     def comparator_unique_graph_record(self):
         return str(self.temperature) + str(self.sector_error_count) + str(self.smart_status) \

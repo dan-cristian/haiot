@@ -15,7 +15,7 @@ class BaseGraph:
 
 class SensorGraph(BaseGraph):
     graph_x_ = 'updated_on'
-    graph_y_ = ["temperature", "humidity"]
+    graph_y_ = ['temperature', 'humidity']
     graph_id_ = 'address'
     graph_legend_ = 'sensor_name'
 
