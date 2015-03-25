@@ -11,9 +11,6 @@ from common import constant
 from main.admin import models
 from main import db
 
-g_cpu_percent = float(0)
-g_memory_available_percent = float(0)
-
 def save_hdd_to_db(serial, power_status, temperature, sector_error_count, smart_status, device, family, disk_dev,
                    start_stop_count, load_cycle_count):
     try:
@@ -30,7 +27,8 @@ def save_hdd_to_db(serial, power_status, temperature, sector_error_count, smart_
         if not serial is None: disk.serial = serial
         if not device is None: disk.hdd_name = device + ' ' + serial + ' ' + disk_dev
         if not power_status is None: disk.power_status = power_status
-        if not temperature is None: disk.temperature = float(temperature)#important to make it float as it is read as int from SMART table
+        #important to make it float as it is read as int from SMART table
+        if not temperature is None: disk.temperature = float(temperature)
         if not sector_error_count is None: disk.sector_error_count = sector_error_count
         if not smart_status is None: disk.smart_status = smart_status
         if not start_stop_count is None: disk.start_stop_count = start_stop_count
@@ -216,6 +214,7 @@ def init():
     pass
 
 def thread_run():
+    read_system_attribs()
     read_all_hdd_smart()
     read_system_attribs()
     pass
