@@ -10,6 +10,7 @@ ERROR_CONNECT_PAUSE_SECOND = 1
 OS = 'not initialised'
 OS_LINUX={'Linux', 'posix'}
 OS_WINDOWS={'Windows', 'nt'}
+HOST_NAME='not initialised'
 
 SCRIPT_RESPONSE_OK='RESULTOK'
 

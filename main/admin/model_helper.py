@@ -2,7 +2,6 @@ __author__ = 'dcristian'
 import logging
 import json
 import sys
-import socket
 import datetime
 import models
 from common import constant, utils
@@ -17,7 +16,7 @@ def model_row_to_json(obj, operation=''):
             safe_obj[constant.JSON_PUBLISH_TABLE]=str(table_cols[attr]).split('.')[0]
             break
         safe_obj[constant.JSON_PUBLISH_RECORD_OPERATION]=operation
-        safe_obj[constant.JSON_PUBLISH_SOURCE_HOST]=str(socket.gethostname())
+        safe_obj[constant.JSON_PUBLISH_SOURCE_HOST]=str(constant.HOST_NAME)
         safe_obj[constant.JSON_PUBLISH_DATE]=str(datetime.datetime.now())
         safe_obj[constant.JSON_PUBLISH_TARGET_HOST]=constant.JSON_PUBLISH_VALUE_TARGET_HOST_ALL
         #removing infinite recursions and class noise
@@ -74,7 +73,7 @@ def populate_tables():
 
     if len(models.Node.query.all()) == 0:
         logging.info('Populating Node with default values')
-        db.session.add(models.Node(1, 'localhost', '127.0.0.1', has_sensor=True, sensor_port=4304))
+        db.session.add(models.Node('', constant.HOST_NAME, '127.0.0.1'))
         commit(db.session)
 
     if len(models.Sensor.query.all()) == 0:
@@ -85,20 +84,22 @@ def populate_tables():
         commit(db.session)
 
 
-    import alarm, heat, sensor, relay, mqtt_io, health_monitor, graph_plotly
-    if len(models.Module.query.all()) < 7:
+    import alarm, heat, sensor, relay, mqtt_io, health_monitor, graph_plotly, node
+    if len(models.Module.query.all()) < 8:
         logging.info('Populating Module with default values')
-        db.session.add(models.Module(1, get_mod_name(health_monitor), True, 1))
+        db.session.add(models.Module('', get_mod_name(node), True, 0))
         commit(db.session)
-        db.session.add(models.Module(2, get_mod_name(mqtt_io), True, 2))
+        db.session.add(models.Module('', get_mod_name(health_monitor), False, 1))
         commit(db.session)
-        db.session.add(models.Module(3, get_mod_name(sensor), True, 3))
+        db.session.add(models.Module('', get_mod_name(mqtt_io), True, 2))
         commit(db.session)
-        db.session.add(models.Module(4, get_mod_name(relay), False, 4))
+        db.session.add(models.Module('', get_mod_name(sensor), False, 3))
         commit(db.session)
-        db.session.add(models.Module(5, get_mod_name(heat), True, 5))
+        db.session.add(models.Module('', get_mod_name(relay), False, 4))
         commit(db.session)
-        db.session.add(models.Module(6, get_mod_name(alarm), False, 6))
+        db.session.add(models.Module('', get_mod_name(heat), False, 5))
         commit(db.session)
-        db.session.add(models.Module(7, get_mod_name(graph_plotly), True, 7))
+        db.session.add(models.Module('', get_mod_name(alarm), False, 6))
+        commit(db.session)
+        db.session.add(models.Module('', get_mod_name(graph_plotly), False, 7))
         commit(db.session)

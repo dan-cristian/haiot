@@ -1,7 +1,10 @@
 __author__ = 'dcristian'
-import os,logging
+import os
+import logging
+import socket
 import constant
 
 def init():
-    logging.info('Running on OS '+ os.name)
-    constant.OS=os.name
+    constant.OS = os.name
+    constant.HOST_NAME = socket.gethostname()
+    logging.info('Running on OS {} HOST {}'.format(constant.OS, constant.HOST_NAME))

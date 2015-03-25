@@ -2,7 +2,7 @@ __author__ = 'dcristian'
 from main import db
 
 class BaseGraph:
-    save_to_graph = db.Column(db.Boolean, default=False)
+    save_to_graph = False
     @property
     def graph_x_(self): raise NotImplementedError
     @property
@@ -28,5 +28,11 @@ class SystemMonitorGraph(BaseGraph):
 class SystemDiskGraph(BaseGraph):
     graph_x_ = 'updated_on'
     graph_y_ = ['temperature', 'power_status', 'sector_error_count', 'load_cycle_count', 'start_stop_count']
+    graph_id_ = 'serial'
+    graph_legend_ = 'hdd_name'
+
+class NodeGraph(BaseGraph):
+    graph_x_ = 'master_updated_on'
+    graph_y_ = ['start_stop_count']
     graph_id_ = 'serial'
     graph_legend_ = 'hdd_name'

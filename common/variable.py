@@ -1,0 +1,5 @@
+__author__ = 'dcristian'
+
+NODE_THIS_IS_MASTER_GRAPH = False
+NODE_THIS_IS_MASTER_DB_ARCHIVE = False
+NODE_THIS_IS_MASTER_RULE = False

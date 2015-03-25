@@ -174,25 +174,26 @@ class ZoneSensor(db.Model):
     def __repr__(self):
         return 'ZoneSensor zone {} sensor {}'.format(self.zone,  self.sensor_name)
 
-class Node(db.Model):
+class Node(db.Model, graphs.NodeGraph):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
     ip = db.Column(db.String(15), nullable=False)
-    has_sensor = db.Column(db.Boolean)
-    sensor_port = db.Column(db.Integer)
-    has_alarm = db.Column(db.Boolean)
-    has_relay = db.Column(db.Boolean)
+    is_master_db_archive = db.Column(db.Boolean(), default=False)
+    is_master_graph = db.Column(db.Boolean(), default=False)
+    is_master_rule = db.Column(db.Boolean(), default=False)
+    master_updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    def __init__(self, id='', name ='', ip='', has_sensor=False, sensor_port=''):
+    def __init__(self, id='', name ='', ip=''):
         if id:
             self.id = id
         self.name = name
         self.ip = ip
-        self.has_sensor = has_sensor
-        self.sensor_port = sensor_port
 
     def __repr__(self):
         return 'Node {} ip {}'.format(self.name,  self.ip)
+
+    def comparator_unique_graph_record(self):
+        return str(self.is_master_db_archive) + str(self.is_master_graph) + str(self.is_master_rule)
 
 class GraphPlotly(db.Model):
     id = db.Column(db.Integer, primary_key=True)

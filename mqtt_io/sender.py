@@ -12,5 +12,5 @@ def send_message(txt):
             mqtt_io.mqtt_client.publish(mqtt_io.topic, txt)
         else:
             logging.warning('MQTT client not connected, message to be discarded: {}'.format(txt))
-    except Exception:
-        logging.critical('Error sending mqtt message, {}'.format(sys.exc_info()[0]))
+    except Exception, ex:
+        logging.critical('Error sending mqtt message, {}'.format(ex))

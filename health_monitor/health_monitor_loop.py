@@ -3,9 +3,6 @@ import subprocess
 import cStringIO
 import logging
 import psutil
-import socket
-import os
-import sys
 import datetime
 from common import constant
 from main.admin import models
@@ -14,7 +11,7 @@ from main import db
 def save_hdd_to_db(serial, power_status, temperature, sector_error_count, smart_status, device, family, disk_dev,
                    start_stop_count, load_cycle_count):
     try:
-        system_name=socket.gethostname()
+        system_name=constant.HOST_NAME
         disk = models.SystemDisk.query.filter_by(hdd_disk_dev=disk_dev, system_name=system_name).first()
         if disk is None:
             disk = models.SystemDisk()
@@ -180,7 +177,7 @@ def read_system_attribs():
 
 def save_system_attribs_to_db(cpu_percent='', memory_available_percent=''):
     try:
-        system_name=socket.gethostname()
+        system_name=constant.HOST_NAME
         system = models.SystemMonitor.query.filter_by(name=system_name).first()
         if system is None:
             system = models.SystemMonitor()
