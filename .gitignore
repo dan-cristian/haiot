@@ -2,3 +2,4 @@ venv/
 *.pyc
 *database.db
 
+database.db
