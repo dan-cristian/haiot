@@ -22,7 +22,7 @@ def save_hdd_to_db(serial, power_status, temperature, sector_error_count, smart_
             record_is_new = False
         key_compare = disk.comparator_unique_graph_record()
         if not serial is None: disk.serial = serial
-        if not device is None: disk.hdd_name = device + ' ' + serial + ' ' + disk_dev
+        if not device is None: disk.hdd_name = system_name + ' ' +device + ' ' + serial + ' ' + disk_dev
         if not power_status is None: disk.power_status = power_status
         #important to make it float as it is read as int from SMART table
         if not temperature is None: disk.temperature = float(temperature)
