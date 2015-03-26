@@ -61,13 +61,30 @@ def node_update(obj={}):
             #...
             pass
 
-def thread_run():
-    logging.info('Processing node_run')
+
+#TODO: implement
+def try_become_master():
+    try:
+        node_list = models.Node.query.all()
+        for node in node_list:
+            pass
+
+    except Exception, ex:
+        logging.warning('Error saving Node to DB, err {}'.format(ex))
+
+
     if not variable.NODE_THIS_IS_MASTER_GRAPH:
         #trying to become a master graph
         node = models.Node()
         node.name = constant.HOST_NAME
         node.is_master_graph = True
-        mqtt_io.sender.send_message(model_helper.model_row_to_json(node, 'update'))
+        mqtt_io.sender.send_message(model_helper.model_row_to_json(node, constant.JSON_PUBLISH_OPERATION_UPDATE))
 
+def ask_for_advertise():
+    mqtt_io.sender.send_message()
+    #...
+
+def thread_run():
+    logging.info('Processing node_run')
+    #try_become_master()
     return 'Processed node_run'

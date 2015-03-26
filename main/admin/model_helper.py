@@ -89,7 +89,7 @@ def populate_tables():
         logging.info('Populating Module with default values')
         db.session.add(models.Module('', get_mod_name(node), True, 0))
         commit(db.session)
-        db.session.add(models.Module('', get_mod_name(health_monitor), False, 1))
+        db.session.add(models.Module('', get_mod_name(health_monitor), True, 1))
         commit(db.session)
         db.session.add(models.Module('', get_mod_name(mqtt_io), True, 2))
         commit(db.session)

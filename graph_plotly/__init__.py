@@ -42,7 +42,7 @@ def upload_data(obj):
     try:
         #logging.info('Trying to upload plotly obj {}'.format(obj))
         global g_series_id_list
-        logging.info('Trying to upload plotly obj')
+        logging.info('Trying to upload plotly obj {}'.format(obj))
         if constant.JSON_PUBLISH_GRAPH_X in obj:
             axis_x_field = obj[constant.JSON_PUBLISH_GRAPH_X]
             graph_id_field = obj[constant.JSON_PUBLISH_GRAPH_ID]
