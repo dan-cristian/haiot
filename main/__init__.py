@@ -54,7 +54,7 @@ def init():
     logging.basicConfig(format='%(levelname)s:%(module)s:%(funcName)s:%(threadName)s:%(message)s', level=logging.INFO)
     common.init()
     global app, db, DB_LOCATION
-    app.config.update(DEBUG=True, SQLALCHEMY_ECHO = True, SQLALCHEMY_DATABASE_URI=DB_LOCATION)
+    app.config.update(DEBUG=True, SQLALCHEMY_ECHO = False, SQLALCHEMY_DATABASE_URI=DB_LOCATION)
     db = SQLAlchemy(app)
 
     from admin import admin, user
