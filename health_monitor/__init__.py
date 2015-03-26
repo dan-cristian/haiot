@@ -14,7 +14,7 @@ def init():
     logging.info('Monitor module initialising')
     health_monitor_loop.init()
     thread_pool.add_callable(health_monitor_loop.thread_run)
-    thread_pool.set_exec_interval(health_monitor_loop.thread_run, 60)
+    thread_pool.set_exec_interval(health_monitor_loop.thread_run, 120)
     global initialised
     initialised = True
 
