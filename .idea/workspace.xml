@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="763df811-101e-4bd5-a07f-ffb7e2bc31e2" name="Revert: sudo (4396f4bb5365b71f66d540ce3fbef13599a232af)" comment="db">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/startserver.bat" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/health_monitor/__init__.py" afterPath="$PROJECT_DIR$/health_monitor/__init__.py" />
+    <list default="true" id="763df811-101e-4bd5-a07f-ffb7e2bc31e2" name="Revert: sudo (4396f4bb5365b71f66d540ce3fbef13599a232af)" comment="start">
+      <change type="DELETED" beforePath="C:\Development\python\main_app\nohup.out" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="blog_app.iws" />
@@ -31,8 +31,8 @@
       <file leaf-file-name="__init__.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main/__init__.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-0.17085427" vertical-offset="765" max-vertical-offset="1632">
-              <caret line="41" column="30" selection-start-line="41" selection-start-column="30" selection-end-line="41" selection-end-column="30" />
+            <state vertical-scroll-proportion="0.59799" vertical-offset="765" max-vertical-offset="1632">
+              <caret line="59" column="33" selection-start-line="59" selection-start-column="33" selection-end-line="59" selection-end-column="33" />
               <folding>
                 <element signature="e#23#46#0" expanded="true" />
               </folding>
@@ -103,7 +103,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/common/eventhook.py" />
         <option value="$PROJECT_DIR$/main/admin/update.py" />
         <option value="$PROJECT_DIR$/sensors/__init__.py" />
         <option value="$PROJECT_DIR$/sensors/owsensor.py" />
@@ -154,6 +153,7 @@
         <option value="$PROJECT_DIR$/startserver.sh" />
         <option value="$PROJECT_DIR$/health_monitor/__init__.py" />
         <option value="$PROJECT_DIR$/startserver.bat" />
+        <option value="$PROJECT_DIR$/.gitignore" />
       </list>
     </option>
   </component>
@@ -570,12 +570,6 @@
       <option name="number" value="Default" />
       <updated>1426274164651</updated>
     </task>
-    <task id="LOCAL-00008" summary="hdd monit">
-      <created>1426716403411</created>
-      <option name="number" value="00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1426716403411</updated>
-    </task>
     <task id="LOCAL-00009" summary="hdd monit">
       <created>1426720546944</created>
       <option name="number" value="00009" />
@@ -864,7 +858,13 @@
       <option name="project" value="LOCAL" />
       <updated>1427402817415</updated>
     </task>
-    <option name="localTasksCounter" value="57" />
+    <task id="LOCAL-00057" summary="start">
+      <created>1427403148877</created>
+      <option name="number" value="00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1427403148877</updated>
+    </task>
+    <option name="localTasksCounter" value="58" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -926,7 +926,8 @@
     <MESSAGE value="graphs &amp; monitor" />
     <MESSAGE value="run with parameters" />
     <MESSAGE value="db" />
-    <option name="LAST_COMMIT_MESSAGE" value="db" />
+    <MESSAGE value="start" />
+    <option name="LAST_COMMIT_MESSAGE" value="start" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
@@ -946,13 +947,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://C:/Python27/Lib/json/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.7592068" vertical-offset="5546" max-vertical-offset="6052">
-          <caret line="343" column="42" selection-start-line="343" selection-start-column="42" selection-end-line="343" selection-end-column="42" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://C:/Python27/Lib/site-packages/plotly/graph_objs/graph_objs.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-0.9246377" vertical-offset="14106" max-vertical-offset="20349">
@@ -1317,10 +1311,18 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.17085427" vertical-offset="0" max-vertical-offset="398">
+          <caret line="4" column="9" selection-start-line="4" selection-start-column="9" selection-end-line="4" selection-end-column="9" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/main/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-0.17085427" vertical-offset="765" max-vertical-offset="1632">
-          <caret line="41" column="30" selection-start-line="41" selection-start-column="30" selection-end-line="41" selection-end-column="30" />
+        <state vertical-scroll-proportion="0.59799" vertical-offset="765" max-vertical-offset="1632">
+          <caret line="59" column="33" selection-start-line="59" selection-start-column="33" selection-end-line="59" selection-end-column="33" />
           <folding>
             <element signature="e#23#46#0" expanded="true" />
           </folding>

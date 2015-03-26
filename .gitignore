@@ -1,5 +1,5 @@
 venv/
 *.pyc
+.idea/
 *database.db
-
-database.db
+nohup.out
