@@ -214,5 +214,4 @@ def init():
 def thread_run():
     read_system_attribs()
     read_all_hdd_smart()
-    read_system_attribs()
     pass
