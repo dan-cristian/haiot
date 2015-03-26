@@ -42,7 +42,7 @@ def init_modules():
 def set_db_location(location):
     global DB_LOCATION
     if location == 'disk':
-        DB_LOCATION='sqlite:///../database.db'
+        DB_LOCATION='sqlite:///../../database.db'
     else:
         if location == 'mem':
             DB_LOCATION='sqlite:////tmp/database.db'
