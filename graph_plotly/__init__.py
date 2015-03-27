@@ -42,12 +42,13 @@ def upload_data(obj):
     try:
         #logging.info('Trying to upload plotly obj {}'.format(obj))
         global g_series_id_list
-        logging.info('Trying to upload plotly obj {}'.format(obj))
+
         if constant.JSON_PUBLISH_GRAPH_X in obj:
             axis_x_field = obj[constant.JSON_PUBLISH_GRAPH_X]
             graph_id_field = obj[constant.JSON_PUBLISH_GRAPH_ID]
             graph_legend_field = obj[constant.JSON_PUBLISH_GRAPH_LEGEND]
-
+            list_axis_y = obj[constant.JSON_PUBLISH_GRAPH_Y]
+            logging.info('Trying to upload plotly obj {}'.format(list_axis_y))
             if axis_x_field in obj and graph_id_field in obj:
                 table = obj[constant.JSON_PUBLISH_TABLE]
                 series_id = obj[graph_id_field]#unique record/trace identifier
@@ -55,7 +56,7 @@ def upload_data(obj):
                 graph_legend = obj[graph_legend_field]#unique key for legend
                 x_val = utils.parse_to_date(x_val)
                 x = [x_val]
-                list_axis_y = obj[constant.JSON_PUBLISH_GRAPH_Y]
+
                 for axis_y in list_axis_y:
                     if axis_y in obj:
                         trace_list = []
