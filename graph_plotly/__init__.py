@@ -85,6 +85,8 @@ def upload_data(obj):
                         url = py.plot(data, filename=graph_name, fileopt=fileopt, auto_open=False)
                         if fileopt=='append':
                             add_new_serie(graph_name, url, series_id)
+                        else:
+                            logging.info('Extended graph on url {}'.format(url))
 
             else:
                 logging.critical('Graphable object missing axis X or ID {}'.format(axis_x_field))
