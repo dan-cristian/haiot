@@ -25,6 +25,7 @@ def node_update(obj={}):
         node.is_master_rule = utils.get_object_field_value(obj, models.Node.is_master_rule)
         node.priority = utils.get_object_field_value(obj, models.Node.priority)
         node.ip = utils.get_object_field_value(obj, models.Node.ip)
+        node.updated_on = datetime.datetime.now()
         db.session.commit()
     else:
         logging.debug('Skipping node DB save, this node is master = {}'.format(
