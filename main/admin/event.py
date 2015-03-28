@@ -47,7 +47,7 @@ def handle_event_mqtt_received(client, userdata, topic, obj):
                 else:
                     logging.debug('Graph not initialised on obj upload to graph')
             else:
-                logging.debug('Ignoring mqtt event {} for graph upload'.format(obj))
+                pass
         else:
             logging.debug('Mqtt event without graphing capabilities {}'.format(obj))
 

@@ -7,7 +7,7 @@ source venv/bin/activate
 #    echo "Selected"
 #else
 #    echo "Can't wait anymore!"
-    answer=disk
+answer=disk
 #fi
 #echo "Your answer is: $answer"
 python run_all.py $answer

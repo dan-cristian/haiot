@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="763df811-101e-4bd5-a07f-ffb7e2bc31e2" name="Revert: sudo (4396f4bb5365b71f66d540ce3fbef13599a232af)" comment="node leader">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main/__init__.py" afterPath="$PROJECT_DIR$/main/__init__.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/run_all.py" afterPath="$PROJECT_DIR$/run_all.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main/admin/event.py" afterPath="$PROJECT_DIR$/main/admin/event.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node/node_run.py" afterPath="$PROJECT_DIR$/node/node_run.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/startserver.sh" afterPath="$PROJECT_DIR$/startserver.sh" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="blog_app.iws" />
@@ -41,8 +42,48 @@
       <file leaf-file-name="node_run.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/node/node_run.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="1.4512196" vertical-offset="102" max-vertical-offset="1275">
-              <caret line="40" column="50" selection-start-line="40" selection-start-column="50" selection-end-line="40" selection-end-column="50" />
+            <state vertical-scroll-proportion="0.66233766" vertical-offset="0" max-vertical-offset="1275">
+              <caret line="18" column="32" selection-start-line="18" selection-start-column="32" selection-end-line="18" selection-end-column="32" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="startserver.bat" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/startserver.bat">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="102">
+              <caret line="0" column="22" selection-start-line="0" selection-start-column="22" selection-end-line="0" selection-end-column="22" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="event.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/main/admin/event.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="333" max-vertical-offset="969">
+              <caret line="48" column="17" selection-start-line="48" selection-start-column="17" selection-end-line="48" selection-end-column="17" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="query.py" pinned="false" current-in-tab="false">
+        <entry file="file://C:/Python27/Lib/site-packages/sqlalchemy/orm/query.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="61166" max-vertical-offset="62186">
+              <caret line="3623" column="0" selection-start-line="3623" selection-start-column="0" selection-end-line="3623" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="SocketServer.py" pinned="false" current-in-tab="false">
+        <entry file="file://C:/Python27/Lib/SocketServer.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="2448" max-vertical-offset="12563">
+              <caret line="154" column="0" selection-start-line="154" selection-start-column="0" selection-end-line="154" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -103,15 +144,12 @@
         <option value="$PROJECT_DIR$/setup.sh.bat" />
         <option value="$PROJECT_DIR$/requirements.txt" />
         <option value="$PROJECT_DIR$/mqtt_io/sender.py" />
-        <option value="$PROJECT_DIR$/startserver.sh" />
-        <option value="$PROJECT_DIR$/startserver.bat" />
         <option value="$PROJECT_DIR$/health_monitor/health_monitor_loop.py" />
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/restartserver.sh" />
         <option value="$PROJECT_DIR$/main/admin/graphs.py" />
         <option value="$PROJECT_DIR$/health_monitor/__init__.py" />
         <option value="$PROJECT_DIR$/common/variable.py" />
-        <option value="$PROJECT_DIR$/main/admin/event.py" />
         <option value="$PROJECT_DIR$/graph_plotly/__init__.py" />
         <option value="$PROJECT_DIR$/test/test_run.py" />
         <option value="$PROJECT_DIR$/node/__init__.py" />
@@ -119,9 +157,12 @@
         <option value="$PROJECT_DIR$/main/admin/model_helper.py" />
         <option value="$PROJECT_DIR$/common/__init__.py" />
         <option value="$PROJECT_DIR$/main/admin/models.py" />
-        <option value="$PROJECT_DIR$/node/node_run.py" />
         <option value="$PROJECT_DIR$/run_all.py" />
         <option value="$PROJECT_DIR$/main/__init__.py" />
+        <option value="$PROJECT_DIR$/startserver.sh" />
+        <option value="$PROJECT_DIR$/startserver.bat" />
+        <option value="$PROJECT_DIR$/main/admin/event.py" />
+        <option value="$PROJECT_DIR$/node/node_run.py" />
       </list>
     </option>
   </component>
@@ -374,7 +415,7 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="main_app" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/run_all.py" />
-      <option name="PARAMETERS" value="mem" />
+      <option name="PARAMETERS" value="disk debug" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <RunnerSettings RunnerId="PyDebugRunner" />
       <RunnerSettings RunnerId="PythonRunner" />
@@ -554,12 +595,6 @@
       <created>1426274164651</created>
       <option name="number" value="Default" />
       <updated>1426274164651</updated>
-    </task>
-    <task id="LOCAL-00022" summary="lock db">
-      <created>1427056347995</created>
-      <option name="number" value="00022" />
-      <option name="project" value="LOCAL" />
-      <updated>1427056347995</updated>
     </task>
     <task id="LOCAL-00023" summary="graph improvs">
       <created>1427061169474</created>
@@ -849,7 +884,13 @@
       <option name="project" value="LOCAL" />
       <updated>1427559022391</updated>
     </task>
-    <option name="localTasksCounter" value="71" />
+    <task id="LOCAL-00071" summary="node leader">
+      <created>1427559548082</created>
+      <option name="number" value="00071" />
+      <option name="project" value="LOCAL" />
+      <updated>1427559548082</updated>
+    </task>
+    <option name="localTasksCounter" value="72" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -868,7 +909,7 @@
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.18740849" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.43937007" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.47086614" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -934,20 +975,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://C:/Python27/Lib/site-packages/sqlalchemy/orm/scoping.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.33333334" vertical-offset="2383" max-vertical-offset="3060">
-          <caret line="149" column="0" selection-start-line="149" selection-start-column="0" selection-end-line="149" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://C:/Python27/Lib/SocketServer.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.33243242" vertical-offset="2427" max-vertical-offset="12563">
-          <caret line="154" column="0" selection-start-line="154" selection-start-column="0" selection-end-line="154" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://C:/Python27/Lib/site-packages/pydispatch/dispatcher.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.33204633" vertical-offset="5626" max-vertical-offset="8364">
@@ -1054,13 +1081,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/startserver.bat">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="398">
-          <caret line="0" column="22" selection-start-line="0" selection-start-column="22" selection-end-line="0" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.094444446" vertical-offset="0" max-vertical-offset="23069">
@@ -1074,13 +1094,6 @@
         <state vertical-scroll-proportion="0.08401977" vertical-offset="0" max-vertical-offset="607">
           <caret line="3" column="9" selection-start-line="3" selection-start-column="9" selection-end-line="3" selection-end-column="9" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/startserver.sh">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="306">
-          <caret line="12" column="25" selection-start-line="12" selection-start-column="25" selection-end-line="12" selection-end-column="25" />
         </state>
       </provider>
     </entry>
@@ -1102,13 +1115,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="136">
           <caret line="2" column="16" selection-start-line="2" selection-start-column="16" selection-end-line="2" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main/admin/thread_pool.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.19604613" vertical-offset="0" max-vertical-offset="1360">
-          <caret line="9" column="4" selection-start-line="9" selection-start-column="4" selection-end-line="9" selection-end-column="4" />
         </state>
       </provider>
     </entry>
@@ -1250,14 +1256,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main/admin/event.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.33231708" vertical-offset="333" max-vertical-offset="969">
-          <caret line="41" column="0" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/common/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.79268295" vertical-offset="46" max-vertical-offset="425">
@@ -1320,10 +1318,58 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/startserver.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.6219512" vertical-offset="0" max-vertical-offset="328">
+          <caret line="12" column="18" selection-start-line="12" selection-start-column="18" selection-end-line="12" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/startserver.bat">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="328">
+          <caret line="0" column="22" selection-start-line="0" selection-start-column="22" selection-end-line="0" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/Python27/Lib/site-packages/sqlalchemy/orm/query.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="61166" max-vertical-offset="62186">
+          <caret line="3623" column="0" selection-start-line="3623" selection-start-column="0" selection-end-line="3623" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main/admin/thread_pool.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.16558442" vertical-offset="306" max-vertical-offset="1360">
+          <caret line="23" column="46" selection-start-line="23" selection-start-column="46" selection-end-line="23" selection-end-column="46" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/Python27/Lib/SocketServer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="2448" max-vertical-offset="12563">
+          <caret line="154" column="0" selection-start-line="154" selection-start-column="0" selection-end-line="154" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main/admin/event.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="333" max-vertical-offset="969">
+          <caret line="48" column="17" selection-start-line="48" selection-start-column="17" selection-end-line="48" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/node/node_run.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="1.4512196" vertical-offset="102" max-vertical-offset="1275">
-          <caret line="40" column="50" selection-start-line="40" selection-start-column="50" selection-end-line="40" selection-end-column="50" />
+        <state vertical-scroll-proportion="0.66233766" vertical-offset="0" max-vertical-offset="1275">
+          <caret line="18" column="32" selection-start-line="18" selection-start-column="32" selection-end-line="18" selection-end-column="32" />
           <folding />
         </state>
       </provider>

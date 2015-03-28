@@ -11,7 +11,7 @@ from main import db
 #save node state to db, except for current node. no decisions taken on node election
 def node_update(obj={}):
     node_host_name = utils.get_object_field_name(obj, models.Node.name)
-    logging.debug('Received node state update from '.format(node_host_name))
+    logging.debug('Received node state update from {}'.format(node_host_name))
     #avoid node to update itself in infinite recursion
     if node_host_name != constant.HOST_NAME:
         node = models.Node.query.filter_by(name=node_host_name).first()
