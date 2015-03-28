@@ -156,7 +156,7 @@ def init():
                                      port=str(model_helper.get_param(constant.P_OWSERVER_PORT_1)))
 
 def thread_run():
-    logging.info('Processing sensors')
+    logging.debug('Processing sensors')
     return do_device(owproxy)
 
 
