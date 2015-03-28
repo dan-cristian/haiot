@@ -8,6 +8,7 @@ from mqtt_io import sender
 from main.admin import models, model_helper
 from main import db
 
+first_run = True
 #save node state to db, except for current node. no decisions taken on node election
 def node_update(obj={}):
     node_host_name = utils.get_object_field_value(obj, models.Node.name)
@@ -79,6 +80,12 @@ def announce_node_state():
 
 def thread_run():
     logging.info('Processing node_run')
-    announce_node_state()
+    global first_run
+    if first_run:
+        logging.info('On first node run I will sleep 40 seconds to get state updates')
+        time.sleep(40)
+        first_run = False
+        logging.info('Sleep done on first node run')
     update_master_state()
+    announce_node_state()
     return 'Processed node_run'
