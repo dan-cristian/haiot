@@ -17,8 +17,8 @@ def node_update(obj={}):
         node = models.Node.query.filter_by(name=node_host_name).first()
         if node is None:
             node = models.Node()
-            node.name = node_host_name
             db.session.add(node)
+        node.name = node_host_name
         node.is_master_graph = utils.get_object_field_name(obj, models.Node.is_master_graph)
         node.is_master_db_archive = utils.get_object_field_name(obj, models.Node.is_master_db_archive)
         node.is_master_overall = utils.get_object_field_name(obj, models.Node.is_master_overall)
@@ -33,7 +33,7 @@ def update_master_state():
     master_selected=False
     try:
         alive_date_time = datetime.datetime.now() - datetime.timedelta(minutes=1)
-        node_list = models.Node.query.order_by(models.Node.id).all()
+        node_list = models.Node.query.order_by(models.Node.priority).all()
         for node in node_list:
             #if recently alive, in order of id prio
             if node.updated_on >= alive_date_time:

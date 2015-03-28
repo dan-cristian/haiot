@@ -1,6 +1,7 @@
 __author__ = 'dcristian'
 import logging
 import json
+import random
 import sys
 import datetime
 import models
@@ -73,7 +74,9 @@ def populate_tables():
 
     if len(models.Node.query.all()) == 0:
         logging.info('Populating Node with default values')
-        db.session.add(models.Node('', constant.HOST_NAME, '127.0.0.1'))
+        if constant.HOST_NAME=='nas': priority = 0
+        else: priority=random.randint(1, 100)
+        db.session.add(models.Node('', name=constant.HOST_NAME, ip=constant.HOST_MAIN_IP, priority=priority))
         commit(db.session)
 
     if len(models.Sensor.query.all()) == 0:

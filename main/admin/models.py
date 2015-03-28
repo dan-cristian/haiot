@@ -182,13 +182,15 @@ class Node(db.Model, graphs.NodeGraph):
     is_master_db_archive = db.Column(db.Boolean(), default=False)
     is_master_graph = db.Column(db.Boolean(), default=False)
     is_master_rule = db.Column(db.Boolean(), default=False)
+    priority = db.Column(db.Integer)
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    def __init__(self, id='', name ='', ip=''):
+    def __init__(self, id='', name ='', ip='', priority=''):
         if id:
             self.id = id
         self.name = name
         self.ip = ip
+        self.priority = priority
 
     def __repr__(self):
         return 'Node {} ip {}'.format(self.name,  self.ip)

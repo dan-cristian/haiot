@@ -11,6 +11,7 @@ OS = 'not initialised'
 OS_LINUX={'Linux', 'posix'}
 OS_WINDOWS={'Windows', 'nt'}
 HOST_NAME='not initialised'
+HOST_MAIN_IP='not initialised'
 
 SCRIPT_RESPONSE_OK='RESULTOK'
 
