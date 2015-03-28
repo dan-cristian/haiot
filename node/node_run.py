@@ -40,7 +40,7 @@ def update_master_state():
         node_list = models.Node.query.order_by(models.Node.priority).all()
         for node in node_list:
             #if recently alive, in order of id prio
-            if node.updated_on >= alive_date_time:
+            if node.updated_on >= alive_date_time and (not master_selected):
                 if node.is_master_overall:
                     logging.debug('Node {} is already master, all good'.format(node.name))
                     master_selected = True
