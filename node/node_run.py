@@ -39,6 +39,7 @@ def update_master_state():
             if node.updated_on >= alive_date_time:
                 if node.is_master_overall:
                     logging.debug('Node {} is already master, all good'.format(node.name))
+                    master_selected = True
                 else:
                     logging.info('Node {} will become a master'.format(node.name))
                     if node.name == constant.HOST_NAME:
