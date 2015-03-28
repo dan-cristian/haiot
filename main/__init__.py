@@ -8,6 +8,7 @@ import common
 
 
 DB_LOCATION=None
+LOGGING_LEVEL=logging.INFO
 app = Flask('main')
 db=None
 
@@ -48,10 +49,17 @@ def set_db_location(location):
             DB_LOCATION='sqlite:////tmp/database.db'
         else:
             logging.critical('No DB location set {}'.format(location))
+
+def set_logging_level(level):
+    global LOGGING_LEVEL
+    if level=='debug':
+        LOGGING_LEVEL = logging.DEBUG
+
 #--------------------------------------------------------------------------#
 
 def init():
-    logging.basicConfig(format='%(levelname)s:%(module)s:%(funcName)s:%(threadName)s:%(message)s', level=logging.INFO)
+    logging.basicConfig(format='%(levelname)s:%(module)s:%(funcName)s:%(threadName)s:%(message)s', level=LOGGING_LEVEL)
+    logging.info('Logging level is {}'.format(LOGGING_LEVEL))
     common.init()
     global app, db, DB_LOCATION
     app.config.update(DEBUG=True, SQLALCHEMY_ECHO = False, SQLALCHEMY_DATABASE_URI=DB_LOCATION)

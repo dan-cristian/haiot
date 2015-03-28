@@ -14,10 +14,13 @@ def main(argv):
             sys.exit(1)
 
 if __name__ == '__main__':
-    location = main(sys.argv[1:])
+    arg_list=sys.argv[1:]
+    location = main(arg_list)
     print('DB Location is {}'.format(location))
     import main
     main.set_db_location(location)
+    if 'debug' in arg_list:
+        main.set_logging_level('debug')
     main.init()
     print 'App EXIT'
 
