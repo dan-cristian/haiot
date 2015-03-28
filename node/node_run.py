@@ -25,7 +25,6 @@ def node_update(obj={}):
         node.is_master_rule = utils.get_object_field_value(obj, models.Node.is_master_rule)
         node.priority = utils.get_object_field_value(obj, models.Node.priority)
         node.ip = utils.get_object_field_value(obj, models.Node.ip)
-
         db.session.commit()
     else:
         logging.debug('Skipping node DB save, this node is master = {}'.format(
@@ -48,6 +47,7 @@ def update_master_state():
                     logging.info('Node {} will become a master'.format(node.name))
                     if node.name == constant.HOST_NAME:
                         node.is_master_overall = True
+                        node.notify_enabled_ = True
                         db.session.commit()
                     master_selected = True
             else:
@@ -55,6 +55,7 @@ def update_master_state():
                     logging.info('Node {} will lose master status'.format(node.name))
                     if node.name == constant.HOST_NAME:
                         node.is_master_overall = False
+                        node.notify_enabled_ = True
                         db.session.commit()
             if node.name == constant.HOST_NAME:
                 if variable.NODE_THIS_IS_MASTER_OVERALL != node.is_master_overall:
@@ -69,6 +70,7 @@ def announce_node_state():
     logging.debug('I tell everyone my node state')
     node = models.Node.query.filter_by(name=constant.HOST_NAME).first()
     node.updated_on = datetime.datetime.now()
+    node.notify_enabled_ = True
     db.session.commit()
 
 def thread_run():

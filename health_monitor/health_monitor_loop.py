@@ -39,6 +39,7 @@ def save_hdd_to_db(serial, power_status, temperature, sector_error_count, smart_
                 logging.info('Disk {} change, old={} new={}'.format(disk.hdd_name, key_compare,
                                                                       disk.comparator_unique_graph_record()))
             disk.save_to_graph = True
+            disk.notify_enabled_ = True
             db.session.commit()
         else:
             logging.debug('Ignoring disk read {}, no value change'.format(key_compare))
@@ -199,6 +200,7 @@ def save_system_attribs_to_db(cpu_percent='', memory_available_percent=''):
                 logging.info('System {} change, old={} new={}'.format(system.name, key_compare,
                                                                       system.comparator_unique_graph_record()))
             system.save_to_graph = True
+            system.notify_enabled_ = True
             db.session.commit()
         else:
             logging.debug('Ignoring system read {}, no value change'.format(key_compare))

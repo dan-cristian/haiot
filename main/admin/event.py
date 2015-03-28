@@ -35,10 +35,6 @@ def handle_event_db_model_post(model, row):
     #print model_row_to_json(row._sa_instance_state.dict)
 
 def handle_event_mqtt_received(client, userdata, topic, obj):
-    #avoid recursion
-    if 'db_notified_' in obj and obj['db_notified_']:
-        return
-
     if constant.JSON_PUBLISH_TABLE in obj:
         table = obj[constant.JSON_PUBLISH_TABLE]
         if str(table) == 'Node':
@@ -60,13 +56,17 @@ def on_models_committed(sender, changes):
     try:
         for obj, change in changes:
             #avoid recursion
-            if hasattr(obj, 'db_notified_'):
-                if not obj.db_notified_:
-                    obj.db_notified_ = True
-                    txt = model_helper.model_row_to_json(obj, operation=change)
-                    mqtt_io.sender.send_message(txt)
-    except Exception:
-        logging.critical('Error in DB commit hook, {}'.format(sys.exc_info()[0]))
+            if hasattr(obj, 'notify_enabled_'):
+                if obj.notify_enabled_:
+                    if hasattr(obj, 'db_notified_'):
+                        if not obj.db_notified_:
+                            obj.db_notified_ = True
+                            txt = model_helper.model_row_to_json(obj, operation=change)
+                            mqtt_io.sender.send_message(txt)
+                else:
+                    pass
+    except Exception, ex:
+        logging.critical('Error in DB commit hook, {}'.format(ex))
 
 def init():
     #http://pydispatcher.sourceforge.net/

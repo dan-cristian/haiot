@@ -6,6 +6,7 @@ import graphs
 
 class DbEvent:
     db_notified_=False
+    notify_enabled_=False
 
 class Blog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -113,7 +114,7 @@ class HeatSchedule(db.Model):
                 self.pattern_week.name, self.pattern_weekend.name)
 
 
-class Sensor(db.Model, graphs.SensorGraph):
+class Sensor(db.Model, graphs.SensorGraph, DbEvent):
     id = db.Column(db.Integer, primary_key=True)
     address = db.Column(db.String(50), unique=True)
     type = db.Column(db.String(50))
@@ -217,7 +218,7 @@ class GraphPlotly(db.Model):
     def __repr__(self):
         return 'GraphPlotly {} ip {}'.format(self.name,  self.url)
 
-class SystemMonitor(db.Model, graphs.SystemMonitorGraph):
+class SystemMonitor(db.Model, graphs.SystemMonitorGraph, DbEvent):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True)
     cpu_usage_percent = db.Column(db.Float)
@@ -230,7 +231,7 @@ class SystemMonitor(db.Model, graphs.SystemMonitorGraph):
     def comparator_unique_graph_record(self):
         return str(self.cpu_usage_percent) + str(self.memory_available_percent)
 
-class SystemDisk(db.Model, graphs.SystemDiskGraph):
+class SystemDisk(db.Model, graphs.SystemDiskGraph, DbEvent):
     id = db.Column(db.Integer, primary_key=True)
     serial = db.Column(db.String(50), unique=True)
     system_name = db.Column(db.String(50))

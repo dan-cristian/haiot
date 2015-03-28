@@ -87,6 +87,7 @@ def save_to_db(dev):
                 logging.info('Sensor {} change, old={} new={}'.format(sensor.sensor_name, key_compare,
                                                                       sensor.comparator_unique_graph_record()))
             sensor.save_to_graph = True
+            sensor.notify_enabled_ = True
             db.session.commit()
         else:
             logging.debug('Ignoring sensor read {}, no value change'.format(key_compare))

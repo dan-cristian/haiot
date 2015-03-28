@@ -15,7 +15,7 @@ def on_subscribe(client, userdata, mid, granted_qos):
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
-    logging.debug('Received from client [{}] userdata [{}] topic [{}] at {} '.format(client._client_id,
+    logging.debug('Received from client [{}] userdata [{}] msg [{}] at {} '.format(client._client_id,
                                                                                          userdata, msg.topic,
                                                                                           datetime.datetime.now()))
     try:
@@ -24,7 +24,7 @@ def on_message(client, userdata, msg):
         end = msg.payload.find('}')
         json = msg.payload[start:end + 1]
         x = json2obj(json)
-
+        logging.debug('Message received is {}'.format(json))
         dispatcher.send(signal=constant.SIGNAL_MQTT_RECEIVED, client=client, userdata=userdata, topic=msg.topic, obj=x)
         if hasattr(x, 'command') and hasattr(x, 'command_id') and hasattr(x, 'host_target'):
             if x.host_target == socket.gethostname():
