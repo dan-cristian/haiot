@@ -178,10 +178,11 @@ class Node(db.Model, graphs.NodeGraph):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
     ip = db.Column(db.String(15), nullable=False)
+    is_master_overall = db.Column(db.Boolean(), default=False)
     is_master_db_archive = db.Column(db.Boolean(), default=False)
     is_master_graph = db.Column(db.Boolean(), default=False)
     is_master_rule = db.Column(db.Boolean(), default=False)
-    master_updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def __init__(self, id='', name ='', ip=''):
         if id:
@@ -193,7 +194,8 @@ class Node(db.Model, graphs.NodeGraph):
         return 'Node {} ip {}'.format(self.name,  self.ip)
 
     def comparator_unique_graph_record(self):
-        return str(self.is_master_db_archive) + str(self.is_master_graph) + str(self.is_master_rule)
+        return str(self.is_master_overall) + str(self.is_master_db_archive) \
+               + str(self.is_master_graph) + str(self.is_master_rule)
 
 class GraphPlotly(db.Model):
     id = db.Column(db.Integer, primary_key=True)

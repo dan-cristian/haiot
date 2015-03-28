@@ -56,7 +56,6 @@ def upload_data(obj):
                 graph_legend = obj[graph_legend_field]#unique key for legend
                 x_val = utils.parse_to_date(x_val)
                 x = [x_val]
-
                 for axis_y in list_axis_y:
                     if axis_y in obj:
                         trace_list = []
@@ -82,13 +81,13 @@ def upload_data(obj):
                             trace_list = [trace]
                             logging.debug('Appending new graph serie {} {}'.format(graph_legend, series_id))
                         data = graph_objs.Data(trace_list)
-
+                        py.grid_ops
                         url = py.plot(data, filename=graph_name, fileopt=fileopt, auto_open=False)
                         if fileopt=='append':
                             add_new_serie(graph_name, url, series_id)
+                            logging.info('Appended graph on url {}'.format(url))
                         else:
                             logging.info('Extended graph on url {}'.format(url))
-
             else:
                 logging.critical('Graphable object missing axis X or ID {}'.format(axis_x_field))
         else:

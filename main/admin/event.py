@@ -39,7 +39,7 @@ def handle_event_mqtt_received(client, userdata, topic, obj):
         table = obj[constant.JSON_PUBLISH_TABLE]
         if str(table) == 'Node':
             node.node_run.node_update(obj)
-    if variable.NODE_THIS_IS_MASTER_GRAPH:
+    if variable.NODE_THIS_IS_MASTER_OVERALL:
         if constant.JSON_PUBLISH_GRAPH_X in obj:
             if obj[constant.JSON_PUBLISH_SAVE_TO_GRAPH]:
                 if graph_plotly.initialised:

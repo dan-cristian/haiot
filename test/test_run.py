@@ -4,10 +4,10 @@ import logging
 from plotly.graph_objs import *
 import plotly.plotly as py
 from plotly import graph_objs
+from plotly.grid_objs import Column, Grid
+import datetime
 
 def test1():
-    py.sign_in("dancri77", "lw2w6fz9xk")
-
     trace0 = graph_objs.Scatter(
         x=[2],
         y=[3],
@@ -24,7 +24,6 @@ def test1():
     plot_url = py.plot(data, filename='extend plot 1', fileopt='extend')
 
 def test2():
-
     trace0 = Scatter(
         x=[7, 8],
         y=[2, 1]
@@ -45,9 +44,22 @@ def test2():
     # Take 2: extend the traces on the plot with the data in the order supplied.
     plot_url = py.plot(data, filename='extend plot', fileopt='extend')
 
+def test3():
+    column_1 = Column([1, 2, 3], 'column 1')
+    column_2 = Column(['a', 'b', datetime.datetime.now()], 'column 2')
+    grid = Grid([column_1, column_2])
+
+    unique_url = py.grid_ops.upload(grid, 'grid1', world_readable=True)
+    print unique_url
+
+def test4():
+    row = [4, 5]
+    url=py.grid_ops.append_rows([row], grid_url="https://plot.ly/~dancri77/816") #shortcut
+    print url
 
 def thread_run():
     logging.info('Processing TEST_run')
-    test1()
+    #py.sign_in("dancri77", "lw2w6fz9xk")
+    #test4()
     #test2()
     return 'Processed TEST_run'
