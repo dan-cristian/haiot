@@ -252,3 +252,28 @@ class SystemDisk(db.Model, graphs.SystemDiskGraph, DbEvent):
         return str(self.temperature) + str(self.sector_error_count) + str(self.smart_status) \
                + str(self.power_status) + str(self.hdd_disk_dev) + str(self.load_cycle_count) \
                 + str(self.start_stop_count)
+
+class GpioPin(db.Model, DbEvent):
+     id = db.Column(db.Integer, primary_key=True)
+     system_name = db.Column(db.String(50))
+     pin_code = db.Column(db.String(50))
+     pin_index = db.Column(db.Integer)
+
+     def __repr__(self):
+        return '{} {} '.format(self.pin_code, self.pin_index)
+
+class ZoneAlarm(db.Model, DbEvent):
+    id = db.Column(db.Integer, primary_key=True)
+    alarm_pin_name = db.Column(db.String(50))
+    zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'))
+    zone = db.relationship('Zone', backref=db.backref('ZoneAlarm(zone)', lazy='dynamic'))
+    gpio_pin_id = db.Column(db.Integer, db.ForeignKey('gpio_pin.id'))
+    gpio_pin = db.relationship('GpioPin', backref=db.backref('ZoneAlarm(gpiopin)', lazy='dynamic'))
+
+    def __init__(self, id='', alarm_pin_name =''):
+        if id:
+            self.id = id
+        self.alarm_pin_name = alarm_pin_name
+
+    def __repr__(self):
+        return 'ZoneAlarm zone {} gpiopin{}'.format(self.zone,  self.alarm_pin_name)

@@ -3,6 +3,7 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 import logging
 import time
 import datetime
+import random
 from common import constant, variable, utils
 from mqtt_io import sender
 from main.admin import models, model_helper
@@ -74,7 +75,14 @@ def update_master_state():
 def announce_node_state():
     logging.debug('I tell everyone my node state')
     node = models.Node.query.filter_by(name=constant.HOST_NAME).first()
+    if node is None:
+        node = models.Node()
+        node.name = constant.HOST_NAME
+        node.priority = random.randint(1, 100)
+        logging.warning('Detected node host name change, new name={}'.format(constant.HOST_NAME))
+        db.session.add(node)
     node.updated_on = datetime.datetime.now()
+    node.ip = constant.HOST_MAIN_IP
     node.notify_enabled_ = True
     db.session.commit()
 

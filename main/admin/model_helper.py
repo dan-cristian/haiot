@@ -87,8 +87,8 @@ def populate_tables():
         commit(db.session)
 
 
-    import alarm, heat, sensor, relay, mqtt_io, health_monitor, graph_plotly, node
-    if len(models.Module.query.all()) < 8:
+    import alarm, heat, sensor, relay, mqtt_io, health_monitor, graph_plotly, node, io_bbb
+    if len(models.Module.query.all()) < 9:
         logging.info('Populating Module with default values')
         db.session.add(models.Module('1', get_mod_name(node), True, 0))
         commit(db.session)
@@ -105,4 +105,6 @@ def populate_tables():
         db.session.add(models.Module('7', get_mod_name(alarm), False, 6))
         commit(db.session)
         db.session.add(models.Module('8', get_mod_name(graph_plotly), False, 7))
+        commit(db.session)
+        db.session.add(models.Module('9', get_mod_name(io_bbb), False, 8))
         commit(db.session)
