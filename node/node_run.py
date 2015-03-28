@@ -23,6 +23,8 @@ def node_update(obj={}):
         node.is_master_db_archive = utils.get_object_field_name(obj, models.Node.is_master_db_archive)
         node.is_master_overall = utils.get_object_field_name(obj, models.Node.is_master_overall)
         node.is_master_rule = utils.get_object_field_name(obj, models.Node.is_master_rule)
+        node.priority = utils.get_object_field_name(obj, models.Node.priority)
+        node.ip = utils.get_object_field_name(obj, models.Node.ip)
         db.session.commit()
     else:
         logging.debug('Skipping node DB save, this node is master = {}'.format(variable.NODE_THIS_IS_MASTER_OVERALL))

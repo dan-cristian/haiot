@@ -197,7 +197,7 @@ class Node(db.Model, graphs.NodeGraph):
 
     def comparator_unique_graph_record(self):
         return str(self.is_master_overall) + str(self.is_master_db_archive) \
-               + str(self.is_master_graph) + str(self.is_master_rule)
+               + str(self.is_master_graph) + str(self.is_master_rule) + str(self.priority) + str(self.ip)
 
 class GraphPlotly(db.Model):
     id = db.Column(db.Integer, primary_key=True)
