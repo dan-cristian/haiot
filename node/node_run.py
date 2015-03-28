@@ -14,7 +14,7 @@ def node_update(obj={}):
     logging.debug('Received node state update from '.format(node_host_name))
     #avoid node to update itself in infinite recursion
     if node_host_name != constant.HOST_NAME:
-        node = models.Node.query.filter_by(name=node_host_name)
+        node = models.Node.query.filter_by(name=node_host_name).first()
         if node is None:
             node = models.Node()
             node.name = node_host_name
