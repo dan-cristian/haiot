@@ -42,7 +42,7 @@ def update_master_state():
             #if recently alive, in order of id prio
             if node.updated_on >= alive_date_time and (not master_selected):
                 if node.is_master_overall:
-                    logging.debug('Node {} is already master, all good'.format(node.name))
+                    logging.debug('Node {} is already master, all good we have a master'.format(node.name))
                     master_selected = True
                 else:
                     logging.info('Node {} will become a master'.format(node.name))
@@ -60,6 +60,9 @@ def update_master_state():
                         db.session.commit()
             if node.name == constant.HOST_NAME:
                 if variable.NODE_THIS_IS_MASTER_OVERALL != node.is_master_overall:
+                    if node.is_master_overall:
+                        logging.info('Before becoming master I will sleep 15 seconds to let others to obey')
+                        time.sleep(15)
                     variable.NODE_THIS_IS_MASTER_OVERALL = node.is_master_overall
                     logging.info('Change in node mastership, local node is master={}'.format(
                         variable.NODE_THIS_IS_MASTER_OVERALL))

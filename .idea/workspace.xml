@@ -40,8 +40,8 @@
       <file leaf-file-name="node_run.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/node/node_run.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.24172185" vertical-offset="539" max-vertical-offset="1360">
-              <caret line="42" column="75" selection-start-line="42" selection-start-column="75" selection-end-line="42" selection-end-column="75" />
+            <state vertical-scroll-proportion="0.58270675" vertical-offset="882" max-vertical-offset="1411">
+              <caret line="67" column="51" selection-start-line="67" selection-start-column="51" selection-end-line="67" selection-end-column="51" />
               <folding />
             </state>
           </provider>
@@ -395,7 +395,7 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="main_app" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/run_all.py" />
-      <option name="PARAMETERS" value="disk debug" />
+      <option name="PARAMETERS" value="disk" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <RunnerSettings RunnerId="PyDebugRunner" />
       <RunnerSettings RunnerId="PythonRunner" />
@@ -575,12 +575,6 @@
       <created>1426274164651</created>
       <option name="number" value="Default" />
       <updated>1426274164651</updated>
-    </task>
-    <task id="LOCAL-00028" summary="sudo">
-      <created>1427154660828</created>
-      <option name="number" value="00028" />
-      <option name="project" value="LOCAL" />
-      <updated>1427154660828</updated>
     </task>
     <task id="LOCAL-00029" summary="sudo">
       <created>1427155020995</created>
@@ -870,7 +864,13 @@
       <option name="project" value="LOCAL" />
       <updated>1427575531272</updated>
     </task>
-    <option name="localTasksCounter" value="77" />
+    <task id="LOCAL-00077" summary="node leader">
+      <created>1427575708677</created>
+      <option name="number" value="00077" />
+      <option name="project" value="LOCAL" />
+      <updated>1427575708677</updated>
+    </task>
+    <option name="localTasksCounter" value="78" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -890,7 +890,7 @@
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32913387" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.48031497" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.53700787" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -1353,8 +1353,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/node/node_run.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.24172185" vertical-offset="539" max-vertical-offset="1360">
-          <caret line="42" column="75" selection-start-line="42" selection-start-column="75" selection-end-line="42" selection-end-column="75" />
+        <state vertical-scroll-proportion="0.58270675" vertical-offset="882" max-vertical-offset="1411">
+          <caret line="67" column="51" selection-start-line="67" selection-start-column="51" selection-end-line="67" selection-end-column="51" />
           <folding />
         </state>
       </provider>
