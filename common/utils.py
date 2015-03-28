@@ -23,7 +23,7 @@ def obj2json(obj):
     return json.dumps(obj, default=date_serialised)
 def get_object_name(obj):
     str(obj._sa_class_manager.itervalues().next()).split('.')[0]
-def get_object_field_name(obj={}, field_obj=None):
+def get_object_field_value(obj={}, field_obj=None):
     field_name = str(field_obj).split('.')[1]
     if obj.has_key(field_name):
         return obj[field_name]

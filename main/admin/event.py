@@ -55,8 +55,12 @@ def handle_event_mqtt_received(client, userdata, topic, obj):
 def on_models_committed(sender, changes):
     try:
         for obj, change in changes:
-            txt = model_helper.model_row_to_json(obj, operation=change)
-            mqtt_io.sender.send_message(txt)
+            #avoid recursion
+            if hasattr(obj, 'db_notified_'):
+                if not obj.db_notified_:
+                    obj.db_notified_ = True
+                    txt = model_helper.model_row_to_json(obj, operation=change)
+                    mqtt_io.sender.send_message(txt)
     except Exception:
         logging.critical('Error in DB commit hook, {}'.format(sys.exc_info()[0]))
 

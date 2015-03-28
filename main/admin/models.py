@@ -4,6 +4,9 @@ from flask_sqlalchemy import SQLAlchemy #workaround for resolve issue
 from main import db
 import graphs
 
+class DbEvent:
+    db_notified_=False
+
 class Blog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), unique=True)
@@ -174,7 +177,7 @@ class ZoneSensor(db.Model):
     def __repr__(self):
         return 'ZoneSensor zone {} sensor {}'.format(self.zone,  self.sensor_name)
 
-class Node(db.Model, graphs.NodeGraph):
+class Node(db.Model, graphs.NodeGraph, DbEvent):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
     ip = db.Column(db.String(15), nullable=False)

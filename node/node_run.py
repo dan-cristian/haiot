@@ -10,7 +10,7 @@ from main import db
 
 #save node state to db, except for current node. no decisions taken on node election
 def node_update(obj={}):
-    node_host_name = utils.get_object_field_name(obj, models.Node.name)
+    node_host_name = utils.get_object_field_value(obj, models.Node.name)
     logging.debug('Received node state update from {}'.format(node_host_name))
     #avoid node to update itself in infinite recursion
     if node_host_name != constant.HOST_NAME:
@@ -19,15 +19,17 @@ def node_update(obj={}):
             node = models.Node()
             db.session.add(node)
         node.name = node_host_name
-        node.is_master_graph = utils.get_object_field_name(obj, models.Node.is_master_graph)
-        node.is_master_db_archive = utils.get_object_field_name(obj, models.Node.is_master_db_archive)
-        node.is_master_overall = utils.get_object_field_name(obj, models.Node.is_master_overall)
-        node.is_master_rule = utils.get_object_field_name(obj, models.Node.is_master_rule)
-        node.priority = utils.get_object_field_name(obj, models.Node.priority)
-        node.ip = utils.get_object_field_name(obj, models.Node.ip)
+        node.is_master_graph = utils.get_object_field_value(obj, models.Node.is_master_graph)
+        node.is_master_db_archive = utils.get_object_field_value(obj, models.Node.is_master_db_archive)
+        node.is_master_overall = utils.get_object_field_value(obj, models.Node.is_master_overall)
+        node.is_master_rule = utils.get_object_field_value(obj, models.Node.is_master_rule)
+        node.priority = utils.get_object_field_value(obj, models.Node.priority)
+        node.ip = utils.get_object_field_value(obj, models.Node.ip)
+
         db.session.commit()
     else:
-        logging.debug('Skipping node DB save, this node is master = {}'.format(variable.NODE_THIS_IS_MASTER_OVERALL))
+        logging.debug('Skipping node DB save, this node is master = {}'.format(
+            variable.NODE_THIS_IS_MASTER_OVERALL))
 
 
 #elect and set master status in db for current node only. master is elected by node_id priority, if alive
