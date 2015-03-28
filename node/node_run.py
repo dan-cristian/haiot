@@ -35,21 +35,28 @@ def update_master_state():
         alive_date_time = datetime.datetime.now() - datetime.timedelta(minutes=1)
         node_list = models.Node.query.order_by(models.Node.id).all()
         for node in node_list:
-            if (not master_selected) and (node.updated_on >= alive_date_time):
+            #if recently alive, in order of id prio
+            if node.updated_on >= alive_date_time:
                 if node.is_master_overall:
                     logging.debug('Node {} is already master, all good'.format(node.name))
                 else:
-                    logging.info('Node {} is now becoming a master'.format(node.name))
-                    node.is_master_overall = True
-                    db.session.commit()
+                    logging.info('Node {} will become a master'.format(node.name))
+                    if node.name == constant.HOST_NAME:
+                        node.is_master_overall = True
+                        db.session.commit()
                     master_selected = True
             else:
-                if node.is_master_overall:
-                    logging.info('Node {} has lost master status'.format(node.name))
-                    node.is_master_overall = False
-                    db.session.commit()
+                if master_selected and node.is_master_overall:
+                    logging.info('Node {} will lose master status'.format(node.name))
+                    if node.name == constant.HOST_NAME:
+                        node.is_master_overall = False
+                        db.session.commit()
             if node.name == constant.HOST_NAME:
-                variable.NODE_THIS_IS_MASTER_OVERALL = node.is_master_overall
+                if variable.NODE_THIS_IS_MASTER_OVERALL != node.is_master_overall:
+                    variable.NODE_THIS_IS_MASTER_OVERALL = node.is_master_overall
+                    logging.info('Change in node mastership, local node is master={}'.format(
+                        variable.NODE_THIS_IS_MASTER_OVERALL))
+
     except Exception, ex:
         logging.warning('Error try_become_master, err {}'.format(ex))
 
