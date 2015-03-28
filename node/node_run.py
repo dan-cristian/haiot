@@ -8,7 +8,7 @@ from mqtt_io import sender
 from main.admin import models, model_helper
 from main import db
 
-#save node state
+#save node state to db, except for current node. no decisions taken on node election
 def node_update(obj={}):
     node_host_name = utils.get_object_field_name(obj, models.Node.name)
     logging.debug('Received node state update from '.format(node_host_name))
@@ -25,24 +25,31 @@ def node_update(obj={}):
         node.is_master_rule = utils.get_object_field_name(obj, models.Node.is_master_rule)
         db.session.commit()
     else:
-        variable.NODE_THIS_IS_MASTER_OVERALL = utils.get_object_field_name(obj, models.Node.is_master_overall)
-        logging.info('Skipping node DB save, this node is master = {}'.format(variable.NODE_THIS_IS_MASTER_OVERALL))
+        logging.debug('Skipping node DB save, this node is master = {}'.format(variable.NODE_THIS_IS_MASTER_OVERALL))
 
 
-#TODO: implement
+#elect and set master status in db for current node only. master is elected by node_id priority, if alive
 def update_master_state():
+    master_selected=False
     try:
         alive_date_time = datetime.datetime.now() - datetime.timedelta(minutes=1)
         node_list = models.Node.query.order_by(models.Node.id).all()
         for node in node_list:
-            if node.updated_on >= alive_date_time:
+            if (not master_selected) and (node.updated_on >= alive_date_time):
                 if node.is_master_overall:
                     logging.debug('Node {} is already master, all good'.format(node.name))
                 else:
                     logging.info('Node {} is now becoming a master'.format(node.name))
                     node.is_master_overall = True
                     db.session.commit()
-                    break
+                    master_selected = True
+            else:
+                if node.is_master_overall:
+                    logging.info('Node {} has lost master status'.format(node.name))
+                    node.is_master_overall = False
+                    db.session.commit()
+            if node.name == constant.HOST_NAME:
+                variable.NODE_THIS_IS_MASTER_OVERALL = node.is_master_overall
     except Exception, ex:
         logging.warning('Error try_become_master, err {}'.format(ex))
 
