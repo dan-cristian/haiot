@@ -1,6 +1,7 @@
 __author__ = 'dcristian'
 import socket
 import logging
+import datetime
 import sys
 from pydispatch import dispatcher
 from common.utils import json2obj
@@ -14,9 +15,9 @@ def on_subscribe(client, userdata, mid, granted_qos):
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
-    logging.debug('Received from client [{}] userdata [{}] topic [{}] msgsize {} '.format(client._client_id,
+    logging.debug('Received from client [{}] userdata [{}] topic [{}] at {} '.format(client._client_id,
                                                                                          userdata, msg.topic,
-                                                                                         len(msg.payload)))
+                                                                                          datetime.datetime.now()))
     try:
         # locate json string
         start = msg.payload.find('{')

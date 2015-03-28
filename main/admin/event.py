@@ -35,6 +35,10 @@ def handle_event_db_model_post(model, row):
     #print model_row_to_json(row._sa_instance_state.dict)
 
 def handle_event_mqtt_received(client, userdata, topic, obj):
+    #avoid recursion
+    if 'db_notified_' in obj and obj['db_notified_']:
+        return
+
     if constant.JSON_PUBLISH_TABLE in obj:
         table = obj[constant.JSON_PUBLISH_TABLE]
         if str(table) == 'Node':
