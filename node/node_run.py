@@ -79,7 +79,7 @@ def announce_node_state():
     db.session.commit()
 
 def thread_run():
-    logging.info('Processing node_run')
+    logging.debug('Processing node_run')
     global first_run
     if first_run:
         logging.info('On first node run I will sleep 40 seconds to get state updates')
