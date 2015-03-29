@@ -21,12 +21,22 @@ topic='no_topic_defined'
 def on_connect(client, userdata, flags, rc):
     logging.info("Connected to mqtt with result code " + str(rc))
     client_connected = True
+    subscribe()
 
 def on_disconnect(client, userdata, rc):
     if rc != 0:
         logging.warning("Unexpected disconnection from mqtt")
     logging.warning("Disconnected from mqtt")
     client_connected = False
+
+def subscribe():
+    global topic
+    logging.info('Subscribing to mqtt topic{}'.format(topic))
+    mqtt_client.on_subscribe = receiver.on_subscribe
+    mqtt_client.username_pw_set(constant.HOST_NAME)
+    mqtt_client.user_data_set(constant.HOST_NAME + " userdata")
+    mqtt_client.will_set(constant.HOST_NAME + " DIE")
+    mqtt_client.subscribe(topic=topic, qos=0)
 
 def unload():
     # Blocking call that processes network traffic, dispatches callbacks and
@@ -54,13 +64,6 @@ def init():
             client_connected = True
             mqtt_client.on_message = receiver.on_message
             mqtt_client.on_disconnect = on_disconnect
-            mqtt_client.on_subscribe = receiver.on_subscribe
-            mqtt_client.username_pw_set(socket.gethostname())
-            mqtt_client.user_data_set(socket.gethostname() + " userdata")
-            mqtt_client.will_set(socket.gethostname() + " DIE")
-
-            mqtt_client.subscribe(topic=topic, qos=0)
-            
             mqtt_client.loop_start()
         except socket.error:
             logging.error('mqtt client not connected, err {}, pause and retry'.format(sys.exc_info()[0]))
