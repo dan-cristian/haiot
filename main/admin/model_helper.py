@@ -7,7 +7,7 @@ import datetime
 import models
 from common import constant, utils
 from main import db
-from sqlalchemy.exc import IntegrityError, OperationalError
+from sqlalchemy.exc import IntegrityError, OperationalError, InvalidRequestError
 
 def model_row_to_json(obj, operation=''):
     try:
@@ -43,10 +43,11 @@ def get_param(name):
 def commit(session):
     try:
         session.commit()
-        session.flush()
     except IntegrityError:
         session.rollback()
         logging.warning('Unable to commit DB session {}, rolled back'.format(session))
+    except InvalidRequestError:
+        logging.warning('Error on commit {}, ignoring'.format(session))
 
 
 def get_mod_name(module):
@@ -99,13 +100,12 @@ def populate_tables():
         db.session.add(models.Node('', name=constant.HOST_NAME, ip=constant.HOST_MAIN_IP, priority=priority))
         commit(db.session)
 
-    if len(models.Sensor.query.all()) == 0:
-        logging.info('Populating Sensor with a test value')
-
-        sens = models.Sensor(address='ADDRESSTEST')
+    #if len(models.Sensor.query.all()) == 0:
+        #logging.info('Populating Sensor with a test value')
+        #sens = models.Sensor(address='ADDRESSTEST')
         #db.session.add(models.Sensor(0, address='ADDRESSTEST'))
-        db.session.add(sens)
-        commit(db.session)
+        #db.session.add(sens)
+        #commit(db.session)
 
     import alarm, heat, sensor, relay, mqtt_io, health_monitor, graph_plotly, node, io_bbb
     module_list=[
