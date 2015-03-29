@@ -2,6 +2,7 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 import logging
 import time
+from main import db
 from main.admin import models
 #https://learn.adafruit.com/setting-up-io-python-library-on-beaglebone-black/using-the-bbio-library
 try:
@@ -26,6 +27,9 @@ def event_detected(channel):
     zonealarm=models.ZoneAlarm.query.filter_by(gpio_pin_code=channel).all()
     if len(zonealarm)==1:
         state = GPIO.input(zonealarm[0].gpio_pin_code)
+        zonealarm[0].alarm_status = state
+        zonealarm[0].notify_enabled_ = True
+        db.session.commit()
         logging.info('Event detected zone {} channel {} status {}'.format(zonealarm[0].zone.name, channel, state))
     else:
         logging.warning('Multiple zones defined with same gpio code {}'.format(channel))
