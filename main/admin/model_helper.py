@@ -43,6 +43,7 @@ def get_param(name):
 def commit(session):
     try:
         session.commit()
+        session.flush()
     except IntegrityError:
         session.rollback()
         logging.warning('Unable to commit DB session {}, rolled back'.format(session))
@@ -55,7 +56,7 @@ def check_table_schema(table):
     try:
         count = table.query.all()
     except OperationalError, oex:
-        logging.critical('Table {} schema in DB seems outdated, should I drop it and recreate (yes/no)?'.format(table))
+        logging.critical('Table {} schema in DB seems outdated, DROP it and recreate (y/n)?'.format(table))
         read_drop_table(table, oex)
 
 def read_drop_table(table, original_exception):
@@ -106,28 +107,20 @@ def populate_tables():
         db.session.add(sens)
         commit(db.session)
 
-
-
     import alarm, heat, sensor, relay, mqtt_io, health_monitor, graph_plotly, node, io_bbb
-    if len(models.Module.query.all()) < 9:
+    module_list=[
+        ['1', get_mod_name(node), True, 0], ['2', get_mod_name(health_monitor), True, 1],
+        ['3', get_mod_name(mqtt_io), True, 2], ['4', get_mod_name(sensor), False, 3],
+        ['5', get_mod_name(relay), False, 4], ['6', get_mod_name(heat), False, 5],
+        ['7', get_mod_name(alarm), False, 6], ['8', get_mod_name(graph_plotly), False, 7],
+        ['9', get_mod_name(io_bbb), False, 8]
+    ]
+    check_table_schema(models.Module)
+    if len(models.Module.query.all()) < len(module_list):
         logging.info('Populating Module with default values')
-        db.session.add(models.Module('1', get_mod_name(node), True, 0))
-        commit(db.session)
-        db.session.add(models.Module('2', get_mod_name(health_monitor), True, 1))
-        commit(db.session)
-        db.session.add(models.Module('3', get_mod_name(mqtt_io), True, 2))
-        commit(db.session)
-        db.session.add(models.Module('4', get_mod_name(sensor), False, 3))
-        commit(db.session)
-        db.session.add(models.Module('5', get_mod_name(relay), False, 4))
-        commit(db.session)
-        db.session.add(models.Module('6', get_mod_name(heat), False, 5))
-        commit(db.session)
-        db.session.add(models.Module('7', get_mod_name(alarm), False, 6))
-        commit(db.session)
-        db.session.add(models.Module('8', get_mod_name(graph_plotly), False, 7))
-        commit(db.session)
-        db.session.add(models.Module('9', get_mod_name(io_bbb), False, 8))
+        models.Module.query.delete()
+        for tuple in module_list:
+            db.session.add(models.Module(id=tuple[0], name=tuple[1], active=tuple[2], start_order=tuple[3]))
         commit(db.session)
 
     check_table_schema(models.GpioPin)
