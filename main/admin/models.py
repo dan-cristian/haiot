@@ -132,9 +132,7 @@ class Sensor(db.Model, graphs.SensorGraph, DbEvent):
     zone_name = db.Column(db.String(50))
     sensor_name = db.Column(db.String(50))
 
-    def __init__(self, id='', address=''):
-        if id:
-            self.id = id
+    def __init__(self, address=''):
         self.address= address
 
     def __repr__(self):
@@ -165,12 +163,12 @@ class ZoneSensor(db.Model):
     sensor_name = db.Column(db.String(50))
     zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'))
     zone = db.relationship('Zone', backref=db.backref('ZoneSensor(zone)', lazy='dynamic'))
-    sensor_address = db.Column(db.Integer, db.ForeignKey('sensor.address'))
+    sensor_address = db.Column(db.String(50), db.ForeignKey('sensor.address'))
     sensor = db.relationship('Sensor', backref=db.backref('ZoneSensor(sensor)', lazy='dynamic'))
 
-    def __init__(self, id='', sensor_name =''):
-        if id:
-            self.id = id
+    def __init__(self, zone_id='', sensor_address ='', sensor_name=''):
+        self.sensor_address= sensor_address
+        self.zone_id = zone_id
         self.sensor_name = sensor_name
 
     def __repr__(self):

@@ -100,10 +100,12 @@ def populate_tables():
 
     if len(models.Sensor.query.all()) == 0:
         logging.info('Populating Sensor with a test value')
+
         sens = models.Sensor(address='ADDRESSTEST')
         #db.session.add(models.Sensor(0, address='ADDRESSTEST'))
         db.session.add(sens)
         commit(db.session)
+
 
 
     import alarm, heat, sensor, relay, mqtt_io, health_monitor, graph_plotly, node, io_bbb
@@ -143,34 +145,47 @@ def populate_tables():
                 commit(db.session)
 
     check_table_schema(models.Zone)
-    if len(models.Zone.query.all()) < 47:
+    zones = [[1,'bucatarie'], [2,'living'],[3,'beci mic'],[4,'dormitor'],[5,'baie mare'],
+             [6,'bebe'],[7,'curte fata'],[8,'hol intrare'],[9,'beci mare'],[10,'scari beci'],[11,'etaj hol'],
+             [12,'curte fata'],[13,'living tv'],[14,'usa poarta'],[15,'usa casa'],[16, 'usa portita'],
+             [17,'usa garaj mare'], [18, 'buton usa'], [19, 'heat main'], [20, 'heat living'], [21, 'heat birou'],
+             [22, 'heat bucatarie'], [23, 'fridge'], [24, 'powermeter'], [25,'boiler'], [26,'congelator'],
+             [27,'pod fata'], [28,'drum fata'],[29,'hol beci'],[30,'power beci'],[31,'gas heater'],
+             [32,'watermain'],[33,'watersecond'],[34,'horn'],[35,'gas meter'],[36,'front valve'],
+             [37,'back valve'],[38,'puffer'],[39,'back pump'],[40,'back lights'],[41,'front lights'],
+             [42,'hotwater mater'], [43,'headset'],[44,'heat dormitor'],[45,'powerserver'],[46,'ups main'],
+             [47,'birou'], [48, 'solar jos']
+             ]
+    if len(models.Zone.query.all()) < len(zones):
         logging.info('Populating Zone with default values')
         models.Zone.query.delete()
-        zones = [[1,'bucatarie'], [2,'living'],[3,'beci mic'],[4,'dormitor'],[5,'baie mare'],
-                 [6,'bebe'],[7,'curte fata'],[8,'hol intrare'],[9,'beci mare'],[10,'scari beci'],[11,'etaj hol'],
-                 [12,'curte fata'],[13,'living tv'],[14,'usa poarta'],[15,'usa casa'],[16, 'usa portita'],
-                 [17,'usa garaj mare'], [18, 'buton usa'], [19, 'heat main'], [20, 'heat living'], [21, 'heat birou'],
-                 [22, 'heat bucatarie'], [23, 'fridge'], [24, 'powermeter'], [25,'boiler'], [26,'congelator'],
-                 [27,'pod fata'], [28,'drum fata'],[29,'hol beci'],[30,'power beci'],[31,'gas heater'],
-                 [32,'watermain'],[33,'watersecond'],[34,'horn'],[35,'gas meter'],[36,'front valve'],
-                 [37,'back valve'],[38,'puffer'],[39,'back pump'],[40,'back lights'],[41,'front lights'],
-                 [42,'hotwater mater'], [43,'headset'],[44,'heat dormitor'],[45,'powerserver'],[46,'ups main'],
-                 [47,'birou']
-                 ]
-
         for pair in zones:
             db.session.add(models.Zone(pair[0], pair[1]))
         commit(db.session)
 
     check_table_schema(models.ZoneAlarm)
-    if len(models.ZoneAlarm.query.all()) < 7:
+    zonealarm_list=[[47, 'P8_11'],[1,'P8_08'],[2,'P8_16'],[3,'P8_12'],[9,'P8_09'],[10,'P8_07'],[11,'P8_15']]
+    if len(models.ZoneAlarm.query.all()) < len(zonealarm_list):
         logging.info('Populating ZoneAlarm with default values')
         models.ZoneAlarm.query.delete()
         commit(db.session)
-        zonealarm_list=[
-            [47, 'P8_11'],[1,'P8_08'],[2,'P8_16'],[3,'P8_12'],[9,'P8_09'],[10,'P8_07'],[11,'P8_15']
-        ]
         for pair in zonealarm_list:
             db.session.add(models.ZoneAlarm(pair[0], pair[1]))
         commit(db.session)
 
+    check_table_schema(models.ZoneSensor)
+    zonesensor_list=[
+            [34, '5C000004F344F828','horn'],[3,'95000003BDF98428','beci mic'],[48,'D9000004F3BFA428', 'solar jos'],
+            [38,'04000004F3DE2128', 'puffer sus'],[38,'AE000003BDFFB928', 'puffer mijloc'],
+            [38,'12000004F3428528', 'puffer jos'], [31,'66000003BE22ED28', 'gas heater'],
+            [25, '96000003BDFE5D28', 'boiler sus'], [25, '53000004F296DD28', 'boiler mijloc'],
+            [25, 'C8000004F28B0728', 'boiler jos'], [2, '41000003BE099C28', 'living'],
+            [1, 'AA000003BDE6C728', 'bucatarie'], [27, 'E400000155E72D26', 'pod fata']
+        ]
+    if len(models.ZoneSensor.query.all()) < len(zonesensor_list):
+        logging.info('Populating ZoneSensor with default values')
+        models.ZoneSensor.query.delete()
+        commit(db.session)
+        for pair in zonesensor_list:
+            db.session.add(models.ZoneSensor(zone_id=pair[0], sensor_address=pair[1], sensor_name=pair[2]))
+        commit(db.session)
