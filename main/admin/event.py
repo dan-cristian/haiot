@@ -31,7 +31,7 @@ def handle_event_db_model_post(model, row):
         logging.info('Detected Parameter change ' + row)
     elif str(models.Module) in str(model):
         logging.info('Detected Module change')
-        main.init_modules()
+        main.init_module(row.name, row.active)
     #print model_row_to_json(row._sa_instance_state.dict)
 
 def handle_event_mqtt_received(client, userdata, topic, obj):

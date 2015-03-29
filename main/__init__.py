@@ -20,25 +20,29 @@ def my_import(name):
         mod = getattr(mod, comp)
     return mod
 
+def init_module(module_name, module_is_active):
+    dynclass = my_import(module_name)
+    if module_is_active:
+        print "Module {} is active".format(module_name)
+        if not dynclass.initialised:
+            logging.info('Module {} initialising'.format(module_name))
+            dynclass.init()
+        else:
+            logging.info('Module {} already initialised'.format(module_name))
+    else:
+        print "Module {} is not active".format(module_name)
+        if dynclass.initialised:
+            logging.info('Module {} has been deactivated, unloading'.format(module_name))
+            dynclass.unload()
+            del dynclass
+
 def init_modules():
     import admin.models
     module_list = admin.models.Module.query.order_by(admin.models.Module.start_order).all()
     for mod in module_list:
         assert isinstance(mod, admin.models.Module)
-        dynclass = my_import(mod.name)
-        if mod.active:
-            print "Module {} is active".format(mod.name)
-            if not dynclass.initialised:
-                logging.info('Module {} initialising'.format(mod.name))
-                dynclass.init()
-            else:
-                logging.info('Module {} already initialised'.format(mod.name))
-        else:
-            print "Module {} is not active".format(mod.name)
-            if dynclass.initialised:
-                logging.info('Module {} has been deactivated, unloading'.format(mod.name))
-                dynclass.unload()
-                del dynclass
+        init_module(mod.name, mod.active)
+
 
 def set_db_location(location):
     global DB_LOCATION
@@ -85,9 +89,9 @@ def init():
 
     app.run(debug=True, use_reloader=False, host='0.0.0.0')
 
-@app.route('/')
-def home():
-    return 'Blog be here'
+#@app.route('/')
+#def home():
+#    return 'Blog be here'
 
 @models_committed.connect_via(app)
 def on_models_committed(sender, changes):

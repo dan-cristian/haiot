@@ -126,7 +126,7 @@ from .models import Blog, Comment, Zone, SchedulePattern, HeatSchedule, Sensor
 from .models import Module, Parameter, TemperatureTarget, ZoneSensor, Node, GraphPlotly
 from .models import SystemMonitor, SystemDisk, GpioPin, ZoneAlarm
 
-
+register_crud(admin, '/', 'main-entry', Module, filters=simple_filters)
 register_crud(admin, '/blog', 'blog', Blog, filters=blog_filters)
 register_crud(admin, '/comments', 'comments', Comment, filters=comment_filters)
 register_crud(admin, '/module', 'module', Module, filters=simple_filters)

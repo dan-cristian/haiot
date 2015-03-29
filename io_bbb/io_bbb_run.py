@@ -3,7 +3,10 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 import logging
 import time
 #https://learn.adafruit.com/setting-up-io-python-library-on-beaglebone-black/using-the-bbio-library
-import Adafruit_BBIO.GPIO as GPIO
+try:
+    import Adafruit_BBIO.GPIO as GPIO
+except:
+    logging.critical('Module Adafruit_BBIO.GPIO is not installed, module will not be initialised')
 
 def register_gpios():
     GPIO.add_event_detect('P8_11', GPIO.FALLING)
