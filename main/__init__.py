@@ -3,9 +3,10 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy #workaround for resolve issue
 from flask_sqlalchemy import models_committed
-from flask.ext.webtest import get_scopefunc
 import logging
+import threading
 import common
+
 
 
 DB_LOCATION=None
@@ -60,6 +61,24 @@ def set_logging_level(level):
     if level=='debug':
         LOGGING_LEVEL = logging.DEBUG
 
+
+db_lock = threading.Lock()
+def dbcommit():
+    global db_lock
+    try:
+        db_lock.acquire()
+        logging.info('entering commit')
+        db.session.commit()
+        logging.info('exiting commit')
+    finally:
+        db_lock.release()
+
+def dbadd(obj):
+    db.session.add(obj)
+
+def dbbegin():
+    db.session.begin()
+
 #--------------------------------------------------------------------------#
 
 def init():
@@ -69,9 +88,7 @@ def init():
     global app, db, DB_LOCATION
     app.config.update(DEBUG=True, SQLALCHEMY_ECHO = False, SQLALCHEMY_DATABASE_URI=DB_LOCATION)
 
-    session_options = {}
-    session_options['scopefunc'] = get_scopefunc()
-    db = SQLAlchemy(app, session_options=session_options)
+    db = SQLAlchemy(app)
 
     from admin import admin, user
     app.register_blueprint(admin, url_prefix='/admin')

@@ -3,9 +3,9 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 import logging
 import datetime
 import random
-from main import db
+import sys
+from main import dbcommit, dbadd, dbbegin
 from main.admin import models
-from flask.ext.webtest import SessionScope
 #https://learn.adafruit.com/setting-up-io-python-library-on-beaglebone-black/using-the-bbio-library
 try:
     import Adafruit_BBIO.GPIO as GPIO
@@ -24,11 +24,11 @@ def register_gpios():
             GPIO.add_event_detect(zonealarm.gpio_pin_code, GPIO.BOTH, callback=event_detected, bouncetime=300)
             logging.info('Enabled alarm on gpio {} zone {}'.format(zonealarm.gpio_pin_code, zonealarm.zone.name))
         except Exception, ex:
-            logging.critical('Unable to setup GPIO {} zone {} type {}'.format(zonealarm.gpio_pin_code,
-                                                                      zonealarm.zone.name, zonealarm.gpio_pin.pin_type))
+            logging.critical('Unable to setup GPIO {} zone {} '.format(zonealarm.gpio_pin_code,
+                                                                      zonealarm.zone.name))
 
 def event_detected(channel):
-    with SessionScope(db):
+    try:
         zonealarm=models.ZoneAlarm.query.filter_by(gpio_pin_code=channel).first()
         global import_module_exist
         if import_module_exist:
@@ -38,8 +38,11 @@ def event_detected(channel):
             state = random.randint(0,2)
         zonealarm.updated_on = datetime.datetime.now()
         zonealarm.notify_enabled_ = True
-        db.session.commit()
+        dbcommit()
         logging.info('Event detected zone {} channel {} status {}'.format(zonealarm.zone.name, channel, state))
+    except Exception, ex:
+        logging.warning('Error alarm status save, err {}'.format(ex))
+
 
 def check_for_events():
     global zone_alarm_list

@@ -262,8 +262,9 @@ class ZoneAlarm(db.Model, DbEvent):
     alarm_pin_name = db.Column(db.String(50))
     zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'))
     zone = db.relationship('Zone', backref=db.backref('ZoneAlarm(zone)', lazy='dynamic'))
-    gpio_pin_code = db.Column(db.String(50), db.ForeignKey('gpio_pin.pin_code'))
-    gpio_pin = db.relationship('GpioPin', backref=db.backref('ZoneAlarm(gpiopincode)', lazy='dynamic'))
+    #gpio_pin_code = db.Column(db.String(50), db.ForeignKey('gpio_pin.pin_code'))
+    gpio_pin_code = db.Column(db.String(50))
+    #gpio_pin = db.relationship('GpioPin', backref=db.backref('ZoneAlarm(gpiopincode)', lazy='dynamic'))
     alarm_status = db.Column(db.Integer)
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 

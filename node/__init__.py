@@ -16,7 +16,7 @@ def unload():
 def init():
     logging.info('Node module initialising')
     #node_run.init()
-    thread_pool.add_callable(node_run.thread_run, run_interval_second=20)
+    thread_pool.add_callable(node_run.thread_run, run_interval_second=60)
     global initialised
     initialised = True
 

@@ -46,7 +46,7 @@ def do_device (owproxy):
             logging.warning('Connection error owserver')
     return 'Read {} sensors'.format(len(sensors))
 
-db_lock = threading.Lock()
+
 def save_to_db(dev):
     #global db_lock
     #db_lock.acquire()
