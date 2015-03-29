@@ -38,6 +38,9 @@ def main():
                 else:
                     last_exec_date = exec_last_date_list.get(func, None)
                     elapsed_seconds = (datetime.now() - last_exec_date).total_seconds()
+                    if elapsed_seconds>2*60:
+                        logging.warning('Threaded function {} is long running for {} seconds'.format(
+                            print_name,elapsed_seconds))
                 if future_obj.done():
                     try:
                         future_obj.result()

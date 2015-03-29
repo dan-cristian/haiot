@@ -12,5 +12,6 @@ plotly>=0.0
 #fix for ssl warning
 requests==2.5.3
 psutil>=0.0
+enum34>=0.0
 #uncomment on beaglebone
 #Adafruit_BBIO>=0.0

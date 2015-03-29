@@ -1,6 +1,8 @@
 from datetime import datetime
 
 from flask_sqlalchemy import SQLAlchemy #workaround for resolve issue
+from sqlalchemy_utils import ChoiceType
+import enum
 from main import db
 import graphs
 
