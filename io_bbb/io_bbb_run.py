@@ -2,19 +2,29 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 import logging
 import time
+from main.admin import models
 #https://learn.adafruit.com/setting-up-io-python-library-on-beaglebone-black/using-the-bbio-library
 try:
     import Adafruit_BBIO.GPIO as GPIO
 except:
     logging.critical('Module Adafruit_BBIO.GPIO is not installed, module will not be initialised')
 
+zone_alarm_list = None
+
 def register_gpios():
-    GPIO.setup("P8_11", GPIO.IN)
-    GPIO.add_event_detect('P8_11', GPIO.FALLING)
+    global zone_alarm_list
+    zone_alarm_list = models.ZoneAlarm.query.all()
+    for zonealarm in zone_alarm_list:
+        logging.info('Enabling alarm on gpio {} zone {}'.format(zonealarm.gpio_pin_code, zonealarm.zone.name))
+        GPIO.setup(zonealarm.gpio_pin_code, GPIO.IN)
+        GPIO.add_event_detect(zonealarm.gpio_pin_code, GPIO.FALLING)
 
 def check_for_events():
-    if GPIO.event_detected('P8_11'):
-        logging.info('Event detected {}'.format(GPIO.input('P8_11')))
+    global zone_alarm_list
+    for zonealarm in zone_alarm_list:
+        if GPIO.event_detected(zonealarm.gpio_pin_code):
+            state = GPIO.input(zonealarm.gpio_pin_code)
+            logging.info('Event detected gpio {} zone {}'.format(state, zonealarm.zone.name))
 
 def init():
     register_gpios()

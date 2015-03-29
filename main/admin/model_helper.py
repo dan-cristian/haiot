@@ -129,16 +129,48 @@ def populate_tables():
         commit(db.session)
 
     check_table_schema(models.GpioPin)
-    if len(models.GpioPin.query.filter_by(pin_type='bbb').all()) != 46 * 2:#P8_ and P9_ with 46 pins
-        models.GpioPin.query.filter_by(pin_type='bbb').delete()
+    if len(models.GpioPin.query.filter_by(pin_type=constant.GPIO_PIN_TYPE_BBB).all()) != 46 * 2:#P8_ and P9_ with 46 pins
+        models.GpioPin.query.filter_by(pin_type=constant.GPIO_PIN_TYPE_BBB).delete()
         commit(db.session)
         logging.info('Populating GpioPins with default beabglebone values')
         for rail in range(8,10): #last range is not part of the loop
             for pin in range(01, 47):
                 gpio = models.GpioPin()
-                gpio.pin_type='bbb'
+                gpio.pin_type=constant.GPIO_PIN_TYPE_BBB
                 pincode='0'+str(pin)
                 gpio.pin_code='P'+str(rail)+'_'+pincode[-2:]
                 db.session.add(gpio)
                 commit(db.session)
+
+    check_table_schema(models.Zone)
+    if len(models.Zone.query.all()) < 47:
+        logging.info('Populating Zone with default values')
+        models.Zone.query.delete()
+        zones = [[1,'bucatarie'], [2,'living'],[3,'beci mic'],[4,'dormitor'],[5,'baie mare'],
+                 [6,'bebe'],[7,'curte fata'],[8,'hol intrare'],[9,'beci mare'],[10,'scari beci'],[11,'etaj hol'],
+                 [12,'curte fata'],[13,'living tv'],[14,'usa poarta'],[15,'usa casa'],[16, 'usa portita'],
+                 [17,'usa garaj mare'], [18, 'buton usa'], [19, 'heat main'], [20, 'heat living'], [21, 'heat birou'],
+                 [22, 'heat bucatarie'], [23, 'fridge'], [24, 'powermeter'], [25,'boiler'], [26,'congelator'],
+                 [27,'pod fata'], [28,'drum fata'],[29,'hol beci'],[30,'power beci'],[31,'gas heater'],
+                 [32,'watermain'],[33,'watersecond'],[34,'horn'],[35,'gas meter'],[36,'front valve'],
+                 [37,'back valve'],[38,'puffer'],[39,'back pump'],[40,'back lights'],[41,'front lights'],
+                 [42,'hotwater mater'], [43,'headset'],[44,'heat dormitor'],[45,'powerserver'],[46,'ups main'],
+                 [47,'birou']
+                 ]
+
+        for pair in zones:
+            db.session.add(models.Zone(pair[0], pair[1]))
+        commit(db.session)
+
+    check_table_schema(models.ZoneAlarm)
+    if len(models.ZoneAlarm.query.all()) < 7:
+        logging.info('Populating ZoneAlarm with default values')
+        models.ZoneAlarm.query.delete()
+        commit(db.session)
+        zonealarm_list=[
+            [47, 'P8_11'],[1,'P8_08'],[2,'P8_16'],[3,'P8_12'],[9,'P8_09'],[10,'P8_07'],[11,'P8_15']
+        ]
+        for pair in zonealarm_list:
+            db.session.add(models.ZoneAlarm(pair[0], pair[1]))
+        commit(db.session)
 

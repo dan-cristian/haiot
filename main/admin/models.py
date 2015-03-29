@@ -60,9 +60,6 @@ class Module(db.Model):
     def __repr__(self):
         return 'Module id {}, {}'.format(self.id, self.name[:50])
 
-
-
-
 class Zone(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
@@ -73,8 +70,7 @@ class Zone(db.Model):
         self.name = name
 
     def __repr__(self):
-        return '<Zone: id {}, {}>'.format(self.id, self.name[:20])
-
+        return 'Zone id {} {}'.format(self.id, self.name[:20])
 
 class SchedulePattern(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -258,23 +254,22 @@ class SystemDisk(db.Model, graphs.SystemDiskGraph, DbEvent):
 class GpioPin(db.Model, DbEvent):
      id = db.Column(db.Integer, primary_key=True)
      pin_type = db.Column(db.String(50))
-     pin_code = db.Column(db.String(50), info={'choices': [(i, i) for i in xrange(01, 46)]})
+     pin_code = db.Column(db.String(50), unique=True)
 
      def __repr__(self):
-        return '{} {} '.format(self.pin_code, self.pin_type)
+        return 'id {} code {} type {} '.format(self.id, self.pin_code, self.pin_type)
 
 class ZoneAlarm(db.Model, DbEvent):
     id = db.Column(db.Integer, primary_key=True)
     alarm_pin_name = db.Column(db.String(50))
     zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'))
     zone = db.relationship('Zone', backref=db.backref('ZoneAlarm(zone)', lazy='dynamic'))
-    gpio_pin_id = db.Column(db.Integer, db.ForeignKey('gpio_pin.id'))
-    gpio_pin = db.relationship('GpioPin', backref=db.backref('ZoneAlarm(gpiopin)', lazy='dynamic'))
+    gpio_pin_code = db.Column(db.String(50), db.ForeignKey('gpio_pin.pin_code'))
+    gpio_pin = db.relationship('GpioPin', backref=db.backref('ZoneAlarm(gpiopincode)', lazy='dynamic'))
 
-    def __init__(self, id='', alarm_pin_name =''):
-        if id:
-            self.id = id
-        self.alarm_pin_name = alarm_pin_name
+    def __init__(self, zone_id='', gpio_pin_code=''):
+        self.zone_id = zone_id
+        self.gpio_pin_code = gpio_pin_code
 
     def __repr__(self):
-        return 'ZoneAlarm zone {} gpiopin{}'.format(self.zone,  self.alarm_pin_name)
+        return 'ZoneAlarm {} gpiopin {} {}'.format(self.zone, self.gpio_pin_code, self.alarm_pin_name)

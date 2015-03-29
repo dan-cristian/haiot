@@ -51,3 +51,7 @@ JSON_PUBLISH_GRAPH_Y='graph_y_'
 JSON_PUBLISH_GRAPH_ID='graph_id_'
 JSON_PUBLISH_GRAPH_LEGEND='graph_legend_'
 JSON_PUBLISH_SAVE_TO_GRAPH='save_to_graph'
+
+GPIO_PIN_TYPE_BBB='bbb'
+GPIO_PIN_TYPE_PI='pi'
+
