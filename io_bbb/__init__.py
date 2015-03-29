@@ -15,7 +15,8 @@ def unload():
 
 def init():
     logging.info('Beaglebone IO module initialising')
-    thread_pool.add_callable(io_bbb.thread_run, run_interval_second=60)
+    io_bbb.init()
+    thread_pool.add_callable(io_bbb.thread_run, run_interval_second=5)
     global initialised
     initialised = True
 
