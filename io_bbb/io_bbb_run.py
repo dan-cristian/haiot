@@ -16,8 +16,14 @@ def register_gpios():
     zone_alarm_list = models.ZoneAlarm.query.all()
     for zonealarm in zone_alarm_list:
         logging.info('Enabling alarm on gpio {} zone {}'.format(zonealarm.gpio_pin_code, zonealarm.zone.name))
-        GPIO.setup(zonealarm.gpio_pin_code, GPIO.IN)
-        GPIO.add_event_detect(zonealarm.gpio_pin_code, GPIO.FALLING)
+        try:
+            GPIO.setup(zonealarm.gpio_pin_code, GPIO.IN)
+            GPIO.add_event_detect(zonealarm.gpio_pin_code, GPIO.FALLING, callback=event_detected, bouncetime=300)
+        except Exception, ex:
+            logging.critical('Unable to setup GPIO {} zone {}'.format(zonealarm.gpio_pin_code, zonealarm.zone.name))
+
+def event_detected(channel):
+    logging.info('Event detected channel {}'.format(channel))
 
 def check_for_events():
     global zone_alarm_list
@@ -31,5 +37,5 @@ def init():
 
 def thread_run():
     logging.info('Processing Beaglebone IO')
-    check_for_events()
+    #check_for_events()
     return 'Processed bbb_io'
