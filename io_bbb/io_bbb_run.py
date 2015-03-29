@@ -15,15 +15,20 @@ def register_gpios():
     global zone_alarm_list
     zone_alarm_list = models.ZoneAlarm.query.all()
     for zonealarm in zone_alarm_list:
-        logging.info('Enabling alarm on gpio {} zone {}'.format(zonealarm.gpio_pin_code, zonealarm.zone.name))
         try:
             GPIO.setup(zonealarm.gpio_pin_code, GPIO.IN)
-            GPIO.add_event_detect(zonealarm.gpio_pin_code, GPIO.FALLING, callback=event_detected, bouncetime=300)
+            GPIO.add_event_detect(zonealarm.gpio_pin_code, GPIO.RAISING, callback=event_detected, bouncetime=300)
+            logging.info('Enabled alarm on gpio {} zone {}'.format(zonealarm.gpio_pin_code, zonealarm.zone.name))
         except Exception, ex:
             logging.critical('Unable to setup GPIO {} zone {}'.format(zonealarm.gpio_pin_code, zonealarm.zone.name))
 
 def event_detected(channel):
-    logging.info('Event detected channel {}'.format(channel))
+    zonealarm=models.ZoneAlarm.query.filter_by(gpio_pin_code=channel).all()
+    if len(zonealarm)==1:
+        state = GPIO.input(zonealarm.gpio_pin_code)
+        logging.info('Event detected zone {} channel {} status {}'.format(zonealarm.zone.name, channel, state))
+    else:
+        logging.warning('Multiple zones defined with same gpio code {}'.format(channel))
 
 def check_for_events():
     global zone_alarm_list
