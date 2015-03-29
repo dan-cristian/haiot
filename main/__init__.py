@@ -3,6 +3,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy #workaround for resolve issue
 from flask_sqlalchemy import models_committed
+from flask.ext.webtest import get_scopefunc
 import logging
 import common
 
@@ -67,7 +68,10 @@ def init():
     common.init()
     global app, db, DB_LOCATION
     app.config.update(DEBUG=True, SQLALCHEMY_ECHO = False, SQLALCHEMY_DATABASE_URI=DB_LOCATION)
-    db = SQLAlchemy(app)
+
+    session_options = {}
+    session_options['scopefunc'] = get_scopefunc()
+    db = SQLAlchemy(app, session_options=session_options)
 
     from admin import admin, user
     app.register_blueprint(admin, url_prefix='/admin')

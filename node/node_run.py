@@ -90,8 +90,8 @@ def thread_run():
     logging.debug('Processing node_run')
     global first_run
     if first_run:
-        logging.info('On first node run I will sleep 40 seconds to get state updates')
-        time.sleep(40)
+        logging.info('On first node run I will sleep some seconds to get state updates')
+        time.sleep(10)
         first_run = False
         logging.info('Sleep done on first node run')
     update_master_state()

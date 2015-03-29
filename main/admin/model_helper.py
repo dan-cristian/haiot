@@ -59,6 +59,8 @@ def check_table_schema(table):
     except OperationalError, oex:
         logging.critical('Table {} schema in DB seems outdated, DROP it and recreate (y/n)?'.format(table))
         read_drop_table(table, oex)
+    except InvalidRequestError:
+        logging.warning('Error on check table schema {}, ignoring'.format(table))
 
 def read_drop_table(table, original_exception):
     x = sys.stdin.readline(1)
