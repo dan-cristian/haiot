@@ -7,7 +7,7 @@ import datetime
 import models
 from common import constant, utils
 from main import db
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, OperationalError
 
 def model_row_to_json(obj, operation=''):
     try:
@@ -50,6 +50,25 @@ def commit(session):
 
 def get_mod_name(module):
     return str(module).split("'")[1]
+
+def check_table_schema(table):
+    try:
+        count = table.query.all()
+    except OperationalError, oex:
+        logging.critical('Table {} schema in DB seems outdated, should I drop it and recreate (yes/no)?'.format(table))
+        read_drop_table(table, oex)
+
+def read_drop_table(table, original_exception):
+    x = sys.stdin.readline(1)
+    if x=='y':
+        logging.warning('Dropping table {}'.format(table))
+        table_name=table.query._primary_entity.entity_zero._with_polymorphic_selectable.description
+        result = db.engine.execute('DROP TABLE '+table_name)
+        commit(db.session)
+        logging.info('Creating missing schema object after table drop')
+        db.create_all()
+    else:
+        raise original_exception
 
 def populate_tables():
     if len(models.Parameter.query.all()) < 3:
@@ -108,3 +127,18 @@ def populate_tables():
         commit(db.session)
         db.session.add(models.Module('9', get_mod_name(io_bbb), False, 8))
         commit(db.session)
+
+    check_table_schema(models.GpioPin)
+    if len(models.GpioPin.query.filter_by(pin_type='bbb').all()) != 46 * 2:#P8_ and P9_ with 46 pins
+        models.GpioPin.query.filter_by(pin_type='bbb').delete()
+        commit(db.session)
+        logging.info('Populating GpioPins with default beabglebone values')
+        for rail in range(8,10): #last range is not part of the loop
+            for pin in range(01, 47):
+                gpio = models.GpioPin()
+                gpio.pin_type='bbb'
+                pincode='0'+str(pin)
+                gpio.pin_code='P'+str(rail)+'_'+pincode[-2:]
+                db.session.add(gpio)
+                commit(db.session)
+

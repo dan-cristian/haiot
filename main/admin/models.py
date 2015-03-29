@@ -257,12 +257,11 @@ class SystemDisk(db.Model, graphs.SystemDiskGraph, DbEvent):
 
 class GpioPin(db.Model, DbEvent):
      id = db.Column(db.Integer, primary_key=True)
-     system_name = db.Column(db.String(50))
-     pin_code = db.Column(db.String(50))
-     pin_index = db.Column(db.Integer)
+     pin_type = db.Column(db.String(50))
+     pin_code = db.Column(db.String(50), info={'choices': [(i, i) for i in xrange(01, 46)]})
 
      def __repr__(self):
-        return '{} {} '.format(self.pin_code, self.pin_index)
+        return '{} {} '.format(self.pin_code, self.pin_type)
 
 class ZoneAlarm(db.Model, DbEvent):
     id = db.Column(db.Integer, primary_key=True)
