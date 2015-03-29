@@ -25,8 +25,8 @@ def register_gpios():
 def event_detected(channel):
     zonealarm=models.ZoneAlarm.query.filter_by(gpio_pin_code=channel).all()
     if len(zonealarm)==1:
-        state = GPIO.input(zonealarm.gpio_pin_code)
-        logging.info('Event detected zone {} channel {} status {}'.format(zonealarm.zone.name, channel, state))
+        state = GPIO.input(zonealarm[0].gpio_pin_code)
+        logging.info('Event detected zone {} channel {} status {}'.format(zonealarm[0].zone.name, channel, state))
     else:
         logging.warning('Multiple zones defined with same gpio code {}'.format(channel))
 
