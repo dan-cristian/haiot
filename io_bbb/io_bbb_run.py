@@ -9,6 +9,7 @@ except:
     logging.critical('Module Adafruit_BBIO.GPIO is not installed, module will not be initialised')
 
 def register_gpios():
+    GPIO.setup("P8_11", GPIO.IN)
     GPIO.add_event_detect('P8_11', GPIO.FALLING)
 
 def check_for_events():
