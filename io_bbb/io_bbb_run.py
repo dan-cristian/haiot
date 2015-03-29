@@ -10,10 +10,10 @@ try:
 except:
     logging.critical('Module Adafruit_BBIO.GPIO is not installed, module will not be initialised')
 
-zone_alarm_list = None
+#zone_alarm_list = None
 
 def register_gpios():
-    global zone_alarm_list
+    #global zone_alarm_list
     zone_alarm_list = models.ZoneAlarm.query.all()
     for zonealarm in zone_alarm_list:
         try:

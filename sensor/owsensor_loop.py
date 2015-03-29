@@ -48,8 +48,8 @@ def do_device (owproxy):
 
 db_lock = threading.Lock()
 def save_to_db(dev):
-    global db_lock
-    db_lock.acquire()
+    #global db_lock
+    #db_lock.acquire()
     try:
         address=dev['address']
         sensor = models.Sensor.query.filter_by(address=address).first()
@@ -99,8 +99,8 @@ def save_to_db(dev):
             #event.on_models_committed(sensor, changes)
     except Exception, ex:
         logging.warning('Error saving sensor to DB, err {}'.format(ex))
-    finally:
-        db_lock.release()
+    #finally:
+    #    db_lock.release()
 
 def get_prefix(sensor, owproxy, dev):
     dev['address']=str(owproxy.read(sensor+'r_address'))
