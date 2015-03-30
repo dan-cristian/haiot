@@ -17,7 +17,7 @@ def init():
     logging.info('Beaglebone IO module initialising')
     try:
         io_bbb_run.init()
-        thread_pool.add_callable(io_bbb_run.thread_run, run_interval_second=10)
+        thread_pool.add_callable(io_bbb_run.thread_run, run_interval_second=2)
         global initialised
         initialised = True
     except Exception, ex:

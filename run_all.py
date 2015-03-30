@@ -21,6 +21,9 @@ if __name__ == '__main__':
     main.set_db_location(location)
     if 'debug' in arg_list:
         main.set_logging_level('debug')
+    else:
+        if 'warning' in arg_list:
+            main.set_logging_level('warning')
     main.init()
     print 'App EXIT'
 

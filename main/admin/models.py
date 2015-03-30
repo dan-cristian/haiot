@@ -260,8 +260,8 @@ class GpioPin(db.Model, DbEvent):
 class ZoneAlarm(db.Model, DbEvent):
     id = db.Column(db.Integer, primary_key=True)
     alarm_pin_name = db.Column(db.String(50))
-    zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'))
-    zone = db.relationship('Zone', backref=db.backref('ZoneAlarm(zone)', lazy='dynamic'))
+    zone_id = db.Column(db.Integer)#, db.ForeignKey('zone.id'))
+    #zone = db.relationship('Zone', backref=db.backref('ZoneAlarm(zone)', lazy='dynamic'))
     #gpio_pin_code = db.Column(db.String(50), db.ForeignKey('gpio_pin.pin_code'))
     gpio_pin_code = db.Column(db.String(50))
     #gpio_pin = db.relationship('GpioPin', backref=db.backref('ZoneAlarm(gpiopincode)', lazy='dynamic'))
@@ -273,4 +273,4 @@ class ZoneAlarm(db.Model, DbEvent):
         self.gpio_pin_code = gpio_pin_code
 
     def __repr__(self):
-        return 'ZoneAlarm {} gpiopin {} {}'.format(self.zone, self.gpio_pin_code, self.alarm_pin_name)
+        return 'ZoneAlarm {} gpiopin {} {}'.format(self.zone_id, self.gpio_pin_code, self.alarm_pin_name)

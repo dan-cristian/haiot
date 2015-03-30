@@ -49,7 +49,7 @@ def init_modules():
 def set_db_location(location):
     global DB_LOCATION
     if location == 'disk':
-        DB_LOCATION='sqlite:///../../database.db'
+        DB_LOCATION='sqlite:///../database.db'
     else:
         if location == 'mem':
             DB_LOCATION='sqlite:////tmp/database.db'
@@ -60,29 +60,15 @@ def set_logging_level(level):
     global LOGGING_LEVEL
     if level=='debug':
         LOGGING_LEVEL = logging.DEBUG
-
-
-db_lock = threading.Lock()
-def dbcommit():
-    global db_lock
-    try:
-        db_lock.acquire()
-        logging.info('entering commit')
-        db.session.commit()
-        logging.info('exiting commit')
-    finally:
-        db_lock.release()
-
-def dbadd(obj):
-    db.session.add(obj)
-
-def dbbegin():
-    db.session.begin()
+    else:
+        if level=='warning':
+            LOGGING_LEVEL = logging.WARNING
 
 #--------------------------------------------------------------------------#
 
 def init():
-    logging.basicConfig(format='%(levelname)s:%(module)s:%(funcName)s:%(threadName)s:%(message)s', level=LOGGING_LEVEL)
+    logging.basicConfig(format='%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(threadName)s:%(message)s',
+                        level=LOGGING_LEVEL)
     logging.info('Logging level is {}'.format(LOGGING_LEVEL))
     common.init()
     global app, db, DB_LOCATION

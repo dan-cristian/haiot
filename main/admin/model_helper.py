@@ -27,7 +27,11 @@ def model_row_to_json(obj, operation=''):
                     and attr != 'query' and not callable(getattr(obj, attr))\
                     and attr != 'metadata':
                 value=getattr(obj, attr)
-                if value is not None: safe_obj[attr] = value
+                #only convert to json simple primitives
+                if value is not None and not hasattr(value,'_sa_class_manager'):
+                    safe_obj[attr] = value
+                else:
+                    logging.debug('Ignoring obj to json, not simple primitive {}'.format(value))
         return utils.obj2json(safe_obj)
     except Exception, ex:
         logging.critical('Error convert model obj to json, err {}'.format(ex))

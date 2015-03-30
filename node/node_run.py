@@ -7,7 +7,7 @@ import random
 from common import constant, variable, utils
 from mqtt_io import sender
 from main.admin import models, model_helper
-from main import dbcommit, dbadd
+from main import db
 
 first_run = True
 #save node state to db, except for current node. no decisions taken on node election
@@ -20,7 +20,7 @@ def node_update(obj={}):
             node = models.Node.query.filter_by(name=node_host_name).first()
             if node is None:
                 node = models.Node()
-                dbadd(node)
+                db.session.add(node)
             node.name = node_host_name
             node.is_master_graph = utils.get_object_field_value(obj, models.Node.is_master_graph)
             node.is_master_db_archive = utils.get_object_field_value(obj, models.Node.is_master_db_archive)
@@ -29,7 +29,7 @@ def node_update(obj={}):
             node.priority = utils.get_object_field_value(obj, models.Node.priority)
             node.ip = utils.get_object_field_value(obj, models.Node.ip)
             node.updated_on = datetime.datetime.now()
-            dbcommit()
+            db.session.commit()
         else:
             logging.debug('Skipping node DB save, this node is master = {}'.format(
                 variable.NODE_THIS_IS_MASTER_OVERALL))
@@ -54,7 +54,7 @@ def update_master_state():
                     if node.name == constant.HOST_NAME:
                         node.is_master_overall = True
                         node.notify_enabled_ = True
-                        dbcommit()
+                        db.session.commit()
                     master_selected = True
             else:
                 if master_selected and node.is_master_overall:
@@ -62,7 +62,7 @@ def update_master_state():
                     if node.name == constant.HOST_NAME:
                         node.is_master_overall = False
                         node.notify_enabled_ = True
-                        dbcommit()
+                        db.session.commit()
             if node.name == constant.HOST_NAME:
                 if variable.NODE_THIS_IS_MASTER_OVERALL != node.is_master_overall:
                     if node.is_master_overall:
@@ -83,11 +83,11 @@ def announce_node_state():
         node.name = constant.HOST_NAME
         node.priority = random.randint(1, 100)
         logging.warning('Detected node host name change, new name={}'.format(constant.HOST_NAME))
-        dbadd(node)
+        db.session.add(node)
     node.updated_on = datetime.datetime.now()
     node.ip = constant.HOST_MAIN_IP
     node.notify_enabled_ = True
-    dbcommit()
+    db.session.commit()
 
 def thread_run():
     logging.debug('Processing node_run')

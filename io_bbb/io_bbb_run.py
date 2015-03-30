@@ -4,7 +4,8 @@ import logging
 import datetime
 import random
 import sys
-from main import dbcommit, dbadd, dbbegin
+import time
+from main import db
 from main.admin import models
 #https://learn.adafruit.com/setting-up-io-python-library-on-beaglebone-black/using-the-bbio-library
 try:
@@ -22,10 +23,10 @@ def register_gpios():
         try:
             GPIO.setup(zonealarm.gpio_pin_code, GPIO.IN)
             GPIO.add_event_detect(zonealarm.gpio_pin_code, GPIO.BOTH, callback=event_detected, bouncetime=300)
-            logging.info('Enabled alarm on gpio {} zone {}'.format(zonealarm.gpio_pin_code, zonealarm.zone.name))
+            logging.info('Enabled alarm on gpio {} zone {}'.format(zonealarm.gpio_pin_code, zonealarm.zone_id))
         except Exception, ex:
             logging.critical('Unable to setup GPIO {} zone {} '.format(zonealarm.gpio_pin_code,
-                                                                      zonealarm.zone.name))
+                                                                      zonealarm.zone_id))
 
 def event_detected(channel):
     try:
@@ -33,14 +34,16 @@ def event_detected(channel):
         global import_module_exist
         if import_module_exist:
             state = GPIO.input(zonealarm.gpio_pin_code)
-            zonealarm.alarm_status = state
         else:
             state = random.randint(0,2)
+        zonealarm.alarm_status = state
         zonealarm.updated_on = datetime.datetime.now()
         zonealarm.notify_enabled_ = True
-        dbcommit()
-        logging.info('Event detected zone {} channel {} status {}'.format(zonealarm.zone.name, channel, state))
+        time.sleep(1)
+        db.session.commit()
+        logging.info('Event detected zone {} channel {} status {}'.format(zonealarm.zone_id, channel, state))
     except Exception, ex:
+        zonealarm = None
         logging.warning('Error alarm status save, err {}'.format(ex))
 
 
@@ -49,7 +52,7 @@ def check_for_events():
     for zonealarm in zone_alarm_list:
         if GPIO.event_detected(zonealarm.gpio_pin_code):
             state = GPIO.input(zonealarm.gpio_pin_code)
-            logging.info('Event detected gpio {} zone {}'.format(state, zonealarm.zone.name))
+            logging.info('Event detected gpio {} zone {}'.format(state, zonealarm.zone_id))
 
 def init():
     register_gpios()
