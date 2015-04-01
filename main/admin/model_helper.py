@@ -179,13 +179,14 @@ def populate_tables():
         #db.session.add(sens)
         #commit(db.session)
 
-    import alarm, heat, sensor, relay, mqtt_io, health_monitor, graph_plotly, node, io_bbb
+    import alarm, heat, sensor, relay, mqtt_io, health_monitor, graph_plotly, node, io_bbb, webui
     module_list=[
         ['1', get_mod_name(node), True, 0], ['2', get_mod_name(health_monitor), True, 1],
         ['3', get_mod_name(mqtt_io), True, 2], ['4', get_mod_name(sensor), False, 3],
         ['5', get_mod_name(relay), False, 4], ['6', get_mod_name(heat), False, 5],
         ['7', get_mod_name(alarm), False, 6], ['8', get_mod_name(graph_plotly), False, 7],
-        ['9', get_mod_name(io_bbb), False, 8]
+        ['9', get_mod_name(io_bbb), False, 8],
+        [10, get_mod_name(webui), False, 9]
     ]
     check_table_schema(models.Module)
     if len(models.Module.query.all()) < len(module_list):
@@ -228,7 +229,8 @@ def populate_tables():
             [38,'12000004F3428528', 'puffer jos'], [31,'66000003BE22ED28', 'gas heater'],
             [25, '96000003BDFE5D28', 'boiler sus'], [25, '53000004F296DD28', 'boiler mijloc'],
             [25, 'C8000004F28B0728', 'boiler jos'], [2, '41000003BE099C28', 'living'],
-            [1, 'AA000003BDE6C728', 'bucatarie'], [27, 'E400000155E72D26', 'pod fata']
+            [1, 'AA000003BDE6C728', 'bucatarie'], [27, 'E400000155E72D26', 'pod fata'],
+            [4, 'B5000004F3285F28', 'dormitor']
         ]
     if len(models.ZoneSensor.query.all()) < len(zonesensor_list):
         logging.info('Populating ZoneSensor with default values')

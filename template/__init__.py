@@ -8,6 +8,7 @@ import template_run
 initialised=False
 
 def unload():
+    logging.info('Template module unloading')
     #...
     thread_pool.remove_callable(template_run.thread_run)
     global initialised
