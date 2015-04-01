@@ -71,8 +71,11 @@ def read_drop_table(table, original_exception):
     if x=='y':
         logging.warning('Dropping table {}'.format(table))
         table_name=table.query._primary_entity.entity_zero._with_polymorphic_selectable.description
-        result = db.engine.execute('DROP TABLE '+table_name)
-        commit()
+        try:
+            result = db.engine.execute('DROP TABLE '+table_name)
+            commit()
+        except Exception, ex:
+            logging.warning('Something went wrong on drop, err {}'.format(ex))
         logging.info('Creating missing schema object after table drop')
         db.create_all()
     else:
