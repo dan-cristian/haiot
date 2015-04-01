@@ -11,4 +11,4 @@
 #echo "Your answer is: $answer"
 
 source venv/bin/activate
-python run_all.py disk
+python run_all.py mem
