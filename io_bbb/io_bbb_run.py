@@ -10,7 +10,6 @@ from main.admin import models
 #https://learn.adafruit.com/setting-up-io-python-library-on-beaglebone-black/using-the-bbio-library
 try:
     import Adafruit_BBIO.GPIO as GPIO
-    import_module_exist = True
 except:
     logging.critical('Module Adafruit_BBIO.GPIO is not installed, module will not be initialised')
 
@@ -24,6 +23,7 @@ def register_gpios():
             GPIO.setup(zonealarm.gpio_pin_code, GPIO.IN)
             GPIO.add_event_detect(zonealarm.gpio_pin_code, GPIO.BOTH, callback=event_detected, bouncetime=300)
             logging.info('Enabled alarm on gpio {} zone {}'.format(zonealarm.gpio_pin_code, zonealarm.zone_id))
+            import_module_exist = True
         except Exception, ex:
             logging.critical('Unable to setup GPIO {} zone {} '.format(zonealarm.gpio_pin_code,
                                                                       zonealarm.zone_id))
@@ -61,5 +61,6 @@ def thread_run():
     logging.debug('Processing Beaglebone IO')
     global import_module_exist
     if not import_module_exist:
+        logging.info('Simulating motion detection for test purposes')
         event_detected('P8_11')
     return 'Processed bbb_io'
