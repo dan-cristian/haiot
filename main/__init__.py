@@ -1,6 +1,6 @@
 # project/__init__.py
 
-from flask import Flask
+from flask import Flask, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy #workaround for resolve issue
 from flask_sqlalchemy import models_committed
 import logging
@@ -79,6 +79,7 @@ def init():
     from admin import admin, user
     app.register_blueprint(admin, url_prefix='/admin')
     app.register_blueprint(user, url_prefix='/user')
+    db.session.autoflush=True
     db.create_all()
 
     import admin.model_helper
@@ -98,7 +99,7 @@ def init():
 
 #@app.route('/')
 #def home():
-#    return 'Blog be here'
+#    return 'Main'
 
 @models_committed.connect_via(app)
 def on_models_committed(sender, changes):

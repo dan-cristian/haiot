@@ -89,14 +89,24 @@ def announce_node_state():
     node.notify_enabled_ = True
     db.session.commit()
 
+progress_status = None
+def get_progress():
+    global progress_status
+    return progress_status
+
 def thread_run():
     logging.debug('Processing node_run')
     global first_run
+    global progress_status
     if first_run:
+        progress_status='Sleep on first run'
         logging.info('On first node run I will sleep some seconds to get state updates')
         time.sleep(10)
         first_run = False
         logging.info('Sleep done on first node run')
+    progress_status='Updating master state'
     update_master_state()
+    progress_status='Announcing node state'
     announce_node_state()
+    progress_status='Completed'
     return 'Processed node_run'

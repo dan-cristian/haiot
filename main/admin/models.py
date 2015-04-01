@@ -10,40 +10,6 @@ class DbEvent:
     db_notified_=False
     notify_enabled_=False
 
-class Blog(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100), unique=True)
-    body = db.Column(db.Text())
-    created_on = db.Column(db.DateTime(), default=datetime.utcnow)
-    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
-
-    def __init__(self, title="", body=""):
-        self.title = title
-        self.body = body
-
-    def __repr__(self):
-        return '<Blogpost - {}>'.format(self.title)
-
-
-class Comment(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    blog_id = db.Column(db.Integer, db.ForeignKey('blog.id'))
-    blog = db.relationship('Blog', backref=db.backref('comment', lazy='dynamic'))
-    username = db.Column(db.String(50))
-    comment = db.Column(db.Text())
-    visible = db.Column(db.Boolean(), default=False)
-    created_on = db.Column(db.DateTime(), default=datetime.utcnow)
-
-    def __init__(self, post='', username='', comment=''):
-        if post:
-            self.blog = post
-        self.username = username
-        self.comment = comment
-
-    def __repr__(self):
-        return '<Comment: blog {}, {}>'.format(self.blog_id, self.comment[:20])
-
-
 class Module(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
@@ -77,19 +43,25 @@ class SchedulePattern(db.Model):
     name = db.Column(db.String(50))
     pattern = db.Column(db.String(24))
 
-    def __init__(self, id='', name=''):
+    def __init__(self, id, name, pattern):
         if id:
             self.id = id
         self.name = name
+        self.pattern = pattern
 
     def __repr__(self):
-        return self.name[:24]
+        return self.name[:len('1234-5678-9012-3456-7890-1234')]
 
 
 class TemperatureTarget(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(1))
     target = db.Column(db.Float)
+
+    def __init__(self, id, code, target):
+        self.id = id
+        self.code = code
+        self.target = target
 
     def __repr__(self):
         return '{} code {}={}'.format(self.id, self.code, self.target)
@@ -98,18 +70,24 @@ class TemperatureTarget(db.Model):
 class HeatSchedule(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'), nullable=False)
-    zone = db.relationship('Zone', backref=db.backref('heat schedule zone', lazy='dynamic'))
+    #zone = db.relationship('Zone', backref=db.backref('heat schedule zone', lazy='dynamic'))
     pattern_week_id = db.Column(db.Integer, db.ForeignKey('schedule_pattern.id'), nullable=False)
     pattern_weekend_id = db.Column(db.Integer, db.ForeignKey('schedule_pattern.id'), nullable=False)
-    pattern_week = db.relationship('SchedulePattern', foreign_keys='[HeatSchedule.pattern_week_id]',
-                                   backref=db.backref('schedule_pattern_week', lazy='dynamic'))
-    pattern_weekend = db.relationship('SchedulePattern', foreign_keys='[HeatSchedule.pattern_weekend_id]',
-                                    backref=db.backref('schedule_pattern_weekend', lazy='dynamic'))
+    #pattern_week = db.relationship('SchedulePattern', foreign_keys='[HeatSchedule.pattern_week_id]',
+    #                               backref=db.backref('schedule_pattern_week', lazy='dynamic'))
+    #pattern_weekend = db.relationship('SchedulePattern', foreign_keys='[HeatSchedule.pattern_weekend_id]',
+    #                                backref=db.backref('schedule_pattern_weekend', lazy='dynamic'))
     active = db.Column(db.Boolean, default=True)
 
+    def __init__(self, id, zone_id, pattern_week_id, pattern_weekend_id):
+        self.id = id
+        self.zone_id= zone_id
+        self.pattern_week_id= pattern_week_id
+        self.pattern_weekend_id= pattern_weekend_id
+
     def __repr__(self):
-        return 'Zone {}, Active {}, Week {}, Weekend {}'.format(self.zone.name, self.active,
-                self.pattern_week.name, self.pattern_weekend.name)
+        return 'Zone {}, Active {}, Week {}, Weekend {}'.format(self.zone_id, self.active,
+                self.pattern_week_id, self.pattern_weekend_id)
 
 
 class Sensor(db.Model, graphs.SensorGraph, DbEvent):
@@ -162,9 +140,9 @@ class ZoneSensor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     sensor_name = db.Column(db.String(50))
     zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'))
-    zone = db.relationship('Zone', backref=db.backref('ZoneSensor(zone)', lazy='dynamic'))
+    #zone = db.relationship('Zone', backref=db.backref('ZoneSensor(zone)', lazy='dynamic'))
     sensor_address = db.Column(db.String(50), db.ForeignKey('sensor.address'))
-    sensor = db.relationship('Sensor', backref=db.backref('ZoneSensor(sensor)', lazy='dynamic'))
+    #sensor = db.relationship('Sensor', backref=db.backref('ZoneSensor(sensor)', lazy='dynamic'))
 
     def __init__(self, zone_id='', sensor_address ='', sensor_name=''):
         self.sensor_address= sensor_address
@@ -172,7 +150,7 @@ class ZoneSensor(db.Model):
         self.sensor_name = sensor_name
 
     def __repr__(self):
-        return 'ZoneSensor zone {} sensor {}'.format(self.zone,  self.sensor_name)
+        return 'ZoneSensor zone {} sensor {}'.format(self.zone_id,  self.sensor_name)
 
 class Node(db.Model, graphs.NodeGraph, DbEvent):
     id = db.Column(db.Integer, primary_key=True)

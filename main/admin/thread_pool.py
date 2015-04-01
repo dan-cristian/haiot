@@ -3,6 +3,7 @@ import logging, time
 from datetime import datetime
 
 callable_list=[]
+callable_progress_list={}
 exec_interval_list={}
 exec_last_date_list={}
 
@@ -14,8 +15,9 @@ def add_callable(func, run_interval_second=60):
     exec_last_date_list[func]=datetime.now()
     exec_interval_list[func]=run_interval_second
 
-def set_exec_interval(func, seconds):
-    exec_interval_list[func]=seconds
+def add_callable_progress(func, run_interval_second=60, progress_func=None):
+    add_callable(func, run_interval_second=run_interval_second)
+    callable_progress_list[func] = progress_func
 
 def remove_callable(func):
     pass
@@ -34,13 +36,8 @@ def main():
                 exec_interval = exec_interval_list.get(func, None)
                 if not exec_interval:
                     logging.warning('No exec interval set for thread function ' + print_name)
-                    elapsed_seconds=None
-                else:
-                    last_exec_date = exec_last_date_list.get(func, None)
-                    elapsed_seconds = (datetime.now() - last_exec_date).total_seconds()
-                    if elapsed_seconds>2*60:
-                        logging.warning('Threaded function {} is long running for {} seconds'.format(
-                            print_name,elapsed_seconds))
+                last_exec_date = exec_last_date_list.get(func, None)
+                elapsed_seconds = (datetime.now() - last_exec_date).total_seconds()
                 if future_obj.done():
                     try:
                         future_obj.result()
@@ -52,11 +49,13 @@ def main():
                         dict_future_func[executor.submit(func)] = func
                         exec_last_date_list[func] = datetime.now()
                 elif future_obj.running():
-                    if elapsed_seconds and elapsed_seconds > 300:
-                        logging.warning('Very long running {} elapsed {} sec'.format(print_name, elapsed_seconds))
-                    pass
-                    #print('running ' + print_name)
-            time.sleep(5)
+                    if elapsed_seconds>1*60:
+                        logging.warning('Threaded function {} is long running for {} seconds'.format(
+                            print_name,elapsed_seconds))
+                        if callable_progress_list.has_key(func):
+                            progress_status=callable_progress_list[func].func_globals['progress_status']
+                            logging.warning('Progress Status is {}'.format(progress_status))
+            time.sleep(2)
 
 
         logging.info('Thread pool processor exit')

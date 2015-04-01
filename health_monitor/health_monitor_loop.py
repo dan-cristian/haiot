@@ -213,7 +213,16 @@ def save_system_attribs_to_db(cpu_percent='', memory_available_percent=''):
 def init():
     pass
 
+progress_status = None
+def get_progress():
+    global progress_status
+    return progress_status
+
 def thread_run():
+    global progress_status
+    progress_status = 'reading system attribs'
     read_system_attribs()
+    progress_status = 'reading hdd smart attribs'
     read_all_hdd_smart()
+    progress_status = 'completed'
     pass
