@@ -16,6 +16,7 @@ except:
 import_module_exist = False
 
 def register_gpios():
+    global import_module_exist
     #global zone_alarm_list
     zone_alarm_list = models.ZoneAlarm.query.all()
     for zonealarm in zone_alarm_list:
