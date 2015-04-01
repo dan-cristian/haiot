@@ -3,7 +3,7 @@ import subprocess
 import cStringIO
 import logging
 try:
-    import psutila
+    import psutil
 except Exception, ex:
     logging.critical('PSUtil module not available')
 import datetime

@@ -61,7 +61,7 @@ def check_table_schema(table):
     try:
         count = table.query.all()
     except OperationalError, oex:
-        logging.critical('Table {} schema in DB seems outdated, DROP it and recreate (y/n)?'.format(table))
+        logging.critical('Table {} schema in DB seems outdated, err {}, DROP it and recreate (y/n)?'.format(oex, table))
         read_drop_table(table, oex)
     except InvalidRequestError:
         logging.warning('Error on check table schema {}, ignoring'.format(table))
