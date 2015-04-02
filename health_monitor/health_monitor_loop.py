@@ -2,11 +2,16 @@ __author__ = 'dcristian'
 import subprocess
 import cStringIO
 import logging
-import psutil
+try:
+    import psutil
+except Exception, ex:
+    logging.critical('PSUtil module not available')
 import datetime
 from common import constant
 from main.admin import models
 from main import db
+
+import_module_exist = False
 
 def save_hdd_to_db(serial, power_status, temperature, sector_error_count, smart_status, device, family, disk_dev,
                    start_stop_count, load_cycle_count):
@@ -175,6 +180,8 @@ def read_system_attribs():
     cpu_percent = psutil.cpu_percent(interval=1)
     memory_available_percent = psutil.virtual_memory().percent
     save_system_attribs_to_db(cpu_percent=cpu_percent, memory_available_percent=memory_available_percent)
+    global import_module_exist
+    import_module_exist = True
 
 def save_system_attribs_to_db(cpu_percent='', memory_available_percent=''):
     try:
@@ -219,9 +226,10 @@ def get_progress():
     return progress_status
 
 def thread_run():
-    global progress_status
+    global progress_status, import_module_exist
     progress_status = 'reading system attribs'
-    read_system_attribs()
+    if import_module_exist:
+        read_system_attribs()
     progress_status = 'reading hdd smart attribs'
     read_all_hdd_smart()
     progress_status = 'completed'

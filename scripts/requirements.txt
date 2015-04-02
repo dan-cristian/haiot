@@ -16,3 +16,4 @@ psutil>=0.0
 #uncomment on beaglebone
 #Adafruit_BBIO>=0.0
 #Flask-WebTest>=0.0
+RPi.GPIO

@@ -1,18 +1,19 @@
 # project/__init__.py
 
-from flask import Flask, redirect, url_for
+import time
 from flask_sqlalchemy import SQLAlchemy #workaround for resolve issue
+from flask import Flask, redirect, url_for
 from flask_sqlalchemy import models_committed
 import logging
-import threading
 import common
 
-
-
+#location for sqlite db
 DB_LOCATION=None
+#default logging
 LOGGING_LEVEL=logging.INFO
-app = Flask('main')
+app=None
 db=None
+blocking_webui_running = False
 
 def my_import(name):
     #http://stackoverflow.com/questions/547829/how-to-dynamically-load-a-python-class
@@ -72,14 +73,10 @@ def init():
     logging.info('Logging level is {}'.format(LOGGING_LEVEL))
     common.init()
     global app, db, DB_LOCATION
+    app = Flask('main')
     app.config.update(DEBUG=True, SQLALCHEMY_ECHO = False, SQLALCHEMY_DATABASE_URI=DB_LOCATION)
 
     db = SQLAlchemy(app)
-
-    from admin import admin, user
-    app.register_blueprint(admin, url_prefix='/admin')
-    app.register_blueprint(user, url_prefix='/user')
-    db.session.autoflush=True
     db.create_all()
 
     import admin.model_helper
@@ -95,7 +92,12 @@ def init():
     t.daemon = True
     t.start()
 
-    app.run(debug=True, use_reloader=False, host='0.0.0.0')
+    if not blocking_webui_running:
+        logging.info('Blocking app exit as no web ui is running')
+        while not blocking_webui_running:
+            time.sleep(1)
+        logging.info('Exiting Blocking loop as web ui is now running')
+
 
 #@app.route('/')
 #def home():
