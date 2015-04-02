@@ -178,6 +178,8 @@ def read_hddparm(disk_dev=''):
 
 def read_system_attribs():
     global import_module_psutil_exist, progress_status
+    cpu_percent = None
+    memory_available_percent = None
     if False:# import_module_psutil_exist:
         cpu_percent = psutil.cpu_percent(interval=1)
         memory_available_percent = psutil.virtual_memory().percent
@@ -211,12 +213,13 @@ def read_system_attribs():
                     free = int(words[3].replace(' ','').strip())
                     memory_available_percent = float(100) * free / total
                     progress_status = 'Read mem total {} used {} free {}'.format(total, used, free)
-            cpu_percent = -100
+                    cpu_percent = -1
         except Exception, ex:
             logging.warning('Unable to execute free bin to get mem usage, err {}'.format(ex))
-
+            memory_available_percent = -1
     progress_status = 'Saving mem and cpu to db'
-    save_system_attribs_to_db(cpu_percent=cpu_percent, memory_available_percent=memory_available_percent)
+    if not cpu_percent is None and not memory_available_percent is None:
+        save_system_attribs_to_db(cpu_percent=cpu_percent, memory_available_percent=memory_available_percent)
 
 def save_system_attribs_to_db(cpu_percent='', memory_available_percent=''):
     try:
