@@ -42,11 +42,17 @@ def init_module(module_name, module_is_active):
 
 def init_modules():
     import admin.models
+    import admin.model_helper
+    import webui
     module_list = admin.models.Module.query.order_by(admin.models.Module.start_order).all()
     for mod in module_list:
         assert isinstance(mod, admin.models.Module)
-        init_module(mod.name, mod.active)
-
+        #webui will block at init, postpone init for end
+        if mod.name != admin.model_helper.get_mod_name(webui):
+            init_module(mod.name, mod.active)
+        else:
+            global blocking_webui_running
+            blocking_webui_running = True
 
 def set_db_location(location):
     global DB_LOCATION
@@ -93,9 +99,14 @@ def init():
     t.daemon = True
     t.start()
 
+    if blocking_webui_running:
+        import webui
+        init_module(admin.model_helper.get_mod_name(webui), True)
+
     if not blocking_webui_running:
         logging.info('Blocking app exit as no web ui is running')
         while not blocking_webui_running:
+
             time.sleep(1)
         logging.info('Exiting Blocking loop as web ui is now running')
 

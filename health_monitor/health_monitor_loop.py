@@ -178,23 +178,26 @@ def read_hddparm(disk_dev=''):
 
 def read_system_attribs():
     global import_module_psutil_exist, progress_status
-    if import_module_psutil_exist:
+    if False:# import_module_psutil_exist:
         cpu_percent = psutil.cpu_percent(interval=1)
         memory_available_percent = psutil.virtual_memory().percent
         import_module_psutil_exist = True
     else:
         output = cStringIO.StringIO()
-        if constant.OS in constant.OS_WINDOWS:
-            progress_status = 'reading test data on windows'
-            logging.critical('Beware, reading mem usage from a dummy test file')
-            with open ('scripts/testdata/free.txt', "r") as myfile:
-                free_out=myfile.read()
-        else:
-            try:
-                progress_status = 'executing free binary'
-                free_out = subprocess.check_output(['free', 'beer'], stderr=subprocess.STDOUT)
-            except Exception, ex:
-                logging.warning('Unable to execute free bin to get mem usage, err {}'.format(ex))
+        #if constant.OS in constant.OS_WINDOWS:
+        #    progress_status = 'reading test data on windows'
+        #    logging.critical('Beware, reading mem usage from a dummy test file')
+        #    with open ('scripts/testdata/free.txt', "r") as myfile:
+        #        free_out=myfile.read()
+        #else:
+            #this is normally running on OpenWRT
+        try:
+            progress_status = 'executing free binary'
+            free_out = subprocess.Popen(['free'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            progress_status = 'reading output for {}'.format(free_out)
+            free_out = free_out.stdout.readlines()
+        except Exception, ex:
+            logging.warning('Unable to execute free bin to get mem usage, err {}'.format(ex))
         progress_status = 'parsing output started'
         output.write(free_out)
         output.seek(0)

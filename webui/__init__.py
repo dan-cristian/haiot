@@ -22,7 +22,7 @@ def init():
     logging.info('WebUI module initialising')
     #thread_pool.add_callable(webui.thread_run, run_interval_second=60)
 
-    from admin import admin, user
+    from main.admin import admin, user
     app.register_blueprint(admin, url_prefix='/admin')
     app.register_blueprint(user, url_prefix='/user')
     global blocking_webui_running

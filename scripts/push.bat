@@ -1,4 +1,4 @@
 cd ..
 git add -A
-git commit -a
+git commit  -m "%COMPUTERNAME% %USERNAME%" -a
 git push

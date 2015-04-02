@@ -49,7 +49,7 @@ def main():
                         dict_future_func[executor.submit(func)] = func
                         exec_last_date_list[func] = datetime.now()
                 elif future_obj.running():
-                    if elapsed_seconds>1*60:
+                    if elapsed_seconds>1*30:
                         logging.warning('Threaded function {} is long running for {} seconds'.format(
                             print_name,elapsed_seconds))
                         if callable_progress_list.has_key(func):
