@@ -10,5 +10,5 @@
 #fi
 #echo "Your answer is: $answer"
 
-source venv/bin/activate
-python run_all.py disk
+source ../venv/bin/activate
+python ../run_all.py disk

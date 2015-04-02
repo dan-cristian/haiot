@@ -11,7 +11,7 @@ from common import constant
 from main.admin import models
 from main import db
 
-import_module_exist = False
+import_module_psutil_exist = False
 
 def save_hdd_to_db(serial, power_status, temperature, sector_error_count, smart_status, device, family, disk_dev,
                    start_stop_count, load_cycle_count):
@@ -177,11 +177,29 @@ def read_hddparm(disk_dev=''):
     raise subprocess.CalledProcessError(1, 'No power status obtained on hdparm, output={}'.format(hddparm_out))
 
 def read_system_attribs():
-    cpu_percent = psutil.cpu_percent(interval=1)
-    memory_available_percent = psutil.virtual_memory().percent
-    save_system_attribs_to_db(cpu_percent=cpu_percent, memory_available_percent=memory_available_percent)
-    global import_module_exist
-    import_module_exist = True
+    global import_module_psutil_exist
+    if import_module_psutil_exist:
+        cpu_percent = psutil.cpu_percent(interval=1)
+        memory_available_percent = psutil.virtual_memory().percent
+        save_system_attribs_to_db(cpu_percent=cpu_percent, memory_available_percent=memory_available_percent)
+    else:
+        output = cStringIO.StringIO()
+        hddparm_out = subprocess.check_output(['free'], stderr=subprocess.STDOUT)
+        output.write(hddparm_out)
+        output.seek(0)
+        pos=-1
+        while pos != output.tell():
+            pos = output.tell()
+            line=output.readline()
+            if constant.FREE_MEM_STATUS in line:
+                words = line.split(' ')
+                total = words[1].replace(' ','').strip()
+                used = words[2].replace(' ','').strip()
+                free = words[3].replace(' ','').strip()
+
+                return power_status
+
+    import_module_psutil_exist = True
 
 def save_system_attribs_to_db(cpu_percent='', memory_available_percent=''):
     try:
@@ -226,10 +244,9 @@ def get_progress():
     return progress_status
 
 def thread_run():
-    global progress_status, import_module_exist
+    global progress_status, import_module_psutil_exist
     progress_status = 'reading system attribs'
-    if import_module_exist:
-        read_system_attribs()
+    read_system_attribs()
     progress_status = 'reading hdd smart attribs'
     read_all_hdd_smart()
     progress_status = 'completed'

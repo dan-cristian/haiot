@@ -1,6 +1,7 @@
 # project/__init__.py
 
 import time
+import sys
 from flask_sqlalchemy import SQLAlchemy #workaround for resolve issue
 from flask import Flask, redirect, url_for
 from flask_sqlalchemy import models_committed
@@ -109,5 +110,34 @@ def on_models_committed(sender, changes):
     logging.debug('Model commit detected sender {} change {}'.format(sender, changes))
     event.on_models_committed(sender, changes)
 
-if __name__ == '__main__':
-    app.run(debug=True, use_reloader=False)
+def main(argv):
+    if 'disk' in argv:
+        return 'disk'
+    else:
+        if 'mem' in argv:
+            return 'mem'
+        else:
+            print 'usage: python main disk OR mem. Assuming disk as default'
+            return 'disk'
+            #sys.exit(1)
+
+def run(arg_list):
+    location = main(arg_list)
+    print('DB Location is {}'.format(location))
+    set_db_location(location)
+    if 'debug' in arg_list:
+        set_logging_level('debug')
+    else:
+        if 'warning' in arg_list:
+            set_logging_level('warning')
+    if 'remote' in arg_list:
+        import ptvsd
+        ptvsd.enable_attach(secret='secret',address=('0.0.0.0', 5678))
+        print 'Enabled remote debugging'
+    init()
+    print 'App EXIT'
+
+if 'main' in __name__:
+    run(sys.argv[1:])
+else:
+    print 'Not executing main, name is ' + __name__
