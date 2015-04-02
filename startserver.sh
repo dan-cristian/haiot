@@ -1,4 +1,3 @@
-#! /bin/bash
 
 #echo Enter mem[Enter] to run db in memory. Default is from disk
 #read -t 3 answer
