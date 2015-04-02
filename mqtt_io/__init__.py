@@ -80,5 +80,6 @@ def init():
             break
         else:
             logging.warning('Unable to connect to mqtt server {}:{}'.format(host, port))
-    logging.critical('MQTT connection not available, all connect attempts failed')
+    if not client_connected:
+        logging.critical('MQTT connection not available, all connect attempts failed')
 

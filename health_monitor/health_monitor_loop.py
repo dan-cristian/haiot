@@ -177,27 +177,30 @@ def read_hddparm(disk_dev=''):
     raise subprocess.CalledProcessError(1, 'No power status obtained on hdparm, output={}'.format(hddparm_out))
 
 def read_system_attribs():
-    global import_module_psutil_exist
+    global import_module_psutil_exist, progress_status
     if import_module_psutil_exist:
         cpu_percent = psutil.cpu_percent(interval=1)
         memory_available_percent = psutil.virtual_memory().percent
-
         import_module_psutil_exist = True
     else:
         output = cStringIO.StringIO()
         if constant.OS in constant.OS_WINDOWS:
+            progress_status = 'reading test data on windows'
             logging.critical('Beware, reading mem usage from a dummy test file')
             with open ('scripts/testdata/free.txt', "r") as myfile:
-                hddparm_out=myfile.read()
+                free_out=myfile.read()
         else:
             try:
-                hddparm_out = subprocess.check_output(['free'], stderr=subprocess.STDOUT)
+                progress_status = 'executing free binary'
+                free_out = subprocess.check_output(['free', 'beer'], stderr=subprocess.STDOUT)
             except Exception, ex:
                 logging.warning('Unable to execute free bin to get mem usage, err {}'.format(ex))
-        output.write(hddparm_out)
+        progress_status = 'parsing output started'
+        output.write(free_out)
         output.seek(0)
         pos=-1
         while pos != output.tell():
+            progress_status = 'parsing output position={}'.format(pos)
             pos = output.tell()
             line=output.readline()
             if constant.FREE_MEM_STATUS in line:
@@ -206,7 +209,9 @@ def read_system_attribs():
                 used = int(words[2].replace(' ','').strip())
                 free = int(words[3].replace(' ','').strip())
                 memory_available_percent = float(100) * free / total
+                progress_status = 'Read mem total {} used {} free {}'.format(total, used, free)
         cpu_percent = -100
+    progress_status = 'Saving mem and cpu to db'
     save_system_attribs_to_db(cpu_percent=cpu_percent, memory_available_percent=memory_available_percent)
 
 def save_system_attribs_to_db(cpu_percent='', memory_available_percent=''):
