@@ -40,6 +40,8 @@ SMARTCTL_LOAD_CYCLE_COUNT='193 Load_Cycle_Count'
 SMARTCTL_ERROR_NO_DISK='Unable to detect device type'
 SMARTCTL_DEVICE_IN_STANDBY='Device is in STANDBY mode'
 HDPARM_STATUS='drive state is:'
+FREE_MEM_STATUS='Mem:'
+
 DISK_DEV_MAIN='/dev/sd'
 
 JSON_PUBLISH_DATE='datetime_'

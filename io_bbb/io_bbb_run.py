@@ -13,10 +13,10 @@ try:
 except:
     logging.critical('Module Adafruit_BBIO.GPIO is not installed, module will not be initialised')
 
-import_module_exist = False
+import_module_psutil_exist = False
 
 def register_gpios():
-    global import_module_exist
+    global import_module_psutil_exist
     #global zone_alarm_list
     zone_alarm_list = models.ZoneAlarm.query.all()
     for zonealarm in zone_alarm_list:
@@ -32,7 +32,7 @@ def register_gpios():
 def event_detected(channel):
     try:
         zonealarm=models.ZoneAlarm.query.filter_by(gpio_pin_code=channel).first()
-        global import_module_exist
+        global import_module_psutil_exist
         if import_module_exist:
             state = GPIO.input(zonealarm.gpio_pin_code)
         else:
@@ -60,7 +60,7 @@ def init():
 
 def thread_run():
     logging.debug('Processing Beaglebone IO')
-    global import_module_exist
+    global import_module_psutil_exist
     if not import_module_exist:
         logging.info('Simulating motion detection for test purposes')
         event_detected('P8_11')
