@@ -81,7 +81,7 @@ def init():
     common.init()
     global app, db, DB_LOCATION
     app = Flask('main')
-    app.config.update(DEBUG=True, SQLALCHEMY_ECHO = False, SQLALCHEMY_DATABASE_URI=DB_LOCATION)
+    app.config.update(DEBUG=False, SQLALCHEMY_ECHO = False, SQLALCHEMY_DATABASE_URI=DB_LOCATION)
 
     db = SQLAlchemy(app)
     db.create_all()

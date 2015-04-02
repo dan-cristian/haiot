@@ -196,24 +196,25 @@ def read_system_attribs():
             free_out = subprocess.Popen(['free'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             progress_status = 'reading output for {}'.format(free_out)
             free_out = free_out.stdout.readlines()
+            progress_status = 'parsing output started'
+            output.write(free_out)
+            output.seek(0)
+            pos=-1
+            while pos != output.tell():
+                progress_status = 'parsing output position={}'.format(pos)
+                pos = output.tell()
+                line=output.readline()
+                if constant.FREE_MEM_STATUS in line:
+                    words = line.split()
+                    total = int(words[1].replace(' ','').strip())
+                    used = int(words[2].replace(' ','').strip())
+                    free = int(words[3].replace(' ','').strip())
+                    memory_available_percent = float(100) * free / total
+                    progress_status = 'Read mem total {} used {} free {}'.format(total, used, free)
+            cpu_percent = -100
         except Exception, ex:
             logging.warning('Unable to execute free bin to get mem usage, err {}'.format(ex))
-        progress_status = 'parsing output started'
-        output.write(free_out)
-        output.seek(0)
-        pos=-1
-        while pos != output.tell():
-            progress_status = 'parsing output position={}'.format(pos)
-            pos = output.tell()
-            line=output.readline()
-            if constant.FREE_MEM_STATUS in line:
-                words = line.split()
-                total = int(words[1].replace(' ','').strip())
-                used = int(words[2].replace(' ','').strip())
-                free = int(words[3].replace(' ','').strip())
-                memory_available_percent = float(100) * free / total
-                progress_status = 'Read mem total {} used {} free {}'.format(total, used, free)
-        cpu_percent = -100
+
     progress_status = 'Saving mem and cpu to db'
     save_system_attribs_to_db(cpu_percent=cpu_percent, memory_available_percent=memory_available_percent)
 
