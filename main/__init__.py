@@ -105,9 +105,8 @@ def init():
 
     if not blocking_webui_running:
         logging.info('Blocking app exit as no web ui is running')
-        while not blocking_webui_running:
-
-            time.sleep(1)
+        #while not blocking_webui_running:
+        #    time.sleep(1)
         logging.info('Exiting Blocking loop as web ui is now running')
 
 

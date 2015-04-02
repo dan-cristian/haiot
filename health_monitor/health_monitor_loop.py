@@ -214,6 +214,8 @@ def read_system_attribs():
                     memory_available_percent = float(100) * free / total
                     progress_status = 'Read mem total {} used {} free {}'.format(total, used, free)
                     cpu_percent = -1
+                if not memory_available_percent:
+                    logging.warning('free mem binary did not returned valid data: {}'.format(free_out))
         except Exception, ex:
             logging.warning('Unable to execute free bin to get mem usage, err {}'.format(ex))
             memory_available_percent = -1
@@ -265,9 +267,9 @@ def get_progress():
 
 def thread_run():
     global progress_status, import_module_psutil_exist
-    progress_status = 'reading system attribs'
-    read_system_attribs()
     progress_status = 'reading hdd smart attribs'
     read_all_hdd_smart()
+    progress_status = 'reading system attribs'
+    read_system_attribs()
     progress_status = 'completed'
     pass
