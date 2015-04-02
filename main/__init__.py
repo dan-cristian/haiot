@@ -122,6 +122,11 @@ def main(argv):
             #sys.exit(1)
 
 def run(arg_list):
+    if 'remote' in arg_list:
+        import ptvsd
+        ptvsd.enable_attach(secret='secret',address=('0.0.0.0', 5678))
+        print 'Enabled remote debugging, waiting 10 seconds for client to attach'
+        ptvsd.wait_for_attach(timeout=10)
     location = main(arg_list)
     print('DB Location is {}'.format(location))
     set_db_location(location)
@@ -130,10 +135,7 @@ def run(arg_list):
     else:
         if 'warning' in arg_list:
             set_logging_level('warning')
-    if 'remote' in arg_list:
-        import ptvsd
-        ptvsd.enable_attach(secret='secret',address=('0.0.0.0', 5678))
-        print 'Enabled remote debugging'
+    
     init()
     print 'App EXIT'
 
