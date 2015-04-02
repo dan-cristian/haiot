@@ -193,7 +193,7 @@ def read_system_attribs():
             #this is normally running on OpenWRT
         try:
             progress_status = 'executing free binary'
-            free_out = subprocess.Popen(['free'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            free_out = subprocess.Popen('free', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             progress_status = 'reading output for {}'.format(free_out)
             free_out = free_out.stdout.readlines()
             progress_status = 'parsing output started'

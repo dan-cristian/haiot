@@ -10,4 +10,4 @@
 #echo "Your answer is: $answer"
 scripts/stopserver.sh
 source venv/bin/activate
-python run_all.py disk remote
+python run_all.py disk
