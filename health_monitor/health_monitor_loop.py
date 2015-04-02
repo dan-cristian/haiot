@@ -181,10 +181,19 @@ def read_system_attribs():
     if import_module_psutil_exist:
         cpu_percent = psutil.cpu_percent(interval=1)
         memory_available_percent = psutil.virtual_memory().percent
-        save_system_attribs_to_db(cpu_percent=cpu_percent, memory_available_percent=memory_available_percent)
+
+        import_module_psutil_exist = True
     else:
         output = cStringIO.StringIO()
-        hddparm_out = subprocess.check_output(['free'], stderr=subprocess.STDOUT)
+        if constant.OS in constant.OS_WINDOWS:
+            logging.critical('Beware, reading mem usage from a dummy test file')
+            with open ('scripts/testdata/free.txt', "r") as myfile:
+                hddparm_out=myfile.read()
+        else:
+            try:
+                hddparm_out = subprocess.check_output(['free'], stderr=subprocess.STDOUT)
+            except Exception, ex:
+                logging.warning('Unable to execute free bin to get mem usage, err {}'.format(ex))
         output.write(hddparm_out)
         output.seek(0)
         pos=-1
@@ -192,14 +201,13 @@ def read_system_attribs():
             pos = output.tell()
             line=output.readline()
             if constant.FREE_MEM_STATUS in line:
-                words = line.split(' ')
-                total = words[1].replace(' ','').strip()
-                used = words[2].replace(' ','').strip()
-                free = words[3].replace(' ','').strip()
-
-                return power_status
-
-    import_module_psutil_exist = True
+                words = line.split()
+                total = int(words[1].replace(' ','').strip())
+                used = int(words[2].replace(' ','').strip())
+                free = int(words[3].replace(' ','').strip())
+                memory_available_percent = float(100) * free / total
+        cpu_percent = -100
+    save_system_attribs_to_db(cpu_percent=cpu_percent, memory_available_percent=memory_available_percent)
 
 def save_system_attribs_to_db(cpu_percent='', memory_available_percent=''):
     try:
