@@ -13,7 +13,7 @@ def unload():
 def init():
     logging.info('Monitor module initialising')
     health_monitor_loop.init()
-    thread_pool.add_callable_progress(func=health_monitor_loop.thread_run, run_interval_second=180,
+    thread_pool.add_callable_progress(func=health_monitor_loop.thread_run, run_interval_second=30,
                                      progress_func=health_monitor_loop.get_progress)
     global initialised
     initialised = True
