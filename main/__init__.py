@@ -145,7 +145,6 @@ def run(arg_list):
     else:
         if 'warning' in arg_list:
             set_logging_level('warning')
-    
     init()
     print 'App EXIT'
 

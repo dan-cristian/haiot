@@ -7,6 +7,7 @@ try:
 except Exception, ex:
     logging.critical('PSUtil module not available')
 import datetime
+from collections import OrderedDict
 from common import constant
 from main.admin import models
 from main import db
@@ -176,6 +177,60 @@ def read_hddparm(disk_dev=''):
         logging.warning('Disk read error {} disk was {} err {}'.format(exc.message, disk_dev, exc))
     raise subprocess.CalledProcessError(1, 'No power status obtained on hdparm, output={}'.format(hddparm_out))
 
+def get_mem_avail_percent_linux():
+    #http://architects.dzone.com/articles/linux-system-mining-python
+    meminfo=OrderedDict()
+    with open('/proc/meminfo') as f:
+        for line in f:
+            meminfo[line.split(':')[0]] = line.split(':')[1].strip()
+        total = int(meminfo['MemTotal'])
+        free = int(meminfo['MemFree'])
+        memory_available_percent = float(100) * free / total
+    global progress_status
+    progress_status = 'Read mem total {} free {}'.format(total, free)
+    return memory_available_percent
+
+previous_procstat_list = None
+
+def get_cpu_utilisation_linux():
+    with open('/proc/stat') as f:
+        for line in f:
+            words = line.split()
+            if len(words) == 11:
+                user = int(words[1].strip())
+                nice = int(words[2].strip())
+                system = int(words[3].strip())
+                idle = int(words[4].strip())
+                iowait = int(words[5].strip())
+                irq = int(words[6].strip())
+                softirq = int(words[7].strip())
+                steal = int(words[8].strip())
+                guest = int(words[9].strip())
+                guest_nice = int(words[10].strip())
+
+                global previous_procstat_list
+                prevuser = int(previous_procstat_list[1].strip())
+                prevnice = int(previous_procstat_list[2].strip())
+                prevsystem = int(previous_procstat_list[3].strip())
+                previdle = int(previous_procstat_list[4].strip())
+                previowait = int(previous_procstat_list[5].strip())
+                previrq = int(previous_procstat_list[6].strip())
+                prevsoftirq = int(previous_procstat_list[7].strip())
+                prevsteal = int(previous_procstat_list[8].strip())
+                prevguest = int(previous_procstat_list[9].strip())
+                prevguest_nice = int(previous_procstat_list[10].strip())
+                previdle = previdle+previowait
+                idle=idle+iowait
+                prevnonidle = prevuser+prevnice+prevsystem+previrq+prevsoftirq+prevsteal
+                nonidle = user+nice+system+irq+softirq+steal
+                prevtotal = previdle+prevnonidle
+                total = idle+nonidle
+                CPU_Percentage = ((total - prevtotal)-(idle-previdle))/(total-prevtotal)
+                return CPU_Percentage
+            else:
+                logging.warning('proc/stat returned unexpected number of words on line {}'.format(line))
+    return -1
+
 def read_system_attribs():
     global import_module_psutil_exist, progress_status
     cpu_percent = None
@@ -186,39 +241,43 @@ def read_system_attribs():
         import_module_psutil_exist = True
     else:
         output = cStringIO.StringIO()
-        #if constant.OS in constant.OS_WINDOWS:
-        #    progress_status = 'reading test data on windows'
-        #    logging.critical('Beware, reading mem usage from a dummy test file')
-        #    with open ('scripts/testdata/free.txt', "r") as myfile:
-        #        free_out=myfile.read()
-        #else:
+        if constant.OS in constant.OS_WINDOWS:
+            progress_status = 'reading test data on windows'
+            logging.critical('Beware, reading mem usage from a dummy test file')
+            with open ('scripts/testdata/free.txt', "r") as myfile:
+                free_out=myfile.read()
+        else:
             #this is normally running on OpenWRT
-        try:
-            progress_status = 'executing free binary'
-            free_out = subprocess.Popen('free', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            progress_status = 'reading output for {}'.format(free_out)
-            free_out = free_out.stdout.readlines()
-            progress_status = 'parsing output started'
-            output.write(free_out)
-            output.seek(0)
-            pos=-1
-            while pos != output.tell():
-                progress_status = 'parsing output position={}'.format(pos)
-                pos = output.tell()
-                line=output.readline()
-                if constant.FREE_MEM_STATUS in line:
-                    words = line.split()
-                    total = int(words[1].replace(' ','').strip())
-                    used = int(words[2].replace(' ','').strip())
-                    free = int(words[3].replace(' ','').strip())
-                    memory_available_percent = float(100) * free / total
-                    progress_status = 'Read mem total {} used {} free {}'.format(total, used, free)
-                    cpu_percent = -1
-                if not memory_available_percent:
-                    logging.warning('free mem binary did not returned valid data: {}'.format(free_out))
-        except Exception, ex:
-            logging.warning('Unable to execute free bin to get mem usage, err {}'.format(ex))
-            memory_available_percent = -1
+            memory_available_percent = get_mem_avail_percent_linux()
+            cpu_percent = get_cpu_utilisation_linux()
+            logging.info('Read mem free {} cpu {}'.format(memory_available_percent, cpu_percent))
+            if False:#old method, not working, popen freezes
+                try:
+                    progress_status = 'executing free binary'
+                    free_out = subprocess.Popen('free', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    progress_status = 'reading output for {}'.format(free_out)
+                    free_out = free_out.stdout.readlines()
+                    progress_status = 'parsing output started'
+                    output.write(free_out)
+                    output.seek(0)
+                    pos=-1
+                    while pos != output.tell():
+                        progress_status = 'parsing output position={}'.format(pos)
+                        pos = output.tell()
+                        line=output.readline()
+                        if constant.FREE_MEM_STATUS in line:
+                            words = line.split()
+                            total = int(words[1].replace(' ','').strip())
+                            used = int(words[2].replace(' ','').strip())
+                            free = int(words[3].replace(' ','').strip())
+                            memory_available_percent = float(100) * free / total
+                            progress_status = 'Read mem total {} used {} free {}'.format(total, used, free)
+                            cpu_percent = -1
+                        if not memory_available_percent:
+                            logging.warning('free mem binary did not returned valid data: {}'.format(free_out))
+                except Exception, ex:
+                    logging.warning('Unable to execute free bin to get mem usage, err {}'.format(ex))
+                    memory_available_percent = -1
     progress_status = 'Saving mem and cpu to db'
     if not cpu_percent is None and not memory_available_percent is None:
         save_system_attribs_to_db(cpu_percent=cpu_percent, memory_available_percent=memory_available_percent)
