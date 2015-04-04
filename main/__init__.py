@@ -90,11 +90,11 @@ def unload():
     import webui, admin.thread_pool, mqtt_io
     global shutting_down
     shutting_down = True
+    admin.thread_pool.thread_pool_enabled = False
     if webui.initialised:
         webui.unload()
     if mqtt_io.initialised:
         mqtt_io.unload()
-    admin.thread_pool.thread_pool_enabled = False
 
 def init():
     signal.signal(signal.SIGINT, signal_handler)
