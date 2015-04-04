@@ -33,6 +33,10 @@ def handle_event_db_model_post(model, row):
         logging.info('Detected Module change, applying potential changes')
         if row.host_name == constant.HOST_NAME:
             main.init_module(row.name, row.active)
+    elif str(models.Node) in str(model):
+        logging.info('Detected Node change, applying potential changes')
+        txt = model_helper.model_row_to_json(row, operation='update')
+        mqtt_io.sender.send_message(txt)
     #print model_row_to_json(row._sa_instance_state.dict)
 
 def handle_event_mqtt_received(client, userdata, topic, obj):
@@ -42,8 +46,8 @@ def handle_event_mqtt_received(client, userdata, topic, obj):
             node.node_run.node_update(obj)
             if 'execute_command' in obj:
                 execute_command = obj['execute_command']
-                host_name = obj[constant.JSON_PUBLISH_SOURCE_HOST]
-                if host_name == constant.HOST_NAME:
+                host_name = obj['name']
+                if host_name == constant.HOST_NAME and execute_command != '':
                     main.execute_command(execute_command)
         #elif table == 'Module':
 
