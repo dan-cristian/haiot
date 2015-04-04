@@ -4,7 +4,7 @@ import time
 import sys
 from flask_sqlalchemy import SQLAlchemy #workaround for resolve issue
 from flask import Flask, redirect, url_for
-
+import signal
 import logging
 import common
 from common import constant
@@ -67,6 +67,11 @@ def init_modules():
                 #no need to init main module, already initialised
                 pass
 
+def signal_handler(signal, frame):
+    logging.warning('You pressed Ctrl+C!')
+    global exit_code
+    exit_code = 1
+    unload()
 
 def execute_command(command):
     global exit_code
@@ -91,8 +96,8 @@ def unload():
         mqtt_io.unload()
     admin.thread_pool.thread_pool_enabled = False
 
-
 def init():
+    signal.signal(signal.SIGINT, signal_handler)
     global LOGGING_LEVEL
     logging.basicConfig(format='%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(threadName)s:%(message)s',
                         level=LOGGING_LEVEL)
@@ -126,12 +131,9 @@ def init():
     if webui_running:
         import webui
         init_module(admin.model_helper.get_mod_name(webui), module_is_active=True)
-
-    #if not blocking_webui_running:
-    #    logging.info('Blocking app exit as no web ui is running')
+    #stop app from exiting
     while not shutting_down:
         time.sleep(1)
-    #logging.info('Exiting Blocking loop as web ui is now running')
 
 def run(arg_list):
     if 'debug_remote' in arg_list:
