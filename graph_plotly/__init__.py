@@ -12,16 +12,19 @@ from main.admin import models
 
 initialised = False
 g_series_id_list={} #list of series unique identifier used to determine trace order remote
+g_graph_url_list={} #list of remote url for each graph
 
 def download_graph_config(graph_name):
     global g_series_id_list
     graph_rows = models.GraphPlotly.query.filter_by(name=graph_name).all()
     if len(graph_rows)==0:
         g_series_id_list[graph_name] = []
+        g_graph_url_list[graph_name] = []
 
     for graph_row in graph_rows:
         series_split = graph_row.field_list.split(',')
         g_series_id_list[graph_row.name] = series_split
+        g_graph_url_list[graph_row.name] = graph_row.url
 
 def add_new_serie(graph_name, url, series_id):
     graph_row = models.GraphPlotly.query.filter_by(name=graph_name).first()
@@ -41,7 +44,7 @@ def upload_data(obj):
     #FIXME: Add caching and multiple series on same graph
     try:
         logging.debug('Trying to upload plotly obj {}'.format(obj))
-        global g_series_id_list
+        global g_series_id_list, g_graph_url_list
         if constant.JSON_PUBLISH_GRAPH_X in obj:
             axis_x_field = obj[constant.JSON_PUBLISH_GRAPH_X]
             graph_id_field = obj[constant.JSON_PUBLISH_GRAPH_ID]
@@ -65,7 +68,22 @@ def upload_data(obj):
                         if not g_series_id_list.has_key(graph_name):
                             #get series order list from db to ensure graph consistency, usually done at app start
                             download_graph_config(graph_name)
-                        #TODO: check online if graph exists
+                            #TODO: check online if graph exists
+                            if g_graph_url_list.has_key(graph_name):
+                                graph_url = g_graph_url_list[graph_name]
+                                figure = py.get_figure(graph_url)
+                                #print(figure)
+                                i = 0
+                                for serie in figure['data']:
+                                    remote_type=serie['type']
+                                    remote_name=serie['name']
+                                    remote_x=serie['x']
+                                    remote_y=serie['y']
+                                    if graph_series_id_list[graph_name][i]==remote_name:
+                                        logging.debug('Serie order for {} is ok'.format(remote_name))
+                                    else:
+                                        logging.warning('Serie order for remote {} not ok'.format(remote_name))
+                                    i = i + 1
 
                         graph_series_id_list = g_series_id_list[graph_name]
                         if series_id in graph_series_id_list:
@@ -103,6 +121,8 @@ def unload():
     initialised = False
 
 def init():
+    #use auto setup as described here: https://plot.ly/python/getting-started/ to avoid passwords in code
+    #or less secure sign_in code below
     #py.sign_in(model_helper.get_param(constant.P_PLOTLY_USERNAME),model_helper.get_param(constant.P_PLOTLY_APIKEY))
     global initialised
     initialised = True

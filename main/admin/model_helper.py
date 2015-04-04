@@ -94,8 +94,8 @@ def populate_tables(model_auto_update=False):
             ['6', constant.P_MQTT_TOPIC, 'iot/main'],
             ['7', constant.P_MQTT_HOST_2, '127.0.0.1'],
             ['8', constant.P_MQTT_PORT_2, '1883'],
-            ['9', constant.P_PLOTLY_USERNAME, 'dancri77'],
-            ['10', constant.P_PLOTLY_APIKEY, 'lw2w6fz9xk']
+            ['9', constant.P_PLOTLY_USERNAME, 'xxx'],
+            ['10', constant.P_PLOTLY_APIKEY, 'zzz']
         ]
     check_table_schema(models.Parameter, model_auto_update)
     if len(models.Parameter.query.all()) < len(param_list):
