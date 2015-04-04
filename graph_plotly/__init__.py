@@ -79,11 +79,19 @@ def upload_data(obj):
                                     remote_name=serie['name']
                                     remote_x=serie['x']
                                     remote_y=serie['y']
-                                    if graph_series_id_list[graph_name][i]==remote_name:
-                                        logging.debug('Serie order for {} is ok'.format(remote_name))
+                                    if len(g_series_id_list[graph_name]) > i:
+                                        if g_series_id_list[graph_name][i]==remote_name:
+                                            logging.debug('Serie order for {} is ok'.format(remote_name))
+                                        else:
+                                            logging.warning('Serie order for remote {} not ok, fixing'.format(remote_name))
+                                            g_series_id_list[graph_name][i] = remote_name
                                     else:
-                                        logging.warning('Serie order for remote {} not ok'.format(remote_name))
+                                        logging.debug('Series {} not yet saved in DB, strange'.format(remote_name))
                                     i = i + 1
+
+                                if len(g_series_id_list[graph_name]) > i:
+                                    logging.warning('Too many series saved in db for graph {}'.format(graph_name))
+
 
                         graph_series_id_list = g_series_id_list[graph_name]
                         if series_id in graph_series_id_list:
@@ -96,13 +104,13 @@ def upload_data(obj):
                                     trace_list.append(trace)
                                 else:
                                     trace_list.append(trace_empty)
+                            logging.debug('Extending graph serie {} {}'.format(graph_legend, series_id))
                         else:
                             graph_series_id_list.append(series_id)
                             fileopt = 'append'
                             trace_list = [trace]
                             logging.debug('Appending new graph serie {} {}'.format(graph_legend, series_id))
                         data = graph_objs.Data(trace_list)
-                        py.grid_ops
                         url = py.plot(data, filename=graph_name, fileopt=fileopt, auto_open=False)
                         if fileopt=='append':
                             add_new_serie(graph_name, url, series_id)
