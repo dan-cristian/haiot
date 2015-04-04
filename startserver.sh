@@ -40,4 +40,8 @@ while $must_run; do
         echo "App was killed with -9"
         must_run=false
     fi
+    if [ $exit_code == 1 ]; then
+        echo "App was interrupted with CTRL-C"
+        must_run=false
+    fi
 done
