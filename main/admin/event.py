@@ -37,7 +37,6 @@ def handle_event_db_model_post(model, row):
         logging.info('Detected Node change, applying potential changes')
         txt = model_helper.model_row_to_json(row, operation='update')
         mqtt_io.sender.send_message(txt)
-    #print model_row_to_json(row._sa_instance_state.dict)
 
 def handle_event_mqtt_received(client, userdata, topic, obj):
     if constant.JSON_PUBLISH_TABLE in obj:

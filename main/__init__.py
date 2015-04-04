@@ -58,14 +58,14 @@ def init_modules():
         #webui will block at init, postpone init for end
         if mod.name != admin.model_helper.get_mod_name(webui) and mod.name != 'main':
             init_module(mod.name, mod.active)
-
-        if mod.name == admin.model_helper.get_mod_name(webui):
-            global webui_running
-            webui_running = True
-            pass
-        elif mod.name == 'main':
-            #no need to init main module, already initialised
-            pass
+        else:
+            if mod.name == admin.model_helper.get_mod_name(webui):
+                global webui_running
+                webui_running = mod.active
+                pass
+            elif mod.name == 'main':
+                #no need to init main module, already initialised
+                pass
 
 
 def execute_command(command):
