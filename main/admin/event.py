@@ -30,15 +30,18 @@ def handle_event_db_model_post(model, row):
     if str(models.Parameter) in str(model):
         logging.info('Detected Parameter change ' + row)
     elif str(models.Module) in str(model):
-        logging.info('Detected Module change')
-        main.init_module(row.name, row.active)
+        logging.info('Detected Module change, applying potential changes')
+        if row.host_name == constant.HOST_NAME:
+            main.init_module(row.name, row.active, row.restart)
     #print model_row_to_json(row._sa_instance_state.dict)
 
 def handle_event_mqtt_received(client, userdata, topic, obj):
     if constant.JSON_PUBLISH_TABLE in obj:
-        table = obj[constant.JSON_PUBLISH_TABLE]
-        if str(table) == 'Node':
+        table = str(obj[constant.JSON_PUBLISH_TABLE])
+        if table == 'Node':
             node.node_run.node_update(obj)
+        #elif table == 'Module':
+
     if variable.NODE_THIS_IS_MASTER_OVERALL:
         if constant.JSON_PUBLISH_GRAPH_X in obj:
             if obj[constant.JSON_PUBLISH_SAVE_TO_GRAPH]:
@@ -50,6 +53,7 @@ def handle_event_mqtt_received(client, userdata, topic, obj):
                 pass
         else:
             logging.debug('Mqtt event without graphing capabilities {}'.format(obj))
+
 
 
 def on_models_committed(sender, changes):

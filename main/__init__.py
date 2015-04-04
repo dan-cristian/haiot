@@ -7,6 +7,7 @@ from flask import Flask, redirect, url_for
 from flask_sqlalchemy import models_committed
 import logging
 import common
+from common import constant
 
 #location for sqlite db
 DB_LOCATION=None
@@ -15,6 +16,7 @@ LOGGING_LEVEL=logging.INFO
 app=None
 db=None
 blocking_webui_running = False
+initialised = False
 
 def my_import(name):
     #http://stackoverflow.com/questions/547829/how-to-dynamically-load-a-python-class
@@ -24,7 +26,7 @@ def my_import(name):
         mod = getattr(mod, comp)
     return mod
 
-def init_module(module_name, module_is_active):
+def init_module(module_name, module_is_active, restart):
     dynclass = my_import(module_name)
     if module_is_active:
         print "Module {} is active".format(module_name)
@@ -39,20 +41,31 @@ def init_module(module_name, module_is_active):
             logging.info('Module {} has been deactivated, unloading'.format(module_name))
             dynclass.unload()
             del dynclass
+        else:
+            logging.info('Module {} already disabled'.format(module_name))
+    if restart:
+        logging.info('Module restarting')
+        dynclass.unload()
 
 def init_modules():
     import admin.models
     import admin.model_helper
     import webui
-    module_list = admin.models.Module.query.order_by(admin.models.Module.start_order).all()
+    module_list = admin.models.Module.query.filter_by(host_name=constant.HOST_NAME).order_by(
+        admin.models.Module.start_order).all()
     for mod in module_list:
         assert isinstance(mod, admin.models.Module)
         #webui will block at init, postpone init for end
-        if mod.name != admin.model_helper.get_mod_name(webui):
-            init_module(mod.name, mod.active)
-        else:
+        if mod.name != admin.model_helper.get_mod_name(webui) and mod.name != 'main':
+            init_module(mod.name, mod.active, mod.restart)
+
+        if mod.name == admin.model_helper.get_mod_name(webui):
             global blocking_webui_running
             blocking_webui_running = True
+            pass
+        elif mod.name == 'main':
+            #no need to init main module, already initialised
+            pass
 
 def set_db_location(location):
     global DB_LOCATION
@@ -73,6 +86,20 @@ def set_logging_level(level):
             LOGGING_LEVEL = logging.WARNING
 
 #--------------------------------------------------------------------------#
+shutting_down=False
+def unload():
+    logging.warning('Main module is unloading, application will exit')
+    import webui, admin.thread_pool, mqtt_io
+    global shutting_down
+    shutting_down = True
+    if webui.initialised:
+        global blocking_webui_running
+        webui.unload()
+    if mqtt_io.initialised:
+        mqtt_io.unload()
+    admin.thread_pool.thread_pool_enabled = False
+
+    sys.exit(7)
 
 def init():
     logging.basicConfig(format='%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(threadName)s:%(message)s',
@@ -99,14 +126,16 @@ def init():
     t.daemon = True
     t.start()
 
+    global initialised, shutting_down
+    initialised = True
     if blocking_webui_running:
         import webui
-        init_module(admin.model_helper.get_mod_name(webui), True)
+        init_module(admin.model_helper.get_mod_name(webui), module_is_active=True, restart=False)
 
     if not blocking_webui_running:
         logging.info('Blocking app exit as no web ui is running')
-        #while not blocking_webui_running:
-        #    time.sleep(1)
+        while not blocking_webui_running and not shutting_down:
+            time.sleep(1)
         logging.info('Exiting Blocking loop as web ui is now running')
 
 
@@ -148,7 +177,7 @@ def run(arg_list):
     init()
     print 'App EXIT'
 
-if 'main' in __name__:
-    run(sys.argv[1:])
-else:
-    print 'Not executing main, name is ' + __name__
+#if 'main' in __name__:
+#    run(sys.argv[1:])
+#else:
+#    print 'Not executing main, name is ' + __name__

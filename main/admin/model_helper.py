@@ -170,8 +170,10 @@ def populate_tables():
 
     if len(models.Node.query.all()) == 0:
         logging.info('Populating Node with default values')
-        if constant.HOST_NAME=='nas': priority = 0
-        else: priority=random.randint(1, 100)
+        if constant.HOST_NAME=='nas':
+            priority = 0
+        else:
+            priority=random.randint(1, 100)
         db.session.add(models.Node('', name=constant.HOST_NAME, ip=constant.HOST_MAIN_IP, priority=priority))
         commit()
 
@@ -182,21 +184,34 @@ def populate_tables():
         #db.session.add(sens)
         #commit(db.session)
 
-    import alarm, heat, sensor, relay, mqtt_io, health_monitor, graph_plotly, node, io_bbb, webui
-    module_list=[
-        ['1', get_mod_name(node), True, 0], ['2', get_mod_name(health_monitor), True, 1],
-        ['3', get_mod_name(mqtt_io), True, 2], ['4', get_mod_name(sensor), False, 3],
-        ['5', get_mod_name(relay), False, 4], ['6', get_mod_name(heat), False, 5],
-        ['7', get_mod_name(alarm), False, 6], ['8', get_mod_name(graph_plotly), False, 7],
-        ['9', get_mod_name(io_bbb), False, 8],
-        [10, get_mod_name(webui), False, 9]
-    ]
+    import alarm, heat, sensor, relay, mqtt_io, health_monitor, graph_plotly, node, io_bbb, webui, main
+    module_list_dict = {'default':[
+        [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
+        [4, get_mod_name(mqtt_io), True, 3],[5, get_mod_name(sensor), False, 4],[6, get_mod_name(relay), False, 5],
+        [7, get_mod_name(heat), False, 6],[8, get_mod_name(alarm), False, 7],[9, get_mod_name(graph_plotly), False, 8],
+        [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), True, 10]],
+        'netbook':[
+        [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
+        [4, get_mod_name(mqtt_io), True, 3],[5, get_mod_name(sensor), False, 4],[6, get_mod_name(relay), False, 5],
+        [7, get_mod_name(heat), False, 6],[8, get_mod_name(alarm), False, 7],[9, get_mod_name(graph_plotly), False, 8],
+        [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), True, 10]]
+        }
+
     check_table_schema(models.Module)
-    if len(models.Module.query.all()) < len(module_list):
+    if module_list_dict.has_key(constant.HOST_NAME):
+        module_list = module_list_dict[constant.HOST_NAME]
+        logging.info('Module is initialised with host {} specific values'.format(constant.HOST_NAME))
+    else:
+        module_list = module_list_dict['default']
+        logging.info('Module is initialise with default template values')
+
+    if len(models.Module.query.filter_by(host_name=constant.HOST_NAME).all()) < len(module_list):
         logging.info('Populating Module with default values')
-        models.Module.query.delete()
+        models.Module.query.filter_by(host_name=constant.HOST_NAME).delete()
+
         for tuple in module_list:
-            db.session.add(models.Module(id=tuple[0], name=tuple[1], active=tuple[2], start_order=tuple[3]))
+            db.session.add(models.Module(id=tuple[0], host_name=constant.HOST_NAME,
+                                         name=tuple[1], active=tuple[2], start_order=tuple[3]))
         commit()
 
     check_table_schema(models.GpioPin)

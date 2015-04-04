@@ -6,7 +6,7 @@ callable_list=[]
 callable_progress_list={}
 exec_interval_list={}
 exec_last_date_list={}
-
+thread_pool_enabled = True
 
 def add_callable(func, run_interval_second=60):
     print_name = func.func_globals['__name__']+'.'+ func.func_name
@@ -22,11 +22,17 @@ def add_callable_progress(func, run_interval_second=60, progress_func=None):
 def remove_callable(func):
     pass
 
+def unload():
+    global thread_pool_enabled
+    thread_pool_enabled = False
+
 def main():
+    global thread_pool_enabled
+    thread_pool_enabled = True
     #https://docs.python.org/3.3/library/concurrent.futures.html
     dict_future_func={}
     with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-        while True:
+        while thread_pool_enabled:
             if len(callable_list) != len(dict_future_func):
                 logging.info('Initialising thread processing with {} functions'.format(len(callable_list)))
                 dict_future_func = {executor.submit(call_obj): call_obj for call_obj in callable_list}
@@ -56,24 +62,6 @@ def main():
                             progress_status=callable_progress_list[func].func_globals['progress_status']
                             logging.warning('Progress Status is {}'.format(progress_status))
             time.sleep(2)
-
+        executor.shutdown()
 
         logging.info('Thread pool processor exit')
-
-def main2():
-    #https://docs.python.org/3.3/library/concurrent.futures.html
-    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-        while True:
-            # Start the load operations and mark each future with its id
-            future_to_obj = {executor.submit(call_obj): call_obj for call_obj in callable_list}
-
-            for future in concurrent.futures.as_completed(future_to_obj):
-                call_obj = future_to_obj[future]
-                try:
-                    data = future.result()
-                except Exception as exc:
-                    print('%r generated an exception: %s' % (call_obj, exc))
-                else:
-                    print('%r result is %s' % (call_obj, data))
-        #logging.info('Thread Pool Done')
-        time.sleep(1)

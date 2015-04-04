@@ -43,7 +43,9 @@ def unload():
     # handles reconnecting.
     # Other loop*() functions are available that give a threaded interface and a
     # manual interface.
-    global mqtt_client
+    global mqtt_client, topic
+    mqtt_client.unsubscribe(topic)
+    mqtt_client.disconnect()
     mqtt_client.loop_stop()
 
 def init():

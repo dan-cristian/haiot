@@ -12,19 +12,23 @@ class DbEvent:
 
 class Module(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    host_name = db.Column(db.String(50))
     name = db.Column(db.String(50))
     active = db.Column(db.Boolean(), default=False)
     start_order = db.Column(db.Integer)
+    restart = db.Column(db.Boolean(), default=False)
 
-    def __init__(self, id='', name='', active=False, start_order='999'):
+    def __init__(self, id='', host_name='', name='', active=False, start_order='999', restart=False):
         if id:
             self.id = id
+        self.host_name = host_name
         self.name = name
         self.active = active
         self.start_order = start_order
+        self.restart = restart
 
     def __repr__(self):
-        return 'Module id {}, {}'.format(self.id, self.name[:50])
+        return 'Module {} {}, {}'.format(self.id, self.host_name, self.name[:50])
 
 class Zone(db.Model):
     id = db.Column(db.Integer, primary_key=True)
