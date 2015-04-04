@@ -63,5 +63,4 @@ def main():
                             logging.warning('Progress Status is {}'.format(progress_status))
             time.sleep(2)
         executor.shutdown()
-
         logging.info('Thread pool processor exit')

@@ -12,14 +12,15 @@
 function run_app {
     scripts/stopserver.sh
     source venv/bin/activate
-    python run_all.py disk
+    python run_all.py $1
     exit_code=$?
     echo "Program exit with code $exit_code"
+    echo "---------------------------------"
 }
 
 must_run=true
 while $must_run; do
-    run_app
+    run_app $1
     if [ $exit_code == 131 ]; then
         echo "Restarting app"
     fi
@@ -29,6 +30,14 @@ while $must_run; do
     fi
     if [ $exit_code == 133 ]; then
         echo "Shutdown app"
+        must_run=false
+    fi
+    if [ $exit_code == 143 ]; then
+        echo "App was killed"
+        must_run=false
+    fi
+    if [ $exit_code == 137 ]; then
+        echo "App was killed with -9"
         must_run=false
     fi
 done
