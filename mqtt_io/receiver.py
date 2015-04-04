@@ -8,6 +8,8 @@ from common.utils import json2obj
 from common import constant
 import mqtt_io
 
+last_message_received=datetime.datetime.now()
+
 def on_subscribe(client, userdata, mid, granted_qos):
     logging.info('Subscribed to client {} user {} mid {} qos {}'.format(
         str(client), str(userdata), str(mid), str(granted_qos)))
@@ -16,6 +18,8 @@ def on_subscribe(client, userdata, mid, granted_qos):
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
     try:
+        global last_message_received
+        last_message_received = datetime.datetime.now()
         logging.debug('Received from client [{}] userdata [{}] msg [{}] at {} '.format(client._client_id,
                                                                                          userdata, msg.topic,
                                                                                           datetime.datetime.now()))
@@ -38,5 +42,9 @@ def on_message(client, userdata, msg):
 
 def thread_run():
     logging.debug('Processing mqtt_io receiver')
-    mqtt_io.mqtt_client.loop(1)
+    global last_message_received
+    seconds_elapsed = (datetime.datetime.now()-last_message_received).total_seconds()
+    if seconds_elapsed > 60:
+        logging.warning('Last mqtt message was received {} seconds ago, unusually long'.format(seconds_elapsed))
+    mqtt_io.mqtt_client.loop(timeout=2)
     return 'Processed template_run'

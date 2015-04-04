@@ -31,7 +31,7 @@ def on_disconnect(client, userdata, rc):
 
 def subscribe():
     global topic
-    logging.info('Subscribing to mqtt topic{}'.format(topic))
+    logging.info('Subscribing to mqtt topic={}'.format(topic))
     mqtt_client.on_subscribe = receiver.on_subscribe
     mqtt_client.username_pw_set(constant.HOST_NAME)
     mqtt_client.user_data_set(constant.HOST_NAME + " userdata")
