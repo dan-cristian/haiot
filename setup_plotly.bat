@@ -1,0 +1,1 @@
+python -c "import plotly; plotly.tools.set_credentials_file(username='dancri77', api_key='lw2w6fz9xk', stream_ids=['fmjbljkeot', '1piqv8ti6k', '24w1i6s6bs', '15ytl1hrhc'])"
