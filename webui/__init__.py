@@ -35,8 +35,9 @@ def exit():
     return 'werkzeug not exited'
 
 def unload():
+    logging.info('Webui module unloading')
     #response = app.test_client().post('/exit')
-    flask_thread
+
 def init():
     logging.info('WebUI module initialising')
     #thread_pool.add_callable(webui.thread_run, run_interval_second=60)

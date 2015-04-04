@@ -75,7 +75,7 @@ def execute_command(command):
     elif command=='upgrade_app':
         exit_code = 5002
     elif command=='shutdown_app':
-        exit_code = 5003
+        exit_code = 137
     if exit_code != 0:
         unload()
 #--------------------------------------------------------------------------#
