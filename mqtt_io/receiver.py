@@ -38,5 +38,5 @@ def on_message(client, userdata, msg):
 
 def thread_run():
     logging.debug('Processing mqtt_io receiver')
-    mqtt_io.mqtt_client.loop()
+    mqtt_io.mqtt_client.loop(1)
     return 'Processed template_run'
