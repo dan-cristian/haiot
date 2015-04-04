@@ -76,7 +76,7 @@ def update_master_state():
                         logging.info('Waiting to apply master status locally, sec. lapsed={}'.format(seconds_elapsed))
                         if not variable.NODE_THIS_IS_MASTER_OVERALL:
                             #record date when cluster agreed I must be master
-                            if since_when_i_should_be_master == None:
+                            if since_when_i_should_be_master == datetime.datetime.max:
                                 since_when_i_should_be_master = datetime.datetime.now()
                     if seconds_elapsed > 30:
                         variable.NODE_THIS_IS_MASTER_OVERALL = node.is_master_overall
