@@ -71,11 +71,11 @@ def init_modules():
 def execute_command(command):
     global exit_code
     if command=='restart_app':
-        exit_code = 5001
+        exit_code = 131
     elif command=='upgrade_app':
-        exit_code = 5002
+        exit_code = 132
     elif command=='shutdown_app':
-        exit_code = 137
+        exit_code = 133
     if exit_code != 0:
         unload()
 #--------------------------------------------------------------------------#
