@@ -39,14 +39,9 @@ def subscribe():
     mqtt_client.subscribe(topic=topic, qos=0)
 
 def unload():
-    # Blocking call that processes network traffic, dispatches callbacks and
-    # handles reconnecting.
-    # Other loop*() functions are available that give a threaded interface and a
-    # manual interface.
     global mqtt_client, topic
     mqtt_client.unsubscribe(topic)
     mqtt_client.disconnect()
-    mqtt_client.loop_stop()
 
 def init():
     host_list=[
@@ -72,7 +67,8 @@ def init():
                 client_connected = True
                 mqtt_client.on_message = receiver.on_message
                 mqtt_client.on_disconnect = on_disconnect
-                mqtt_client.loop_start()
+                thread_pool.add_callable(receiver.thread_run, run_interval_second=2)
+                #mqtt_client.loop_start()
                 initialised = True
             except socket.error:
                 logging.error('mqtt client not connected, err {}, pause and retry'.format(sys.exc_info()[0]))

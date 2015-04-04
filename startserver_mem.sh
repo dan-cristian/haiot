@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 #echo Enter mem[Enter] to run db in memory. Default is from disk
 #read -t 3 answer
 #if [ $? == 0 ]; then
@@ -11,3 +12,4 @@
 scripts/stopserver.sh
 source venv/bin/activate
 python run_all.py mem
+echo "program exit with code $?"

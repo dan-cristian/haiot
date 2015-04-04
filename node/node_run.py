@@ -28,6 +28,7 @@ def node_update(obj={}):
             node.is_master_rule = utils.get_object_field_value(obj, models.Node.is_master_rule)
             node.priority = utils.get_object_field_value(obj, models.Node.priority)
             node.ip = utils.get_object_field_value(obj, models.Node.ip)
+            node.execute_command = utils.get_object_field_value(obj, models.Node.execute_command)
             node.updated_on = datetime.datetime.now()
             db.session.commit()
         else:
@@ -66,8 +67,8 @@ def update_master_state():
             if node.name == constant.HOST_NAME:
                 if variable.NODE_THIS_IS_MASTER_OVERALL != node.is_master_overall:
                     if node.is_master_overall:
-                        logging.info('Before becoming master I will sleep 15 seconds to let others to obey')
-                        time.sleep(15)
+                        logging.info('Before becoming master I will sleep 5 seconds to let others to obey')
+                        time.sleep(5)
                     variable.NODE_THIS_IS_MASTER_OVERALL = node.is_master_overall
                     logging.info('Change in node mastership, local node is master={}'.format(
                         variable.NODE_THIS_IS_MASTER_OVERALL))

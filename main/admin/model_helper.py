@@ -57,17 +57,20 @@ def commit():
 def get_mod_name(module):
     return str(module).split("'")[1]
 
-def check_table_schema(table):
+def check_table_schema(table, model_auto_update=False):
     try:
         count = table.query.all()
     except OperationalError, oex:
         logging.critical('Table {} schema in DB seems outdated, err {}, DROP it and recreate (y/n)?'.format(oex, table))
-        read_drop_table(table, oex)
+        read_drop_table(table, oex, model_auto_update)
     except InvalidRequestError:
         logging.warning('Error on check table schema {}, ignoring'.format(table))
 
-def read_drop_table(table, original_exception):
-    x = sys.stdin.readline(1)
+def read_drop_table(table, original_exception, drop_without_user_ask=False):
+    if not drop_without_user_ask:
+        x = sys.stdin.readline(1)
+    else:
+        x='y'
     if x=='y':
         logging.warning('Dropping table {}'.format(table))
         table_name=table.query._primary_entity.entity_zero._with_polymorphic_selectable.description
@@ -81,7 +84,7 @@ def read_drop_table(table, original_exception):
     else:
         raise original_exception
 
-def populate_tables():
+def populate_tables(model_auto_update=False):
     param_list=[
             ['1', constant.P_MZP_SERVER_URL, 'http://192.168.0.10'],
             ['2', constant.P_OWSERVER_HOST_1, '192.168.0.113'],
@@ -94,7 +97,7 @@ def populate_tables():
             ['9', constant.P_PLOTLY_USERNAME, 'dancri77'],
             ['10', constant.P_PLOTLY_APIKEY, 'lw2w6fz9xk']
         ]
-    check_table_schema(models.Parameter)
+    check_table_schema(models.Parameter, model_auto_update)
     if len(models.Parameter.query.all()) < len(param_list):
         logging.info('Populating Parameter with default values')
         models.Parameter.query.delete()
@@ -103,7 +106,7 @@ def populate_tables():
             db.session.add(param)
             commit()
 
-    check_table_schema(models.Zone)
+    check_table_schema(models.Zone, model_auto_update)
     zones = [[1,'bucatarie'], [2,'living'],[3,'beci mic'],[4,'dormitor'],[5,'baie mare'],
              [6,'bebe'],[7,'curte fata'],[8,'hol intrare'],[9,'beci mare'],[10,'scari beci'],[11,'etaj hol'],
              [12,'curte fata'],[13,'living tv'],[14,'usa poarta'],[15,'usa casa'],[16, 'usa portita'],
@@ -130,7 +133,7 @@ def populate_tables():
             [5, '3', 23],
             [6, '4', 24]
             ]
-    check_table_schema(models.TemperatureTarget)
+    check_table_schema(models.TemperatureTarget, model_auto_update)
     if len(models.TemperatureTarget.query.all()) < len(temptarget_list):
         logging.info('Populating Temperature Target with default values')
         models.TemperatureTarget.query.delete()
@@ -145,7 +148,7 @@ def populate_tables():
             [3, 'week-living',          'xxxx-xxxx-xxxx-xxxx-xx22-2222'],
             [4, 'weekend-living',       'xxxx-xxxx-2222-2222-2222-2222']
             ]
-    check_table_schema(models.SchedulePattern)
+    check_table_schema(models.SchedulePattern, model_auto_update)
     if len(models.SchedulePattern.query.all()) < len(value_list):
         logging.info('Populating Schedule Pattern with default values')
         models.SchedulePattern.query.delete()
@@ -158,7 +161,7 @@ def populate_tables():
             [1, 1, 1, 2], #bucatarie
             [2, 2, 3, 4], #living
             ]
-    check_table_schema(models.HeatSchedule)
+    check_table_schema(models.HeatSchedule, model_auto_update)
     if len(models.HeatSchedule.query.all()) < len(value_list):
         logging.info('Populating Heat Schedule with default values')
         models.HeatSchedule.query.delete()
@@ -168,13 +171,19 @@ def populate_tables():
             db.session.add(record)
             commit()
 
-    if len(models.Node.query.all()) == 0:
-        logging.info('Populating Node with default values')
+    check_table_schema(models.Node, model_auto_update)
+    if len(models.Node.query.filter_by(name=constant.HOST_NAME).all()) == 0:
+        logging.info('Populating Node {} with default values'.format(constant.HOST_NAME))
         if constant.HOST_NAME=='nas':
             priority = 0
         else:
             priority=random.randint(1, 100)
         db.session.add(models.Node('', name=constant.HOST_NAME, ip=constant.HOST_MAIN_IP, priority=priority))
+        commit()
+    else:
+        #reseting execute_command field to avoid running last command before shutdown
+        node = models.Node.query.filter_by(name=constant.HOST_NAME).first()
+        node.execute_command = ''
         commit()
 
     #if len(models.Sensor.query.all()) == 0:
@@ -189,15 +198,20 @@ def populate_tables():
         [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
         [4, get_mod_name(mqtt_io), True, 3],[5, get_mod_name(sensor), False, 4],[6, get_mod_name(relay), False, 5],
         [7, get_mod_name(heat), False, 6],[8, get_mod_name(alarm), False, 7],[9, get_mod_name(graph_plotly), False, 8],
-        [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), True, 10]],
+        [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), False, 10]],
         'netbook':[
         [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
         [4, get_mod_name(mqtt_io), True, 3],[5, get_mod_name(sensor), False, 4],[6, get_mod_name(relay), False, 5],
         [7, get_mod_name(heat), False, 6],[8, get_mod_name(alarm), False, 7],[9, get_mod_name(graph_plotly), False, 8],
+        [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), True, 10]],
+        'nas':[
+        [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
+        [4, get_mod_name(mqtt_io), True, 3],[5, get_mod_name(sensor), False, 4],[6, get_mod_name(relay), False, 5],
+        [7, get_mod_name(heat), False, 6],[8, get_mod_name(alarm), False, 7],[9, get_mod_name(graph_plotly), True, 8],
         [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), True, 10]]
         }
 
-    check_table_schema(models.Module)
+    check_table_schema(models.Module, model_auto_update)
     if module_list_dict.has_key(constant.HOST_NAME):
         module_list = module_list_dict[constant.HOST_NAME]
         logging.info('Module is initialised with host {} specific values'.format(constant.HOST_NAME))
@@ -214,7 +228,7 @@ def populate_tables():
                                          name=tuple[1], active=tuple[2], start_order=tuple[3]))
         commit()
 
-    check_table_schema(models.GpioPin)
+    check_table_schema(models.GpioPin, model_auto_update)
     if len(models.GpioPin.query.filter_by(pin_type=constant.GPIO_PIN_TYPE_BBB).all()) != 46 * 2:#P8_ and P9_ with 46 pins
         models.GpioPin.query.filter_by(pin_type=constant.GPIO_PIN_TYPE_BBB).delete()
         commit()
@@ -229,7 +243,7 @@ def populate_tables():
                 commit()
 
 
-    check_table_schema(models.ZoneAlarm)
+    check_table_schema(models.ZoneAlarm, model_auto_update)
     zonealarm_list=[[47, 'P8_11'],[1,'P8_08'],[2,'P8_16'],[3,'P8_12'],[9,'P8_09'],[10,'P8_07'],[11,'P8_15']]
     if len(models.ZoneAlarm.query.all()) < len(zonealarm_list):
         logging.info('Populating ZoneAlarm with default values')
@@ -240,7 +254,7 @@ def populate_tables():
         commit()
 
     #if True:
-    check_table_schema(models.ZoneSensor)
+    check_table_schema(models.ZoneSensor, model_auto_update)
     zonesensor_list=[
             [34, '5C000004F344F828','horn'],[3,'95000003BDF98428','beci mic'],[48,'D9000004F3BFA428', 'solar jos'],
             [38,'04000004F3DE2128', 'puffer sus'],[38,'AE000003BDFFB928', 'puffer mijloc'],

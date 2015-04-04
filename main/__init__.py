@@ -4,7 +4,7 @@ import time
 import sys
 from flask_sqlalchemy import SQLAlchemy #workaround for resolve issue
 from flask import Flask, redirect, url_for
-from flask_sqlalchemy import models_committed
+
 import logging
 import common
 from common import constant
@@ -15,8 +15,11 @@ DB_LOCATION=None
 LOGGING_LEVEL=logging.INFO
 app=None
 db=None
-blocking_webui_running = False
+webui_running = False
 initialised = False
+shutting_down=False
+exit_code = 0
+MODEL_AUTO_UPDATE=False
 
 def my_import(name):
     #http://stackoverflow.com/questions/547829/how-to-dynamically-load-a-python-class
@@ -26,26 +29,23 @@ def my_import(name):
         mod = getattr(mod, comp)
     return mod
 
-def init_module(module_name, module_is_active, restart):
+def init_module(module_name, module_is_active):
     dynclass = my_import(module_name)
     if module_is_active:
-        print "Module {} is active".format(module_name)
+        logging.info('Module {} is active'.format(module_name))
         if not dynclass.initialised:
             logging.info('Module {} initialising'.format(module_name))
             dynclass.init()
         else:
             logging.info('Module {} already initialised'.format(module_name))
     else:
-        print "Module {} is not active".format(module_name)
+        logging.info("Module {} is not active".format(module_name))
         if dynclass.initialised:
             logging.info('Module {} has been deactivated, unloading'.format(module_name))
             dynclass.unload()
             del dynclass
         else:
             logging.info('Module {} already disabled'.format(module_name))
-    if restart:
-        logging.info('Module restarting')
-        dynclass.unload()
 
 def init_modules():
     import admin.models
@@ -57,64 +57,59 @@ def init_modules():
         assert isinstance(mod, admin.models.Module)
         #webui will block at init, postpone init for end
         if mod.name != admin.model_helper.get_mod_name(webui) and mod.name != 'main':
-            init_module(mod.name, mod.active, mod.restart)
+            init_module(mod.name, mod.active)
 
         if mod.name == admin.model_helper.get_mod_name(webui):
-            global blocking_webui_running
-            blocking_webui_running = True
+            global webui_running
+            webui_running = True
             pass
         elif mod.name == 'main':
             #no need to init main module, already initialised
             pass
 
-def set_db_location(location):
-    global DB_LOCATION
-    if location == 'disk':
-        DB_LOCATION='sqlite:///../database.db'
-    else:
-        if location == 'mem':
-            DB_LOCATION='sqlite:////tmp/database.db'
-        else:
-            logging.critical('No DB location set {}'.format(location))
 
-def set_logging_level(level):
-    global LOGGING_LEVEL
-    if level=='debug':
-        LOGGING_LEVEL = logging.DEBUG
-    else:
-        if level=='warning':
-            LOGGING_LEVEL = logging.WARNING
-
+def execute_command(command):
+    global exit_code
+    if command=='restart_app':
+        exit_code = 5001
+    elif command=='upgrade_app':
+        exit_code = 5002
+    elif command=='shutdown_app':
+        exit_code = 5003
+    if exit_code != 0:
+        unload()
 #--------------------------------------------------------------------------#
-shutting_down=False
+
 def unload():
     logging.warning('Main module is unloading, application will exit')
     import webui, admin.thread_pool, mqtt_io
     global shutting_down
     shutting_down = True
     if webui.initialised:
-        global blocking_webui_running
         webui.unload()
     if mqtt_io.initialised:
         mqtt_io.unload()
     admin.thread_pool.thread_pool_enabled = False
 
-    sys.exit(7)
 
 def init():
+    global LOGGING_LEVEL
     logging.basicConfig(format='%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(threadName)s:%(message)s',
                         level=LOGGING_LEVEL)
     logging.info('Logging level is {}'.format(LOGGING_LEVEL))
     common.init()
     global app, db, DB_LOCATION
+
     app = Flask('main')
-    app.config.update(DEBUG=False, SQLALCHEMY_ECHO = False, SQLALCHEMY_DATABASE_URI=DB_LOCATION)
+    #app.config['TESTING'] = True
+    app.config.update(DEBUG=True, SQLALCHEMY_ECHO = False, SQLALCHEMY_DATABASE_URI=DB_LOCATION)
 
     db = SQLAlchemy(app)
     db.create_all()
 
     import admin.model_helper
-    admin.model_helper.populate_tables()
+    global MODEL_AUTO_UPDATE
+    admin.model_helper.populate_tables(MODEL_AUTO_UPDATE)
 
     from admin import event
     event.init()
@@ -128,54 +123,42 @@ def init():
 
     global initialised, shutting_down
     initialised = True
-    if blocking_webui_running:
+    if webui_running:
         import webui
-        init_module(admin.model_helper.get_mod_name(webui), module_is_active=True, restart=False)
+        init_module(admin.model_helper.get_mod_name(webui), module_is_active=True)
 
-    if not blocking_webui_running:
-        logging.info('Blocking app exit as no web ui is running')
-        while not blocking_webui_running and not shutting_down:
-            time.sleep(1)
-        logging.info('Exiting Blocking loop as web ui is now running')
-
-
-#@app.route('/')
-#def home():
-#    return 'Main'
-
-@models_committed.connect_via(app)
-def on_models_committed(sender, changes):
-    from admin import event
-    logging.debug('Model commit detected sender {} change {}'.format(sender, changes))
-    event.on_models_committed(sender, changes)
-
-def main(argv):
-    if 'disk' in argv:
-        return 'disk'
-    else:
-        if 'mem' in argv:
-            return 'mem'
-        else:
-            print 'usage: python main disk OR mem. Assuming disk as default'
-            return 'disk'
-            #sys.exit(1)
+    #if not blocking_webui_running:
+    #    logging.info('Blocking app exit as no web ui is running')
+    while not shutting_down:
+        time.sleep(1)
+    #logging.info('Exiting Blocking loop as web ui is now running')
 
 def run(arg_list):
-    if 'remote' in arg_list:
+    if 'debug_remote' in arg_list:
         import ptvsd
         ptvsd.enable_attach(secret='secret',address=('0.0.0.0', 5678))
         print 'Enabled remote debugging, waiting 10 seconds for client to attach'
         ptvsd.wait_for_attach(timeout=10)
-    location = main(arg_list)
-    print('DB Location is {}'.format(location))
-    set_db_location(location)
-    if 'debug' in arg_list:
-        set_logging_level('debug')
+    global DB_LOCATION
+    if 'db_disk' in arg_list:
+        DB_LOCATION='sqlite:///../database.db'
+    elif 'db_mem' in arg_list:
+        DB_LOCATION='sqlite:////tmp/database.db'
     else:
-        if 'warning' in arg_list:
-            set_logging_level('warning')
+        DB_LOCATION='sqlite:///../database.db'
+        print 'Setting default DB location on disk as {}'.format(DB_LOCATION)
+
+    global LOGGING_LEVEL
+    if 'debug' in arg_list:
+        LOGGING_LEVEL = logging.DEBUG
+    elif 'warning' in arg_list:
+        LOGGING_LEVEL = logging.WARNING
+    global MODEL_AUTO_UPDATE
+    MODEL_AUTO_UPDATE = 'model_auto_update' in arg_list
     init()
     print 'App EXIT'
+    global exit_code
+    sys.exit(exit_code)
 
 #if 'main' in __name__:
 #    run(sys.argv[1:])

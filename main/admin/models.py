@@ -2,7 +2,6 @@ from datetime import datetime
 
 from flask_sqlalchemy import SQLAlchemy #workaround for resolve issue
 from sqlalchemy_utils import ChoiceType
-#import enum
 from main import db
 import graphs
 
@@ -16,16 +15,14 @@ class Module(db.Model):
     name = db.Column(db.String(50))
     active = db.Column(db.Boolean(), default=False)
     start_order = db.Column(db.Integer)
-    restart = db.Column(db.Boolean(), default=False)
 
-    def __init__(self, id='', host_name='', name='', active=False, start_order='999', restart=False):
+    def __init__(self, id='', host_name='', name='', active=False, start_order='999'):
         if id:
             self.id = id
         self.host_name = host_name
         self.name = name
         self.active = active
         self.start_order = start_order
-        self.restart = restart
 
     def __repr__(self):
         return 'Module {} {}, {}'.format(self.id, self.host_name, self.name[:50])
@@ -165,6 +162,7 @@ class Node(db.Model, graphs.NodeGraph, DbEvent):
     is_master_graph = db.Column(db.Boolean(), default=False)
     is_master_rule = db.Column(db.Boolean(), default=False)
     priority = db.Column(db.Integer)
+    execute_command=db.Column(db.String(50))
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def __init__(self, id='', name ='', ip='', priority=''):

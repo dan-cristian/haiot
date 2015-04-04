@@ -6,7 +6,7 @@ import sys
 from pydispatch import dispatcher
 from common.utils import json2obj
 from common import constant
-
+import mqtt_io
 
 def on_subscribe(client, userdata, mid, granted_qos):
     logging.info('Subscribed to client {} user {} mid {} qos {}'.format(
@@ -15,10 +15,10 @@ def on_subscribe(client, userdata, mid, granted_qos):
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
-    logging.debug('Received from client [{}] userdata [{}] msg [{}] at {} '.format(client._client_id,
+    try:
+        logging.debug('Received from client [{}] userdata [{}] msg [{}] at {} '.format(client._client_id,
                                                                                          userdata, msg.topic,
                                                                                           datetime.datetime.now()))
-    try:
         # locate json string
         start = msg.payload.find('{')
         end = msg.payload.find('}')
@@ -35,3 +35,8 @@ def on_message(client, userdata, msg):
         logging.warning('Unknown attribute error in msg {} err {}'.format(json, ex))
     except ValueError, e:
         logging.warning('Invalid JSON {} {}'.format(json, e))
+
+def thread_run():
+    logging.debug('Processing mqtt_io receiver')
+    mqtt_io.mqtt_client.loop()
+    return 'Processed template_run'
