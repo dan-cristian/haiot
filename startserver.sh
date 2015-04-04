@@ -12,7 +12,7 @@
 function run_app {
     scripts/stopserver.sh
     source venv/bin/activate
-    python run_all.py $1
+    python run_all.py model_auto_update $1
     exit_code=$?
     echo "Program exit with code $exit_code"
     echo "---------------------------------"
