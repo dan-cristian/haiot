@@ -10,7 +10,7 @@ from main.admin import models, model_helper
 from main import db
 
 first_run = True
-since_when_i_should_be_master = None
+since_when_i_should_be_master = datetime.datetime.min
 
 #save node state to db, except for current node. no decisions taken on node election
 def node_update(obj={}):
@@ -82,7 +82,7 @@ def update_master_state():
                         variable.NODE_THIS_IS_MASTER_OVERALL = node.is_master_overall
                         logging.info('Change in node mastership, local node is master={}'.format(
                             variable.NODE_THIS_IS_MASTER_OVERALL))
-                        since_when_i_should_be_master = None
+                        since_when_i_should_be_master = datetime.datetime.min
 
     except Exception, ex:
         logging.warning('Error try_become_master, err {}'.format(ex))
