@@ -63,7 +63,10 @@ def upload_data(obj):
                         graph_name=str(table+' '+axis_y)
                         trace = graph_objs.Scatter(x=x, y=y, name=graph_legend)
                         if not g_series_id_list.has_key(graph_name):
-                            download_graph_config(graph_name) #get series order list from db to ensure graph consistency
+                            #get series order list from db to ensure graph consistency, usually done at app start
+                            download_graph_config(graph_name)
+                        #TODO: check online if graph exists
+
                         graph_series_id_list = g_series_id_list[graph_name]
                         if series_id in graph_series_id_list:
                             '''series list must be completely filled'''
@@ -100,6 +103,6 @@ def unload():
     initialised = False
 
 def init():
-    py.sign_in(model_helper.get_param(constant.P_PLOTLY_USERNAME),model_helper.get_param(constant.P_PLOTLY_APIKEY))
+    #py.sign_in(model_helper.get_param(constant.P_PLOTLY_USERNAME),model_helper.get_param(constant.P_PLOTLY_APIKEY))
     global initialised
     initialised = True

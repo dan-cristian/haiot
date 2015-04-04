@@ -4,17 +4,18 @@ import cStringIO
 import logging
 import time
 import math
-try:
-    import psutil
-except Exception, ex:
-    logging.critical('PSUtil module not available')
 import datetime
 from collections import OrderedDict
 from common import constant
 from main.admin import models
 from main import db
 
-import_module_psutil_exist = False
+try:
+    import psutil
+    import_module_psutil_exist = True
+except Exception, ex:
+    logging.critical('PSUtil module not available')
+    import_module_psutil_exist = False
 
 def save_hdd_to_db(serial, power_status, temperature, sector_error_count, smart_status, device, family, disk_dev,
                    start_stop_count, load_cycle_count):
