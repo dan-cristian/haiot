@@ -29,6 +29,8 @@ def download_graph_config(graph_name):
         g_graph_url_list[graph_row.name] = graph_row.url
 
 def add_new_serie(graph_name, url, series_id):
+    global g_series_id_list
+    g_series_id_list[graph_name].append(series_id)
     graph_row = models.GraphPlotly.query.filter_by(name=graph_name).first()
     if graph_row:
         if graph_row.field_list:
@@ -81,17 +83,31 @@ def upload_data(obj):
                             #TODO: check online if graph exists
                             if g_graph_url_list.has_key(graph_name):
                                 graph_url = g_graph_url_list[graph_name]
-                                if graph_url == []:
-                                    # FIXME if graph online but not in db, will not work
-                                    #try to get the url by appending blank data
-                                    dx=[datetime.datetime.now()]
-                                    dy=[0]
-                                    trace_dummy = graph_objs.Scatter(x=[dx], y=[dy], name=graph_name, text='dummy check')
-                                    trace_list = [trace_dummy]
-                                    data = graph_objs.Data(trace_list)
-                                    graph_url = py.plot(data, filename=graph_name, fileopt='append', auto_open=False)
+                                figure = None
                                 try:
-                                    figure = py.get_figure(graph_url)
+                                    if graph_url != []:
+                                        figure = py.get_figure(graph_url)
+                                    else:
+                                        # FIXME if graph online but not in db, will not work
+                                        #try to get the url by appending blank data
+                                        dx=[datetime.datetime.now()]
+                                        dy=[0]
+                                        ref_id = 'reference id'
+                                        trace_dummy = graph_objs.Scatter(x=[dx], y=[dy], name=graph_name,
+                                                                         text=ref_id)
+                                        trace_list = [trace_dummy]
+                                        data = graph_objs.Data(trace_list)
+                                        graph_url = py.plot(data, filename=graph_name, fileopt='extend',
+                                                            auto_open=False)
+                                        add_new_serie(graph_name, graph_url, ref_id)
+                                except PlotlyError, er:
+                                    logging.info('Graph {} from db not exist online, err={}'.format(graph_name, er))
+                                    #forcing a new graph download
+                                    graph_url = []
+
+                                try:
+                                    if figure is None:
+                                        figure = py.get_figure(graph_url)
                                     i = 0
                                     for serie in figure['data']:
                                         remote_type=serie['type']
@@ -124,8 +140,8 @@ def upload_data(obj):
                                         i = i + 1
                                     if len(g_series_id_list[graph_name]) > i:
                                         logging.warning('Too many series saved in db for graph {}'.format(graph_name))
-                                except PlotlyError:
-                                    logging.info('Graph {} does not exist online'.format(graph_name))
+                                except PlotlyError, er:
+                                    logging.info('Graph {} does not exist online, err='.format(graph_name, er))
                                     clean_graph_in_db(graph_name)
                         graph_series_id_list = g_series_id_list[graph_name]
                         if series_id in graph_series_id_list:
@@ -141,7 +157,7 @@ def upload_data(obj):
                                     trace_list.append(trace_empty)
                             logging.debug('Extending graph serie {} {}'.format(graph_legend, series_id))
                         else:
-                            graph_series_id_list.append(series_id)
+                            #graph_series_id_list.append(series_id)
                             fileopt = 'append'
                             trace_append = graph_objs.Scatter(x=x, y=y, name=graph_legend, text=series_id)
                             trace_list = [trace_append]
