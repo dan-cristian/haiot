@@ -3,6 +3,7 @@ from __builtin__ import isinstance
 __author__ = 'dcristian'
 
 import logging
+import datetime
 import plotly.plotly as py
 from plotly import graph_objs
 from plotly.exceptions import PlotlyError, PlotlyAccountError
@@ -83,7 +84,9 @@ def upload_data(obj):
                                 if graph_url == []:
                                     # FIXME if graph online but not in db, will not work
                                     #try to get the url by appending blank data
-                                    trace_dummy = graph_objs.Scatter(x=[], y=[], name='dummy name', text='dummy check')
+                                    dx=[datetime.datetime.now()]
+                                    dy=[0]
+                                    trace_dummy = graph_objs.Scatter(x=[dx], y=[dy], name=graph_name, text='dummy check')
                                     trace_list = [trace_dummy]
                                     data = graph_objs.Data(trace_list)
                                     graph_url = py.plot(data, filename=graph_name, fileopt='append', auto_open=False)
@@ -130,8 +133,9 @@ def upload_data(obj):
                             fileopt = 'extend'
                             trace_pos = graph_series_id_list.index(series_id)
                             trace_empty = graph_objs.Scatter(x=[], y=[])
+                            #append this for dummy row
                             for i in range(len(graph_series_id_list)):
-                                if i is trace_pos:
+                                if i == trace_pos:
                                     trace_list.append(trace_extend)
                                 else:
                                     trace_list.append(trace_empty)
