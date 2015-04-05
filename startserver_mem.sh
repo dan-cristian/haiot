@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-./startserver.sh mem
+./startserver.sh db_mem
