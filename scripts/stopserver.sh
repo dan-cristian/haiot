@@ -1,2 +1,3 @@
+#!/usr/bin/env bash
 
-kill $(ps aux | grep '[p]ython run_all.py' | awk '{print $2}')
+kill $(ps w | grep '[p]ython run_all.py' | awk '{print $1}')
