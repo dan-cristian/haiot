@@ -153,7 +153,7 @@ def upload_data(obj):
             graph_id_field = obj[constant.JSON_PUBLISH_GRAPH_ID]
             graph_legend_field = obj[constant.JSON_PUBLISH_GRAPH_LEGEND]
             list_axis_y = obj[constant.JSON_PUBLISH_GRAPH_Y]
-            logging.info('Trying to upload plotly obj {}'.format(list_axis_y))
+            logging.debug('Trying to upload y axis {}'.format(list_axis_y))
             if axis_x_field in obj and graph_id_field in obj:
                 table = obj[constant.JSON_PUBLISH_TABLE]
                 trace_unique_id = obj[graph_id_field] #unique record/trace identifier
@@ -183,12 +183,12 @@ def upload_data(obj):
                             trace_list = populate_trace_for_extend(x=x, y=y,
                                     graph_legend_item_name=graph_legend_item_name, trace_unique_id=trace_unique_id,
                                     trace_unique_id_pattern=trace_unique_id_pattern)
-                            logging.info('Extending graph {}'.format(graph_unique_name))
+                            logging.debug('Extending graph {}'.format(graph_unique_name))
                             fileopt = 'extend'
                         else:
                             trace_list = populate_trace_for_append(x=x, y=y,
                                         graph_legend_item_name=graph_legend_item_name,trace_unique_id=trace_unique_id)
-                            logging.info('Appending graph {}'.format(graph_unique_name))
+                            logging.debug('Appending graph {}'.format(graph_unique_name))
                             fileopt = 'append'
                         data = graph_objs.Data(trace_list)
                         try:
