@@ -15,11 +15,18 @@ mklink /J  template %T%\template
 mklink /J  test %T%\test
 mklink /J  webui %T%\webui
 mklink /J  scripts %T%\scripts
+del LICENSE
 mklink /H LICENSE %T%\LICENSE
+del README.md
 mklink /H README.md %T%\README.md
+del run_all.py
 mklink /H run_all.py %T%\run_all.py
+del startserver.sh
 mklink /H startserver.sh %T%\startserver.sh
+del startserver_mem.sh
 mklink /H startserver_mem.sh  %T%\startserver_mem.sh
+del startserver.bat
 mklink /H startserver.bat  %T%\startserver.bat
+del .gitignore
 mklink /H .gitignore %T%\.gitignore
 rem mklink /J   %T%\

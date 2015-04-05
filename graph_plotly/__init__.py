@@ -71,28 +71,28 @@ def upload_data(obj):
                             #TODO: check online if graph exists
                             if g_graph_url_list.has_key(graph_name):
                                 graph_url = g_graph_url_list[graph_name]
-                                figure = py.get_figure(graph_url)
-                                #print(figure)
-                                i = 0
-                                for serie in figure['data']:
-                                    remote_type=serie['type']
-                                    remote_name=serie['name']
-                                    remote_x=serie['x']
-                                    remote_y=serie['y']
-                                    if len(g_series_id_list[graph_name]) > i:
-                                        if g_series_id_list[graph_name][i]==remote_name:
-                                            logging.debug('Serie order for {} is ok'.format(remote_name))
+                                if graph_url != []:
+                                    figure = py.get_figure(graph_url)
+                                    #print(figure)
+                                    i = 0
+                                    for serie in figure['data']:
+                                        remote_type=serie['type']
+                                        remote_name=serie['name']
+                                        remote_x=serie['x']
+                                        remote_y=serie['y']
+                                        if len(g_series_id_list[graph_name]) > i:
+                                            if g_series_id_list[graph_name][i]==remote_name:
+                                                logging.debug('Serie order for {} is ok'.format(remote_name))
+                                            else:
+                                                logging.warning('Serie order for remote {} not ok, fixing'.format(
+                                                    remote_name))
+                                                g_series_id_list[graph_name][i] = remote_name
                                         else:
-                                            logging.warning('Serie order for remote {} not ok, fixing'.format(remote_name))
-                                            g_series_id_list[graph_name][i] = remote_name
-                                    else:
-                                        logging.debug('Series {} not yet saved in DB, strange'.format(remote_name))
-                                    i = i + 1
-
-                                if len(g_series_id_list[graph_name]) > i:
-                                    logging.warning('Too many series saved in db for graph {}'.format(graph_name))
-
-
+                                            logging.debug('Series {} not yet saved in DB, strange'.format(
+                                                remote_name))
+                                        i = i + 1
+                                    if len(g_series_id_list[graph_name]) > i:
+                                        logging.warning('Too many series saved in db for graph {}'.format(graph_name))
                         graph_series_id_list = g_series_id_list[graph_name]
                         if series_id in graph_series_id_list:
                             '''series list must be completely filled'''
