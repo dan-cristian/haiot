@@ -35,7 +35,9 @@ def download_graph_config(graph_name):
 
 #add graph url and trace id list in memory to keep order when extending graphs
 def add_new_serie(graph_unique_name, url, trace_unique_id):
-    global g_trace_id_list_per_graph
+    global g_trace_id_list_per_graph, g_graph_url_list
+    if not graph_unique_name in g_trace_id_list_per_graph:
+        g_trace_id_list_per_graph[graph_unique_name]=[]
     g_trace_id_list_per_graph[graph_unique_name].append(trace_unique_id)
     if not graph_unique_name in g_graph_url_list:
         g_graph_url_list[graph_unique_name]=url
@@ -88,32 +90,48 @@ def populate_trace_for_append(x=[], y=[], graph_legend_item_name='', trace_uniqu
 def download_trace_id_list(graph_unique_name=''):
     global g_reference_trace_id
     #extending graph with a reference trace to force getting remote url, which is unknown
-    trace_ref = graph_objs.Scatter(x=[datetime.datetime.now()],y=[0],name=graph_unique_name,text=g_reference_trace_id)
-    try:
-        graph_url = py.plot(graph_objs.Data(trace_ref), filename=graph_unique_name, fileopt='extend',auto_open=False)
-        add_new_serie(graph_unique_name=graph_unique_name, url=graph_url, trace_unique_id=g_reference_trace_id)
-    except PlotlyError, ex:
-        logging.info('Graph {} cannot be extended online with ref trace, err={}'.format(graph_unique_name, ex))
+    trace_list = []
+    graph_url = None
+    trace_ref_append = graph_objs.Scatter(x=[datetime.datetime.now()],y=[0],name=graph_unique_name,
+                                          text=g_reference_trace_id, mode='none')
+    trace_ref_extend = graph_objs.Scatter(x=[datetime.datetime.now()],y=[0],name=graph_unique_name,mode='none')
+    trace_empty = graph_objs.Scatter(x=[], y=[])
+    #first time we try an append, assuming trace does not exist
+    trace_list.append(trace_ref_append)
+    #trying several times to guess number of graph traces so I can get the graph url
+    for i in range(1,30):
+        try:
+            graph_url = py.plot(graph_objs.Data(trace_list),filename=graph_unique_name,fileopt='extend',auto_open=False)
+            break
+        except PlotlyError, ex:
+            logging.info('Error extending graph {} in pass {}, err={}'.format(graph_unique_name, i, ex))
+            #first time failed, so second time we try an extend, but trace definition will change
+            trace_list[0]=trace_ref_extend
+            if i>1:
 
-    try:
-        figure = py.get_figure(graph_url)
-        for serie in figure['data']:
-            remote_type=serie['type']
-            if 'name' in serie:
-                remote_name=serie['name']
-            else:
-                logging.warning('Unable to find name field in graph, skipping')
-                remote_name = 'N/A'
-            #remote_x=serie['x']
-            #remote_y=serie['y']
-            if 'text' in serie:
-                remote_id_text=serie['text']
-            else:
-                logging.warning('Could not find serie id {} field in graph {}'.format(remote_name, graph_unique_name))
-                remote_id_text = remote_name
-            add_new_serie(graph_unique_name=graph_unique_name, url=graph_url, trace_unique_id=remote_id_text)
-    except PlotlyError, ex:
-        logging.warning('Unable to get figure {} err={}'.format(graph_url, ex))
+                trace_list.append(trace_empty)
+    if not graph_url is None:
+        try:
+            figure = py.get_figure(graph_url)
+            for serie in figure['data']:
+                remote_type=serie['type']
+                if 'name' in serie:
+                    remote_name=serie['name']
+                else:
+                    logging.warning('Unable to find name field in graph, skipping')
+                    remote_name = 'N/A'
+                #remote_x=serie['x']
+                #remote_y=serie['y']
+                if 'text' in serie:
+                    remote_id_text=serie['text']
+                else:
+                    logging.warning('Could not find serie {} field in graph {}'.format(remote_name,graph_unique_name))
+                    remote_id_text = remote_name
+                add_new_serie(graph_unique_name=graph_unique_name, url=graph_url, trace_unique_id=remote_id_text)
+        except PlotlyError, ex:
+            logging.warning('Unable to get figure {} err={}'.format(graph_url, ex))
+    else:
+        logging.critical('Unable to get or setup remote graph {}'.format(graph_unique_name))
 
 def upload_data(obj):
     try:
@@ -138,19 +156,23 @@ def upload_data(obj):
                         y=[obj[axis_y]]
                         #unique name used for graph on upload
                         graph_unique_name=str(table+' '+axis_y)
-                        if not g_graph_url_list.has_key(graph_unique_name):
+                        if not graph_unique_name in g_graph_url_list:
                             #download series order list to ensure graph consistency, usually done at app start
                             #or when trace is created
                             download_trace_id_list(graph_unique_name)
-                        trace_unique_id_pattern = g_trace_id_list_per_graph[graph_unique_name]
+                        if graph_unique_name in g_trace_id_list_per_graph:
+                            trace_unique_id_pattern = g_trace_id_list_per_graph[graph_unique_name]
+                        else:
+                            logging.warning('Unable to get a reference pattern, graph {}'.format(graph_unique_name))
                         if trace_unique_id in trace_unique_id_pattern:
-                            populate_trace_for_extend(x=x, y=y, graph_legend_item_name=graph_legend_item_name,
-                                    trace_unique_id=trace_unique_id, trace_unique_id_pattern=trace_unique_id_pattern)
+                            trace_list = populate_trace_for_extend(x=x, y=y,
+                                    graph_legend_item_name=graph_legend_item_name, trace_unique_id=trace_unique_id,
+                                    trace_unique_id_pattern=trace_unique_id_pattern)
                             logging.info('Extending graph {}'.format(graph_unique_name))
                             fileopt = 'extend'
                         else:
-                            populate_trace_for_append(x=x, y=y, graph_legend_item_name=graph_legend_item_name,
-                                                      trace_unique_id=trace_unique_id)
+                            trace_list = populate_trace_for_append(x=x, y=y,
+                                        graph_legend_item_name=graph_legend_item_name,trace_unique_id=trace_unique_id)
                             logging.info('Appending graph {}'.format(graph_unique_name))
                             fileopt = 'append'
                         data = graph_objs.Data(trace_list)

@@ -46,6 +46,9 @@ def node_update(obj={}):
     except Exception, ex:
         logging.warning('Error on node update, err {}'.format(ex))
 
+def check_if_no_masters():
+    node_masters = models.Node.query.filter_by(is_master_overall=True).all()
+    return len(node_masters)==0
 
 #elect and set master status in db for current node only. master is elected by node_id priority, if alive
 def update_master_state():
@@ -76,22 +79,26 @@ def update_master_state():
             #applying node master status locally, if changed in db
             if node.name == constant.HOST_NAME:
                 if variable.NODE_THIS_IS_MASTER_OVERALL != node.is_master_overall:
-                    global since_when_i_should_be_master
-                    #check seconds lapsed since cluster agreed I must be or lose master
-                    seconds_elapsed = (datetime.datetime.now() - since_when_i_should_be_master).total_seconds()
-                    if node.is_master_overall:
+                    if not node.is_master_overall:
+                        #disabling local mastership immediately
+                        variable.NODE_THIS_IS_MASTER_OVERALL = node.is_master_overall
+                        logging.info('Immediate change in node mastership, local node is master={}'.format(
+                            variable.NODE_THIS_IS_MASTER_OVERALL))
+                    else:
+                        global since_when_i_should_be_master
+                        #check seconds lapsed since cluster agreed I must be or lose master
+                        seconds_elapsed = (datetime.datetime.now() - since_when_i_should_be_master).total_seconds()
+                        if check_if_no_masters() or seconds_elapsed > 10:
+                            variable.NODE_THIS_IS_MASTER_OVERALL = node.is_master_overall
+                            logging.info('Change in node mastership, local node is master={}'.format(
+                                variable.NODE_THIS_IS_MASTER_OVERALL))
+                            since_when_i_should_be_master = datetime.datetime.max
+                        else:
+                            logging.info('Waiting to set master status, sec. lapsed={}'.format(seconds_elapsed))
                         if not variable.NODE_THIS_IS_MASTER_OVERALL:
                             #record date when cluster agreed I must be master
                             if since_when_i_should_be_master == datetime.datetime.max:
                                 since_when_i_should_be_master = datetime.datetime.now()
-                    if seconds_elapsed > 10:
-                        variable.NODE_THIS_IS_MASTER_OVERALL = node.is_master_overall
-                        logging.info('Change in node mastership, local node is master={}'.format(
-                            variable.NODE_THIS_IS_MASTER_OVERALL))
-                        since_when_i_should_be_master = datetime.datetime.max
-                    else:
-                        logging.info('Waiting to apply master status locally, sec. lapsed={}'.format(seconds_elapsed))
-
     except Exception, ex:
         logging.warning('Error try_become_master, err {}'.format(ex))
 
