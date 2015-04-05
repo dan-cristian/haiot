@@ -73,7 +73,7 @@ def upload_data(obj):
                         y=[obj[axis_y]]
                         #unique name used for graph on upload
                         graph_name=str(table+' '+axis_y)
-                        trace = graph_objs.Scatter(x=x, y=y, name=graph_legend)
+                        trace_extend = graph_objs.Scatter(x=x, y=y, name=graph_legend)
                         if not g_series_id_list.has_key(graph_name):
                             #get series order list from db to ensure graph consistency, usually done at app start
                             download_graph_config(graph_name)
@@ -83,8 +83,8 @@ def upload_data(obj):
                                 if graph_url == []:
                                     # FIXME if graph online but not in db, will not work
                                     #try to get the url by appending blank data
-                                    trace = graph_objs.Scatter(x=[], y=[], name='dummy name', text='dummy check')
-                                    trace_list = [trace]
+                                    trace_dummy = graph_objs.Scatter(x=[], y=[], name='dummy name', text='dummy check')
+                                    trace_list = [trace_dummy]
                                     data = graph_objs.Data(trace_list)
                                     graph_url = py.plot(data, filename=graph_name, fileopt='append', auto_open=False)
                                 try:
@@ -132,15 +132,15 @@ def upload_data(obj):
                             trace_empty = graph_objs.Scatter(x=[], y=[])
                             for i in range(len(graph_series_id_list)):
                                 if i is trace_pos:
-                                    trace_list.append(trace)
+                                    trace_list.append(trace_extend)
                                 else:
                                     trace_list.append(trace_empty)
                             logging.debug('Extending graph serie {} {}'.format(graph_legend, series_id))
                         else:
                             graph_series_id_list.append(series_id)
                             fileopt = 'append'
-                            trace.text = series_id
-                            trace_list = [trace]
+                            trace_append = graph_objs.Scatter(x=x, y=y, name=graph_legend, text=series_id)
+                            trace_list = [trace_append]
                             logging.debug('Appending new graph serie {} {}'.format(graph_legend, series_id))
                         data = graph_objs.Data(trace_list)
                         if fileopt=='append':
