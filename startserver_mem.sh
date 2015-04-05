@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-./startserver.sh db_mem
+nohup ./startserver.sh db_mem model_auto_update > /tmp/iot-nohup.out
