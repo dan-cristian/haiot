@@ -11,11 +11,12 @@ from main import db
 
 first_run = True
 since_when_i_should_be_master = datetime.datetime.max
+node_state_uuid = None
 
 #save node state to db, except for current node. no decisions taken on node election
 def node_update(obj={}):
     try:
-        node_host_name = utils.get_object_field_value(obj, models.Node.name)
+        node_host_name = utils.get_object_field_value(obj, 'name')
         logging.debug('Received node state update from {}'.format(node_host_name))
         #avoid node to update itself in infinite recursion
         if node_host_name != constant.HOST_NAME:
@@ -24,18 +25,24 @@ def node_update(obj={}):
                 node = models.Node()
                 db.session.add(node)
             node.name = node_host_name
-            node.is_master_graph = utils.get_object_field_value(obj, models.Node.is_master_graph)
-            node.is_master_db_archive = utils.get_object_field_value(obj, models.Node.is_master_db_archive)
-            node.is_master_overall = utils.get_object_field_value(obj, models.Node.is_master_overall)
-            node.is_master_rule = utils.get_object_field_value(obj, models.Node.is_master_rule)
-            node.priority = utils.get_object_field_value(obj, models.Node.priority)
-            node.ip = utils.get_object_field_value(obj, models.Node.ip)
-            node.execute_command = utils.get_object_field_value(obj, models.Node.execute_command)
+            node.is_master_graph = utils.get_object_field_value(obj, 'is_master_graph')
+            node.is_master_db_archive = utils.get_object_field_value(obj, 'is_master_db_archive')
+            node.is_master_overall = utils.get_object_field_value(obj, 'is_master_overall')
+            node.is_master_rule = utils.get_object_field_value(obj, 'is_master_rule')
+            node.priority = utils.get_object_field_value(obj, 'priority')
+            node.ip = utils.get_object_field_value(obj, 'ip')
+            node.execute_command = utils.get_object_field_value(obj, 'execute_command')
             node.updated_on = datetime.datetime.now()
             db.session.commit()
         else:
             logging.debug('Skipping node DB save, this node is master = {}'.format(
                 variable.NODE_THIS_IS_MASTER_OVERALL))
+            sent_date = utils.get_object_field_value(obj, 'event_sent_datetime_')
+            if not sent_date is None:
+                event_sent_date_time = utils.parse_to_date(sent_date)
+                seconds_elapsed = (datetime.datetime.now()-event_sent_date_time).total_seconds()
+                if seconds_elapsed>10:
+                    logging.warning('Very slow mqtt processing, message delay is {} seconds'.format(seconds_elapsed))
     except Exception, ex:
         logging.warning('Error on node update, err {}'.format(ex))
 
@@ -77,7 +84,7 @@ def update_master_state():
                             #record date when cluster agreed I must be master
                             if since_when_i_should_be_master == datetime.datetime.max:
                                 since_when_i_should_be_master = datetime.datetime.now()
-                    if seconds_elapsed > 30:
+                    if seconds_elapsed > 10:
                         variable.NODE_THIS_IS_MASTER_OVERALL = node.is_master_overall
                         logging.info('Change in node mastership, local node is master={}'.format(
                             variable.NODE_THIS_IS_MASTER_OVERALL))
@@ -97,6 +104,7 @@ def announce_node_state():
         node.priority = random.randint(1, 100)
         logging.warning('Detected node host name change, new name={}'.format(constant.HOST_NAME))
         db.session.add(node)
+    node.event_sent_datetime_= datetime.datetime.now()
     node.updated_on = datetime.datetime.now()
     node.ip = constant.HOST_MAIN_IP
     node.notify_enabled_ = True

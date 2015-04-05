@@ -41,6 +41,10 @@ def subscribe():
 def unload():
     global mqtt_client, topic
     mqtt_client.unsubscribe(topic)
+    try:
+        mqtt_client.loop_stop()
+    except Exception, ex:
+        logging.warning('Unable to stop mqtt loop, err {}'.format(ex))
     mqtt_client.disconnect()
 
 def init():
@@ -67,8 +71,8 @@ def init():
                 client_connected = True
                 mqtt_client.on_message = receiver.on_message
                 mqtt_client.on_disconnect = on_disconnect
-                thread_pool.add_callable(receiver.thread_run, run_interval_second=2)
-                #mqtt_client.loop_start()
+                thread_pool.add_callable(receiver.thread_run, run_interval_second=10)
+                mqtt_client.loop_start()
                 initialised = True
             except socket.error:
                 logging.error('mqtt client not connected, err {}, pause and retry'.format(sys.exc_info()[0]))

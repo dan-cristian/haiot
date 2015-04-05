@@ -8,6 +8,7 @@ import graphs
 class DbEvent:
     db_notified_=False
     notify_enabled_=False
+    event_sent_datetime_ = None
 
 class Module(db.Model):
     id = db.Column(db.Integer, primary_key=True)

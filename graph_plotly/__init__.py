@@ -5,6 +5,7 @@ __author__ = 'dcristian'
 import logging
 import plotly.plotly as py
 from plotly import graph_objs
+from plotly.exceptions import PlotlyError, PlotlyAccountError
 from main.admin import model_helper
 from common import constant, utils
 from main import db
@@ -15,7 +16,7 @@ g_series_id_list={} #list of series unique identifier used to determine trace or
 g_graph_url_list={} #list of remote url for each graph
 
 def download_graph_config(graph_name):
-    global g_series_id_list
+    global g_series_id_list, g_graph_url_list
     graph_rows = models.GraphPlotly.query.filter_by(name=graph_name).all()
     if len(graph_rows)==0:
         g_series_id_list[graph_name] = []
@@ -39,6 +40,14 @@ def add_new_serie(graph_name, url, series_id):
         logging.info('Created new graph plotly {} serie {}'.format(graph_name, series_id))
         db.session.add(graph_row)
     db.session.commit()
+
+def clean_graph_in_db(graph_name):
+    global g_series_id_list, g_graph_url_list
+    g_graph_url_list[graph_name] = []
+    g_series_id_list[graph_name] = []
+    models.GraphPlotly.query.filter_by(name=graph_name).delete()
+    db.session.commit()
+    logging.info('Deleted graph {} from db'.format(graph_name))
 
 def upload_data(obj):
     #FIXME: Add caching and multiple series on same graph
@@ -72,27 +81,31 @@ def upload_data(obj):
                             if g_graph_url_list.has_key(graph_name):
                                 graph_url = g_graph_url_list[graph_name]
                                 if graph_url != []:
-                                    figure = py.get_figure(graph_url)
-                                    #print(figure)
-                                    i = 0
-                                    for serie in figure['data']:
-                                        remote_type=serie['type']
-                                        remote_name=serie['name']
-                                        remote_x=serie['x']
-                                        remote_y=serie['y']
-                                        if len(g_series_id_list[graph_name]) > i:
-                                            if g_series_id_list[graph_name][i]==remote_name:
-                                                logging.debug('Serie order for {} is ok'.format(remote_name))
+                                    try:
+                                        figure = py.get_figure(graph_url)
+                                        i = 0
+                                        for serie in figure['data']:
+                                            remote_type=serie['type']
+                                            remote_name=serie['name']
+                                            remote_x=serie['x']
+                                            remote_y=serie['y']
+                                            remote_text=serie['text']
+                                            if len(g_series_id_list[graph_name]) > i:
+                                                if g_series_id_list[graph_name][i]==remote_text:
+                                                    logging.debug('Serie order for {} is ok'.format(remote_name))
+                                                else:
+                                                    logging.warning('Serie order for remote {} not ok, fixing'.format(
+                                                        remote_name))
+                                                    g_series_id_list[graph_name][i] = remote_name
                                             else:
-                                                logging.warning('Serie order for remote {} not ok, fixing'.format(
+                                                logging.debug('Series {} not yet saved in DB, strange'.format(
                                                     remote_name))
-                                                g_series_id_list[graph_name][i] = remote_name
-                                        else:
-                                            logging.debug('Series {} not yet saved in DB, strange'.format(
-                                                remote_name))
-                                        i = i + 1
-                                    if len(g_series_id_list[graph_name]) > i:
-                                        logging.warning('Too many series saved in db for graph {}'.format(graph_name))
+                                            i = i + 1
+                                        if len(g_series_id_list[graph_name]) > i:
+                                            logging.warning('Too many series saved in db for graph {}'.format(graph_name))
+                                    except PlotlyError:
+                                        logging.info('Graph {} does not exist online'.format(graph_name))
+                                        clean_graph_in_db(graph_name)
                         graph_series_id_list = g_series_id_list[graph_name]
                         if series_id in graph_series_id_list:
                             '''series list must be completely filled'''
@@ -108,21 +121,25 @@ def upload_data(obj):
                         else:
                             graph_series_id_list.append(series_id)
                             fileopt = 'append'
+                            trace.text = series_id
                             trace_list = [trace]
                             logging.debug('Appending new graph serie {} {}'.format(graph_legend, series_id))
                         data = graph_objs.Data(trace_list)
+                        if fileopt=='append':
+                            logging.info('Appending graph {}'.format(graph_name))
+                        else:
+                            logging.info('Extending graph {}'.format(graph_name))
                         url = py.plot(data, filename=graph_name, fileopt=fileopt, auto_open=False)
                         if fileopt=='append':
                             add_new_serie(graph_name, url, series_id)
-                            logging.info('Appended graph on url {}'.format(url))
-                        else:
-                            logging.info('Extended graph on url {}'.format(url))
             else:
                 logging.critical('Graphable object missing axis X or ID {}'.format(axis_x_field))
         else:
             logging.critical('Graphable object missing axis X field {}'.format(constant.JSON_PUBLISH_GRAPH_X))
+    except PlotlyAccountError, ex1:
+        logging.warning('Unable to plot graph, err {}'.format(ex1))
     except Exception, ex:
-        logging.warning('Unable to upload graph, err {}'.format(ex))
+        logging.warning('General error saving graph, err {}'.format(ex))
 
 def unload():
     global initialised
