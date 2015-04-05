@@ -123,7 +123,7 @@ simple_filters = {
 }
 
 from .models import Zone, SchedulePattern, HeatSchedule, Sensor
-from .models import Module, Parameter, TemperatureTarget, ZoneSensor, Node, GraphPlotly
+from .models import Module, Parameter, TemperatureTarget, ZoneSensor, Node#, GraphPlotly
 from .models import SystemMonitor, SystemDisk, GpioPin, ZoneAlarm
 
 register_crud(admin, '/', 'main-entry', Module, filters=simple_filters)
@@ -136,7 +136,7 @@ register_crud(user, '/temperaturetarget', 'temperaturetarget', TemperatureTarget
 register_crud(user, '/sensor', 'sensor', Sensor, filters=simple_filters)
 register_crud(user, '/zonesensor', 'zonesensor', ZoneSensor, filters=simple_filters)
 register_crud(user, '/node', 'node', Node, filters=simple_filters)
-register_crud(user, '/graphplotly', 'graphplotly', GraphPlotly, filters=simple_filters)
+#register_crud(user, '/graphplotly', 'graphplotly', GraphPlotly, filters=simple_filters)
 register_crud(user, '/systemmonitor', 'systemmonitor', SystemMonitor, filters=simple_filters)
 register_crud(user, '/systemdisk', 'systemdisk', SystemDisk, filters=simple_filters)
 register_crud(user, '/gpiopin', 'gpiopin', GpioPin, filters=simple_filters)

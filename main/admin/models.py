@@ -180,20 +180,20 @@ class Node(db.Model, graphs.NodeGraph, DbEvent):
         return str(self.is_master_overall) + str(self.is_master_db_archive) \
                + str(self.is_master_graph) + str(self.is_master_rule) + str(self.priority) + str(self.ip)
 
-class GraphPlotly(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), unique=True)
-    url = db.Column(db.String(255))
-    field_list = db.Column(db.String(2000))
+#class GraphPlotly(db.Model):
+#    id = db.Column(db.Integer, primary_key=True)
+#    name = db.Column(db.String(50), unique=True)
+#    url = db.Column(db.String(255))
+#    field_list = db.Column(db.String(2000))
 
-    def __init__(self, id='', name ='', url=''):
-        if id:
-            self.id = id
-        self.name = name
-        self.url = url
-
-    def __repr__(self):
-        return 'GraphPlotly {} ip {}'.format(self.name,  self.url)
+#    def __init__(self, id='', name ='', url=''):
+#        if id:
+#            self.id = id
+#        self.name = name
+#        self.url = url
+#
+#    def __repr__(self):
+#        return 'GraphPlotly {} ip {}'.format(self.name,  self.url)
 
 class SystemMonitor(db.Model, graphs.SystemMonitorGraph, DbEvent):
     id = db.Column(db.Integer, primary_key=True)

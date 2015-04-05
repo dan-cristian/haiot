@@ -44,7 +44,8 @@ def thread_run():
     logging.debug('Processing mqtt_io receiver')
     global last_message_received
     seconds_elapsed = (datetime.datetime.now()-last_message_received).total_seconds()
-    if seconds_elapsed > 60:
+    if seconds_elapsed > 120:
         logging.warning('Last mqtt message was received {} seconds ago, unusually long'.format(seconds_elapsed))
+        mqtt_io.init()
     #mqtt_io.mqtt_client.loop(timeout=1)
     return 'Processed template_run'

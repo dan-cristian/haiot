@@ -13,6 +13,7 @@ def send_message(txt):
         if mqtt_io.client_connected:
             mqtt_io.mqtt_client.publish(mqtt_io.topic, txt)
         else:
-            logging.debug('MQTT client not connected, message to be discarded: {}'.format(txt))
+            logging.debug('MQTT client not connected, retrying connect, message to be discarded: {}'.format(txt))
+            mqtt_io.init()
     except Exception, ex:
         logging.critical('Error sending mqtt message, {}'.format(ex))

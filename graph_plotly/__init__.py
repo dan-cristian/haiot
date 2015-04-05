@@ -6,7 +6,7 @@ import logging
 import datetime
 import plotly.plotly as py
 from plotly import graph_objs
-from plotly.exceptions import PlotlyError, PlotlyAccountError
+from plotly.exceptions import PlotlyError, PlotlyAccountError, PlotlyListEntryError
 from common import constant, utils
 from main import db
 from main.admin import models
@@ -21,49 +21,27 @@ g_trace_id_list_per_graph={}
 g_graph_url_list={}
 g_reference_trace_id='reference-id'
 
-def download_graph_config(graph_name):
-    global g_trace_id_list_per_graph, g_graph_url_list
-    graph_rows = models.GraphPlotly.query.filter_by(name=graph_name).all()
-    if len(graph_rows)==0:
-        g_trace_id_list_per_graph[graph_name] = []
-        g_graph_url_list[graph_name] = []
-
-    for graph_row in graph_rows:
-        series_split = graph_row.field_list.split(',')
-        g_trace_id_list_per_graph[graph_row.name] = series_split
-        g_graph_url_list[graph_row.name] = graph_row.url
-
 #add graph url and trace id list in memory to keep order when extending graphs
 def add_new_serie(graph_unique_name, url, trace_unique_id):
     global g_trace_id_list_per_graph, g_graph_url_list
     if not graph_unique_name in g_trace_id_list_per_graph:
         g_trace_id_list_per_graph[graph_unique_name]=[]
     g_trace_id_list_per_graph[graph_unique_name].append(trace_unique_id)
-    if not graph_unique_name in g_graph_url_list:
-        g_graph_url_list[graph_unique_name]=url
-    #not used
-    if False:
-        graph_row = models.GraphPlotly.query.filter_by(name=graph_unique_name).first()
-        if graph_row:
-            if graph_row.field_list:
-                graph_row.field_list = graph_row.field_list + ',' + trace_unique_id
-            else:
-                graph_row.field_list = trace_unique_id
-        else:
-            graph_row = models.GraphPlotly(name=graph_unique_name, url=url)
-            graph_row.field_list = trace_unique_id
-            logging.info('Created new graph plotly {} serie {}'.format(graph_unique_name, trace_unique_id))
-            db.session.add(graph_row)
-        db.session.commit()
+    #if not graph_unique_name in g_graph_url_list:
+    g_graph_url_list[graph_unique_name]=url
 
-#delete graph definition from db if not found online
-def clean_graph_in_db(graph_name):
-    global g_trace_id_list_per_graph, g_graph_url_list
-    g_graph_url_list[graph_name] = []
-    g_trace_id_list_per_graph[graph_name] = []
-    #models.GraphPlotly.query.filter_by(name=graph_name).delete()
-    #db.session.commit()
-    logging.info('Deleted graph {} from db'.format(graph_name))
+def get_layout(title='', ):
+    title = title.replace('_', ' ')
+    layout = graph_objs.Layout(
+        title=title,
+        showlegend=True,
+        autosize=True,
+        legend = graph_objs.Legend(
+            xanchor='right',
+            yanchor='bottom'
+        )
+    )
+    return layout
 
 def populate_trace_for_extend(x=[], y=[], graph_legend_item_name='', trace_unique_id='', trace_unique_id_pattern=[]):
     #series list must be completely filled in using graph create order
@@ -80,35 +58,54 @@ def populate_trace_for_extend(x=[], y=[], graph_legend_item_name='', trace_uniqu
     logging.debug('Extending graph serie {} {}'.format(graph_legend_item_name, trace_unique_id))
     return trace_list
 
-def populate_trace_for_append(x=[], y=[], graph_legend_item_name='', trace_unique_id=''):
+def populate_trace_for_append(x=[], y=[], graph_legend_item_name='', trace_unique_id='', show_legend=True):
     #'text' param should only be added at trace creation
-    trace_append = graph_objs.Scatter(x=x, y=y, name=graph_legend_item_name, text=trace_unique_id)
+    trace_append = graph_objs.Scatter(x=x, y=y, name=graph_legend_item_name, text=trace_unique_id,
+                                      showlegend=show_legend)
     trace_list = [trace_append]
     logging.debug('Appending new graph serie {} {}'.format(graph_legend_item_name, trace_unique_id))
     return trace_list
 
-def download_trace_id_list(graph_unique_name=''):
+def clean_graph_memory(graph_unique_name=''):
+    global g_reference_trace_id, g_trace_id_list_per_graph, g_graph_url_list
+    #reseting known series and graphs to download again clean
+    if graph_unique_name in g_trace_id_list_per_graph:
+        g_trace_id_list_per_graph[graph_unique_name] = []
+    if graph_unique_name in g_graph_url_list:
+        g_graph_url_list.pop(graph_unique_name)
+
+def get_reference_trace_for_append(graph_unique_name=''):
     global g_reference_trace_id
+    return graph_objs.Scatter(x=[datetime.datetime.now()], y=[0], name=graph_unique_name, text=g_reference_trace_id,
+                              mode='none', showlegend=False)
+
+def download_trace_id_list(graph_unique_name=''):
+    logging.info('Downloading existing online traces in memory, graph {}'.format(graph_unique_name))
+    global g_reference_trace_id
+    #reseting known series and graphs to download again clean
+    clean_graph_memory(graph_unique_name)
     #extending graph with a reference trace to force getting remote url, which is unknown
     trace_list = []
     graph_url = None
-    trace_ref_append = graph_objs.Scatter(x=[datetime.datetime.now()],y=[0],name=graph_unique_name,
-                                          text=g_reference_trace_id, mode='none')
-    trace_ref_extend = graph_objs.Scatter(x=[datetime.datetime.now()],y=[0],name=graph_unique_name,mode='none')
+    trace_ref_append = get_reference_trace_for_append(graph_unique_name)
+    trace_ref_extend = graph_objs.Scatter(x=[datetime.datetime.now()],y=[0],name=graph_unique_name,mode='none',
+                                          showlegend=False)
     trace_empty = graph_objs.Scatter(x=[], y=[])
     #first time we try an append, assuming trace does not exist
     trace_list.append(trace_ref_append)
     #trying several times to guess number of graph traces so I can get the graph url
     for i in range(1,30):
         try:
-            graph_url = py.plot(graph_objs.Data(trace_list),filename=graph_unique_name,fileopt='extend',auto_open=False)
+            fig = graph_objs.Figure(data=graph_objs.Data(trace_list), layout=get_layout(graph_unique_name))
+            graph_url = py.plot(fig,filename=graph_unique_name,fileopt='extend',auto_open=False)
             break
         except PlotlyError, ex:
-            logging.info('Error extending graph {} in pass {}, err={}'.format(graph_unique_name, i, ex))
+            #usually first try will give an error
+            if i>1:
+                logging.info('Error extending graph {} in pass {}, err={}'.format(graph_unique_name, i, ex))
             #first time failed, so second time we try an extend, but trace definition will change
             trace_list[0]=trace_ref_extend
             if i>1:
-
                 trace_list.append(trace_empty)
     if not graph_url is None:
         try:
@@ -132,6 +129,20 @@ def download_trace_id_list(graph_unique_name=''):
             logging.warning('Unable to get figure {} err={}'.format(graph_url, ex))
     else:
         logging.critical('Unable to get or setup remote graph {}'.format(graph_unique_name))
+
+def upload_reference_graph(graph_unique_name=''):
+    trace_list = get_reference_trace_for_append(graph_unique_name)
+    try:
+        #update reference trace
+        fig = graph_objs.Figure(data=graph_objs.Data([trace_list]), layout=get_layout(graph_unique_name))
+        py.plot(fig, filename=graph_unique_name, fileopt='overwrite', auto_open=False)
+        #clean graph from memory to force graph traces reload in the right order
+        clean_graph_memory(graph_unique_name)
+        logging.info('New reference graph {} uploaded ok'.format(graph_unique_name))
+    except PlotlyListEntryError, ex:
+        logging.warning('Error uploading new reference graph {} err {}'.format(graph_unique_name, ex))
+    except PlotlyAccountError, ex:
+        logging.warning('Unable to upload new reference graph {} err {}'.format(graph_unique_name, ex))
 
 def upload_data(obj):
     try:
@@ -164,6 +175,10 @@ def upload_data(obj):
                             trace_unique_id_pattern = g_trace_id_list_per_graph[graph_unique_name]
                         else:
                             logging.warning('Unable to get a reference pattern, graph {}'.format(graph_unique_name))
+                        if graph_unique_name in g_graph_url_list:
+                            known_graph_url = g_graph_url_list[graph_unique_name]
+                        else:
+                            known_graph_url = None
                         if trace_unique_id in trace_unique_id_pattern:
                             trace_list = populate_trace_for_extend(x=x, y=y,
                                     graph_legend_item_name=graph_legend_item_name, trace_unique_id=trace_unique_id,
@@ -177,9 +192,16 @@ def upload_data(obj):
                             fileopt = 'append'
                         data = graph_objs.Data(trace_list)
                         try:
-                            url = py.plot(data, filename=graph_unique_name, fileopt=fileopt, auto_open=False)
-                            if fileopt=='append':
-                                add_new_serie(graph_unique_name, url, trace_unique_id)
+                            if known_graph_url is None:
+                                logging.warning('Graph {} is setting up, dropping data'.format(graph_unique_name))
+                            else:
+                                fig = graph_objs.Figure(data=data, layout=get_layout(graph_unique_name))
+                                url = py.plot(fig, filename=graph_unique_name, fileopt=fileopt, auto_open=False)
+                                if url != known_graph_url:
+                                    logging.warning('Original graph {} removed from plotly'.format(graph_unique_name))
+                                    upload_reference_graph(graph_unique_name)
+                                if fileopt=='append' or fileopt=='new':
+                                    add_new_serie(graph_unique_name, url, trace_unique_id)
                         except PlotlyAccountError, ex:
                             logging.warning('Unable to plot graph, err {}'.format(ex))
             else:

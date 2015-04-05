@@ -102,6 +102,8 @@ def init():
     logging.basicConfig(format='%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(threadName)s:%(message)s',
                         level=LOGGING_LEVEL)
     logging.info('Logging level is {}'.format(LOGGING_LEVEL))
+    #annoying info messages
+    logging.getLogger("requests").setLevel(logging.WARNING)
     common.init()
     global app, db, DB_LOCATION
 

@@ -16,10 +16,12 @@ initialised=False
 mqtt_client = None
 client_connected = False
 topic='no_topic_defined'
+client_connecting = False
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
     logging.info("Connected to mqtt with result code " + str(rc))
+    global client_connected
     client_connected = True
     subscribe()
 
@@ -27,6 +29,7 @@ def on_disconnect(client, userdata, rc):
     if rc != 0:
         logging.warning("Unexpected disconnection from mqtt")
     logging.warning("Disconnected from mqtt")
+    global client_connected
     client_connected = False
 
 def subscribe():
@@ -48,6 +51,11 @@ def unload():
     mqtt_client.disconnect()
 
 def init():
+    global client_connecting
+    if client_connecting:
+        logging.warning('Mqtt client already in connection process, skipping attempt to connect until done')
+        return
+
     host_list=[
         [model_helper.get_param(constant.P_MQTT_HOST_1), int(model_helper.get_param(constant.P_MQTT_PORT_1))],
         [model_helper.get_param(constant.P_MQTT_HOST_2), int(model_helper.get_param(constant.P_MQTT_PORT_2))]
@@ -59,6 +67,7 @@ def init():
     global client_connected
     global initialised
     for host_port in host_list:
+        client_connecting = True
         host = host_port[0]
         port = host_port[1]
         logging.info('MQTT publisher module initialising, host={} port={}'.format(host, port))
@@ -74,10 +83,13 @@ def init():
                 thread_pool.add_callable(receiver.thread_run, run_interval_second=10)
                 mqtt_client.loop_start()
                 initialised = True
+                client_connecting = False
             except socket.error:
                 logging.error('mqtt client not connected, err {}, pause and retry'.format(sys.exc_info()[0]))
                 retry_count += 1
                 time.sleep(constant.ERROR_CONNECT_PAUSE_SECOND)
+            finally:
+                client_connecting = False
         if client_connected:
             break
         else:
