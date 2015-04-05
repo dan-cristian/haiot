@@ -37,8 +37,8 @@ def get_layout(title='', ):
         showlegend=True,
         autosize=True,
         legend = graph_objs.Legend(
-            xanchor='right',
-            yanchor='bottom'
+            xanchor='left',
+            yanchor='top'
         )
     )
     return layout
