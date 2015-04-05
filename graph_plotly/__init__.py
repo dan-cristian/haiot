@@ -83,7 +83,7 @@ def upload_data(obj):
                                 if graph_url == []:
                                     # FIXME if graph online but not in db, will not work
                                     #try to get the url by appending blank data
-                                    trace = graph_objs.Scatter(x=[], y=[])
+                                    trace = graph_objs.Scatter(x=[], y=[], name='dummy name', text='dummy check')
                                     trace_list = [trace]
                                     data = graph_objs.Data(trace_list)
                                     graph_url = py.plot(data, filename=graph_name, fileopt='append', auto_open=False)
@@ -92,27 +92,32 @@ def upload_data(obj):
                                     i = 0
                                     for serie in figure['data']:
                                         remote_type=serie['type']
-                                        remote_name=serie['name']
-                                        remote_x=serie['x']
-                                        remote_y=serie['y']
+                                        if 'name' in serie:
+                                            remote_name=serie['name']
+                                        else:
+                                            logging.warning('Unable to find name field in graph, skipping')
+                                            remote_name = 'N/A'
+                                        #remote_x=serie['x']
+                                        #remote_y=serie['y']
                                         if 'text' in serie:
-                                            remote_text=serie['text']
+                                            remote_id_text=serie['text']
                                         else:
                                             logging.warning('Could not find serie id field in graph {} serie {}'.format(
                                                 graph_name, remote_name))
-                                            remote_text = remote_name
+                                            remote_id_text = remote_name
 
                                         if len(g_series_id_list[graph_name]) > i:
-                                            if g_series_id_list[graph_name][i]==remote_text:
-                                                logging.debug('Serie order for {} is ok'.format(remote_name))
+                                            if g_series_id_list[graph_name][i]==remote_id_text:
+                                                logging.info('Serie order for {} is ok'.format(remote_name))
                                             else:
                                                 logging.warning('Serie order for remote {} not ok, fixing'.format(
                                                     remote_name))
                                                 g_series_id_list[graph_name][i] = remote_name
                                         else:
-                                            logging.debug('Series {} not yet saved in DB, strange'.format(
+                                            logging.info('Series {} not yet saved in DB, saving'.format(
                                                 remote_name))
                                             # fixme add series in db
+                                            add_new_serie(graph_name, graph_url, remote_id_text)
                                         i = i + 1
                                     if len(g_series_id_list[graph_name]) > i:
                                         logging.warning('Too many series saved in db for graph {}'.format(graph_name))
