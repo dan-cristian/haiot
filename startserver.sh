@@ -12,7 +12,7 @@
 function run_app {
     scripts/stopserver.sh
     source venv/bin/activate
-    python run_all.py model_auto_update $1
+    python run_all.py model_auto_update %1
     exit_code=$?
     echo "Program exit with code $exit_code"
     echo "---------------------------------"
@@ -20,7 +20,7 @@ function run_app {
 
 must_run=true
 while $must_run; do
-    run_app $1
+    run_app %1
     if [ $exit_code == 131 ]; then
         echo "Restarting app"
     fi
