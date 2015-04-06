@@ -33,7 +33,7 @@ def event_detected(channel):
     try:
         zonealarm=models.ZoneAlarm.query.filter_by(gpio_pin_code=channel).first()
         global import_module_psutil_exist
-        if import_module_exist:
+        if import_module_psutil_exist:
             state = GPIO.input(zonealarm.gpio_pin_code)
         else:
             state = random.randint(0,2)
@@ -61,7 +61,7 @@ def init():
 def thread_run():
     logging.debug('Processing Beaglebone IO')
     global import_module_psutil_exist
-    if not import_module_exist:
+    if not import_module_psutil_exist:
         logging.info('Simulating motion detection for test purposes')
         event_detected('P8_11')
     return 'Processed bbb_io'

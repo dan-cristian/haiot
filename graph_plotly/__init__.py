@@ -205,7 +205,7 @@ def upload_data(obj):
                         except PlotlyAccountError, ex:
                             logging.warning('Unable to plot graph, err {}'.format(ex))
             else:
-                logging.critical('Graphable object missing axis X or ID {}'.format(axis_x_field))
+                logging.critical('Graphable object missing axis X or ID {} obj {}'.format(axis_x_field, obj))
         else:
             logging.critical('Graphable object missing axis X field {}'.format(constant.JSON_PUBLISH_GRAPH_X))
     except Exception, ex:
