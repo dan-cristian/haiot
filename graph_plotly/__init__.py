@@ -11,6 +11,7 @@ from common import constant, utils
 from main import db
 from main.admin import models
 
+
 initialised = False
 #list of series unique identifier used to determine trace order remote, key is graph name
 #each trace id list starts with a standard reference element used to get graph url, not ideal!
@@ -80,6 +81,12 @@ def get_reference_trace_for_append(graph_unique_name=''):
                               mode='none', showlegend=False)
 
 def download_trace_id_list(graph_unique_name=''):
+    try:
+        result=py.file_ops.mkdirs(get_folder_name())
+        logging.info('Created archiving folder {} result {}'.format(get_folder_name(), result))
+    except Exception, ex:
+        logging.warning('Unable to create archive folder {} err {}'.format(get_folder_name(), ex))
+
     logging.info('Downloading existing online traces in memory, graph {}'.format(graph_unique_name))
     global g_reference_trace_id
     #reseting known series and graphs to download again clean
@@ -130,6 +137,17 @@ def download_trace_id_list(graph_unique_name=''):
     else:
         logging.critical('Unable to get or setup remote graph {}'.format(graph_unique_name))
 
+def get_folder_name():
+    year = datetime.datetime.now().year
+    month = datetime.datetime.now().month
+    #week =  datetime.datetime.now().weekday()
+    return str(year) + '-' + ('0'+str(month))[-2:]
+
+def get_graph_full_name_path(graph_unique_name=''):
+    return  get_folder_name() + '/' + graph_unique_name
+
+#called first time when the app is started to force url retrieval
+#as a side effect this creates a hidden trace
 def upload_reference_graph(graph_unique_name=''):
     trace_list = get_reference_trace_for_append(graph_unique_name)
     try:
@@ -144,10 +162,24 @@ def upload_reference_graph(graph_unique_name=''):
     except PlotlyAccountError, ex:
         logging.warning('Unable to upload new reference graph {} err {}'.format(graph_unique_name, ex))
 
+#check if graph exists in memory. Used this function rather than checking graph dict variable directly
+#as this function enables archiving in different folders
+def graph_url_exists_in_memory(graph_unique_name=''):
+    global g_graph_url_list
+
+    return graph_unique_name in g_graph_url_list
+
+def get_graph_url_from_memory(graph_unique_name=''):
+    global g_graph_url_list
+    if graph_url_exists_in_memory(graph_unique_name):
+        return g_graph_url_list[graph_unique_name]
+    else:
+        return None
+
 def upload_data(obj):
     try:
         logging.debug('Trying to upload plotly obj {}'.format(obj))
-        global g_trace_id_list_per_graph, g_graph_url_list
+        global g_trace_id_list_per_graph
         if constant.JSON_PUBLISH_GRAPH_X in obj:
             axis_x_field = obj[constant.JSON_PUBLISH_GRAPH_X]
             graph_id_field = obj[constant.JSON_PUBLISH_GRAPH_ID]
@@ -166,19 +198,18 @@ def upload_data(obj):
                         trace_list = []
                         y=[obj[axis_y]]
                         #unique name used for graph on upload
-                        graph_unique_name=str(table+' '+axis_y)
-                        if not graph_unique_name in g_graph_url_list:
+                        graph_base_name = str(table+' '+axis_y)
+                        #full name and path to enable archiving
+                        graph_unique_name = get_graph_full_name_path(graph_base_name)
+                        if not graph_url_exists_in_memory(graph_unique_name):
                             #download series order list to ensure graph consistency, usually done at app start
                             #or when trace is created
-                            download_trace_id_list(graph_unique_name)
+                            download_trace_id_list(graph_unique_name=graph_unique_name)
                         if graph_unique_name in g_trace_id_list_per_graph:
                             trace_unique_id_pattern = g_trace_id_list_per_graph[graph_unique_name]
                         else:
                             logging.warning('Unable to get a reference pattern, graph {}'.format(graph_unique_name))
-                        if graph_unique_name in g_graph_url_list:
-                            known_graph_url = g_graph_url_list[graph_unique_name]
-                        else:
-                            known_graph_url = None
+                        known_graph_url = get_graph_url_from_memory(graph_unique_name)
                         if trace_unique_id in trace_unique_id_pattern:
                             trace_list = populate_trace_for_extend(x=x, y=y,
                                     graph_legend_item_name=graph_legend_item_name, trace_unique_id=trace_unique_id,
