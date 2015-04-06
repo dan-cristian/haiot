@@ -9,6 +9,7 @@ initialised=False
 def init():
     logging.info("Relay initialised")
     global initialised
+
     initialised = True
 
 @app.route('/relay/get')

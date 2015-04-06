@@ -166,7 +166,6 @@ def upload_reference_graph(graph_unique_name=''):
 #as this function enables archiving in different folders
 def graph_url_exists_in_memory(graph_unique_name=''):
     global g_graph_url_list
-
     return graph_unique_name in g_graph_url_list
 
 def get_graph_url_from_memory(graph_unique_name=''):
