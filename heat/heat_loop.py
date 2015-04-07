@@ -3,14 +3,17 @@ __author__ = 'dcristian'
 import logging
 import datetime
 from main.admin import models
+from common import constant
 
 def decide_action(zone, current_temperature, target_temperature):
     if current_temperature < target_temperature:
         logging.info('Heat must be ON in {} temp {} target {}'.format(zone.name, current_temperature,
                                                                       target_temperature))
+
     else:
         logging.info('Heat must be OFF in {} temp {} target {}'.format(zone.name, current_temperature,
                                                                        target_temperature))
+    dispatcher.send(signal=constant.SIGNAL_HEAT, zone=zone, row=obj)
 
 def update_zone_heat(zone, heat_schedule, sensor):
     minute = datetime.datetime.now().minute

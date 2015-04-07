@@ -12,6 +12,7 @@ mklink /J  node %T%\node
 mklink /J  relay %T%\relay
 mklink /J  sensor %T%\sensor
 mklink /J  template %T%\template
+mklink /J  transport %T%\transport
 mklink /J  test %T%\test
 mklink /J  webui %T%\webui
 mklink /J  scripts %T%\scripts

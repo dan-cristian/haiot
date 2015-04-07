@@ -231,27 +231,50 @@ class SystemDisk(db.Model, graphs.SystemDiskGraph, DbEvent):
                 + str(self.start_stop_count)
 
 class GpioPin(db.Model, DbEvent):
-     id = db.Column(db.Integer, primary_key=True)
-     pin_type = db.Column(db.String(50))
-     pin_code = db.Column(db.String(50), unique=True)
+    id = db.Column(db.Integer, primary_key=True)
+    host_name = db.Column(db.String(50))
+    pin_type = db.Column(db.String(50))
+    pin_code = db.Column(db.String(50), unique=True)
+    pin_value = db.Column(db.Integer)
 
-     def __repr__(self):
-        return 'id {} code {} type {} '.format(self.id, self.pin_code, self.pin_type)
+    def __repr__(self):
+        return 'host {} code {} type {} value {}'.format(self.host_name, self.pin_code, self.pin_type, self.pin_value)
 
 class ZoneAlarm(db.Model, DbEvent):
     id = db.Column(db.Integer, primary_key=True)
+    #friendly display name for pin mapping
     alarm_pin_name = db.Column(db.String(50))
     zone_id = db.Column(db.Integer)#, db.ForeignKey('zone.id'))
     #zone = db.relationship('Zone', backref=db.backref('ZoneAlarm(zone)', lazy='dynamic'))
     #gpio_pin_code = db.Column(db.String(50), db.ForeignKey('gpio_pin.pin_code'))
     gpio_pin_code = db.Column(db.String(50))
+    gpio_host_name = db.Column(db.String(50))
     #gpio_pin = db.relationship('GpioPin', backref=db.backref('ZoneAlarm(gpiopincode)', lazy='dynamic'))
     alarm_status = db.Column(db.Integer)
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    def __init__(self, zone_id='', gpio_pin_code=''):
+    def __init__(self, zone_id='', gpio_pin_code='', host_name=''):
         self.zone_id = zone_id
         self.gpio_pin_code = gpio_pin_code
+        self.gpio_host_name = host_name
 
     def __repr__(self):
-        return 'ZoneAlarm {} gpiopin {} {}'.format(self.zone_id, self.gpio_pin_code, self.alarm_pin_name)
+        return 'host {} gpiopin {} {}'.format(self.gpio_host_name, self.gpio_pin_code, self.alarm_pin_name)
+
+class ZoneHeatRelay(db.Model, DbEvent):
+    id = db.Column(db.Integer, primary_key=True)
+    #friendly display name for pin mapping
+    heat_pin_name = db.Column(db.String(50))
+    zone_id = db.Column(db.Integer)
+    gpio_pin_code = db.Column(db.String(50))
+    gpio_host_name = db.Column(db.String(50))
+    heat_status = db.Column(db.Integer)
+    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __init__(self, zone_id='', gpio_pin_code='', host_name=''):
+        self.zone_id = zone_id
+        self.gpio_pin_code = gpio_pin_code
+        self.gpio_host_name = host_name
+
+    def __repr__(self):
+        return 'host {} gpiopin {} {}'.format(self.gpio_host_name, self.gpio_pin_code, self.heat_pin_name)

@@ -1,6 +1,5 @@
 __author__ = 'dcristian'
 import logging
-import json
 import random
 import sys
 import datetime
@@ -236,29 +235,54 @@ def populate_tables(model_auto_update=False):
         commit()
 
     check_table_schema(models.GpioPin, model_auto_update)
-    if len(models.GpioPin.query.filter_by(pin_type=constant.GPIO_PIN_TYPE_BBB).all()) != 46 * 2:#P8_ and P9_ with 46 pins
+    if len(models.GpioPin.query.filter_by(pin_type=constant.GPIO_PIN_TYPE_BBB).all()) != 46*2: #P8_ and P9_ with 46 pins
         models.GpioPin.query.filter_by(pin_type=constant.GPIO_PIN_TYPE_BBB).delete()
         commit()
-        logging.info('Populating GpioPins with default beabglebone values')
-        for rail in range(8,10): #last range is not part of the loop
-            for pin in range(01, 47):
+        for host_name in ['beaglebone']:
+            logging.info('Populating GpioPins with default beabglebone {} values'.format(host_name))
+            for rail in range(8,10): #last range is not part of the loop
+                for pin in range(01, 47):
+                    gpio = models.GpioPin()
+                    gpio.pin_type=constant.GPIO_PIN_TYPE_BBB
+                    gpio.host_name = host_name
+                    pincode='0'+str(pin)
+                    gpio.pin_code='P'+str(rail)+'_'+pincode[-2:]
+                    db.session.add(gpio)
+            commit()
+        for host_name in ['pi-power']:
+            logging.info('Populating GpioPins with default raspberry pi {} values'.format(host_name))
+            for pin in range(01, 27): # -1
                 gpio = models.GpioPin()
-                gpio.pin_type=constant.GPIO_PIN_TYPE_BBB
-                pincode='0'+str(pin)
-                gpio.pin_code='P'+str(rail)+'_'+pincode[-2:]
+                gpio.pin_type=constant.GPIO_PIN_TYPE_PI
+                gpio.host_name=host_name
+                gpio.pin_code=str(pin)
                 db.session.add(gpio)
-                commit()
-
+        commit()
 
     check_table_schema(models.ZoneAlarm, model_auto_update)
-    zonealarm_list=[[47, 'P8_11'],[1,'P8_08'],[2,'P8_16'],[3,'P8_12'],[9,'P8_09'],[10,'P8_07'],[11,'P8_15']]
+    zonealarm_list={'beaglebone':[[47, 'P8_11'],[1,'P8_08'],[2,'P8_16'],[3,'P8_12'],[9,'P8_09'],[10,'P8_07'],
+                                  [11,'P8_15']]}
     if len(models.ZoneAlarm.query.all()) < len(zonealarm_list):
-        logging.info('Populating ZoneAlarm with default values')
-        models.ZoneAlarm.query.delete()
+        for host_name in zonealarm_list.keys():
+            logging.info('Populating ZoneAlarm for {} with default values'.format(host_name))
+            models.ZoneAlarm.query.delete()
+            commit()
+            for pair in zonealarm_list[host_name]:
+                db.session.add(models.ZoneAlarm(pair[0], pair[1], host_name))
+            commit()
+
+    check_table_schema(models.ZoneHeatRelay, model_auto_update)
+    #fixme: mapping not correct
+    heat_relay_list={'pi-power': [[19, '24']],
+                     'beaglebone': [[1,'P8_08'],[2,'P8_16'],[3,'P8_12'],[9,'P8_09']]}
+    if len(models.ZoneHeatRelay.query.all()) < len(zonealarm_list):
+        models.ZoneHeatRelay.query.delete()
         commit()
-        for pair in zonealarm_list:
-            db.session.add(models.ZoneAlarm(pair[0], pair[1]))
-        commit()
+        for host_name in heat_relay_list.keys():
+            logging.info('Populating ZoneHeatRelay for {} with default values'.format(host_name))
+            for pair in heat_relay_list[host_name]:
+                db.session.add(models.ZoneHeatRelay(pair[0], pair[1], host_name))
+            commit()
 
     #if True:
     check_table_schema(models.ZoneSensor, model_auto_update)

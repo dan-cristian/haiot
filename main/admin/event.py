@@ -2,10 +2,10 @@ from pydispatch import dispatcher
 import logging
 from common import constant, variable
 import common.utils
+import transport
 import models
 import main
 import model_helper
-import mqtt_io
 import graph_plotly
 import node
 
@@ -34,7 +34,7 @@ def handle_event_db_model_post(model, row):
     elif str(models.Node) in str(model):
         logging.info('Detected Node change, applying potential changes')
         txt = model_helper.model_row_to_json(row, operation='update')
-        mqtt_io.sender.send_message(txt)
+        transport.send_message_json(json = txt)
 
 def handle_event_mqtt_received(client, userdata, topic, obj):
     if constant.JSON_PUBLISH_TABLE in obj:
@@ -70,7 +70,7 @@ def on_models_committed(sender, changes):
                         if not obj.db_notified_:
                             obj.db_notified_ = True
                             txt = model_helper.model_row_to_json(obj, operation=change)
-                            mqtt_io.sender.send_message(txt)
+                            transport.send_message_json(json = txt)
                 else:
                     pass
     except Exception, ex:
