@@ -324,4 +324,3 @@ def thread_run():
     progress_status = 'reading system attribs'
     read_system_attribs()
     progress_status = 'completed'
-    pass

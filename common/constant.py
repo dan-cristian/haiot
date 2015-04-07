@@ -3,6 +3,7 @@ __author__ = 'dcristian'
 SIGNAL_SENSOR = 'signal-from-sensor'
 SIGNAL_SENSOR_DB_POST = 'signal-from-db-post'
 SIGNAL_MQTT_RECEIVED = 'signal-from-mqtt-data-received'
+SIGNAL_HEAT = 'signal-from-heat'
 
 
 ERROR_CONNECT_MAX_RETRY_COUNT = 5
@@ -10,10 +11,16 @@ ERROR_CONNECT_PAUSE_SECOND = 1
 OS = 'not initialised'
 OS_LINUX={'linux', 'posix'}
 OS_WINDOWS={'windows', 'nt'}
+MACHINE_TYPE_BEAGLEBONE = 'beaglebone'
+MACHINE_TYPE_RASPBERRY = 'raspberry'
+MACHINE_TYPE_OPENWRT = 'openwrt'
+
 HOST_NAME='not initialised'
 HOST_MAIN_IP='not initialised'
+HOST_MACHINE_TYPE='not initialised'
 
 SCRIPT_RESPONSE_OK='RESULTOK'
+SCRIPT_RESPONSE_NOTOK='RESULTNOTOK'
 
 P_MZP_SERVER_URL='MZP_SERVER_URL'
 P_MQTT_HOST_1='MQTT_HOST'

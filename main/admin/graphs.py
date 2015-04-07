@@ -30,9 +30,3 @@ class SystemDiskGraph(BaseGraph):
     graph_y_ = ['temperature', 'power_status', 'sector_error_count', 'load_cycle_count', 'start_stop_count']
     graph_id_ = 'serial'
     graph_legend_ = 'hdd_name'
-
-class NodeGraph(BaseGraph):
-    graph_x_ = 'master_updated_on'
-    graph_y_ = ['start_stop_count']
-    graph_id_ = 'serial'
-    graph_legend_ = 'hdd_name'

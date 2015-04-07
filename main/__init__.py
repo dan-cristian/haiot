@@ -15,7 +15,6 @@ DB_LOCATION=None
 LOGGING_LEVEL=logging.INFO
 app=None
 db=None
-webui_running = False
 initialised = False
 shutting_down=False
 exit_code = 0
@@ -50,22 +49,13 @@ def init_module(module_name, module_is_active):
 def init_modules():
     import admin.models
     import admin.model_helper
-    import webui
     module_list = admin.models.Module.query.filter_by(host_name=constant.HOST_NAME).order_by(
         admin.models.Module.start_order).all()
     for mod in module_list:
         assert isinstance(mod, admin.models.Module)
         #webui will block at init, postpone init for end
-        if mod.name != admin.model_helper.get_mod_name(webui) and mod.name != 'main':
+        if mod.name != 'main':
             init_module(mod.name, mod.active)
-        else:
-            if mod.name == admin.model_helper.get_mod_name(webui):
-                global webui_running
-                webui_running = mod.active
-                pass
-            elif mod.name == 'main':
-                #no need to init main module, already initialised
-                pass
 
 def signal_handler(signal, frame):
     logging.warning('You pressed Ctrl+C!')
@@ -105,8 +95,8 @@ def init():
     #annoying info messages
     logging.getLogger("requests").setLevel(logging.WARNING)
     common.init()
-    global app, db, DB_LOCATION
 
+    global app, db, DB_LOCATION
     app = Flask('main')
     #app.config['TESTING'] = True
     app.config.update(DEBUG=True, SQLALCHEMY_ECHO = False, SQLALCHEMY_DATABASE_URI=DB_LOCATION)
@@ -120,6 +110,8 @@ def init():
 
     from admin import event
     event.init()
+    from admin import system_info
+    system_info.init()
     init_modules()
 
     from admin import thread_pool
@@ -130,9 +122,6 @@ def init():
 
     global initialised, shutting_down
     initialised = True
-    if webui_running:
-        import webui
-        init_module(admin.model_helper.get_mod_name(webui), module_is_active=True)
     #stop app from exiting
     while not shutting_down:
         time.sleep(1)

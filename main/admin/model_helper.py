@@ -203,8 +203,8 @@ def populate_tables(model_auto_update=False):
         [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), False, 10]],
         'netbook':[
         [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
-        [4, get_mod_name(mqtt_io), True, 3],[5, get_mod_name(sensor), False, 4],[6, get_mod_name(relay), False, 5],
-        [7, get_mod_name(heat), False, 6],[8, get_mod_name(alarm), False, 7],[9, get_mod_name(graph_plotly), True, 8],
+        [4, get_mod_name(mqtt_io), True, 3],[5, get_mod_name(sensor), False, 4],[6, get_mod_name(relay), True, 5],
+        [7, get_mod_name(heat), True, 6],[8, get_mod_name(alarm), False, 7],[9, get_mod_name(graph_plotly), False, 8],
         [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), True, 10]],
         'nas':[
         [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
@@ -213,7 +213,7 @@ def populate_tables(model_auto_update=False):
         [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), True, 10]],
         'pi-power':[
         [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
-        [4, get_mod_name(mqtt_io), True, 3],[5, get_mod_name(sensor), True, 4],[6, get_mod_name(relay), False, 5],
+        [4, get_mod_name(mqtt_io), True, 3],[5, get_mod_name(sensor), True, 4],[6, get_mod_name(relay), True, 5],
         [7, get_mod_name(heat), False, 6],[8, get_mod_name(alarm), False, 7],[9, get_mod_name(graph_plotly), False, 8],
         [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), False, 10]]
         }

@@ -17,6 +17,3 @@ def init():
                                      progress_func=health_monitor_loop.get_progress)
     global initialised
     initialised = True
-
-if __name__ == '__main__':
-    init()

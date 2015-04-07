@@ -154,7 +154,7 @@ class ZoneSensor(db.Model):
     def __repr__(self):
         return 'ZoneSensor zone {} sensor {}'.format(self.zone_id,  self.sensor_name)
 
-class Node(db.Model, graphs.NodeGraph, DbEvent):
+class Node(db.Model, DbEvent):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
     ip = db.Column(db.String(15), nullable=False)

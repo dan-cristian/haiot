@@ -1,8 +1,5 @@
 from pydispatch import dispatcher
 import logging
-import paho.mqtt.client as mqtt
-import json
-import sys
 from common import constant, variable
 import common.utils
 import models
@@ -12,9 +9,7 @@ import mqtt_io
 import graph_plotly
 import node
 
-from main import db
-from common import utils
-
+'''
 def handle_event_sensor(sender):
     #print "Signal was sent by ", sender
     sensor = models.Sensor.query.filter_by(address=sender.address).first()
@@ -24,6 +19,9 @@ def handle_event_sensor(sender):
     else:
         sensor.update(sender)
     db.session.commit()
+'''
+def handle_event_heat(sender):
+    pass
 
 def handle_event_db_model_post(model, row):
     print 'Signal was sent by model {} row {}'.format(model, row)
@@ -80,6 +78,7 @@ def on_models_committed(sender, changes):
 
 def init():
     #http://pydispatcher.sourceforge.net/
-    dispatcher.connect(handle_event_sensor, signal=common.constant.SIGNAL_SENSOR, sender=dispatcher.Any)
+    #dispatcher.connect(handle_event_sensor, signal=common.constant.SIGNAL_SENSOR, sender=dispatcher.Any)
     dispatcher.connect(handle_event_db_model_post, signal=common.constant.SIGNAL_SENSOR_DB_POST, sender=dispatcher.Any)
     dispatcher.connect(handle_event_mqtt_received, signal=common.constant.SIGNAL_MQTT_RECEIVED, sender=dispatcher.Any)
+    dispatcher.connect(handle_event_heat, signal=common.constant.SIGNAL_HEAT, sender=dispatcher.Any)
