@@ -51,7 +51,8 @@ def save_hdd_to_db(serial, power_status, temperature, sector_error_count, smart_
             disk.notify_enabled_ = True
             db.session.commit()
         else:
-            logging.debug('Ignoring SystemDisk read {}, no value change'.format(key_compare))
+            logging.debug('Ignoring SystemDisk read {}, no change from {}'.format(
+                disk.comparator_unique_graph_record(), key_compare))
             disk.save_to_graph = False
             db.session.rollback()
     except Exception, ex:
