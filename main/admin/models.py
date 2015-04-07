@@ -200,6 +200,7 @@ class SystemMonitor(db.Model, graphs.SystemMonitorGraph, DbEvent):
     name = db.Column(db.String(50), unique=True)
     cpu_usage_percent = db.Column(db.Float)
     memory_available_percent = db.Column(db.Float)
+    uptime_days = db.Column(db.Integer)
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def __repr__(self):

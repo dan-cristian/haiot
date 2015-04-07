@@ -206,6 +206,12 @@ def get_mem_avail_percent_linux():
     progress_status = 'Read mem total {} free {}'.format(total, free)
     return memory_available_percent
 
+def get_uptime_linux_days():
+    with open('/proc/meminfo') as f:
+        line = f.readline()
+        uptime_seconds = float(line.split()[0])
+    return uptime_seconds / (60 * 60 * 24)
+
 def get_cpu_utilisation_linux():
     previous_procstat_list = None
     CPU_Percentage = None
@@ -258,6 +264,7 @@ def read_system_attribs():
     global import_module_psutil_exist, progress_status
     cpu_percent = None
     memory_available_percent = None
+    uptime_days = None
     if import_module_psutil_exist:
         cpu_percent = psutil.cpu_percent(interval=1)
         memory_available_percent = psutil.virtual_memory().percent
@@ -271,12 +278,14 @@ def read_system_attribs():
             #this is normally running on OpenWRT
             memory_available_percent = get_mem_avail_percent_linux()
             cpu_percent = get_cpu_utilisation_linux()
+            uptime_days = int(get_uptime_linux_days())
             logging.info('Read mem free {} cpu {}'.format(memory_available_percent, cpu_percent))
     progress_status = 'Saving mem and cpu to db'
     if not cpu_percent is None and not memory_available_percent is None:
-        save_system_attribs_to_db(cpu_percent=cpu_percent, memory_available_percent=memory_available_percent)
+        save_system_attribs_to_db(cpu_percent=cpu_percent, memory_available_percent=memory_available_percent,
+                                  uptime_days=uptime_days)
 
-def save_system_attribs_to_db(cpu_percent='', memory_available_percent=''):
+def save_system_attribs_to_db(cpu_percent='', memory_available_percent='', uptime_days=''):
     try:
         system_name=constant.HOST_NAME
         system = models.SystemMonitor.query.filter_by(name=system_name).first()
@@ -290,7 +299,7 @@ def save_system_attribs_to_db(cpu_percent='', memory_available_percent=''):
         key_compare = system.comparator_unique_graph_record()
         system.cpu_usage_percent = cpu_percent
         system.memory_available_percent = memory_available_percent
-
+        system.uptime_days = uptime_days
         system.updated_on = datetime.datetime.now()
         db.session.autoflush=False
         if key_compare != system.comparator_unique_graph_record():
