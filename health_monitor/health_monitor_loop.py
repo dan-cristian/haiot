@@ -207,7 +207,7 @@ def get_mem_avail_percent_linux():
     return memory_available_percent
 
 def get_uptime_linux_days():
-    with open('/proc/meminfo') as f:
+    with open('/proc/uptime') as f:
         line = f.readline()
         uptime_seconds = float(line.split()[0])
     return uptime_seconds / (60 * 60 * 24)
