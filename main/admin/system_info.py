@@ -33,10 +33,10 @@ def init():
 
                     #debian Intel
                     #model name      : Intel(R) Celeron(R) CPU 1037U @ 1.80GHz
-
-                    sysinfo[line.split(':')[0]] = line.split(':')[1].strip()
+                    words = line.split(':')
+                    sysinfo[words[0].strip()] = words[1].strip()
                 except Exception, ex:
-                    logging.warning('get sysinfo line split error {} line {}'.format(ex, line))
+                    logging.warning('get sysinfo line split error [{}] line [{}]'.format(ex, line))
             global description_model_name, description_machine, description_system_type, description_hardware, \
                 description_revision, description_cpu_model
             if 'model name' in sysinfo:     description_model_name = sysinfo['model name']

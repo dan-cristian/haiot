@@ -216,6 +216,30 @@ def get_uptime_linux_days():
     f.close()
     return uptime_seconds / (60 * 60 * 24)
 
+def get_uptime_win_days():
+    """Returns a datetime.timedelta instance representing the uptime in a Windows 2000/NT/XP machine"""
+    cmd = "net statistics server"
+    p = subprocess.Popen(cmd, shell=True,
+          stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    (child_stdin, child_stdout) = (p.stdin, p.stdout)
+    lines = child_stdout.readlines()
+    child_stdin.close()
+    child_stdout.close()
+    lines = [line.strip() for line in lines if line.strip()]
+    date, time, ampm = lines[1].split()[2:5]
+    #print date, time, ampm
+    separator = date[2]
+    d, m, y = [v for v in date.split(separator)]
+    m = datetime.datetime.strptime(m,'%b').month
+    y = datetime.datetime.strptime(y,'%y').year
+    H, M, S = [int(v) for v in time.split(':')]
+    if ampm.lower() == 'pm':
+        H += 12
+    now = datetime.datetime.now()
+    then = datetime.datetime(int(y), int(m), int(d), H, M)
+    diff = now - then
+    return diff.days
+
 def get_cpu_utilisation_linux():
     previous_procstat_list = None
     CPU_Percentage = None
@@ -272,7 +296,10 @@ def read_system_attribs():
     if import_module_psutil_exist:
         cpu_percent = psutil.cpu_percent(interval=1)
         memory_available_percent = psutil.virtual_memory().percent
-        uptime_days = int(get_uptime_linux_days())
+        if constant.OS in constant.OS_LINUX:
+            uptime_days = int(get_uptime_linux_days())
+        elif constant.OS in constant.OS_WINDOWS:
+            uptime_days = int(get_uptime_win_days())
         import_module_psutil_exist = True
     else:
         output = cStringIO.StringIO()
@@ -284,7 +311,7 @@ def read_system_attribs():
             memory_available_percent = get_mem_avail_percent_linux()
             cpu_percent = get_cpu_utilisation_linux()
             uptime_days = int(get_uptime_linux_days())
-            logging.info('Read mem free {} cpu {} uptime'.format(memory_available_percent, cpu_percent, uptime_days))
+            logging.info('Read mem free {} cpu {} uptime {}'.format(memory_available_percent, cpu_percent, uptime_days))
     progress_status = 'Saving mem cpu uptime to db'
     if not cpu_percent is None and not memory_available_percent is None:
         save_system_attribs_to_db(cpu_percent=cpu_percent, memory_available_percent=memory_available_percent,
