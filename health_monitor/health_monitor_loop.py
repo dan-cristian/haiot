@@ -272,6 +272,7 @@ def read_system_attribs():
     if import_module_psutil_exist:
         cpu_percent = psutil.cpu_percent(interval=1)
         memory_available_percent = psutil.virtual_memory().percent
+        uptime_days = int(get_uptime_linux_days())
         import_module_psutil_exist = True
     else:
         output = cStringIO.StringIO()
