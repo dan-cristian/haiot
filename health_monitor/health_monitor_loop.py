@@ -207,9 +207,13 @@ def get_mem_avail_percent_linux():
     return memory_available_percent
 
 def get_uptime_linux_days():
-    with open('/proc/uptime') as f:
+    try:
+        f = open('/proc/uptime')
         line = f.readline()
         uptime_seconds = float(line.split()[0])
+    except Exception, ex:
+        logging.warning('Unable to read uptime err {}'.format(ex))
+    f.close()
     return uptime_seconds / (60 * 60 * 24)
 
 def get_cpu_utilisation_linux():
