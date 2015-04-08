@@ -21,7 +21,7 @@ class SensorGraph(BaseGraph):
 
 class SystemMonitorGraph(BaseGraph):
     graph_x_ = 'updated_on'
-    graph_y_ = ['cpu_usage_percent', 'memory_available_percent']
+    graph_y_ = ['cpu_usage_percent', 'memory_available_percent', 'uptime_days']
     graph_id_ = 'name'
     graph_legend_ = 'name'
 
