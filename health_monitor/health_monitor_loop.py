@@ -228,7 +228,10 @@ def get_uptime_win_days():
     lines = [line.strip() for line in lines if line.strip()]
     date, time, ampm = lines[1].split()[2:5]
     #print date, time, ampm
-    separator = date[2]
+    if str(date[2]).isdigit():
+        separator = date[1]
+    else:
+        separator = date[2]
     d, m, y = [v for v in date.split(separator)]
     m = datetime.datetime.strptime(m,'%b').month
     y = datetime.datetime.strptime(y,'%y').year
