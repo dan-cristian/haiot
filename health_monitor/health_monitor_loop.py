@@ -279,8 +279,8 @@ def read_system_attribs():
             memory_available_percent = get_mem_avail_percent_linux()
             cpu_percent = get_cpu_utilisation_linux()
             uptime_days = int(get_uptime_linux_days())
-            logging.info('Read mem free {} cpu {}'.format(memory_available_percent, cpu_percent))
-    progress_status = 'Saving mem and cpu to db'
+            logging.info('Read mem free {} cpu {} uptime'.format(memory_available_percent, cpu_percent, uptime_days))
+    progress_status = 'Saving mem cpu uptime to db'
     if not cpu_percent is None and not memory_available_percent is None:
         save_system_attribs_to_db(cpu_percent=cpu_percent, memory_available_percent=memory_available_percent,
                                   uptime_days=uptime_days)

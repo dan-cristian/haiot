@@ -207,7 +207,7 @@ class SystemMonitor(db.Model, graphs.SystemMonitorGraph, DbEvent):
         return '{} {} {}'.format(self.id, self.name, self.updated_on)
 
     def comparator_unique_graph_record(self):
-        return str(self.cpu_usage_percent) + str(self.memory_available_percent)
+        return 'c{}m{}u{}'.format(self.cpu_usage_percent, self.memory_available_percent, self.uptime_days)
 
 class SystemDisk(db.Model, graphs.SystemDiskGraph, DbEvent):
     id = db.Column(db.Integer, primary_key=True)
