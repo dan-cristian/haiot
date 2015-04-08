@@ -14,6 +14,7 @@ OS_WINDOWS={'windows', 'nt'}
 MACHINE_TYPE_BEAGLEBONE = 'beaglebone'
 MACHINE_TYPE_RASPBERRY = 'raspberry'
 MACHINE_TYPE_OPENWRT = 'openwrt'
+MACHINE_TYPE_INTEL_LINUX = 'intel-linux'
 
 HOST_NAME='not initialised'
 HOST_MAIN_IP='not initialised'

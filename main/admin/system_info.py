@@ -31,6 +31,9 @@ def init():
                     #Hardware        : BCM2708
                     #Revision        : 000e
 
+                    #debian Intel
+                    #model name      : Intel(R) Celeron(R) CPU 1037U @ 1.80GHz
+
                     sysinfo[line.split(':')[0]] = line.split(':')[1].strip()
                 except Exception, ex:
                     logging.warning('get sysinfo line split error {} line {}'.format(ex, line))
@@ -43,9 +46,11 @@ def init():
             if 'revision' in sysinfo:       description_revision = sysinfo['revision']
             if 'cpu model' in sysinfo:      description_cpu_model = sysinfo['cpu model']
 
-            if 'AM33XX' in description_hardware:
+            if description_hardware and 'AM33XX' in description_hardware:
                 constant.HOST_MACHINE_TYPE = constant.MACHINE_TYPE_BEAGLEBONE
-            if 'BCM2708' in description_hardware:
+            if description_hardware and 'BCM2708' in description_hardware:
                 constant.HOST_MACHINE_TYPE = constant.MACHINE_TYPE_RASPBERRY
-            if 'Atheros' in description_system_type:
+            if description_system_type and 'Atheros' in description_system_type:
                 constant.HOST_MACHINE_TYPE = constant.MACHINE_TYPE_OPENWRT
+            if description_model_name and 'Intel' in description_model_name:
+                constant.HOST_MACHINE_TYPE = constant.MACHINE_TYPE_INTEL_LINUX
