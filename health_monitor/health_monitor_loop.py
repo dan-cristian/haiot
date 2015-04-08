@@ -219,8 +219,7 @@ def get_uptime_linux_days():
 def get_uptime_win_days():
     """Returns a datetime.timedelta instance representing the uptime in a Windows 2000/NT/XP machine"""
     cmd = "net statistics server"
-    p = subprocess.Popen(cmd, shell=True,
-          stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    p = subprocess.Popen(cmd, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
     (child_stdin, child_stdout) = (p.stdin, p.stdout)
     lines = child_stdout.readlines()
     child_stdin.close()
