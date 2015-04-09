@@ -17,7 +17,7 @@ except Exception, ex:
     logging.critical('PSUtil module not available')
     import_module_psutil_exist = False
 
-def save_hdd_to_db(serial, power_status, temperature, sector_error_count, smart_status, device, family, disk_dev,
+def __save_hdd_to_db(serial, power_status, temperature, sector_error_count, smart_status, device, family, disk_dev,
                    start_stop_count, load_cycle_count):
     try:
         system_name=constant.HOST_NAME
@@ -48,7 +48,7 @@ def save_hdd_to_db(serial, power_status, temperature, sector_error_count, smart_
                 logging.info('SystemDisk {} change, old={} new={}'.format(disk.hdd_name, key_compare,
                                                                       disk.comparator_unique_graph_record()))
             disk.save_to_graph = True
-            disk.notify_enabled_ = True
+            disk.notify_transport_enabled = True
             db.session.commit()
         else:
             logging.debug('Ignoring SystemDisk read {}, no change from {}'.format(
@@ -60,7 +60,7 @@ def save_hdd_to_db(serial, power_status, temperature, sector_error_count, smart_
 
 ERR_TEXT_NO_DEV = 'failed: No such device'
 
-def read_all_hdd_smart():
+def __read_all_hdd_smart():
     output = cStringIO.StringIO()
     current_disk_valid = True
     disk_letter='a'
@@ -72,7 +72,7 @@ def read_all_hdd_smart():
                 disk_dev=constant.DISK_DEV_MAIN + disk_letter
                 logging.debug('Processing disk {}'.format(disk_dev))
                 #disk_dev=get_device_name_linux_style(part.device)
-                power_status = read_hddparm(disk_dev=disk_dev)
+                power_status = __read_hddparm(disk_dev=disk_dev)
                 try:
                     if constant.OS in constant.OS_LINUX:
                         smart_out = subprocess.check_output(['sudo', 'smartctl', '-a', disk_dev, '-n', 'sleep'],
@@ -134,7 +134,7 @@ def read_all_hdd_smart():
                         serial = words[1].replace('\r','').replace('\n','').lstrip()
                         #print 'Serial is {}'.format(serial)
                 #print ('Disk dev is {}'.format(disk_dev))
-                save_hdd_to_db(serial, power_status, temperature, sector_error_count, smart_status, device, family,
+                __save_hdd_to_db(serial, power_status, temperature, sector_error_count, smart_status, device, family,
                                disk_dev, start_stop_count, load_cycle_count)
                 disk_letter = chr(ord(disk_letter) + 1)
             except subprocess.CalledProcessError, ex:
@@ -154,7 +154,7 @@ def get_device_name_linux_style(dev):
     else:
         return dev
 
-def read_hddparm(disk_dev=''):
+def __read_hddparm(disk_dev=''):
     output = cStringIO.StringIO()
     global ERR_TEXT_NO_DEV
     try:
@@ -188,7 +188,7 @@ def read_hddparm(disk_dev=''):
         logging.warning('Disk read error {} disk was {} err {}'.format(exc.message, disk_dev, exc))
     raise subprocess.CalledProcessError(1, 'No power status obtained on hdparm, output={}'.format(hddparm_out))
 
-def get_mem_avail_percent_linux():
+def __get_mem_avail_percent_linux():
     #http://architects.dzone.com/articles/linux-system-mining-python
     meminfo=OrderedDict()
     with open('/proc/meminfo') as f:
@@ -206,7 +206,7 @@ def get_mem_avail_percent_linux():
     progress_status = 'Read mem total {} free {}'.format(total, free)
     return memory_available_percent
 
-def get_uptime_linux_days():
+def __get_uptime_linux_days():
     try:
         f = open('/proc/uptime')
         line = f.readline()
@@ -216,7 +216,7 @@ def get_uptime_linux_days():
     f.close()
     return uptime_seconds / (60 * 60 * 24)
 
-def get_uptime_win_days():
+def __get_uptime_win_days():
     """Returns a datetime.timedelta instance representing the uptime in a Windows 2000/NT/XP machine"""
     cmd = "net statistics server"
     p = subprocess.Popen(cmd, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
@@ -242,7 +242,7 @@ def get_uptime_win_days():
     diff = now - then
     return diff.days
 
-def get_cpu_utilisation_linux():
+def __get_cpu_utilisation_linux():
     previous_procstat_list = None
     CPU_Percentage = None
     for i in range(0,2):
@@ -299,9 +299,9 @@ def read_system_attribs():
         cpu_percent = psutil.cpu_percent(interval=1)
         memory_available_percent = psutil.virtual_memory().percent
         if constant.OS in constant.OS_LINUX:
-            uptime_days = int(get_uptime_linux_days())
+            uptime_days = int(__get_uptime_linux_days())
         elif constant.OS in constant.OS_WINDOWS:
-            uptime_days = int(get_uptime_win_days())
+            uptime_days = int(__get_uptime_win_days())
         import_module_psutil_exist = True
     else:
         output = cStringIO.StringIO()
@@ -310,16 +310,16 @@ def read_system_attribs():
             pass
         else:
             #this is normally running on OpenWRT
-            memory_available_percent = get_mem_avail_percent_linux()
-            cpu_percent = get_cpu_utilisation_linux()
-            uptime_days = int(get_uptime_linux_days())
+            memory_available_percent = __get_mem_avail_percent_linux()
+            cpu_percent = __get_cpu_utilisation_linux()
+            uptime_days = int(__get_uptime_linux_days())
             logging.info('Read mem free {} cpu {} uptime {}'.format(memory_available_percent, cpu_percent, uptime_days))
     progress_status = 'Saving mem cpu uptime to db'
     if not cpu_percent is None and not memory_available_percent is None:
-        save_system_attribs_to_db(cpu_percent=cpu_percent, memory_available_percent=memory_available_percent,
+        __save_system_attribs_to_db(cpu_percent=cpu_percent, memory_available_percent=memory_available_percent,
                                   uptime_days=uptime_days)
 
-def save_system_attribs_to_db(cpu_percent='', memory_available_percent='', uptime_days=''):
+def __save_system_attribs_to_db(cpu_percent='', memory_available_percent='', uptime_days=''):
     try:
         system_name=constant.HOST_NAME
         system = models.SystemMonitor.query.filter_by(name=system_name).first()
@@ -343,7 +343,7 @@ def save_system_attribs_to_db(cpu_percent='', memory_available_percent='', uptim
                 logging.info('SystemMonitor {} change, old={} new={}'.format(system.name, key_compare,
                                                                       system.comparator_unique_graph_record()))
             system.save_to_graph = True
-            system.notify_enabled_ = True
+            system.notify_transport_enabled = True
             db.session.commit()
         else:
             logging.debug('Ignoring system read {}, no value change'.format(key_compare))
@@ -363,7 +363,7 @@ def get_progress():
 def thread_run():
     global progress_status, import_module_psutil_exist
     progress_status = 'reading hdd smart attribs'
-    read_all_hdd_smart()
+    __read_all_hdd_smart()
     progress_status = 'reading system attribs'
     read_system_attribs()
     progress_status = 'completed'

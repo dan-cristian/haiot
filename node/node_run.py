@@ -5,7 +5,6 @@ import time
 import datetime
 import random
 from common import constant, variable, utils
-from mqtt_io import sender
 from main.admin import models, model_helper
 from main import db
 
@@ -37,7 +36,7 @@ def node_update(obj={}):
         else:
             logging.debug('Skipping node DB save, this node is master = {}'.format(
                 variable.NODE_THIS_IS_MASTER_OVERALL))
-            sent_date = utils.get_object_field_value(obj, 'event_sent_datetime_')
+            sent_date = utils.get_object_field_value(obj, 'event_sent_datetime')
             if not sent_date is None:
                 event_sent_date_time = utils.parse_to_date(sent_date)
                 seconds_elapsed = (datetime.datetime.now()-event_sent_date_time).total_seconds()
@@ -111,10 +110,10 @@ def announce_node_state():
         node.priority = random.randint(1, 100)
         logging.warning('Detected node host name change, new name={}'.format(constant.HOST_NAME))
         db.session.add(node)
-    node.event_sent_datetime_= datetime.datetime.now()
+    node.event_sent_datetime= datetime.datetime.now()
     node.updated_on = datetime.datetime.now()
     node.ip = constant.HOST_MAIN_IP
-    node.notify_enabled_ = True
+    node.notify_transport_enabled = True
     db.session.commit()
 
 progress_status = None

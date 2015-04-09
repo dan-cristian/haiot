@@ -3,6 +3,7 @@ import logging
 import random
 import sys
 import datetime
+import uuid
 import models
 from common import constant, utils
 from main import db
@@ -11,14 +12,18 @@ from sqlalchemy.exc import IntegrityError, OperationalError, InvalidRequestError
 def model_row_to_json(obj, operation=''):
     try:
         safe_obj = {}
+        obj.event_sent_datetime = str(datetime.datetime.now())
+        obj.operation_type=operation
+        obj.event_uuid = str(uuid.uuid4())
         table_cols=obj._sa_class_manager
         for attr in table_cols:
             safe_obj[constant.JSON_PUBLISH_TABLE]=str(table_cols[attr]).split('.')[0]
             break
-        safe_obj[constant.JSON_PUBLISH_RECORD_OPERATION]=operation
+
+        #safe_obj[constant.JSON_PUBLISH_RECORD_OPERATION]=operation
         safe_obj[constant.JSON_PUBLISH_SOURCE_HOST]=str(constant.HOST_NAME)
-        safe_obj[constant.JSON_PUBLISH_DATE]=str(datetime.datetime.now())
-        safe_obj[constant.JSON_PUBLISH_TARGET_HOST]=constant.JSON_PUBLISH_VALUE_TARGET_HOST_ALL
+        #safe_obj[constant.JSON_PUBLISH_DATE]=str(datetime.datetime.now())
+        #safe_obj[constant.JSON_PUBLISH_TARGET_HOST]=constant.JSON_PUBLISH_VALUE_TARGET_HOST_ALL
         #removing infinite recursions and class noise
         #for attr in obj._sa_class_manager:
         for attr in dir(obj):

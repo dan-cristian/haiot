@@ -4,6 +4,8 @@ import os
 import json
 import re
 import datetime
+import logging
+
 from collections import namedtuple
 
 #http://stackoverflow.com/questions/6578986/how-to-convert-json-data-into-a-python-object
@@ -30,16 +32,15 @@ def get_object_field_value(obj={}, field_name=None):
     else:
         return None
 def parse_to_date(strdate):
-    if re.search("....-..-..T..:..:..\.......",  strdate):
+    if  re.search("....-..-..T..:..:..\.......",  strdate) or \
+        re.search("....-..-.. ..:..:..\.......",  strdate):
         strdate= strdate.replace('T',' ')
         strdate = datetime.datetime.strptime(strdate, "%Y-%m-%d %H:%M:%S.%f")
+    else:
+        logging.warning('Warning, unexpected date format in parse []'.format(strdate))
     return strdate
 
-def restart_program():
-    """Restarts the current program.
-    Note: this function does not return. Any cleanup action (like
-    saving data) must be done before calling this function."""
-
-    python = sys.executable
-    os.execl(python, python, * sys.argv)
-
+def get_table_name(model_obj):
+    parts = str(model_obj).split('.')
+    table = parts[len(parts)-1].split('\'')
+    return table[0]

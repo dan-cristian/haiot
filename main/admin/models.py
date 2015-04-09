@@ -6,9 +6,11 @@ from main import db
 import graphs
 
 class DbEvent:
-    db_notified_=False
-    notify_enabled_=False
-    event_sent_datetime_ = None
+    notified_on_db_commit=False
+    notify_transport_enabled=False
+    event_sent_datetime = None
+    event_uuid = None
+    operation_type=None
 
 class Module(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -266,10 +268,10 @@ class ZoneHeatRelay(db.Model, DbEvent):
     id = db.Column(db.Integer, primary_key=True)
     #friendly display name for pin mapping
     heat_pin_name = db.Column(db.String(50))
-    zone_id = db.Column(db.Integer)
+    zone_id = db.Column(db.Integer, unique=True)
     gpio_pin_code = db.Column(db.String(50))
     gpio_host_name = db.Column(db.String(50))
-    heat_status = db.Column(db.Integer)
+    heat_is_on = db.Column(db.Boolean)
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def __init__(self, zone_id='', gpio_pin_code='', host_name=''):
