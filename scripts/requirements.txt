@@ -19,4 +19,3 @@ psutil>=0.0
 RPi.GPIO
 #for rfxcom utility
 pyserial>=0.0
-twisted>=0

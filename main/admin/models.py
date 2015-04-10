@@ -109,6 +109,8 @@ class Sensor(db.Model, graphs.SensorGraph, DbEvent):
     pio_b = db.Column(db.Integer)
     sensed_a = db.Column(db.Integer)
     sensed_b = db.Column(db.Integer)
+    battery_level = db.Column(db.Integer) #RFXCOM specific
+    rssi = db.Column(db.Integer) #RFXCOM specific, rssi - distance
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
     #FIXME: now filled manually, try relations
     zone_name = db.Column(db.String(50))
@@ -121,9 +123,9 @@ class Sensor(db.Model, graphs.SensorGraph, DbEvent):
         return 'Sensor {}, {}{}'.format(self.type, self.sensor_name, self.address)
     
     def comparator_unique_graph_record(self):
-        return str(self.temperature)+str(self.humidity)+str(self.counters_a)+str(self.counters_b) \
-               + str(self.iad) + str(self.vad) + str(self.vdd) + str(self.pio_a) + str(self.pio_b) \
-                + str(self.sensed_a) + str(self.sensed_b)
+        return 't{}h{}ca{}cb{}i{}va{}vd{}pa{}pb{}sa{}sb{}b{}r{}'.format(self.temperature, self.humidity,
+                self.counters_a,self.counters_b, self.iad, self.vad, self.vdd, self.pio_a,self.pio_b,
+                self.sensed_a, self.sensed_b, self.battery_level,self.rssi)
 
 
 class Parameter(db.Model):

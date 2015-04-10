@@ -21,7 +21,8 @@ Web interface to manage the application
 Cluster capability, multiple nodes can run at the same time with failover capability enabled
 
 <h3>sensor</h3>
-Monitors 1-wire sensors based on owserver
+Monitors 1-wire sensors based on owserver and RFXCOM compatible sensors.
+RFXCOM device tested is RFXtrx433.
 
 <h3>alarm</h3>
 

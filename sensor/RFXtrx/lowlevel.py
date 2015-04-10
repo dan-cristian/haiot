@@ -69,10 +69,10 @@ def parse(data):
         pkt = TempHumidBaro()
         pkt.load_receive(data)
         return pkt
-    if data[1] == 0x55:
-        pkt = RainGauge()
-        pkt.load_receive(data)
-        return pkt
+    #if data[1] == 0x55:
+    #    pkt = RainGauge()
+    #    pkt.load_receive(data)
+    #    return pkt
     if data[1] == 0x56:
         pkt = Wind()
         pkt.load_receive(data)

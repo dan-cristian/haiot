@@ -92,11 +92,6 @@ def save_to_db(dev):
         else:
             logging.debug('Ignoring sensor read {}, no value change'.format(key_compare))
             sensor.save_to_graph = False
-            #DONE: Normally a db commit event should be triggered automatically, forcing the event below manually
-            #changes = []
-            #tuple = (sensor, 'update')
-            #changes.append(tuple)
-            #event.on_models_committed(sensor, changes)
     except Exception, ex:
         logging.warning('Error saving sensor to DB, err {}'.format(ex))
     #finally:
@@ -148,15 +143,25 @@ def get_unknown (sensor, owproxy, dev):
     dev = get_prefix(sensor, owproxy, dev)
     return dev
 
+initialised = False
 owproxy=None
 def init():
     logging.info('Initialising owssensor')
-    global owproxy
-    owproxy = pyownet.protocol.proxy(host=model_helper.get_param(constant.P_OWSERVER_HOST_1),
-                                     port=str(model_helper.get_param(constant.P_OWSERVER_PORT_1)))
+    global owproxy, initialised
+    try:
+        host = model_helper.get_param(constant.P_OWSERVER_HOST_1)
+        port = str(model_helper.get_param(constant.P_OWSERVER_PORT_1))
+        owproxy = pyownet.protocol.proxy(host=host, port=port)
+        initialised = True
+    except Exception, ex:
+        logging.warning('Unable to connect to 1-wire owserver host {} port {}'.format(host, port))
+        initialised = False
+    return initialised
 
 def thread_run():
+    global initialised
     logging.debug('Processing sensors')
-    return do_device(owproxy)
+    if initialised:
+        return do_device(owproxy)
 
 

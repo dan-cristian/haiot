@@ -48,7 +48,7 @@ class PySerialTransport(RFXtrxTransport):
                                               for x in pkt))
                 return self.parse(pkt)
             else:
-                logging.info('not blocking read data len {}, exit'.format(len(data)))
+                logging.debug('not blocking read data len {}, exit'.format(len(data)))
                 return None
 
     def send(self, data):

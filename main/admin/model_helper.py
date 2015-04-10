@@ -91,7 +91,7 @@ def read_drop_table(table, original_exception, drop_without_user_ask=False):
 def populate_tables(model_auto_update=False):
     param_list=[
             ['1', constant.P_MZP_SERVER_URL, 'http://192.168.0.10'],
-            ['2', constant.P_OWSERVER_HOST_1, '192.168.0.113'],
+            ['2', constant.P_OWSERVER_HOST_1, '127.0.0.1'],
             ['3', constant.P_OWSERVER_PORT_1, '4304'],
             ['4', constant.P_MQTT_HOST_1, '192.168.0.9'],
             ['5', constant.P_MQTT_PORT_1, '1883'],
@@ -193,6 +193,7 @@ def populate_tables(model_auto_update=False):
         commit()
 
     check_table_schema(models.SystemMonitor, model_auto_update)
+    check_table_schema(models.Sensor, model_auto_update)
     #if len(models.Sensor.query.all()) == 0:
         #logging.info('Populating Sensor with a test value')
         #sens = models.Sensor(address='ADDRESSTEST')
@@ -208,7 +209,7 @@ def populate_tables(model_auto_update=False):
         [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), False, 10]],
         'netbook':[
         [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
-        [4, get_mod_name(mqtt_io), True, 3],[5, get_mod_name(sensor), False, 4],[6, get_mod_name(relay), True, 5],
+        [4, get_mod_name(mqtt_io), True, 3],[5, get_mod_name(sensor), True, 4],[6, get_mod_name(relay), True, 5],
         [7, get_mod_name(heat), True, 6],[8, get_mod_name(alarm), False, 7],[9, get_mod_name(graph_plotly), False, 8],
         [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), True, 10]],
         'nas':[
@@ -299,7 +300,7 @@ def populate_tables(model_auto_update=False):
             [25, '96000003BDFE5D28', 'boiler sus'], [25, '53000004F296DD28', 'boiler mijloc'],
             [25, 'C8000004F28B0728', 'boiler jos'], [2, '41000003BE099C28', 'living'],
             [1, 'AA000003BDE6C728', 'bucatarie'], [27, 'E400000155E72D26', 'pod fata'],
-            [4, 'B5000004F3285F28', 'dormitor']
+            [4, 'B5000004F3285F28', 'dormitor'], [47, 'f9:01','birou'], [23, 'f3:01', 'fridge']
         ]
     if len(models.ZoneSensor.query.all()) < len(zonesensor_list):
         logging.info('Populating ZoneSensor with default values')
