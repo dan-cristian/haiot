@@ -24,7 +24,7 @@ This module provides a transport for PySerial
 from serial import Serial
 from time import sleep
 from . import RFXtrxTransport
-
+import logging
 
 class PySerialTransport(RFXtrxTransport):
     """ Implementation of a transport using PySerial """
@@ -40,14 +40,14 @@ class PySerialTransport(RFXtrxTransport):
             if (len(data) > 0):
                 if data == '\x00':
                     continue
-                if len(data) > 1:
-                    pkt = bytearray(data)
-                    data = self.serial.read(pkt[0])
-                    pkt.extend(bytearray(data))
-                    if self.debug:
-                        print("Recv: " + " ".join("0x{0:02x}".format(x)
-                                                  for x in pkt))
-                    return self.parse(pkt)
+                pkt = bytearray(data)
+                data = self.serial.read(pkt[0])
+                pkt.extend(bytearray(data))
+                if self.debug:
+                    logging.info("Recv: " + " ".join("0x{0:02x}".format(x)
+                                              for x in pkt))
+                return self.parse(pkt)
+
 
     def send(self, data):
         """ Send the given packet """
@@ -58,7 +58,7 @@ class PySerialTransport(RFXtrxTransport):
         else:
             raise ValueError("Invalid type")
         if self.debug:
-            print ("Send: " + " ".join("0x{0:02x}".format(x) for x in pkt))
+            logging.info ("Send: " + " ".join("0x{0:02x}".format(x) for x in pkt))
         self.serial.write(pkt)
 
     def reset(self):
