@@ -30,7 +30,7 @@ class PySerialTransport(RFXtrxTransport):
     """ Implementation of a transport using PySerial """
 
     def __init__(self, port, debug=False):
-        self.serial = Serial(port, 38400, timeout=0.1)
+        self.serial = Serial(port, 38400, timeout=0)
         self.debug = debug
 
     def receive_blocking(self):
@@ -47,7 +47,9 @@ class PySerialTransport(RFXtrxTransport):
                     logging.info("Recv: " + " ".join("0x{0:02x}".format(x)
                                               for x in pkt))
                 return self.parse(pkt)
-
+            else:
+                logging.info('not blocking read')
+                sleep(0.5)
 
     def send(self, data):
         """ Send the given packet """
