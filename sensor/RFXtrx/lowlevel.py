@@ -26,8 +26,6 @@ RFXtrx.
 
 def parse(data):
     """ Parse a packet from a bytearray """
-    if len(data)<2:
-        return None
     if data[0] == 0:
         # null length packet - sometimes happens on initialization
         return None
