@@ -37,8 +37,8 @@ def __save_sensor_db(id='', type='', value_list=[]):
     key_compare = sensor.comparator_unique_graph_record()
     sensor.updated_on = datetime.datetime.now()
     sensor.type = type
-    if 'Humidity' in value_list: sensor.humidity = round_sensor_value(value_list['Humidity'])
-    if 'Temperature' in value_list: sensor.temperature= round_sensor_value(value_list['Temperature'])
+    if 'Humidity' in value_list: sensor.humidity = utils.round_sensor_value(value_list['Humidity'])
+    if 'Temperature' in value_list: sensor.temperature= utils.round_sensor_value(value_list['Temperature'])
     if 'Battery numeric' in value_list: sensor.battery_level = value_list['Battery numeric']
     if 'Rssi numeric' in value_list: sensor.rssi = value_list['Rssi numeric']
 
