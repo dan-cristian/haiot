@@ -63,8 +63,8 @@ def get_portpath_linux():
     for path in path_list:
         words = path.split('/')
         dev_path = '/dev/'+words[len(words)-2]
-        for word in range(0, len(words) - 5):
-            root_path = '/'+word
+        for index in range(0, len(words) - 5):
+            root_path = '/'+words[index]
         f = open(root_path+'/product')
         product = f.readline()
         f.close()
