@@ -18,7 +18,10 @@ def thread_run():
     global transport
     try:
         logging.info('Waiting for RFX event')
-        logging.info(transport.receive_blocking())
+        if transport:
+            logging.info(transport.receive_blocking())
+        else:
+            logging.warning('No transport for rfxcom')
     except Exception, ex:
         logging.warning('Error read RFX tty port, err {}'.format(ex))
         raise ex

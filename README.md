@@ -62,6 +62,7 @@ Ensure hdparm.exe and smartctl.exe are added in the PATH
 Specific prerequisites for Linux<br>
 - Enable sudo access for hdparm and smartctl
 - virtualenv usage recommended
+- for pyserial, set access rights to open /dev/ttyUSBx device: sudo usermod -a -G dialout $USER
 
 On Linux, grant execute rights and run setup.sh.bat.
 This will install virtualenv and setup a python venv context with all required packages
