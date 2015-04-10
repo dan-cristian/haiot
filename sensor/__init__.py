@@ -11,6 +11,7 @@ initialised=False
 def unload():
     #...
     thread_pool.remove_callable(owsensor_loop.thread_run)
+    thread_pool.remove_callable(rfxcom_run.thread_run)
     global initialised
     initialised = False
 
@@ -19,6 +20,7 @@ def init():
     owsensor_loop.init()
     rfxcom_run.init()
     thread_pool.add_callable(owsensor_loop.thread_run, run_interval_second=15)
+    thread_pool.add_callable(rfxcom_run.thread_run, run_interval_second=15)
     global initialised
     initialised = True
 

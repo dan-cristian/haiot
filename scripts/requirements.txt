@@ -17,3 +17,6 @@ psutil>=0.0
 #Adafruit_BBIO>=0.0
 #Flask-WebTest>=0.0
 RPi.GPIO
+#for rfxcom utility
+pyserial>=0.0
+twisted>=0
