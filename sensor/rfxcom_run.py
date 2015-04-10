@@ -21,3 +21,4 @@ def thread_run():
         logging.info(transport.receive_blocking())
     except Exception, ex:
         logging.warning('Error read RFX tty port, err {}'.format(ex))
+        raise ex
