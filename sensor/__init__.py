@@ -5,6 +5,7 @@ __author__ = 'dcristian'
 from main.admin import thread_pool
 import logging
 import owsensor_loop
+import rfxcom_run
 initialised=False
 
 def unload():
@@ -16,6 +17,7 @@ def unload():
 def init():
     logging.info('Sensor module initialising')
     owsensor_loop.init()
+    rfxcom_run.init()
     thread_pool.add_callable(owsensor_loop.thread_run, run_interval_second=15)
     global initialised
     initialised = True
