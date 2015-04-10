@@ -7,6 +7,7 @@ from RFXtrx.pyserial import PySerialTransport
 import RFXtrx
 from main.admin import models, db
 from common import constant
+from sensor import round_sensor_value
 
 initialised = False
 transport = None
@@ -37,8 +38,8 @@ def __save_sensor_db(id='', type='', value_list=[]):
     key_compare = sensor.comparator_unique_graph_record()
     sensor.updated_on = datetime.datetime.now()
     sensor.type = type
-    if 'Humidity' in value_list: sensor.humidity = value_list['Humidity']
-    if 'Temperature' in value_list: sensor.temperature= value_list['Temperature']
+    if 'Humidity' in value_list: sensor.humidity = round_sensor_value(value_list['Humidity'])
+    if 'Temperature' in value_list: sensor.temperature= round_sensor_value(value_list['Temperature'])
     if 'Battery numeric' in value_list: sensor.battery_level = value_list['Battery numeric']
     if 'Rssi numeric' in value_list: sensor.rssi = value_list['Rssi numeric']
 

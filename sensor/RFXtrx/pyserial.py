@@ -44,7 +44,7 @@ class PySerialTransport(RFXtrxTransport):
                 data = self.serial.read(pkt[0])
                 pkt.extend(bytearray(data))
                 if self.debug:
-                    logging.info("Recv: " + " ".join("0x{0:02x}".format(x)
+                    logging.debug("Recv: " + " ".join("0x{0:02x}".format(x)
                                               for x in pkt))
                 return self.parse(pkt)
             else:

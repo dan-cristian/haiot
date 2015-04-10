@@ -78,3 +78,6 @@ for db_disk option, db is created in the current path.
 for db_mem option, db is created in /tmp folder, on constrained devices (PI, BBB) this is usually mapped to ramfs.
 Note that db content will be lost at restarts if db is created in ram
 - model_auto_update, automatically updates db schema if changes are detected (implies drop tables and default values)
+
+<h1>Other packages used</h1>
+https://github.com/woudt/pyRFXtrx

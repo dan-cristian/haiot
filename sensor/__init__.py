@@ -4,9 +4,13 @@ __author__ = 'dcristian'
 
 from main.admin import thread_pool
 import logging
+import math
 import owsensor_loop
 import rfxcom_run
 initialised=False
+
+def round_sensor_value(val):
+    return math.ceil(float(val)*10)/10
 
 def unload():
     #...
