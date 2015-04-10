@@ -96,7 +96,7 @@ def init():
 def thread_run():
     global transport, initialised
     try:
-        logging.info('Waiting for RFX event')
+        logging.debug('Waiting for RFX event')
         if initialised:
             __rfx_reading(transport.receive_blocking())
     except Exception, ex:
