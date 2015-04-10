@@ -5,6 +5,7 @@ import json
 import re
 import datetime
 import logging
+import math
 
 from collections import namedtuple
 
@@ -44,3 +45,6 @@ def get_table_name(model_obj):
     parts = str(model_obj).split('.')
     table = parts[len(parts)-1].split('\'')
     return table[0]
+
+def round_sensor_value(val):
+    return math.ceil(float(val)*10)/10
