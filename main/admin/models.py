@@ -38,7 +38,7 @@ class DbEvent:
             if len(current_record.last_commit_field_changed_list) == 0:
                 current_record.notify_transport_enabled = False
             elif len(current_record.last_commit_field_changed_list) == 1 and ignore_only_update_on_change and \
-                            'update_on' in current_record.last_commit_field_changed_list:
+                            'updated_on' in current_record.last_commit_field_changed_list:
                 current_record.notify_transport_enabled = False
         else:
             for column in new_record.query.statement._columns._all_col_set:
