@@ -163,11 +163,6 @@ class Sensor(db.Model, graphs.SensorGraph, DbEvent):
     def __repr__(self):
         return 'Sensor {}, {}{}'.format(self.type, self.sensor_name, self.address)
     
-    def comparator_unique_graph_record(self):
-        return 't{}h{}ca{}cb{}i{}va{}vd{}pa{}pb{}sa{}sb{}b{}r{}'.format(self.temperature, self.humidity,
-                self.counters_a,self.counters_b, self.iad, self.vad, self.vdd, self.pio_a,self.pio_b,
-                self.sensed_a, self.sensed_b, self.battery_level,self.rssi)
-
 
 class Parameter(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -262,18 +257,13 @@ class SystemDisk(db.Model, graphs.SystemDiskGraph, DbEvent):
     temperature = db.Column(db.Float)
     sector_error_count = db.Column(db.Integer)
     smart_status = db.Column(db.String(50))
-    power_status = db.Column(db.String(50))
+    power_status = db.Column(db.Integer)
     load_cycle_count = db.Column(db.Integer)
     start_stop_count = db.Column(db.Integer)
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def __repr__(self):
         return '{} {} {} {} {}'.format(self.id, self.serial,  self.system_name, self.hdd_name, self.hdd_disk_dev)
-
-    def comparator_unique_graph_record(self):
-        return str(self.temperature) + str(self.sector_error_count) + str(self.smart_status) \
-               + str(self.power_status) + str(self.hdd_disk_dev) + str(self.load_cycle_count) \
-                + str(self.start_stop_count)
 
 class GpioPin(db.Model, DbEvent):
     id = db.Column(db.Integer, primary_key=True)

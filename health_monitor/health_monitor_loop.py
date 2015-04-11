@@ -136,6 +136,12 @@ def __read_hddparm(disk_dev=''):
                 if constant.HDPARM_STATUS in line:
                     words = line.split(': ')
                     power_status = words[1].replace('\r', '').replace('\n', '').replace('/', '-').lstrip()
+                    if power_status == 'active-idle':
+                        power_status = 1 + constant.HOST_PRIORITY
+                    elif power_status == 'standby':
+                        power_status = 0
+                    else:
+                        power_status = -1 - constant.HOST_PRIORITY
                     return power_status
         else:
             power_status = 'not available'

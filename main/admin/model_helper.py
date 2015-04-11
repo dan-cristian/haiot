@@ -182,8 +182,10 @@ def populate_tables(model_auto_update=False):
             priority = 0
         elif constant.HOST_NAME=='netbook':
             priority = 1
+        elif constant.HOST_NAME=='server':
+            priority = 2
         else:
-            priority=random.randint(2, 100)
+            priority=random.randint(3, 100)
         db.session.add(models.Node('', name=constant.HOST_NAME, ip=constant.HOST_MAIN_IP, priority=priority))
         commit()
     else:
@@ -191,6 +193,8 @@ def populate_tables(model_auto_update=False):
         node = models.Node.query.filter_by(name=constant.HOST_NAME).first()
         node.execute_command = ''
         commit()
+    node = models.Node.query.filter_by(name=constant.HOST_NAME).first()
+    constant.HOST_PRIORITY = node.priority
 
     check_table_schema(models.SystemMonitor, model_auto_update)
     check_table_schema(models.Sensor, model_auto_update)
