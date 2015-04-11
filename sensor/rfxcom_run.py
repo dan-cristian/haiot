@@ -11,7 +11,6 @@ from common import constant, utils
 initialised = False
 transport = None
 
-
 def __rfx_reading(packet):
     if packet:
         try:
@@ -23,37 +22,22 @@ def __rfx_reading(packet):
             logging.info('Unknown rfx packet type {}'.format(packet))
 
 def __save_sensor_db(id='', type='', value_list=[]):
-    sensor = models.Sensor.query.filter_by(address=id).first()
+    record = models.Sensor(address=id)
+    assert isinstance(record, models.Sensor)
     zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=id).first()
-    if sensor == None:
-        sensor = models.Sensor(address=id)
-        record_is_new = True
-    else:
-        record_is_new = False
     if zone_sensor:
-        sensor.sensor_name = zone_sensor.sensor_name
+        record.sensor_name = zone_sensor.sensor_name
     else:
-        sensor.sensor_name = '(not defined) ' + id
-    key_compare = sensor.comparator_unique_graph_record()
-    sensor.updated_on = datetime.datetime.now()
-    sensor.type = type
-    if 'Humidity' in value_list: sensor.humidity = utils.round_sensor_value(value_list['Humidity'])
-    if 'Temperature' in value_list: sensor.temperature= utils.round_sensor_value(value_list['Temperature'])
-    if 'Battery numeric' in value_list: sensor.battery_level = value_list['Battery numeric']
-    if 'Rssi numeric' in value_list: sensor.rssi = value_list['Rssi numeric']
-
-    if key_compare != sensor.comparator_unique_graph_record():
-        if record_is_new:
-            db.session.add(sensor)
-        else:
-            logging.info('RFX Sensor {} change, old={} new={}'.format(sensor.sensor_name, key_compare,
-                                                                  sensor.comparator_unique_graph_record()))
-        sensor.save_to_graph = True
-        sensor.notify_transport_enabled = True
-        db.session.commit()
-    else:
-        logging.debug('Ignoring RFX sensor read {}, no value change'.format(key_compare))
-        sensor.save_to_graph = False
+        record.sensor_name = '(not defined) ' + id
+    record.updated_on = datetime.datetime.now()
+    record.type = type
+    if 'Humidity' in value_list: record.humidity = utils.round_sensor_value(value_list['Humidity'])
+    if 'Temperature' in value_list: record.temperature= utils.round_sensor_value(value_list['Temperature'])
+    if 'Battery numeric' in value_list: record.battery_level = value_list['Battery numeric']
+    if 'Rssi numeric' in value_list: record.rssi = value_list['Rssi numeric']
+    current_record = models.Sensor.query.filter_by(address=id).first()
+    record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
+                                   save_to_graph=True, ignore_only_updated_on_change=True)
 
 def get_portpath_linux():
     #/sys/bus/usb/devices/2-1.2/2-1.2:1.0/ttyUSB0/tty/ttyUSB0/dev
