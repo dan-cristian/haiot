@@ -268,7 +268,7 @@ def read_system_attribs():
     try:
         record = models.SystemMonitor()
         if import_module_psutil_exist:
-            record.cpu_percent = psutil.cpu_percent(interval=1)
+            record.cpu_usage_percent = psutil.cpu_percent(interval=1)
             record.memory_available_percent = psutil.virtual_memory().percent
             if constant.OS in constant.OS_LINUX:
                 record.uptime_days = int(__get_uptime_linux_days())
@@ -283,7 +283,7 @@ def read_system_attribs():
             else:
                 # this is normally running on OpenWRT
                 record.memory_available_percent = __get_mem_avail_percent_linux()
-                record.cpu_percent = __get_cpu_utilisation_linux()
+                record.cpu_usage_percent = __get_cpu_utilisation_linux()
                 record.uptime_days = int(__get_uptime_linux_days())
                 logging.info('Read mem free {} cpu {} uptime {}'.format(record.memory_available_percent,
                                                                         record.cpu_percent, record.uptime_days))
