@@ -44,12 +44,13 @@ def get_layout(title='', ):
     )
     return layout
 
-def populate_trace_for_extend(x=[], y=[], graph_legend_item_name='', trace_unique_id='', trace_unique_id_pattern=[]):
+def populate_trace_for_extend(x=[], y=[], graph_legend_item_name='', trace_unique_id='', trace_unique_id_pattern=[],
+                              shape_type=''):
     #series list must be completely filled in using graph create order
     #'text' param if added generates error
-    trace_extend = graph_objs.Scatter(x=x, y=y, name=graph_legend_item_name)
+    trace_extend = graph_objs.Scatter(x=x, y=y, name=graph_legend_item_name, line = graph_objs.Line(shape=shape_type))
     trace_pos = trace_unique_id_pattern.index(trace_unique_id)
-    trace_empty = graph_objs.Scatter(x=[], y=[])
+    trace_empty = graph_objs.Scatter(x=[], y=[], line = graph_objs.Line(shape=shape_type))
     trace_list=[]
     for i in range(len(trace_unique_id_pattern)):
         if i == trace_pos:
@@ -59,10 +60,11 @@ def populate_trace_for_extend(x=[], y=[], graph_legend_item_name='', trace_uniqu
     logging.debug('Extending graph serie {} {}'.format(graph_legend_item_name, trace_unique_id))
     return trace_list
 
-def populate_trace_for_append(x=[], y=[], graph_legend_item_name='', trace_unique_id='', show_legend=True):
+def populate_trace_for_append(x=[], y=[], graph_legend_item_name='', trace_unique_id='', show_legend=True,
+                              shape_type=''):
     #'text' param should only be added at trace creation
     trace_append = graph_objs.Scatter(x=x, y=y, name=graph_legend_item_name, text=trace_unique_id,
-                                      showlegend=show_legend)
+                                      showlegend=show_legend, line = graph_objs.Line(shape=shape_type))
     trace_list = [trace_append]
     logging.debug('Appending new graph serie {} {}'.format(graph_legend_item_name, trace_unique_id))
     return trace_list
@@ -75,12 +77,12 @@ def clean_graph_memory(graph_unique_name=''):
     if graph_unique_name in g_graph_url_list:
         g_graph_url_list.pop(graph_unique_name)
 
-def get_reference_trace_for_append(graph_unique_name=''):
+def get_reference_trace_for_append(graph_unique_name='', shape_type=''):
     global g_reference_trace_id
     return graph_objs.Scatter(x=[datetime.datetime.now()], y=[0], name=graph_unique_name, text=g_reference_trace_id,
-                              mode='none', showlegend=False)
+                              mode='none', showlegend=False, line = graph_objs.Line(shape=shape_type))
 
-def download_trace_id_list(graph_unique_name=''):
+def download_trace_id_list(graph_unique_name='', shape_type=''):
     try:
         result=py.file_ops.mkdirs(get_folder_name())
         logging.info('Created archiving folder {} result {}'.format(get_folder_name(), result))
@@ -94,10 +96,10 @@ def download_trace_id_list(graph_unique_name=''):
     #extending graph with a reference trace to force getting remote url, which is unknown
     trace_list = []
     graph_url = None
-    trace_ref_append = get_reference_trace_for_append(graph_unique_name)
+    trace_ref_append = get_reference_trace_for_append(graph_unique_name, shape_type=shape_type)
     trace_ref_extend = graph_objs.Scatter(x=[datetime.datetime.now()],y=[0],name=graph_unique_name,mode='none',
-                                          showlegend=False)
-    trace_empty = graph_objs.Scatter(x=[], y=[])
+                                          showlegend=False, line = graph_objs.Line(shape=shape_type))
+    trace_empty = graph_objs.Scatter(x=[], y=[], line = graph_objs.Line(shape=shape_type))
     #first time we try an append, assuming trace does not exist
     trace_list.append(trace_ref_append)
     #trying several times to guess number of graph traces so I can get the graph url
@@ -183,6 +185,7 @@ def upload_data(obj):
             axis_x_field = obj[constant.JSON_PUBLISH_GRAPH_X]
             graph_id_field = obj[constant.JSON_PUBLISH_GRAPH_ID]
             graph_legend_field = obj[constant.JSON_PUBLISH_GRAPH_LEGEND]
+            graph_shape_fields = obj[constant.JSON_PUBLISH_GRAPH_SHAPE]
             graph_y_fields = obj[constant.JSON_PUBLISH_GRAPH_Y]
             changed_fields = obj[constant.JSON_PUBLISH_FIELDS_CHANGED]
             #intersect lists and get only graphable fields that had values changed
@@ -198,10 +201,13 @@ def upload_data(obj):
                 graph_legend_item_name = obj[graph_legend_field] #unique key for legend
                 x_val = utils.parse_to_date(x_val)
                 x = [x_val]
+                index = 0
                 for axis_y in list_axis_y:
                     if axis_y in obj:
                         trace_list = []
                         y=[obj[axis_y]]
+                        #shape visual type for this trace
+                        shape = graph_shape_fields[index]
                         #unique name used for graph on upload
                         graph_base_name = str(table+' '+axis_y)
                         #full name and path to enable archiving
@@ -218,12 +224,13 @@ def upload_data(obj):
                         if trace_unique_id in trace_unique_id_pattern:
                             trace_list = populate_trace_for_extend(x=x, y=y,
                                     graph_legend_item_name=graph_legend_item_name, trace_unique_id=trace_unique_id,
-                                    trace_unique_id_pattern=trace_unique_id_pattern)
+                                    trace_unique_id_pattern=trace_unique_id_pattern, shape_type=shape)
                             logging.debug('Extending graph {}'.format(graph_unique_name))
                             fileopt = 'extend'
                         else:
                             trace_list = populate_trace_for_append(x=x, y=y,
-                                        graph_legend_item_name=graph_legend_item_name,trace_unique_id=trace_unique_id)
+                                        graph_legend_item_name=graph_legend_item_name,trace_unique_id=trace_unique_id,
+                                        shape_type=shape)
                             logging.debug('Appending graph {}'.format(graph_unique_name))
                             fileopt = 'append'
                         data = graph_objs.Data(trace_list)
@@ -240,6 +247,7 @@ def upload_data(obj):
                                     add_new_serie(graph_unique_name, url, trace_unique_id)
                         except PlotlyAccountError, ex:
                             logging.warning('Unable to plot graph, err {}'.format(ex))
+                    index = index + 1
             else:
                 logging.critical('Graphable object missing axis X or ID {} obj {}'.format(axis_x_field, obj))
         else:
