@@ -74,6 +74,9 @@ def get_portpath_linux():
             return dev_path
     return None
 
+def unload():
+    pass
+
 def init():
     global transport, initialised
     initialised = False

@@ -4,6 +4,7 @@ import time
 import sys
 from flask_sqlalchemy import SQLAlchemy #workaround for resolve issue
 from flask import Flask, redirect, url_for
+from flask_sqlalchemy import models_committed
 import signal
 import logging
 import common
@@ -75,6 +76,7 @@ def execute_command(command):
         unload()
 #--------------------------------------------------------------------------#
 
+
 def unload():
     logging.warning('Main module is unloading, application will exit')
     import webui, admin.thread_pool, mqtt_io
@@ -122,6 +124,13 @@ def init():
 
     global initialised, shutting_down
     initialised = True
+
+    @models_committed.connect_via(app)
+    def on_models_committed(sender, changes):
+        from main.admin import event
+        logging.debug('Model commit detected sender {} change {}'.format(sender, changes))
+        event.on_models_committed(sender, changes)
+
     #stop app from exiting
     while not shutting_down:
         time.sleep(1)
@@ -152,6 +161,8 @@ def run(arg_list):
     print 'App EXIT'
     global exit_code
     sys.exit(exit_code)
+
+
 
 #if 'main' in __name__:
 #    run(sys.argv[1:])

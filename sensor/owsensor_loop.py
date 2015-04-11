@@ -52,46 +52,31 @@ def save_to_db(dev):
     #db_lock.acquire()
     try:
         address=dev['address']
-        sensor = models.Sensor.query.filter_by(address=address).first()
-        zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=address).first()
-        if sensor == None:
-            sensor = models.Sensor(address=address)
-            record_is_new = True
-        else:
-            record_is_new = False
-        if zone_sensor:
-            sensor.sensor_name = zone_sensor.sensor_name
-        else:
-            sensor.sensor_name = '(not defined) ' + address
-        key_compare = sensor.comparator_unique_graph_record()
-        sensor.type = dev['type']
-        sensor.updated_on = datetime.datetime.now()
-        if dev.has_key('counters_a'): sensor.counters_a = dev['counters_a']
-        if dev.has_key('counters_b'): sensor.counters_b = dev['counters_b']
-        if dev.has_key('temperature'): sensor.temperature = dev['temperature']
-        if dev.has_key('humidity'): sensor.humidity = dev['humidity']
-        if dev.has_key('iad'): sensor.iad = dev['iad']
-        if dev.has_key('vad'): sensor.vad = dev['vad']
-        if dev.has_key('vdd'): sensor.vdd = dev['vdd']
-        if dev.has_key('pio_a'): sensor.pio_a = dev['pio_a']
-        if dev.has_key('pio_b'): sensor.pio_b = dev['pio_b']
-        if dev.has_key('sensed_a'): sensor.sensed_a = dev['sensed_a']
-        if dev.has_key('sensed_b'): sensor.sensed_b = dev['sensed_b']
+        record = models.Sensor(address=address)
+        assert isinstance(record, models.Sensor)
 
-        #assert isinstance(old_value, models.Sensor)
-        db.session.autoflush=False
-        if key_compare != sensor.comparator_unique_graph_record():
-            if record_is_new:
-                db.session.add(sensor)
-            else:
-                logging.info('Sensor {} change, old={} new={}'.format(sensor.sensor_name, key_compare,
-                                                                      sensor.comparator_unique_graph_record()))
-            sensor.save_to_graph = True
-            sensor.notify_transport_enabled = True
-            db.session.commit()
+        zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=address).first()
+        if zone_sensor:
+            record.sensor_name = zone_sensor.sensor_name
         else:
-            logging.debug('Ignoring sensor read {}, no value change'.format(key_compare))
-            sensor.save_to_graph = False
+            record.sensor_name = '(not defined) ' + address
+        record.type = dev['type']
+        record.updated_on = datetime.datetime.now()
+        if dev.has_key('counters_a'): record.counters_a = dev['counters_a']
+        if dev.has_key('counters_b'): record.counters_b = dev['counters_b']
+        if dev.has_key('temperature'): record.temperature = dev['temperature']
+        if dev.has_key('humidity'): record.humidity = dev['humidity']
+        if dev.has_key('iad'): record.iad = dev['iad']
+        if dev.has_key('vad'): record.vad = dev['vad']
+        if dev.has_key('vdd'): record.vdd = dev['vdd']
+        if dev.has_key('pio_a'): record.pio_a = dev['pio_a']
+        if dev.has_key('pio_b'): record.pio_b = dev['pio_b']
+        if dev.has_key('sensed_a'): record.sensed_a = dev['sensed_a']
+        if dev.has_key('sensed_b'): record.sensed_b = dev['sensed_b']
+
+        current_record = models.Sensor.query.filter_by(address=address).first()
+        record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
+                                   save_to_graph=True)
     except Exception, ex:
         logging.warning('Error saving sensor to DB, err {}'.format(ex))
     #finally:

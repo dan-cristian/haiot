@@ -5,7 +5,7 @@ import logging
 from main.admin import thread_pool
 from main import app
 from flask import request
-from flask_sqlalchemy import models_committed
+
 
 import webui
 import helpers
@@ -54,8 +54,3 @@ def init():
 def home():
     return '<a href="/user/node">Node</a>'
 
-@models_committed.connect_via(app)
-def on_models_committed(sender, changes):
-    from main.admin import event
-    logging.debug('Model commit detected sender {} change {}'.format(sender, changes))
-    event.on_models_committed(sender, changes)

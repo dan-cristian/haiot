@@ -17,47 +17,6 @@ except Exception, ex:
     logging.critical('PSUtil module not available')
     import_module_psutil_exist = False
 
-def __save_hdd_to_db(serial, power_status, temperature, sector_error_count, smart_status, device, family, disk_dev,
-                   start_stop_count, load_cycle_count):
-    try:
-        system_name=constant.HOST_NAME
-        disk = models.SystemDisk.query.filter_by(hdd_disk_dev=disk_dev, system_name=system_name).first()
-        if disk is None:
-            disk = models.SystemDisk()
-            disk.system_name = system_name
-            disk.hdd_disk_dev = disk_dev
-            record_is_new = True
-        else:
-            record_is_new = False
-        key_compare = disk.comparator_unique_graph_record()
-        if not serial is None: disk.serial = serial
-        if not device is None: disk.hdd_name = system_name + ' ' +device + ' ' + disk_dev
-        if not power_status is None: disk.power_status = power_status
-        #important to make it float as it is read as int from SMART table
-        if not temperature is None: disk.temperature = float(temperature)
-        if not sector_error_count is None: disk.sector_error_count = sector_error_count
-        if not smart_status is None: disk.smart_status = smart_status
-        if not start_stop_count is None: disk.start_stop_count = start_stop_count
-        if not load_cycle_count is None: disk.load_cycle_count  = load_cycle_count
-        disk.updated_on = datetime.datetime.now()
-        db.session.autoflush=False
-        if key_compare != disk.comparator_unique_graph_record():
-            if record_is_new:
-                db.session.add(disk)
-            else:
-                logging.info('SystemDisk {} change, old={} new={}'.format(disk.hdd_name, key_compare,
-                                                                      disk.comparator_unique_graph_record()))
-            disk.save_to_graph = True
-            disk.notify_transport_enabled = True
-            db.session.commit()
-        else:
-            logging.debug('Ignoring SystemDisk read {}, no change from {}'.format(
-                disk.comparator_unique_graph_record(), key_compare))
-            disk.save_to_graph = False
-            db.session.rollback()
-    except Exception, ex:
-        logging.warning('Error saving disk to DB, err {}'.format(ex))
-
 ERR_TEXT_NO_DEV = 'failed: No such device'
 
 def __read_all_hdd_smart():
@@ -69,10 +28,12 @@ def __read_all_hdd_smart():
     if import_module_psutil_exist:
         while current_disk_valid:
             try:
-                disk_dev=constant.DISK_DEV_MAIN + disk_letter
+                record = models.SystemDisk()
+                record.system_name = constant.HOST_NAME
+                assert isinstance(record, models.SystemDisk)
+                record.disk_dev=constant.DISK_DEV_MAIN + disk_letter
                 logging.debug('Processing disk {}'.format(disk_dev))
-                #disk_dev=get_device_name_linux_style(part.device)
-                power_status = __read_hddparm(disk_dev=disk_dev)
+                record.power_status = __read_hddparm(disk_dev=disk_dev)
                 try:
                     if constant.OS in constant.OS_LINUX:
                         smart_out = subprocess.check_output(['sudo', 'smartctl', '-a', disk_dev, '-n', 'sleep'],
@@ -84,15 +45,6 @@ def __read_all_hdd_smart():
                     smart_out = exc.output
                     if ERR_TEXT_NO_DEV in smart_out:
                         raise exc
-
-                temperature = None
-                sector_error_count = None
-                device = None
-                family = None
-                serial = None
-                smart_status = None
-                load_cycle_count = None
-                start_stop_count = None
                 output.reset()
                 output.write(smart_out)
                 output.seek(0)
@@ -105,37 +57,40 @@ def __read_all_hdd_smart():
                         logging.debug('First disk that cannot be read is {}'.format(disk_dev))
                     if constant.SMARTCTL_TEMP_ID in line:
                         words=line.split(None)
-                        temperature = words[9]
+                        record.temperature = words[9]
                         #print 'Temp is {}'.format(temp)
                     if constant.SMARTCTL_ERROR_SECTORS in line:
                         words=line.split(None)
-                        sector_error_count = words[9]
+                        record.sector_error_count = words[9]
                         #print 'Offline sectors with error is {}'.format(errcount)
                     if constant.SMARTCTL_START_STOP_COUNT in line:
                         words=line.split(None)
-                        start_stop_count = words[9]
+                        record.start_stop_count = words[9]
                     if constant.SMARTCTL_LOAD_CYCLE_COUNT in line:
                         words=line.split(None)
-                        load_cycle_count = words[9]
+                        record.load_cycle_count = words[9]
                     if constant.SMARTCTL_STATUS in line:
                         words = line.split(': ')
-                        smart_status = words[1].replace('\r','').replace('\n','').strip()
+                        record.smart_status = words[1].replace('\r','').replace('\n','').strip()
                         #print 'SMART Status is {}'.format(status)
                     if constant.SMARTCTL_MODEL_DEVICE in line:
                         words = line.split(': ')
-                        device = words[1].replace('\r','').replace('\n','').lstrip()
+                        record.device = words[1].replace('\r','').replace('\n','').lstrip()
                         #print 'Device is {}'.format(device)
                     if constant.SMARTCTL_MODEL_FAMILY in line:
                         words = line.split(': ')
-                        family = words[1].replace('\r','').replace('\n','').lstrip()
+                        record.family = words[1].replace('\r','').replace('\n','').lstrip()
                         #print 'Family is {}'.format(family)
                     if constant.SMARTCTL_SERIAL_NUMBER in line:
                         words = line.split(': ')
-                        serial = words[1].replace('\r','').replace('\n','').lstrip()
+                        record.serial = words[1].replace('\r','').replace('\n','').lstrip()
                         #print 'Serial is {}'.format(serial)
                 #print ('Disk dev is {}'.format(disk_dev))
-                __save_hdd_to_db(serial, power_status, temperature, sector_error_count, smart_status, device, family,
-                               disk_dev, start_stop_count, load_cycle_count)
+                record.updated_on = datetime.datetime.now()
+                current_record = models.SystemDisk.query.filter_by(hdd_disk_dev=record.disk_dev,
+                                                                   system_name=record.system_name).first()
+                record.save_changed_fields(current_record=current_record, new_record=record,
+                                                     notify_transport_enabled=True, save_to_graph=True)
                 disk_letter = chr(ord(disk_letter) + 1)
             except subprocess.CalledProcessError, ex:
                 logging.debug('Invalid disk {} err {}'.format(disk_dev, ex))
@@ -292,63 +247,34 @@ def __get_cpu_utilisation_linux():
 
 def read_system_attribs():
     global import_module_psutil_exist, progress_status
-    cpu_percent = None
-    memory_available_percent = None
-    uptime_days = None
-    if import_module_psutil_exist:
-        cpu_percent = psutil.cpu_percent(interval=1)
-        memory_available_percent = psutil.virtual_memory().percent
-        if constant.OS in constant.OS_LINUX:
-            uptime_days = int(__get_uptime_linux_days())
-        elif constant.OS in constant.OS_WINDOWS:
-            uptime_days = int(__get_uptime_win_days())
-        import_module_psutil_exist = True
-    else:
-        output = cStringIO.StringIO()
-        if constant.OS in constant.OS_WINDOWS:
-            #no backup impl in Windows
-            pass
-        else:
-            #this is normally running on OpenWRT
-            memory_available_percent = __get_mem_avail_percent_linux()
-            cpu_percent = __get_cpu_utilisation_linux()
-            uptime_days = int(__get_uptime_linux_days())
-            logging.info('Read mem free {} cpu {} uptime {}'.format(memory_available_percent, cpu_percent, uptime_days))
-    progress_status = 'Saving mem cpu uptime to db'
-    if not cpu_percent is None and not memory_available_percent is None:
-        __save_system_attribs_to_db(cpu_percent=cpu_percent, memory_available_percent=memory_available_percent,
-                                  uptime_days=uptime_days)
-
-def __save_system_attribs_to_db(cpu_percent='', memory_available_percent='', uptime_days=''):
     try:
-        system_name=constant.HOST_NAME
-        system = models.SystemMonitor.query.filter_by(name=system_name).first()
-        if system is None:
-            system = models.SystemMonitor()
-            system.name = system_name
-            record_is_new = True
+        record = models.SystemMonitor()
+        if import_module_psutil_exist:
+            record.cpu_percent = psutil.cpu_percent(interval=1)
+            record.memory_available_percent = psutil.virtual_memory().percent
+            if constant.OS in constant.OS_LINUX:
+                record.uptime_days = int(__get_uptime_linux_days())
+            elif constant.OS in constant.OS_WINDOWS:
+                record.uptime_days = int(__get_uptime_win_days())
+            import_module_psutil_exist = True
         else:
-            record_is_new = False
-
-        key_compare = system.comparator_unique_graph_record()
-        system.cpu_usage_percent = cpu_percent
-        system.memory_available_percent = memory_available_percent
-        system.uptime_days = uptime_days
-        system.updated_on = datetime.datetime.now()
-        db.session.autoflush=False
-        if key_compare != system.comparator_unique_graph_record():
-            if record_is_new:
-                db.session.add(system)
+            output = cStringIO.StringIO()
+            if constant.OS in constant.OS_WINDOWS:
+                #no backup impl in Windows
+                pass
             else:
-                logging.info('SystemMonitor {} change, old={} new={}'.format(system.name, key_compare,
-                                                                      system.comparator_unique_graph_record()))
-            system.save_to_graph = True
-            system.notify_transport_enabled = True
-            db.session.commit()
-        else:
-            logging.debug('Ignoring system read {}, no value change'.format(key_compare))
-            system.save_to_graph = False
-            db.session.rollback()
+                #this is normally running on OpenWRT
+                record.memory_available_percent = __get_mem_avail_percent_linux()
+                record.cpu_percent = __get_cpu_utilisation_linux()
+                record.uptime_days = int(__get_uptime_linux_days())
+                logging.info('Read mem free {} cpu {} uptime {}'.format(record.memory_available_percent,
+                                                                        record.cpu_percent, record.uptime_days))
+        progress_status = 'Saving mem cpu uptime to db'
+        record.name = constant.HOST_NAME
+        record.updated_on = datetime.datetime.now()
+        current_record = models.SystemMonitor.query.filter_by(name=record.name).first()
+        record.save_changed_fields(current_record=current_record, new_record=record,
+                                                     notify_transport_enabled=True, save_to_graph=True)
     except Exception, ex:
         logging.warning('Error saving system to DB, err {}'.format(ex))
 

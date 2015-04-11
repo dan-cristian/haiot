@@ -10,19 +10,6 @@ import graph_plotly
 import relay
 import node
 
-'''
-def handle_event_sensor(sender):
-    #print "Signal was sent by ", sender
-    sensor = models.Sensor.query.filter_by(address=sender.address).first()
-    if sensor==None:
-        sensor = models.Sensor(sender)
-        db.session.add(sensor)
-    else:
-        sensor.update(sender)
-    db.session.commit()
-'''
-
-
 def handle_local_event_db_post(model, row):
     #executed on local db changes done via web ui only
     print 'Signal was sent by model {} row {}'.format(model, row)

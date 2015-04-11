@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from flask_sqlalchemy import SQLAlchemy #workaround for resolve issue
-from sqlalchemy_utils import ChoiceType
+import logging
+from copy import deepcopy
 from main import db
 import graphs
 
@@ -11,6 +11,30 @@ class DbEvent:
     event_sent_datetime = None
     event_uuid = None
     operation_type=None
+    last_commit_field_changed_list = []
+
+    def get_deepcopy(self):
+        return deepcopy(self)
+
+    def save_changed_fields(self,current_record='',new_record='',notify_transport_enabled=False, save_to_graph=False):
+        current_record.last_commit_field_changed_list=[]
+        new_record.save_to_graph = save_to_graph
+        new_record.notify_transport_enabled = notify_transport_enabled
+
+        if current_record:
+            for column in new_record.query.statement._columns._all_col_set:
+                column_name = str(column)
+                new_value = getattr(new_record, column_name)
+                old_value = getattr(current_record, column_name)
+                if (not new_value is None) and old_value != new_value:
+                    logging.info('{} {}={} oldvalue={}'.format(type(self), column_name, new_value, old_value))
+                    setattr(current_record, column_name, new_value)
+                    current_record.last_commit_field_changed_list.append(column_name)
+        else:
+            db.session.add(new_record)
+        db.session.commit()
+        #else:
+        #    logging.warning('Incorrect parameters received on save changed fields to db')
 
 class Module(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -113,7 +137,7 @@ class Sensor(db.Model, graphs.SensorGraph, DbEvent):
     rssi = db.Column(db.Integer) #RFXCOM specific, rssi - distance
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
     #FIXME: now filled manually, try relations
-    zone_name = db.Column(db.String(50))
+    #zone_name = db.Column(db.String(50))
     sensor_name = db.Column(db.String(50))
 
     def __init__(self, address=''):
@@ -210,8 +234,7 @@ class SystemMonitor(db.Model, graphs.SystemMonitorGraph, DbEvent):
     def __repr__(self):
         return '{} {} {}'.format(self.id, self.name, self.updated_on)
 
-    def comparator_unique_graph_record(self):
-        return 'c{}m{}u{}'.format(self.cpu_usage_percent, self.memory_available_percent, self.uptime_days)
+
 
 class SystemDisk(db.Model, graphs.SystemDiskGraph, DbEvent):
     id = db.Column(db.Integer, primary_key=True)
