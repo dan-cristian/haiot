@@ -96,7 +96,7 @@ def download_trace_id_list(graph_unique_name='', shape_type=''):
     #extending graph with a reference trace to force getting remote url, which is unknown
     trace_list = []
     graph_url = None
-    trace_ref_append = get_reference_trace_for_append(graph_unique_name, shape_type=shape_type)
+    trace_ref_append = get_reference_trace_for_append(graph_unique_name=graph_unique_name, shape_type=shape_type)
     trace_ref_extend = graph_objs.Scatter(x=[datetime.datetime.now()],y=[0],name=graph_unique_name,mode='none',
                                           showlegend=False, line = graph_objs.Line(shape=shape_type))
     trace_empty = graph_objs.Scatter(x=[], y=[], line = graph_objs.Line(shape=shape_type))
@@ -215,7 +215,7 @@ def upload_data(obj):
                         if not graph_url_exists_in_memory(graph_unique_name):
                             #download series order list to ensure graph consistency, usually done at app start
                             #or when trace is created
-                            download_trace_id_list(graph_unique_name=graph_unique_name)
+                            download_trace_id_list(graph_unique_name=graph_unique_name, shape_type=shape)
                         if graph_unique_name in g_trace_id_list_per_graph:
                             trace_unique_id_pattern = g_trace_id_list_per_graph[graph_unique_name]
                         else:
