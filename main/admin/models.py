@@ -32,7 +32,8 @@ class DbEvent:
                 new_value = getattr(new_record, column_name)
                 old_value = getattr(current_record, column_name)
                 if (not new_value is None) and old_value != new_value:
-                    logging.info('{} {}={} oldvalue={}'.format(type(self), column_name, new_value, old_value))
+                    if column_name != 'updated_on':
+                        logging.info('{} {}={} oldvalue={}'.format(type(self), column_name, new_value, old_value))
                     setattr(current_record, column_name, new_value)
                     current_record.last_commit_field_changed_list.append(column_name)
             if len(current_record.last_commit_field_changed_list) == 0:
