@@ -19,8 +19,11 @@ class DbEvent:
     def save_changed_fields(self,current_record='',new_record='',notify_transport_enabled=False, save_to_graph=False):
         if current_record:
             current_record.last_commit_field_changed_list=[]
-        new_record.save_to_graph = save_to_graph
-        new_record.notify_transport_enabled = notify_transport_enabled
+            current_record.save_to_graph = save_to_graph
+            current_record.notify_transport_enabled = notify_transport_enabled
+        else:
+            new_record.save_to_graph = save_to_graph
+            new_record.notify_transport_enabled = notify_transport_enabled
 
         if current_record:
             for column in new_record.query.statement._columns._all_col_set:
