@@ -16,7 +16,8 @@ class DbEvent:
     def get_deepcopy(self):
         return deepcopy(self)
 
-    def save_changed_fields(self,current_record='',new_record='',notify_transport_enabled=False, save_to_graph=False):
+    def save_changed_fields(self,current_record='',new_record='',notify_transport_enabled=False, save_to_graph=False,
+                            ignore_only_update_on_change=True):
         if current_record:
             current_record.last_commit_field_changed_list=[]
             current_record.save_to_graph = save_to_graph
@@ -34,11 +35,17 @@ class DbEvent:
                     logging.info('{} {}={} oldvalue={}'.format(type(self), column_name, new_value, old_value))
                     setattr(current_record, column_name, new_value)
                     current_record.last_commit_field_changed_list.append(column_name)
+            if len(current_record.last_commit_field_changed_list) == 0:
+                current_record.notify_transport_enabled = False
+            elif len(current_record.last_commit_field_changed_list==1) and ignore_only_update_on_change and \
+                            'update_on' in current_record.last_commit_field_changed_list:
+                current_record.notify_transport_enabled = False
         else:
             for column in new_record.query.statement._columns._all_col_set:
                 column_name = str(column)
                 new_value = getattr(new_record, column_name)
-                new_record.last_commit_field_changed_list.append(column_name)
+                if new_value:
+                    new_record.last_commit_field_changed_list.append(column_name)
             db.session.add(new_record)
 
         db.session.commit()

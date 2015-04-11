@@ -183,7 +183,13 @@ def upload_data(obj):
             axis_x_field = obj[constant.JSON_PUBLISH_GRAPH_X]
             graph_id_field = obj[constant.JSON_PUBLISH_GRAPH_ID]
             graph_legend_field = obj[constant.JSON_PUBLISH_GRAPH_LEGEND]
-            list_axis_y = obj[constant.JSON_PUBLISH_GRAPH_Y]
+            graph_y_fields = obj[constant.JSON_PUBLISH_GRAPH_Y]
+            changed_fields = obj[constant.JSON_PUBLISH_FIELDS_CHANGED]
+            #intersect lists and get only graphable fields that had values changed
+            list_axis_y = list(set(graph_y_fields) & set(changed_fields))
+            if len(list_axis_y)==0:
+                logging.info('Ignoring graph upload graph={} changed={} obj={}'.format(graph_y_fields,
+                                                                                       changed_fields, obj))
             logging.debug('Trying to upload y axis {}'.format(list_axis_y))
             if axis_x_field in obj and graph_id_field in obj:
                 table = obj[constant.JSON_PUBLISH_TABLE]
