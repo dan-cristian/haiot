@@ -25,7 +25,6 @@ def __read_all_hdd_smart():
     output = cStringIO.StringIO()
     current_disk_valid = True
     disk_letter = 'a'
-    disk_dev = ''
     global ERR_TEXT_NO_DEV
     if import_module_psutil_exist:
         while current_disk_valid:
@@ -33,15 +32,18 @@ def __read_all_hdd_smart():
                 record = models.SystemDisk()
                 record.system_name = constant.HOST_NAME
                 assert isinstance(record, models.SystemDisk)
-                record.disk_dev = constant.DISK_DEV_MAIN + disk_letter
-                logging.debug('Processing disk {}'.format(disk_dev))
-                record.power_status = __read_hddparm(disk_dev=disk_dev)
+                record.hdd_disk_dev = constant.DISK_DEV_MAIN + disk_letter
+                logging.debug('Processing disk {}'.format(record.hdd_disk_dev))
+                try:
+                    record.power_status = __read_hddparm(disk_dev=record.hdd_disk_dev)
+                except Exception, ex:
+                    record.power_status = None
                 try:
                     if constant.OS in constant.OS_LINUX:
-                        smart_out = subprocess.check_output(['sudo', 'smartctl', '-a', disk_dev, '-n', 'sleep'],
-                                                            stderr=subprocess.STDOUT)
+                        smart_out = subprocess.check_output(['sudo', 'smartctl', '-a', record.hdd_disk_dev,
+                                                             '-n', 'sleep'], stderr=subprocess.STDOUT)
                     else:
-                        smart_out = subprocess.check_output(['smartctl', '-a', disk_dev, '-n', 'sleep'],
+                        smart_out = subprocess.check_output(['smartctl', '-a', record.hdd_disk_dev, '-n', 'sleep'],
                                                             stderr=subprocess.STDOUT)
                 except subprocess.CalledProcessError, exc:
                     smart_out = exc.output
@@ -56,7 +58,7 @@ def __read_all_hdd_smart():
                     line = output.readline()
                     if constant.SMARTCTL_ERROR_NO_DISK in line:
                         current_disk_valid = False
-                        logging.debug('First disk that cannot be read is {}'.format(disk_dev))
+                        logging.debug('First disk that cannot be read is {}'.format(record.hdd_disk_dev))
                     if constant.SMARTCTL_TEMP_ID in line:
                         words = line.split(None)
                         record.temperature = words[9]
@@ -89,16 +91,16 @@ def __read_all_hdd_smart():
                         # print 'Serial is {}'.format(serial)
                 # print ('Disk dev is {}'.format(disk_dev))
                 record.updated_on = datetime.datetime.now()
-                current_record = models.SystemDisk.query.filter_by(hdd_disk_dev=record.disk_dev,
+                current_record = models.SystemDisk.query.filter_by(hdd_disk_dev=record.hdd_disk_dev,
                                                                    system_name=record.system_name).first()
                 record.save_changed_fields(current_record=current_record, new_record=record,
                                            notify_transport_enabled=True, save_to_graph=True)
                 disk_letter = chr(ord(disk_letter) + 1)
             except subprocess.CalledProcessError, ex:
-                logging.debug('Invalid disk {} err {}'.format(disk_dev, ex))
+                logging.debug('Invalid disk {} err {}'.format(record.hdd_disk_dev, ex))
                 current_disk_valid = False
             except Exception as exc:
-                logging.warning('Disk read error {} dev {}'.format(exc, disk_dev))
+                logging.warning('Disk read error {} dev {}'.format(exc, record.hdd_disk_dev))
                 current_disk_valid = False
     else:
         logging.debug('Unable to read smart status')

@@ -262,6 +262,9 @@ class SystemDisk(db.Model, graphs.SystemDiskGraph, DbEvent):
     start_stop_count = db.Column(db.Integer)
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    def __init__(self):
+        self.hdd_disk_dev = ''
+
     def __repr__(self):
         return '{} {} {} {} {}'.format(self.id, self.serial,  self.system_name, self.hdd_name, self.hdd_disk_dev)
 
