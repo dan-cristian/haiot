@@ -91,6 +91,7 @@ def __read_all_hdd_smart():
                         # print 'Serial is {}'.format(serial)
                 # print ('Disk dev is {}'.format(disk_dev))
                 record.updated_on = datetime.datetime.now()
+                record.hdd_name = '{} {} {}'.format(record.system_name, record.device, record.hdd_disk_dev)
                 current_record = models.SystemDisk.query.filter_by(hdd_disk_dev=record.hdd_disk_dev,
                                                                    system_name=record.system_name).first()
                 record.save_changed_fields(current_record=current_record, new_record=record,
