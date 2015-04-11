@@ -17,7 +17,8 @@ class DbEvent:
         return deepcopy(self)
 
     def save_changed_fields(self,current_record='',new_record='',notify_transport_enabled=False, save_to_graph=False):
-        current_record.last_commit_field_changed_list=[]
+        if current_record:
+            current_record.last_commit_field_changed_list=[]
         new_record.save_to_graph = save_to_graph
         new_record.notify_transport_enabled = notify_transport_enabled
 
@@ -31,7 +32,12 @@ class DbEvent:
                     setattr(current_record, column_name, new_value)
                     current_record.last_commit_field_changed_list.append(column_name)
         else:
+            for column in new_record.query.statement._columns._all_col_set:
+                column_name = str(column)
+                new_value = getattr(new_record, column_name)
+                new_record.last_commit_field_changed_list.append(column_name)
             db.session.add(new_record)
+
         db.session.commit()
         #else:
         #    logging.warning('Incorrect parameters received on save changed fields to db')

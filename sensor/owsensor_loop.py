@@ -54,7 +54,6 @@ def save_to_db(dev):
         address=dev['address']
         record = models.Sensor(address=address)
         assert isinstance(record, models.Sensor)
-
         zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=address).first()
         if zone_sensor:
             record.sensor_name = zone_sensor.sensor_name
