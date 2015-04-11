@@ -253,6 +253,7 @@ class SystemDisk(db.Model, graphs.SystemDiskGraph, DbEvent):
     serial = db.Column(db.String(50), unique=True)
     system_name = db.Column(db.String(50))
     hdd_name = db.Column(db.String(50))
+    hdd_device = db.Column(db.String(50))
     hdd_disk_dev = db.Column(db.String(50))
     temperature = db.Column(db.Float)
     sector_error_count = db.Column(db.Integer)
