@@ -42,6 +42,7 @@ def __read_all_hdd_smart():
                     if constant.OS in constant.OS_LINUX:
                         smart_out = subprocess.check_output(['sudo', 'smartctl', '-a', record.hdd_disk_dev,
                                                              '-n', 'sleep'], stderr=subprocess.STDOUT)
+                        print 'out=[{}]'.format(smart_out)
                     else:
                         smart_out = subprocess.check_output(['smartctl', '-a', record.hdd_disk_dev, '-n', 'sleep'],
                                                             stderr=subprocess.STDOUT)
