@@ -42,12 +42,12 @@ def __read_all_hdd_smart():
                     if constant.OS in constant.OS_LINUX:
                         smart_out = subprocess.check_output(['sudo', 'smartctl', '-a', record.hdd_disk_dev,
                                                              '-n', 'sleep'], stderr=subprocess.STDOUT)
-                        print 'out=[{}]'.format(smart_out)
+                        logging.info('sm out=[{}]'.format(smart_out))
                     else:
                         smart_out = subprocess.check_output(['smartctl', '-a', record.hdd_disk_dev, '-n', 'sleep'],
                                                             stderr=subprocess.STDOUT)
                 except subprocess.CalledProcessError, exc:
-                    print 'err=[{}]'.format(exc.output)
+                    logging.info('sm err=[{}]'.format(exc.output))
                     smart_out = exc.output
                     if ERR_TEXT_NO_DEV in smart_out:
                         raise exc
@@ -125,10 +125,12 @@ def __read_hddparm(disk_dev=''):
             try:
                 if constant.OS in constant.OS_LINUX:
                     hddparm_out = subprocess.check_output(['sudo', 'hdparm', '-C', disk_dev], stderr=subprocess.STDOUT)
+                    logging.info('hd out=[{}]'.format(hddparm_out))
                 else:
                     hddparm_out = subprocess.check_output(['hdparm', '-C', disk_dev], stderr=subprocess.STDOUT)
             except subprocess.CalledProcessError, ex1:
                 hddparm_out = ex1.output
+                logging.info('hderr out=[{}]'.format(hddparm_out))
                 if ERR_TEXT_NO_DEV in hddparm_out:
                     raise ex1
             output.reset()
