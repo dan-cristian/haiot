@@ -32,8 +32,8 @@ def register_gpios():
 def event_detected(channel):
     try:
         zonealarm=models.ZoneAlarm.query.filter_by(gpio_pin_code=channel).first()
-        global import_module_psutil_exist
-        if import_module_psutil_exist:
+        global import_module_exist
+        if import_module_exist:
             state = GPIO.input(zonealarm.gpio_pin_code)
         else:
             state = random.randint(0,2)
