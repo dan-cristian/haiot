@@ -19,6 +19,8 @@ except Exception, ex:
     import_module_psutil_exist = False
 
 ERR_TEXT_NO_DEV = 'failed: No such device'
+ERR_TEXT_NO_DEV_2 = 'HDIO_GET_32BIT failed: Invalid argument'
+ERR_TEXT_NO_DEV_3 = 'Unknown USB bridge'
 
 #http://unix.stackexchange.com/questions/18830/how-to-run-a-specific-program-as-root-without-a-password-prompt
 # Cmnd alias specification
@@ -60,7 +62,7 @@ def __read_all_hdd_smart():
                                                             stderr=subprocess.STDOUT)
                 except subprocess.CalledProcessError, exc:
                     smart_out = exc.output
-                    if ERR_TEXT_NO_DEV in smart_out:
+                    if ERR_TEXT_NO_DEV in smart_out or ERR_TEXT_NO_DEV_3 in smart_out:
                         raise exc
                 output.reset()
                 output.write(smart_out)
@@ -144,7 +146,7 @@ def __read_hddparm(disk_dev=''):
                     hddparm_out = subprocess.check_output(['hdparm', '-C', disk_dev], stderr=subprocess.STDOUT)
             except subprocess.CalledProcessError, ex1:
                 hddparm_out = ex1.output
-                if ERR_TEXT_NO_DEV in hddparm_out:
+                if ERR_TEXT_NO_DEV in hddparm_out or ERR_TEXT_NO_DEV_2 in hddparm_out:
                     raise ex1
             output.reset()
             output.write(hddparm_out)
