@@ -33,7 +33,7 @@ def __read_all_hdd_smart():
                 record.system_name = constant.HOST_NAME
                 assert isinstance(record, models.SystemDisk)
                 record.hdd_disk_dev = constant.DISK_DEV_MAIN + disk_letter
-                logging.debug('Processing disk {}'.format(record.hdd_disk_dev))
+                logging.info('Processing disk {}'.format(record.hdd_disk_dev))
                 try:
                     record.power_status = __read_hddparm(disk_dev=record.hdd_disk_dev)
                 except Exception, ex:
@@ -263,7 +263,7 @@ def __get_cpu_utilisation_linux():
     return CPU_Percentage
 
 
-def read_system_attribs():
+def __read_system_attribs():
     global import_module_psutil_exist, progress_status
     try:
         record = models.SystemMonitor()
@@ -314,5 +314,5 @@ def thread_run():
     progress_status = 'reading hdd smart attribs'
     __read_all_hdd_smart()
     progress_status = 'reading system attribs'
-    read_system_attribs()
+    __read_system_attribs()
     progress_status = 'completed'

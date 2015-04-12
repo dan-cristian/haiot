@@ -18,38 +18,42 @@ class DbEvent:
 
     def save_changed_fields(self,current_record='',new_record='',notify_transport_enabled=False, save_to_graph=False,
                             ignore_only_updated_on_change=True):
-        if current_record:
-            current_record.last_commit_field_changed_list=[]
-            current_record.save_to_graph = save_to_graph
-            current_record.notify_transport_enabled = notify_transport_enabled
-        else:
-            new_record.save_to_graph = save_to_graph
-            new_record.notify_transport_enabled = notify_transport_enabled
+        try:
+            if current_record:
+                current_record.last_commit_field_changed_list=[]
+                current_record.save_to_graph = save_to_graph
+                current_record.notify_transport_enabled = notify_transport_enabled
+            else:
+                new_record.save_to_graph = save_to_graph
+                new_record.notify_transport_enabled = notify_transport_enabled
 
-        if current_record:
-            for column in new_record.query.statement._columns._all_col_set:
-                column_name = str(column)
-                new_value = getattr(new_record, column_name)
-                old_value = getattr(current_record, column_name)
-                if (not new_value is None) and (str(old_value) != str(new_value)):
-                    if column_name != 'updated_on':
-                        logging.info('{} {}={} oldvalue={}'.format(type(self), column_name, new_value, old_value))
-                    setattr(current_record, column_name, new_value)
-                    current_record.last_commit_field_changed_list.append(column_name)
-            if len(current_record.last_commit_field_changed_list) == 0:
-                current_record.notify_transport_enabled = False
-            elif len(current_record.last_commit_field_changed_list) == 1 and ignore_only_updated_on_change and \
-                            'updated_on' in current_record.last_commit_field_changed_list:
-                current_record.notify_transport_enabled = False
-        else:
-            for column in new_record.query.statement._columns._all_col_set:
-                column_name = str(column)
-                new_value = getattr(new_record, column_name)
-                if new_value:
-                    new_record.last_commit_field_changed_list.append(column_name)
-            db.session.add(new_record)
+            if current_record:
+                for column in new_record.query.statement._columns._all_col_set:
+                    column_name = str(column)
+                    new_value = getattr(new_record, column_name)
+                    old_value = getattr(current_record, column_name)
+                    if (not new_value is None) and (str(old_value) != str(new_value)):
+                        if column_name != 'updated_on':
+                            logging.info('{} {}={} oldvalue={}'.format(type(self), column_name, new_value, old_value))
+                        setattr(current_record, column_name, new_value)
+                        current_record.last_commit_field_changed_list.append(column_name)
+                if len(current_record.last_commit_field_changed_list) == 0:
+                    current_record.notify_transport_enabled = False
+                elif len(current_record.last_commit_field_changed_list) == 1 and ignore_only_updated_on_change and \
+                                'updated_on' in current_record.last_commit_field_changed_list:
+                    current_record.notify_transport_enabled = False
+            else:
+                for column in new_record.query.statement._columns._all_col_set:
+                    column_name = str(column)
+                    new_value = getattr(new_record, column_name)
+                    if new_value:
+                        new_record.last_commit_field_changed_list.append(column_name)
+                db.session.add(new_record)
 
-        db.session.commit()
+            db.session.commit()
+        except Exception, ex:
+            logging.critical('Error when saving db changes {}, err={}'.format(new_record, ex))
+            raise ex
         #else:
         #    logging.warning('Incorrect parameters received on save changed fields to db')
 
