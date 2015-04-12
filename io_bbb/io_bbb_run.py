@@ -6,7 +6,10 @@ import random
 import sys
 import time
 from main import db
+from common import constant
 from main.admin import models
+from pydispatch import dispatcher
+
 #https://learn.adafruit.com/setting-up-io-python-library-on-beaglebone-black/using-the-bbio-library
 try:
     import Adafruit_BBIO.GPIO as GPIO
@@ -31,21 +34,17 @@ def register_gpios():
 
 def event_detected(channel):
     try:
-        zonealarm=models.ZoneAlarm.query.filter_by(gpio_pin_code=channel).first()
         global import_module_exist
         if import_module_exist:
-            state = GPIO.input(zonealarm.gpio_pin_code)
+            state = GPIO.input(channel)
         else:
+            #FOR TESTING PURPOSES
             state = random.randint(0,2)
-        zonealarm.alarm_status = state
-        zonealarm.updated_on = datetime.datetime.now()
-        zonealarm.notify_enabled_ = True
-        time.sleep(1)
-        db.session.commit()
-        logging.info('Event detected zone {} channel {} status {}'.format(zonealarm.zone_id, channel, state))
+        logging.info('IO input detected channel {} status {}'.format(channel, state))
+        dispatcher.send(constant.SIGNAL_GPIO, gpio_pin_code=channel, direction='in', pin_value=state)
     except Exception, ex:
         zonealarm = None
-        logging.warning('Error alarm status save, err {}'.format(ex))
+        logging.warning('Error io event detected, err {}'.format(ex))
 
 
 def check_for_events():

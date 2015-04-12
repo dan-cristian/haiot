@@ -4,6 +4,7 @@ SIGNAL_SENSOR = 'signal-from-sensor'
 SIGNAL_SENSOR_DB_POST = 'signal-from-db-post'
 SIGNAL_MQTT_RECEIVED = 'signal-from-mqtt-data-received'
 SIGNAL_HEAT = 'signal-from-heat'
+SIGNAL_GPIO = 'signal-from-GPIO'
 
 
 ERROR_CONNECT_MAX_RETRY_COUNT = 5
