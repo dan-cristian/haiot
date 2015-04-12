@@ -46,7 +46,7 @@ def __read_all_hdd_smart():
                 record.system_name = constant.HOST_NAME
                 assert isinstance(record, models.SystemDisk)
                 record.hdd_disk_dev = constant.DISK_DEV_MAIN + disk_letter
-                logging.info('Processing disk {}'.format(record.hdd_disk_dev))
+                logging.debug('Processing disk {}'.format(record.hdd_disk_dev))
                 try:
                     record.power_status = __read_hddparm(disk_dev=record.hdd_disk_dev)
                 except Exception, ex:
