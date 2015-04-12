@@ -10,14 +10,14 @@ import relay
 
 initialised=False
 
-def heat_update(obj={}):
+def heat_update(obj_dict={}):
     try:
-        source_host_name = utils.get_object_field_value(obj, 'name')
+        source_host_name = utils.get_object_field_value(obj_dict, 'name')
         logging.debug('Received heat relay state update from {}'.format(source_host_name))
-        zone_id = utils.get_object_field_value(obj, 'zone_id')
+        zone_id = utils.get_object_field_value(obj_dict, 'zone_id')
         zone_heat_relay = models.ZoneHeatRelay.query.filter_by(zone_id=zone_id).first()
         if zone_heat_relay and zone_heat_relay.gpio_host_name == constant.HOST_NAME:
-            cmd_heat_is_on = utils.get_object_field_value(obj, 'heat_is_on')
+            cmd_heat_is_on = utils.get_object_field_value(obj_dict, 'heat_is_on')
             if cmd_heat_is_on != zone_heat_relay.heat_is_on:
                 logging.info('Local heat state zone_id {} must be changed to {}'.format(zone_id, cmd_heat_is_on))
                 pin_state = relay.relay_update(zone_heat_relay.gpio_pin_code, cmd_heat_is_on)
