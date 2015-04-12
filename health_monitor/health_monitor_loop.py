@@ -116,7 +116,7 @@ def __read_all_hdd_smart():
                 current_disk_valid = False
             except Exception as exc:
                 if disk_count > 10:
-                    logging.warning('Iterated through too many disks {}, maybe wrong sudo rights for smartctl'.format(
+                    logging.warning('Too many disks iterated {}, missing or wrong sudo rights for smartctl'.format(
                         disk_count))
                 logging.warning('Disk read error {} dev {}'.format(exc, record.hdd_disk_dev))
                 current_disk_valid = False
