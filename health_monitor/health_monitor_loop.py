@@ -47,6 +47,7 @@ def __read_all_hdd_smart():
                         smart_out = subprocess.check_output(['smartctl', '-a', record.hdd_disk_dev, '-n', 'sleep'],
                                                             stderr=subprocess.STDOUT)
                 except subprocess.CalledProcessError, exc:
+                    print 'err out=[{}] err=[{}]'.format(smart_out, exc.output)
                     smart_out = exc.output
                     if ERR_TEXT_NO_DEV in smart_out:
                         raise exc
