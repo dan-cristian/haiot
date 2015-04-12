@@ -20,11 +20,24 @@ except Exception, ex:
 
 ERR_TEXT_NO_DEV = 'failed: No such device'
 
+#http://unix.stackexchange.com/questions/18830/how-to-run-a-specific-program-as-root-without-a-password-prompt
+# Cmnd alias specification
+#Cmnd_Alias      SMARTCTL = /usr/sbin/smartctl
+#Cmnd_Alias      HDPARM = /sbin/hdparm
+# User privilege specification
+#root    ALL=(ALL:ALL) ALL
+# Allow members of group sudo to execute any command
+#%sudo   ALL=(ALL:ALL) ALL
+#%users  ALL=(ALL) NOPASSWD: SMARTCTL
+#%users  ALL=(ALL) NOPASSWD: HDPARM
+#%dialout  ALL=(ALL) NOPASSWD: SMARTCTL
+#%dialout  ALL=(ALL) NOPASSWD: HDPARM
 
 def __read_all_hdd_smart():
     output = cStringIO.StringIO()
     current_disk_valid = True
     disk_letter = 'a'
+    disk_count = 1
     global ERR_TEXT_NO_DEV
     if import_module_psutil_exist:
         while current_disk_valid:
@@ -42,12 +55,10 @@ def __read_all_hdd_smart():
                     if constant.OS in constant.OS_LINUX:
                         smart_out = subprocess.check_output(['sudo', 'smartctl', '-a', record.hdd_disk_dev,
                                                              '-n', 'sleep'], stderr=subprocess.STDOUT)
-                        logging.info('sm out=[{}]'.format(smart_out))
                     else:
                         smart_out = subprocess.check_output(['smartctl', '-a', record.hdd_disk_dev, '-n', 'sleep'],
                                                             stderr=subprocess.STDOUT)
                 except subprocess.CalledProcessError, exc:
-                    logging.info('sm err=[{}]'.format(exc.output))
                     smart_out = exc.output
                     if ERR_TEXT_NO_DEV in smart_out:
                         raise exc
@@ -99,10 +110,14 @@ def __read_all_hdd_smart():
                 record.save_changed_fields(current_record=current_record, new_record=record,
                                            notify_transport_enabled=True, save_to_graph=True)
                 disk_letter = chr(ord(disk_letter) + 1)
+                disk_count = disk_count + 1
             except subprocess.CalledProcessError, ex:
                 logging.debug('Invalid disk {} err {}'.format(record.hdd_disk_dev, ex))
                 current_disk_valid = False
             except Exception as exc:
+                if disk_count > 10:
+                    logging.warning('Iterated through too many disks {}, maybe wrong sudo rights for smartctl'.format(
+                        disk_count))
                 logging.warning('Disk read error {} dev {}'.format(exc, record.hdd_disk_dev))
                 current_disk_valid = False
     else:
@@ -125,12 +140,10 @@ def __read_hddparm(disk_dev=''):
             try:
                 if constant.OS in constant.OS_LINUX:
                     hddparm_out = subprocess.check_output(['sudo', 'hdparm', '-C', disk_dev], stderr=subprocess.STDOUT)
-                    logging.info('hd out=[{}]'.format(hddparm_out))
                 else:
                     hddparm_out = subprocess.check_output(['hdparm', '-C', disk_dev], stderr=subprocess.STDOUT)
             except subprocess.CalledProcessError, ex1:
                 hddparm_out = ex1.output
-                logging.info('hderr out=[{}]'.format(hddparm_out))
                 if ERR_TEXT_NO_DEV in hddparm_out:
                     raise ex1
             output.reset()
