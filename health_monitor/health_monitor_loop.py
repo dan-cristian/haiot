@@ -305,7 +305,7 @@ def __read_system_attribs():
                 record.cpu_usage_percent = __get_cpu_utilisation_linux()
                 record.uptime_days = int(__get_uptime_linux_days())
                 logging.info('Read mem free {} cpu {} uptime {}'.format(record.memory_available_percent,
-                                                                        record.cpu_percent, record.uptime_days))
+                                                                        record.cpu_usage_percent, record.uptime_days))
         progress_status = 'Saving mem cpu uptime to db'
         record.name = constant.HOST_NAME
         record.updated_on = datetime.datetime.now()
