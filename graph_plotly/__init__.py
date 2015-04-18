@@ -83,13 +83,14 @@ def get_reference_trace_for_append(graph_unique_name='', shape_type=''):
                               mode='none', showlegend=False, line = graph_objs.Line(shape=shape_type))
 
 def download_trace_id_list(graph_unique_name='', shape_type=''):
+    logging.info('Downloading existing online traces in memory, graph {}'.format(graph_unique_name))
+    start_date = datetime.datetime.now()
     try:
         result=py.file_ops.mkdirs(get_folder_name())
         logging.info('Created archiving folder {} result {}'.format(get_folder_name(), result))
     except Exception, ex:
         logging.warning('Unable to create archive folder {} err {}'.format(get_folder_name(), ex))
 
-    logging.info('Downloading existing online traces in memory, graph {}'.format(graph_unique_name))
     global g_reference_trace_id
     #reseting known series and graphs to download again clean
     clean_graph_memory(graph_unique_name)
@@ -138,6 +139,8 @@ def download_trace_id_list(graph_unique_name='', shape_type=''):
             logging.warning('Unable to get figure {} err={}'.format(graph_url, ex))
     else:
         logging.critical('Unable to get or setup remote graph {}'.format(graph_unique_name))
+    elapsed = (datetime.datetime.now()-start_date).seconds
+    logging.info('Download {} completed, seconds elapsed={}'.format(graph_unique_name, elapsed))
 
 def get_folder_name():
     year = datetime.datetime.now().year

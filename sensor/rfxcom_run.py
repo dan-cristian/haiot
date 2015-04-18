@@ -10,7 +10,7 @@ from common import constant, utils
 
 initialised = False
 transport = None
-last_packet_received=datetime.datetime.now()
+last_packet_received
 
 def __rfx_reading(packet):
     if packet:
@@ -65,8 +65,9 @@ def unload():
     pass
 
 def init():
-    global transport, initialised
+    global transport, initialised, last_packet_received
     initialised = False
+    last_packet_received = datetime.datetime.now()
     try:
         if constant.OS in constant.OS_LINUX:
             portpath = get_portpath_linux()
