@@ -99,7 +99,8 @@ def populate_tables(model_auto_update=False):
             ['7', constant.P_MQTT_HOST_2, '127.0.0.1'],
             ['8', constant.P_MQTT_PORT_2, '1883'],
             ['9', constant.P_PLOTLY_USERNAME, 'xxx'],
-            ['10', constant.P_PLOTLY_APIKEY, 'zzz']
+            ['10', constant.P_PLOTLY_APIKEY, 'zzz'],
+            ['11', constant.P_DDNS_RACKSPACE_CONFIG_FILE, '/home/dcristian/.rackspace.ddnsupdate.config.json']
         ]
     check_table_schema(models.Parameter, model_auto_update)
     if len(models.Parameter.query.all()) < len(param_list):
@@ -206,32 +207,37 @@ def populate_tables(model_auto_update=False):
         #db.session.add(sens)
         #commit(db.session)
 
-    import alarm, heat, sensor, relay, mqtt_io, health_monitor, graph_plotly, node, io_bbb, webui, main
+    import alarm, heat, sensor, relay, mqtt_io, health_monitor, graph_plotly, node, io_bbb, webui, main, ddns
     module_list_dict = {'default':[
         [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
         [4, get_mod_name(mqtt_io), True, 3],[5, get_mod_name(sensor), False, 4],[6, get_mod_name(relay), False, 5],
         [7, get_mod_name(heat), False, 6],[8, get_mod_name(alarm), False, 7],[9, get_mod_name(graph_plotly), False, 8],
-        [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), False, 10]],
+        [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), False, 10],[12, get_mod_name(ddns), False, 11]],
         'netbook':[
         [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
         [4, get_mod_name(mqtt_io), True, 3],[5, get_mod_name(sensor), True, 4],[6, get_mod_name(relay), True, 5],
         [7, get_mod_name(heat), True, 6],[8, get_mod_name(alarm), False, 7],[9, get_mod_name(graph_plotly), False, 8],
-        [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), True, 10]],
+        [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), True, 10],[12, get_mod_name(ddns), True, 11]],
         'nas':[
         [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
         [4, get_mod_name(mqtt_io), True, 3],[5, get_mod_name(sensor), True, 4],[6, get_mod_name(relay), False, 5],
         [7, get_mod_name(heat), False, 6],[8, get_mod_name(alarm), False, 7],[9, get_mod_name(graph_plotly), True, 8],
-        [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), True, 10]],
+        [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), True, 10],[12, get_mod_name(ddns), False, 11]],
         'pi-power':[
         [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
         [4, get_mod_name(mqtt_io), True, 3],[5, get_mod_name(sensor), True, 4],[6, get_mod_name(relay), True, 5],
         [7, get_mod_name(heat), True, 6],[8, get_mod_name(alarm), False, 7],[9, get_mod_name(graph_plotly), False, 8],
-        [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), False, 10]],
+        [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), False, 10],[12, get_mod_name(ddns), False, 11]],
         'beaglebone':[
         [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
         [4, get_mod_name(mqtt_io), True, 3],[5, get_mod_name(sensor), True, 4],[6, get_mod_name(relay), True, 5],
         [7, get_mod_name(heat), True, 6],[8, get_mod_name(alarm), False, 7],[9, get_mod_name(graph_plotly), False, 8],
-        [10, get_mod_name(io_bbb), True, 9],[11, get_mod_name(webui), False, 10]]
+        [10, get_mod_name(io_bbb), True, 9],[11, get_mod_name(webui), False, 10],[12, get_mod_name(ddns), False, 11]],
+        'router':[
+        [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
+        [4, get_mod_name(mqtt_io), True, 3],[5, get_mod_name(sensor), False, 4],[6, get_mod_name(relay), False, 5],
+        [7, get_mod_name(heat), False, 6],[8, get_mod_name(alarm), False, 7],[9, get_mod_name(graph_plotly), False, 8],
+        [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), False, 10],[12, get_mod_name(ddns), True, 11]]
         }
 
     check_table_schema(models.Module, model_auto_update)
