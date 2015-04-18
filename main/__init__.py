@@ -91,9 +91,13 @@ def unload():
 
 def init():
     signal.signal(signal.SIGTERM, signal_handler)
-    global LOGGING_LEVEL
-    logging.basicConfig(format='%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(threadName)s:%(message)s',
+    global LOGGING_LEVEL, LOG_FILE
+    if LOG_FILE is None:
+        logging.basicConfig(format='%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(threadName)s:%(message)s',
                         level=LOGGING_LEVEL)
+    else:
+        logging.basicConfig(format='%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(threadName)s:%(message)s',
+                        level=LOGGING_LEVEL, filename=LOG_FILE)
     logging.info('Logging level is {}'.format(LOGGING_LEVEL))
     #annoying info messages
     logging.getLogger("requests").setLevel(logging.WARNING)
