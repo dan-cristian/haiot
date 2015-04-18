@@ -60,7 +60,7 @@ def init_modules():
             init_module(mod.name, mod.active)
 
 def signal_handler(signal, frame):
-    logging.warning('You pressed Ctrl+C!')
+    logging.warning('I got signal {} frame {}, exiting'.format(signal, frame))
     global exit_code
     exit_code = 1
     unload()
@@ -90,7 +90,7 @@ def unload():
         mqtt_io.unload()
 
 def init():
-    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
     global LOGGING_LEVEL
     logging.basicConfig(format='%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(threadName)s:%(message)s',
                         level=LOGGING_LEVEL)
