@@ -321,7 +321,7 @@ def __check_log_file_size():
     if not main.LOG_FILE is None:
         try:
             size = os.path.getsize(main.LOG_FILE)
-            if size > 1024: #* 1024 * 10:
+            if size > 1024 * 1024 * 10:
                 logging.info('Log file {} size is {}, truncating'.format(main.LOG_FILE, size))
                 shutil.copy(main.LOG_FILE, main.LOG_FILE+'.last')
                 file = open(main.LOG_FILE, mode='rw+')
