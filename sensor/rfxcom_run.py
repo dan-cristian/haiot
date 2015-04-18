@@ -87,7 +87,7 @@ def thread_run():
     global transport, initialised, last_packet_received
     try:
         logging.debug('Waiting for RFX event')
-        time_elapsed_minutes = (datetime.datetime.now()-last_packet_received).microseconds / 60
+        time_elapsed_minutes = (datetime.datetime.now()-last_packet_received).seconds / 60
         if time_elapsed_minutes > 10:
             logging.warning('RFX event not received since {} minutes, device error?'.format(time_elapsed_minutes))
         if initialised:
