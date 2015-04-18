@@ -30,4 +30,7 @@ del startserver.bat
 mklink /H startserver.bat  %T%\startserver.bat
 del .gitignore
 mklink /H .gitignore %T%\.gitignore
+del requirements.txt
+mklink /H requirements.txt %T%\requirements.txt
+
 rem mklink /J   %T%\
