@@ -1,14 +1,16 @@
 __author__ = 'dcristian'
 import subprocess
+import os
 import cStringIO
 import logging
+import shutil
 import time
 import math
 import datetime
 from collections import OrderedDict
 from common import constant
 from main.admin import models
-from main import db
+import main
 
 try:
     import psutil
@@ -315,10 +317,21 @@ def __read_system_attribs():
     except Exception, ex:
         logging.warning('Error saving system to DB, err {}'.format(ex))
 
+def __check_log_file_size():
+    if not main.LOG_FILE is None:
+        try:
+            size = os.path.getsize(main.LOG_FILE)
+            if size > 1024: #* 1024 * 10:
+                logging.info('Log file {} size is {}, truncating'.format(main.LOG_FILE, size))
+                shutil.copy(main.LOG_FILE, main.LOG_FILE+'.last')
+                file = open(main.LOG_FILE, mode='rw+')
+                file.truncate()
+                file.close()
+        except Exception, ex:
+            logging.warning('Cannot retrieve or truncate log file {} err={}'.format(main.LOG_FILE, ex))
 
 def init():
     pass
-
 
 progress_status = None
 
@@ -334,4 +347,6 @@ def thread_run():
     __read_all_hdd_smart()
     progress_status = 'reading system attribs'
     __read_system_attribs()
+    progress_status = 'checking log size'
+    __check_log_file_size()
     progress_status = 'completed'

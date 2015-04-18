@@ -14,6 +14,7 @@ from common import constant
 DB_LOCATION=None
 #default logging
 LOGGING_LEVEL=logging.INFO
+LOG_FILE=None
 app=None
 db=None
 initialised = False
@@ -155,6 +156,13 @@ def run(arg_list):
         LOGGING_LEVEL = logging.DEBUG
     elif 'warning' in arg_list:
         LOGGING_LEVEL = logging.WARNING
+
+    for s in arg_list:
+        if 'log=' in s:
+            global LOG_FILE
+            LOG_FILE=s.split('=')[1]
+            print 'Log file is {}'.format(LOG_FILE)
+
     global MODEL_AUTO_UPDATE
     MODEL_AUTO_UPDATE = 'model_auto_update' in arg_list
     init()
