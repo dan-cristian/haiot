@@ -326,6 +326,7 @@ def __check_log_file_size():
                 shutil.copy(main.LOG_FILE, main.LOG_FILE+'.last')
                 file = open(main.LOG_FILE, mode='rw+')
                 file.truncate()
+                file.seek(offset=0)
                 file.close()
         except Exception, ex:
             logging.warning('Cannot retrieve or truncate log file {} err={}'.format(main.LOG_FILE, ex))
