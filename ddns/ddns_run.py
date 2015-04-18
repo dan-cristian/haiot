@@ -4,8 +4,6 @@ import logging
 import datetime
 import dateutil.parser
 import json
-#import os.path
-import pytz
 import requests
 from main.admin import model_helper
 from common import constant, utils
@@ -14,7 +12,7 @@ cache = {}
 #record_id can be found on rackspace with a trick. select multiple records and click on Actions / Edit TTL
 #then with chrome right click on the list, inspect elements. you will find the A record id in a div
 
-def __update_ddns_rackspace(domain_name=''):
+def __update_ddns_rackspace():
     ConfigFile = model_helper.get_param(constant.P_DDNS_RACKSPACE_CONFIG_FILE)
     with open(ConfigFile, 'r') as f:
         config = json.load(f)
@@ -81,5 +79,5 @@ def __update_ddns_rackspace(domain_name=''):
 
 def thread_run():
     logging.debug('Processing ddns_run')
-    __update_ddns_rackspace(domain_name='www.dancristian.ro')
+    __update_ddns_rackspace()
     return 'Processed ddns_run'

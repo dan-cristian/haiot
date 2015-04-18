@@ -16,6 +16,7 @@ mklink /J  transport %T%\transport
 mklink /J  test %T%\test
 mklink /J  webui %T%\webui
 mklink /J  scripts %T%\scripts
+mklink /J  ddns %T%\ddns
 del LICENSE
 mklink /H LICENSE %T%\LICENSE
 del README.md
