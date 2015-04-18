@@ -10,6 +10,7 @@ from common import constant, utils
 
 initialised = False
 transport = None
+last_packet_received=datetime.datetime.now()
 
 def __rfx_reading(packet):
     if packet:
@@ -18,6 +19,8 @@ def __rfx_reading(packet):
             id = packet.device.id_string
             type = packet.device.type_string
             __save_sensor_db(id=id, type=type, value_list=packet.values)
+            global last_packet_received
+            last_packet_received = datetime.datetime.now()
         except Exception:
             logging.info('Unknown rfx packet type {}'.format(packet))
 
@@ -80,9 +83,12 @@ def init():
     return initialised
 
 def thread_run():
-    global transport, initialised
+    global transport, initialised, last_packet_received
     try:
         logging.debug('Waiting for RFX event')
+        time_elapsed_minutes = (datetime.datetime.now()-last_packet_received).microseconds / 60
+        if time_elapsed_minutes > 10:
+            logging.warning('RFX event not received since {} minutes, device error?'.format(time_elapsed_minutes))
         if initialised:
             __rfx_reading(transport.receive_blocking())
     except Exception, ex:
