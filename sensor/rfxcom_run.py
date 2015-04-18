@@ -10,7 +10,7 @@ from common import constant, utils
 
 initialised = False
 transport = None
-last_packet_received
+last_packet_received = None
 
 def __rfx_reading(packet):
     if packet:
