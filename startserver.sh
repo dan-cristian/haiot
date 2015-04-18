@@ -10,15 +10,15 @@
 #echo "Your answer is: $answer"
 
 function run_app {
-    scripts/stopserver.sh
-    source venv/bin/activate
+    $DIR/scripts/stopserver.sh
+    source $DIR/venv/bin/activate
     echo Starting app with parameter $1
-    python run_all.py $1 $2 $3 $4 $5
+    python $DIR/run_all.py $1 $2 $3 $4 $5
     exit_code=$?
     echo "Program exit with code $exit_code"
     echo "---------------------------------"
 }
-
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 must_run=true
 while $must_run; do
     run_app $1 $2 $3 $4 $5
