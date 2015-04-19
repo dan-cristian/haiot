@@ -14,10 +14,9 @@ import main
 
 try:
     import psutil
-
     import_module_psutil_exist = True
 except Exception, ex:
-    logger.critical('PSUtil module not available')
+    #logger.critical('PSUtil module not available')
     import_module_psutil_exist = False
 
 ERR_TEXT_NO_DEV = 'failed: No such device'
