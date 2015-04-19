@@ -113,7 +113,7 @@ def init_logging():
     global LOGGING_LEVEL, LOG_FILE, LOG_TO_SYSLOG, SYSLOG_ADDRESS, SYSLOG_PORT
     global logger
     log_name = 'haiot-' + socket.gethostname()
-    logging.basicConfig(format='%(asctime)s haiot %(levelname)s %(module)s:%(funcName)s:%(threadName)s %(message)s')
+    logging.basicConfig(format='%(asctime)s haiot %(levelname)s %(module)s:%(funcName)s %(message)s')#%(threadName)s
     logger = logging.getLogger(log_name)
     logger.setLevel(LOGGING_LEVEL)
 
@@ -121,7 +121,7 @@ def init_logging():
         filter_log = ContextFilter()
         logger.addFilter(filter_log)
         syslog_papertrail = logging.handlers.SysLogHandler(address=(SYSLOG_ADDRESS, int(SYSLOG_PORT)))
-        pap_formatter = logging.Formatter('%(asctime)s %(hostname)s haiot %(levelname)s %(funcName)s:%(module)s %(message)s',
+        pap_formatter = logging.Formatter('%(asctime)s %(hostname)s haiot %(levelname)s %(module)s:%(funcName)s %(message)s',
                                           datefmt='%Y-%m-%dT%H:%M:%S')
         syslog_papertrail.setFormatter(pap_formatter)
         logger.addHandler(syslog_papertrail)
