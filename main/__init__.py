@@ -120,8 +120,7 @@ def init_logging():
     log_name = 'haiot-' + socket.gethostname()
     logging.basicConfig(format='%(asctime)s haiot %(levelname)s %(module)s:%(funcName)s %(message)s')#%(threadName)s
     logger = logging.getLogger(log_name)
-    if RUN_IN_LIVE:
-        logger.propagate = False
+
     logger.setLevel(LOGGING_LEVEL)
 
     if (SYSLOG_ADDRESS is not None) and (SYSLOG_PORT is not None):
@@ -153,6 +152,9 @@ def init_logging():
     logger.info('Logging level is {}'.format(LOGGING_LEVEL))
     #remove annoying info messages
     logging.getLogger("requests").setLevel(logging.WARNING)
+    if RUN_IN_LIVE:
+        logger.info('Logger is set to live mode, disabling propagate')
+        logger.propagate = False
 
 def init():
     init_logging()
