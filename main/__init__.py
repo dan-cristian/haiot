@@ -3,11 +3,13 @@
 import time
 import sys
 import socket
-from flask_sqlalchemy import SQLAlchemy #workaround for resolve issue
-from flask import Flask, redirect, url_for
-from flask_sqlalchemy import models_committed
 import datetime
 import signal
+
+from flask_sqlalchemy import SQLAlchemy #workaround for resolve issue
+from flask import Flask
+from flask_sqlalchemy import models_committed
+
 
 
 #location for sqlite db
@@ -90,7 +92,9 @@ def execute_command(command):
 
 def unload():
     logger.warning('Main module is unloading, application will exit')
-    import webui, admin.thread_pool, mqtt_io
+    import webui, admin.thread_pool
+    from transport import mqtt_io
+
     global shutting_down
     shutting_down = True
     admin.thread_pool.thread_pool_enabled = False
@@ -219,7 +223,7 @@ def run(arg_list):
         LOGGING_LEVEL = logging.INFO
 
     global LOG_TO_SYSLOG
-    if 'syslog' in arg_list:
+    if 'sysloglocal' in arg_list:
         LOG_TO_SYSLOG = True
 
     for s in arg_list:

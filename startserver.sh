@@ -14,7 +14,7 @@ function run_app {
     sleep 2
     echo Starting app with parameter $1 $2 $3 $4 $5 $6 $7 $8 $9 $10
     source $DIR/venv/bin/activate
-    python $DIR/run_all.py $1 $2 $3 $4 $5 $6 $7 $8 $9 $10
+    python $DIR/haiot.py $1 $2 $3 $4 $5 $6 $7 $8 $9 $10
     exit_code=$?
     echo "Program exit with code $exit_code"
     echo "---------------------------------"

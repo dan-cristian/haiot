@@ -2,7 +2,7 @@
 
 goto :start
 :run_app
-    python run_all.py model_auto_update syslog=logs2.papertrailapp.com:30445 %~1 %~2 %~3 %~4 %~5
+    python haiot.py model_auto_update syslog=logs2.papertrailapp.com:30445 %~1 %~2 %~3 %~4 %~5
     set exit_code=%ERRORLEVEL%
     echo Program exit with code %exit_code%
     echo ---------------------------------

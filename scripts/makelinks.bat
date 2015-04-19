@@ -21,8 +21,8 @@ del LICENSE
 mklink /H LICENSE %T%\LICENSE
 del README.md
 mklink /H README.md %T%\README.md
-del run_all.py
-mklink /H run_all.py %T%\run_all.py
+del haiot.py
+mklink /H haiot.py %T%\haiot.py
 del startserver.sh
 mklink /H startserver.sh %T%\startserver.sh
 del startserver_mem.sh
