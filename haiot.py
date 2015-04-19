@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 import sys
