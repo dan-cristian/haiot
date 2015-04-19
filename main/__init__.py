@@ -96,11 +96,11 @@ def init():
     global LOGGING_LEVEL, LOG_FILE, LOG_TO_SYSLOG
 
     common.init()
-    my_logger = logging.getLogger('haiot ' + constant.HOST_NAME)
-    my_logger.setLevel(logging.DEBUG)
-    handler = logging.handlers.SysLogHandler(address = '/dev/log')
-    my_logger.addHandler(handler)
-    my_logger.debug('Program started on {} at {}'.format(datetime.datetime.now(), constant.HOST_NAME))
+    #my_logger = logging.getLogger('haiot ' + constant.HOST_NAME)
+    #my_logger.setLevel(logging.DEBUG)
+    #handler = logging.handlers.SysLogHandler(address = '/dev/log')
+    #my_logger.addHandler(handler)
+    #my_logger.debug('Program started on {} at {}'.format(datetime.datetime.now(), constant.HOST_NAME))
     if LOG_FILE is None:
         logging.basicConfig(format='%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(threadName)s:%(message)s',
                         level=LOGGING_LEVEL)
