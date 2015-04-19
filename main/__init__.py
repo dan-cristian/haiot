@@ -113,7 +113,7 @@ def init_logging():
     global LOGGING_LEVEL, LOG_FILE, LOG_TO_SYSLOG, SYSLOG_ADDRESS, SYSLOG_PORT
     global logger
     log_name = 'haiot-' + socket.gethostname()
-    logging.basicConfig(format='%(asctime)s %(hostname)s haiot %(levelname)s:%(module)s:%(funcName)s:%(threadName)s:%(message)s')
+    logging.basicConfig(format='%(asctime)s haiot %(levelname)s:%(module)s:%(funcName)s:%(threadName)s:%(message)s')
     logger = logging.getLogger(log_name)
     logger.setLevel(LOGGING_LEVEL)
 
