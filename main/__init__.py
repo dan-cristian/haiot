@@ -103,6 +103,7 @@ def init():
         handler = logging.handlers.SysLogHandler(address = '/dev/log')
         my_logger.addHandler(handler)
         my_logger.debug('Program started on {} at {}'.format(datetime.datetime.now(), constant.HOST_NAME))
+        print 'Syslog logger initialised'
     except Exception, ex:
         print 'Unable to init syslog handler, probably I run on windows'
     if LOG_FILE is None:
