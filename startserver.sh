@@ -12,8 +12,8 @@
 function run_app {
     $DIR/scripts/stopserver.sh
     sleep 2
+    echo Starting app with parameter $1 $2 $3 $4 $5 $6 $7 $8 $9 $10
     source $DIR/venv/bin/activate
-    echo Starting app with parameter $1
     python $DIR/run_all.py $1 $2 $3 $4 $5 $6 $7 $8 $9 $10
     exit_code=$?
     echo "Program exit with code $exit_code"
