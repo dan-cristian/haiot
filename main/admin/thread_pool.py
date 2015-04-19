@@ -57,7 +57,7 @@ def main():
                         result = future_obj.result()
                         logger.debug('Thread result={}'.format(result))
                     except Exception, exc:
-                        logger.critical('Exception [{}] in {}'.format(exc, print_name))
+                        logger.error('Exception {} in {}'.format(exc, print_name, exc_info=True))
                     #print('%s=%s' % (print_name, future_obj.result()))
                     if elapsed_seconds and elapsed_seconds > exec_interval:
                         del dict_future_func[future_obj]
