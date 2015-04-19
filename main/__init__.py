@@ -5,6 +5,7 @@ import sys
 from flask_sqlalchemy import SQLAlchemy #workaround for resolve issue
 from flask import Flask, redirect, url_for
 from flask_sqlalchemy import models_committed
+import datetime
 import signal
 import logging, logging.handlers
 import common
@@ -99,7 +100,7 @@ def init():
     my_logger.setLevel(logging.DEBUG)
     handler = logging.handlers.SysLogHandler(address = '/dev/log')
     my_logger.addHandler(handler)
-
+    my_logger.debug('Program started on {} at {}'.format(datetime.datetime.now(), constant.HOST_NAME))
     if LOG_FILE is None:
         logging.basicConfig(format='%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(threadName)s:%(message)s',
                         level=LOGGING_LEVEL)
