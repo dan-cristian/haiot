@@ -8,6 +8,8 @@ exec_interval_list={}
 exec_last_date_list={}
 thread_pool_enabled = True
 
+dict_future_func={}
+
 def add_callable(func, run_interval_second=60):
     print_name = func.func_globals['__name__']+'.'+ func.func_name
     logging.info('Added for processing callable ' + print_name)
@@ -26,12 +28,17 @@ def unload():
     global thread_pool_enabled
     thread_pool_enabled = False
 
+def get_thread_status():
+    global dict_future_func
+    return dict_future_func
+
 def main():
     global thread_pool_enabled
     thread_pool_enabled = True
     #https://docs.python.org/3.3/library/concurrent.futures.html
+    global dict_future_func
     dict_future_func={}
-    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
         while thread_pool_enabled:
             if len(callable_list) != len(dict_future_func):
                 logging.info('Initialising thread processing with {} functions'.format(len(callable_list)))
@@ -46,8 +53,9 @@ def main():
                 elapsed_seconds = (datetime.now() - last_exec_date).total_seconds()
                 if future_obj.done():
                     try:
-                        future_obj.result()
-                    except Exception as exc:
+                        result = future_obj.result()
+                        logging.debug('Thread result={}'.format(result))
+                    except Exception, exc:
                         logging.critical('Exception [{}] in {}'.format(exc, print_name))
                     #print('%s=%s' % (print_name, future_obj.result()))
                     if elapsed_seconds and elapsed_seconds > exec_interval:

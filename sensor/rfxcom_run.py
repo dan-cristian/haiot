@@ -72,13 +72,15 @@ def init():
         if constant.OS in constant.OS_LINUX:
             portpath = get_portpath_linux()
         else:
+            portpath = None
             #fixme windows autodetect version
-            pass
         if portpath:
             logging.info('Initialising RFXCOM on port {}'.format(portpath))
             transport = PySerialTransport(portpath, debug=True)
             transport.reset()
             initialised = True
+        else:
+            logging.info('No RFX device detected on this system')
     except Exception, ex:
         logging.warning('Unable to open RFX tty port, err {}'.format(ex))
     return initialised

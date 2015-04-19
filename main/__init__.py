@@ -137,8 +137,10 @@ def init():
         event.on_models_committed(sender, changes)
 
     #stop app from exiting
+    from admin import thread_pool
     while not shutting_down:
         time.sleep(1)
+        #logging.debug('Threads: {}'.format(thread_pool.get_thread_status()))
 
 def run(arg_list):
     if 'debug_remote' in arg_list:

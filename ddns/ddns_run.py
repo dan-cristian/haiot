@@ -14,78 +14,80 @@ cache = {}
 #then with chrome right click on the list, inspect elements. you will find the A record id in a div
 
 def __update_ddns_rackspace():
-    ConfigFile = model_helper.get_param(constant.P_DDNS_RACKSPACE_CONFIG_FILE)
-    with open(ConfigFile, 'r') as f:
-        config = json.load(f)
-    global cache
-    if cache == {} or cache == None:
-        cache = {}
-        cache['auth']={}
-        cache['auth']['expires']=str(datetime.datetime.now())
-
-    # get IP address
     try:
-        cache['ip']=socket.gethostbyname(config['record_name'])
-    except Exception, ex:
-        cache['ip']=None
-        logging.warning('Unable to get ip for host {}, err={}'.format(config['record_name'], ex))
-    try:
-        ip = requests.get('http://icanhazip.com').text.strip()
-    except Exception, ex:
-        logging.warning('Unable to get my ip, err={}'.format(ex))
-        ip = None
+        ConfigFile = model_helper.get_param(constant.P_DDNS_RACKSPACE_CONFIG_FILE)
+        with open(ConfigFile, 'r') as f:
+            config = json.load(f)
+        global cache
+        if cache == {} or cache == None:
+            cache = {}
+            cache['auth']={}
+            cache['auth']['expires']=str(datetime.datetime.now())
 
-    if ip == '' or ip is None or ip == cache['ip']:
-        logging.debug('IP address is still ' + ip + '; nothing to update.')
-        exit()
-    else:
-        logging.info('IP address was changed, old was {} new is {}'.format(cache['ip'], ip))
+        # get IP address
+        try:
+            cache['ip']=socket.gethostbyname(config['record_name'])
+        except Exception, ex:
+            cache['ip']=None
+            logging.warning('Unable to get ip for host {}, err={}'.format(config['record_name'], ex))
+        try:
+            ip = requests.get('http://icanhazip.com').text.strip()
+        except Exception, ex:
+            logging.warning('Unable to get my ip, err={}'.format(ex))
+            ip = None
 
-    cache['ip'] = ip
-    now = datetime.datetime.now()
-    expires = dateutil.parser.parse(cache['auth']['expires'])
-    if expires <= now:
-        logging.info('Expired rackspace authentication token; reauthenticating...')
-        # authenticate with Rackspace
-        authUrl = 'https://identity.api.rackspacecloud.com/v2.0/tokens'
-        authData = {
-            'auth': {
-                'RAX-KSKEY:apiKeyCredentials': {
-                    'username': config['username'],
-                    'apiKey': config['api_key']
+        if ip == '' or ip is None or ip == cache['ip']:
+            logging.debug('IP address is still ' + ip + '; nothing to update.')
+            return
+        else:
+            logging.info('IP address was changed, old was {} new is {}'.format(cache['ip'], ip))
+
+        cache['ip'] = ip
+        now = datetime.datetime.now()
+        expires = dateutil.parser.parse(cache['auth']['expires'])
+        if expires <= now:
+            logging.info('Expired rackspace authentication token; reauthenticating...')
+            # authenticate with Rackspace
+            authUrl = 'https://identity.api.rackspacecloud.com/v2.0/tokens'
+            authData = {
+                'auth': {
+                    'RAX-KSKEY:apiKeyCredentials': {
+                        'username': config['username'],
+                        'apiKey': config['api_key']
+                    }
                 }
             }
+            authHeaders = {
+                'Accept': 'application/json',
+                'Content-type': 'application/json'
+            }
+            auth = requests.post(authUrl, data=json.dumps(authData), headers=authHeaders)
+            auth = utils.json2obj(auth.text)
+            cache['auth']['expires'] = auth['access']['token']['expires']
+            cache['auth']['token'] = auth['access']['token']['id']
+
+        # update DNS record
+        url = 'https://dns.api.rackspacecloud.com/v1.0/' + config['account_id'] + \
+            '/domains/' + config['domain_id'] + '/records/' + config['record_id']
+
+        data = {
+            'ttl': config['record_ttl'],
+            'name': config['record_name'],
+            'data': cache['ip']
         }
-        authHeaders = {
+        headers = {
             'Accept': 'application/json',
-            'Content-type': 'application/json'
+            'Content-type': 'application/json',
+            'X-Auth-Token': cache['auth']['token']
         }
-        auth = requests.post(authUrl, data=json.dumps(authData), headers=authHeaders)
-        auth = utils.json2obj(auth.text)
-        cache['auth']['expires'] = auth['access']['token']['expires']
-        cache['auth']['token'] = auth['access']['token']['id']
 
-    # update DNS record
-    url = 'https://dns.api.rackspacecloud.com/v1.0/' + config['account_id'] + \
-        '/domains/' + config['domain_id'] + '/records/' + config['record_id']
-
-    data = {
-        'ttl': config['record_ttl'],
-        'name': config['record_name'],
-        'data': cache['ip']
-    }
-    headers = {
-        'Accept': 'application/json',
-        'Content-type': 'application/json',
-        'X-Auth-Token': cache['auth']['token']
-    }
-
-    result = requests.put(url, data=json.dumps(data), headers=headers)
-    if result.ok:
-        logging.info('Updated IP address to ' + cache['ip'])
-    else:
-        logging.warning('Unable to update IP, response={}'.format(result))
-
+        result = requests.put(url, data=json.dumps(data), headers=headers)
+        if result.ok:
+            logging.info('Updated IP address to ' + cache['ip'])
+        else:
+            logging.warning('Unable to update IP, response={}'.format(result))
+    except Exception, ex:
+        logging.warning('Unable to check and update dns, err={}'.format(ex))
 
 def thread_run():
     logging.debug('Processing ddns_run')
