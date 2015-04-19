@@ -13,7 +13,7 @@ function run_app {
     $DIR/scripts/stopserver.sh
     source $DIR/venv/bin/activate
     echo Starting app with parameter $1
-    python $DIR/run_all.py $1 $2 $3 $4 $5
+    python $DIR/run_all.py $1 $2 $3 $4 $5 $6 $7 $8 $9 $10
     exit_code=$?
     echo "Program exit with code $exit_code"
     echo "---------------------------------"
@@ -21,7 +21,7 @@ function run_app {
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 must_run=true
 while $must_run; do
-    run_app $1 $2 $3 $4 $5
+    run_app $1 $2 $3 $4 $5 $6 $7 $8 $9 $10
     if [ $exit_code == 131 ]; then
         echo "Restarting app"
     fi

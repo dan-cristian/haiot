@@ -6,7 +6,7 @@ from flask_sqlalchemy import SQLAlchemy #workaround for resolve issue
 from flask import Flask, redirect, url_for
 from flask_sqlalchemy import models_committed
 import signal
-import logging
+import logging, logging.handlers
 import common
 from common import constant
 
@@ -21,6 +21,7 @@ initialised = False
 shutting_down=False
 exit_code = 0
 MODEL_AUTO_UPDATE=False
+LOG_TO_SYSLOG = False
 
 def my_import(name):
     #http://stackoverflow.com/questions/547829/how-to-dynamically-load-a-python-class
@@ -91,7 +92,14 @@ def unload():
 
 def init():
     signal.signal(signal.SIGTERM, signal_handler)
-    global LOGGING_LEVEL, LOG_FILE
+    global LOGGING_LEVEL, LOG_FILE, LOG_TO_SYSLOG
+
+    common.init()
+    my_logger = logging.getLogger('haiot ' + constant.HOST_NAME)
+    my_logger.setLevel(logging.DEBUG)
+    handler = logging.handlers.SysLogHandler(address = '/dev/log')
+    my_logger.addHandler(handler)
+
     if LOG_FILE is None:
         logging.basicConfig(format='%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(threadName)s:%(message)s',
                         level=LOGGING_LEVEL)
@@ -101,7 +109,7 @@ def init():
     logging.info('Logging level is {}'.format(LOGGING_LEVEL))
     #annoying info messages
     logging.getLogger("requests").setLevel(logging.WARNING)
-    common.init()
+
 
     global app, db, DB_LOCATION
     app = Flask('main')
@@ -162,6 +170,10 @@ def run(arg_list):
         LOGGING_LEVEL = logging.DEBUG
     elif 'warning' in arg_list:
         LOGGING_LEVEL = logging.WARNING
+
+    global LOG_TO_SYSLOG
+    if 'syslog' in arg_list:
+        LOG_TO_SYSLOG = True
 
     for s in arg_list:
         if 'log=' in s:
