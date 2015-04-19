@@ -252,7 +252,8 @@ def upload_data(obj):
                             logging.warning('Unable to plot graph, err {}'.format(ex))
                     index = index + 1
             else:
-                logging.critical('Graphable object missing axis X or ID {} obj {}'.format(axis_x_field, obj))
+                logging.critical('Graphable object missing axis_x [{}], graph_id [{}], in obj {}'.format(axis_x_field,
+                                                                                          graph_id_field, obj))
         else:
             logging.critical('Graphable object missing axis X field {}'.format(constant.JSON_PUBLISH_GRAPH_X))
     except Exception, ex:

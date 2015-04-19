@@ -33,7 +33,7 @@ goto :app_stop
         goto :end
     )
     if %exit_code% EQU 1 (
-        echo App was interrupted with CTRL-C
+        echo App was interrupted with CTRL-C or by exception
         goto :end
     )
 goto :start

@@ -4,6 +4,7 @@ import logging
 import datetime
 import dateutil.parser
 import json
+import socket
 import requests
 from main.admin import model_helper
 from common import constant, utils
@@ -19,12 +20,21 @@ def __update_ddns_rackspace():
     global cache
     if cache == {} or cache == None:
         cache = {}
-        cache['ip']=''
         cache['auth']={}
         cache['auth']['expires']=str(datetime.datetime.now())
 
     # get IP address
-    ip = requests.get('http://icanhazip.com').text.strip()
+    try:
+        cache['ip']=socket.gethostbyname(config['record_name'])
+    except Exception, ex:
+        cache['ip']=None
+        logging.warning('Unable to get ip for host {}, err={}'.format(config['record_name'], ex))
+    try:
+        ip = requests.get('http://icanhazip.com').text.strip()
+    except Exception, ex:
+        logging.warning('Unable to get my ip, err={}'.format(ex))
+        ip = None
+
     if ip == '' or ip is None or ip == cache['ip']:
         logging.debug('IP address is still ' + ip + '; nothing to update.')
         exit()
