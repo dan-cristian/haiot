@@ -95,7 +95,7 @@ def init():
     signal.signal(signal.SIGTERM, signal_handler)
     global LOGGING_LEVEL, LOG_FILE, LOG_TO_SYSLOG
 
-    common.init()
+
     #my_logger = logging.getLogger('haiot ' + constant.HOST_NAME)
     #my_logger.setLevel(logging.DEBUG)
     #handler = logging.handlers.SysLogHandler(address = '/dev/log')
@@ -111,6 +111,7 @@ def init():
     #annoying info messages
     logging.getLogger("requests").setLevel(logging.WARNING)
 
+    common.init()
 
     global app, db, DB_LOCATION
     app = Flask('main')
