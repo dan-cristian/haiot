@@ -2,6 +2,7 @@
 
 import time
 import sys
+import os
 from flask_sqlalchemy import SQLAlchemy #workaround for resolve issue
 from flask import Flask, redirect, url_for
 from flask_sqlalchemy import models_committed
@@ -96,11 +97,14 @@ def init():
     global LOGGING_LEVEL, LOG_FILE, LOG_TO_SYSLOG
 
 
-    #my_logger = logging.getLogger('haiot ' + constant.HOST_NAME)
-    #my_logger.setLevel(logging.DEBUG)
-    #handler = logging.handlers.SysLogHandler(address = '/dev/log')
-    #my_logger.addHandler(handler)
-    #my_logger.debug('Program started on {} at {}'.format(datetime.datetime.now(), constant.HOST_NAME))
+    my_logger = logging.getLogger('haiot ' + os.name)
+    my_logger.setLevel(logging.DEBUG)
+    try:
+        handler = logging.handlers.SysLogHandler(address = '/dev/log')
+        my_logger.addHandler(handler)
+        my_logger.debug('Program started on {} at {}'.format(datetime.datetime.now(), constant.HOST_NAME))
+    except Exception, ex:
+        print 'Unable to init syslog handler, probably I run on windows'
     if LOG_FILE is None:
         logging.basicConfig(format='%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(threadName)s:%(message)s',
                         level=LOGGING_LEVEL)
