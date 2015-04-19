@@ -44,7 +44,7 @@ def __read_all_hdd_smart():
     disk_count = 1
     global ERR_TEXT_NO_DEV
     if import_module_psutil_exist:
-        while current_disk_valid:
+        while current_disk_valid and disk_count < 64:
             try:
                 record = models.SystemDisk()
                 record.system_name = constant.HOST_NAME
