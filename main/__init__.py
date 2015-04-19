@@ -96,16 +96,18 @@ def init():
     signal.signal(signal.SIGTERM, signal_handler)
     global LOGGING_LEVEL, LOG_FILE, LOG_TO_SYSLOG
 
-
     my_logger = logging.getLogger('haiot ' + os.name)
     my_logger.setLevel(logging.DEBUG)
-    try:
-        handler = logging.handlers.SysLogHandler(address = '/dev/log')
-        my_logger.addHandler(handler)
-        my_logger.debug('Program started on {} at {}'.format(datetime.datetime.now(), constant.HOST_NAME))
-        print 'Syslog logger initialised'
-    except Exception, ex:
-        print 'Unable to init syslog handler, probably I run on windows'
+    if LOG_TO_SYSLOG:
+        try:
+            handler = logging.handlers.SysLogHandler(address = '/dev/log')
+            my_logger.addHandler(handler)
+            my_logger.info('Syslog program started on {} at {}'.format(datetime.datetime.now(), constant.HOST_NAME))
+            print 'Syslog logger initialised'
+        except Exception, ex:
+            print 'Unable to init syslog handler, probably I run on windows'
+    else:
+        print 'Not logging to syslog'
     if LOG_FILE is None:
         logging.basicConfig(format='%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(threadName)s:%(message)s',
                         level=LOGGING_LEVEL)
