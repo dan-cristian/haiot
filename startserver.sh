@@ -20,6 +20,7 @@ function run_app {
     echo "---------------------------------"
 }
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+echo "Current dir on start is $DIR"
 must_run=true
 while $must_run; do
     run_app $1 $2 $3 $4 $5 $6 $7 $8 $9 $10
