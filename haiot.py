@@ -10,5 +10,6 @@ import os
 if __name__ == '__main__':
     print 'Executing venv'
     os.system('/bin/bash  --rcfile /home/dcristian/PYC/venv/bin/activate')
+    print 'Executing main'
     import main
     main.run(sys.argv[1:])
