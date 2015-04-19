@@ -27,6 +27,7 @@ LOG_TO_SYSLOG = False
 logger = None
 SYSLOG_ADDRESS = None
 SYSLOG_PORT = None
+RUN_IN_LIVE = False
 
 from . import logger
 
@@ -114,11 +115,13 @@ def init_logging():
             record.hostname = ContextFilter.hostname
             return True
 
-    global LOGGING_LEVEL, LOG_FILE, LOG_TO_SYSLOG, SYSLOG_ADDRESS, SYSLOG_PORT
+    global LOGGING_LEVEL, LOG_FILE, LOG_TO_SYSLOG, SYSLOG_ADDRESS, SYSLOG_PORT, RUN_IN_LIVE
     global logger
     log_name = 'haiot-' + socket.gethostname()
     logging.basicConfig(format='%(asctime)s haiot %(levelname)s %(module)s:%(funcName)s %(message)s')#%(threadName)s
     logger = logging.getLogger(log_name)
+    if RUN_IN_LIVE:
+        logger.propagate = False
     logger.setLevel(LOGGING_LEVEL)
 
     if (SYSLOG_ADDRESS is not None) and (SYSLOG_PORT is not None):
@@ -232,8 +235,9 @@ def run(arg_list):
         LOGGING_LEVEL = logging.INFO
 
     global LOG_TO_SYSLOG
-    if 'sysloglocal' in arg_list:
-        LOG_TO_SYSLOG = True
+    LOG_TO_SYSLOG = 'sysloglocal' in arg_list
+    global RUN_IN_LIVE
+    RUN_IN_LIVE = 'live' in arg_list
 
     for s in arg_list:
         #carefull with the order for unicity, start with longest words first
