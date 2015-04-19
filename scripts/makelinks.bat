@@ -29,6 +29,8 @@ del startserver_mem.sh
 mklink /H startserver_mem.sh  %T%\startserver_mem.sh
 del startserver_disk.sh
 mklink /H startserver_disk.sh  %T%\startserver_disk.sh
+del startserver_daemon.sh
+mklink /H startserver_daemon.sh  %T%\startserver_daemon.sh
 del startserver.bat
 mklink /H startserver.bat  %T%\startserver.bat
 del .gitignore
