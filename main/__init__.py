@@ -102,7 +102,7 @@ def init():
     global LOGGING_LEVEL, LOG_FILE, LOG_TO_SYSLOG
     global logger
 
-    logging.basicConfig(format='%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(threadName)s:%(message)s')
+    logging.basicConfig(format='%(name)s:%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(threadName)s:%(message)s')
     logger = logging.getLogger('haiot ' + os.name)
 
     logger.setLevel(LOGGING_LEVEL)
