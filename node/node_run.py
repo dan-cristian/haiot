@@ -5,7 +5,7 @@ import time
 import datetime
 import random
 from common import constant, variable, utils
-from main.admin import models, model_helper
+from main.admin import models
 from main import db
 
 first_run = True

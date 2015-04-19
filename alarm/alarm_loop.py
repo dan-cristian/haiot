@@ -11,8 +11,7 @@ import urllib
 from main import logger
 from common import constant
 from main.admin import model_helper
-import transport.mqtt_io
-
+import transport
 
 #http://owfs.sourceforge.net/owpython.html
 topic = "mzp/iot/alarm"
@@ -36,8 +35,7 @@ def do_line(line):
         else:
             status = "closed"
         alert(pinindex, status, )
-        if transport.mqtt_io.mqtt_client.client_connected:
-            transport.mqtt_io.mqtt_client.publish(topic, message)
+        transport.send_message_obj(message)
     else:
         print ("Invalid line " + line)
 
