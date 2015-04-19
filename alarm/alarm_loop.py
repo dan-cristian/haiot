@@ -11,7 +11,7 @@ import urllib
 from main import logger
 from common import constant
 from main.admin import model_helper
-from transport.mqtt_io import mqtt_client
+import transport.mqtt_io
 
 
 #http://owfs.sourceforge.net/owpython.html
@@ -36,8 +36,8 @@ def do_line(line):
         else:
             status = "closed"
         alert(pinindex, status, )
-        if mqtt_client.client_connected:
-            mqtt_client.publish(topic, message)
+        if transport.mqtt_client.client_connected:
+            transport.mqtt_client.publish(topic, message)
     else:
         print ("Invalid line " + line)
 
