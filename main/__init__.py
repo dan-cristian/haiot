@@ -2,7 +2,7 @@
 
 import time
 import sys
-import os
+import socket
 from flask_sqlalchemy import SQLAlchemy #workaround for resolve issue
 from flask import Flask, redirect, url_for
 from flask_sqlalchemy import models_committed
@@ -103,15 +103,14 @@ def init():
     global logger
 
     logging.basicConfig(format='%(name)s:%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(threadName)s:%(message)s')
-    logger = logging.getLogger('haiot ' + os.name)
+    logger = logging.getLogger('haiot-' + socket.gethostname())
 
     logger.setLevel(LOGGING_LEVEL)
     if LOG_TO_SYSLOG:
         try:
             handler = logging.handlers.SysLogHandler(address = '/dev/log')
             logger.addHandler(handler)
-            logger.info('Syslog program started on {} at {}'.format(datetime.datetime.now(), os.name))
-            print 'Syslog logger initialised'
+            logger.info('Syslog program started on {} at {}'.format(datetime.datetime.now(), socket.gethostname()))
         except Exception, ex:
             try:
                 ntl = logging.handlers.NTEventLogHandler(appname='haiot')
@@ -119,7 +118,6 @@ def init():
             except Exception, ex:
                 print 'Unable to init syslog handler'
     else:
-        print 'Not logging to syslog, maybe to file'
         if not LOG_FILE is None:
             file_handler = logging.handlers.RotatingFileHandler(LOG_FILE, maxBytes=1024*1024*1, backupCount=3)
             logger.addHandler(file_handler)
