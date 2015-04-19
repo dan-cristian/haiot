@@ -44,11 +44,11 @@ class PySerialTransport(RFXtrxTransport):
                 data = self.serial.read(pkt[0])
                 pkt.extend(bytearray(data))
                 if self.debug:
-                    logger.debug("Recv: " + " ".join("0x{0:02x}".format(x)
+                    logging.debug("Recv: " + " ".join("0x{0:02x}".format(x)
                                               for x in pkt))
                 return self.parse(pkt)
             else:
-                logger.debug('not blocking read data len {}, exit'.format(len(data)))
+                logging.debug('not blocking read data len {}, exit'.format(len(data)))
                 return None
 
     def send(self, data):
@@ -60,7 +60,7 @@ class PySerialTransport(RFXtrxTransport):
         else:
             raise ValueError("Invalid type")
         if self.debug:
-            logger.info ("Send: " + " ".join("0x{0:02x}".format(x) for x in pkt))
+            logging.info ("Send: " + " ".join("0x{0:02x}".format(x) for x in pkt))
         self.serial.write(pkt)
 
     def reset(self):
