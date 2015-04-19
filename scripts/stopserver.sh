@@ -7,6 +7,8 @@ fi
 if [ -n "$proc_pid" ]; then
     echo Killing proc id [$proc_pid]
     kill $proc_pid
+    sleep 1
+    kill -9 $proc_pid
 else
     echo Program is not running, nothing to stop
 fi
