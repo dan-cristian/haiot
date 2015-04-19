@@ -101,9 +101,9 @@ def init():
     signal.signal(signal.SIGTERM, signal_handler)
     global LOGGING_LEVEL, LOG_FILE, LOG_TO_SYSLOG
     global logger
-
+    log_name = 'haiot-' + socket.gethostname()
     logging.basicConfig(format='%(name)s:%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(threadName)s:%(message)s')
-    logger = logging.getLogger('haiot-' + socket.gethostname())
+    logger = logging.getLogger(log_name)
 
     logger.setLevel(LOGGING_LEVEL)
     if LOG_TO_SYSLOG:
@@ -113,7 +113,7 @@ def init():
             logger.info('Syslog program started on {} at {}'.format(datetime.datetime.now(), socket.gethostname()))
         except Exception, ex:
             try:
-                ntl = logging.handlers.NTEventLogHandler(appname='haiot')
+                ntl = logging.handlers.NTEventLogHandler(appname=log_name)
                 logger.addHandler(ntl)
             except Exception, ex:
                 print 'Unable to init syslog handler'
