@@ -15,7 +15,7 @@ try:
     import Adafruit_BBIO.GPIO as GPIO
     import_module_exist = True
 except:
-    logger.critical('Module Adafruit_BBIO.GPIO is not installed, module will not be initialised')
+    logger.info('Module Adafruit_BBIO.GPIO is not installed, module will not be initialised')
     import_module_exist = False
 
 def register_gpios():
