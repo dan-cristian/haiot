@@ -160,13 +160,16 @@ def init():
     common.init()
 
     global app, db, DB_LOCATION
+    logger.info('Initialising flask')
     app = Flask('main')
     #app.config['TESTING'] = True
     app.config.update(DEBUG=True, SQLALCHEMY_ECHO = False, SQLALCHEMY_DATABASE_URI=DB_LOCATION)
 
+    logger.info('Initialising SQLAlchemy')
     db = SQLAlchemy(app)
     db.create_all()
 
+    logger.info('Populating db tables')
     import admin.model_helper
     global MODEL_AUTO_UPDATE
     admin.model_helper.populate_tables(MODEL_AUTO_UPDATE)

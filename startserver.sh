@@ -43,7 +43,7 @@ while $must_run; do
         must_run=false
     fi
     if [ $exit_code == 1 ]; then
-        echo "App was interrupted with CTRL-C or by exception code[$exit_code] "
+        echo "App was interrupted with CTRL-C or by exception code[$exit_code]"
         must_run=false
     fi
 done
