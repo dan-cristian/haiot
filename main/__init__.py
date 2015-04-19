@@ -23,6 +23,8 @@ exit_code = 0
 MODEL_AUTO_UPDATE=False
 LOG_TO_SYSLOG = False
 logger = None
+SYSLOG_ADDRESS = None
+SYSLOG_PORT = None
 
 from . import logger
 
@@ -81,6 +83,8 @@ def execute_command(command):
         exit_code = 133
     if exit_code != 0:
         unload()
+
+
 #--------------------------------------------------------------------------#
 
 
@@ -95,17 +99,33 @@ def unload():
     if mqtt_io.initialised:
         mqtt_io.unload()
 
-def init():
+def init_logging():
     import logging
     import logging.handlers
-    signal.signal(signal.SIGTERM, signal_handler)
-    global LOGGING_LEVEL, LOG_FILE, LOG_TO_SYSLOG
+
+    class ContextFilter(logging.Filter):
+        hostname = socket.gethostname()
+
+        def filter(self, record):
+            record.hostname = ContextFilter.hostname
+            return True
+
+    global LOGGING_LEVEL, LOG_FILE, LOG_TO_SYSLOG, SYSLOG_ADDRESS, SYSLOG_PORT
     global logger
     log_name = 'haiot-' + socket.gethostname()
-    logging.basicConfig(format='%(name)s:%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(threadName)s:%(message)s')
+    logging.basicConfig(format='%(asctime)s %(hostname)s haiot %(levelname)s:%(module)s:%(funcName)s:%(threadName)s:%(message)s')
     logger = logging.getLogger(log_name)
-
     logger.setLevel(LOGGING_LEVEL)
+
+    if (SYSLOG_ADDRESS is not None) and (SYSLOG_PORT is not None):
+        filter_log = ContextFilter()
+        logger.addFilter(filter_log)
+        syslog_papertrail = logging.handlers.SysLogHandler(address=(SYSLOG_ADDRESS, int(SYSLOG_PORT)))
+        pap_formatter = logging.Formatter('%(asctime)s %(hostname)s haiot %(message)s', datefmt='%Y-%m-%dT%H:%M:%S')
+        syslog_papertrail.setFormatter(pap_formatter)
+        logger.addHandler(syslog_papertrail)
+        logger.info('Initialised syslog with {}:{}'.format(SYSLOG_ADDRESS, SYSLOG_PORT))
+
     if LOG_TO_SYSLOG:
         try:
             handler = logging.handlers.SysLogHandler(address = '/dev/log')
@@ -121,10 +141,15 @@ def init():
         if not LOG_FILE is None:
             file_handler = logging.handlers.RotatingFileHandler(LOG_FILE, maxBytes=1024*1024*1, backupCount=3)
             logger.addHandler(file_handler)
-    # log=c:\tmp\iot-nohup.out
+
     logger.info('Logging level is {}'.format(LOGGING_LEVEL))
     #remove annoying info messages
     logging.getLogger("requests").setLevel(logging.WARNING)
+
+def init():
+    init_logging()
+    signal.signal(signal.SIGTERM, signal_handler)
+
 
     import common
     common.init()
@@ -197,10 +222,18 @@ def run(arg_list):
         LOG_TO_SYSLOG = True
 
     for s in arg_list:
-        if 'log=' in s:
+        #carefull with the order for unicity, start with longest words first
+        if 'syslog=' in s:
+            #syslog=logs2.papertrailapp.com:30445
+            global SYSLOG_ADDRESS, SYSLOG_PORT
+            par_vals = s.split('=')[1].split(':')
+            SYSLOG_ADDRESS = par_vals[0]
+            SYSLOG_PORT = par_vals[1]
+        elif 'log=' in s:
+            # log=c:\tmp\iot-nohup.out
             global LOG_FILE
             LOG_FILE=s.split('=')[1]
-            print 'Log file is {}'.format(LOG_FILE)
+
 
     global MODEL_AUTO_UPDATE
     MODEL_AUTO_UPDATE = 'model_auto_update' in arg_list
