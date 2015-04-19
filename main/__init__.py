@@ -174,12 +174,16 @@ def init():
     global MODEL_AUTO_UPDATE
     admin.model_helper.populate_tables(MODEL_AUTO_UPDATE)
 
+    logger.info('Initialising events')
     from admin import event
     event.init()
+    logger.info('Collecting system info')
     from admin import system_info
     system_info.init()
+    logger.info('Initialising modules')
     init_modules()
 
+    logger.info('Initialising threads')
     from admin import thread_pool
     import threading
     t = threading.Thread(target=thread_pool.main)
@@ -195,11 +199,13 @@ def init():
         logger.debug('Model commit detected sender {} change {}'.format(sender, changes))
         event.on_models_committed(sender, changes)
 
+    logger.info('Looping until app exit')
     #stop app from exiting
     from admin import thread_pool
     while not shutting_down:
         time.sleep(1)
         #logger.debug('Threads: {}'.format(thread_pool.get_thread_status()))
+    logger.info('Looping ended, app will exit')
 
 def run(arg_list):
     if 'debug_remote' in arg_list:
