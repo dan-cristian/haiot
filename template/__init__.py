@@ -8,14 +8,14 @@ import template_run
 initialised=False
 
 def unload():
-    logging.info('Template module unloading')
+    logger.info('Template module unloading')
     #...
     thread_pool.remove_callable(template_run.thread_run)
     global initialised
     initialised = False
 
 def init():
-    logging.info('Template module initialising')
+    logger.info('Template module initialising')
     thread_pool.add_callable(template_run.thread_run, run_interval_second=60)
     global initialised
     initialised = True

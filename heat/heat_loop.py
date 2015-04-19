@@ -1,6 +1,6 @@
 __author__ = 'dcristian'
 
-import logging
+from main import logger
 import datetime
 from pydispatch import dispatcher
 from main.admin import models
@@ -16,23 +16,23 @@ def __save_heat_state_db(zone='', heat_is_on=''):
         if zone_heat_relay.heat_is_on != heat_is_on:
             zone_heat_relay.heat_is_on = heat_is_on
             zone_heat_relay.updated_on = datetime.datetime.now()
-            logging.debug('Heat state changed to is-on {} in zone {}'.format(heat_is_on, zone.name))
+            logger.debug('Heat state changed to is-on {} in zone {}'.format(heat_is_on, zone.name))
             zone_heat_relay.notify_transport_enabled = True
             db.session.commit()
         else:
-            logging.debug('Heat state [{}] unchanged in zone {}'.format(heat_is_on, zone.name))
+            logger.debug('Heat state [{}] unchanged in zone {}'.format(heat_is_on, zone.name))
     else:
-        logging.warning('No heat relay found in zone {}'.format(zone.name))
+        logger.warning('No heat relay found in zone {}'.format(zone.name))
 
 def __decide_action(zone, current_temperature, target_temperature):
     assert isinstance(zone, models.Zone)
     if current_temperature < target_temperature:
-        logging.info('Heat must be ON in {} temp {} target {}'.format(zone.name, current_temperature,
+        logger.info('Heat must be ON in {} temp {} target {}'.format(zone.name, current_temperature,
                                                                       target_temperature))
         heat_is_on = True
 
     else:
-        logging.info('Heat must be OFF in {} temp {} target {}'.format(zone.name, current_temperature,
+        logger.info('Heat must be OFF in {} temp {} target {}'.format(zone.name, current_temperature,
                                                                        target_temperature))
         heat_is_on = False
     __save_heat_state_db(zone=zone, heat_is_on=heat_is_on)
@@ -50,12 +50,12 @@ def __update_zone_heat(zone, heat_schedule, sensor):
         temperature_code = pattern[hour]
         temperature = models.TemperatureTarget.query.filter_by(code=temperature_code).first()
         if temperature:
-            logging.info('Active pattern for zone {} is {} temp {}'.format(zone.name, schedule_pattern.name,
+            logger.info('Active pattern for zone {} is {} temp {}'.format(zone.name, schedule_pattern.name,
                                                                                  temperature.target))
             if sensor.temperature:
                 __decide_action(zone, sensor.temperature, temperature.target)
         else:
-            logging.critical('Unknown temperature pattern code {}'.format(temperature_code))
+            logger.critical('Unknown temperature pattern code {}'.format(temperature_code))
 
 def loop_zones():
     zone_list = models.Zone.query.all()
@@ -69,7 +69,7 @@ def loop_zones():
             if heat_schedule.active and sensor:
                 sensor_last_update_seconds = (datetime.datetime.now()-sensor.updated_on).total_seconds()
                 if sensor_last_update_seconds > 60 * 60:
-                    logging.warning('Sensor {} not updated in last 60 minutes, unusual'.format(sensor.zone_name))
+                    logger.warning('Sensor {} not updated in last 60 minutes, unusual'.format(sensor.zone_name))
                 __update_zone_heat(zone, heat_schedule, sensor)
 
 progress_status = None
@@ -79,7 +79,7 @@ def get_progress():
 
 def thread_run():
     global progress_status
-    logging.debug('Processing heat')
+    logger.debug('Processing heat')
     progress_status = 'Looping zones'
     loop_zones()
     return 'Heat ok'

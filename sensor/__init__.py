@@ -3,8 +3,7 @@ __author__ = 'dcristian'
 #! venv/bin/python
 
 from main.admin import thread_pool
-import logging
-import math
+from main import logger
 import owsensor_loop
 import rfxcom_run
 initialised=False
@@ -20,7 +19,7 @@ def unload():
     initialised = False
 
 def init():
-    logging.info('Sensor module initialising')
+    logger.info('Sensor module initialising')
     if owsensor_loop.init():
         thread_pool.add_callable(owsensor_loop.thread_run, run_interval_second=15)
     if rfxcom_run.init():

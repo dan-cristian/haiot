@@ -1,6 +1,6 @@
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
-import logging
+from main import logger
 import datetime
 import dateutil.parser
 import json
@@ -29,24 +29,24 @@ def __update_ddns_rackspace():
             cache['ip']=socket.gethostbyname(config['record_name'])
         except Exception, ex:
             cache['ip']=None
-            logging.warning('Unable to get ip for host {}, err={}'.format(config['record_name'], ex))
+            logger.warning('Unable to get ip for host {}, err={}'.format(config['record_name'], ex))
         try:
             ip = requests.get('http://icanhazip.com').text.strip()
         except Exception, ex:
-            logging.warning('Unable to get my ip, err={}'.format(ex))
+            logger.warning('Unable to get my ip, err={}'.format(ex))
             ip = None
 
         if ip == '' or ip is None or ip == cache['ip']:
-            logging.debug('IP address is still ' + ip + '; nothing to update.')
+            logger.debug('IP address is still ' + ip + '; nothing to update.')
             return
         else:
-            logging.info('IP address was changed, old was {} new is {}'.format(cache['ip'], ip))
+            logger.info('IP address was changed, old was {} new is {}'.format(cache['ip'], ip))
 
         cache['ip'] = ip
         now = datetime.datetime.now()
         expires = dateutil.parser.parse(cache['auth']['expires'])
         if expires <= now:
-            logging.info('Expired rackspace authentication token; reauthenticating...')
+            logger.info('Expired rackspace authentication token; reauthenticating...')
             # authenticate with Rackspace
             authUrl = 'https://identity.api.rackspacecloud.com/v2.0/tokens'
             authData = {
@@ -83,13 +83,13 @@ def __update_ddns_rackspace():
 
         result = requests.put(url, data=json.dumps(data), headers=headers)
         if result.ok:
-            logging.info('Updated IP address to ' + cache['ip'])
+            logger.info('Updated IP address to ' + cache['ip'])
         else:
-            logging.warning('Unable to update IP, response={}'.format(result))
+            logger.warning('Unable to update IP, response={}'.format(result))
     except Exception, ex:
-        logging.warning('Unable to check and update dns, err={}'.format(ex))
+        logger.warning('Unable to check and update dns, err={}'.format(ex))
 
 def thread_run():
-    logging.debug('Processing ddns_run')
+    logger.debug('Processing ddns_run')
     __update_ddns_rackspace()
     return 'Processed ddns_run'

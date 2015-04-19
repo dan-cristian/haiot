@@ -1,6 +1,6 @@
 __author__ = 'dcristian'
 import os
-import logging
+from main import logger
 import socket
 import constant
 
@@ -13,7 +13,7 @@ def init():
         constant.HOST_MAIN_IP = s.getsockname()[0]
         s.close()
     except Exception, ex:
-        logging.warning('Cannot obtain main IP accurately, probably not connected to Internet, ex={}'.format(ex))
+        logger.warning('Cannot obtain main IP accurately, probably not connected to Internet, ex={}'.format(ex))
         constant.HOST_MAIN_IP=socket.gethostbyname(socket.gethostname())
 
-    logging.info('Running on OS {} HOST {} IP {}'.format(constant.OS, constant.HOST_NAME, constant.HOST_MAIN_IP))
+    logger.info('Running on OS {} HOST {} IP {}'.format(constant.OS, constant.HOST_NAME, constant.HOST_MAIN_IP))

@@ -1,8 +1,6 @@
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
-import logging
-
-from main.admin import thread_pool
+from main import logger
 from main import app
 from flask import request
 
@@ -15,31 +13,31 @@ flask_thread=None
 
 @app.route('/exit', methods=['POST'])
 def exit():
-    logging.info('WebUI module unloading')
+    logger.info('WebUI module unloading')
     try:
         if not app.testing:
-            logging.warning('Unable to shutdown werk if not in testing mode')
+            logger.warning('Unable to shutdown werk if not in testing mode')
         else:
             #with app.app_context():
                 func = request.environ.get('werkzeug.server.shutdown')
                 if func is None:
-                    logging.warning('unable to unload webui, not running with the Werkzeug Server')
+                    logger.warning('unable to unload webui, not running with the Werkzeug Server')
                 else:
-                    logging.info('shuting down werkzeug')
+                    logger.info('shuting down werkzeug')
                     func()
                 global initialised
                 initialised = False
                 return 'werkzeug exited'
     except Exception, ex:
-        logging.warning('Unable to shutdown werkzeug, err {}'.format(ex))
+        logger.warning('Unable to shutdown werkzeug, err {}'.format(ex))
     return 'werkzeug not exited'
 
 def unload():
-    logging.info('Webui module unloading')
+    logger.info('Webui module unloading')
     #response = app.test_client().post('/exit')
 
 def init():
-    logging.info('WebUI module initialising')
+    logger.info('WebUI module initialising')
     #thread_pool.add_callable(webui.thread_run, run_interval_second=60)
     from main.admin import admin, user
     app.register_blueprint(admin, url_prefix='/admin')

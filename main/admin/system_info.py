@@ -1,6 +1,6 @@
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
-import logging
+from main import logger
 from collections import OrderedDict
 from common import constant
 
@@ -36,7 +36,7 @@ def init():
                     words = line.split(':')
                     sysinfo[words[0].strip()] = words[1].strip()
                 except Exception, ex:
-                    logging.warning('get sysinfo line split error [{}] line [{}]'.format(ex, line))
+                    logger.warning('get sysinfo line split error [{}] line [{}]'.format(ex, line))
             global description_model_name, description_machine, description_system_type, description_hardware, \
                 description_revision, description_cpu_model
             if 'model name' in sysinfo:     description_model_name = sysinfo['model name']

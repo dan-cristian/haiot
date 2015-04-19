@@ -14,7 +14,7 @@ def unload():
     initialised = False
 
 def init():
-    logging.info('TEST module initialising')
+    logger.info('TEST module initialising')
     #thread_pool.add_callable(test_run.thread_run, run_interval_second=60)
     global initialised
     initialised = True

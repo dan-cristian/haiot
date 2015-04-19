@@ -2,7 +2,7 @@ __author__ = 'dcristian'
 import subprocess
 import os
 import cStringIO
-import logging
+from main import logger
 import shutil
 import time
 import math
@@ -17,7 +17,7 @@ try:
 
     import_module_psutil_exist = True
 except Exception, ex:
-    logging.critical('PSUtil module not available')
+    logger.critical('PSUtil module not available')
     import_module_psutil_exist = False
 
 ERR_TEXT_NO_DEV = 'failed: No such device'
@@ -50,7 +50,7 @@ def __read_all_hdd_smart():
                 record.system_name = constant.HOST_NAME
                 assert isinstance(record, models.SystemDisk)
                 record.hdd_disk_dev = constant.DISK_DEV_MAIN + disk_letter
-                logging.debug('Processing disk {}'.format(record.hdd_disk_dev))
+                logger.debug('Processing disk {}'.format(record.hdd_disk_dev))
                 try:
                     record.power_status = __read_hddparm(disk_dev=record.hdd_disk_dev)
                 except Exception, ex:
@@ -75,7 +75,7 @@ def __read_all_hdd_smart():
                     line = output.readline()
                     if constant.SMARTCTL_ERROR_NO_DISK in line:
                         current_disk_valid = False
-                        logging.debug('First disk that cannot be read is {}'.format(record.hdd_disk_dev))
+                        logger.debug('First disk that cannot be read is {}'.format(record.hdd_disk_dev))
                     if constant.SMARTCTL_TEMP_ID in line:
                         words = line.split(None)
                         record.temperature = words[9]
@@ -109,7 +109,7 @@ def __read_all_hdd_smart():
                 # print ('Disk dev is {}'.format(disk_dev))
                 record.updated_on = datetime.datetime.now()
                 if record.serial is None or record.serial == '':
-                    logging.debug('This hdd will be skipped, probably does not exist if serial not retrieved')
+                    logger.debug('This hdd will be skipped, probably does not exist if serial not retrieved')
                 else:
                     record.hdd_name = '{} {} {}'.format(record.system_name, record.hdd_device, record.hdd_disk_dev)
                     current_record = models.SystemDisk.query.filter_by(hdd_disk_dev=record.hdd_disk_dev,
@@ -119,16 +119,16 @@ def __read_all_hdd_smart():
                 disk_letter = chr(ord(disk_letter) + 1)
                 disk_count = disk_count + 1
             except subprocess.CalledProcessError, ex:
-                logging.debug('Invalid disk {} err {}'.format(record.hdd_disk_dev, ex))
+                logger.debug('Invalid disk {} err {}'.format(record.hdd_disk_dev, ex))
                 current_disk_valid = False
             except Exception as exc:
                 if disk_count > 10:
-                    logging.warning('Too many disks iterated {}, missing or wrong sudo rights for smartctl'.format(
+                    logger.warning('Too many disks iterated {}, missing or wrong sudo rights for smartctl'.format(
                         disk_count))
-                logging.warning('Disk read error {} dev {}'.format(exc, record.hdd_disk_dev))
+                logger.warning('Disk read error {} dev {}'.format(exc, record.hdd_disk_dev))
                 current_disk_valid = False
     else:
-        logging.debug('Unable to read smart status')
+        logger.debug('Unable to read smart status')
 
 
 def get_device_name_linux_style(dev):
@@ -174,9 +174,9 @@ def __read_hddparm(disk_dev=''):
             power_status = 'not available'
             return power_status
     except subprocess.CalledProcessError, ex:
-        logging.debug('Invalid disk {} err {}'.format(disk_dev, ex))
+        logger.debug('Invalid disk {} err {}'.format(disk_dev, ex))
     except Exception as exc:
-        logging.warning('Disk read error {} disk was {} err {}'.format(exc.message, disk_dev, exc))
+        logger.warning('Disk read error {} disk was {} err {}'.format(exc.message, disk_dev, exc))
     raise subprocess.CalledProcessError(1, 'No power status obtained on hdparm, output={}'.format(hddparm_out))
 
 
@@ -189,7 +189,7 @@ def __get_mem_avail_percent_linux():
                 #MemTotal:        8087892 kB
                 meminfo[line.split(':')[0]] = line.split(':')[1].split()[0].strip()
             except Exception, ex:
-                logging.warning('get mem line split error {} line {}'.format(ex, line))
+                logger.warning('get mem line split error {} line {}'.format(ex, line))
         total = int(meminfo['MemTotal'])
         free = int(meminfo['MemFree'])
         memory_available_percent = float(100) * free / total
@@ -205,7 +205,7 @@ def __get_uptime_linux_days():
         line = f.readline()
         uptime_seconds = float(line.split()[0])
     except Exception, ex:
-        logging.warning('Unable to read uptime err {}'.format(ex))
+        logger.warning('Unable to read uptime err {}'.format(ex))
     f.close()
     return uptime_seconds / (60 * 60 * 24)
 
@@ -279,9 +279,9 @@ def __get_cpu_utilisation_linux():
                     CPU_Percentage = math.ceil(CPU_Percentage * 10) / 10
                 previous_procstat_list = words
             else:
-                logging.warning('proc/stat returned unexpected number of words on line {}'.format(line))
+                logger.warning('proc/stat returned unexpected number of words on line {}'.format(line))
         except Exception, ex:
-            logging.warning('get cpu line split error {} line {}'.format(ex, line))
+            logger.warning('get cpu line split error {} line {}'.format(ex, line))
         # sampling CPU usage for 1 second
         time.sleep(1)
     return CPU_Percentage
@@ -309,7 +309,7 @@ def __read_system_attribs():
                 record.memory_available_percent = __get_mem_avail_percent_linux()
                 record.cpu_usage_percent = __get_cpu_utilisation_linux()
                 record.uptime_days = int(__get_uptime_linux_days())
-                logging.info('Read mem free {} cpu {} uptime {}'.format(record.memory_available_percent,
+                logger.info('Read mem free {} cpu {} uptime {}'.format(record.memory_available_percent,
                                                                         record.cpu_usage_percent, record.uptime_days))
         progress_status = 'Saving mem cpu uptime to db'
         record.name = constant.HOST_NAME
@@ -318,21 +318,21 @@ def __read_system_attribs():
         record.save_changed_fields(current_record=current_record, new_record=record,
                                    notify_transport_enabled=True, save_to_graph=True)
     except Exception, ex:
-        logging.warning('Error saving system to DB, err {}'.format(ex))
+        logger.warning('Error saving system to DB, err {}'.format(ex))
 
 def __check_log_file_size():
     if not main.LOG_FILE is None:
         try:
             size = os.path.getsize(main.LOG_FILE)
             if size > 1024 * 1024 * 10:
-                logging.info('Log file {} size is {}, truncating'.format(main.LOG_FILE, size))
+                logger.info('Log file {} size is {}, truncating'.format(main.LOG_FILE, size))
                 shutil.copy(main.LOG_FILE, main.LOG_FILE+'.last')
                 file = open(main.LOG_FILE, mode='rw+')
                 file.truncate()
                 file.seek(0)
                 file.close()
         except Exception, ex:
-            logging.warning('Cannot retrieve or truncate log file {} err={}'.format(main.LOG_FILE, ex))
+            logger.warning('Cannot retrieve or truncate log file {} err={}'.format(main.LOG_FILE, ex))
 
 def init():
     pass
@@ -352,5 +352,6 @@ def thread_run():
     progress_status = 'reading system attribs'
     __read_system_attribs()
     progress_status = 'checking log size'
-    __check_log_file_size()
+    #not needed if RotatingFileHandler if used for logging
+    #__check_log_file_size()
     progress_status = 'completed'

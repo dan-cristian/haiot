@@ -6,7 +6,7 @@ import time
 import sys
 
 from main.admin import thread_pool
-import logging
+from main import logger
 from main.admin import model_helper
 from common import constant
 import receiver
@@ -20,21 +20,21 @@ client_connecting = False
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
-    logging.info("Connected to mqtt with result code " + str(rc))
+    logger.info("Connected to mqtt with result code " + str(rc))
     global client_connected
     client_connected = True
     subscribe()
 
 def on_disconnect(client, userdata, rc):
     if rc != 0:
-        logging.warning("Unexpected disconnection from mqtt")
-    logging.warning("Disconnected from mqtt")
+        logger.warning("Unexpected disconnection from mqtt")
+    logger.warning("Disconnected from mqtt")
     global client_connected
     client_connected = False
 
 def subscribe():
     global topic
-    logging.info('Subscribing to mqtt topic={}'.format(topic))
+    logger.info('Subscribing to mqtt topic={}'.format(topic))
     mqtt_client.on_subscribe = receiver.on_subscribe
     mqtt_client.username_pw_set(constant.HOST_NAME)
     mqtt_client.user_data_set(constant.HOST_NAME + " userdata")
@@ -47,13 +47,13 @@ def unload():
     try:
         mqtt_client.loop_stop()
     except Exception, ex:
-        logging.warning('Unable to stop mqtt loop, err {}'.format(ex))
+        logger.warning('Unable to stop mqtt loop, err {}'.format(ex))
     mqtt_client.disconnect()
 
 def init():
     global client_connecting
     if client_connecting:
-        logging.warning('Mqtt client already in connection process, skipping attempt to connect until done')
+        logger.warning('Mqtt client already in connection process, skipping attempt to connect until done')
         return
 
     host_list=[
@@ -70,7 +70,7 @@ def init():
         client_connecting = True
         host = host_port[0]
         port = host_port[1]
-        logging.info('MQTT publisher module initialising, host={} port={}'.format(host, port))
+        logger.info('MQTT publisher module initialising, host={} port={}'.format(host, port))
         client_connected=False
         retry_count=0
         while (not client_connected) and (retry_count < constant.ERROR_CONNECT_MAX_RETRY_COUNT):
@@ -93,7 +93,7 @@ def init():
         if client_connected:
             break
         else:
-            logging.warning('Unable to connect to mqtt server {}:{}'.format(host, port))
+            logger.warning('Unable to connect to mqtt server {}:{}'.format(host, port))
     if not client_connected:
-        logging.critical('MQTT connection not available, all connect attempts failed')
+        logger.critical('MQTT connection not available, all connect attempts failed')
 

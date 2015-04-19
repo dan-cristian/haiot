@@ -1,7 +1,6 @@
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
-import logging
-
+from main import logger
 from main.admin import thread_pool
 import node_run
 
@@ -14,7 +13,7 @@ def unload():
     initialised = False
 
 def init():
-    logging.info('Node module initialising')
+    logger.info('Node module initialising')
     #node_run.init()
     thread_pool.add_callable_progress(node_run.thread_run, run_interval_second=10,progress_func=node_run.get_progress)
     global initialised

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-import logging
+from main import logger
 from copy import deepcopy
 from main import db
 import graphs
@@ -34,7 +34,7 @@ class DbEvent:
                     old_value = getattr(current_record, column_name)
                     if (not new_value is None) and (str(old_value) != str(new_value)):
                         if column_name != 'updated_on':
-                            logging.info('{} {}={} oldvalue={}'.format(type(self), column_name, new_value, old_value))
+                            logger.info('{} {}={} oldvalue={}'.format(type(self), column_name, new_value, old_value))
                         setattr(current_record, column_name, new_value)
                         current_record.last_commit_field_changed_list.append(column_name)
                 if len(current_record.last_commit_field_changed_list) == 0:
@@ -52,10 +52,10 @@ class DbEvent:
 
             db.session.commit()
         except Exception, ex:
-            logging.critical('Error when saving db changes {}, err={}'.format(new_record, ex))
+            logger.critical('Error when saving db changes {}, err={}'.format(new_record, ex))
             raise ex
         #else:
-        #    logging.warning('Incorrect parameters received on save changed fields to db')
+        #    logger.warning('Incorrect parameters received on save changed fields to db')
 
 class Module(db.Model):
     id = db.Column(db.Integer, primary_key=True)

@@ -1,5 +1,5 @@
 from pydispatch import dispatcher
-import logging
+from main import logger
 from common import constant, variable, utils
 import common.utils
 import transport
@@ -14,13 +14,13 @@ def handle_local_event_db_post(model, row):
     #executed on local db changes done via web ui only
     print 'Signal was sent by model {} row {}'.format(model, row)
     if str(models.Parameter) in str(model):
-        logging.info('Detected Parameter change ' + row)
+        logger.info('Detected Parameter change ' + row)
     elif str(models.Module) in str(model):
-        logging.info('Detected Module change, applying potential changes')
+        logger.info('Detected Module change, applying potential changes')
         if row.host_name == constant.HOST_NAME:
             main.init_module(row.name, row.active)
     elif str(models.Node) in str(model):
-        logging.info('Detected Node change, applying potential changes')
+        logger.info('Detected Node change, applying potential changes')
         txt = model_helper.model_row_to_json(row, operation='update')
         transport.send_message_json(json = txt)
 
@@ -46,11 +46,11 @@ def handle_event_mqtt_received(client, userdata, topic, obj):
                 if graph_plotly.initialised:
                     graph_plotly.upload_data(obj)
                 else:
-                    logging.debug('Graph not initialised on obj upload to graph')
+                    logger.debug('Graph not initialised on obj upload to graph')
             else:
                 pass
         else:
-            logging.debug('Mqtt event without graphing capabilities {}'.format(obj))
+            logger.debug('Mqtt event without graphing capabilities {}'.format(obj))
 
 def on_models_committed(sender, changes):
     try:
@@ -66,7 +66,7 @@ def on_models_committed(sender, changes):
                 else:
                     pass
     except Exception, ex:
-        logging.critical('Error in DB commit hook, {}'.format(ex))
+        logger.critical('Error in DB commit hook, {}'.format(ex))
 
 def init():
     #http://pydispatcher.sourceforge.net/

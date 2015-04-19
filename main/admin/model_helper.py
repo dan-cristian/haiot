@@ -1,5 +1,5 @@
 __author__ = 'dcristian'
-import logging
+from main import logger
 import random
 import sys
 import datetime
@@ -35,17 +35,17 @@ def model_row_to_json(obj, operation=''):
                 if value is not None and not hasattr(value,'_sa_class_manager'):
                     safe_obj[attr] = value
                 else:
-                    logging.debug('Ignoring obj to json, not simple primitive {}'.format(value))
+                    logger.debug('Ignoring obj to json, not simple primitive {}'.format(value))
         return utils.obj2json(safe_obj)
     except Exception, ex:
-        logging.critical('Error convert model obj to json, err {}'.format(ex))
+        logger.critical('Error convert model obj to json, err {}'.format(ex))
 
 def get_param(name):
     try:
         val = models.Parameter.query.filter_by(name=name).first().value
         return val
     except ValueError:
-        logging.warning('Unable to get parameter {} error {}'.format(name, sys.exc_info()[0]))
+        logger.warning('Unable to get parameter {} error {}'.format(name, sys.exc_info()[0]))
         raise ValueError
 
 def commit():
@@ -53,9 +53,9 @@ def commit():
         db.session.commit()
     except IntegrityError:
         db.session.rollback()
-        logging.warning('Unable to commit DB session {}, rolled back'.format(db.session))
+        logger.warning('Unable to commit DB session {}, rolled back'.format(db.session))
     except InvalidRequestError:
-        logging.warning('Error on commit {}, ignoring'.format(db.session))
+        logger.warning('Error on commit {}, ignoring'.format(db.session))
 
 
 def get_mod_name(module):
@@ -65,10 +65,10 @@ def check_table_schema(table, model_auto_update=False):
     try:
         count = table.query.all()
     except OperationalError, oex:
-        logging.critical('Table {} schema in DB seems outdated, err {}, DROP it and recreate (y/n)?'.format(oex, table))
+        logger.critical('Table {} schema in DB seems outdated, err {}, DROP it and recreate (y/n)?'.format(oex, table))
         read_drop_table(table, oex, model_auto_update)
     except InvalidRequestError:
-        logging.warning('Error on check table schema {}, ignoring'.format(table))
+        logger.warning('Error on check table schema {}, ignoring'.format(table))
 
 def read_drop_table(table, original_exception, drop_without_user_ask=False):
     if not drop_without_user_ask:
@@ -76,14 +76,14 @@ def read_drop_table(table, original_exception, drop_without_user_ask=False):
     else:
         x='y'
     if x=='y':
-        logging.warning('Dropping table {}'.format(table))
+        logger.warning('Dropping table {}'.format(table))
         table_name=table.query._primary_entity.entity_zero._with_polymorphic_selectable.description
         try:
             result = db.engine.execute('DROP TABLE '+table_name)
             commit()
         except Exception, ex:
-            logging.warning('Something went wrong on drop, err {}'.format(ex))
-        logging.info('Creating missing schema object after table drop')
+            logger.warning('Something went wrong on drop, err {}'.format(ex))
+        logger.info('Creating missing schema object after table drop')
         db.create_all()
     else:
         raise original_exception
@@ -104,7 +104,7 @@ def populate_tables(model_auto_update=False):
         ]
     check_table_schema(models.Parameter, model_auto_update)
     if len(models.Parameter.query.all()) < len(param_list):
-        logging.info('Populating Parameter with default values')
+        logger.info('Populating Parameter with default values')
         models.Parameter.query.delete()
         for param_tuple in param_list:
             param=models.Parameter(id=param_tuple[0], name=param_tuple[1], value=param_tuple[2])
@@ -124,7 +124,7 @@ def populate_tables(model_auto_update=False):
              [47,'birou'], [48, 'solar jos']
              ]
     if len(models.Zone.query.all()) < len(zones):
-        logging.info('Populating Zone with default values')
+        logger.info('Populating Zone with default values')
         models.Zone.query.delete()
         for pair in zones:
             db.session.add(models.Zone(pair[0], pair[1]))
@@ -140,7 +140,7 @@ def populate_tables(model_auto_update=False):
             ]
     check_table_schema(models.TemperatureTarget, model_auto_update)
     if len(models.TemperatureTarget.query.all()) < len(temptarget_list):
-        logging.info('Populating Temperature Target with default values')
+        logger.info('Populating Temperature Target with default values')
         models.TemperatureTarget.query.delete()
         for tuple in temptarget_list:
             record=models.TemperatureTarget(id=tuple[0], code=tuple[1], target=tuple[2])
@@ -155,7 +155,7 @@ def populate_tables(model_auto_update=False):
             ]
     check_table_schema(models.SchedulePattern, model_auto_update)
     if len(models.SchedulePattern.query.all()) < len(value_list):
-        logging.info('Populating Schedule Pattern with default values')
+        logger.info('Populating Schedule Pattern with default values')
         models.SchedulePattern.query.delete()
         for tuple in value_list:
             record=models.SchedulePattern(id=tuple[0], name=tuple[1], pattern=tuple[2])
@@ -168,7 +168,7 @@ def populate_tables(model_auto_update=False):
             ]
     check_table_schema(models.HeatSchedule, model_auto_update)
     if len(models.HeatSchedule.query.all()) < len(value_list):
-        logging.info('Populating Heat Schedule with default values')
+        logger.info('Populating Heat Schedule with default values')
         models.HeatSchedule.query.delete()
         for tuple in value_list:
             record=models.HeatSchedule(id=tuple[0], zone_id=tuple[1], pattern_week_id=tuple[2],
@@ -178,7 +178,7 @@ def populate_tables(model_auto_update=False):
 
     check_table_schema(models.Node, model_auto_update)
     if len(models.Node.query.filter_by(name=constant.HOST_NAME).all()) == 0:
-        logging.info('Populating Node {} with default values'.format(constant.HOST_NAME))
+        logger.info('Populating Node {} with default values'.format(constant.HOST_NAME))
         if constant.HOST_NAME=='nas':
             priority = 0
         elif constant.HOST_NAME=='netbook':
@@ -201,7 +201,7 @@ def populate_tables(model_auto_update=False):
     check_table_schema(models.SystemDisk, model_auto_update)
     check_table_schema(models.Sensor, model_auto_update)
     #if len(models.Sensor.query.all()) == 0:
-        #logging.info('Populating Sensor with a test value')
+        #logger.info('Populating Sensor with a test value')
         #sens = models.Sensor(address='ADDRESSTEST')
         #db.session.add(models.Sensor(0, address='ADDRESSTEST'))
         #db.session.add(sens)
@@ -243,13 +243,13 @@ def populate_tables(model_auto_update=False):
     check_table_schema(models.Module, model_auto_update)
     if module_list_dict.has_key(constant.HOST_NAME):
         module_list = module_list_dict[constant.HOST_NAME]
-        logging.info('Module is initialised with host {} specific values'.format(constant.HOST_NAME))
+        logger.info('Module is initialised with host {} specific values'.format(constant.HOST_NAME))
     else:
         module_list = module_list_dict['default']
-        logging.info('Module is initialise with default template values')
+        logger.info('Module is initialise with default template values')
 
     if len(models.Module.query.filter_by(host_name=constant.HOST_NAME).all()) < len(module_list):
-        logging.info('Populating Module with default values')
+        logger.info('Populating Module with default values')
         models.Module.query.filter_by(host_name=constant.HOST_NAME).delete()
 
         for tuple in module_list:
@@ -262,7 +262,7 @@ def populate_tables(model_auto_update=False):
         models.GpioPin.query.filter_by(pin_type=constant.GPIO_PIN_TYPE_BBB).delete()
         commit()
         for host_name in ['beaglebone']:
-            logging.info('Populating GpioPins with default beabglebone {} values'.format(host_name))
+            logger.info('Populating GpioPins with default beabglebone {} values'.format(host_name))
             for rail in range(8,10): #last range is not part of the loop
                 for pin in range(01, 47):
                     gpio = models.GpioPin()
@@ -273,7 +273,7 @@ def populate_tables(model_auto_update=False):
                     db.session.add(gpio)
             commit()
         for host_name in ['pi-power']:
-            logging.info('Populating GpioPins with default raspberry pi {} values'.format(host_name))
+            logger.info('Populating GpioPins with default raspberry pi {} values'.format(host_name))
             for pin in range(01, 27): # -1
                 gpio = models.GpioPin()
                 gpio.pin_type=constant.GPIO_PIN_TYPE_PI
@@ -287,7 +287,7 @@ def populate_tables(model_auto_update=False):
                                   [11,'P8_15']]}
     if len(models.ZoneAlarm.query.all()) < len(zonealarm_list):
         for host_name in zonealarm_list.keys():
-            logging.info('Populating ZoneAlarm for {} with default values'.format(host_name))
+            logger.info('Populating ZoneAlarm for {} with default values'.format(host_name))
             models.ZoneAlarm.query.delete()
             commit()
             for pair in zonealarm_list[host_name]:
@@ -302,7 +302,7 @@ def populate_tables(model_auto_update=False):
         models.ZoneHeatRelay.query.delete()
         commit()
         for host_name in heat_relay_list.keys():
-            logging.info('Populating ZoneHeatRelay for {} with default values'.format(host_name))
+            logger.info('Populating ZoneHeatRelay for {} with default values'.format(host_name))
             for pair in heat_relay_list[host_name]:
                 db.session.add(models.ZoneHeatRelay(pair[0], pair[1], host_name))
             commit()
@@ -319,7 +319,7 @@ def populate_tables(model_auto_update=False):
             [4, 'B5000004F3285F28', 'dormitor'], [47, 'f9:01','birou'], [23, 'f3:01', 'fridge']
         ]
     if len(models.ZoneSensor.query.all()) < len(zonesensor_list):
-        logging.info('Populating ZoneSensor with default values')
+        logger.info('Populating ZoneSensor with default values')
         models.ZoneSensor.query.delete()
         commit()
         for pair in zonesensor_list:

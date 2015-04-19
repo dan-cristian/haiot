@@ -8,14 +8,12 @@ from flask import Flask, redirect, url_for
 from flask_sqlalchemy import models_committed
 import datetime
 import signal
-import logging, logging.handlers
-import common
-from common import constant
+
 
 #location for sqlite db
 DB_LOCATION=None
 #default logging
-LOGGING_LEVEL=logging.INFO
+LOGGING_LEVEL=None
 LOG_FILE=None
 app=None
 db=None
@@ -24,6 +22,9 @@ shutting_down=False
 exit_code = 0
 MODEL_AUTO_UPDATE=False
 LOG_TO_SYSLOG = False
+logger = None
+
+from . import logger
 
 def my_import(name):
     #http://stackoverflow.com/questions/547829/how-to-dynamically-load-a-python-class
@@ -36,24 +37,26 @@ def my_import(name):
 def init_module(module_name, module_is_active):
     dynclass = my_import(module_name)
     if module_is_active:
-        logging.info('Module {} is active'.format(module_name))
+        logger.info('Module {} is active'.format(module_name))
         if not dynclass.initialised:
-            logging.info('Module {} initialising'.format(module_name))
+            logger.info('Module {} initialising'.format(module_name))
             dynclass.init()
         else:
-            logging.info('Module {} already initialised'.format(module_name))
+            logger.info('Module {} already initialised'.format(module_name))
     else:
-        logging.info("Module {} is not active".format(module_name))
+        logger.info("Module {} is not active".format(module_name))
         if dynclass.initialised:
-            logging.info('Module {} has been deactivated, unloading'.format(module_name))
+            logger.info('Module {} has been deactivated, unloading'.format(module_name))
             dynclass.unload()
             del dynclass
         else:
-            logging.info('Module {} already disabled'.format(module_name))
+            logger.info('Module {} already disabled'.format(module_name))
 
 def init_modules():
     import admin.models
     import admin.model_helper
+    from common import constant
+
     module_list = admin.models.Module.query.filter_by(host_name=constant.HOST_NAME).order_by(
         admin.models.Module.start_order).all()
     for mod in module_list:
@@ -63,7 +66,7 @@ def init_modules():
             init_module(mod.name, mod.active)
 
 def signal_handler(signal, frame):
-    logging.warning('I got signal {} frame {}, exiting'.format(signal, frame))
+    logger.warning('I got signal {} frame {}, exiting'.format(signal, frame))
     global exit_code
     exit_code = 1
     unload()
@@ -82,7 +85,7 @@ def execute_command(command):
 
 
 def unload():
-    logging.warning('Main module is unloading, application will exit')
+    logger.warning('Main module is unloading, application will exit')
     import webui, admin.thread_pool, mqtt_io
     global shutting_down
     shutting_down = True
@@ -93,31 +96,39 @@ def unload():
         mqtt_io.unload()
 
 def init():
+    import logging
+    import logging.handlers
     signal.signal(signal.SIGTERM, signal_handler)
     global LOGGING_LEVEL, LOG_FILE, LOG_TO_SYSLOG
+    global logger
 
-    my_logger = logging.getLogger('haiot ' + os.name)
-    my_logger.setLevel(logging.DEBUG)
+    logging.basicConfig(format='%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(threadName)s:%(message)s')
+    logger = logging.getLogger('haiot ' + os.name)
+
+    logger.setLevel(LOGGING_LEVEL)
     if LOG_TO_SYSLOG:
         try:
             handler = logging.handlers.SysLogHandler(address = '/dev/log')
-            my_logger.addHandler(handler)
-            my_logger.info('Syslog program started on {} at {}'.format(datetime.datetime.now(), constant.HOST_NAME))
+            logger.addHandler(handler)
+            logger.info('Syslog program started on {} at {}'.format(datetime.datetime.now(), os.name))
             print 'Syslog logger initialised'
         except Exception, ex:
-            print 'Unable to init syslog handler, probably I run on windows'
+            try:
+                ntl = logging.handlers.NTEventLogHandler(appname='haiot')
+                logger.addHandler(ntl)
+            except Exception, ex:
+                print 'Unable to init syslog handler'
     else:
-        print 'Not logging to syslog'
-    if LOG_FILE is None:
-        logging.basicConfig(format='%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(threadName)s:%(message)s',
-                        level=LOGGING_LEVEL)
-    else:
-        logging.basicConfig(format='%(asctime)s:%(levelname)s:%(module)s:%(funcName)s:%(threadName)s:%(message)s',
-                        level=LOGGING_LEVEL, filename=LOG_FILE)
-    logging.info('Logging level is {}'.format(LOGGING_LEVEL))
-    #annoying info messages
+        print 'Not logging to syslog, maybe to file'
+        if not LOG_FILE is None:
+            file_handler = logging.handlers.RotatingFileHandler(LOG_FILE, maxBytes=1024*1024*1, backupCount=3)
+            logger.addHandler(file_handler)
+    # log=c:\tmp\iot-nohup.out
+    logger.info('Logging level is {}'.format(LOGGING_LEVEL))
+    #remove annoying info messages
     logging.getLogger("requests").setLevel(logging.WARNING)
 
+    import common
     common.init()
 
     global app, db, DB_LOCATION
@@ -150,14 +161,14 @@ def init():
     @models_committed.connect_via(app)
     def on_models_committed(sender, changes):
         from main.admin import event
-        logging.debug('Model commit detected sender {} change {}'.format(sender, changes))
+        logger.debug('Model commit detected sender {} change {}'.format(sender, changes))
         event.on_models_committed(sender, changes)
 
     #stop app from exiting
     from admin import thread_pool
     while not shutting_down:
         time.sleep(1)
-        #logging.debug('Threads: {}'.format(thread_pool.get_thread_status()))
+        #logger.debug('Threads: {}'.format(thread_pool.get_thread_status()))
 
 def run(arg_list):
     if 'debug_remote' in arg_list:
@@ -175,10 +186,13 @@ def run(arg_list):
         print 'Setting default DB location on disk as {}'.format(DB_LOCATION)
 
     global LOGGING_LEVEL
+    import logging
     if 'debug' in arg_list:
         LOGGING_LEVEL = logging.DEBUG
     elif 'warning' in arg_list:
         LOGGING_LEVEL = logging.WARNING
+    else:
+        LOGGING_LEVEL = logging.INFO
 
     global LOG_TO_SYSLOG
     if 'syslog' in arg_list:

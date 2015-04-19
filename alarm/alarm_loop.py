@@ -5,7 +5,8 @@ import json
 import socket
 from collections import namedtuple
 import subprocess
-import datetime, logging
+import datetime
+from main import logger
 import select
 import urllib2, urllib
 from common import constant
@@ -64,15 +65,15 @@ def alert(pinindex, status):
 def init():
     try:
         global tailproc, tailpipe
-        logging.info('Watching file ' + gpio_file)
+        logger.info('Watching file ' + gpio_file)
         tailproc = subprocess.Popen(['tail', '-f', gpio_file], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if constant.OS in constant.OS_LINUX:
             tailpipe = select.poll()
             tailpipe.register(tailproc.stdout)
         else:
-            logging.critical('Publish GPIO via tail -f not available in OS ' + constant.OS)
+            logger.critical('Publish GPIO via tail -f not available in OS ' + constant.OS)
     except WindowsError:
-        logging.warning('Cannot open tail, maybe not running on Linux, os='+ constant.OS)
+        logger.warning('Cannot open tail, maybe not running on Linux, os='+ constant.OS)
 
 def unload():
     # Blocking call that processes network traffic, dispatches callbacks and
@@ -88,6 +89,6 @@ def thread_run():
         if tailpipe.poll(1):
             do_line(tailproc.stdout.readline())
     else:
-        logging.warning('Ignoring read alarm tail file in OS ' + constant.OS)
+        logger.warning('Ignoring read alarm tail file in OS ' + constant.OS)
     return 'Alarm ok'
 

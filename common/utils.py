@@ -4,7 +4,7 @@ import os
 import json
 import re
 import datetime
-import logging
+from main import logger
 import math
 
 from collections import namedtuple
@@ -38,7 +38,7 @@ def parse_to_date(strdate):
         strdate= strdate.replace('T',' ')
         strdate = datetime.datetime.strptime(strdate, "%Y-%m-%d %H:%M:%S.%f")
     else:
-        logging.warning('Warning, unexpected date format in parse []'.format(strdate))
+        logger.warning('Warning, unexpected date format in parse []'.format(strdate))
     return strdate
 
 def get_table_name(model_obj):
