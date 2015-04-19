@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-proc_pid=$(ps w | grep '[r]un_all.py' | awk '{print $1}')
+proc_pid=$(ps w | grep '[h]aiot.py' | awk '{print $1}')
 if [ -z "$proc_pid" ]; then
     echo No pid found with ps w, trying now with ps wx
-    proc_pid=$(ps wx | grep '[r]un_all.py' | awk '{print $1}')
+    proc_pid=$(ps wx | grep '[h]aiot.py' | awk '{print $1}')
 fi
 if [ -n "$proc_pid" ]; then
     echo Killing proc id [$proc_pid]
