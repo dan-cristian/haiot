@@ -2,14 +2,14 @@
 
 goto :start
 :run_app
-    python run_all.py model_auto_update syslog %~1
+    python run_all.py model_auto_update syslog=logs2.papertrailapp.com:30445 %~1 %~2 %~3 %~4 %~5
     set exit_code=%ERRORLEVEL%
     echo Program exit with code %exit_code%
     echo ---------------------------------
 goto :app_stop
 
 :start
-    goto :run_app %1
+    goto :run_app %1 %2 %3 %4 %5
 :app_stop
     echo Processing exit code %exit_code%
     if %exit_code% EQU 131 echo "Restarting app"
