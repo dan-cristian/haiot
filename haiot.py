@@ -8,5 +8,6 @@ import os
 #http://www.tutorialspoint.com/python/python_command_line_arguments.htm
 
 if __name__ == '__main__':
+    print 'Executing venv'
     os.system('/bin/bash  --rcfile /home/dcristian/PYC/venv/bin/activate')
     main.run(sys.argv[1:])
