@@ -36,8 +36,8 @@ def do_line(line):
         else:
             status = "closed"
         alert(pinindex, status, )
-        if transport.mqtt_client.client_connected:
-            transport.mqtt_client.publish(topic, message)
+        if transport.mqtt_io.mqtt_client.client_connected:
+            transport.mqtt_io.mqtt_client.publish(topic, message)
     else:
         print ("Invalid line " + line)
 
