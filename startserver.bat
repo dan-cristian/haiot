@@ -2,7 +2,7 @@
 
 goto :start
 :run_app
-    python run_all.py model_auto_update %~1
+    python run_all.py model_auto_update syslog %~1
     set exit_code=%ERRORLEVEL%
     echo Program exit with code %exit_code%
     echo ---------------------------------
