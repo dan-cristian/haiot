@@ -210,7 +210,9 @@ def populate_tables(model_auto_update=False):
         #db.session.add(sens)
         #commit(db.session)
 
-    import alarm, heat, sensor, relay, health_monitor, graph_plotly, node, io_bbb, webui, main, ddns, transport.mqtt_io
+    import alarm, heat, sensor, relay, health_monitor, graph_plotly, node, io_bbb, webui, main, ddns
+    from transport import mqtt_io
+    import transport.mqtt_io
 
     module_list_dict = {'default':[
         [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
