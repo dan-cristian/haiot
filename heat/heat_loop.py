@@ -47,16 +47,19 @@ def __update_zone_heat(zone, heat_schedule, sensor):
         else:
             schedule_pattern=models.SchedulePattern.query.filter_by(id=heat_schedule.pattern_weekend_id).first()
         if schedule_pattern:
-            pattern = schedule_pattern.pattern
-            temperature_code = pattern[hour]
-            temperature = models.TemperatureTarget.query.filter_by(code=temperature_code).first()
-            if temperature:
-                logger.info('Active pattern for zone {} is {} temp {}'.format(zone.name, schedule_pattern.name,
-                                                                                     temperature.target))
-                if sensor.temperature:
-                    __decide_action(zone, sensor.temperature, temperature.target)
+            pattern = str(schedule_pattern.pattern).replace('-', '').strip(' ')
+            if len(pattern) == 24:
+                temperature_code = pattern[hour]
+                temperature = models.TemperatureTarget.query.filter_by(code=temperature_code).first()
+                if temperature:
+                    logger.info('Active pattern for zone {} is {} temp {}'.format(zone.name, schedule_pattern.name,
+                                                                                         temperature.target))
+                    if sensor.temperature:
+                        __decide_action(zone, sensor.temperature, temperature.target)
+                else:
+                    logger.critical('Unknown temperature pattern code {}'.format(temperature_code))
             else:
-                logger.critical('Unknown temperature pattern code {}'.format(temperature_code))
+                logger.warning('Incorrect temp pattern [{}] in zone {}, length is not 24'.format(pattern, zone.name))
     except Exception, ex:
         logger.error('Error updatezoneheat, err={}'.format(ex, exc_info=True))
 
