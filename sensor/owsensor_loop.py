@@ -127,7 +127,7 @@ def init():
         owproxy = pyownet.protocol.proxy(host=host, port=port)
         initialised = True
     except Exception, ex:
-        logger.warning('Unable to connect to 1-wire owserver host {} port {}'.format(host, port))
+        logger.info('Unable to connect to 1-wire owserver host {} port {}'.format(host, port))
         initialised = False
     return initialised
 

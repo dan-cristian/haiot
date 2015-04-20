@@ -71,7 +71,7 @@ def init_modules():
             init_module(mod.name, mod.active)
 
 def signal_handler(signal, frame):
-    logger.warning('I got signal {} frame {}, exiting'.format(signal, frame))
+    logger.info('I got signal {} frame {}, exiting'.format(signal, frame))
     global exit_code
     exit_code = 1
     unload()
@@ -92,7 +92,7 @@ def execute_command(command):
 
 
 def unload():
-    logger.warning('Main module is unloading, application will exit')
+    logger.info('Main module is unloading, application will exit')
     import webui, admin.thread_pool
     from transport import mqtt_io
 
@@ -160,7 +160,6 @@ def init():
     init_logging()
     signal.signal(signal.SIGTERM, signal_handler)
 
-
     import common
     common.init()
 
@@ -210,7 +209,7 @@ def init():
     while not shutting_down:
         time.sleep(1)
         #logger.debug('Threads: {}'.format(thread_pool.get_thread_status()))
-    logger.info('Looping ended, app will exit')
+    logger.critical('Looping ended, app will exit')
 
 def run(arg_list):
     if 'debug_remote' in arg_list:

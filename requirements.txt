@@ -20,3 +20,4 @@ RPi.GPIO
 #for rfxcom utility
 pyserial>=0.0
 python-dateutil>=0.0
+hiplogging>=0.0
