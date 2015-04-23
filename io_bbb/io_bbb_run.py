@@ -25,8 +25,10 @@ def register_gpios():
     for zonealarm in zone_alarm_list:
         try:
             GPIO.setup(zonealarm.gpio_pin_code, GPIO.IN)
-            GPIO.add_event_detect(zonealarm.gpio_pin_code, GPIO.BOTH, callback=event_detected)#, bouncetime=300)
+            GPIO.add_event_detect(zonealarm.gpio_pin_code, GPIO.BOTH, callback=event_detected, bouncetime=300)
             logger.info('Enabled alarm on gpio {} zone {}'.format(zonealarm.gpio_pin_code, zonealarm.zone_id))
+            logger.info('Testing an input read on this gpio pin')
+            event_detected(zonealarm.gpio_pin_code)
             import_module_exist = True
         except Exception, ex:
             logger.critical('Unable to setup GPIO {} zone {} err={}'.format(zonealarm.gpio_pin_code,
