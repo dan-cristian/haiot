@@ -3,12 +3,12 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 from main import logger
 from main.admin import thread_pool
 import transport_run
-import mqtt_io
+import transport.mqtt_io
 
 initialised=False
 
 def send_message_json(json=''):
-    mqtt_io.sender.send_message(json)
+    transport.mqtt_io.sender.send_message(json)
     pass
 
 
