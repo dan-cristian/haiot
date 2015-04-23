@@ -8,7 +8,7 @@ import time
 import math
 import datetime
 from collections import OrderedDict
-from common import constant
+from common import constant, utils
 from main.admin import models
 import main
 
@@ -77,7 +77,7 @@ def __read_all_hdd_smart():
                         logger.debug('First disk that cannot be read is {}'.format(record.hdd_disk_dev))
                     if constant.SMARTCTL_TEMP_ID in line:
                         words = line.split(None)
-                        record.temperature = words[9]
+                        record.temperature = utils.round_sensor_value(words[9])
                         # print 'Temp is {}'.format(temp)
                     if constant.SMARTCTL_ERROR_SECTORS in line:
                         words = line.split(None)

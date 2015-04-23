@@ -143,7 +143,7 @@ def init_logging():
                 ntl = logging.handlers.NTEventLogHandler(appname=log_name)
                 logger.addHandler(ntl)
             except Exception, ex:
-                print 'Unable to init syslog handler'
+                print 'Unable to init syslog handler err=' + ex
     else:
         if not LOG_FILE is None:
             file_handler = logging.handlers.RotatingFileHandler(LOG_FILE, maxBytes=1024*1024*1, backupCount=3)
