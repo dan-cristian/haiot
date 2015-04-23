@@ -8,7 +8,6 @@
 #answer=disk
 #fi
 #echo "Your answer is: $answer"
-
 function run_app {
     $DIR/scripts/stopserver.sh
     sleep 2
