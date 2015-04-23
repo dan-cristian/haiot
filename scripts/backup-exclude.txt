@@ -1,0 +1,7 @@
+mnt/*
+dev/*
+proc/*
+tmp/*
+sys/*
+run/*
+

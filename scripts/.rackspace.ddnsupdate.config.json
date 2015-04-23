@@ -1,0 +1,9 @@
+{
+"username": "dancristian",
+"api_key": "xxxxxx",
+"account_id": "tttt",
+"domain_id": "zzzzzz",
+"record_id": "A-1234567",
+"record_ttl": "300",
+"record_name": "www.xxx.com"
+}
