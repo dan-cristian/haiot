@@ -29,6 +29,7 @@ while $must_run; do
     fi
     if [ $exit_code == 132 ]; then
         echo "Upgrading app"
+        cd $DIR
         git pull --no-edit
     fi
     if [ $exit_code == 133 ]; then
