@@ -284,6 +284,7 @@ class GpioPin(db.Model, DbEvent):
     host_name = db.Column(db.String(50))
     pin_type = db.Column(db.String(50))
     pin_code = db.Column(db.String(50), unique=True)
+    pin_index = db.Column(db.String(50))
     pin_value = db.Column(db.Integer)
 
     def __repr__(self):
