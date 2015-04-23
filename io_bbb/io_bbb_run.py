@@ -29,8 +29,8 @@ def register_gpios():
             logger.info('Enabled alarm on gpio {} zone {}'.format(zonealarm.gpio_pin_code, zonealarm.zone_id))
             import_module_exist = True
         except Exception, ex:
-            logger.critical('Unable to setup GPIO {} zone {} '.format(zonealarm.gpio_pin_code,
-                                                                      zonealarm.zone_id))
+            logger.critical('Unable to setup GPIO {} zone {} err={}'.format(zonealarm.gpio_pin_code,
+                                                                      zonealarm.zone_id, ex))
 
 def event_detected(channel):
     try:

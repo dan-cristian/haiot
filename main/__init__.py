@@ -173,7 +173,7 @@ def init():
     db = SQLAlchemy(app)
     db.create_all()
 
-    logger.info('Populating db tables')
+    logger.info('Checking db tables')
     import admin.model_helper
     global MODEL_AUTO_UPDATE
     admin.model_helper.populate_tables(MODEL_AUTO_UPDATE)
