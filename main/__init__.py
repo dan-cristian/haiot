@@ -184,6 +184,8 @@ def init():
     logger.info('Collecting system info')
     from admin import system_info
     system_info.init()
+    from common import constant
+    logger.info('Machine type is {}'.format(constant.HOST_MACHINE_TYPE))
     logger.info('Initialising modules')
     init_modules()
 

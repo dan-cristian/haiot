@@ -303,7 +303,9 @@ def __get_cpu_temperature():
         except Exception, ex:
             logger.error('Unable to open cpu_temp_read file {}'.format(path))
         file.close()
-    else: line = '-1'
+    else:
+        line = '-1'
+        logger.info('Unable to get CPU temp for machine type {}'.format(constant.HOST_MACHINE_TYPE))
 
     temp = float(line) / 1000
     temp = utils.round_sensor_value(temp)
