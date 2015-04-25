@@ -103,7 +103,8 @@ def populate_tables(model_auto_update=False):
             ['8', constant.P_MQTT_PORT_2, '1883'],
             ['9', constant.P_PLOTLY_USERNAME, 'xxx'],
             ['10', constant.P_PLOTLY_APIKEY, 'zzz'],
-            ['11', constant.P_DDNS_RACKSPACE_CONFIG_FILE, '/home/dcristian/.rackspace.ddnsupdate.config.json']
+            ['11', constant.P_DDNS_RACKSPACE_CONFIG_FILE, '/home/dcristian/.rackspace.ddnsupdate.config.json'],
+            ['12', constant.P_USESUDO_DISKTOOLS, 'False']
         ]
     check_table_schema(models.Parameter, model_auto_update)
     if len(models.Parameter.query.all()) < len(param_list):
