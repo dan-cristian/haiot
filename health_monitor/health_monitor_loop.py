@@ -9,7 +9,7 @@ import math
 import datetime
 from collections import OrderedDict
 from common import constant, utils
-from main.admin import models
+from main.admin import models, model_helper
 import main
 
 try:
@@ -55,7 +55,8 @@ def __read_all_hdd_smart():
                 except Exception, ex:
                     record.power_status = None
                 try:
-                    if constant.OS in constant.OS_LINUX:
+                    use_sudo = bool(model_helper.get_param(constant.P_USESUDO_DISKTOOLS))
+                    if constant.OS in constant.OS_LINUX and use_sudo:
                         smart_out = subprocess.check_output(['sudo', 'smartctl', '-a', record.hdd_disk_dev,
                                                              '-n', 'sleep'], stderr=subprocess.STDOUT)
                     else:
@@ -144,7 +145,8 @@ def __read_hddparm(disk_dev=''):
     try:
         if import_module_psutil_exist:
             try:
-                if constant.OS in constant.OS_LINUX:
+                use_sudo = bool(model_helper.get_param(constant.P_USESUDO_DISKTOOLS))
+                if constant.OS in constant.OS_LINUX and use_sudo:
                     hddparm_out = subprocess.check_output(['sudo', 'hdparm', '-C', disk_dev], stderr=subprocess.STDOUT)
                 else:
                     hddparm_out = subprocess.check_output(['hdparm', '-C', disk_dev], stderr=subprocess.STDOUT)
