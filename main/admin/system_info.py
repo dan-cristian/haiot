@@ -48,9 +48,13 @@ def init():
 
             if description_hardware and 'AM33XX' in description_hardware:
                 constant.HOST_MACHINE_TYPE = constant.MACHINE_TYPE_BEAGLEBONE
+                constant.IS_MACHINE_BEAGLEBONE = True
             if description_hardware and 'BCM2708' in description_hardware:
                 constant.HOST_MACHINE_TYPE = constant.MACHINE_TYPE_RASPBERRY
+                constant.IS_MACHINE_RASPBERRYPI = True
             if description_system_type and 'Atheros' in description_system_type:
                 constant.HOST_MACHINE_TYPE = constant.MACHINE_TYPE_OPENWRT
+                constant.IS_MACHINE_OPENWRT = True
             if description_model_name and 'Intel' in description_model_name:
                 constant.HOST_MACHINE_TYPE = constant.MACHINE_TYPE_INTEL_LINUX
+                constant.IS_MACHINE_INTEL = True

@@ -249,6 +249,7 @@ class SystemMonitor(db.Model, graphs.SystemMonitorGraph, DbEvent):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True)
     cpu_usage_percent = db.Column(db.Float)
+    cpu_temperature = db.Column(db.Float)
     memory_available_percent = db.Column(db.Float)
     uptime_days = db.Column(db.Integer)
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)

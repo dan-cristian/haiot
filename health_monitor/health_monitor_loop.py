@@ -9,7 +9,7 @@ import math
 import datetime
 from collections import OrderedDict
 from common import constant, utils
-from main.admin import models, model_helper
+from main.admin import models, model_helper, system_info
 import main
 
 try:
@@ -287,6 +287,28 @@ def __get_cpu_utilisation_linux():
         time.sleep(1)
     return CPU_Percentage
 
+def __get_cpu_temperature():
+    if constant.IS_MACHINE_RASPBERRYPI:
+        path = open('/sys/class/thermal/thermal_zone0/temp')
+    elif constant.IS_MACHINE_BEAGLEBONE:
+        path = open('/sys/class/hwmon/hwmon0/device/temp1_input')
+    elif constant.IS_MACHINE_INTEL:
+        path = open('/sys/devices/virtual/thermal/thermal_zone0/temp')
+    else:
+        path=None
+    if path:
+        try:
+            file = open(path)
+            line = file.readline()
+        except Exception, ex:
+            logger.error('Unable to open cpu_temp_read file {}'.format(path))
+        file.close()
+    else: line = '-1'
+
+    temp = float(line) / 1000
+    temp = utils.round_sensor_value(temp)
+    return temp
+
 
 def __read_system_attribs():
     global import_module_psutil_exist, progress_status
@@ -310,6 +332,7 @@ def __read_system_attribs():
                 record.memory_available_percent = __get_mem_avail_percent_linux()
                 record.cpu_usage_percent = __get_cpu_utilisation_linux()
                 record.uptime_days = int(__get_uptime_linux_days())
+                record.cpu_temperature = __get_cpu_temperature()
                 logger.info('Read mem free {} cpu {} uptime {}'.format(record.memory_available_percent,
                                                                         record.cpu_usage_percent, record.uptime_days))
         progress_status = 'Saving mem cpu uptime to db'
