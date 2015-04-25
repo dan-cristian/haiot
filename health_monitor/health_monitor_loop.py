@@ -289,11 +289,11 @@ def __get_cpu_utilisation_linux():
 
 def __get_cpu_temperature():
     if constant.IS_MACHINE_RASPBERRYPI:
-        path = open('/sys/class/thermal/thermal_zone0/temp')
+        path = '/sys/class/thermal/thermal_zone0/temp'
     elif constant.IS_MACHINE_BEAGLEBONE:
-        path = open('/sys/class/hwmon/hwmon0/device/temp1_input')
+        path = '/sys/class/hwmon/hwmon0/device/temp1_input'
     elif constant.IS_MACHINE_INTEL:
-        path = open('/sys/devices/virtual/thermal/thermal_zone0/temp')
+        path = '/sys/devices/virtual/thermal/thermal_zone0/temp'
     else:
         path=None
     if path:
