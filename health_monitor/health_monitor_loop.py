@@ -317,6 +317,7 @@ def __read_system_attribs():
         if import_module_psutil_exist:
             record.cpu_usage_percent = psutil.cpu_percent(interval=1)
             record.memory_available_percent = psutil.virtual_memory().percent
+            record.cpu_temperature = __get_cpu_temperature()
             if constant.OS in constant.OS_LINUX:
                 record.uptime_days = int(__get_uptime_linux_days())
             elif constant.OS in constant.OS_WINDOWS:
@@ -333,8 +334,9 @@ def __read_system_attribs():
                 record.cpu_usage_percent = __get_cpu_utilisation_linux()
                 record.uptime_days = int(__get_uptime_linux_days())
                 record.cpu_temperature = __get_cpu_temperature()
-                logger.info('Read mem free {} cpu {} uptime {}'.format(record.memory_available_percent,
-                                                                        record.cpu_usage_percent, record.uptime_days))
+                logger.info('Read mem free {} cpu% {} cpu_temp {} uptime {}'.format(record.memory_available_percent,
+                                                                    record.cpu_usage_percent, record.cpu_temperature,
+                                                                    record.uptime_days))
         progress_status = 'Saving mem cpu uptime to db'
         record.name = constant.HOST_NAME
         record.updated_on = datetime.datetime.now()
