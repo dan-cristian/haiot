@@ -16,8 +16,16 @@ try:
     import psutil
     import_module_psutil_exist = True
 except Exception, ex:
-    #logger.critical('PSUtil module not available')
+    logger.info('PSUtil module not available')
     import_module_psutil_exist = False
+
+try:
+    import wmi
+    import pythoncom
+    import_module_wmi_ok = True
+except Exception, ex:
+    logger.info('pywin / wmi module not available')
+    import_module_wmi_ok = False
 
 ERR_TEXT_NO_DEV = 'failed: No such device'
 ERR_TEXT_NO_DEV_2 = 'HDIO_GET_32BIT failed: Invalid argument'
@@ -288,26 +296,38 @@ def __get_cpu_utilisation_linux():
     return CPU_Percentage
 
 def __get_cpu_temperature():
-    if constant.IS_MACHINE_RASPBERRYPI:
-        path = '/sys/class/thermal/thermal_zone0/temp'
-    elif constant.IS_MACHINE_BEAGLEBONE:
-        path = '/sys/class/hwmon/hwmon0/device/temp1_input'
-    elif constant.IS_MACHINE_INTEL:
-        path = '/sys/devices/virtual/thermal/thermal_zone0/temp'
+    if constant.IS_OS_WINDOWS():
+        #http://stackoverflow.com/questions/3262603/accessing-cpu-temperature-in-python
+        global import_module_wmi_ok
+        if import_module_wmi_ok:
+            try:
+                pythoncom.CoInitialize()
+                w = wmi.WMI(namespace="root\wmi")
+                temperature_info = w.MSAcpi_ThermalZoneTemperature()[0]
+                temp = (temperature_info.CurrentTemperature / 10) - 273
+            except Exception, ex:
+                logger.error('Unable to get temperature using wmi, err={}'.format(ex))
     else:
-        path=None
-    if path:
-        try:
-            file = open(path)
-            line = file.readline()
-        except Exception, ex:
-            logger.error('Unable to open cpu_temp_read file {}'.format(path))
-        file.close()
-    else:
-        line = '-1'
-        logger.info('Unable to get CPU temp for machine type {}'.format(constant.HOST_MACHINE_TYPE))
+        if constant.IS_MACHINE_RASPBERRYPI:
+            path = '/sys/class/thermal/thermal_zone0/temp'
+        elif constant.IS_MACHINE_BEAGLEBONE:
+            path = '/sys/class/hwmon/hwmon0/device/temp1_input'
+        elif constant.IS_MACHINE_INTEL:
+            path = '/sys/devices/virtual/thermal/thermal_zone0/temp'
+        else:
+            path=None
 
-    temp = float(line) / 1000
+        if path:
+            try:
+                file = open(path)
+                line = file.readline()
+            except Exception, ex:
+                logger.error('Unable to open cpu_temp_read file {}'.format(path))
+            file.close()
+        else:
+            line = '-1'
+            logger.info('Unable to get CPU temp for machine type {}'.format(constant.HOST_MACHINE_TYPE))
+        temp = float(line) / 1000
     temp = utils.round_sensor_value(temp)
     return temp
 
