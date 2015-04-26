@@ -12,7 +12,7 @@ description_revision = None
 description_cpu_model = None
 
 def init():
-    if constant.OS in constant.OS_LINUX:
+    if constant.IS_OS_LINUX():
         sysinfo = OrderedDict()
         with open('/proc/cpuinfo') as f:
             for line in f:
@@ -58,3 +58,6 @@ def init():
             if description_model_name and 'Intel' in description_model_name:
                 constant.HOST_MACHINE_TYPE = constant.MACHINE_TYPE_INTEL_LINUX
                 constant.IS_MACHINE_INTEL = True
+    elif constant.IS_OS_WINDOWS():
+        import platform
+        constant.HOST_MACHINE_TYPE = platform.machine()
