@@ -21,3 +21,5 @@ python-dateutil>=0.0
 hiplogging>=0.0
 #uncomment on beaglebone
 Adafruit_BBIO>=0.0
+pywin
+wmi>=0.0

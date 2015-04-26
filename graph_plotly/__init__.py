@@ -83,7 +83,7 @@ def get_reference_trace_for_append(graph_unique_name='', shape_type=''):
                               mode='none', showlegend=False, line = graph_objs.Line(shape=shape_type))
 
 def download_trace_id_list(graph_unique_name='', shape_type=''):
-    logger.info('Downloading existing online traces in memory, graph {}'.format(graph_unique_name))
+    logger.info('Downloading online traces in memory, graph {} shape {}'.format(graph_unique_name, shape_type))
     start_date = datetime.datetime.now()
     try:
         result=py.file_ops.mkdirs(get_folder_name())
@@ -228,7 +228,7 @@ def upload_data(obj):
                             trace_list = populate_trace_for_extend(x=x, y=y,
                                     graph_legend_item_name=graph_legend_item_name, trace_unique_id=trace_unique_id,
                                     trace_unique_id_pattern=trace_unique_id_pattern, shape_type=shape)
-                            logger.debug('Extending graph {}'.format(graph_unique_name))
+                            logger.debug('Extending graph {}'.format(graph_unique_name, shape))
                             fileopt = 'extend'
                         else:
                             trace_list = populate_trace_for_append(x=x, y=y,
