@@ -103,11 +103,10 @@ def __read_line(bcm_id=''):
 
 def __write_line(bcm_id='', pin_value=''):
     try:
-        file = open('/sys/class/gpio/gpio{}/value'.format(bcm_id), 'a')
-        print >> file, pin_value
-        file.close()
+        #file = open('/sys/class/gpio/gpio{}/value'.format(bcm_id), 'a')
+        #print >> file, pin_value
+        #file.close()
         __write_to_file_as_root(file='/sys/class/gpio/gpio{}/value'.format(bcm_id), value=pin_value)
-
     except Exception, ex:
         logger.critical('Unexpected general exception on pin {} write, err {}'.format(bcm_id, ex))
         return None
