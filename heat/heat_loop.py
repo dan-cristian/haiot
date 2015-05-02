@@ -30,7 +30,6 @@ def __decide_action(zone, current_temperature, target_temperature):
         logger.info('Heat must be ON in {} temp {} target {}'.format(zone.name, current_temperature,
                                                                       target_temperature))
         heat_is_on = True
-
     else:
         logger.info('Heat must be OFF in {} temp {} target {}'.format(zone.name, current_temperature,
                                                                        target_temperature))

@@ -13,8 +13,8 @@ initialised=False
 def heat_update(obj_dict={}):
     try:
         source_host_name = utils.get_object_field_value(obj_dict, 'name')
-        logger.debug('Received heat relay state update from {}'.format(source_host_name))
         zone_id = utils.get_object_field_value(obj_dict, 'zone_id')
+        logger.info('Received heat relay state update from {} for zoneid='.format(source_host_name, zone_id))
         zone_heat_relay = models.ZoneHeatRelay.query.filter_by(zone_id=zone_id).first()
         if zone_heat_relay and zone_heat_relay.gpio_host_name == constant.HOST_NAME:
             cmd_heat_is_on = utils.get_object_field_value(obj_dict, 'heat_is_on')
@@ -28,9 +28,9 @@ def heat_update(obj_dict={}):
                 else:
                     logger.warning('Heat state zone_id {} unexpected value {} after set'.format(zone_id, pin_state))
             else:
-                logger.debug('No change needed in heat state')
+                logger.info('No change needed in heat state')
         else:
-            logger.debug('Ignoring heat change, not owning the zone relay pin on this host')
+            logger.info('Ignoring heat change, not owning the zone relay pin on this host')
     except Exception, ex:
         logger.warning('Error updating heat relay state, err {}'.format(ex))
 
