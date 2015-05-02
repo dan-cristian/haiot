@@ -1,9 +1,7 @@
 __author__ = 'dcristian'
 import socket
 import datetime
-
 from pydispatch import dispatcher
-
 from main import logger
 from common.utils import json2obj
 from common import constant

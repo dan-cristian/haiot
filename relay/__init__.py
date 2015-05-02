@@ -8,21 +8,21 @@ import relay_pi
 
 initialised=False
 
-def relay_update(gpio_pin_code='', heat_is_on=''):
+def relay_update(gpio_pin_code='', pin_is_on=''):
     #return pin value after state set
     try:
         logger.debug('Received relay state update pin {}'.format(gpio_pin_code))
         gpiopin = models.GpioPin.query.filter_by(pin_code=gpio_pin_code).first()
         pin_value = -1
         if gpiopin:
-            pin_value = relay_set(gpiopin.pin_code, heat_is_on, from_web=False)
+            pin_value = relay_set(gpiopin.pin_code, pin_is_on, from_web=False)
             gpiopin.pin_value = pin_value
             gpiopin.notify_transport_enabled = False
             db.session.commit()
         else:
             logger.warning('Pin {} does not exists locally'.format(gpio_pin_code))
     except Exception, ex:
-        logger.warning('Error updating relay state')
+        logger.warning('Error updating relay state err={}'.format(ex))
     return -1
 
 def relay_get(pin=None, from_web=False):
@@ -31,14 +31,11 @@ def relay_get(pin=None, from_web=False):
     if constant.HOST_MACHINE_TYPE == constant.MACHINE_TYPE_RASPBERRY:
         pin_value = relay_pi.get_pin_bcm(pin)
     else:
+        message = message + '\n error not running on raspberry'
         pin_value = None
-        message = message + ' error not running on raspberry'
 
     if from_web:
-        if pin_value:
-            return message + '\n' + constant.SCRIPT_RESPONSE_OK + '=' + pin_value
-        else:
-            return message #error case
+        return return_web_message(pin_value=pin_value, ok_message=message, err_message=message)
     else:
         return pin_value
 
@@ -49,15 +46,19 @@ def relay_set(pin=None, value=None, from_web=False):
     if constant.HOST_MACHINE_TYPE == constant.MACHINE_TYPE_RASPBERRY:
         pin_value = relay_pi.set_pin_bcm(pin, value)
     else:
-        message = message + ' error not running on raspberry'
+        message = message + '\n error not running on raspberry'
+        pin_value = None
 
     if from_web:
-        if pin_value:
-            return message + '\n' + constant.SCRIPT_RESPONSE_OK + '=' + pin_value
-        else:
-            return message #error case
+        return return_web_message(pin_value=pin_value, ok_message=message, err_message=message)
     else:
         return pin_value
+
+def return_web_message(pin_value, ok_message='', err_message=''):
+    if pin_value:
+        return ok_message + '\n' + constant.SCRIPT_RESPONSE_OK + '=' + pin_value
+    else:
+        return err_message + '\n'
 
 def unload():
     global initialised
@@ -71,16 +72,24 @@ def init():
 
     @app.route('/relay/get')
     def relay_get_web():
-        pin=request.args.get('pin', '')
-        relay_get(pin=pin, from_web=True)
+        pin=request.args.get('pin', '').strip()
+        if pin == '':
+            response = return_web_message(pin_value=None, err_message='Argument [pin] not provided')
+        else:
+            response = relay_get(pin=pin, from_web=True)
+        return response
 
     @app.route('/relay/set')
     def relay_set_web():
-        pin=request.args.get('pin', '')
-        value=request.args.get('value', '')
-        relay_set(pin=pin, value=value, from_web=True)
-
-
+        pin=request.args.get('pin', '').strip()
+        value=request.args.get('value', '').strip()
+        if pin == '':
+            response = return_web_message(pin_value=None, err_message='Argument [pin] not provided')
+        elif value == '':
+            response = return_web_message(pin_value=None, err_message='Argument [value] not provided')
+        else:
+            response = relay_set(pin=pin, value=value, from_web=True)
+        return response
     initialised = True
 
 

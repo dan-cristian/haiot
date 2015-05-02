@@ -3,9 +3,7 @@ __author__ = 'dcristian'
 import socket
 import time
 import sys
-
 import paho.mqtt.client as mqtt
-
 from main.admin import thread_pool
 from main import logger
 from main.admin import model_helper
@@ -87,7 +85,7 @@ def init():
                 initialised = True
                 client_connecting = False
             except socket.error:
-                logging.error('mqtt client not connected, err {}, pause and retry'.format(sys.exc_info()[0]))
+                logger.error('mqtt client not connected, err {}, pause and retry'.format(sys.exc_info()[0]))
                 retry_count += 1
                 time.sleep(constant.ERROR_CONNECT_PAUSE_SECOND)
             finally:
