@@ -9,6 +9,8 @@ import model_helper
 import graph_plotly
 import relay
 import node
+import sensor
+import heat
 
 def handle_local_event_db_post(model, row):
     #executed on local db changes done via web ui only
@@ -37,8 +39,10 @@ def handle_event_mqtt_received(client, userdata, topic, obj):
                 if host_name == constant.HOST_NAME and execute_command != '':
                     main.execute_command(execute_command)
         elif table == utils.get_table_name(models.ZoneHeatRelay):
-            if relay.initialised:
-                relay.relay_update(obj)
+            if heat.initialised:
+                heat.heat_update(obj)
+        elif table == utils.get_table_name(models.Sensor):
+            sensor.sensor_update(obj)
 
     if variable.NODE_THIS_IS_MASTER_OVERALL:
         if constant.JSON_PUBLISH_GRAPH_X in obj:

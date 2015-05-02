@@ -12,18 +12,20 @@ def relay_update(gpio_pin_code='', pin_is_on=''):
     #return pin value after state set
     try:
         logger.debug('Received relay state update pin {}'.format(gpio_pin_code))
-        gpiopin = models.GpioPin.query.filter_by(pin_code=gpio_pin_code).first()
-        pin_value = -1
+        gpiopin = models.GpioPin.query.filter_by(pin_code=gpio_pin_code, host_name=constant.HOST_NAME).first()
+        result = None
         if gpiopin:
             pin_value = relay_set(gpiopin.pin_code, pin_is_on, from_web=False)
+            if pin_value:
+                result = pin_value
             gpiopin.pin_value = pin_value
             gpiopin.notify_transport_enabled = False
             db.session.commit()
         else:
-            logger.warning('Pin {} does not exists locally'.format(gpio_pin_code))
+            logger.warning('Pin {} does not exists locally, is db data correct?'.format(gpio_pin_code))
     except Exception, ex:
         logger.warning('Error updating relay state err={}'.format(ex))
-    return -1
+    return result
 
 def relay_get(pin=None, from_web=False):
     message = 'Get relay state for pin {}'.format(pin)
