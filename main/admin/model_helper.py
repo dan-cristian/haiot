@@ -125,7 +125,7 @@ def populate_tables(model_auto_update=False):
              [32,'watermain'],[33,'watersecond'],[34,'horn'],[35,'gas meter'],[36,'front valve'],
              [37,'back valve'],[38,'puffer'],[39,'back pump'],[40,'back lights'],[41,'front lights'],
              [42,'hotwater mater'], [43,'headset'],[44,'heat dormitor'],[45,'powerserver'],[46,'ups main'],
-             [47,'birou'], [48, 'solar jos']
+             [47,'birou'], [48, 'solar jos'], [49, 'congelator']
              ]
     if len(models.Zone.query.all()) < len(zones):
         logger.info('Populating Zone with default values')
@@ -355,7 +355,7 @@ def populate_tables(model_auto_update=False):
             [25, '96000003BDFE5D28', 'boiler sus'], [25, '53000004F296DD28', 'boiler mijloc'],
             [25, 'C8000004F28B0728', 'boiler jos'], [2, '41000003BE099C28', 'living'],
             [1, 'AA000003BDE6C728', 'bucatarie'], [27, 'E400000155E72D26', 'pod fata'],
-            [4, 'B5000004F3285F28', 'dormitor'], [47, 'f9:01','birou'], [23, 'f3:01', 'fridge']
+            [4, 'B5000004F3285F28', 'dormitor'], [23, 'f9:01','fridge'], [49, 'f3:01', 'congelator']
         ]
     if len(models.ZoneSensor.query.all()) < len(zonesensor_list):
         logger.info('Populating ZoneSensor with default values')
