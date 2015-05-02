@@ -35,11 +35,11 @@ def relay_get(pin=None, from_web=False):
     else:
         message = message + ' error not running on gpio enabled devices'
         pin_value = None
+        logger.warning(message)
 
     if from_web:
         return return_web_message(pin_value=pin_value, ok_message=message, err_message=message)
     else:
-        logger.warning(message)
         return pin_value
 
 def relay_set(pin=None, value=None, from_web=False):
@@ -51,11 +51,11 @@ def relay_set(pin=None, value=None, from_web=False):
     else:
         message = message + ' error not running on gpio enabled devices'
         pin_value = None
+        logger.warning(message)
 
     if from_web:
         return return_web_message(pin_value=pin_value, ok_message=message, err_message=message)
     else:
-        logger.warning(message)
         return pin_value
 
 def return_web_message(pin_value, ok_message='', err_message=''):
@@ -66,7 +66,7 @@ def return_web_message(pin_value, ok_message='', err_message=''):
 
 def unload():
     global initialised
-    if constant.HOST_MACHINE_TYPE == constant.MACHINE_TYPE_RASPBERRY:
+    if constant.HOST_MACHINE_TYPE in [constant.MACHINE_TYPE_RASPBERRY, constant.MACHINE_TYPE_BEAGLEBONE]:
          gpio_pi_bbb.unload()
     initialised = False
 
