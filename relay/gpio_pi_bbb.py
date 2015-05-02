@@ -123,14 +123,17 @@ def get_pin_bcm(bcm_id=''):
 
 def set_pin_bcm(bcm_id='', pin_value=''):
     '''BCM pin id format. Value is 0 or 1. Return value is 0 or 1, confirms pin state'''
-    if not __is_pin_setup_out(bcm_id):
-        __set_pin_dir_out(bcm_id)
-    if __is_pin_setup_out(bcm_id):
-        __write_line(bcm_id, pin_value)
-        return get_pin_bcm(bcm_id)
+    if not pin_value is None:
+        if not __is_pin_setup_out(bcm_id):
+            __set_pin_dir_out(bcm_id)
+        if __is_pin_setup_out(bcm_id):
+            __write_line(bcm_id, pin_value)
+            return get_pin_bcm(bcm_id)
+        else:
+            logger.critical('Unable to write pin bcm {}'.format(bcm_id))
+            return -1
     else:
-        logger.critical('Unable to write pin bcm {}'.format(bcm_id))
-        return -1
+        logger.warning('Pin value provided for pin {} was None, ignoring'.format(bcm_id))
 
 def unload():
     global __pins_setup_list

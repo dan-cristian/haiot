@@ -36,7 +36,7 @@ def heat_update(obj_dict={}):
                 else:
                     logger.warning('Heat state zone_id {} unexpected value {} after set'.format(zone_id, pin_state))
             else:
-                logger.info('Ignoring heat change, not owning the zone relay pin {} on this host'.format(gpio_host_name))
+                logger.debug('Ignoring heat change, not owning the zone relay pin {} on this host'.format(gpio_host_name))
         else:
             logger.warning('No heat relay defined for zone {}, db data issue?'.format(zone_id))
     except Exception, ex:
@@ -57,6 +57,6 @@ def unload():
 def init():
     logger.info('Heat module initialising')
     dispatcher.connect(handle_event_heat, signal=constant.SIGNAL_HEAT, sender=dispatcher.Any)
-    thread_pool.add_callable(heat_loop.thread_run, 30)
+    thread_pool.add_callable(heat_loop.thread_run, 45)
     global initialised
     initialised = True
