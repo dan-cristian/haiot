@@ -8,7 +8,7 @@ import gpio_pi_bbb
 
 initialised=False
 
-def relay_update(gpio_pin_code='', pin_value=''):
+def relay_update(gpio_pin_code=None, pin_value=None):
     #return pin value after state set
     try:
         logger.debug('Received relay state update pin {}'.format(gpio_pin_code))
