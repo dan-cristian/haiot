@@ -328,7 +328,7 @@ def populate_tables(model_auto_update=False):
     #fixme: mapping not correct
     heat_relay_list={
         #1=bucatarie, 2=living, 47=birou, 4=dormitor
-        'beaglebone': [[1, 'P9_11'], [2, 'P9_12'], [47, 'P9_13'], [4, 'P9_15']],
+        'beaglebone': [[1, 'P9_13'], [2, 'P9_12'], [47, 'P9_11'], [4, 'P9_15']],
         #19=heat main
         'pi-power': [[19, '24']]
         #for test only
