@@ -37,6 +37,7 @@ def __set_pin_dir_out(bcm_id=''):
         #file = open('/sys/class/gpio/gpio{}/direction'.format(bcm_id), 'a')
         #print >> file, 'out'
         #file.close()
+        __setup_pin(bcm_id)
         if __write_to_file_as_root(file='/sys/class/gpio/gpio{}/direction'.format(bcm_id), value='out'):
             logger.info('Pin {} direction out OK'.format(bcm_id))
         return True
@@ -49,6 +50,7 @@ def __set_pin_dir_in(bcm_id=''):
         #file = open('/sys/class/gpio/gpio{}/direction'.format(bcm_id), 'a')
         #print >> file, 'in'
         #file.close()
+        __setup_pin(bcm_id)
         if __write_to_file_as_root(file='/sys/class/gpio/gpio{}/direction'.format(bcm_id), value='in'):
             logger.info('Pin {} direction in OK'.format(bcm_id))
         return True
