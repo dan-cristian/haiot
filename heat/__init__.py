@@ -15,7 +15,7 @@ def heat_update(obj_dict={}):
     try:
         source_host_name = utils.get_object_field_value(obj_dict, constant.JSON_PUBLISH_SOURCE_HOST)
         zone_id = utils.get_object_field_value(obj_dict, utils.get_model_field_name(models.ZoneHeatRelay.zone_id))
-        logger.info('Received heat relay state update from {} for zoneid {}'.format(source_host_name, zone_id))
+        logger.debug('Received heat relay state update from {} for zoneid {}'.format(source_host_name, zone_id))
         zone_heat_relay = models.ZoneHeatRelay.query.filter_by(zone_id=zone_id).first()
         if zone_heat_relay:
             gpio_host_name = zone_heat_relay.gpio_host_name
