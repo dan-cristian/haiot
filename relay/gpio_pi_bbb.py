@@ -136,8 +136,11 @@ def set_pin_bcm(bcm_id=None, pin_value=None):
             return -1
 
 def unload():
+    #set all pins to low and unexport
     global __pins_setup_list
     for bcm_pin in __pins_setup_list:
+        if __is_pin_setup_out(bcm_id=bcm_pin):
+            set_pin_bcm(bcm_id=bcm_pin, pin_value=0)
         __unsetup_pin(bcm_pin=bcm_pin)
 
 def init():
