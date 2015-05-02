@@ -343,7 +343,7 @@ def populate_tables(model_auto_update=False):
             logger.info('Populating ZoneHeatRelay for {} with default values'.format(host_name))
             for pair in heat_relay_list[host_name]:
                 db.session.add(models.ZoneHeatRelay(zone_id=pair[0], gpio_pin_code=pair[1], host_name=host_name,
-                                                    is_main_heat_source=(pair[0]==heat_main_source_zone_id)))
+                                                    is_main_heat_source=(pair[0] == heat_main_source_zone_id)))
             commit()
 
     #if True:

@@ -332,4 +332,4 @@ class ZoneHeatRelay(db.Model, DbEvent):
         self.is_main_heat_source = is_main_heat_source
 
     def __repr__(self):
-        return 'host {} gpiopin {} {}'.format(self.gpio_host_name, self.gpio_pin_code, self.heat_pin_name)
+        return 'host {} {} {} {}'.format(self.gpio_host_name, self.gpio_pin_code, self.heat_pin_name, self.heat_is_on)
