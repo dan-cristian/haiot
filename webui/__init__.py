@@ -4,7 +4,7 @@ import os
 from main import logger
 from main import app
 from flask import request, abort, send_file, render_template
-from flask.ext.autoindex import AutoIndex
+#from flask.ext.autoindex import AutoIndex
 
 import webui
 import helpers
