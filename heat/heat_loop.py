@@ -84,7 +84,7 @@ def loop_zones():
                         heat_is_on = True
         heatrelay_main_source = models.ZoneHeatRelay.query.filter_by(is_main_heat_source=True).first()
         if heatrelay_main_source:
-            main_source_zone = models.Zone.query.filter_by(zone_id=heatrelay_main_source.zone_id).first()
+            main_source_zone = models.Zone.query.filter_by(id=heatrelay_main_source.zone_id).first()
             if main_source_zone:
                 __save_heat_state_db(zone=main_source_zone, heat_is_on=heat_is_on)
             else:
