@@ -4,7 +4,7 @@ from flask import request
 from main import logger
 from common import constant, utils
 from main.admin import db, models
-import relay_pi
+import gpio_pi_bbb
 
 initialised=False
 
@@ -31,7 +31,7 @@ def relay_get(pin=None, from_web=False):
     message = 'Get relay state for pin {}'.format(pin)
     logger.info(message)
     if constant.HOST_MACHINE_TYPE == constant.MACHINE_TYPE_RASPBERRY:
-        pin_value = relay_pi.get_pin_bcm(pin)
+        pin_value = gpio_pi_bbb.get_pin_bcm(pin)
     else:
         message = message + '\n error not running on raspberry'
         pin_value = None
@@ -46,7 +46,7 @@ def relay_set(pin=None, value=None, from_web=False):
     message = 'Set relay state {} for pin {}'.format(value, pin)
     logger.info(message)
     if constant.HOST_MACHINE_TYPE == constant.MACHINE_TYPE_RASPBERRY:
-        pin_value = relay_pi.set_pin_bcm(pin, value)
+        pin_value = gpio_pi_bbb.set_pin_bcm(pin, value)
     else:
         message = message + '\n error not running on raspberry'
         pin_value = None
@@ -65,7 +65,7 @@ def return_web_message(pin_value, ok_message='', err_message=''):
 def unload():
     global initialised
     if constant.HOST_MACHINE_TYPE == constant.MACHINE_TYPE_RASPBERRY:
-         relay_pi.unload()
+         gpio_pi_bbb.unload()
     initialised = False
 
 def init():

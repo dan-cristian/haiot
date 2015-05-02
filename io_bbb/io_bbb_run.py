@@ -9,6 +9,7 @@ from main import db
 from common import constant
 from main.admin import models
 from pydispatch import dispatcher
+from relay import gpio_pi_bbb
 
 #https://learn.adafruit.com/setting-up-io-python-library-on-beaglebone-black/using-the-bbio-library
 try:
@@ -24,12 +25,18 @@ def register_gpios():
     zone_alarm_list = models.ZoneAlarm.query.all()
     for zonealarm in zone_alarm_list:
         try:
-            GPIO.setup(zonealarm.gpio_pin_code, GPIO.IN)
-            GPIO.add_event_detect(zonealarm.gpio_pin_code, GPIO.BOTH, callback=event_detected, bouncetime=300)
-            logger.info('Enabled alarm on gpio {} zone {}'.format(zonealarm.gpio_pin_code, zonealarm.zone_id))
-            logger.info('Testing an input read on this gpio pin')
-            event_detected(zonealarm.gpio_pin_code)
-            import_module_exist = True
+            gpio_pin = models.GpioPin.query.filter_by(pin_code=zonealarm.gpio_pin_code, host_name=constant.HOST_NAME)
+            if gpio_pin:
+                if gpio_pin.pin_index != '':
+                    gpio_pi_bbb.get_pin_bcm()
+                GPIO.setup(zonealarm.gpio_pin_code, GPIO.IN)
+                GPIO.add_event_detect(zonealarm.gpio_pin_code, GPIO.BOTH, callback=event_detected, bouncetime=300)
+                logger.info('Enabled alarm on gpio {} zone {}'.format(zonealarm.gpio_pin_code, zonealarm.zone_id))
+                logger.info('Testing an input read on this gpio pin')
+                event_detected(zonealarm.gpio_pin_code)
+                import_module_exist = True
+            else:
+                logger.warning('Unable to find gpio for zonealarm pin {}'.format(zonealarm.alarm_pin_name))
         except Exception, ex:
             logger.critical('Unable to setup GPIO {} zone {} err={}'.format(zonealarm.gpio_pin_code,
                                                                       zonealarm.zone_id, ex))
