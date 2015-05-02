@@ -279,7 +279,7 @@ def populate_tables(model_auto_update=False):
 
     check_table_schema(models.GpioPin, model_auto_update)
     bbb_bcm_map={
-        'P9_11':30, 'P9_12':60, 'P9_13':31, 'P9_14':40, 'P9:15':48, 'P9_16':51,
+        'P9_11':30, 'P9_12':60, 'P9_13':31, 'P9_14':40, 'P9_15':48, 'P9_16':51,
         'P8_07':66, 'P8_08':67, 'P8_09':69, 'P8_11':45, 'P8_12':44, 'P8_15':47, 'P8_16':46
     }
     if len(models.GpioPin.query.filter_by(pin_type=constant.GPIO_PIN_TYPE_BBB).all()) != 46*2: #P8_ and P9_ with 46 pins
