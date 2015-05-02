@@ -159,13 +159,13 @@ def populate_tables(model_auto_update=False):
     value_list=[
             # hour in day, 24 hr format  0    4    8    12   16   20   
             [1, 'week-bucatarie',       '.... ..22 .... .... ..22 2222'],
-            [2, 'weekend-bucatarie',    '.... .... 2222-2222 2222 2222'],
-            [3, 'week-living',          '.... .... ....-.... ..22 2222'],
-            [4, 'weekend-living',       '.... .... 2222-2222 2222 2222'],
-            [5, 'week-birou',           '.... .... ....-.... ..22 2222'],
-            [6, 'weekend-birou',        '.... .... 2222-2222 2222 2222'],
-            [7, 'week-dormitor',        'bbbb bbb. ....-.... .... bbbb'],
-            [8, 'weekend-dormitor',     'bbbb bbb. ....-.bbb .... bbbb']
+            [2, 'weekend-bucatarie',    '.... .... 2222 2222 2222 2222'],
+            [3, 'week-living',          '.... .... .... .... ..22 2222'],
+            [4, 'weekend-living',       '.... .... 2222 2222 2222 2222'],
+            [5, 'week-birou',           '.... .... .... .... ..22 2222'],
+            [6, 'weekend-birou',        '.... .... 2222 2222 2222 2222'],
+            [7, 'week-dormitor',        'bbbb bbb. .... .... .... bbbb'],
+            [8, 'weekend-dormitor',     'bbbb bbb. .... .bbb .... bbbb']
             ]
     check_table_schema(models.SchedulePattern, model_auto_update)
     if len(models.SchedulePattern.query.all()) < len(value_list):
