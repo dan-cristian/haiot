@@ -56,7 +56,7 @@ def home():
 @app.route('/ebooks', defaults={'req_path': ''})
 @app.route('/<path:req_path>')
 def dir_listing(req_path):
-    BASE_DIR = '/media/cloud/ebooks'
+    BASE_DIR = '/media/ebooks'
 
     # Joining the base and the requested path
     abs_path = os.path.join(BASE_DIR, req_path)
