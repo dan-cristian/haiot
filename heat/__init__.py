@@ -22,7 +22,8 @@ def heat_update(obj_dict={}):
             if zone_heat_relay and gpio_host_name == constant.HOST_NAME:
                 cmd_heat_is_on = utils.get_object_field_value(obj_dict,
                                                             utils.get_model_field_name(models.ZoneHeatRelay.heat_is_on))
-                logger.info('Local heat state zone_id {} must be changed to {}'.format(zone_id, cmd_heat_is_on))
+                logger.info('Local heat state zone_id {} must be changed to {} on pin {}'.format(zone_id,
+                                                                    cmd_heat_is_on, zone_heat_relay.gpio_pin_code))
                 if cmd_heat_is_on:
                     pin_value = 1
                 else:
