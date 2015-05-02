@@ -30,30 +30,32 @@ def relay_update(gpio_pin_code='', pin_value=''):
 def relay_get(pin=None, from_web=False):
     message = 'Get relay state for pin {}'.format(pin)
     logger.info(message)
-    if constant.HOST_MACHINE_TYPE == constant.MACHINE_TYPE_RASPBERRY:
+    if constant.HOST_MACHINE_TYPE in [constant.MACHINE_TYPE_RASPBERRY, constant.MACHINE_TYPE_BEAGLEBONE]:
         pin_value = gpio_pi_bbb.get_pin_bcm(pin)
     else:
-        message = message + '\n error not running on raspberry'
+        message = message + ' error not running on gpio enabled devices'
         pin_value = None
 
     if from_web:
         return return_web_message(pin_value=pin_value, ok_message=message, err_message=message)
     else:
+        logger.warning(message)
         return pin_value
 
 def relay_set(pin=None, value=None, from_web=False):
     value = int(value)
     message = 'Set relay state {} for pin {}'.format(value, pin)
     logger.info(message)
-    if constant.HOST_MACHINE_TYPE == constant.MACHINE_TYPE_RASPBERRY:
+    if constant.HOST_MACHINE_TYPE in [constant.MACHINE_TYPE_RASPBERRY, constant.MACHINE_TYPE_BEAGLEBONE]:
         pin_value = gpio_pi_bbb.set_pin_bcm(pin, value)
     else:
-        message = message + '\n error not running on raspberry'
+        message = message + ' error not running on gpio enabled devices'
         pin_value = None
 
     if from_web:
         return return_web_message(pin_value=pin_value, ok_message=message, err_message=message)
     else:
+        logger.warning(message)
         return pin_value
 
 def return_web_message(pin_value, ok_message='', err_message=''):
