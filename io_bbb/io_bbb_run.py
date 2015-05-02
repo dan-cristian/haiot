@@ -25,7 +25,8 @@ def register_gpios():
     zone_alarm_list = models.ZoneAlarm.query.all()
     for zonealarm in zone_alarm_list:
         try:
-            gpio_pin = models.GpioPin.query.filter_by(pin_code=zonealarm.gpio_pin_code, host_name=constant.HOST_NAME)
+            gpio_pin = models.GpioPin.query.filter_by(pin_code=zonealarm.gpio_pin_code,
+                                                      host_name=constant.HOST_NAME).first()
             if gpio_pin:
                 if gpio_pin.pin_index != '':
                     gpio_pi_bbb.get_pin_bcm()
