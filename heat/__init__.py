@@ -23,7 +23,11 @@ def heat_update(obj_dict={}):
                 cmd_heat_is_on = utils.get_object_field_value(obj_dict,
                                                             utils.get_model_field_name(models.ZoneHeatRelay.heat_is_on))
                 logger.info('Local heat state zone_id {} must be changed to {}'.format(zone_id, cmd_heat_is_on))
-                pin_state = relay.relay_update(zone_heat_relay.gpio_pin_code, cmd_heat_is_on)
+                if cmd_heat_is_on:
+                    pin_value = 1
+                else:
+                    pin_value = 0
+                pin_state = relay.relay_update(gpio_pin_code=zone_heat_relay.gpio_pin_code, pin_value=pin_value)
                 if pin_state:
                     pin_state = (pin_state == 1)
                     zone_heat_relay.heat_is_on = pin_state

@@ -8,14 +8,14 @@ import gpio_pi_bbb
 
 initialised=False
 
-def relay_update(gpio_pin_code='', pin_is_on=''):
+def relay_update(gpio_pin_code='', pin_value=''):
     #return pin value after state set
     try:
         logger.debug('Received relay state update pin {}'.format(gpio_pin_code))
         gpiopin = models.GpioPin.query.filter_by(pin_code=gpio_pin_code, host_name=constant.HOST_NAME).first()
         result = None
         if gpiopin:
-            pin_value = relay_set(gpiopin.pin_code, pin_is_on, from_web=False)
+            pin_value = relay_set(pin=gpiopin.pin_code, value=pin_value, from_web=False)
             if pin_value:
                 result = pin_value
             gpiopin.pin_value = pin_value
