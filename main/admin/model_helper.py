@@ -135,12 +135,17 @@ def populate_tables(model_auto_update=False):
         commit()
 
     temptarget_list=[
-            [1, 'x', 18],
-            [2, '0', 20],
-            [3, '1', 21],
-            [4, '2', 22],
-            [5, '3', 23],
-            [6, '4', 24]
+            [ 1, '.', 18],
+            [ 2, '0', 20],
+            [ 3, 'a', 20.5],
+            [ 4, '1', 21],
+            [ 5, 'b', 21.5],
+            [ 6, '2', 22],
+            [ 7, 'c', 22.5],
+            [ 8, '3', 23],
+            [ 9, 'd', 23.5],
+            [10, '4', 24],
+            [11, 'e', 24.5]
             ]
     check_table_schema(models.TemperatureTarget, model_auto_update)
     if len(models.TemperatureTarget.query.all()) < len(temptarget_list):
@@ -152,10 +157,15 @@ def populate_tables(model_auto_update=False):
             commit()
 
     value_list=[
-            [1, 'week-bucatarie',       'xxxx-xx22-xxxx-xxxx-xx22-2222'],
-            [2, 'weekend-bucatarie',    'xxxx-xxxx-2222-2222-2222-2222'],
-            [3, 'week-living',          'xxxx-xxxx-xxxx-xxxx-xx22-2222'],
-            [4, 'weekend-living',       'xxxx-xxxx-2222-2222-2222-2222']
+            # hour in day, 24 hr format  0    4    8    12   16   20   
+            [1, 'week-bucatarie',       '....-..22-....-....-..22-2222'],
+            [2, 'weekend-bucatarie',    '....-....-2222-2222-2222-2222'],
+            [3, 'week-living',          '....-....-....-....-..22-2222'],
+            [4, 'weekend-living',       '....-....-2222-2222-2222-2222'],
+            [5, 'week-birou',           '....-....-....-....-..22-2222'],
+            [6, 'weekend-birou',        '....-....-2222-2222-2222-2222'],
+            [7, 'week-dormitor',        'bbbb-bbb.-....-....-....-bbbb'],
+            [8, 'weekend-dormitor',     'bbbb-bbb.-....-.bbb-....-bbbb']
             ]
     check_table_schema(models.SchedulePattern, model_auto_update)
     if len(models.SchedulePattern.query.all()) < len(value_list):
@@ -167,8 +177,11 @@ def populate_tables(model_auto_update=False):
             commit()
 
     value_list=[
-            [1, 1, 1, 2], #bucatarie
-            [2, 2, 3, 4], #living
+            #id, zone_id, week_id, weekend_id
+            [1,  1, 1, 2], #bucatarie
+            [2,  2, 3, 4], #living
+            [3, 47, 5, 6], #birou
+            [4,  4, 7, 8], #dormitor   
             ]
     check_table_schema(models.HeatSchedule, model_auto_update)
     if len(models.HeatSchedule.query.all()) < len(value_list):
@@ -239,7 +252,7 @@ def populate_tables(model_auto_update=False):
         [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
         [4, get_mod_name(mqtt_io), True, 3],[5, get_mod_name(sensor), True, 4],[6, get_mod_name(relay), True, 5],
         [7, get_mod_name(heat), True, 6],[8, get_mod_name(alarm), False, 7],[9, get_mod_name(graph_plotly), False, 8],
-        [10, get_mod_name(io_bbb), True, 9],[11, get_mod_name(webui), False, 10],[12, get_mod_name(ddns), False, 11]],
+        [10, get_mod_name(io_bbb), True, 9],[11, get_mod_name(webui), True, 10],[12, get_mod_name(ddns), False, 11]],
         'router':[
         [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
         [4, get_mod_name(mqtt_io), True, 3],[5, get_mod_name(sensor), False, 4],[6, get_mod_name(relay), False, 5],
@@ -279,7 +292,7 @@ def populate_tables(model_auto_update=False):
                     gpio.pin_code='P'+str(rail)+'_'+pincode[-2:]
                     db.session.add(gpio)
             commit()
-        for host_name in ['pi-power']:
+        for host_name in ['pi-power', 'pi-bell']:
             logger.info('Populating GpioPins with default raspberry pi {} values'.format(host_name))
             for pin in range(01, 27): # -1
                 gpio = models.GpioPin()
@@ -304,7 +317,8 @@ def populate_tables(model_auto_update=False):
     check_table_schema(models.ZoneHeatRelay, model_auto_update)
     #fixme: mapping not correct
     heat_relay_list={'pi-power': [[19, '24']],
-                     'beaglebone': [[1,'P8_08'],[2,'P8_16'],[3,'P8_12'],[9,'P8_09']]}
+                     #1=bucatarie, 2=living, 47=birou
+                     'beaglebone': [[1,'P9_11'],[2,'P9_12'],[47,'P9_13'],[9,'P8_15'],[9,'P8_16']]}
     if len(models.ZoneHeatRelay.query.all()) < len(zonealarm_list):
         models.ZoneHeatRelay.query.delete()
         commit()
