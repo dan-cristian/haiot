@@ -75,7 +75,7 @@ def loop_zones():
                 if heat_schedule.active and sensor:
                     sensor_last_update_seconds = (datetime.datetime.now()-sensor.updated_on).total_seconds()
                     if sensor_last_update_seconds > 60 * 60:
-                        logger.warning('Sensor {} not updated in last 60 minutes, unusual'.format(sensor.zone_name))
+                        logger.warning('Sensor {} not updated in last 60 minutes, unusual'.format(sensor.sensor_name))
                     __update_zone_heat(zone, heat_schedule, sensor)
     except Exception, ex:
         logger.error('Error loop_zones, err={}'.format(ex, exc_info=True))
