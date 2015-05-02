@@ -32,6 +32,17 @@ def get_object_field_value(obj={}, field_name=None):
         return obj[field_name]
     else:
         return None
+
+#
+def get_model_field_name(field_obj):
+    val = str(property(field_obj).fget)
+    words=val.split('.')
+    if len(words) >1:
+        return words[1]
+    else:
+        logger.critical('Unexpected words count in get_model_field_name={}'.format(field_obj))
+        return None
+
 def parse_to_date(strdate):
     if  re.search("....-..-..T..:..:..\.......",  strdate) or \
         re.search("....-..-.. ..:..:..\.......",  strdate):

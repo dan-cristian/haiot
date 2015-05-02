@@ -281,7 +281,7 @@ def populate_tables(model_auto_update=False):
     if len(models.GpioPin.query.filter_by(pin_type=constant.GPIO_PIN_TYPE_BBB).all()) != 46*2: #P8_ and P9_ with 46 pins
         models.GpioPin.query.filter_by(pin_type=constant.GPIO_PIN_TYPE_BBB).delete()
         commit()
-        for host_name in ['beaglebone']:
+        for host_name in ['beaglebone', 'netbook']:
             logger.info('Populating GpioPins with default beabglebone {} values'.format(host_name))
             for rail in range(8,10): #last range is not part of the loop
                 for pin in range(01, 47):
@@ -291,7 +291,7 @@ def populate_tables(model_auto_update=False):
                     pincode='0'+str(pin)
                     gpio.pin_code='P'+str(rail)+'_'+pincode[-2:]
                     db.session.add(gpio)
-            commit()
+        commit()
         for host_name in ['pi-power', 'pi-bell']:
             logger.info('Populating GpioPins with default raspberry pi {} values'.format(host_name))
             for pin in range(01, 27): # -1
@@ -303,8 +303,9 @@ def populate_tables(model_auto_update=False):
         commit()
 
     check_table_schema(models.ZoneAlarm, model_auto_update)
-    zonealarm_list={'beaglebone':[[47, 'P8_11'],[1,'P8_08'],[2,'P8_16'],[3,'P8_12'],[9,'P8_09'],[10,'P8_07'],
-                                  [11,'P8_15']]}
+    zonealarm_list={
+        'beaglebone':[[47, 'P8_11'],[1,'P8_08'],[2,'P8_16'],[3,'P8_12'],[9,'P8_09'],[10,'P8_07'], [11,'P8_15']]
+    }
     if len(models.ZoneAlarm.query.all()) < len(zonealarm_list):
         for host_name in zonealarm_list.keys():
             logger.info('Populating ZoneAlarm for {} with default values'.format(host_name))
@@ -320,7 +321,9 @@ def populate_tables(model_auto_update=False):
         #19=heat main
         'pi-power': [[19, '24']],
         #1=bucatarie, 2=living, 47=birou, 4=dormitor
-        'beaglebone': [[1,'P9_11'],[2,'P9_12'],[47,'P9_13'],[4,'P8_15']]
+        'beaglebone': [[1,'P9_11'],[2,'P9_12'],[147,'xxP9_13'],[4,'P9_15']],
+        #for test only
+        'netbook':[[47,'P9_13']]
     }
     #,[4,'P8_16']
     if len(models.ZoneHeatRelay.query.all()) < len(heat_relay_list):

@@ -13,14 +13,14 @@ def __save_heat_state_db(zone='', heat_is_on=''):
     assert isinstance(zone, models.Zone)
     zone_heat_relay = models.ZoneHeatRelay.query.filter_by(zone_id=zone.id).first()
     if zone_heat_relay:
-        if zone_heat_relay.heat_is_on != heat_is_on:
+        #if zone_heat_relay.heat_is_on != heat_is_on:
             zone_heat_relay.heat_is_on = heat_is_on
             zone_heat_relay.updated_on = datetime.datetime.now()
-            logger.info('Heat state changed to is-on {} in zone {}'.format(heat_is_on, zone.name))
+            logger.info('Heat state changed to is-on={} in zone {}'.format(heat_is_on, zone.name))
             zone_heat_relay.notify_transport_enabled = True
             db.session.commit()
-        else:
-            logger.debug('Heat state [{}] unchanged in zone {}'.format(heat_is_on, zone.name))
+        #else:
+        #    logger.debug('Heat state [{}] unchanged in zone {}'.format(heat_is_on, zone.name))
     else:
         logger.warning('No heat relay found in zone {}'.format(zone.name))
 
@@ -41,7 +41,7 @@ def __update_zone_heat(zone, heat_schedule, sensor):
         minute = datetime.datetime.now().minute
         hour = datetime.datetime.now().hour
         weekday = datetime.datetime.today().weekday()
-        if weekday <= 5:
+        if weekday <= 4: #Monday=0
             schedule_pattern=models.SchedulePattern.query.filter_by(id=heat_schedule.pattern_week_id).first()
         else:
             schedule_pattern=models.SchedulePattern.query.filter_by(id=heat_schedule.pattern_weekend_id).first()

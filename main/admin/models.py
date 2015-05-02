@@ -3,6 +3,7 @@ from datetime import datetime
 from main import logger
 from copy import deepcopy
 from main import db
+from common import constant
 import graphs
 
 class DbEvent:
@@ -12,6 +13,7 @@ class DbEvent:
     event_uuid = None
     operation_type=None
     last_commit_field_changed_list = []
+
 
     def get_deepcopy(self):
         return deepcopy(self)
@@ -284,7 +286,7 @@ class GpioPin(db.Model, DbEvent):
     id = db.Column(db.Integer, primary_key=True)
     host_name = db.Column(db.String(50))
     pin_type = db.Column(db.String(50))
-    pin_code = db.Column(db.String(50), unique=True)
+    pin_code = db.Column(db.String(50))
     pin_index = db.Column(db.String(50))
     pin_value = db.Column(db.Integer)
 
