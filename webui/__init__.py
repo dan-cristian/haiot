@@ -4,7 +4,7 @@ import os
 from main import logger
 from main import app
 from flask import request, abort, send_file, render_template
-
+from flask.ext.autoindex import AutoIndex
 
 import webui
 import helpers
@@ -46,6 +46,7 @@ def init():
     global initialised
     initialised = True
     flask_thread = helpers.FlaskInThread(app, host='0.0.0.0', port=5000, debug=True, use_reloader=False)
+    #AutoIndex(app, browse_root=os.path.curdir)
     flask_thread.start()
     #app.run(debug=True, use_reloader=False, host='0.0.0.0')
 
@@ -56,19 +57,22 @@ def home():
 @app.route('/ebooks', defaults={'req_path': ''})
 @app.route('/<path:req_path>')
 def dir_listing(req_path):
-    BASE_DIR = '/media/ebooks'
+    try:
+        BASE_DIR = '/media/ebooks'
 
-    # Joining the base and the requested path
-    abs_path = os.path.join(BASE_DIR, req_path)
+        # Joining the base and the requested path
+        abs_path = os.path.join(BASE_DIR, req_path)
 
-    # Return 404 if path doesn't exist
-    if not os.path.exists(abs_path):
-        return abort(404)
+        # Return 404 if path doesn't exist
+        if not os.path.exists(abs_path):
+            return abort(404)
 
-    # Check if path is a file and serve
-    if os.path.isfile(abs_path):
-        return send_file(abs_path)
+        # Check if path is a file and serve
+        if os.path.isfile(abs_path):
+            return send_file(abs_path)
 
-    # Show directory contents
-    files = os.listdir(abs_path)
-    return render_template('files.html', files=files)
+        # Show directory contents
+        files = os.listdir(abs_path)
+        return render_template('files.html', files=files)
+    except Exception, ex:
+        return 'Error request={}, err={}'.format(req_path, ex)
