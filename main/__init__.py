@@ -93,7 +93,7 @@ def execute_command(command):
 
 def unload():
     logger.info('Main module is unloading, application will exit')
-    import webui, admin.thread_pool
+    import webui, admin.thread_pool, relay
     from transport import mqtt_io
 
     global shutting_down
@@ -103,6 +103,8 @@ def unload():
         webui.unload()
     if mqtt_io.initialised:
         mqtt_io.unload()
+    if relay.initialised:
+        relay.unload()
 
 def init_logging():
     import logging
