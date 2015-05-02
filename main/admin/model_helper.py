@@ -320,7 +320,7 @@ def populate_tables(model_auto_update=False):
                      #1=bucatarie, 2=living, 47=birou, 4=dormitor
                      'beaglebone': [[1,'P9_11'],[2,'P9_12'],[47,'P9_13'],[4,'P8_15']]}
     #,[4,'P8_16']
-    if len(models.ZoneHeatRelay.query.all()) < len(zonealarm_list):
+    if len(models.ZoneHeatRelay.query.all()) < len(heat_relay_list):
         models.ZoneHeatRelay.query.delete()
         commit()
         for host_name in heat_relay_list.keys():
