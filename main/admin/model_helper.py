@@ -158,14 +158,14 @@ def populate_tables(model_auto_update=False):
 
     value_list=[
             # hour in day, 24 hr format  0    4    8    12   16   20   
-            [1, 'week-bucatarie',       '....-..22-....-....-..22-2222'],
-            [2, 'weekend-bucatarie',    '....-....-2222-2222-2222-2222'],
-            [3, 'week-living',          '....-....-....-....-..22-2222'],
-            [4, 'weekend-living',       '....-....-2222-2222-2222-2222'],
-            [5, 'week-birou',           '....-....-....-....-..22-2222'],
-            [6, 'weekend-birou',        '....-....-2222-2222-2222-2222'],
-            [7, 'week-dormitor',        'bbbb-bbb.-....-....-....-bbbb'],
-            [8, 'weekend-dormitor',     'bbbb-bbb.-....-.bbb-....-bbbb']
+            [1, 'week-bucatarie',       '.... ..22 .... .... ..22 2222'],
+            [2, 'weekend-bucatarie',    '.... .... 2222-2222 2222 2222'],
+            [3, 'week-living',          '.... .... ....-.... ..22 2222'],
+            [4, 'weekend-living',       '.... .... 2222-2222 2222 2222'],
+            [5, 'week-birou',           '.... .... ....-.... ..22 2222'],
+            [6, 'weekend-birou',        '.... .... 2222-2222 2222 2222'],
+            [7, 'week-dormitor',        'bbbb bbb. ....-.... .... bbbb'],
+            [8, 'weekend-dormitor',     'bbbb bbb. ....-.bbb .... bbbb']
             ]
     check_table_schema(models.SchedulePattern, model_auto_update)
     if len(models.SchedulePattern.query.all()) < len(value_list):
@@ -278,6 +278,10 @@ def populate_tables(model_auto_update=False):
         commit()
 
     check_table_schema(models.GpioPin, model_auto_update)
+    bbb_bcm_map={
+        'P9_11':30, 'P9_12':60, 'P9_13':31, 'P9_14':40, 'P9:15':48, 'P9_16':51,
+        'P8_07':66, 'P8_08':67, 'P8_09':69, 'P8_11':45, 'P8_12':44, 'P8_15':47, 'P8_16':46
+    }
     if len(models.GpioPin.query.filter_by(pin_type=constant.GPIO_PIN_TYPE_BBB).all()) != 46*2: #P8_ and P9_ with 46 pins
         models.GpioPin.query.filter_by(pin_type=constant.GPIO_PIN_TYPE_BBB).delete()
         commit()
@@ -286,19 +290,24 @@ def populate_tables(model_auto_update=False):
             for rail in range(8,10): #last range is not part of the loop
                 for pin in range(01, 47):
                     gpio = models.GpioPin()
-                    gpio.pin_type=constant.GPIO_PIN_TYPE_BBB
+                    gpio.pin_type = constant.GPIO_PIN_TYPE_BBB
                     gpio.host_name = host_name
-                    pincode='0'+str(pin)
-                    gpio.pin_code='P'+str(rail)+'_'+pincode[-2:]
+                    pincode = '0'+str(pin)
+                    gpio.pin_code = 'P'+str(rail)+'_'+pincode[-2:]
+                    if bbb_bcm_map.has_key(gpio.pin_code):
+                        gpio.pin_index = bbb_bcm_map[gpio.pin_code]
+                    else:
+                        gpio.pin_index = ''
                     db.session.add(gpio)
         commit()
         for host_name in ['pi-power', 'pi-bell']:
             logger.info('Populating GpioPins with default raspberry pi {} values'.format(host_name))
             for pin in range(01, 27): # -1
                 gpio = models.GpioPin()
-                gpio.pin_type=constant.GPIO_PIN_TYPE_PI
-                gpio.host_name=host_name
-                gpio.pin_code=str(pin)
+                gpio.pin_type = constant.GPIO_PIN_TYPE_PI
+                gpio.host_name = host_name
+                gpio.pin_code = str(pin)
+                gpio.pin_index = pin
                 db.session.add(gpio)
         commit()
 
@@ -321,7 +330,7 @@ def populate_tables(model_auto_update=False):
         #19=heat main
         'pi-power': [[19, '24']],
         #1=bucatarie, 2=living, 47=birou, 4=dormitor
-        'beaglebone': [[1,'P9_11'],[2,'P9_12'],[147,'xxP9_13'],[4,'P9_15']],
+        'beaglebone': [[1,'P9_11'],[2,'P9_12'],[47,'P9_13'],[4,'P9_15']],
         #for test only
         'netbook':[[47,'P9_13']]
     }

@@ -33,6 +33,3 @@ def init():
     dispatcher.connect(handle_event_alarm, signal=constant.SIGNAL_GPIO, sender=dispatcher.Any)
     global initialised
     initialised = True
-
-if __name__ == '__main__':
-    init()

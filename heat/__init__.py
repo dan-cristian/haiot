@@ -17,21 +17,24 @@ def heat_update(obj_dict={}):
         zone_id = utils.get_object_field_value(obj_dict, utils.get_model_field_name(models.ZoneHeatRelay.zone_id))
         logger.info('Received heat relay state update from {} for zoneid {}'.format(source_host_name, zone_id))
         zone_heat_relay = models.ZoneHeatRelay.query.filter_by(zone_id=zone_id).first()
-        gpio_host_name = zone_heat_relay.gpio_host_name
-        if zone_heat_relay and gpio_host_name == constant.HOST_NAME:
-            cmd_heat_is_on = utils.get_object_field_value(obj_dict,
-                                                          utils.get_model_field_name(models.ZoneHeatRelay.heat_is_on))
-            logger.info('Local heat state zone_id {} must be changed to {}'.format(zone_id, cmd_heat_is_on))
-            pin_state = relay.relay_update(zone_heat_relay.gpio_pin_code, cmd_heat_is_on)
-            if pin_state:
-                pin_state = (pin_state == 1)
-                zone_heat_relay.heat_is_on = pin_state
-                zone_heat_relay.notify_transport_enabled = False
-                db.session.commit()
+        if zone_heat_relay:
+            gpio_host_name = zone_heat_relay.gpio_host_name
+            if zone_heat_relay and gpio_host_name == constant.HOST_NAME:
+                cmd_heat_is_on = utils.get_object_field_value(obj_dict,
+                                                            utils.get_model_field_name(models.ZoneHeatRelay.heat_is_on))
+                logger.info('Local heat state zone_id {} must be changed to {}'.format(zone_id, cmd_heat_is_on))
+                pin_state = relay.relay_update(zone_heat_relay.gpio_pin_code, cmd_heat_is_on)
+                if pin_state:
+                    pin_state = (pin_state == 1)
+                    zone_heat_relay.heat_is_on = pin_state
+                    zone_heat_relay.notify_transport_enabled = False
+                    db.session.commit()
+                else:
+                    logger.warning('Heat state zone_id {} unexpected value {} after set'.format(zone_id, pin_state))
             else:
-                logger.warning('Heat state zone_id {} unexpected value {} after set'.format(zone_id, pin_state))
+                logger.info('Ignoring heat change, not owning the zone relay pin {} on this host'.format(gpio_host_name))
         else:
-            logger.info('Ignoring heat change, not owning the zone relay pin {} on this host'.format(gpio_host_name))
+            logger.warning('No heat relay defined for zone {}, db data issue?'.format(zone_id))
     except Exception, ex:
         logger.warning('Error updating heat relay state, err {}'.format(ex))
 
