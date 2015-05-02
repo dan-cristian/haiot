@@ -35,9 +35,11 @@ def __decide_action(zone, current_temperature, target_temperature):
                                                                        target_temperature))
         heat_is_on = False
     __save_heat_state_db(zone=zone, heat_is_on=heat_is_on)
+    return heat_is_on
 
 def __update_zone_heat(zone, heat_schedule, sensor):
     try:
+        heat_is_on = False
         minute = datetime.datetime.now().minute
         hour = datetime.datetime.now().hour
         weekday = datetime.datetime.today().weekday()
@@ -54,16 +56,18 @@ def __update_zone_heat(zone, heat_schedule, sensor):
                     logger.info('Active pattern for zone {} is {} temp {}'.format(zone.name, schedule_pattern.name,
                                                                                          temperature.target))
                     if sensor.temperature:
-                        __decide_action(zone, sensor.temperature, temperature.target)
+                        heat_is_on = __decide_action(zone, sensor.temperature, temperature.target)
                 else:
                     logger.critical('Unknown temperature pattern code {}'.format(temperature_code))
             else:
                 logger.warning('Incorrect temp pattern [{}] in zone {}, length is not 24'.format(pattern, zone.name))
     except Exception, ex:
         logger.error('Error updatezoneheat, err={}'.format(ex, exc_info=True))
+    return heat_is_on
 
 def loop_zones():
     try:
+        heat_is_on = False
         zone_list = models.Zone.query.all()
         global progress_status
         for zone in zone_list:
@@ -76,7 +80,14 @@ def loop_zones():
                     sensor_last_update_seconds = (datetime.datetime.now()-sensor.updated_on).total_seconds()
                     if sensor_last_update_seconds > 60 * 60:
                         logger.warning('Sensor {} not updated in last 60 minutes, unusual'.format(sensor.sensor_name))
-                    __update_zone_heat(zone, heat_schedule, sensor)
+                    if __update_zone_heat(zone, heat_schedule, sensor):
+                        heat_is_on = True
+        heatrelay_main_source = models.ZoneHeatRelay.query.filter_by(is_main_heat_source=True).first()
+        if heatrelay_main_source:
+            main_source_zone = models.Zone.query.filter_by(zone_id=heatrelay_main_source.zone_id).first()
+            __save_heat_state_db(zone=main_source_zone, heat_is_on=heat_is_on)
+        else:
+            logger.critical('No heat main source is defined in db')
     except Exception, ex:
         logger.error('Error loop_zones, err={}'.format(ex, exc_info=True))
 

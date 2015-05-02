@@ -335,13 +335,15 @@ def populate_tables(model_auto_update=False):
         #,'netbook':[[47, 'P9_13']]
     }
     #,[4,'P8_16']
+    heat_main_source_zone_id=19
     if len(models.ZoneHeatRelay.query.all()) < len(heat_relay_list):
         models.ZoneHeatRelay.query.delete()
         commit()
         for host_name in heat_relay_list.keys():
             logger.info('Populating ZoneHeatRelay for {} with default values'.format(host_name))
             for pair in heat_relay_list[host_name]:
-                db.session.add(models.ZoneHeatRelay(pair[0], pair[1], host_name))
+                db.session.add(models.ZoneHeatRelay(zone_id=pair[0], gpio_pin_code=pair[1], host_name=host_name,
+                                                    is_main_heat_source=(pair[0]==heat_main_source_zone_id)))
             commit()
 
     #if True:
