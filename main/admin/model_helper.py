@@ -327,12 +327,12 @@ def populate_tables(model_auto_update=False):
     check_table_schema(models.ZoneHeatRelay, model_auto_update)
     #fixme: mapping not correct
     heat_relay_list={
-        #19=heat main
-        'pi-power': [[19, '24']],
         #1=bucatarie, 2=living, 47=birou, 4=dormitor
-        'beaglebone': [[1,'P9_11'],[2,'P9_12'],[47,'P9_13'],[4,'P9_15']],
+        'beaglebone': [[1, 'P9_11'], [2, 'P9_12'], [47, 'P9_13'], [4, 'P9_15']],
+        #19=heat main
+        'pi-power': [[19, '24']]
         #for test only
-        'netbook':[[47,'P9_13']]
+        #,'netbook':[[47, 'P9_13']]
     }
     #,[4,'P8_16']
     if len(models.ZoneHeatRelay.query.all()) < len(heat_relay_list):
