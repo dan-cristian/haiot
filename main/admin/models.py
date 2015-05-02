@@ -322,12 +322,14 @@ class ZoneHeatRelay(db.Model, DbEvent):
     gpio_pin_code = db.Column(db.String(50))
     gpio_host_name = db.Column(db.String(50))
     heat_is_on = db.Column(db.Boolean)
+    is_main_heat_source = db.Column(db.Boolean)
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    def __init__(self, zone_id='', gpio_pin_code='', host_name=''):
+    def __init__(self, zone_id='', gpio_pin_code='', host_name='', is_main_heat_source=False):
         self.zone_id = zone_id
         self.gpio_pin_code = gpio_pin_code
         self.gpio_host_name = host_name
+        self.is_main_heat_source = is_main_heat_source
 
     def __repr__(self):
         return 'host {} gpiopin {} {}'.format(self.gpio_host_name, self.gpio_pin_code, self.heat_pin_name)
