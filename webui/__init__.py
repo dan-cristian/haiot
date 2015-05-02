@@ -4,7 +4,6 @@ import os
 from main import logger
 from main import app
 from flask import request, abort, send_file, render_template
-#from flask.ext.autoindex import AutoIndex
 
 import webui
 import helpers
@@ -46,7 +45,6 @@ def init():
     global initialised
     initialised = True
     flask_thread = helpers.FlaskInThread(app, host='0.0.0.0', port=5000, debug=True, use_reloader=False)
-    #AutoIndex(app, browse_root=os.path.curdir)
     flask_thread.start()
     #app.run(debug=True, use_reloader=False, host='0.0.0.0')
 
@@ -58,7 +56,8 @@ def home():
 @app.route('/<path:req_path>')
 def dir_listing(req_path):
     try:
-        BASE_DIR = '/media/ebooks'
+        #BASE_DIR = '/media/ebooks'
+        BASE_DIR = '/temp'
 
         # Joining the base and the requested path
         abs_path = os.path.join(BASE_DIR, req_path)

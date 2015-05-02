@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 function log(){
-	logger -i -t sync $1
+	logger -i -t haiot $1
 	echo $1
 }
 
