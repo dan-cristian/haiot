@@ -11,7 +11,7 @@ def __write_to_file_as_root(file, value):
     try:
         if constant.OS in constant.OS_LINUX :
             res = os.system('echo {} | sudo tee --append  {}'.format(str(value), file))
-            if res==0:
+            if res == 0:
                 return True
             else:
                 logger.warning('Error writing value {} to file {} result={}'.format(value, file, res))

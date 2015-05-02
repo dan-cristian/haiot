@@ -53,7 +53,7 @@ def unload():
     global initialised
     initialised = False
     thread_pool.remove_callable(heat_loop.thread_run)
-    dispatcher.disconnect(handle_event_heat,signal=constant.SIGNAL_HEAT,sender=dispatcher.Any)
+    dispatcher.disconnect(handle_event_heat, signal=constant.SIGNAL_HEAT, sender=dispatcher.Any)
 
 def init():
     logger.info('Heat module initialising')

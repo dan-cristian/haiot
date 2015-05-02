@@ -67,7 +67,8 @@ def return_web_message(pin_value, ok_message='', err_message=''):
 def unload():
     global initialised
     if constant.HOST_MACHINE_TYPE in [constant.MACHINE_TYPE_RASPBERRY, constant.MACHINE_TYPE_BEAGLEBONE]:
-         gpio_pi_bbb.unload()
+        logger.info('Unloading gpio pins')
+        gpio_pi_bbb.unload()
     initialised = False
 
 def init():
