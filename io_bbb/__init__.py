@@ -21,6 +21,3 @@ def init():
         initialised = True
     except Exception, ex:
         logger.critical('Module io_bbb not initialised, err={}'.format(ex))
-
-if __name__ == '__main__':
-    io_bbb_run.thread_run()
