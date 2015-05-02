@@ -46,7 +46,7 @@ def __update_zone_heat(zone, heat_schedule, sensor):
         else:
             schedule_pattern=models.SchedulePattern.query.filter_by(id=heat_schedule.pattern_weekend_id).first()
         if schedule_pattern:
-            pattern = str(schedule_pattern.pattern).replace('-', '').strip(' ')
+            pattern = str(schedule_pattern.pattern).replace('-', '').lstrip(' ').rstrip(' ')
             if len(pattern) == 24:
                 temperature_code = pattern[hour]
                 temperature = models.TemperatureTarget.query.filter_by(code=temperature_code).first()
