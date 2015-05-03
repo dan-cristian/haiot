@@ -34,6 +34,7 @@ class DbEvent:
                     column_name = str(column)
                     new_value = getattr(new_record, column_name)
                     old_value = getattr(current_record, column_name)
+                    #todo: comparison not working for float, because str appends .0
                     if (not new_value is None) and (str(old_value) != str(new_value)):
                         if column_name != 'updated_on':
                             try:

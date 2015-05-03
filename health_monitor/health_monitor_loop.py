@@ -432,8 +432,8 @@ def __read_disk_stats():
                         continue #just to avoid another tab
 
                     device_name = words[2]
-                    reads_completed = float(words[3])
-                    writes_completed = float(words[7])
+                    reads_completed = utils.round_sensor_value(float(words[3]))
+                    writes_completed = utils.round_sensor_value(float(words[7]))
                     record = models.SystemDisk()
                     record.hdd_disk_dev = '/dev/' + device_name
                     record.last_reads_completed_count = reads_completed
