@@ -460,15 +460,17 @@ def __read_disk_stats():
                             record.last_writes_datetime = current_record.last_writes_datetime
                         if current_record.last_reads_datetime:
                             read_elapsed = (datetime.datetime.now() - record.last_reads_datetime).total_seconds()
+                            record.last_reads_elapsed = utils.round_sensor_value(read_elapsed)
                         if current_record.last_writes_datetime:
                             write_elapsed = (datetime.datetime.now() - record.last_writes_datetime).total_seconds()
+                            record.last_writes_elapsed = utils.round_sensor_value(write_elapsed)
                         logger.info('Disk {} elapsed read {}s write {}s'.format(device_name,
                                                                                 int(read_elapsed), int(write_elapsed)))
                     else:
                         record.last_reads_datetime = datetime.datetime.now()
                         record.last_writes_datetime = datetime.datetime.now()
                     record.save_changed_fields(current_record=current_record, new_record=record,
-                                               notify_transport_enabled=False, save_to_graph=False, debug=False)
+                                               notify_transport_enabled=False, save_to_graph=True, debug=False)
                 else:
                     logger.warning('Unexpected lower number of split atoms={} in diskstat={}'.format(len(words), line))
 
