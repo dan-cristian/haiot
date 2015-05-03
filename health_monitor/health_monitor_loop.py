@@ -427,11 +427,13 @@ def __read_disk_stats():
                 words = line.split()
                 if len(words) > 8:
                     device_major = words[0]
+                    device_name = words[2]
 
-                    if device_major != '8':
+                    #skip for non hdds and partitions (ending with digit)
+                    if device_major != '8' and device_name[-1:].isdigit():
                         continue #just to avoid another tab
 
-                    device_name = words[2]
+
                     reads_completed = utils.round_sensor_value(words[3])
                     writes_completed = utils.round_sensor_value(words[7])
                     record = models.SystemDisk()
