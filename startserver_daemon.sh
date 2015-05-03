@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 function log(){
-	logger -i -t haiot $1
+	logger -t haiot $1
 	echo $1
 }
 
