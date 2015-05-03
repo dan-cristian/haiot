@@ -19,7 +19,7 @@ class DbEvent:
         return deepcopy(self)
 
     def save_changed_fields(self,current_record='',new_record='',notify_transport_enabled=False, save_to_graph=False,
-                            ignore_only_updated_on_change=True):
+                            ignore_only_updated_on_change=True, debug=False):
         try:
             if current_record:
                 current_record.last_commit_field_changed_list=[]
@@ -42,7 +42,8 @@ class DbEvent:
                                 obj_type=obj_type_words[len(obj_type_words)-1]
                             except Exception, ex:
                                 obj_type = str(type(self))
-                            logger.debug('{} {}={} oldvalue={}'.format(obj_type, column_name, new_value, old_value))
+                            if debug:
+                                logger.info('{} {}={} oldvalue={}'.format(obj_type, column_name, new_value, old_value))
                         setattr(current_record, column_name, new_value)
                         current_record.last_commit_field_changed_list.append(column_name)
                 if len(current_record.last_commit_field_changed_list) == 0:
@@ -57,7 +58,6 @@ class DbEvent:
                     if new_value:
                         new_record.last_commit_field_changed_list.append(column_name)
                 db.session.add(new_record)
-
             db.session.commit()
         except Exception, ex:
             logger.critical('Error when saving db changes {}, err={}'.format(new_record, ex))

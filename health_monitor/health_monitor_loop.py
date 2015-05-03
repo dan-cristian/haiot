@@ -59,8 +59,7 @@ def __read_all_hdd_smart():
                 record.hdd_disk_dev = constant.DISK_DEV_MAIN + disk_letter
                 logger.debug('Processing disk {}'.format(record.hdd_disk_dev))
                 try:
-                    #record.power_status = __read_hddparm(disk_dev=record.hdd_disk_dev)
-                    pass
+                    record.power_status = __read_hddparm(disk_dev=record.hdd_disk_dev)
                 except Exception, ex:
                     record.power_status = None
                 try:
@@ -440,6 +439,8 @@ def __read_disk_stats():
                     record.last_reads_completed_count = reads_completed
                     record.last_writes_completed_count = writes_completed
                     record.system_name = constant.HOST_NAME
+                    record.updated_on = datetime.datetime.now()
+
                     current_record = models.SystemDisk.query.filter_by(hdd_disk_dev=record.hdd_disk_dev,
                                                                    system_name=record.system_name).first()
                     #save read/write date time only if count changes
@@ -457,10 +458,10 @@ def __read_disk_stats():
                                              ).total_seconds()
                             logger.info('Disk {} write elapsed {} seconds'.format(device_name, write_elapsed))
                     else:
-                        record.last_reads_datetime =  datetime.datetime.now()
-                        record.last_writes_datetime =  datetime.datetime.now()
+                        record.last_reads_datetime = datetime.datetime.now()
+                        record.last_writes_datetime = datetime.datetime.now()
                     record.save_changed_fields(current_record=current_record, new_record=record,
-                                               notify_transport_enabled=False, save_to_graph=False)
+                                               notify_transport_enabled=False, save_to_graph=False, debug=True)
                 else:
                     logger.warning('Unexpected lower number of split atoms={} in diskstat={}'.format(len(words), line))
 
