@@ -132,7 +132,10 @@ def set_pin_bcm(bcm_id=None, pin_value=None):
         if __is_pin_setup_out(bcm_id):
             if get_pin_bcm(bcm_id=bcm_id) != pin_value:
                 __write_line(bcm_id, pin_value)
-            return get_pin_bcm(bcm_id)
+            result = get_pin_bcm(bcm_id)
+            if result is None:
+                logger.warning('Get pin {} returned None result'.format(bcm_id))
+            return result
         else:
             logger.critical('Unable to write pin bcm {}'.format(bcm_id))
             return -1
