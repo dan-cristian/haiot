@@ -1,6 +1,6 @@
 __author__ = 'dcristian'
 from main import db
-from main.admin import models
+import models
 from common import utils
 
 class BaseGraph:
