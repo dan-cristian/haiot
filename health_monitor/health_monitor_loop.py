@@ -450,6 +450,8 @@ def __read_disk_stats():
                     if current_record:
                         if current_record.serial is None or current_record.serial == '':
                             record.serial = 'serial not available {} {}'.format(constant.HOST_NAME, record.hdd_disk_dev)
+                        if current_record.hdd_name is None or current_record.hdd_name== '':
+                            record.hdd_name= '{} {}'.format(constant.HOST_NAME, record.hdd_disk_dev)
                         read_elapsed = -1
                         write_elapsed = -1
                         if record.last_reads_completed_count != current_record.last_reads_completed_count:
