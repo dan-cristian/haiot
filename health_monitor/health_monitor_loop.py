@@ -443,12 +443,17 @@ def __read_disk_stats():
 
                     current_record = models.SystemDisk.query.filter_by(hdd_disk_dev=record.hdd_disk_dev,
                                                                    system_name=record.system_name).first()
+
                     #save read/write date time only if count changes
                     if current_record:
                         if record.last_reads_completed_count != current_record.last_reads_completed_count:
                             record.last_reads_datetime = datetime.datetime.now()
+                        else:
+                            record.last_reads_datetime = current_record.last_reads_datetime
                         if record.last_writes_completed_count != current_record.last_writes_completed_count:
                             record.last_writes_datetime = datetime.datetime.now()
+                        else:
+                            record.last_writes_datetime = current_record.last_writes_datetime
                         if current_record.last_reads_datetime:
                             read_elapsed = (record.last_reads_datetime - current_record.last_reads_datetime
                                             ).total_seconds()
