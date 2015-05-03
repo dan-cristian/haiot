@@ -59,7 +59,8 @@ def __read_all_hdd_smart():
                 record.hdd_disk_dev = constant.DISK_DEV_MAIN + disk_letter
                 logger.debug('Processing disk {}'.format(record.hdd_disk_dev))
                 try:
-                    record.power_status = __read_hddparm(disk_dev=record.hdd_disk_dev)
+                    #record.power_status = __read_hddparm(disk_dev=record.hdd_disk_dev)
+                    pass
                 except Exception, ex:
                     record.power_status = None
                 try:
