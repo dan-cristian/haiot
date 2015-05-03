@@ -257,7 +257,7 @@ def upload_data(obj):
         else:
             logger.critical('Graphable object missing axis X field {}'.format(constant.JSON_PUBLISH_GRAPH_X))
     except Exception, ex:
-        logger.warning('General error saving graph, err {}'.format(ex))
+        logger.error('General error saving graph, err {} obj={}'.format(ex, obj))
 
 def unload():
     global initialised

@@ -357,7 +357,7 @@ def __read_system_attribs():
                 record.cpu_usage_percent = __get_cpu_utilisation_linux()
                 record.uptime_days = int(__get_uptime_linux_days())
                 record.cpu_temperature = __get_cpu_temperature()
-                logger.info('Read mem free {} cpu% {} cpu_temp {} uptime {}'.format(record.memory_available_percent,
+                logger.debug('Read mem free {} cpu% {} cpu_temp {} uptime {}'.format(record.memory_available_percent,
                                                                     record.cpu_usage_percent, record.cpu_temperature,
                                                                     record.uptime_days))
         progress_status = 'Saving mem cpu uptime to db'
