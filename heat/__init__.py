@@ -35,9 +35,10 @@ def heat_update(obj_dict={}):
                     zone_heat_relay.notify_transport_enabled = False
                     db.session.commit()
                 else:
-                    logger.warning('Heat state zone_id {} unexpected value {} after set'.format(zone_id, pin_state))
+                    logger.warning('Heat state zone_id {} unexpected val={} after setval={}'.format(zone_id, pin_state,
+                                                                                                    pin_value))
             else:
-                logger.debug('Ignoring heat change, not owning the zone relay pin {} on this host'.format(gpio_host_name))
+                logger.debug('Ignoring heat change, not owning zone relay pin {} on this host'.format(gpio_host_name))
         else:
             logger.warning('No heat relay defined for zone {}, db data issue?'.format(zone_id))
     except Exception, ex:
