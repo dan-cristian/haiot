@@ -439,19 +439,18 @@ def __read_disk_stats():
                     #save read/write date time only if count changes
                     if current_record:
                         if record.last_reads_completed_count != current_record.last_reads_completed_count:
-                            record.last_reads_datetime =  datetime.datetime.now()
+                            record.last_reads_datetime = datetime.datetime.now()
                         if record.last_writes_completed_count != current_record.last_writes_completed_count:
-                            record.last_writes_datetime =  datetime.datetime.now()
+                            record.last_writes_datetime = datetime.datetime.now()
+                        read_elapsed = (record.last_reads_datetime - current_record.last_reads_datetime).total_seconds()
+                        write_elapsed = (record.last_writes_datetime - current_record.last_writes_datetime).total_seconds()
+                        logger.info('Disk {} read elapsed {} seconds'.format(device_name, read_elapsed))
+                        logger.info('Disk {} write elapsed {} seconds'.format(device_name, write_elapsed))
                     else:
                         record.last_reads_datetime =  datetime.datetime.now()
                         record.last_writes_datetime =  datetime.datetime.now()
-                    read_elapsed = (record.last_reads_datetime - current_record.last_reads_datetime).total_seconds()
-                    write_elapsed = (record.last_writes_datetime - current_record.last_writes_datetime).total_seconds()
                     record.save_changed_fields(current_record=current_record, new_record=record,
                                                notify_transport_enabled=False, save_to_graph=False)
-                    logger.info('Disk {} read elapsed {} seconds'.format(device_name, read_elapsed))
-                    logger.info('Disk {} write elapsed {} seconds'.format(device_name, write_elapsed))
-
                 else:
                     logger.warning('Unexpected lower number of split atoms={} in diskstat={}'.format(len(words), line))
 
