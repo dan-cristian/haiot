@@ -32,8 +32,7 @@ class SystemMonitorGraph(BaseGraph):
 class SystemDiskGraph(BaseGraph):
     graph_x_ = 'updated_on'
     graph_y_ = ['temperature', 'power_status', 'sector_error_count', 'load_cycle_count', 'start_stop_count',
-                utils.get_model_field_name(models.SystemDisk.last_reads_elapsed),
-                utils.get_model_field_name(models.SystemDisk.last_writes_elapsed),
+                'last_reads_elapsed', 'last_writes_elapsed'
                 ]
     graph_shape_ = ['spline','hv','hv','hv','hv', 'hv', 'hv']
     graph_id_ = 'serial'
