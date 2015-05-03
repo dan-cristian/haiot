@@ -446,7 +446,8 @@ def __read_disk_stats():
 
                     current_record = models.SystemDisk.query.filter_by(hdd_disk_dev=record.hdd_disk_dev,
                                                                    system_name=record.system_name).first()
-
+                    if current_record.serial is None or current_record.serial == '':
+                        record.serial = 'serial not available'
                     #save read/write date time only if count changes
                     if current_record:
                         read_elapsed = -1
