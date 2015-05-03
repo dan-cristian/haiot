@@ -32,8 +32,8 @@ class SystemMonitorGraph(BaseGraph):
 class SystemDiskGraph(BaseGraph):
     graph_x_ = 'updated_on'
     graph_y_ = ['temperature', 'power_status', 'sector_error_count', 'load_cycle_count', 'start_stop_count',
-                'last_reads_elapsed', 'last_writes_elapsed'
-                ]
-    graph_shape_ = ['spline','hv','hv','hv','hv', 'hv', 'hv']
+                'last_reads_elapsed', 'last_writes_elapsed']
+    graph_shape_ = ['spline','hv','hv','hv','hv',
+                    'hv', 'hv']
     graph_id_ = 'serial'
     graph_legend_ = 'hdd_name'
