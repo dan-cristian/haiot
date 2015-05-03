@@ -95,8 +95,8 @@ def __is_pin_setup_out(bcm_id=''):
 def __read_line(bcm_id=''):
     try:
         file = open('/sys/class/gpio/gpio{}/value'.format(bcm_id), 'r')
-        value = file.readline()
-        return value
+        value = file.readline().replace('\n','')
+        return int(value)
     except Exception, ex:
         logger.critical('Unexpected general exception on pin {} value read, err {}'.format(bcm_id, ex))
         return None
@@ -106,6 +106,7 @@ def __write_line(bcm_id='', pin_value=''):
         #file = open('/sys/class/gpio/gpio{}/value'.format(bcm_id), 'a')
         #print >> file, pin_value
         #file.close()
+        logger.info('Write bcm pin={} value={}'.format(bcm_id, pin_value))
         __write_to_file_as_root(file='/sys/class/gpio/gpio{}/value'.format(bcm_id), value=pin_value)
     except Exception, ex:
         logger.critical('Unexpected general exception on pin {} write, err {}'.format(bcm_id, ex))
@@ -129,7 +130,8 @@ def set_pin_bcm(bcm_id=None, pin_value=None):
         if not __is_pin_setup_out(bcm_id):
             __set_pin_dir_out(bcm_id)
         if __is_pin_setup_out(bcm_id):
-            __write_line(bcm_id, pin_value)
+            if get_pin_bcm(bcm_id=bcm_id) != pin_value:
+                __write_line(bcm_id, pin_value)
             return get_pin_bcm(bcm_id)
         else:
             logger.critical('Unable to write pin bcm {}'.format(bcm_id))
