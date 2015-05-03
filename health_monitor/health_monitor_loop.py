@@ -435,7 +435,7 @@ def __read_disk_stats():
                     reads_completed = words[3]
                     writes_completed = words[7]
                     record = models.SystemDisk()
-                    record.hdd_disk_dev = '/dev/'+device_name
+                    record.hdd_disk_dev = '/dev/' + device_name
                     record.last_reads_completed_count = reads_completed
                     record.last_writes_completed_count = writes_completed
                     record.system_name = constant.HOST_NAME
@@ -447,8 +447,12 @@ def __read_disk_stats():
                             record.last_reads_datetime = datetime.datetime.now()
                         if record.last_writes_completed_count != current_record.last_writes_completed_count:
                             record.last_writes_datetime = datetime.datetime.now()
-                        read_elapsed = (record.last_reads_datetime - current_record.last_reads_datetime).total_seconds()
-                        write_elapsed = (record.last_writes_datetime - current_record.last_writes_datetime).total_seconds()
+                        if current_record.last_reads_datetime:
+                            read_elapsed = (record.last_reads_datetime - current_record.last_reads_datetime
+                                            ).total_seconds()
+                        if current_record.last_writes_datetime:
+                            write_elapsed = (record.last_writes_datetime - current_record.last_writes_datetime
+                                             ).total_seconds()
                         logger.info('Disk {} read elapsed {} seconds'.format(device_name, read_elapsed))
                         logger.info('Disk {} write elapsed {} seconds'.format(device_name, write_elapsed))
                     else:
