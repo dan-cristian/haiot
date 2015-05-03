@@ -118,7 +118,7 @@ def __read_all_hdd_smart():
                 record.updated_on = datetime.datetime.now()
                 if record.serial is None or record.serial == '':
                     logger.debug('This hdd will be skipped, probably does not exist if serial not retrieved')
-                    record.serial = 'serial not available'
+                    record.serial = 'serial not available {} {}'.format(constant.HOST_NAME, record.hdd_disk_dev )
                 else:
                     record.hdd_name = '{} {} {}'.format(record.system_name, record.hdd_device, record.hdd_disk_dev)
                     current_record = models.SystemDisk.query.filter_by(hdd_disk_dev=record.hdd_disk_dev,
@@ -449,7 +449,7 @@ def __read_disk_stats():
                     #save read/write date time only if count changes
                     if current_record:
                         if current_record.serial is None or current_record.serial == '':
-                            record.serial = 'serial not available'
+                            record.serial = 'serial not available {} {}'.format(constant.HOST_NAME, record.hdd_disk_dev)
                         read_elapsed = -1
                         write_elapsed = -1
                         if record.last_reads_completed_count != current_record.last_reads_completed_count:
@@ -471,7 +471,7 @@ def __read_disk_stats():
                     else:
                         record.last_reads_datetime = datetime.datetime.now()
                         record.last_writes_datetime = datetime.datetime.now()
-                        record.serial = 'serial not available'
+                        record.serial = 'serial not available {} {}'.format(constant.HOST_NAME, record.hdd_disk_dev)
                     record.save_changed_fields(current_record=current_record, new_record=record,
                                                notify_transport_enabled=True, save_to_graph=True, debug=False)
                 else:
