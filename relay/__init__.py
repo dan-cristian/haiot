@@ -16,8 +16,7 @@ def relay_update(gpio_pin_code=None, pin_value=None):
         result = None
         if gpiopin:
             pin_value = relay_set(pin=gpiopin.pin_index, value=pin_value, from_web=False)
-            if pin_value:
-                result = pin_value
+            result = pin_value
             gpiopin.pin_value = pin_value
             gpiopin.notify_transport_enabled = False
             db.session.commit()
