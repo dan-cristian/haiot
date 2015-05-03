@@ -470,7 +470,7 @@ def __read_disk_stats():
                         record.last_reads_datetime = datetime.datetime.now()
                         record.last_writes_datetime = datetime.datetime.now()
                     record.save_changed_fields(current_record=current_record, new_record=record,
-                                               notify_transport_enabled=False, save_to_graph=True, debug=False)
+                                               notify_transport_enabled=True, save_to_graph=True, debug=False)
                 else:
                     logger.warning('Unexpected lower number of split atoms={} in diskstat={}'.format(len(words), line))
 
