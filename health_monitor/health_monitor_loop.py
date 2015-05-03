@@ -430,7 +430,7 @@ def __read_disk_stats():
                     device_name = words[2]
 
                     #skip for non hdds and partitions (ending with digit)
-                    if device_major != '8' and device_name[-1:].isdigit():
+                    if device_major != '8' or device_name[-1:].isdigit():
                         continue #just to avoid another tab
 
 
