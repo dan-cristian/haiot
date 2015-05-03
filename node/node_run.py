@@ -40,7 +40,7 @@ def node_update(obj={}):
             if not sent_date is None:
                 event_sent_date_time = utils.parse_to_date(sent_date)
                 seconds_elapsed = (datetime.datetime.now()-event_sent_date_time).total_seconds()
-                if seconds_elapsed>10:
+                if seconds_elapsed>15:
                     logger.warning('Very slow mqtt processing, message delay is {} seconds'.format(seconds_elapsed))
     except Exception, ex:
         logger.warning('Error on node update, err {}'.format(ex))
