@@ -456,10 +456,10 @@ def __read_disk_stats():
                             record.last_writes_datetime = current_record.last_writes_datetime
                         if current_record.last_reads_datetime:
                             read_elapsed = (datetime.datetime.now() - record.last_reads_datetime).total_seconds()
-                            logger.info('Disk {} read elapsed {} seconds'.format(device_name, read_elapsed))
+                            logger.info('Disk {} read elapsed {} seconds'.format(device_name, int(read_elapsed)))
                         if current_record.last_writes_datetime:
                             write_elapsed = (datetime.datetime.now() - record.last_writes_datetime).total_seconds()
-                            logger.info('Disk {} write elapsed {} seconds'.format(device_name, write_elapsed))
+                            logger.info('Disk {} write elapsed {} seconds'.format(device_name, int(write_elapsed)))
                     else:
                         record.last_reads_datetime = datetime.datetime.now()
                         record.last_writes_datetime = datetime.datetime.now()
