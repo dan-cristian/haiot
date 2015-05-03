@@ -16,7 +16,7 @@ def __save_heat_state_db(zone='', heat_is_on=''):
         #if zone_heat_relay.heat_is_on != heat_is_on:
             zone_heat_relay.heat_is_on = heat_is_on
             zone_heat_relay.updated_on = datetime.datetime.now()
-            logger.info('Heat state changed to is-on={} in zone {}'.format(heat_is_on, zone.name))
+            logger.debug('Heat state changed to is-on={} in zone {}'.format(heat_is_on, zone.name))
             zone_heat_relay.notify_transport_enabled = True
             db.session.commit()
         #else:
