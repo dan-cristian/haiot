@@ -464,7 +464,7 @@ def __read_disk_stats():
                         if current_record.last_writes_datetime:
                             write_elapsed = (datetime.datetime.now() - record.last_writes_datetime).total_seconds()
                             record.last_writes_elapsed = utils.round_sensor_value(write_elapsed)
-                        logger.info('Disk {} elapsed read {}s write {}s'.format(device_name,
+                        logger.debug('Disk {} elapsed read {}s write {}s'.format(device_name,
                                                                                 int(read_elapsed), int(write_elapsed)))
                     else:
                         record.last_reads_datetime = datetime.datetime.now()
