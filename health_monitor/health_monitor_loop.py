@@ -435,7 +435,7 @@ def __read_disk_stats():
                     reads_completed = words[3]
                     writes_completed = words[7]
                     record = models.SystemDisk()
-                    record.hdd_disk_dev = device_name
+                    record.hdd_disk_dev = '/dev/'+device_name
                     record.last_reads_completed_count = reads_completed
                     record.last_writes_completed_count = writes_completed
                     record.system_name = constant.HOST_NAME
