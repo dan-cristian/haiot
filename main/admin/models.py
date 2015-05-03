@@ -265,15 +265,19 @@ class SystemDisk(db.Model, graphs.SystemDiskGraph, DbEvent):
     id = db.Column(db.Integer, primary_key=True)
     serial = db.Column(db.String(50), unique=True)
     system_name = db.Column(db.String(50))
-    hdd_name = db.Column(db.String(50))
-    hdd_device = db.Column(db.String(50))
-    hdd_disk_dev = db.Column(db.String(50))
+    hdd_name = db.Column(db.String(50)) #netbook /dev/sda
+    hdd_device = db.Column(db.String(50)) #usually empty?
+    hdd_disk_dev = db.Column(db.String(50)) #/dev/sda
     temperature = db.Column(db.Float)
     sector_error_count = db.Column(db.Integer)
     smart_status = db.Column(db.String(50))
     power_status = db.Column(db.Integer)
     load_cycle_count = db.Column(db.Integer)
     start_stop_count = db.Column(db.Integer)
+    last_reads_completed_count = db.Column(db.Float)
+    last_reads_datetime = db.Column(db.DateTime())
+    last_writes_completed_count = db.Column(db.Float)
+    last_writes_datetime = db.Column(db.DateTime())
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def __init__(self):
