@@ -279,6 +279,8 @@ class SystemDisk(db.Model, graphs.SystemDiskGraph, DbEvent):
     last_reads_datetime = db.Column(db.DateTime())
     last_writes_completed_count = db.Column(db.Float)
     last_writes_datetime = db.Column(db.DateTime())
+    last_reads_elapsed = db.Column(db.Float)
+    last_writes_elapsed = db.Column(db.Float)
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def __init__(self):
