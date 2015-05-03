@@ -27,11 +27,11 @@ def __save_heat_state_db(zone='', heat_is_on=''):
 def __decide_action(zone, current_temperature, target_temperature):
     assert isinstance(zone, models.Zone)
     if current_temperature < target_temperature:
-        logger.info('Heat must be ON in {} temp {} target {}'.format(zone.name, current_temperature,
+        logger.debug('Heat must be ON in {} temp {} target {}'.format(zone.name, current_temperature,
                                                                       target_temperature))
         heat_is_on = True
     else:
-        logger.info('Heat must be OFF in {} temp {} target {}'.format(zone.name, current_temperature,
+        logger.debug('Heat must be OFF in {} temp {} target {}'.format(zone.name, current_temperature,
                                                                        target_temperature))
         heat_is_on = False
     __save_heat_state_db(zone=zone, heat_is_on=heat_is_on)
@@ -53,7 +53,7 @@ def __update_zone_heat(zone, heat_schedule, sensor):
                 temperature_code = pattern[hour]
                 temperature = models.TemperatureTarget.query.filter_by(code=temperature_code).first()
                 if temperature:
-                    logger.info('Active pattern for zone {} is {} temp {}'.format(zone.name, schedule_pattern.name,
+                    logger.debug('Active pattern for zone {} is {} temp {}'.format(zone.name, schedule_pattern.name,
                                                                                          temperature.target))
                     if sensor.temperature:
                         heat_is_on = __decide_action(zone, sensor.temperature, temperature.target)
