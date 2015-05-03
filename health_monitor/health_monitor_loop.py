@@ -118,6 +118,7 @@ def __read_all_hdd_smart():
                 record.updated_on = datetime.datetime.now()
                 if record.serial is None or record.serial == '':
                     logger.debug('This hdd will be skipped, probably does not exist if serial not retrieved')
+                    record.serial = 'serial not available'
                 else:
                     record.hdd_name = '{} {} {}'.format(record.system_name, record.hdd_device, record.hdd_disk_dev)
                     current_record = models.SystemDisk.query.filter_by(hdd_disk_dev=record.hdd_disk_dev,
