@@ -382,6 +382,79 @@ def __check_log_file_size():
         except Exception, ex:
             logger.warning('Cannot retrieve or truncate log file {} err={}'.format(main.LOG_FILE, ex))
 
+'''
+/proc/diskstats
+Date:		February 2008
+Contact:	Jerome Marchand <jmarchan@redhat.com>
+Description:
+		The /proc/diskstats file displays the I/O statistics
+		of block devices. Each line contains the following 14
+		fields:
+		 1 - major number
+		 2 - minor mumber
+		 3 - device name
+		 4 - reads completed successfully
+		 5 - reads merged
+		 6 - sectors read
+		 7 - time spent reading (ms)
+		 8 - writes completed
+		 9 - writes merged
+		10 - sectors written
+		11 - time spent writing (ms)
+		12 - I/Os currently in progress
+		13 - time spent doing I/Os (ms)
+		14 - weighted time spent doing I/Os (ms)
+		For more details refer to Documentation/iostats.txt
+
+   8       0 sda 1264452 108516 266937483 9246396 26186052 21697821 696126202 330211680 0 273631688 339408208
+   8       1 sda1 1264262 108498 266935819 9245816 26176857 21697821 696126202 330172072 0 273625840 339368112
+   8      16 sdb 11763370 716778077 5926755744 292424284 69189 3018361 24616255 6178444 54 31594756 298616996
+   8      32 sdc 10372408 718147281 5926630968 1646330436 68771 3019336 24620503 6615124 48 35857060 1652958924
+   8      48 sdd 12075964 716437570 5926572722 152391492 68759 3019611 24622311 3160472 1 23324912 155550488
+   8      64 sde 253447 64045 9317516 747916 17886 52020 1359424 55258600 0 902828 56115344
+   8      65 sde1 252938 64015 9313216 747528 17886 52020 1359424 55258600 0 902636 56114956
+   8      66 sde2 2 0 4 0 0 0 0 0 0 0 0
+   8      69 sde5 335 30 2920 316 0 0 0 0 0 312 316
+   9       0 md0 15176822 0 416880026 0 289061 0 46834672 0 0 0 0
+   7       0 loop0 0 0 0 0 0 0 0 0 0 0 0
+
+'''
+
+def __read_disk_stats():
+    if constant.IS_OS_LINUX():
+        with open('/proc/diskstats') as f:
+            for line in f:
+                words = line.split()
+                if len(words) > 8:
+                    device_name = words[2]
+                    reads_completed = words[3]
+                    writes_completed = words[7]
+                    record = models.SystemDisk()
+                    record.hdd_disk_dev = device_name
+                    record.last_reads_completed_count = reads_completed
+                    record.last_writes_completed_count = writes_completed
+                    record.system_name = constant.HOST_NAME
+                    current_record = models.SystemDisk.query.filter_by(hdd_disk_dev=record.hdd_disk_dev,
+                                                                   system_name=record.system_name).first()
+                    #save read/write date time only if count changes
+                    if current_record:
+                        if record.last_reads_completed_count != current_record.last_reads_completed_count:
+                            record.last_reads_datetime =  datetime.datetime.now()
+                        if record.last_writes_completed_count != current_record.last_writes_completed_count:
+                            record.last_writes_datetime =  datetime.datetime.now()
+                    else:
+                        record.last_reads_datetime =  datetime.datetime.now()
+                        record.last_writes_datetime =  datetime.datetime.now()
+                    read_elapsed = (record.last_reads_datetime - current_record.last_reads_datetime).total_seconds()
+                    write_elapsed = (record.last_writes_datetime - current_record.last_writes_datetime).total_seconds()
+                    record.save_changed_fields(current_record=current_record, new_record=record,
+                                               notify_transport_enabled=False, save_to_graph=False)
+                    logger.info('Disk {} read elapsed {} seconds'.format(device_name, read_elapsed))
+                    logger.info('Disk {} write elapsed {} seconds'.format(device_name, write_elapsed))
+
+                else:
+                    logger.warning('Unexpected lower number of split atoms={} in diskstat={}'.format(len(words), line))
+
 def init():
     pass
 
@@ -399,6 +472,8 @@ def thread_run():
     __read_all_hdd_smart()
     progress_status = 'reading system attribs'
     __read_system_attribs()
+    progress_status = 'reading disk stats'
+    __read_disk_stats()
     progress_status = 'checking log size'
     #not needed if RotatingFileHandler if used for logging
     #__check_log_file_size()
