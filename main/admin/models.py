@@ -42,7 +42,7 @@ class DbEvent:
                                 obj_type=obj_type_words[len(obj_type_words)-1]
                             except Exception, ex:
                                 obj_type = str(type(self))
-                            logger.info('{} {}={} oldvalue={}'.format(obj_type, column_name, new_value, old_value))
+                            logger.debug('{} {}={} oldvalue={}'.format(obj_type, column_name, new_value, old_value))
                         setattr(current_record, column_name, new_value)
                         current_record.last_commit_field_changed_list.append(column_name)
                 if len(current_record.last_commit_field_changed_list) == 0:
