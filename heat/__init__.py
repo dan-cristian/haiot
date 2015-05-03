@@ -29,7 +29,7 @@ def heat_update(obj_dict={}):
                 else:
                     pin_value = 0
                 pin_state = relay.relay_update(gpio_pin_code=zone_heat_relay.gpio_pin_code, pin_value=pin_value)
-                if pin_state:
+                if pin_state == pin_value:
                     pin_state = (pin_state == 1)
                     zone_heat_relay.heat_is_on = pin_state
                     zone_heat_relay.notify_transport_enabled = False
