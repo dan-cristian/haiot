@@ -426,6 +426,11 @@ def __read_disk_stats():
             for line in f:
                 words = line.split()
                 if len(words) > 8:
+                    device_major = words[0]
+
+                    if device_major != 8:
+                        continue #just to avoid another tab
+
                     device_name = words[2]
                     reads_completed = words[3]
                     writes_completed = words[7]
