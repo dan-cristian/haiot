@@ -8,8 +8,8 @@ from common import constant
 import transport.mqtt_io
 
 
-last_message_received = datetime.datetime.now()
-
+__last_message_received = datetime.datetime.now()
+__last_minute = 0
 
 def on_subscribe(client, userdata, mid, granted_qos):
     logger.info('Subscribed as user {} mid {} qos {}'.format(str(userdata), str(mid), str(granted_qos)))
@@ -18,8 +18,13 @@ def on_subscribe(client, userdata, mid, granted_qos):
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
     try:
-        global last_message_received
-        last_message_received = datetime.datetime.now()
+        global __last_message_received, __last_minute
+        if datetime.datetime.now().minute != __last_minute:
+            __last_minute = datetime.datetime.now().minute
+            transport.mqtt_io.mqtt_msg_count_per_minute = 0
+
+        transport.mqtt_io.mqtt_msg_count_per_minute += 1
+        __last_message_received = datetime.datetime.now()
         logger.debug('Received from client [{}] userdata [{}] msg [{}] at {} '.format(client._client_id,
                                                                                       userdata, msg.topic,
                                                                                       datetime.datetime.now()))
@@ -43,8 +48,8 @@ def on_message(client, userdata, msg):
 
 def thread_run():
     logger.debug('Processing mqtt_io receiver')
-    global last_message_received
-    seconds_elapsed = (datetime.datetime.now() - last_message_received).total_seconds()
+    global __last_message_received
+    seconds_elapsed = (datetime.datetime.now() - __last_message_received).total_seconds()
     if seconds_elapsed > 120:
         logger.warning('Last mqtt message was received {} seconds ago, unusually long'.format(seconds_elapsed))
         transport.mqtt_io.init()
