@@ -99,11 +99,14 @@ def __is_pin_setup(bcm_id=''):
         gpio_pin = models.GpioPin.query.filter_by(pin_index = bcm_id, host_name = constant.HOST_NAME).first()
         if gpio_pin and not gpio_pin.is_active:
             logger.warning('Gpio pin={} is used not via me, conflict with ext. apps or unclean stop?'.format(bcm_id))
+            gpio_pin.is_active = True
+            db.session.commit()
         return True
     except IOError:
         return False
     except Exception, ex:
         logger.warning('Unexpected exception on pin setup check, err {}'.format(ex))
+        db.session.rollback()
         return False
 
 def __is_pin_setup_out(bcm_id=''):
