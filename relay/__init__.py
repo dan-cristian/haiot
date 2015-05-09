@@ -32,7 +32,7 @@ def relay_get(pin=None, from_web=False):
     if constant.HOST_MACHINE_TYPE in [constant.MACHINE_TYPE_RASPBERRY, constant.MACHINE_TYPE_BEAGLEBONE]:
         pin_value = gpio_pi_bbb.get_pin_bcm(pin)
     else:
-        message = message + ' error not running on gpio enabled devices'
+        message += ' error not running on gpio enabled devices'
         pin_value = None
         logger.warning(message)
 
@@ -48,7 +48,7 @@ def relay_set(pin=None, value=None, from_web=False):
     if constant.HOST_MACHINE_TYPE in [constant.MACHINE_TYPE_RASPBERRY, constant.MACHINE_TYPE_BEAGLEBONE]:
         pin_value = gpio_pi_bbb.set_pin_bcm(pin, value)
     else:
-        message = message + ' error not running on gpio enabled devices'
+        message += ' error not running on gpio enabled devices'
         pin_value = None
         logger.warning(message)
 

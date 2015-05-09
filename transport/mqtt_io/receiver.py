@@ -8,11 +8,11 @@ from common import constant
 import transport.mqtt_io
 
 
-last_message_received=datetime.datetime.now()
+last_message_received = datetime.datetime.now()
+
 
 def on_subscribe(client, userdata, mid, granted_qos):
-    logger.info('Subscribed to client {} user {} mid {} qos {}'.format(
-        str(client), str(userdata), str(mid), str(granted_qos)))
+    logger.info('Subscribed as user {} mid {} qos {}'.format(str(userdata), str(mid), str(granted_qos)))
 
 
 # The callback for when a PUBLISH message is received from the server.
@@ -21,8 +21,8 @@ def on_message(client, userdata, msg):
         global last_message_received
         last_message_received = datetime.datetime.now()
         logger.debug('Received from client [{}] userdata [{}] msg [{}] at {} '.format(client._client_id,
-                                                                                         userdata, msg.topic,
-                                                                                          datetime.datetime.now()))
+                                                                                      userdata, msg.topic,
+                                                                                      datetime.datetime.now()))
         # locate json string
         start = msg.payload.find('{')
         end = msg.payload.find('}')
@@ -40,12 +40,13 @@ def on_message(client, userdata, msg):
     except ValueError, e:
         logger.warning('Invalid JSON {} {}'.format(json, e))
 
+
 def thread_run():
     logger.debug('Processing mqtt_io receiver')
     global last_message_received
-    seconds_elapsed = (datetime.datetime.now()-last_message_received).total_seconds()
+    seconds_elapsed = (datetime.datetime.now() - last_message_received).total_seconds()
     if seconds_elapsed > 120:
         logger.warning('Last mqtt message was received {} seconds ago, unusually long'.format(seconds_elapsed))
         transport.mqtt_io.init()
-    #mqtt_io.mqtt_client.loop(timeout=1)
+    # mqtt_io.mqtt_client.loop(timeout=1)
     return 'Processed template_run'

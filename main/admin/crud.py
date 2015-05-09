@@ -1,6 +1,6 @@
 # crud.py
 
-from flask import Blueprint, request, g, redirect, url_for, abort, render_template
+from flask import Blueprint, request, redirect, url_for, render_template
 from flask.views import MethodView
 from wtforms.ext.sqlalchemy.orm import model_form
 from main import db
@@ -119,7 +119,8 @@ comment_filters = {
 
 simple_filters = {
     'id_asc': lambda model: model.query.order_by(model.id.asc()),
-    'id_desc': lambda model: model.query.order_by(model.id.desc())
+    'id_desc': lambda model: model.query.order_by(model.id.desc()),
+    'active': lambda model: model.query.filter_by(is_active=True).all()
 }
 
 from .models import Zone, SchedulePattern, HeatSchedule, Sensor
@@ -136,7 +137,6 @@ register_crud(user, '/temperaturetarget', 'temperaturetarget', TemperatureTarget
 register_crud(user, '/sensor', 'sensor', Sensor, filters=simple_filters)
 register_crud(user, '/zonesensor', 'zonesensor', ZoneSensor, filters=simple_filters)
 register_crud(user, '/node', 'node', Node, filters=simple_filters)
-#register_crud(user, '/graphplotly', 'graphplotly', GraphPlotly, filters=simple_filters)
 register_crud(user, '/systemmonitor', 'systemmonitor', SystemMonitor, filters=simple_filters)
 register_crud(user, '/systemdisk', 'systemdisk', SystemDisk, filters=simple_filters)
 register_crud(user, '/gpiopin', 'gpiopin', GpioPin, filters=simple_filters)

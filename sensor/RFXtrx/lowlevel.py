@@ -137,7 +137,7 @@ class Status(Packet):
     """
 
     def __str__(self):
-        return ("Status [subtype={0}, firmware={1}, devices={2}]") \
+        return "Status [subtype={0}, firmware={1}, devices={2}]" \
             .format(self.type_string, self.firmware_version, self.devices)
 
     def __init__(self):

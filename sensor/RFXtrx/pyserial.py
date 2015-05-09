@@ -21,10 +21,17 @@
 This module provides a transport for PySerial
 """
 
-from serial import Serial
+
 from time import sleep
 from . import RFXtrxTransport
-import logging
+from main import logger
+try:
+    from serial import Serial
+    module_serial_exist = True
+except ImportError:
+    logger.info('Module serial cannot be imported')
+    module_serial_exist = False
+
 
 class PySerialTransport(RFXtrxTransport):
     """ Implementation of a transport using PySerial """
@@ -37,7 +44,7 @@ class PySerialTransport(RFXtrxTransport):
         """ Wait until a packet is received and return with an RFXtrxEvent """
         while True:
             data = self.serial.read()
-            if (len(data) > 0):
+            if len(data) > 0:
                 if data == '\x00':
                     continue
                 pkt = bytearray(data)

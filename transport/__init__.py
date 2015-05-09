@@ -5,7 +5,8 @@ from main.admin import thread_pool
 import transport_run
 from transport import mqtt_io
 
-initialised=False
+initialised = False
+
 
 def send_message_json(json=''):
     mqtt_io.sender.send_message(json)
@@ -15,12 +16,14 @@ def send_message_json(json=''):
 def send_message_obj(obj=''):
     pass
 
+
 def unload():
     logger.info('Template transport unloading')
-    #...
+    # ...
     thread_pool.remove_callable(transport_run.thread_run)
     global initialised
     initialised = False
+
 
 def init():
     logger.info('Template transport initialising')
