@@ -37,14 +37,17 @@ def register_gpios():
                 if gpio_pin.pin_index != '':
                     gpio_pi_bbb.get_pin_bcm(gpio_pin.pin_index)
                 GPIO.setup(zonealarm.gpio_pin_code, GPIO.IN)
-                gpio_pi_bbb.set_pin_edge(gpio_pin.pin_index, 'both')
+                #gpio_pi_bbb.set_pin_edge(gpio_pin.pin_index, 'both')
                 try:
                     GPIO.add_event_detect(zonealarm.gpio_pin_code, GPIO.BOTH, callback=event_detected, bouncetime=300)
                 except Exception, ex:
                     logger.warning('Unable to add event detect with callback pin {}'.format(zonealarm.gpio_pin_code))
-                    GPIO.add_event_detect(zonealarm.gpio_pin_code, GPIO.FALLING)
-                    logger.info('Added event detect with pooling pin {}'.format(zonealarm.gpio_pin_code))
-                    __pool_pin_codes.append(zonealarm.gpio_pin_code)
+                    try:
+                        GPIO.add_event_detect(zonealarm.gpio_pin_code, GPIO.FALLING)
+                        logger.info('Added event detect with pooling pin {} err='.format(zonealarm.gpio_pin_code, ex))
+                        __pool_pin_codes.append(zonealarm.gpio_pin_code)
+                    except Exception, ex:
+                        logger.warning('Unable to add pooling on pin {} err={}'.format(zonealarm.gpio_pin_code, ex))
 
                 logger.info('Enabled alarm on gpio {} zone {}'.format(zonealarm.gpio_pin_code, zonealarm.zone_id))
                 #logger.info('Testing an input read on this gpio pin')
