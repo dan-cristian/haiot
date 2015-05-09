@@ -46,6 +46,7 @@ def sensor_update(obj):
             db.session.commit()
     except Exception, ex:
         logger.warning('Error on sensor update, err {}'.format(ex))
+        db.session.rollback()
 
 def unload():
     #...
