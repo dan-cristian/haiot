@@ -31,6 +31,7 @@ def register_gpios():
                 if gpio_pin.pin_index != '':
                     gpio_pi_bbb.get_pin_bcm(gpio_pin.pin_index)
                 GPIO.setup(zonealarm.gpio_pin_code, GPIO.IN)
+                gpio_pi_bbb.set_pin_edge(gpio_pin.pin_index, 'both')
                 GPIO.add_event_detect(zonealarm.gpio_pin_code, GPIO.BOTH, callback=event_detected, bouncetime=300)
                 logger.info('Enabled alarm on gpio {} zone {}'.format(zonealarm.gpio_pin_code, zonealarm.zone_id))
                 #logger.info('Testing an input read on this gpio pin')
