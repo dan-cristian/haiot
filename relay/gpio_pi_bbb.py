@@ -98,7 +98,7 @@ def __is_pin_setup(bcm_id=''):
         file.close()
         gpio_pin = models.GpioPin.query.filter_by(pin_index = bcm_id, host_name = constant.HOST_NAME).first()
         if gpio_pin and not gpio_pin.is_active:
-            logger.warning('Gpio pin={} is used but not via this app, conflict with external apps?'.format(bcm_id))
+            logger.warning('Gpio pin={} is used not via me, conflict with ext. apps or unclean stop?'.format(bcm_id))
         return True
     except IOError:
         return False
