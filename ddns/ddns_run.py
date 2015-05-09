@@ -2,7 +2,10 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 from main import logger
 import datetime
-import dateutil.parser
+try:
+    import dateutil.parser
+except ImportError:
+    logger.info('Module dateutil.parser cannot be imported')
 import json
 import socket
 import requests
@@ -19,7 +22,7 @@ def __update_ddns_rackspace():
         with open(ConfigFile, 'r') as f:
             config = json.load(f)
         global cache
-        if cache == {} or cache == None:
+        if cache == {} or cache is None:
             cache = {}
             cache['auth']={}
             cache['auth']['expires']=str(datetime.datetime.now())

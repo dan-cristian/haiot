@@ -250,7 +250,7 @@ def upload_data(obj):
                                     add_new_serie(graph_unique_name, url, trace_unique_id)
                         except PlotlyAccountError, ex:
                             logger.warning('Unable to plot graph, err {}'.format(ex))
-                    index = index + 1
+                    index += 1
             else:
                 logger.critical('Graphable object missing axis_x [{}], graph_id [{}], in obj {}'.format(axis_x_field,
                                                                                           graph_id_field, obj))

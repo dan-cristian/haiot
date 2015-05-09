@@ -1,9 +1,9 @@
 __author__ = 'dcristian'
-from main import db
-import models
-from common import utils
 
 class BaseGraph:
+    def __init__(self):
+        pass
+
     save_to_graph = False
     @property
     def graph_x_(self): raise NotImplementedError
@@ -16,6 +16,9 @@ class BaseGraph:
     def comparator_unique_graph_record(self): raise NotImplementedError
 
 class SensorGraph(BaseGraph):
+    def __init__(self):
+        pass
+
     graph_x_ = 'updated_on'
     graph_y_ = ['temperature', 'humidity']
     graph_shape_ = ['spline','spline']
@@ -23,6 +26,9 @@ class SensorGraph(BaseGraph):
     graph_legend_ = 'sensor_name'
 
 class SystemMonitorGraph(BaseGraph):
+    def __init__(self):
+        pass
+
     graph_x_ = 'updated_on'
     graph_y_ = ['cpu_usage_percent', 'memory_available_percent', 'uptime_days', 'cpu_temperature']
     graph_shape_ = ['spline','spline','hv', 'spline']
@@ -30,6 +36,9 @@ class SystemMonitorGraph(BaseGraph):
     graph_legend_ = 'name'
 
 class SystemDiskGraph(BaseGraph):
+    def __init__(self):
+        pass
+
     graph_x_ = 'updated_on'
     graph_y_ = ['temperature', 'power_status', 'sector_error_count', 'load_cycle_count', 'start_stop_count',
                 'last_reads_elapsed', 'last_writes_elapsed']

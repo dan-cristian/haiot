@@ -208,11 +208,11 @@ def populate_tables(model_auto_update=False):
         commit()
     else:
         #reseting execute_command field to avoid running last command before shutdown
-        node = models.Node.query.filter_by(name=constant.HOST_NAME).first()
-        node.execute_command = ''
+        node_obj = models.Node.query.filter_by(name=constant.HOST_NAME).first()
+        node_obj.execute_command = ''
         commit()
-    node = models.Node.query.filter_by(name=constant.HOST_NAME).first()
-    constant.HOST_PRIORITY = node.priority
+    node_obj = models.Node.query.filter_by(name=constant.HOST_NAME).first()
+    constant.HOST_PRIORITY = node_obj.priority
 
     check_table_schema(models.SystemMonitor, model_auto_update)
     check_table_schema(models.SystemDisk, model_auto_update)
@@ -232,7 +232,7 @@ def populate_tables(model_auto_update=False):
         [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
         [4, get_mod_name(mqtt_io), True, 3],[5, get_mod_name(sensor), False, 4],[6, get_mod_name(relay), False, 5],
         [7, get_mod_name(heat), False, 6],[8, get_mod_name(alarm), False, 7],[9, get_mod_name(graph_plotly), False, 8],
-        [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), False, 10],[12, get_mod_name(ddns), False, 11]],
+        [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), True, 10],[12, get_mod_name(ddns), False, 11]],
         'netbook':[
         [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
         [4, get_mod_name(mqtt_io), True, 3],[5, get_mod_name(sensor), True, 4],[6, get_mod_name(relay), True, 5],
@@ -279,13 +279,14 @@ def populate_tables(model_auto_update=False):
 
     check_table_schema(models.GpioPin, model_auto_update)
     bbb_bcm_map={
-        'P9_11':30, 'P9_12':60, 'P9_13':31, 'P9_14':40, 'P9_15':48, 'P9_16':51,
+        'P9_11':30, 'P9_12':60, 'P9_13':31, 'P9_14':40, 'P9_15':48, 'P9_16':51, 'P9_24':15, 'P9_23':49, 'P9_22':2,
         'P8_07':66, 'P8_08':67, 'P8_09':69, 'P8_11':45, 'P8_12':44, 'P8_15':47, 'P8_16':46
     }
-    if len(models.GpioPin.query.filter_by(pin_type=constant.GPIO_PIN_TYPE_BBB).all()) != 46*2: #P8_ and P9_ with 46 pins
-        models.GpioPin.query.filter_by(pin_type=constant.GPIO_PIN_TYPE_BBB).delete()
+    if len(models.GpioPin.query.filter_by(pin_type=constant.GPIO_PIN_TYPE_BBB,
+                                          host_name=constant.HOST_NAME).all()) != 46*2: #P8_ and P9_ with 46 pins
+        models.GpioPin.query.filter_by(pin_type=constant.GPIO_PIN_TYPE_BBB, host_name=constant.HOST_NAME).delete()
         commit()
-        for host_name in ['beaglebone', 'netbook']:
+        for host_name in ['beaglebone', 'netbook', 'EN62395']:
             logger.info('Populating GpioPins with default beabglebone {} values'.format(host_name))
             for rail in range(8,10): #last range is not part of the loop
                 for pin in range(01, 47):
@@ -300,7 +301,12 @@ def populate_tables(model_auto_update=False):
                         gpio.pin_index = ''
                     db.session.add(gpio)
         commit()
-        for host_name in ['pi-power', 'pi-bell']:
+
+    #fixme: check for other PI revisions
+    if len(models.GpioPin.query.filter_by(pin_type=constant.GPIO_PIN_TYPE_PI,host_name=constant.HOST_NAME).all()) != 26:
+        models.GpioPin.query.filter_by(pin_type=constant.GPIO_PIN_TYPE_PI, host_name=constant.HOST_NAME).delete()
+        commit()
+        for host_name in ['pi-power', 'pi-bell', 'netbook', 'EN62395']:
             logger.info('Populating GpioPins with default raspberry pi {} values'.format(host_name))
             for pin in range(01, 27): # -1
                 gpio = models.GpioPin()

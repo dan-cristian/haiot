@@ -3,10 +3,12 @@ from datetime import datetime
 from main import logger
 from copy import deepcopy
 from main import db
-from common import constant
 import graphs
 
 class DbEvent:
+    def __init__(self):
+        pass
+
     notified_on_db_commit=False
     notify_transport_enabled=False
     event_sent_datetime = None
@@ -292,10 +294,12 @@ class SystemDisk(db.Model, graphs.SystemDiskGraph, DbEvent):
 class GpioPin(db.Model, DbEvent):
     id = db.Column(db.Integer, primary_key=True)
     host_name = db.Column(db.String(50))
-    pin_type = db.Column(db.String(50))
-    pin_code = db.Column(db.String(50))
-    pin_index = db.Column(db.String(50))
-    pin_value = db.Column(db.Integer)
+    pin_type = db.Column(db.String(50)) #bbb, pi
+    pin_code = db.Column(db.String(50)) #friendly format, e.g. for Beagle is P9_11, for PI is same with pin_index
+    pin_index = db.Column(db.String(50))#bcm format, 0 to n
+    pin_value = db.Column(db.Integer) # 0, 1 or None
+    pin_direction = db.Column(db.String(4)) #in, out, None
+    is_active = db.Column(db.Boolean) # if pin was setup(exported) through this app. will be unexported when app exit
 
     def __repr__(self):
         return 'host {} code {} type {} value {}'.format(self.host_name, self.pin_code, self.pin_type, self.pin_value)
@@ -326,7 +330,7 @@ class ZoneHeatRelay(db.Model, DbEvent):
     #friendly display name for pin mapping
     heat_pin_name = db.Column(db.String(50))
     zone_id = db.Column(db.Integer, unique=True)
-    gpio_pin_code = db.Column(db.String(50))
+    gpio_pin_code = db.Column(db.String(50)) #user friendly format, e.g. P8_11
     gpio_host_name = db.Column(db.String(50))
     heat_is_on = db.Column(db.Boolean)
     is_main_heat_source = db.Column(db.Boolean)

@@ -7,7 +7,6 @@ import models
 import main
 import model_helper
 import graph_plotly
-import relay
 import node
 import sensor
 import heat

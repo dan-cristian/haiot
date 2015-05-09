@@ -2,10 +2,15 @@ __author__ = 'dcristian'
 
 import subprocess
 import os
-from main import logger
+from main import logger, db
 from common import constant
+from main.admin import models
 
 __pins_setup_list = []
+
+def __get_gpio_db_pin(bcm_id=None):
+    gpio_pin = models.GpioPin.query.filter_by(pin_index = bcm_id, host_name = constant.HOST_NAME).first()
+    return gpio_pin
 
 def __write_to_file_as_root(file, value):
     try:
@@ -27,6 +32,11 @@ def __setup_pin(bcm_id=''):
             logger.info('Pin {} exported OK'.format(bcm_id))
         if not bcm_id in __pins_setup_list:
             __pins_setup_list.append(bcm_id)
+            gpio_pin = __get_gpio_db_pin(bcm_id)
+            if gpio_pin:
+                gpio_pin.is_active = True
+            else:
+                logger.warning('Unable to find gpio pin with bcmid={} to mark as active'.format(bcm_id))
         else:
             logger.warning('Trying to add an existing pin {} in setup list'.format(bcm_id))
     except Exception, ex:
@@ -40,6 +50,10 @@ def __set_pin_dir_out(bcm_id=''):
         __setup_pin(bcm_id)
         if __write_to_file_as_root(file='/sys/class/gpio/gpio{}/direction'.format(bcm_id), value='out'):
             logger.info('Pin {} direction out OK'.format(bcm_id))
+            gpio_pin = __get_gpio_db_pin(bcm_id)
+            if gpio_pin:
+                gpio_pin.pin_direction = 'out'
+                db.session.commit()
         return True
     except Exception, ex:
         logger.warning('Unexpected exception on pin {} direction OUT set, err {}'.format(bcm_id, ex))
@@ -53,6 +67,10 @@ def __set_pin_dir_in(bcm_id=''):
         __setup_pin(bcm_id)
         if __write_to_file_as_root(file='/sys/class/gpio/gpio{}/direction'.format(bcm_id), value='in'):
             logger.info('Pin {} direction in OK'.format(bcm_id))
+            gpio_pin = __get_gpio_db_pin(bcm_id)
+            if gpio_pin:
+                gpio_pin.pin_direction = 'in'
+                db.session.commit()
         return True
     except Exception, ex:
         logger.warning('Unexpected exception on pin {} direction IN set, err {}'.format(bcm_id, ex))
@@ -66,6 +84,11 @@ def __unsetup_pin(bcm_id=''):
         if __write_to_file_as_root('/sys/class/gpio/unexport', bcm_id):
             logger.info('Pin {} unexport OK'.format(bcm_id))
         __pins_setup_list.remove(bcm_id)
+        gpio_pin = models.GpioPin.query.filter_by(pin_index = bcm_id, host_name = constant.HOST_NAME).first()
+        if gpio_pin:
+            gpio_pin.is_active = False
+        else:
+            logger.warning('Unable to find gpio pin with bcmid={} to mark as inactive'.format(bcm_id))
     except Exception, ex:
         logger.critical('Unexpected error on pin {} un-setup, err {}'.format(bcm_id, ex))
 
@@ -73,6 +96,9 @@ def __is_pin_setup(bcm_id=''):
     try:
         file = open('/sys/class/gpio/gpio{}/value'.format(bcm_id), 'r')
         file.close()
+        gpio_pin = models.GpioPin.query.filter_by(pin_index = bcm_id, host_name = constant.HOST_NAME).first()
+        if gpio_pin and not gpio_pin.is_active:
+            logger.warning('Gpio pin={} is used but not via this app, conflict with external apps?'.format(bcm_id))
         return True
     except IOError:
         return False
@@ -117,10 +143,14 @@ def get_pin_bcm(bcm_id=''):
     if not __is_pin_setup(bcm_id):
         __set_pin_dir_in(bcm_id)
     if __is_pin_setup(bcm_id):
-        return __read_line(bcm_id)
+        pin_value = __read_line(bcm_id)
+        gpio_pin = models.GpioPin.query.filter_by(pin_index = bcm_id, host_name = constant.HOST_NAME).first()
+        if gpio_pin:
+            gpio_pin.pin_value = pin_value
+            db.session.commit()
+        return pin_value
     else:
         logger.critical('Unable to get pin bcm {}'.format(bcm_id))
-
 
 def set_pin_bcm(bcm_id=None, pin_value=None):
     '''BCM pin id format. Value is 0 or 1. Return value is 0 or 1, confirms pin state'''

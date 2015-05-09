@@ -126,7 +126,7 @@ def __read_all_hdd_smart():
                     record.save_changed_fields(current_record=current_record, new_record=record,
                                            notify_transport_enabled=True, save_to_graph=True)
                 disk_letter = chr(ord(disk_letter) + 1)
-                disk_count = disk_count + 1
+                disk_count += 1
             except subprocess.CalledProcessError, ex:
                 logger.debug('Invalid disk {} err {}'.format(record.hdd_disk_dev, ex))
                 current_disk_valid = False
@@ -134,7 +134,7 @@ def __read_all_hdd_smart():
                 if disk_count > 10:
                     logger.warning('Too many disks iterated {}, missing or wrong sudo rights for smartctl'.format(
                         disk_count))
-                logger.warning('Disk read error {} dev {}'.format(exc, record.hdd_disk_dev))
+                logger.exception('Disk read error={} dev={}'.format(exc, record.hdd_disk_dev))
                 current_disk_valid = False
     else:
         logger.debug('Unable to read smart status')
@@ -186,7 +186,7 @@ def __read_hddparm(disk_dev=''):
     except subprocess.CalledProcessError, ex:
         logger.debug('Invalid disk {} err {}'.format(disk_dev, ex))
     except Exception as exc:
-        logger.warning('Disk read error {} disk was {} err {}'.format(exc.message, disk_dev, exc))
+        logger.exception('Disk read error disk was {} err {}'.format(disk_dev, exc))
     raise subprocess.CalledProcessError(1, 'No power status obtained on hdparm, output={}'.format(hddparm_out))
 
 
@@ -278,8 +278,8 @@ def __get_cpu_utilisation_linux():
                     prevsteal = int(previous_procstat_list[8].strip())
                     prevguest = int(previous_procstat_list[9].strip())
                     prevguest_nice = int(previous_procstat_list[10].strip())
-                    previdle = previdle + previowait
-                    idle = idle + iowait
+                    previdle += previowait
+                    idle += iowait
                     prevnonidle = prevuser + prevnice + prevsystem + previrq + prevsoftirq + prevsteal
                     nonidle = user + nice + system + irq + softirq + steal
                     prevtotal = previdle + prevnonidle
@@ -308,6 +308,9 @@ def __get_cpu_temperature():
                 temp = (temperature_info.CurrentTemperature / 10) - 273
             except Exception, ex:
                 logger.error('Unable to get temperature using wmi, err={}'.format(ex))
+        else:
+            logger.warning('Unable to get CPU temp, no function available')
+            temp = -1
     else:
         if constant.IS_MACHINE_RASPBERRYPI:
             path = '/sys/class/thermal/thermal_zone0/temp'
@@ -332,7 +335,6 @@ def __get_cpu_temperature():
     temp = utils.round_sensor_value(temp)
     return temp
 
-
 def __read_system_attribs():
     global import_module_psutil_exist, progress_status
     try:
@@ -349,8 +351,8 @@ def __read_system_attribs():
         else:
             output = cStringIO.StringIO()
             if constant.OS in constant.OS_WINDOWS:
-                # no backup impl in Windows
-                pass
+                #fixme: no backup impl in Windows
+                return
             else:
                 # this is normally running on OpenWRT
                 record.memory_available_percent = __get_mem_avail_percent_linux()
@@ -367,7 +369,7 @@ def __read_system_attribs():
         record.save_changed_fields(current_record=current_record, new_record=record,
                                    notify_transport_enabled=True, save_to_graph=True)
     except Exception, ex:
-        logger.warning('Error saving system to DB, err {}'.format(ex))
+        logger.exception('Error saving system to DB err={}'.format(ex))
 
 def __check_log_file_size():
     if not main.LOG_FILE is None:
