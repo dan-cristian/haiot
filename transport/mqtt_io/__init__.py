@@ -17,6 +17,7 @@ mqtt_client = None
 client_connected = False
 topic='no_topic_defined'
 client_connecting = False
+mqtt_msg_count_per_minute = 0
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
@@ -84,8 +85,8 @@ def init():
                 mqtt_client.loop_start()
                 initialised = True
                 client_connecting = False
-            except socket.error:
-                logger.error('mqtt client not connected, err {}, pause and retry'.format(sys.exc_info()[0]))
+            except socket.error, ex:
+                logger.error('mqtt client not connected, err {}, pause and retry {}'.format(ex, retry_count))
                 retry_count += 1
                 time.sleep(constant.ERROR_CONNECT_PAUSE_SECOND)
             finally:

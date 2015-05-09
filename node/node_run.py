@@ -7,6 +7,7 @@ import random
 from common import constant, variable, utils
 from main.admin import models
 from main import db
+from transport import mqtt_io
 
 first_run = True
 since_when_i_should_be_master = datetime.datetime.max
@@ -41,7 +42,9 @@ def node_update(obj={}):
                 event_sent_date_time = utils.parse_to_date(sent_date)
                 seconds_elapsed = (datetime.datetime.now()-event_sent_date_time).total_seconds()
                 if seconds_elapsed>15:
-                    logger.warning('Very slow mqtt processing, message delay is {} seconds'.format(seconds_elapsed))
+                    logger.warning('Very slow mqtt, delay is {} seconds rate msg {}/min'.format(seconds_elapsed,
+                                                                                    mqtt_io.mqtt_msg_count_per_minute))
+
     except Exception, ex:
         logger.warning('Error on node update, err {}'.format(ex))
 
