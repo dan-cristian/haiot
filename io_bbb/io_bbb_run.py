@@ -43,6 +43,7 @@ def register_gpios():
                 except Exception, ex:
                     logger.warning('Unable to add event detect with callback pin {}'.format(zonealarm.gpio_pin_code))
                     GPIO.add_event_detect(zonealarm.gpio_pin_code, GPIO.FALLING)
+                    logger.info('Added event detect with pooling pin {}'.format(zonealarm.gpio_pin_code))
                     __pool_pin_codes.append(zonealarm.gpio_pin_code)
 
                 logger.info('Enabled alarm on gpio {} zone {}'.format(zonealarm.gpio_pin_code, zonealarm.zone_id))
