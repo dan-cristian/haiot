@@ -25,13 +25,18 @@ def node_update(obj={}):
                 node = models.Node()
                 db.session.add(node)
             node.name = node_host_name
-            node.is_master_graph = utils.get_object_field_value(obj, 'is_master_graph')
-            node.is_master_db_archive = utils.get_object_field_value(obj, 'is_master_db_archive')
-            node.is_master_overall = utils.get_object_field_value(obj, 'is_master_overall')
-            node.is_master_rule = utils.get_object_field_value(obj, 'is_master_rule')
-            node.priority = utils.get_object_field_value(obj, 'priority')
-            node.ip = utils.get_object_field_value(obj, 'ip')
-            node.execute_command = utils.get_object_field_value(obj, 'execute_command')
+            node.is_master_graph = utils.get_object_field_value(obj,
+                                                                utils.get_model_field_name(models.Node.is_master_graph))
+            node.is_master_db_archive = utils.get_object_field_value(obj,
+                                                        utils.get_model_field_name(models.Node.is_master_db_archive))
+            node.is_master_overall = utils.get_object_field_value(obj,
+                                                            utils.get_model_field_name(models.Node.is_master_overall))
+            node.is_master_rule = utils.get_object_field_value(obj,
+                                                               utils.get_model_field_name(models.Node.is_master_rule))
+            node.priority = utils.get_object_field_value(obj, utils.get_model_field_name(models.Node.priority))
+            node.ip = utils.get_object_field_value(obj, utils.get_model_field_name(models.Node.ip))
+            node.execute_command = utils.get_object_field_value(obj,
+                                                                utils.get_model_field_name(models.Node.execute_command))
             node.updated_on = datetime.datetime.now()
             db.session.commit()
         else:
