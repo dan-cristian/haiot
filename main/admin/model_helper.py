@@ -319,6 +319,7 @@ def populate_tables(model_auto_update=False):
 
     check_table_schema(models.ZoneAlarm, model_auto_update)
     zonealarm_list={
+        #47-birou, 1-bucatarie, 2-living, 3-beci mic, 9-beci mare, 10-scari beci, 11-etaj hol
         'beaglebone':[[47, 'P8_11'],[1,'P8_08'],[2,'P8_16'],[3,'P8_12'],[9,'P8_09'],[10,'P8_07'], [11,'P8_15']]
     }
     if len(models.ZoneAlarm.query.all()) < len(zonealarm_list):
