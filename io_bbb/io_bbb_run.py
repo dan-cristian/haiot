@@ -40,6 +40,7 @@ def register_gpios():
                 gpio_pi_bbb.set_pin_edge(gpio_pin.pin_index, 'both')
                 try:
                     GPIO.add_event_detect(zonealarm.gpio_pin_code, GPIO.BOTH)#, callback=event_detected, bouncetime=300)
+                    __pool_pin_codes.append(zonealarm.gpio_pin_code)
                     logger.info('OK callback on gpio {} zone {}'.format(zonealarm.gpio_pin_code, zonealarm.zone_id))
                 except Exception, ex:
                     logger.warning('Unable to add event callback pin {} zone {}'.format(zonealarm.gpio_pin_code,
