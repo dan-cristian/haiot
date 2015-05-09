@@ -170,6 +170,12 @@ def set_pin_bcm(bcm_id=None, pin_value=None):
             logger.critical('Unable to write pin bcm {}'.format(bcm_id))
             return -1
 
+def set_pin_edge(bcm_id=None, pin_edge=None):
+    logger.info('Write bcm pin={} EDGE={}'.format(bcm_id, pin_edge))
+    if not __is_pin_setup_out(bcm_id):
+        __set_pin_dir_in(bcm_id)
+    __write_to_file_as_root(file='/sys/class/gpio/gpio{}/edge'.format(bcm_id), value=pin_edge)
+
 def unload():
     #set all pins to low and unexport
     global __pins_setup_list
