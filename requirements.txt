@@ -11,13 +11,14 @@ blinker>=0.0
 plotly>=0.0
 #fix for ssl warning
 requests==2.5.3
-#psutil>=0.0
-RPi.GPIO
 #for rfxcom utility
 pyserial>=0.0
 python-dateutil>=0.0
 hiplogging>=0.0
+#uncomment on RPI
+#RPi.GPIO
 #uncomment on beaglebone
 Adafruit_BBIO>=0.0
+#psutil>=0.0
 #pywin
 #wmi>=0.0
