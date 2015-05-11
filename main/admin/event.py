@@ -49,9 +49,10 @@ def on_models_committed(sender, changes):
 
 
 def mqtt_thread_run():
-    if len(mqtt_event_list) > 10:
-        logger.info('Processing {} mqtt events, a bit slow'.format(len(mqtt_event_list)))
+    last_count = len(mqtt_event_list)
     for obj in mqtt_event_list:
+        if len(mqtt_event_list) > last_count:
+            logger.info('Not keeping up with {} mqtt events'.format(len(mqtt_event_list)))
         mqtt_event_list.remove(obj)
         #events received via mqtt transport
         #fixme: make it generic to work with any transport
