@@ -1,4 +1,5 @@
 from pydispatch import dispatcher
+import datetime
 from main import logger
 from main.admin import thread_pool
 from common import constant, variable, utils
@@ -51,10 +52,9 @@ def on_models_committed(sender, changes):
 def mqtt_thread_run():
     last_count = len(mqtt_event_list)
     for obj in mqtt_event_list:
-        if len(mqtt_event_list) > last_count:
-            logger.info('Not keeping up with {} mqtt events'.format(len(mqtt_event_list)))
         mqtt_event_list.remove(obj)
         #events received via mqtt transport
+        table = None
         #fixme: make it generic to work with any transport
         if constant.JSON_PUBLISH_TABLE in obj:
             table = str(obj[constant.JSON_PUBLISH_TABLE])
@@ -75,13 +75,19 @@ def mqtt_thread_run():
             if constant.JSON_PUBLISH_GRAPH_X in obj:
                 if obj[constant.JSON_PUBLISH_SAVE_TO_GRAPH]:
                     if graph_plotly.initialised:
+                        start = datetime.datetime.now()
                         graph_plotly.upload_data(obj)
+                        elapsed = (datetime.datetime.now() - start).total_seconds()
+                        logger.info('Plotly upload took {}s'.format(elapsed))
                     else:
                         logger.debug('Graph not initialised on obj upload to graph')
                 else:
                     pass
             else:
                 logger.debug('Mqtt event without graphing capabilities {}'.format(obj))
+
+        if len(mqtt_event_list) > last_count:
+            logger.info('Not keeping up with {} mqtt events'.format(len(mqtt_event_list)))
 
 def init():
     #http://pydispatcher.sourceforge.net/
