@@ -18,7 +18,7 @@ hiplogging>=0.0
 #uncomment on RPI
 #RPi.GPIO
 #uncomment on beaglebone
-Adafruit_BBIO>=0.0
+#Adafruit_BBIO>=0.0
 #psutil>=0.0
 #pywin
 #wmi>=0.0
