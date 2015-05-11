@@ -65,7 +65,7 @@ def main():
                         exec_last_date_list[func] = datetime.now()
                 elif future_obj.running():
                     if elapsed_seconds>1*30:
-                        logger.warning('Threaded function {} is long running for {} seconds'.format(
+                        logger.debug('Threaded function {} is long running for {} seconds'.format(
                             print_name,elapsed_seconds))
                         if callable_progress_list.has_key(func):
                             progress_status=callable_progress_list[func].func_globals['progress_status']
