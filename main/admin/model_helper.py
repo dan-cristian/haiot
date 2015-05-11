@@ -99,7 +99,7 @@ def populate_tables(model_auto_update=False):
             ['4', constant.P_MQTT_HOST_1, '192.168.0.9'],
             ['5', constant.P_MQTT_PORT_1, '1883'],
             ['6', constant.P_MQTT_TOPIC, 'iot/main'],
-            ['7', constant.P_MQTT_HOST_2, '127.0.0.1'],
+            ['7', constant.P_MQTT_HOST_2, '192.168.0.115'],
             ['8', constant.P_MQTT_PORT_2, '1883'],
             ['9', constant.P_PLOTLY_USERNAME, 'xxx'],
             ['10', constant.P_PLOTLY_APIKEY, 'zzz'],
