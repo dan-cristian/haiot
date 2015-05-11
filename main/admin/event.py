@@ -78,7 +78,7 @@ def mqtt_thread_run():
                         start = datetime.datetime.now()
                         graph_plotly.upload_data(obj)
                         elapsed = (datetime.datetime.now() - start).total_seconds()
-                        logger.info('Plotly upload took {}s'.format(elapsed))
+                        logger.debug('Plotly upload took {}s'.format(elapsed))
                     else:
                         logger.debug('Graph not initialised on obj upload to graph')
                 else:
@@ -87,7 +87,7 @@ def mqtt_thread_run():
                 logger.debug('Mqtt event without graphing capabilities {}'.format(obj))
 
         if len(mqtt_event_list) > last_count:
-            logger.info('Not keeping up with {} mqtt events'.format(len(mqtt_event_list)))
+            logger.debug('Not keeping up with {} mqtt events'.format(len(mqtt_event_list)))
 
 def init():
     #http://pydispatcher.sourceforge.net/
