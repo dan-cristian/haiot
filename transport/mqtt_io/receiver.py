@@ -38,7 +38,7 @@ def on_message(client, userdata, msg):
         dispatcher.send(signal=constant.SIGNAL_MQTT_RECEIVED, client=client, userdata=userdata, topic=msg.topic, obj=x)
         elapsed = (datetime.datetime.now() - start).total_seconds()
         if elapsed>5:
-            logger.warning('Command received took {} seconds, obj={}'.format(elapsed, x))
+            logger.warning('Command received took {} seconds'.format(elapsed))
         if hasattr(x, 'command') and hasattr(x, 'command_id') and hasattr(x, 'host_target'):
             if x.host_target == socket.gethostname():
                 logger.info('Executing command {}'.format(x.command))
