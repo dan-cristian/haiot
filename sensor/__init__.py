@@ -59,8 +59,8 @@ def unload():
 def init():
     logger.info('Sensor module initialising')
     if owsensor_loop.init():
-        thread_pool.add_callable(owsensor_loop.thread_run, run_interval_second=15)
+        thread_pool.add_callable(owsensor_loop.thread_run, run_interval_second=30)
     if rfxcom_run.init():
-        thread_pool.add_callable(rfxcom_run.thread_run, run_interval_second=15)
+        thread_pool.add_callable(rfxcom_run.thread_run, run_interval_second=30)
     global initialised
     initialised = True
