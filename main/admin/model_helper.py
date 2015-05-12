@@ -50,15 +50,21 @@ def get_param(name):
     except ValueError:
         logger.warning('Unable to get parameter {} error {}'.format(name, sys.exc_info()[0]))
         raise ValueError
+    except Exception, ex:
+        logger.critical('Exception when getting param {}'.format(name))
+        db.session.rollback()
+        raise ex
 
 def commit():
     try:
         db.session.commit()
-    except IntegrityError:
+    except IntegrityError, ex:
         db.session.rollback()
-        logger.warning('Unable to commit DB session {}, rolled back'.format(db.session))
-    except InvalidRequestError:
-        logger.warning('Error on commit {}, ignoring'.format(db.session))
+        logger.warning('Unable to commit DB session={}, rolled back, err={}'.format(db.session, ex))
+    except InvalidRequestError, ex:
+        logger.warning('Error on commit, session={}, ignoring, err={}'.format(db.session, ex))
+    except Exception, ex:
+        logger.warning('Exception on commit, session={} err={}'.format(db.session, ex))
 
 
 def get_mod_name(module):
@@ -104,7 +110,10 @@ def populate_tables(model_auto_update=False):
             ['9', constant.P_PLOTLY_USERNAME, 'xxx'],
             ['10', constant.P_PLOTLY_APIKEY, 'zzz'],
             ['11', constant.P_DDNS_RACKSPACE_CONFIG_FILE, '/home/dcristian/.rackspace.ddnsupdate.config.json'],
-            ['12', constant.P_USESUDO_DISKTOOLS, 'False']
+            ['12', constant.P_USESUDO_DISKTOOLS, 'False'],
+            ['13', constant.P_MQTT_HOST_3, 'iot.eclipse.org'],
+            ['14', constant.P_MQTT_PORT_3, '1883'],
+
         ]
     check_table_schema(models.Parameter, model_auto_update)
     if len(models.Parameter.query.all()) < len(param_list):

@@ -3,6 +3,7 @@ from datetime import datetime
 from main import logger
 from copy import deepcopy
 from main import db
+from main.admin.model_helper import commit
 import graphs
 
 class DbEvent:
@@ -61,9 +62,14 @@ class DbEvent:
                     if new_value:
                         new_record.last_commit_field_changed_list.append(column_name)
                 db.session.add(new_record)
-            db.session.commit()
+            commit()
         except Exception, ex:
             logger.critical('Error when saving db changes {}, err={}'.format(new_record, ex))
+            if len(db.session.dirty) > 0:
+                logger.info('Session dirty records={}, rolling back'.format(len(db.session.dirty)))
+                db.session.rollback()
+            else:
+                logger.info('No session dirty records')
             raise ex
         #else:
         #    logger.warning('Incorrect parameters received on save changed fields to db')
