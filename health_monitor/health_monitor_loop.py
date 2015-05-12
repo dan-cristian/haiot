@@ -320,16 +320,17 @@ def __get_cpu_temperature():
             path = '/sys/devices/virtual/thermal/thermal_zone0/temp'
         else:
             path=None
-
+        line = '-1'
         if path:
+            file = None
             try:
                 file = open(path)
                 line = file.readline()
             except Exception, ex:
                 logger.error('Unable to open cpu_temp_read file {}'.format(path))
-            file.close()
+            if file:
+                file.close()
         else:
-            line = '-1'
             logger.info('Unable to get CPU temp for machine type {}'.format(constant.HOST_MACHINE_TYPE))
         temp = float(line) / 1000
     temp = utils.round_sensor_value(temp)

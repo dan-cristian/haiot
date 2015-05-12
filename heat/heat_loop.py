@@ -4,6 +4,7 @@ from main import logger
 import datetime
 from pydispatch import dispatcher
 from main.admin import models
+from main.admin.model_helper import commit
 from main import db
 
 from common import constant
@@ -18,7 +19,7 @@ def __save_heat_state_db(zone='', heat_is_on=''):
             zone_heat_relay.updated_on = datetime.datetime.now()
             logger.debug('Heat state changed to is-on={} in zone {}'.format(heat_is_on, zone.name))
             zone_heat_relay.notify_transport_enabled = True
-            db.session.commit()
+            commit()
         #else:
         #    logger.debug('Heat state [{}] unchanged in zone {}'.format(heat_is_on, zone.name))
     else:

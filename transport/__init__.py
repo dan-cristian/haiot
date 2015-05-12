@@ -10,8 +10,6 @@ initialised = False
 
 def send_message_json(json=''):
     mqtt_io.sender.send_message(json)
-    pass
-
 
 def send_message_obj(obj=''):
     pass

@@ -52,50 +52,54 @@ def unload():
     mqtt_client.disconnect()
 
 def init():
-    global client_connecting
-    if client_connecting:
-        logger.warning('Mqtt client already in connection process, skipping attempt to connect until done')
-        return
+    try:
+        global client_connecting
+        if client_connecting:
+            logger.warning('Mqtt client already in connection process, skipping attempt to connect until done')
+            return
 
-    host_list=[
-        [model_helper.get_param(constant.P_MQTT_HOST_1), int(model_helper.get_param(constant.P_MQTT_PORT_1))],
-        [model_helper.get_param(constant.P_MQTT_HOST_2), int(model_helper.get_param(constant.P_MQTT_PORT_2))]
-        ]
-    global topic
-    topic=str(model_helper.get_param(constant.P_MQTT_TOPIC))
-    global mqtt_client
-    mqtt_client = mqtt.Client()
-    global client_connected
-    global initialised
-    for host_port in host_list:
-        client_connecting = True
-        host = host_port[0]
-        port = host_port[1]
-        logger.info('MQTT publisher module initialising, host={} port={}'.format(host, port))
-        client_connected=False
-        retry_count=0
-        while (not client_connected) and (retry_count < constant.ERROR_CONNECT_MAX_RETRY_COUNT):
-            try:
-                mqtt_client.on_connect = on_connect
-                #mqtt_client.username_pw_set('user', 'pass')
-                mqtt_client.connect(host=host,port=port, keepalive=60)
-                client_connected = True
-                mqtt_client.on_message = receiver.on_message
-                mqtt_client.on_disconnect = on_disconnect
-                thread_pool.add_callable(receiver.thread_run, run_interval_second=10)
-                mqtt_client.loop_start()
-                initialised = True
-                client_connecting = False
-            except socket.error, ex:
-                logger.error('mqtt client not connected, err {}, pause and retry {}'.format(ex, retry_count))
-                retry_count += 1
-                time.sleep(constant.ERROR_CONNECT_PAUSE_SECOND)
-            finally:
-                client_connecting = False
-        if client_connected:
-            break
-        else:
-            logger.warning('Unable to connect to mqtt server {}:{}'.format(host, port))
-    if not client_connected:
-        logger.critical('MQTT connection not available, all connect attempts failed')
+        host_list=[
+            [model_helper.get_param(constant.P_MQTT_HOST_1), int(model_helper.get_param(constant.P_MQTT_PORT_1))],
+            [model_helper.get_param(constant.P_MQTT_HOST_2), int(model_helper.get_param(constant.P_MQTT_PORT_2))],
+            [model_helper.get_param(constant.P_MQTT_HOST_3), int(model_helper.get_param(constant.P_MQTT_PORT_3))]
+            ]
+        global topic
+        topic=str(model_helper.get_param(constant.P_MQTT_TOPIC))
+        global mqtt_client
+        mqtt_client = mqtt.Client()
+        global client_connected
+        global initialised
+        for host_port in host_list:
+            client_connecting = True
+            host = host_port[0]
+            port = host_port[1]
+            logger.info('MQTT publisher module initialising, host={} port={}'.format(host, port))
+            client_connected=False
+            retry_count=0
+            while (not client_connected) and (retry_count < constant.ERROR_CONNECT_MAX_RETRY_COUNT):
+                try:
+                    mqtt_client.on_connect = on_connect
+                    #mqtt_client.username_pw_set('user', 'pass')
+                    mqtt_client.connect(host=host,port=port, keepalive=60)
+                    client_connected = True
+                    mqtt_client.on_message = receiver.on_message
+                    mqtt_client.on_disconnect = on_disconnect
+                    thread_pool.add_callable(receiver.thread_run, run_interval_second=10)
+                    mqtt_client.loop_start()
+                    initialised = True
+                    client_connecting = False
+                except socket.error, ex:
+                    logger.error('mqtt client not connected, err {}, pause and retry {}'.format(ex, retry_count))
+                    retry_count += 1
+                    time.sleep(constant.ERROR_CONNECT_PAUSE_SECOND)
+                finally:
+                    client_connecting = False
+            if client_connected:
+                break
+            else:
+                logger.warning('Unable to connect to mqtt server {}:{}'.format(host, port))
+        if not client_connected:
+            logger.critical('MQTT connection not available, all connect attempts failed')
+    except Exception, ex:
+        logger.error('Exception on mqtt init, err={}'.format(ex))
 

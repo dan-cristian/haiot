@@ -6,6 +6,7 @@ import datetime
 import random
 from common import constant, variable, utils
 from main.admin import models
+from main.admin.model_helper import commit
 from main import db
 from transport import mqtt_io
 
@@ -38,7 +39,7 @@ def node_update(obj={}):
             node.execute_command = utils.get_object_field_value(obj,
                                                                 utils.get_model_field_name(models.Node.execute_command))
             node.updated_on = datetime.datetime.now()
-            db.session.commit()
+            commit()
         else:
             logger.debug('Skipping node DB save, this node is master = {}'.format(
                 variable.NODE_THIS_IS_MASTER_OVERALL))
@@ -74,7 +75,7 @@ def update_master_state():
                     if node.name == constant.HOST_NAME:
                         node.is_master_overall = True
                         node.notify_enabled_ = True
-                        db.session.commit()
+                        commit()
                     master_selected = True
             else:
                 if master_selected and node.is_master_overall:
@@ -82,7 +83,7 @@ def update_master_state():
                     if node.name == constant.HOST_NAME:
                         node.is_master_overall = False
                         node.notify_enabled_ = True
-                        db.session.commit()
+                        commit()
             #applying node master status locally, if changed in db
             if node.name == constant.HOST_NAME:
                 if variable.NODE_THIS_IS_MASTER_OVERALL != node.is_master_overall:
@@ -110,19 +111,22 @@ def update_master_state():
         logger.warning('Error try_become_master, err {}'.format(ex))
 
 def announce_node_state():
-    logger.debug('I tell everyone my node state')
-    node = models.Node.query.filter_by(name=constant.HOST_NAME).first()
-    if node is None:
-        node = models.Node()
-        node.name = constant.HOST_NAME
-        node.priority = random.randint(1, 100)
-        logger.warning('Detected node host name change, new name={}'.format(constant.HOST_NAME))
-        db.session.add(node)
-    node.event_sent_datetime= datetime.datetime.now()
-    node.updated_on = datetime.datetime.now()
-    node.ip = constant.HOST_MAIN_IP
-    node.notify_transport_enabled = True
-    db.session.commit()
+    try:
+        logger.debug('I tell everyone my node state')
+        node = models.Node.query.filter_by(name=constant.HOST_NAME).first()
+        if node is None:
+            node = models.Node()
+            node.name = constant.HOST_NAME
+            node.priority = random.randint(1, 100)
+            logger.warning('Detected node host name change, new name={}'.format(constant.HOST_NAME))
+            db.session.add(node)
+        node.event_sent_datetime= datetime.datetime.now()
+        node.updated_on = datetime.datetime.now()
+        node.ip = constant.HOST_MAIN_IP
+        node.notify_transport_enabled = True
+        commit()
+    except Exception, ex:
+        logger.error('Unable to announce my state, err={}'.format(ex))
 
 progress_status = None
 def get_progress():
