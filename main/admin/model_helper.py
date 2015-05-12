@@ -80,8 +80,8 @@ def read_drop_table(table, original_exception, drop_without_user_ask=False):
         x='y'
     if x=='y':
         logger.warning('Dropping table {}'.format(table))
-        table_name=table.query._primary_entity.entity_zero._with_polymorphic_selectable.description
         try:
+            table_name=table.query._primary_entity.entity_zero._with_polymorphic_selectable.description
             result = db.engine.execute('DROP TABLE '+table_name)
             commit()
         except Exception, ex:
