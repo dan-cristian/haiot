@@ -77,6 +77,7 @@ def init():
         while (not client_connected) and (retry_count < constant.ERROR_CONNECT_MAX_RETRY_COUNT):
             try:
                 mqtt_client.on_connect = on_connect
+                #mqtt_client.username_pw_set('user', 'pass')
                 mqtt_client.connect(host=host,port=port, keepalive=60)
                 client_connected = True
                 mqtt_client.on_message = receiver.on_message
