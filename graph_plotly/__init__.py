@@ -270,7 +270,7 @@ def init():
     if py.get_credentials()['username'] == '' or py.get_credentials()['api_key'] == '':
         logger.info("Plotly standard config does not contain an username, trying login from db folder config")
         credential_file = model_helper.get_param(constant.P_PLOTLY_ALTERNATE_CONFIG)
-        with open(os.getcwd()+credential_file, 'r') as cred_file:
+        with open(os.getcwd()+'/'+credential_file, 'r') as cred_file:
             data = cred_file.read().replace('\n','')
         if len(data) > 0:
             cred_obj = utils.json2obj(data)
