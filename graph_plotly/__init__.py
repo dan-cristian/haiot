@@ -275,7 +275,7 @@ def init():
         if len(data) > 0:
             cred_obj = utils.json2obj(data)
             if cred_obj.username and cred_obj.api_key:
-                py.sign_in(cred_obj.username, cred_obj.api_key)
+                py.sign_in(cred_obj['username'], cred_obj['api_key'])
                 global initialised
                 initialised = True
             else:
@@ -285,5 +285,5 @@ def init():
                 py.sign_in(model_helper.get_param(constant.P_PLOTLY_USERNAME),
                            model_helper.get_param(constant.P_PLOTLY_APIKEY))
     else:
-        logger.info("Plotly config found with username {}".format(py.get_credentials()['username']))
+        logger.info("Plotly standard config found with username {}".format(py.get_credentials()['username']))
         initialised = True
