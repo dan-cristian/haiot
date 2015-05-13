@@ -274,8 +274,10 @@ def init():
             data = cred_file.read().replace('\n','')
         if len(data) > 0:
             cred_obj = utils.json2obj(data)
-            if cred_obj.username and cred_obj.api_key:
-                py.sign_in(cred_obj['username'], cred_obj['api_key'])
+            username=cred_obj['username']
+            api_key=cred_obj['api_key']
+            if username and api_key:
+                py.sign_in(username, api_key)
                 global initialised
                 initialised = True
             else:
