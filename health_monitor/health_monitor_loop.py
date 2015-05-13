@@ -256,7 +256,7 @@ def __get_cpu_utilisation_linux():
         file.close()
         try:
             words = line.split()
-            if len(words) == 11:
+            if len(words) >= 9:
                 user = int(words[1].strip())
                 nice = int(words[2].strip())
                 system = int(words[3].strip())
@@ -265,8 +265,8 @@ def __get_cpu_utilisation_linux():
                 irq = int(words[6].strip())
                 softirq = int(words[7].strip())
                 steal = int(words[8].strip())
-                guest = int(words[9].strip())
-                guest_nice = int(words[10].strip())
+                #guest = int(words[9].strip())
+                #guest_nice = int(words[10].strip())
                 if not previous_procstat_list is None:
                     prevuser = int(previous_procstat_list[1].strip())
                     prevnice = int(previous_procstat_list[2].strip())
@@ -276,8 +276,8 @@ def __get_cpu_utilisation_linux():
                     previrq = int(previous_procstat_list[6].strip())
                     prevsoftirq = int(previous_procstat_list[7].strip())
                     prevsteal = int(previous_procstat_list[8].strip())
-                    prevguest = int(previous_procstat_list[9].strip())
-                    prevguest_nice = int(previous_procstat_list[10].strip())
+                    #prevguest = int(previous_procstat_list[9].strip())
+                    #prevguest_nice = int(previous_procstat_list[10].strip())
                     previdle += previowait
                     idle += iowait
                     prevnonidle = prevuser + prevnice + prevsystem + previrq + prevsoftirq + prevsteal
