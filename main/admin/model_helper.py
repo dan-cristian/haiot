@@ -114,7 +114,7 @@ def populate_tables(model_auto_update=False):
             ['13', constant.P_MQTT_HOST_3, 'iot.eclipse.org'],
             ['14', constant.P_MQTT_PORT_3, '1883'],
             ['15', constant.P_PLOTLY_ALTERNATE_CONFIG, '../.plotly.credentials'],
-            ['16', constant.P_FLASK_WEB_PORT, '16000']
+            ['16', constant.P_FLASK_WEB_PORT, '8080']
 
         ]
     check_table_schema(models.Parameter, model_auto_update)

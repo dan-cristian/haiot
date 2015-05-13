@@ -45,7 +45,12 @@ def init():
     global initialised
     initialised = True
     port = model_helper.get_param(constant.P_FLASK_WEB_PORT)
-    flask_thread = helpers.FlaskInThread(app, host='0.0.0.0', port=port, debug=True, use_reloader=False)
+    #for rh openshift we need to get gear ip
+    host = os.environ.get('OPENSHIFT_PYTHON_IP')
+    if not host:
+        #otherwise listen on all interfaces
+        host='0.0.0.0'
+    flask_thread = helpers.FlaskInThread(app, host=host, port=port, debug=True, use_reloader=False)
     flask_thread.start()
     #app.run(debug=True, use_reloader=False, host='0.0.0.0')
 
