@@ -8,9 +8,8 @@ import plotly.plotly as py
 from plotly import graph_objs
 from plotly.exceptions import PlotlyError, PlotlyAccountError, PlotlyListEntryError
 from common import constant, utils
-from main import db
-from main.admin import models
-
+from main.admin import model_helper
+import os
 
 initialised = False
 #list of series unique identifier used to determine trace order remote, key is graph name
@@ -181,6 +180,7 @@ def get_graph_url_from_memory(graph_unique_name=''):
         return None
 
 def upload_data(obj):
+
     try:
         logger.debug('Trying to upload plotly obj {}'.format(obj))
         global g_trace_id_list_per_graph
@@ -267,5 +267,23 @@ def init():
     #use auto setup as described here: https://plot.ly/python/getting-started/ to avoid passwords in code
     #or less secure sign_in code below
     #py.sign_in(model_helper.get_param(constant.P_PLOTLY_USERNAME),model_helper.get_param(constant.P_PLOTLY_APIKEY))
-    global initialised
-    initialised = True
+    if py.get_credentials()['username'] == '' or py.get_credentials()['api_key'] == '':
+        logger.info("Plotly standard config does not contain an username, trying login from db folder config")
+        credential_file = model_helper.get_param(constant.P_PLOTLY_ALTERNATE_CONFIG)
+        with open(credential_file, 'r') as cred_file:
+            data = cred_file.read().replace('\n','')
+        if len(data) > 0:
+            cred_obj = utils.json2obj(data)
+            if cred_obj.username and cred_obj.api_key:
+                py.sign_in(cred_obj.username, cred_obj.api_key)
+                global initialised
+                initialised = True
+            else:
+                logger.info("Plotly init from db folder config {}{} not ok, trying with db data".format(os.getcwd(),
+                    credential_file))
+                #alternate way if reading data from DB
+                py.sign_in(model_helper.get_param(constant.P_PLOTLY_USERNAME),
+                           model_helper.get_param(constant.P_PLOTLY_APIKEY))
+    else:
+        logger.info("Plotly config found with username {}".format(py.get_credentials()['username']))
+        initialised = True

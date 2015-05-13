@@ -107,12 +107,13 @@ def populate_tables(model_auto_update=False):
             ['6', constant.P_MQTT_TOPIC, 'iot/main'],
             ['7', constant.P_MQTT_HOST_2, '192.168.0.115'],
             ['8', constant.P_MQTT_PORT_2, '1883'],
-            ['9', constant.P_PLOTLY_USERNAME, 'xxx'],
-            ['10', constant.P_PLOTLY_APIKEY, 'zzz'],
+            ['9', constant.P_PLOTLY_USERNAME, 'xxx'],#not used
+            ['10', constant.P_PLOTLY_APIKEY, 'zzz'],#not used
             ['11', constant.P_DDNS_RACKSPACE_CONFIG_FILE, '/home/dcristian/.rackspace.ddnsupdate.config.json'],
             ['12', constant.P_USESUDO_DISKTOOLS, 'False'],
             ['13', constant.P_MQTT_HOST_3, 'iot.eclipse.org'],
             ['14', constant.P_MQTT_PORT_3, '1883'],
+            ['15', constant.P_PLOTLY_ALTERNATE_CONFIG, '../.plotly.credentials']
 
         ]
     check_table_schema(models.Parameter, model_auto_update)
