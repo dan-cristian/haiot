@@ -1,10 +1,10 @@
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 import os
-from main import logger
-from main import app
+from main import logger, app
+from main.admin import model_helper
 from flask import request, abort, send_file, render_template
-
+from common import constant
 import webui
 import helpers
 
@@ -44,7 +44,8 @@ def init():
     app.register_blueprint(user, url_prefix='/user')
     global initialised
     initialised = True
-    flask_thread = helpers.FlaskInThread(app, host='0.0.0.0', port=5000, debug=True, use_reloader=False)
+    port = model_helper.get_param(constant.P_FLASK_WEB_PORT)
+    flask_thread = helpers.FlaskInThread(app, host='0.0.0.0', port=port, debug=True, use_reloader=False)
     flask_thread.start()
     #app.run(debug=True, use_reloader=False, host='0.0.0.0')
 
