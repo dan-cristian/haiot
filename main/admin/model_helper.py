@@ -207,11 +207,13 @@ def populate_tables(model_auto_update=False):
     if len(models.Node.query.filter_by(name=constant.HOST_NAME).all()) == 0:
         logger.info('Populating Node {} with default values'.format(constant.HOST_NAME))
         if constant.HOST_NAME=='nas':
-            priority = 0
-        elif constant.HOST_NAME=='netbook':
             priority = 1
-        elif constant.HOST_NAME=='server':
+        elif constant.HOST_NAME=='netbook':
             priority = 2
+        elif constant.HOST_NAME=='server':
+            priority = 3
+        elif constant.HOST_NAME=='ex-std-node466.prod.rhcloud.com':
+            priority = 0
         else:
             priority=random.randint(3, 100)
         db.session.add(models.Node('', name=constant.HOST_NAME, ip=constant.HOST_MAIN_IP, priority=priority))

@@ -289,3 +289,5 @@ def init():
     else:
         logger.info("Plotly standard config found with username {}".format(py.get_credentials()['username']))
         initialised = True
+    if initialised:
+        logger.info('Plotly is connected')
