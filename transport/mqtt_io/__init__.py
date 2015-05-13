@@ -3,13 +3,28 @@ __author__ = 'dcristian'
 import socket
 import time
 import sys
-import paho.mqtt.client as mqtt
 from main.admin import thread_pool
 from main import logger
 from main.admin import model_helper
 from common import constant
 import receiver
 import sender
+
+mqtt_mosquitto_exists = False
+mqtt_paho_exists = False
+
+try:
+    import mosquitto as mqtt
+    mqtt_mosquitto_exists = True
+except Exception:
+    mqtt_mosquitto_exists = False
+
+try:
+    if not mqtt_mosquitto_exists:
+        import paho.mqtt.client as mqtt
+        mqtt_paho_exists = True
+except Exception:
+    mqtt_paho_exists = False
 
 
 initialised=False
@@ -20,7 +35,13 @@ client_connecting = False
 mqtt_msg_count_per_minute = 0
 
 # The callback for when the client receives a CONNACK response from the server.
-def on_connect(client, userdata, flags, rc):
+def on_connect_paho(client, userdata, flags, rc):
+    logger.info("Connected to mqtt with result code " + str(rc))
+    global client_connected
+    client_connected = True
+    subscribe()
+
+def on_connect_mosquitto(mosq, userdata, rc):
     logger.info("Connected to mqtt with result code " + str(rc))
     global client_connected
     client_connected = True
@@ -43,7 +64,7 @@ def subscribe():
     mqtt_client.subscribe(topic=topic, qos=0)
 
 def unload():
-    global mqtt_client, topic
+    global mqtt_client, topic, mqtt_paho_exists, mqtt_mosquitto_exists
     mqtt_client.unsubscribe(topic)
     try:
         mqtt_client.loop_stop()
@@ -52,6 +73,14 @@ def unload():
     mqtt_client.disconnect()
 
 def init():
+    if mqtt_mosquitto_exists:
+        logger.info("Using mosquitto as mqtt client")
+    elif mqtt_paho_exists:
+        logger.info("Using paho as mqtt client")
+    else:
+        logger.critical("No mqtt client enabled via import")
+        raise Exception("No mqtt client enabled via import")
+
     try:
         global client_connecting
         if client_connecting:
@@ -66,7 +95,11 @@ def init():
         global topic
         topic=str(model_helper.get_param(constant.P_MQTT_TOPIC))
         global mqtt_client
-        mqtt_client = mqtt.Client()
+        if mqtt_paho_exists:
+            mqtt_client = mqtt.Client()
+        elif mqtt_mosquitto_exists:
+            mqtt_client = mqtt.Mosquitto()
+
         global client_connected
         global initialised
         for host_port in host_list:
@@ -78,7 +111,11 @@ def init():
             retry_count=0
             while (not client_connected) and (retry_count < constant.ERROR_CONNECT_MAX_RETRY_COUNT):
                 try:
-                    mqtt_client.on_connect = on_connect
+                    if mqtt_mosquitto_exists:
+                        mqtt_client.on_connect = on_connect_mosquitto
+                    if mqtt_paho_exists:
+                        mqtt_client.on_connect = on_connect_paho
+
                     #mqtt_client.username_pw_set('user', 'pass')
                     mqtt_client.connect(host=host,port=port, keepalive=60)
                     client_connected = True
