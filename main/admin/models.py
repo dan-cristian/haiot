@@ -223,16 +223,18 @@ class Node(db.Model, DbEvent):
     is_master_db_archive = db.Column(db.Boolean(), default=False)
     is_master_graph = db.Column(db.Boolean(), default=False)
     is_master_rule = db.Column(db.Boolean(), default=False)
+    is_master_logging = db.Column(db.Boolean(), default=False)
     priority = db.Column(db.Integer)
     execute_command=db.Column(db.String(50))
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    def __init__(self, id='', name ='', ip='', priority=''):
+    def __init__(self, id='', name ='', ip='', priority='', is_master_logging=False):
         if id:
             self.id = id
         self.name = name
         self.ip = ip
         self.priority = priority
+        self.is_master_logging = is_master_logging
 
     def __repr__(self):
         return 'Node {} ip {}'.format(self.name,  self.ip)

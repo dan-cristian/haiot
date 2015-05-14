@@ -11,8 +11,7 @@ import transport.mqtt_io
 __last_message_received = datetime.datetime.now()
 __last_minute = 0
 
-def on_subscribe(client, userdata, mid, granted_qos):
-    logger.info('Subscribed as user {} mid {} qos {}'.format(str(userdata), str(mid), str(granted_qos)))
+
 
 
 # The callback for when a PUBLISH message is received from the server.
