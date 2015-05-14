@@ -44,8 +44,6 @@ def on_connect_paho(client, userdata, flags, rc):
 
 def on_connect_mosquitto(mosq, userdata, rc):
     logger.info("Connected to mqtt mosquitto with result code " + str(rc))
-    global client_connected
-    client_connected = True
     subscribe()
 
 def on_disconnect(client, userdata, rc):
@@ -55,10 +53,21 @@ def on_disconnect(client, userdata, rc):
     global client_connected
     client_connected = False
 
+def on_subscribe(client, userdata, mid, granted_qos):
+    global client_connected
+    client_connected = True
+    print 'MQTT subscribed'
+
+#def on_subscribe(client, userdata, mid, granted_qos):
+#    logger.info('Subscribed as user {} mid {} qos {}'.format(str(userdata), str(mid), str(granted_qos)))
+
+def on_unsubscribe(client, userdata, mid):
+    global client_connected
+    client_connected = False
+
 def subscribe():
     global topic
     logger.info('Subscribing to mqtt topic={}'.format(topic))
-    mqtt_client.on_subscribe = receiver.on_subscribe
     mqtt_client.username_pw_set(constant.HOST_NAME)
     mqtt_client.user_data_set(constant.HOST_NAME + " userdata")
     mqtt_client.will_set(constant.HOST_NAME + " DIE")
@@ -118,16 +127,25 @@ def init():
                         mqtt_client.on_connect = on_connect_mosquitto
                     if mqtt_paho_exists:
                         mqtt_client.on_connect = on_connect_paho
-
+                    mqtt_client.on_subscribe = on_subscribe
+                    mqtt_client.on_unsubscribe = on_unsubscribe
                     #mqtt_client.username_pw_set('user', 'pass')
-                    mqtt_client.connect(host=host,port=port, keepalive=60)
-                    client_connected = True
-                    mqtt_client.on_message = receiver.on_message
-                    mqtt_client.on_disconnect = on_disconnect
-                    thread_pool.add_callable(receiver.thread_run, run_interval_second=10)
                     mqtt_client.loop_start()
-                    initialised = True
-                    client_connecting = False
+                    mqtt_client.connect(host=host,port=port, keepalive=60)
+                    seconds_lapsed = 0
+                    while not client_connected and seconds_lapsed < 10:
+                        time.sleep(1)
+                        seconds_lapsed += 1
+                    if client_connected:
+                        mqtt_client.on_message = receiver.on_message
+                        mqtt_client.on_disconnect = on_disconnect
+                        thread_pool.add_callable(receiver.thread_run, run_interval_second=10)
+                        #mqtt_client.loop_start()
+                        initialised = True
+                        client_connecting = False
+                    else:
+                        logger.warning('Timeout connecting to mqtt')
+                        retry_count += 1
                 except socket.error, ex:
                     logger.error('mqtt client not connected, err {}, pause and retry {}'.format(ex, retry_count))
                     retry_count += 1

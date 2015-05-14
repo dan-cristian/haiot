@@ -1,12 +1,10 @@
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 from main import logger
-from main.admin import thread_pool
 import transport_run
 from transport import mqtt_io
 
 initialised = False
-
 
 def send_message_json(json=''):
     mqtt_io.sender.send_message(json)
@@ -16,7 +14,8 @@ def send_message_obj(obj=''):
 
 
 def unload():
-    logger.info('Template transport unloading')
+    from main.admin import thread_pool
+    logger.info('Transport unloading')
     # ...
     thread_pool.remove_callable(transport_run.thread_run)
     global initialised
@@ -24,7 +23,9 @@ def unload():
 
 
 def init():
-    logger.info('Template transport initialising')
-    thread_pool.add_callable(transport_run.thread_run, run_interval_second=60)
+    from main.admin import thread_pool
+    logger.info('Transport initialising')
+    #thread_pool.add_callable(transport_run.thread_run, run_interval_second=60)
+    mqtt_io.init()
     global initialised
     initialised = True

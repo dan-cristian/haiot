@@ -67,6 +67,7 @@ FREE_MEM_STATUS='Mem:'
 
 DISK_DEV_MAIN='/dev/sd'
 
+JSON_MESSAGE_TYPE='message_type'
 JSON_PUBLISH_DATE='datetime_'
 JSON_PUBLISH_TABLE='table_'
 #JSON_PUBLISH_RECORD_OPERATION='operation_'
@@ -81,6 +82,7 @@ JSON_PUBLISH_GRAPH_ID='graph_id_'
 JSON_PUBLISH_GRAPH_LEGEND='graph_legend_'
 JSON_PUBLISH_SAVE_TO_GRAPH='save_to_graph'
 JSON_PUBLISH_FIELDS_CHANGED='last_commit_field_changed_list'
+
 GPIO_PIN_TYPE_BBB='bbb'
 GPIO_PIN_TYPE_PI='pi'
 

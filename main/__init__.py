@@ -23,13 +23,20 @@ initialised = False
 shutting_down=False
 exit_code = 0
 MODEL_AUTO_UPDATE=False
+#logging output will go to syslog
 LOG_TO_SYSLOG = False
+#on systems without remote logging access like openshift use transport to perform logging by a proxy node
+LOG_TO_TRANSPORT = False
 logger = None
+#this logger is used to log remote logs messages using a different formatter
+remote_logger=None
+#this is to enable remote syslog like papertrail
 SYSLOG_ADDRESS = None
 SYSLOG_PORT = None
 RUN_IN_LIVE = False
 
 from . import logger
+
 
 def my_import(name):
     #http://stackoverflow.com/questions/547829/how-to-dynamically-load-a-python-class
@@ -117,21 +124,29 @@ def init_logging():
             return True
 
     global LOGGING_LEVEL, LOG_FILE, LOG_TO_SYSLOG, SYSLOG_ADDRESS, SYSLOG_PORT, RUN_IN_LIVE
-    global logger
-    log_name = 'haiot-' + socket.gethostname()
+    global logger, remote_logger
     logging.basicConfig(format='%(asctime)s haiot %(levelname)s %(module)s:%(funcName)s %(message)s')#%(threadName)s
-    logger = logging.getLogger(log_name)
-
+    logger = logging.getLogger('haiot-' + socket.gethostname())
+    remote_logger = logging.getLogger('haiot-remote-' + socket.gethostname())
     logger.setLevel(LOGGING_LEVEL)
+    remote_logger.setLevel(LOGGING_LEVEL)
 
     if (SYSLOG_ADDRESS is not None) and (SYSLOG_PORT is not None):
         filter_log = ContextFilter()
         logger.addFilter(filter_log)
+        remote_logger.addFilter(filter_log)
         syslog_papertrail = logging.handlers.SysLogHandler(address=(SYSLOG_ADDRESS, int(SYSLOG_PORT)))
-        pap_formatter = logging.Formatter('%(asctime)s %(hostname)s haiot %(levelname)s %(module)s:%(funcName)s %(message)s',
-                                          datefmt='%Y-%m-%dT%H:%M:%S')
+        pap_formatter = logging.Formatter(
+            '%(asctime)s %(hostname)s haiot %(levelname)s %(module)s:%(funcName)s %(message)s',
+            datefmt='%Y-%m-%dT%H:%M:%S')
         syslog_papertrail.setFormatter(pap_formatter)
         logger.addHandler(syslog_papertrail)
+
+        remote_syslog_papertrail = logging.handlers.SysLogHandler(address=(SYSLOG_ADDRESS, int(SYSLOG_PORT)))
+        remote_pap_formatter = logging.Formatter('')
+        remote_syslog_papertrail.setFormatter(remote_pap_formatter)
+        remote_logger.addHandler(remote_syslog_papertrail)
+
         logger.info('Initialised syslog with {}:{}'.format(SYSLOG_ADDRESS, SYSLOG_PORT))
 
     if LOG_TO_SYSLOG:
@@ -158,13 +173,18 @@ def init_logging():
         logger.propagate = False
 
 def init():
+    #carefull with order of imports
+    global logger
+    import common
+    from common import constant, utils
+    common.init_simple()
+
     init_logging()
     signal.signal(signal.SIGTERM, signal_handler)
 
-    import common
     common.init()
 
-    global app, db, DB_LOCATION
+    global app, db, DB_LOCATION, LOG_TO_TRANSPORT
     logger.info('Initialising flask')
     app = Flask('main')
     #app.config['TESTING'] = True
@@ -173,6 +193,29 @@ def init():
     logger.info('Initialising SQLAlchemy')
     db = SQLAlchemy(app)
     db.create_all()
+
+    import transport
+    transport.init()
+
+    class LogMessage():
+        message_type = 'logging'
+        message = ''
+        level = ''
+        source_host = constant.HOST_NAME
+        datetime = utils.date_serialised(datetime.datetime.now())
+
+    import logging
+    class TransportLogging(logging.Handler):
+        def emit(self, record):
+            if transport.initialised and transport.mqtt_io.client_connected:
+                msg = LogMessage()
+                msg.message = self.format(record)
+                msg.level = record.levelname
+                transport.send_message_json(utils.unsafeobj2json(msg))
+
+    if LOG_TO_TRANSPORT:
+        logger.addHandler(TransportLogging())
+        logger.info('Initialised logging via transport proxy')
 
     logger.info('Checking db tables')
     import admin.model_helper
@@ -244,8 +287,11 @@ def run(arg_list):
     RUN_IN_LIVE = 'live' in arg_list
 
     for s in arg_list:
-        #carefull with the order for unicity, start with longest words first
-        if 'syslog=' in s:
+        #carefull with the order for uniqueness, start with longest words first
+        if 'transport_syslog' in s:
+            global LOG_TO_TRANSPORT
+            LOG_TO_TRANSPORT = True
+        elif 'syslog=' in s:
             #syslog=logs2.papertrailapp.com:30445
             global SYSLOG_ADDRESS, SYSLOG_PORT
             par_vals = s.split('=')[1].split(':')

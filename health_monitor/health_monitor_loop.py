@@ -321,7 +321,7 @@ def __get_cpu_temperature():
         else:
             path=None
         line = '-1'
-        if path:
+        if path and os.path.isfile(path):
             file = None
             try:
                 file = open(path)
@@ -331,7 +331,7 @@ def __get_cpu_temperature():
             if file:
                 file.close()
         else:
-            logger.info('Unable to get CPU temp for machine type {}'.format(constant.HOST_MACHINE_TYPE))
+            logger.debug('Unable to get CPU temp for machine type {}'.format(constant.HOST_MACHINE_TYPE))
         temp = float(line) / 1000
     temp = utils.round_sensor_value(temp)
     return temp

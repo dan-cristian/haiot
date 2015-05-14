@@ -39,7 +39,7 @@ def model_row_to_json(obj, operation=''):
                     safe_obj[attr] = value
                 else:
                     logger.debug('Ignoring obj to json, not simple primitive {}'.format(value))
-        return utils.obj2json(safe_obj)
+        return utils.safeobj2json(safe_obj)
     except Exception, ex:
         logger.critical('Error convert model obj to json, err {}'.format(ex))
 
@@ -207,9 +207,11 @@ def populate_tables(model_auto_update=False):
     check_table_schema(models.Node, model_auto_update)
     if len(models.Node.query.filter_by(name=constant.HOST_NAME).all()) == 0:
         logger.info('Populating Node {} with default values'.format(constant.HOST_NAME))
+        master_logging = False
         if constant.HOST_NAME=='nas':
             priority = 1
         elif constant.HOST_NAME=='netbook':
+            master_logging = True
             priority = 2
         elif constant.HOST_NAME=='server':
             priority = 3
@@ -217,7 +219,8 @@ def populate_tables(model_auto_update=False):
             priority = 0
         else:
             priority=random.randint(3, 100)
-        db.session.add(models.Node('', name=constant.HOST_NAME, ip=constant.HOST_MAIN_IP, priority=priority))
+        db.session.add(models.Node('', name=constant.HOST_NAME, ip=constant.HOST_MAIN_IP, priority=priority,
+                                   is_master_logging=master_logging))
         commit()
     else:
         #reseting execute_command field to avoid running last command before shutdown
@@ -243,32 +246,32 @@ def populate_tables(model_auto_update=False):
 
     module_list_dict = {'default':[
         [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
-        [4, get_mod_name(mqtt_io), True, 3],[5, get_mod_name(sensor), False, 4],[6, get_mod_name(relay), False, 5],
+                    [5, get_mod_name(sensor), False, 4],[6, get_mod_name(relay), False, 5],
         [7, get_mod_name(heat), False, 6],[8, get_mod_name(alarm), False, 7],[9, get_mod_name(graph_plotly), True, 8],
         [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), True, 10],[12, get_mod_name(ddns), False, 11]],
         'netbook':[
         [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
-        [4, get_mod_name(mqtt_io), True, 3],[5, get_mod_name(sensor), True, 4],[6, get_mod_name(relay), True, 5],
+                    [5, get_mod_name(sensor), True, 4],[6, get_mod_name(relay), True, 5],
         [7, get_mod_name(heat), True, 6],[8, get_mod_name(alarm), False, 7],[9, get_mod_name(graph_plotly), False, 8],
         [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), True, 10],[12, get_mod_name(ddns), True, 11]],
         'nas':[
         [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
-        [4, get_mod_name(mqtt_io), True, 3],[5, get_mod_name(sensor), True, 4],[6, get_mod_name(relay), False, 5],
+                    [5, get_mod_name(sensor), True, 4],[6, get_mod_name(relay), False, 5],
         [7, get_mod_name(heat), False, 6],[8, get_mod_name(alarm), False, 7],[9, get_mod_name(graph_plotly), True, 8],
         [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), True, 10],[12, get_mod_name(ddns), True, 11]],
         'pi-power':[
         [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
-        [4, get_mod_name(mqtt_io), True, 3],[5, get_mod_name(sensor), True, 4],[6, get_mod_name(relay), True, 5],
+                    [5, get_mod_name(sensor), True, 4],[6, get_mod_name(relay), True, 5],
         [7, get_mod_name(heat), True, 6],[8, get_mod_name(alarm), False, 7],[9, get_mod_name(graph_plotly), False, 8],
         [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), True, 10],[12, get_mod_name(ddns), False, 11]],
         'beaglebone':[
         [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
-        [4, get_mod_name(mqtt_io), True, 3],[5, get_mod_name(sensor), True, 4],[6, get_mod_name(relay), True, 5],
+                    [5, get_mod_name(sensor), True, 4],[6, get_mod_name(relay), True, 5],
         [7, get_mod_name(heat), True, 6],[8, get_mod_name(alarm), False, 7],[9, get_mod_name(graph_plotly), False, 8],
         [10, get_mod_name(io_bbb), True, 9],[11, get_mod_name(webui), True, 10],[12, get_mod_name(ddns), False, 11]],
         'router':[
         [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
-        [4, get_mod_name(mqtt_io), True, 3],[5, get_mod_name(sensor), False, 4],[6, get_mod_name(relay), False, 5],
+                    [5, get_mod_name(sensor), False, 4],[6, get_mod_name(relay), False, 5],
         [7, get_mod_name(heat), False, 6],[8, get_mod_name(alarm), False, 7],[9, get_mod_name(graph_plotly), False, 8],
         [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), False, 10],[12, get_mod_name(ddns), True, 11]]
         }

@@ -27,17 +27,19 @@ def node_update(obj={}):
                 db.session.add(node)
             node.name = node_host_name
             node.is_master_graph = utils.get_object_field_value(obj,
-                                                                utils.get_model_field_name(models.Node.is_master_graph))
+                                                        utils.get_model_field_name(models.Node.is_master_graph))
             node.is_master_db_archive = utils.get_object_field_value(obj,
                                                         utils.get_model_field_name(models.Node.is_master_db_archive))
             node.is_master_overall = utils.get_object_field_value(obj,
-                                                            utils.get_model_field_name(models.Node.is_master_overall))
+                                                        utils.get_model_field_name(models.Node.is_master_overall))
             node.is_master_rule = utils.get_object_field_value(obj,
-                                                               utils.get_model_field_name(models.Node.is_master_rule))
+                                                        utils.get_model_field_name(models.Node.is_master_rule))
+            node.is_master_logging = utils.get_object_field_value(obj,
+                                                        utils.get_model_field_name(models.Node.is_master_logging))
             node.priority = utils.get_object_field_value(obj, utils.get_model_field_name(models.Node.priority))
             node.ip = utils.get_object_field_value(obj, utils.get_model_field_name(models.Node.ip))
             node.execute_command = utils.get_object_field_value(obj,
-                                                                utils.get_model_field_name(models.Node.execute_command))
+                                                        utils.get_model_field_name(models.Node.execute_command))
             node.updated_on = datetime.datetime.now()
             commit()
         else:
@@ -54,31 +56,31 @@ def node_update(obj={}):
     except Exception, ex:
         logger.warning('Error on node update, err {}'.format(ex))
 
-def check_if_no_masters():
+def check_if_no_masters_overall():
     node_masters = models.Node.query.filter_by(is_master_overall=True).all()
-    return len(node_masters)==0
+    return len(node_masters) == 0
 
 #elect and set master status in db for current node only. master is elected by node_id priority, if alive
 def update_master_state():
-    master_selected=False
+    master_overall_selected=False
     try:
         alive_date_time = datetime.datetime.now() - datetime.timedelta(minutes=1)
         node_list = models.Node.query.order_by(models.Node.priority).all()
         for node in node_list:
             #if recently alive, in order of id prio
-            if node.updated_on >= alive_date_time and (not master_selected):
+            if node.updated_on >= alive_date_time and (not master_overall_selected):
                 if node.is_master_overall:
                     logger.debug('Node {} is already master, all good we have a master'.format(node.name))
-                    master_selected = True
+                    master_overall_selected = True
                 else:
                     logger.info('Node {} will become a master'.format(node.name))
                     if node.name == constant.HOST_NAME:
                         node.is_master_overall = True
                         node.notify_enabled_ = True
                         commit()
-                    master_selected = True
+                    master_overall_selected = True
             else:
-                if master_selected and node.is_master_overall:
+                if master_overall_selected and node.is_master_overall:
                     logger.info('Node {} should lose master status, if alive'.format(node.name))
                     if node.name == constant.HOST_NAME:
                         node.is_master_overall = False
@@ -86,6 +88,8 @@ def update_master_state():
                         commit()
             #applying node master status locally, if changed in db
             if node.name == constant.HOST_NAME:
+                variable.NODE_THIS_IS_MASTER_LOGGING =  node.is_master_logging
+
                 if variable.NODE_THIS_IS_MASTER_OVERALL != node.is_master_overall:
                     if not node.is_master_overall:
                         #disabling local mastership immediately
@@ -96,7 +100,7 @@ def update_master_state():
                         global since_when_i_should_be_master
                         #check seconds lapsed since cluster agreed I must be or lose master
                         seconds_elapsed = (datetime.datetime.now() - since_when_i_should_be_master).total_seconds()
-                        if check_if_no_masters() or seconds_elapsed > 10:
+                        if check_if_no_masters_overall() or seconds_elapsed > 10:
                             variable.NODE_THIS_IS_MASTER_OVERALL = node.is_master_overall
                             logger.info('Change in node mastership, local node is master={}'.format(
                                 variable.NODE_THIS_IS_MASTER_OVERALL))

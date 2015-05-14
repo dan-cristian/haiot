@@ -22,8 +22,22 @@ def date_serialised(obj):
 def json2obj(data):
     #return json.loads(data, object_pairs_hook=date_deserialiser)
     return json.loads(data)
-def obj2json(obj):
+
+#this function takes objects that can be safely serialised
+def safeobj2json(obj):
     return json.dumps(obj, default=date_serialised)
+def unsafeobj2json(obj):
+    safe_obj = {}
+    for attr in dir(obj):
+        if not attr.startswith('_') and not '(' in attr \
+                and attr != 'query' and not callable(getattr(obj, attr))\
+                and attr != 'metadata':
+            value=getattr(obj, attr)
+            #only convert to json simple primitives
+            if value is not None and not hasattr(value,'_sa_class_manager'):
+                safe_obj[attr] = value
+    return safeobj2json(safe_obj)
+
 def get_object_name(obj):
     str(obj._sa_class_manager.itervalues().next()).split('.')[0]
 def get_object_field_value(obj={}, field_name=None):
