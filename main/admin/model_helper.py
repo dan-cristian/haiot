@@ -209,9 +209,9 @@ def populate_tables(model_auto_update=False):
         logger.info('Populating Node {} with default values'.format(constant.HOST_NAME))
         master_logging = False
         if constant.HOST_NAME=='nas':
+            master_logging = True
             priority = 1
         elif constant.HOST_NAME=='netbook':
-            master_logging = True
             priority = 2
         elif constant.HOST_NAME=='server':
             priority = 3
