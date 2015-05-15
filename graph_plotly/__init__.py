@@ -268,9 +268,10 @@ def init():
     #or less secure sign_in code below
     #py.sign_in(model_helper.get_param(constant.P_PLOTLY_USERNAME),model_helper.get_param(constant.P_PLOTLY_APIKEY))
     if py.get_credentials()['username'] == '' or py.get_credentials()['api_key'] == '':
-        logger.info("Plotly standard config does not contain an username, trying login from db folder config")
         credential_file = model_helper.get_param(constant.P_PLOTLY_ALTERNATE_CONFIG)
-        with open(os.getcwd()+'/'+credential_file, 'r') as cred_file:
+        alt_path = os.getcwd()+'/'+credential_file
+        logger.info("Plotly standard config does not contain an username, trying db folder config {}".format(alt_path))
+        with open(alt_path, 'r') as cred_file:
             data = cred_file.read().replace('\n','')
         if len(data) > 0:
             cred_obj = utils.json2obj(data)
