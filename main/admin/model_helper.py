@@ -47,19 +47,19 @@ def get_param(name):
     try:
         val = models.Parameter.query.filter_by(name=name).first().value
         return val
-    except ValueError:
-        logger.warning('Unable to get parameter {} error {}'.format(name, sys.exc_info()[0]))
+    except ValueError, ex:
+        logger.warning('Unable to get parameter {} error {}'.format(name, ex))
         raise ValueError
     except Exception, ex:
-        logger.critical('Exception when getting param {}'.format(name))
-        db.session.rollback()
+        logger.critical('Exception {} when getting param {}'.format(ex, name))
+        #db.session.rollback()
         raise ex
 
 def commit():
     try:
         db.session.commit()
     except IntegrityError, ex:
-        db.session.rollback()
+        #db.session.rollback()
         logger.warning('Unable to commit DB session={}, rolled back, err={}'.format(db.session, ex))
     except InvalidRequestError, ex:
         logger.warning('Error on commit, session={}, ignoring, err={}'.format(db.session, ex))
@@ -113,7 +113,7 @@ def populate_tables(model_auto_update=False):
             ['12', constant.P_USESUDO_DISKTOOLS, 'False'],
             ['13', constant.P_MQTT_HOST_3, 'iot.eclipse.org'],
             ['14', constant.P_MQTT_PORT_3, '1883'],
-            ['15', constant.P_PLOTLY_ALTERNATE_CONFIG, '../.plotly.credentials'],
+            ['15', constant.P_PLOTLY_ALTERNATE_CONFIG, '.plotly.credentials'],
             ['16', constant.P_FLASK_WEB_PORT, '8080']
 
         ]
@@ -220,7 +220,7 @@ def populate_tables(model_auto_update=False):
         else:
             priority=random.randint(3, 100)
         db.session.add(models.Node('', name=constant.HOST_NAME, ip=constant.HOST_MAIN_IP, priority=priority,
-                                   is_master_logging=master_logging))
+                                   mac=constant.HOST_MAC, is_master_logging=master_logging))
         commit()
     else:
         #reseting execute_command field to avoid running last command before shutdown

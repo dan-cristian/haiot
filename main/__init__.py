@@ -194,6 +194,7 @@ def init():
     db = SQLAlchemy(app)
     db.create_all()
 
+
     import transport
     transport.init()
 
