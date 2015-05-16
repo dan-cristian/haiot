@@ -241,6 +241,9 @@ def init():
     t.daemon = True
     t.start()
 
+    from admin import cron
+    cron.init()
+
     global initialised, shutting_down
     initialised = True
 
