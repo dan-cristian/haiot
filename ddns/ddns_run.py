@@ -6,6 +6,7 @@ try:
     import dateutil.parser
 except ImportError:
     logger.info('Module dateutil.parser cannot be imported')
+import pytz
 import json
 import socket
 import requests
@@ -48,6 +49,8 @@ def __update_ddns_rackspace():
         cache['ip'] = ip
         now = datetime.datetime.now()
         expires = dateutil.parser.parse(cache['auth']['expires'])
+        now = pytz.utc.localize(now)
+        expires = pytz.utc.localize(expires)
         if expires <= now:
             logger.info('Expired rackspace authentication token; reauthenticating...')
             # authenticate with Rackspace
