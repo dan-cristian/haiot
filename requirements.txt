@@ -15,6 +15,7 @@ requests==2.5.3
 pyserial>=0.0
 python-dateutil>=0.0
 hiplogging>=0.0
+python-crontab
 #uncomment on RPI
 #RPi.GPIO
 #uncomment on beaglebone
