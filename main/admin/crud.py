@@ -44,7 +44,7 @@ class CRUDView(MethodView):
         if operation == 'delete':
             obj = self.model.query.get(obj_id)
             db.session.delete(obj)
-            db.session.commit()
+            commit()
             return redirect(self.path)
 
         # list view with filter
@@ -92,7 +92,7 @@ class CRUDView(MethodView):
         form.populate_obj(obj)
 
         db.session.add(obj)
-        db.session.commit()
+        commit()
         dispatcher.send(signal=constant.SIGNAL_SENSOR_DB_POST, model=self.model, row=obj)
         return redirect(self.path)
 

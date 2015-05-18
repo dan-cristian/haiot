@@ -5,7 +5,9 @@ import datetime
 from main.admin import db, models
 import alarm_loop
 from main.admin import thread_pool
-from common import constant
+from common import constant, utils
+from main.admin.model_helper import commit
+
 initialised=False
 
 def handle_event_alarm(gpio_pin_code='', direction='', pin_value=''):
@@ -13,9 +15,9 @@ def handle_event_alarm(gpio_pin_code='', direction='', pin_value=''):
     zonealarm=models.ZoneAlarm.query.filter_by(gpio_pin_code=gpio_pin_code).first()
     if zonealarm:
         zonealarm.alarm_status = pin_value
-        zonealarm.updated_on = datetime.datetime.now()
+        zonealarm.updated_on = utils.get_base_location_now_date()
         zonealarm.notify_transport_enabled= False
-        db.session.commit()
+        commit()
     else:
         logger.warning('Unexpected mising zone alarm for gpio code {}'.format(gpio_pin_code))
 

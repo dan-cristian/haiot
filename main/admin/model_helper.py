@@ -15,7 +15,7 @@ from main import db
 def model_row_to_json(obj, operation=''):
     try:
         safe_obj = {}
-        obj.event_sent_datetime = str(datetime.datetime.now())
+        obj.event_sent_datetime = str(utils.get_base_location_now_date())
         obj.operation_type=operation
         obj.event_uuid = str(uuid.uuid4())
         table_cols=obj._sa_class_manager
@@ -25,7 +25,7 @@ def model_row_to_json(obj, operation=''):
 
         #safe_obj[constant.JSON_PUBLISH_RECORD_OPERATION]=operation
         safe_obj[constant.JSON_PUBLISH_SOURCE_HOST]=str(constant.HOST_NAME)
-        #safe_obj[constant.JSON_PUBLISH_DATE]=str(datetime.datetime.now())
+        #safe_obj[constant.JSON_PUBLISH_DATE]=str(utils.get_base_location_now_date())
         #safe_obj[constant.JSON_PUBLISH_TARGET_HOST]=constant.JSON_PUBLISH_VALUE_TARGET_HOST_ALL
         #removing infinite recursions and class noise
         #for attr in obj._sa_class_manager:
@@ -78,6 +78,8 @@ def check_table_schema(table, model_auto_update=False):
         read_drop_table(table, oex, model_auto_update)
     except InvalidRequestError:
         logger.warning('Error on check table schema {}, ignoring'.format(table))
+    except Exception, ex:
+        logger.warning('Unexpected error on check table, err={}'.format(ex))
 
 def read_drop_table(table, original_exception, drop_without_user_ask=False):
     if not drop_without_user_ask:
@@ -92,6 +94,7 @@ def read_drop_table(table, original_exception, drop_without_user_ask=False):
             commit()
         except Exception, ex:
             logger.warning('Something went wrong on drop, err {}'.format(ex))
+            db.session.rollback()
         logger.info('Creating missing schema object after table drop')
         db.create_all()
     else:
@@ -165,7 +168,7 @@ def populate_tables(model_auto_update=False):
         for tuple in temptarget_list:
             record=models.TemperatureTarget(id=tuple[0], code=tuple[1], target=tuple[2])
             db.session.add(record)
-            commit()
+        commit()
 
     value_list=[
             # hour in day, 24 hr format  0    4    8    12   16   20   
@@ -185,7 +188,7 @@ def populate_tables(model_auto_update=False):
         for tuple in value_list:
             record=models.SchedulePattern(id=tuple[0], name=tuple[1], pattern=tuple[2])
             db.session.add(record)
-            commit()
+        commit()
 
     value_list=[
             #id, zone_id, week_id, weekend_id
@@ -202,7 +205,7 @@ def populate_tables(model_auto_update=False):
             record=models.HeatSchedule(id=tuple[0], zone_id=tuple[1], pattern_week_id=tuple[2],
                                        pattern_weekend_id=tuple[3])
             db.session.add(record)
-            commit()
+        commit()
 
     check_table_schema(models.Node, model_auto_update)
     if len(models.Node.query.filter_by(name=constant.HOST_NAME).all()) == 0:
@@ -291,7 +294,7 @@ def populate_tables(model_auto_update=False):
         for tuple in module_list:
             db.session.add(models.Module(id=tuple[0], host_name=constant.HOST_NAME,
                                          name=tuple[1], active=tuple[2], start_order=tuple[3]))
-        commit()
+            commit()
 
     check_table_schema(models.GpioPin, model_auto_update)
     bbb_bcm_map={
@@ -345,7 +348,7 @@ def populate_tables(model_auto_update=False):
             commit()
             for pair in zonealarm_list[host_name]:
                 db.session.add(models.ZoneAlarm(pair[0], pair[1], host_name))
-            commit()
+        commit()
 
     check_table_schema(models.ZoneHeatRelay, model_auto_update)
     #fixme: mapping not correct
@@ -367,7 +370,7 @@ def populate_tables(model_auto_update=False):
             for pair in heat_relay_list[host_name]:
                 db.session.add(models.ZoneHeatRelay(zone_id=pair[0], gpio_pin_code=pair[1], host_name=host_name,
                                                     is_main_heat_source=(pair[0] == heat_main_source_zone_id)))
-            commit()
+        commit()
 
     #if True:
     check_table_schema(models.ZoneSensor, model_auto_update)

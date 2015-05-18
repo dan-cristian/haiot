@@ -5,6 +5,7 @@ from copy import deepcopy
 from main import db
 from main.admin.model_helper import commit
 import graphs
+from common import utils
 
 class DbEvent:
     def __init__(self):
@@ -21,12 +22,20 @@ class DbEvent:
     def get_deepcopy(self):
         return deepcopy(self)
 
+    #graph_save_frequency in seconds
     def save_changed_fields(self,current_record='',new_record='',notify_transport_enabled=False, save_to_graph=False,
-                            ignore_only_updated_on_change=True, debug=False):
+                            ignore_only_updated_on_change=True, debug=False, graph_save_frequency=0):
         try:
             if current_record:
+                if not current_record.last_save_to_graph:
+                    current_record.last_save_to_graph = datetime.min
+                save_to_graph_elapsed = (utils.get_base_location_now_date() -
+                                         current_record.last_save_to_graph).total_seconds()
                 current_record.last_commit_field_changed_list=[]
-                current_record.save_to_graph = save_to_graph
+                if save_to_graph_elapsed > graph_save_frequency:
+                    current_record.save_to_graph = save_to_graph
+                else:
+                    current_record.save_to_graph = False
                 current_record.notify_transport_enabled = notify_transport_enabled
             else:
                 new_record.save_to_graph = save_to_graph
@@ -63,6 +72,8 @@ class DbEvent:
                         new_record.last_commit_field_changed_list.append(column_name)
                 db.session.add(new_record)
             commit()
+            if hasattr(new_record, 'last_save_to_graph'):
+                new_record.last_save_to_graph = utils.get_base_location_now_date()
         except Exception, ex:
             logger.critical('Error when saving db changes {}, err={}'.format(new_record, ex))
             if len(db.session.dirty) > 0:
@@ -215,17 +226,20 @@ class ZoneSensor(db.Model):
     def __repr__(self):
         return 'ZoneSensor zone {} sensor {}'.format(self.zone_id,  self.sensor_name)
 
-class Node(db.Model, DbEvent):
+class Node(db.Model, DbEvent, graphs.NodeGraph):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
     ip = db.Column(db.String(15), nullable=False)
     mac = db.Column(db.String(17), nullable=False)
+    app_start_time = db.Column(db.DateTime())
     is_master_overall = db.Column(db.Boolean(), default=False)
     is_master_db_archive = db.Column(db.Boolean(), default=False)
     is_master_graph = db.Column(db.Boolean(), default=False)
     is_master_rule = db.Column(db.Boolean(), default=False)
     is_master_logging = db.Column(db.Boolean(), default=False)
     priority = db.Column(db.Integer)
+    master_overall_cycles = db.Column(db.Integer) #count of update cycles while node was master
+    run_overall_cycles = db.Column(db.Integer) #count of total update cycles
     execute_command=db.Column(db.String(50))
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -241,24 +255,6 @@ class Node(db.Model, DbEvent):
     def __repr__(self):
         return 'Node {} ip {}'.format(self.name,  self.ip)
 
-    def comparator_unique_graph_record(self):
-        return str(self.is_master_overall) + str(self.is_master_db_archive) \
-               + str(self.is_master_graph) + str(self.is_master_rule) + str(self.priority) + str(self.ip)
-
-#class GraphPlotly(db.Model):
-#    id = db.Column(db.Integer, primary_key=True)
-#    name = db.Column(db.String(50), unique=True)
-#    url = db.Column(db.String(255))
-#    field_list = db.Column(db.String(2000))
-
-#    def __init__(self, id='', name ='', url=''):
-#        if id:
-#            self.id = id
-#        self.name = name
-#        self.url = url
-#
-#    def __repr__(self):
-#        return 'GraphPlotly {} ip {}'.format(self.name,  self.url)
 
 class SystemMonitor(db.Model, graphs.SystemMonitorGraph, DbEvent):
     id = db.Column(db.Integer, primary_key=True)
@@ -271,7 +267,6 @@ class SystemMonitor(db.Model, graphs.SystemMonitorGraph, DbEvent):
 
     def __repr__(self):
         return '{} {} {}'.format(self.id, self.name, self.updated_on)
-
 
 
 class SystemDisk(db.Model, graphs.SystemDiskGraph, DbEvent):

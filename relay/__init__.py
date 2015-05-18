@@ -4,6 +4,8 @@ from flask import request
 from main import logger
 from common import constant, utils
 from main.admin import db, models
+from main.admin.model_helper import commit
+
 import gpio_pi_bbb
 
 initialised=False
@@ -19,7 +21,7 @@ def relay_update(gpio_pin_code=None, pin_value=None):
             result = pin_value
             gpiopin.pin_value = pin_value
             gpiopin.notify_transport_enabled = False
-            db.session.commit()
+            commit()
         else:
             logger.warning('Pin {} does not exists locally, is db data correct?'.format(gpio_pin_code))
     except Exception, ex:

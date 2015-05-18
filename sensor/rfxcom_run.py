@@ -20,7 +20,7 @@ def __rfx_reading(packet):
             type = packet.device.type_string
             __save_sensor_db(id=id, type=type, value_list=packet.values)
             global last_packet_received
-            last_packet_received = datetime.datetime.now()
+            last_packet_received = utils.get_base_location_now_date()
         except Exception:
             logger.info('Unknown rfx packet type {}'.format(packet))
 
@@ -32,7 +32,7 @@ def __save_sensor_db(id='', type='', value_list=[]):
         record.sensor_name = zone_sensor.sensor_name
     else:
         record.sensor_name = '(not defined) ' + id
-    record.updated_on = datetime.datetime.now()
+    record.updated_on = utils.get_base_location_now_date()
     record.type = type
     if 'Humidity' in value_list: record.humidity = utils.round_sensor_value(value_list['Humidity'])
     if 'Temperature' in value_list: record.temperature= utils.round_sensor_value(value_list['Temperature'])
@@ -67,7 +67,7 @@ def unload():
 def init():
     global transport, initialised, last_packet_received
     initialised = False
-    last_packet_received = datetime.datetime.now()
+    last_packet_received = utils.get_base_location_now_date()
     try:
         if constant.OS in constant.OS_LINUX:
             portpath = get_portpath_linux()
@@ -89,7 +89,7 @@ def thread_run():
     global transport, initialised, last_packet_received
     try:
         logger.debug('Waiting for RFX event')
-        time_elapsed_minutes = (datetime.datetime.now()-last_packet_received).seconds / 60
+        time_elapsed_minutes = (utils.get_base_location_now_date()-last_packet_received).seconds / 60
         if time_elapsed_minutes > 10:
             logger.warning('RFX event not received since {} minutes, device error?'.format(time_elapsed_minutes))
         if initialised:

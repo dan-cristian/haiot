@@ -6,6 +6,8 @@ from main import logger
 from main.admin import thread_pool
 from main.admin import models, db
 from common import constant, utils
+from main.admin.model_helper import commit
+
 import relay
 
 initialised=False
@@ -33,7 +35,7 @@ def heat_update(obj_dict={}):
                     pin_state = (pin_state == 1)
                     zone_heat_relay.heat_is_on = pin_state
                     zone_heat_relay.notify_transport_enabled = False
-                    db.session.commit()
+                    commit()
                 else:
                     logger.warning('Heat state zone_id {} unexpected val={} after setval={}'.format(zone_id, pin_state,
                                                                                                     pin_value))

@@ -1,7 +1,7 @@
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 import os
-from main import logger, app
+from main import logger, app, BIND_IP, BIND_PORT
 from main.admin import model_helper
 from flask import request, abort, send_file, render_template
 from common import constant
@@ -43,14 +43,16 @@ def init():
     app.register_blueprint(admin, url_prefix='/admin')
     app.register_blueprint(user, url_prefix='/user')
     global initialised
-    initialised = True
-    port = model_helper.get_param(constant.P_FLASK_WEB_PORT)
-    #for rh openshift we need to get gear ip
-    host = os.environ.get('OPENSHIFT_PYTHON_IP')
-    if not host:
+    if BIND_IP is not None and BIND_PORT is not None:
+        #host = os.environ.get('OPENSHIFT_PYTHON_IP')
+        host = BIND_IP
+        port = BIND_PORT
+    else:
         #otherwise listen on all interfaces
         host='0.0.0.0'
+        port = model_helper.get_param(constant.P_FLASK_WEB_PORT)
     flask_thread = helpers.FlaskInThread(app, host=host, port=port, debug=True, use_reloader=False)
+    initialised = True
     flask_thread.start()
     #app.run(debug=True, use_reloader=False, host='0.0.0.0')
 

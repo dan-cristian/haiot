@@ -26,7 +26,7 @@ def __update_ddns_rackspace():
         if cache == {} or cache is None:
             cache = {}
             cache['auth']={}
-            cache['auth']['expires']=str(datetime.datetime.now())
+            cache['auth']['expires']=str(utils.get_base_location_now_date())
 
         # get IP address
         try:
@@ -47,7 +47,7 @@ def __update_ddns_rackspace():
             logger.info('IP address was changed, old was {} new is {}'.format(cache['ip'], ip))
 
         cache['ip'] = ip
-        now = datetime.datetime.now()
+        now = utils.get_base_location_now_date()
         expires = dateutil.parser.parse(cache['auth']['expires'])
         now = pytz.utc.localize(now)
         expires = pytz.utc.localize(expires)
