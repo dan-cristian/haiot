@@ -229,8 +229,8 @@ class ZoneSensor(db.Model):
 class Node(db.Model, DbEvent, graphs.NodeGraph):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
-    ip = db.Column(db.String(15), nullable=False)
-    mac = db.Column(db.String(17), nullable=False)
+    ip = db.Column(db.String(15))
+    mac = db.Column(db.String(17))
     app_start_time = db.Column(db.DateTime())
     is_master_overall = db.Column(db.Boolean(), default=False)
     is_master_db_archive = db.Column(db.Boolean(), default=False)
@@ -243,7 +243,7 @@ class Node(db.Model, DbEvent, graphs.NodeGraph):
     execute_command=db.Column(db.String(50))
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    def __init__(self, id='', name ='', ip='', priority='', mac='', is_master_logging=False):
+    def __init__(self, id=None, name=None, ip=None, priority=None, mac=None, is_master_logging=False):
         if id:
             self.id = id
         self.name = name
