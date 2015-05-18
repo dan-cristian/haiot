@@ -273,13 +273,14 @@ def init():
         if not alt_path:
             logger.info('Plotly config not in environment var: {}'.format(env_var))
             env_var = 'OPENSHIFT_REPO_DIR'
-            alt_path = str(os.environ.get(env_var))
-            if alt_path == '':
+            alt_path = os.environ.get(env_var)
+            if alt_path is None:
                 logger.info('Plotly config not in environment var: {}'.format(env_var))
                 credential_file = model_helper.get_param(constant.P_PLOTLY_ALTERNATE_CONFIG)
                 alt_path = os.getcwd()+'/'+credential_file
             else:
-                alt_path += '/../data/.plotly.credentials'
+                logger.info('Plotly config found in environment var: {}, path={}'.format(env_var, alt_path))
+                alt_path = str(alt_path) + '/../data/.plotly.credentials'
         logger.info("Plotly standard config empty, trying alt_path={}".format(alt_path))
         with open(alt_path, 'r') as cred_file:
             data = cred_file.read().replace('\n','')
