@@ -6,6 +6,7 @@ from wtforms.ext.sqlalchemy.orm import model_form
 from main import db
 from common import constant
 from pydispatch import dispatcher
+from main.admin.model_helper import commit
 
 admin = Blueprint('admin', __name__, template_folder='templates')
 user = Blueprint('user', __name__, template_folder='templates')
