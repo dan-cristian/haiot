@@ -5,6 +5,7 @@ import os
 from main import logger, db
 from common import constant
 from main.admin import models
+from main.admin.model_helper import commit
 
 __pins_setup_list = []
 
