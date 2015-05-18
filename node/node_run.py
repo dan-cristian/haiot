@@ -118,6 +118,7 @@ def announce_node_state():
     try:
         logger.debug('I tell everyone my node state')
         current_record = models.Node.query.filter_by(name=constant.HOST_NAME).first()
+
         node = models.Node()
         node.name = constant.HOST_NAME
         if not current_record:

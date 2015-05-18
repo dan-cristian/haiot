@@ -254,12 +254,10 @@ def init():
         logger.debug('Model commit detected sender {} change {}'.format(sender, changes))
         event.on_models_committed(sender, changes)
 
-    logger.info('Looping until app exit')
+    logger.info('Feeding dogs with grass until app will exit')
     #stop app from exiting
-    from admin import thread_pool
     while not shutting_down:
         time.sleep(1)
-        #logger.debug('Threads: {}'.format(thread_pool.get_thread_status()))
     logger.critical('Looping ended, app will exit')
 
 def run(arg_list):

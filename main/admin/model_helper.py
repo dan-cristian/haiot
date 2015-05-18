@@ -93,7 +93,7 @@ def read_drop_table(table, original_exception, drop_without_user_ask=False):
             result = db.engine.execute('DROP TABLE '+table_name)
             commit()
         except Exception, ex:
-            logger.warning('Something went wrong on drop, err {}'.format(ex))
+            logger.info('Something went wrong on drop, ignoring err {}'.format(ex))
             db.session.rollback()
         logger.info('Creating missing schema object after table drop')
         db.create_all()
