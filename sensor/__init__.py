@@ -9,6 +9,8 @@ from common import utils, constant
 import owsensor_loop
 import rfxcom_run
 from main.admin import models
+from main.admin.model_helper import commit
+
 initialised=False
 
 def sensor_update(obj):
@@ -27,7 +29,7 @@ def sensor_update(obj):
             else:
                 record.sensor_name = '(not defined) {}'.format(address)
             record.type = utils.get_object_field_value(obj, 'type')
-            record.updated_on = datetime.datetime.now()
+            record.updated_on = utils.get_base_location_now_date()
             if obj.has_key('counters_a'): record.counters_a = utils.get_object_field_value(obj, 'counters_a')
             if obj.has_key('counters_b'): record.counters_b = utils.get_object_field_value(obj, 'counters_b')
             if obj.has_key('temperature'): record.temperature = utils.get_object_field_value(obj, 'temperature')
@@ -43,7 +45,7 @@ def sensor_update(obj):
             current_record = models.Sensor.query.filter_by(address=address).first()
             record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=False,
                                        save_to_graph=False)
-            db.session.commit()
+            commit()
     except Exception, ex:
         logger.warning('Error on sensor update, err {}'.format(ex))
         db.session.rollback()

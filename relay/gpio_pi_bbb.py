@@ -53,7 +53,7 @@ def __set_pin_dir_out(bcm_id=''):
             gpio_pin = __get_gpio_db_pin(bcm_id)
             if gpio_pin:
                 gpio_pin.pin_direction = 'out'
-                db.session.commit()
+                commit()
         return True
     except Exception, ex:
         logger.warning('Unexpected exception on pin {} direction OUT set, err {}'.format(bcm_id, ex))
@@ -70,7 +70,7 @@ def __set_pin_dir_in(bcm_id=''):
             gpio_pin = __get_gpio_db_pin(bcm_id)
             if gpio_pin:
                 gpio_pin.pin_direction = 'in'
-                db.session.commit()
+                commit()
         return True
     except Exception, ex:
         logger.warning('Unexpected exception on pin {} direction IN set, err {}'.format(bcm_id, ex))
@@ -100,7 +100,7 @@ def __is_pin_setup(bcm_id=''):
         if gpio_pin and not gpio_pin.is_active:
             logger.warning('Gpio pin={} is used not via me, conflict with ext. apps or unclean stop?'.format(bcm_id))
             gpio_pin.is_active = True
-            db.session.commit()
+            commit()
         return True
     except IOError:
         return False
@@ -150,7 +150,7 @@ def get_pin_bcm(bcm_id=''):
         gpio_pin = models.GpioPin.query.filter_by(pin_index = bcm_id, host_name = constant.HOST_NAME).first()
         if gpio_pin:
             gpio_pin.pin_value = pin_value
-            db.session.commit()
+            commit()
         return pin_value
     else:
         logger.critical('Unable to get pin bcm {}'.format(bcm_id))

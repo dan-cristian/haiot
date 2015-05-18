@@ -7,7 +7,7 @@ from main.admin import models
 from main.admin.model_helper import commit
 from main import db
 
-from common import constant
+from common import constant, utils
 import transport
 
 def __save_heat_state_db(zone='', heat_is_on=''):
@@ -16,7 +16,7 @@ def __save_heat_state_db(zone='', heat_is_on=''):
     if zone_heat_relay:
         #if zone_heat_relay.heat_is_on != heat_is_on:
             zone_heat_relay.heat_is_on = heat_is_on
-            zone_heat_relay.updated_on = datetime.datetime.now()
+            zone_heat_relay.updated_on = utils.get_base_location_now_date()
             logger.debug('Heat state changed to is-on={} in zone {}'.format(heat_is_on, zone.name))
             zone_heat_relay.notify_transport_enabled = True
             commit()
@@ -41,8 +41,8 @@ def __decide_action(zone, current_temperature, target_temperature):
 def __update_zone_heat(zone, heat_schedule, sensor):
     try:
         heat_is_on = False
-        minute = datetime.datetime.now().minute
-        hour = datetime.datetime.now().hour
+        minute = utils.get_base_location_now_date().minute
+        hour = utils.get_base_location_now_date().hour
         weekday = datetime.datetime.today().weekday()
         if weekday <= 4: #Monday=0
             schedule_pattern=models.SchedulePattern.query.filter_by(id=heat_schedule.pattern_week_id).first()
@@ -78,7 +78,7 @@ def loop_zones():
             if heat_schedule and zonesensor:
                 sensor = models.Sensor.query.filter_by(address=zonesensor.sensor_address).first()
                 if heat_schedule.active and sensor:
-                    sensor_last_update_seconds = (datetime.datetime.now()-sensor.updated_on).total_seconds()
+                    sensor_last_update_seconds = (utils.get_base_location_now_date()-sensor.updated_on).total_seconds()
                     if sensor_last_update_seconds > 60 * 60:
                         logger.warning('Sensor {} not updated in last 60 minutes, unusual'.format(sensor.sensor_name))
                     if __update_zone_heat(zone, heat_schedule, sensor):

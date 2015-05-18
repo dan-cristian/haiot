@@ -11,7 +11,6 @@ from flask import Flask
 from flask_sqlalchemy import models_committed
 
 
-
 #location for sqlite db
 DB_LOCATION=None
 #default logging
@@ -34,6 +33,8 @@ remote_logger=None
 SYSLOG_ADDRESS = None
 SYSLOG_PORT = None
 RUN_IN_LIVE = False
+BIND_IP = None
+BIND_PORT = None
 
 from . import logger
 
@@ -153,10 +154,10 @@ def init_logging():
         try:
             handler = logging.handlers.SysLogHandler(address = '/dev/log')
             logger.addHandler(handler)
-            logger.info('Syslog program started on {} at {}'.format(datetime.datetime.now(), socket.gethostname()))
+            logger.info('Syslog program started at {}'.format(socket.gethostname()))
         except Exception, ex:
             try:
-                ntl = logging.handlers.NTEventLogHandler(appname=log_name)
+                ntl = logging.handlers.NTEventLogHandler(appname='haiot')
                 logger.addHandler(ntl)
             except Exception, ex:
                 print 'Unable to init syslog handler err=' + ex
@@ -194,6 +195,10 @@ def init():
     db = SQLAlchemy(app)
     db.create_all()
 
+    logger.info('Checking db tables')
+    import admin.model_helper
+    global MODEL_AUTO_UPDATE
+    admin.model_helper.populate_tables(MODEL_AUTO_UPDATE)
 
     import transport
     transport.init()
@@ -203,7 +208,7 @@ def init():
         message = ''
         level = ''
         source_host = constant.HOST_NAME
-        datetime = utils.date_serialised(datetime.datetime.now())
+        datetime = utils.date_serialised(utils.get_base_location_now_date())
 
     import logging
     class TransportLogging(logging.Handler):
@@ -218,10 +223,6 @@ def init():
         logger.addHandler(TransportLogging())
         logger.info('Initialised logging via transport proxy')
 
-    logger.info('Checking db tables')
-    import admin.model_helper
-    global MODEL_AUTO_UPDATE
-    admin.model_helper.populate_tables(MODEL_AUTO_UPDATE)
 
     logger.info('Initialising events')
     from admin import event
@@ -305,6 +306,12 @@ def run(arg_list):
             # log=c:\tmp\iot-nohup.out
             global LOG_FILE
             LOG_FILE=s.split('=')[1]
+        elif 'bind_ip=' in s:
+            global BIND_IP
+            BIND_IP = s.split('=')[1]
+        elif 'bind_port=' in s:
+            global BIND_PORT
+            BIND_PORT = s.split('=')[1]
 
 
     global MODEL_AUTO_UPDATE

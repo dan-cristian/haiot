@@ -40,7 +40,7 @@ def node_update(obj={}):
             node.ip = utils.get_object_field_value(obj, utils.get_model_field_name(models.Node.ip))
             node.execute_command = utils.get_object_field_value(obj,
                                                         utils.get_model_field_name(models.Node.execute_command))
-            node.updated_on = datetime.datetime.now()
+            node.updated_on = utils.get_base_location_now_date()
             commit()
         else:
             logger.debug('Skipping node DB save, this node is master = {}'.format(
@@ -48,7 +48,7 @@ def node_update(obj={}):
             sent_date = utils.get_object_field_value(obj, 'event_sent_datetime')
             if not sent_date is None:
                 event_sent_date_time = utils.parse_to_date(sent_date)
-                seconds_elapsed = (datetime.datetime.now()-event_sent_date_time).total_seconds()
+                seconds_elapsed = (utils.get_base_location_now_date()-event_sent_date_time).total_seconds()
                 if seconds_elapsed>15:
                     logger.warning('Very slow mqtt, delay is {} seconds rate msg {}/min'.format(seconds_elapsed,
                                                                                     mqtt_io.mqtt_msg_count_per_minute))
@@ -64,7 +64,7 @@ def check_if_no_masters_overall():
 def update_master_state():
     master_overall_selected=False
     try:
-        alive_date_time = datetime.datetime.now() - datetime.timedelta(minutes=1)
+        alive_date_time = utils.get_base_location_now_date() - datetime.timedelta(minutes=1)
         node_list = models.Node.query.order_by(models.Node.priority).all()
         for node in node_list:
             #if recently alive, in order of id prio
@@ -99,7 +99,7 @@ def update_master_state():
                     else:
                         global since_when_i_should_be_master
                         #check seconds lapsed since cluster agreed I must be or lose master
-                        seconds_elapsed = (datetime.datetime.now() - since_when_i_should_be_master).total_seconds()
+                        seconds_elapsed = (utils.get_base_location_now_date() - since_when_i_should_be_master).total_seconds()
                         if check_if_no_masters_overall() or seconds_elapsed > 10:
                             variable.NODE_THIS_IS_MASTER_OVERALL = node.is_master_overall
                             logger.info('Change in node mastership, local node is master={}'.format(
@@ -110,25 +110,38 @@ def update_master_state():
                         if not variable.NODE_THIS_IS_MASTER_OVERALL:
                             #record date when cluster agreed I must be master
                             if since_when_i_should_be_master == datetime.datetime.max:
-                                since_when_i_should_be_master = datetime.datetime.now()
+                                since_when_i_should_be_master = utils.get_base_location_now_date()
     except Exception, ex:
         logger.warning('Error try_become_master, err {}'.format(ex))
 
 def announce_node_state():
     try:
         logger.debug('I tell everyone my node state')
-        node = models.Node.query.filter_by(name=constant.HOST_NAME).first()
-        if node is None:
-            node = models.Node()
-            node.name = constant.HOST_NAME
+        current_record = models.Node.query.filter_by(name=constant.HOST_NAME).first()
+        node = models.Node()
+        node.name = constant.HOST_NAME
+        if not current_record:
             node.priority = random.randint(1, 100)
-            logger.warning('Detected node host name change, new name={}'.format(constant.HOST_NAME))
-            db.session.add(node)
-        node.event_sent_datetime= datetime.datetime.now()
-        node.updated_on = datetime.datetime.now()
+            node.run_overall_cycles = 0
+            node.master_overall_cycles = 0
+        else:
+            node.run_overall_cycles = current_record.run_overall_cycles
+            node.master_overall_cycles = current_record.run_overall_cycles
+            if not node.run_overall_cycles:
+                node.run_overall_cycles = 0
+            if not node.master_overall_cycles:
+                node.master_overall_cycles = 0
+        node.event_sent_datetime= utils.get_base_location_now_date()
+        node.updated_on = utils.get_base_location_now_date()
         node.ip = constant.HOST_MAIN_IP
+        if variable.NODE_THIS_IS_MASTER_OVERALL == True:
+            node.master_overall_cycles += 1
+        node.run_overall_cycles += 1
         node.notify_transport_enabled = True
-        commit()
+        node.save_changed_fields(current_record=current_record, new_record=node, notify_transport_enabled=True,
+                                   save_to_graph=True, graph_save_frequency=60)
+
+        #commit()
     except Exception, ex:
         logger.error('Unable to announce my state, err={}'.format(ex))
 

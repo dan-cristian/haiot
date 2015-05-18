@@ -49,7 +49,7 @@ def save_to_db(dev):
         else:
             record.sensor_name = '(not defined) {}'.format(address)
         record.type = dev['type']
-        record.updated_on = datetime.datetime.now()
+        record.updated_on = utils.get_base_location_now_date()
         if dev.has_key('counters_a'): record.counters_a = dev['counters_a']
         if dev.has_key('counters_b'): record.counters_b = dev['counters_b']
         if dev.has_key('temperature'): record.temperature = dev['temperature']

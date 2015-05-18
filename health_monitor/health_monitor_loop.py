@@ -115,7 +115,7 @@ def __read_all_hdd_smart():
                         record.serial = words[1].replace('\r', '').replace('\n', '').lstrip()
                         # print 'Serial is {}'.format(serial)
                 # print ('Disk dev is {}'.format(disk_dev))
-                record.updated_on = datetime.datetime.now()
+                record.updated_on = utils.get_base_location_now_date()
                 if record.serial is None or record.serial == '':
                     logger.debug('This hdd will be skipped, probably does not exist if serial not retrieved')
                     record.serial = 'serial not available {} {}'.format(constant.HOST_NAME, record.hdd_disk_dev )
@@ -241,7 +241,7 @@ def __get_uptime_win_days():
     H, M, S = [int(v) for v in time.split(':')]
     if ampm.lower() == 'pm':
         H += 12
-    now = datetime.datetime.now()
+    now = utils.get_base_location_now_date()
     then = datetime.datetime(int(y), int(m), int(d), H, M)
     diff = now - then
     return diff.days
@@ -365,7 +365,7 @@ def __read_system_attribs():
                                                                     record.uptime_days))
         progress_status = 'Saving mem cpu uptime to db'
         record.name = constant.HOST_NAME
-        record.updated_on = datetime.datetime.now()
+        record.updated_on = utils.get_base_location_now_date()
         current_record = models.SystemMonitor.query.filter_by(name=record.name).first()
         record.save_changed_fields(current_record=current_record, new_record=record,
                                    notify_transport_enabled=True, save_to_graph=True)
@@ -445,7 +445,7 @@ def __read_disk_stats():
                     record.last_reads_completed_count = reads_completed
                     record.last_writes_completed_count = writes_completed
                     record.system_name = constant.HOST_NAME
-                    record.updated_on = datetime.datetime.now()
+                    record.updated_on = utils.get_base_location_now_date()
 
                     current_record = models.SystemDisk.query.filter_by(hdd_disk_dev=record.hdd_disk_dev,
                                                                    system_name=record.system_name).first()
@@ -458,24 +458,24 @@ def __read_disk_stats():
                         read_elapsed = -1
                         write_elapsed = -1
                         if record.last_reads_completed_count != current_record.last_reads_completed_count:
-                            record.last_reads_datetime = datetime.datetime.now()
+                            record.last_reads_datetime = utils.get_base_location_now_date()
                         else:
                             record.last_reads_datetime = current_record.last_reads_datetime
                         if record.last_writes_completed_count != current_record.last_writes_completed_count:
-                            record.last_writes_datetime = datetime.datetime.now()
+                            record.last_writes_datetime = utils.get_base_location_now_date()
                         else:
                             record.last_writes_datetime = current_record.last_writes_datetime
                         if current_record.last_reads_datetime:
-                            read_elapsed = (datetime.datetime.now() - record.last_reads_datetime).total_seconds()
+                            read_elapsed = (utils.get_base_location_now_date() - record.last_reads_datetime).total_seconds()
                             record.last_reads_elapsed = utils.round_sensor_value(read_elapsed)
                         if current_record.last_writes_datetime:
-                            write_elapsed = (datetime.datetime.now() - record.last_writes_datetime).total_seconds()
+                            write_elapsed = (utils.get_base_location_now_date() - record.last_writes_datetime).total_seconds()
                             record.last_writes_elapsed = utils.round_sensor_value(write_elapsed)
                         logger.debug('Disk {} elapsed read {}s write {}s'.format(device_name,
                                                                                 int(read_elapsed), int(write_elapsed)))
                     else:
-                        record.last_reads_datetime = datetime.datetime.now()
-                        record.last_writes_datetime = datetime.datetime.now()
+                        record.last_reads_datetime = utils.get_base_location_now_date()
+                        record.last_writes_datetime = utils.get_base_location_now_date()
                         record.serial = 'serial not available {} {}'.format(constant.HOST_NAME, record.hdd_disk_dev)
                     record.save_changed_fields(current_record=current_record, new_record=record,
                                                notify_transport_enabled=True, save_to_graph=True, debug=False)

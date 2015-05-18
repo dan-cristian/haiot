@@ -56,7 +56,7 @@ def on_disconnect(client, userdata, rc):
 def on_subscribe(client, userdata, mid, granted_qos):
     global client_connected
     client_connected = True
-    print 'MQTT subscribed'
+    #print 'MQTT subscribed'
 
 #def on_subscribe(client, userdata, mid, granted_qos):
 #    logger.info('Subscribed as user {} mid {} qos {}'.format(str(userdata), str(mid), str(granted_qos)))

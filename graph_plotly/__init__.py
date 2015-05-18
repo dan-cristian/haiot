@@ -78,12 +78,12 @@ def clean_graph_memory(graph_unique_name=''):
 
 def get_reference_trace_for_append(graph_unique_name='', shape_type=''):
     global g_reference_trace_id
-    return graph_objs.Scatter(x=[datetime.datetime.now()], y=[0], name=graph_unique_name, text=g_reference_trace_id,
+    return graph_objs.Scatter(x=[utils.get_base_location_now_date()], y=[0], name=graph_unique_name, text=g_reference_trace_id,
                               mode='none', showlegend=False, line = graph_objs.Line(shape=shape_type))
 
 def download_trace_id_list(graph_unique_name='', shape_type=''):
     logger.info('Downloading online traces in memory, graph {} shape {}'.format(graph_unique_name, shape_type))
-    start_date = datetime.datetime.now()
+    start_date = utils.get_base_location_now_date()
     try:
         result=py.file_ops.mkdirs(get_folder_name())
         logger.debug('Created archiving folder {} result {}'.format(get_folder_name(), result))
@@ -97,7 +97,7 @@ def download_trace_id_list(graph_unique_name='', shape_type=''):
     trace_list = []
     graph_url = None
     trace_ref_append = get_reference_trace_for_append(graph_unique_name=graph_unique_name, shape_type=shape_type)
-    trace_ref_extend = graph_objs.Scatter(x=[datetime.datetime.now()],y=[0],name=graph_unique_name,mode='none',
+    trace_ref_extend = graph_objs.Scatter(x=[utils.get_base_location_now_date()],y=[0],name=graph_unique_name,mode='none',
                                           showlegend=False, line = graph_objs.Line(shape=shape_type))
     trace_empty = graph_objs.Scatter(x=[], y=[], line = graph_objs.Line(shape=shape_type))
     #first time we try an append, assuming trace does not exist
@@ -138,13 +138,13 @@ def download_trace_id_list(graph_unique_name='', shape_type=''):
             logger.warning('Unable to get figure {} err={}'.format(graph_url, ex))
     else:
         logger.critical('Unable to get or setup remote graph {}'.format(graph_unique_name))
-    elapsed = (datetime.datetime.now()-start_date).seconds
+    elapsed = (utils.get_base_location_now_date()-start_date).seconds
     logger.info('Download {} completed in {} seconds'.format(graph_unique_name, elapsed))
 
 def get_folder_name():
-    year = datetime.datetime.now().year
-    month = datetime.datetime.now().month
-    #week =  datetime.datetime.now().weekday()
+    year = utils.get_base_location_now_date().year
+    month = utils.get_base_location_now_date().month
+    #week =  utils.get_base_location_now_date().weekday()
     return str(year) + '-' + ('0'+str(month))[-2:]
 
 def get_graph_full_name_path(graph_unique_name=''):
@@ -268,9 +268,19 @@ def init():
     #or less secure sign_in code below
     #py.sign_in(model_helper.get_param(constant.P_PLOTLY_USERNAME),model_helper.get_param(constant.P_PLOTLY_APIKEY))
     if py.get_credentials()['username'] == '' or py.get_credentials()['api_key'] == '':
-        credential_file = model_helper.get_param(constant.P_PLOTLY_ALTERNATE_CONFIG)
-        alt_path = os.getcwd()+'/'+credential_file
-        logger.info("Plotly standard config does not contain an username, trying db folder config {}".format(alt_path))
+        env_var='PLOTLY_CREDENTIALS_PATH'
+        alt_path = os.environ.get(env_var)
+        if not alt_path:
+            logger.info('Plotly config not in environment var: {}'.format(env_var))
+            env_var = 'OPENSHIFT_REPO_DIR'
+            alt_path = str(os.environ.get(env_var))
+            if not alt_path:
+                logger.info('Plotly config not in environment var: {}'.format(env_var))
+                credential_file = model_helper.get_param(constant.P_PLOTLY_ALTERNATE_CONFIG)
+                alt_path = os.getcwd()+'/'+credential_file
+            else:
+                alt_path += '/../data/.plotly.credentials'
+        logger.info("Plotly standard config empty, trying alt_path={}".format(alt_path))
         with open(alt_path, 'r') as cred_file:
             data = cred_file.read().replace('\n','')
         if len(data) > 0:
@@ -281,12 +291,12 @@ def init():
                 py.sign_in(username, api_key)
                 global initialised
                 initialised = True
-            else:
-                logger.info("Plotly init from db folder config {}{} not ok, trying with db data".format(os.getcwd(),
-                    credential_file))
-                #alternate way if reading data from DB
-                py.sign_in(model_helper.get_param(constant.P_PLOTLY_USERNAME),
-                           model_helper.get_param(constant.P_PLOTLY_APIKEY))
+            #else:
+            #    logger.info("Plotly init from db folder config {}{} not ok, trying with db data".format(os.getcwd(),
+            #        credential_file))
+            #    #alternate way if reading data from DB
+            #    py.sign_in(model_helper.get_param(constant.P_PLOTLY_USERNAME),
+            #               model_helper.get_param(constant.P_PLOTLY_APIKEY))
     else:
         logger.info("Plotly standard config found with username {}".format(py.get_credentials()['username']))
         initialised = True

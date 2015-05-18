@@ -9,7 +9,7 @@ import urllib2
 import urllib
 
 from main import logger
-from common import constant
+from common import constant, utils
 from main.admin import model_helper
 import transport
 
@@ -43,14 +43,14 @@ def do_line(line):
 def get_prefix(pinindex, value):
     prefix = '{"host_origin":"%s", "command":"alarmevent", "datetime":"%s", "pinindex":"%s", "value":"%s"' % (
     socket.gethostname(),
-    urllib.quote(str(datetime.datetime.now())), pinindex, value)
+    urllib.quote(str(utils.get_base_location_now_date())), pinindex, value)
     return prefix
 
 
 def alert(pinindex, status):
     host = model_helper.get_param(constant.P_MZP_SERVER_URL)
     request = host + 'cmd?command=alarmevent&pinindex=' + pinindex \
-              + '&status=' + status + '&datetime=' + urllib.quote(str(datetime.datetime.now())) + '&action=none'
+              + '&status=' + status + '&datetime=' + urllib.quote(str(utils.get_base_location_now_date())) + '&action=none'
     #request=urllib.quote(request)
     print (request)
     try:

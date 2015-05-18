@@ -6,6 +6,7 @@ import plotly.plotly as py
 from plotly import graph_objs
 from plotly.grid_objs import Column, Grid
 import datetime
+from common import utils
 
 def test1():
     trace0 = graph_objs.Scatter(
@@ -46,7 +47,7 @@ def test2():
 
 def test3():
     column_1 = Column([1, 2, 3], 'column 1')
-    column_2 = Column(['a', 'b', datetime.datetime.now()], 'column 2')
+    column_2 = Column(['a', 'b', utils.get_base_location_now_date()], 'column 2')
     grid = Grid([column_1, column_2])
 
     unique_url = py.grid_ops.upload(grid, 'grid1', world_readable=True)

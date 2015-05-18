@@ -73,3 +73,6 @@ def get_table_name(model_obj):
 
 def round_sensor_value(val):
     return math.ceil(float(val)*10)/10
+
+def get_base_location_now_date():
+    return datetime.datetime.now()

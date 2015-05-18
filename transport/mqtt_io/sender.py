@@ -8,7 +8,7 @@ import transport.mqtt_io
 
 def send_message(txt):
     try:
-        #logger.debug('Sending message at {} [{}] '.format(datetime.datetime.now(), txt))
+        #logger.debug('Sending message at {} [{}] '.format(utils.get_base_location_now_date(), txt))
         if transport.mqtt_io.client_connected:
             transport.mqtt_io.mqtt_client.publish(transport.mqtt_io.topic, txt)
         else:

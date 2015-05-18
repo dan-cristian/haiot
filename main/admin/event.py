@@ -97,9 +97,9 @@ def mqtt_thread_run():
             if constant.JSON_PUBLISH_GRAPH_X in obj:
                 if obj[constant.JSON_PUBLISH_SAVE_TO_GRAPH]:
                     if graph_plotly.initialised:
-                        start = datetime.datetime.now()
+                        start = utils.get_base_location_now_date()
                         graph_plotly.upload_data(obj)
-                        elapsed = (datetime.datetime.now() - start).total_seconds()
+                        elapsed = (utils.get_base_location_now_date() - start).total_seconds()
                         logger.debug('Plotly upload took {}s'.format(elapsed))
                     else:
                         logger.debug('Graph not initialised on obj upload to graph')

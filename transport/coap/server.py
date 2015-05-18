@@ -15,6 +15,7 @@ from twisted.python import log
 import txthings.resource as resource
 import txthings.coap as coap
 
+from common import utils
 
 class CounterResource (resource.CoAPResource):
     """
@@ -112,7 +113,7 @@ class TimeResource(resource.CoAPResource):
         reactor.callLater(60, self.notify)
 
     def render_GET(self, request):
-        response = coap.Message(code=coap.CONTENT, payload=datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
+        response = coap.Message(code=coap.CONTENT, payload=utils.get_base_location_now_date().strftime("%Y-%m-%d %H:%M"))
         return defer.succeed(response)
 
 class CoreResource(resource.CoAPResource):
