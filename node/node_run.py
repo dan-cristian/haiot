@@ -128,6 +128,8 @@ def announce_node_state():
         else:
             node.run_overall_cycles = current_record.run_overall_cycles
             node.master_overall_cycles = current_record.run_overall_cycles
+            node.is_master_logging = current_record.is_master_logging
+            node.is_master_overall = current_record.is_master_overall
             if not node.run_overall_cycles:
                 node.run_overall_cycles = 0
             if not node.master_overall_cycles:
