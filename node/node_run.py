@@ -140,7 +140,7 @@ def announce_node_state():
         node.run_overall_cycles += 1
         node.notify_transport_enabled = True
         node.save_changed_fields(current_record=current_record, new_record=node, notify_transport_enabled=True,
-                                   save_to_graph=True, graph_save_frequency=60)
+                                   save_to_graph=True, graph_save_frequency=120)
 
         #commit()
     except Exception, ex:
