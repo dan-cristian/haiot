@@ -6,6 +6,7 @@ import re
 import datetime
 from main import logger
 import math
+import pytz
 
 from collections import namedtuple
 
@@ -74,5 +75,13 @@ def get_table_name(model_obj):
 def round_sensor_value(val):
     return math.ceil(float(val)*10)/10
 
+#http://pytz.sourceforge.net/, get date in a naive format
 def get_base_location_now_date():
-    return datetime.datetime.now()
+    tz_base_name = pytz.country_timezones['ro'][0]
+    tz = pytz.timezone(tz_base_name)
+    utc = pytz.timezone('UTC')
+    now = datetime.datetime.utcnow()
+    utc.localize(datetime.datetime.now())
+    delta =  utc.localize(now) - tz.localize(now)
+    local_date_as_base = now + delta
+    return local_date_as_base
