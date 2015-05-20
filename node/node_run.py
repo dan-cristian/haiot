@@ -127,7 +127,7 @@ def announce_node_state():
             node.master_overall_cycles = 0
         else:
             node.run_overall_cycles = current_record.run_overall_cycles
-            node.master_overall_cycles = current_record.run_overall_cycles
+            node.master_overall_cycles = current_record.master_overall_cycles
             node.is_master_logging = current_record.is_master_logging
             node.is_master_overall = current_record.is_master_overall
             if not node.run_overall_cycles:
@@ -137,7 +137,7 @@ def announce_node_state():
         node.event_sent_datetime= utils.get_base_location_now_date()
         node.updated_on = utils.get_base_location_now_date()
         node.ip = constant.HOST_MAIN_IP
-        if variable.NODE_THIS_IS_MASTER_OVERALL == True:
+        if variable.NODE_THIS_IS_MASTER_OVERALL:
             node.master_overall_cycles += 1
         node.run_overall_cycles += 1
         node.notify_transport_enabled = True

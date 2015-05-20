@@ -76,6 +76,7 @@ def round_sensor_value(val):
     return math.ceil(float(val)*10)/10
 
 #http://pytz.sourceforge.net/, get date in a naive format
+#http://stackoverflow.com/questions/12691081/from-a-timezone-and-a-utc-time-get-the-difference-in-seconds-vs-local-time-at-t
 def get_base_location_now_date():
     tz_base_name = pytz.country_timezones['ro'][0]
     tz = pytz.timezone(tz_base_name)
