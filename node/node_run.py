@@ -81,7 +81,7 @@ def update_master_state():
                     master_overall_selected = True
             else:
                 if master_overall_selected and node.is_master_overall:
-                    logger.info('Node {} should lose master status, if alive'.format(node.name))
+                    logger.debug('Node {} should lose master status, if alive'.format(node.name))
                     if node.name == constant.HOST_NAME:
                         node.is_master_overall = False
                         node.notify_enabled_ = True
