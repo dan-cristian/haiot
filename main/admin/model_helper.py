@@ -213,13 +213,13 @@ def populate_tables(model_auto_update=False):
         master_logging = False
         if constant.HOST_NAME=='nas':
             master_logging = True
-            priority = 1
-        elif constant.HOST_NAME=='netbook':
             priority = 2
+        elif constant.HOST_NAME=='netbook':
+            priority = 0
         elif constant.HOST_NAME=='server':
             priority = 3
         elif constant.HOST_NAME=='ex-std-node466.prod.rhcloud.com':
-            priority = 0
+            priority = 1
         else:
             priority=random.randint(3, 100)
         db.session.add(models.Node('', name=constant.HOST_NAME, ip=constant.HOST_MAIN_IP, priority=priority,
