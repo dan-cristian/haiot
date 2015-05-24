@@ -1,5 +1,5 @@
 from pydispatch import dispatcher
-import datetime
+import threading
 from main import logger, remote_logger
 from main.admin import thread_pool
 from common import constant, variable, utils
@@ -13,7 +13,9 @@ import node
 import sensor
 import heat
 
-mqtt_event_list = []
+
+__mqtt_event_list = []
+#__mqtt_lock = threading.Lock()
 
 def handle_local_event_db_post(model, row):
     #executed on local db changes done via web ui only
@@ -30,7 +32,13 @@ def handle_local_event_db_post(model, row):
         transport.send_message_json(json = txt)
 
 def handle_event_mqtt_received(client, userdata, topic, obj):
-    mqtt_event_list.append(obj)
+    #global __mqtt_lock
+    #__mqtt_lock.acquire()
+    try:
+        __mqtt_event_list.append(obj)
+    finally:
+        #__mqtt_lock.release()
+        pass
 
 def on_models_committed(sender, changes):
     try:
@@ -50,66 +58,72 @@ def on_models_committed(sender, changes):
 
 
 def mqtt_thread_run():
-    last_count = len(mqtt_event_list)
-    for obj in mqtt_event_list:
-        mqtt_event_list.remove(obj)
-        #events received via mqtt transport
-        table = None
-        #fixme: make it generic to work with any transport
-        if constant.JSON_PUBLISH_TABLE in obj:
-            table = str(obj[constant.JSON_PUBLISH_TABLE])
-            if table == utils.get_table_name(models.Node):#'Node':
-                node.node_run.node_update(obj)
-                if 'execute_command' in obj:
-                    execute_command = obj['execute_command']
-                    host_name = obj['name']
-                    if host_name == constant.HOST_NAME and execute_command != '':
-                        main.execute_command(execute_command)
-            elif table == utils.get_table_name(models.ZoneHeatRelay):
-                if heat.initialised:
-                    heat.heat_update(obj)
-            elif table == utils.get_table_name(models.Sensor):
-                sensor.sensor_update(obj)
+    #global __mqtt_lock
+    #__mqtt_lock.acquire()
+    try:
+        last_count = len(__mqtt_event_list)
+        for obj in __mqtt_event_list:
+            __mqtt_event_list.remove(obj)
+            #events received via mqtt transport
+            table = None
+            #fixme: make it generic to work with any transport
+            if constant.JSON_PUBLISH_TABLE in obj:
+                table = str(obj[constant.JSON_PUBLISH_TABLE])
+                if table == utils.get_table_name(models.Node):#'Node':
+                    node.node_run.node_update(obj)
+                    if 'execute_command' in obj:
+                        execute_command = obj['execute_command']
+                        host_name = obj['name']
+                        if host_name == constant.HOST_NAME and execute_command != '':
+                            main.execute_command(execute_command)
+                elif table == utils.get_table_name(models.ZoneHeatRelay):
+                    if heat.initialised:
+                        heat.heat_update(obj)
+                elif table == utils.get_table_name(models.Sensor):
+                    sensor.sensor_update(obj)
 
-        if constant.JSON_MESSAGE_TYPE in obj:
-            if variable.NODE_THIS_IS_MASTER_LOGGING:
-                if obj['source_host'] != constant.HOST_NAME:
-                    levelname = obj['level']
-                    msg = obj['message']
-                    msgdatetime = obj['datetime']
-                    source_host = obj['source_host']
-                    message = '{}, {}, {}'.format(source_host, msgdatetime, msg)
-                    remote_logger
-                    if levelname == 'INFO':
-                        remote_logger.info(message)
-                    elif levelname == 'WARNING':
-                        remote_logger.warning(message)
-                    elif levelname == 'CRITICAL':
-                        remote_logger.critical(message)
-                    elif levelname == 'ERROR':
-                        remote_logger.error(message)
-                    elif levelname == 'DEBUG':
-                        remote_logger.debug(message)
-                #else:
-                    #logger.warning('This node is master logging but emits remote logs, is a circular reference')
+            if constant.JSON_MESSAGE_TYPE in obj:
+                if variable.NODE_THIS_IS_MASTER_LOGGING:
+                    if obj['source_host'] != constant.HOST_NAME:
+                        levelname = obj['level']
+                        msg = obj['message']
+                        msgdatetime = obj['datetime']
+                        source_host = obj['source_host']
+                        message = '{}, {}, {}'.format(source_host, msgdatetime, msg)
+                        remote_logger
+                        if levelname == 'INFO':
+                            remote_logger.info(message)
+                        elif levelname == 'WARNING':
+                            remote_logger.warning(message)
+                        elif levelname == 'CRITICAL':
+                            remote_logger.critical(message)
+                        elif levelname == 'ERROR':
+                            remote_logger.error(message)
+                        elif levelname == 'DEBUG':
+                            remote_logger.debug(message)
+                    #else:
+                        #logger.warning('This node is master logging but emits remote logs, is a circular reference')
 
-        if variable.NODE_THIS_IS_MASTER_OVERALL:
-            if constant.JSON_PUBLISH_GRAPH_X in obj:
-                if obj[constant.JSON_PUBLISH_SAVE_TO_GRAPH]:
-                    if graph_plotly.initialised:
-                        start = utils.get_base_location_now_date()
-                        graph_plotly.upload_data(obj)
-                        elapsed = (utils.get_base_location_now_date() - start).total_seconds()
-                        logger.debug('Plotly upload took {}s'.format(elapsed))
+            if variable.NODE_THIS_IS_MASTER_OVERALL:
+                if constant.JSON_PUBLISH_GRAPH_X in obj:
+                    if obj[constant.JSON_PUBLISH_SAVE_TO_GRAPH]:
+                        if graph_plotly.initialised:
+                            start = utils.get_base_location_now_date()
+                            graph_plotly.upload_data(obj)
+                            elapsed = (utils.get_base_location_now_date() - start).total_seconds()
+                            logger.debug('Plotly upload took {}s'.format(elapsed))
+                        else:
+                            logger.debug('Graph not initialised on obj upload to graph')
                     else:
-                        logger.debug('Graph not initialised on obj upload to graph')
+                        pass
                 else:
-                    pass
-            else:
-                logger.debug('Mqtt event without graphing capabilities {}'.format(obj))
+                    logger.debug('Mqtt event without graphing capabilities {}'.format(obj))
 
-        if len(mqtt_event_list) > last_count:
-            logger.debug('Not keeping up with {} mqtt events'.format(len(mqtt_event_list)))
+            if len(__mqtt_event_list) > last_count:
+                logger.debug('Not keeping up with {} mqtt events'.format(len(__mqtt_event_list)))
+    finally:
+        #__mqtt_lock.release()
+        pass
 
 def init():
     #http://pydispatcher.sourceforge.net/
