@@ -28,12 +28,15 @@ def __search_ups(port_no):
         try:
             ser.flushInput()
             ser.flushOutput()
-            ser.write('I')
-            while True:
+            for i in range(0, 3):
+                ser.write('I')
                 time.sleep(0.5)
                 response = ser.readline()
-                logger.info('Got serial response [{}] on ups init'.format(response))
-                break;
+                if response != '':
+                    logger.info('Got serial response [{}] on ups init port {}'.format(response, port_no))
+                    break;
+                else:
+                    logger.info('Got empty response on ups init port {}'.format(port_no))
         except Exception, ex:
             logger.warning('Unable to init ups legrand on serial port {}, err={}'.format(ser.port, ex))
         finally:
