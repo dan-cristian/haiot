@@ -95,6 +95,7 @@ def __read_ups_status():
                 __ups.BeeperOn = (__ups.OtherStatus[7] == '1')
 
             record = models.Ups()
+            record.name = __ups.Name
             record.system_name = constant.HOST_NAME
             record.input_voltage = __ups.InputVoltage
             record.remaining_minutes = __ups.RemainingMinutes
