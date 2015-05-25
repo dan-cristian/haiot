@@ -57,7 +57,7 @@ def __search_ups(port_no):
     ser.port = port_no
     __open_port(ser)
     if ser.isOpen():
-        for i in range(0, 3):
+        for i in range(0, 4):
             response = __write_read_port(ser, 'I\r')
             if response != '':
                 logger.info('Got serial response [{}] on ups init port {}'.format(response, port_no))
@@ -76,7 +76,7 @@ def __read_ups_status():
     status = __write_read_port(__serial, 'Q1\r')
     if status != '':
         status = status.replace('(','')
-        atoms = status.split(sep=' ')
+        atoms = status.split()
         if len(atoms) >= 8:
             __ups.InputVoltage = atoms[0]
             __ups.RemainingMinutes = atoms[1]
