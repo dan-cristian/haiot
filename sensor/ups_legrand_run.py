@@ -58,7 +58,7 @@ def __search_ups(port_no):
     __open_port(ser)
     if ser.isOpen():
         for i in range(0, 3):
-            response = __write_read_port('I\r')
+            response = __write_read_port(__serial, 'I\r')
             if response != '':
                 logger.info('Got serial response [{}] on ups init port {}'.format(response, port_no))
                 __serial = ser
