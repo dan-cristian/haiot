@@ -32,7 +32,7 @@ def __search_ups(port_no):
             ser.flushInput()
             ser.flushOutput()
             for i in range(0, 3):
-                ser.write('I')
+                ser.write('I\r')
                 time.sleep(0.5)
                 response = ser.readline()
                 if response != '':
