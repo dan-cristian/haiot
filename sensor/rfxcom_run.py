@@ -1,12 +1,12 @@
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
 from main import logger
-import glob
-import datetime
+
 from RFXtrx.pyserial import PySerialTransport
 import RFXtrx
 from main.admin import models
 from common import constant, utils
+import serial_common
 
 initialised = False
 transport = None
@@ -42,24 +42,7 @@ def __save_sensor_db(id='', type='', value_list=[]):
     record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
                                    save_to_graph=True, ignore_only_updated_on_change=True)
 
-def get_portpath_linux():
-    #/sys/bus/usb/devices/2-1.2/2-1.2:1.0/ttyUSB0/tty/ttyUSB0/dev
-    #/sys/bus/usb/devices/2-1.2/product
-    logger.info('Searching for RFXCOM devices on linux')
-    path_list = glob.glob('/sys/bus/usb/devices/*/*/*/*/tty*/dev')
-    for path in path_list:
-        words = path.split('/')
-        dev_path = '/dev/'+words[len(words)-2]
-        root_path = ''
-        for index in range(0, len(words) - 5):
-            root_path = root_path + '/' + words[index]
-        f = open(root_path+'/product')
-        product = f.readline()
-        f.close()
-        if 'RFXtrx433' in product:
-            logger.info('Found RFXCOM RFXtrx433 device at {}'.format(dev_path))
-            return dev_path
-    return None
+
 
 def unload():
     pass
@@ -70,7 +53,7 @@ def init():
     last_packet_received = utils.get_base_location_now_date()
     try:
         if constant.OS in constant.OS_LINUX:
-            portpath = get_portpath_linux()
+            portpath = serial_common.get_portpath_linux('RFXtrx433')
         else:
             portpath = None
             #fixme windows autodetect version

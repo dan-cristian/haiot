@@ -8,6 +8,7 @@ from main import logger
 from common import utils, constant
 import owsensor_loop
 import rfxcom_run
+import ups_legrand_run
 from main.admin import models
 from main.admin.model_helper import commit
 
@@ -61,8 +62,10 @@ def unload():
 def init():
     logger.info('Sensor module initialising')
     if owsensor_loop.init():
-        thread_pool.add_callable(owsensor_loop.thread_run, run_interval_second=30)
+        thread_pool.add_callable(owsensor_loop.thread_run, run_interval_second=60)
     if rfxcom_run.init():
-        thread_pool.add_callable(rfxcom_run.thread_run, run_interval_second=30)
+        thread_pool.add_callable(rfxcom_run.thread_run, run_interval_second=60)
+    if ups_legrand_run.init():
+        thread_pool.add_callable(ups_legrand_run.thread_run, run_interval_second=60)
     global initialised
     initialised = True
