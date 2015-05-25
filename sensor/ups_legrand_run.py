@@ -12,9 +12,12 @@ initialised = False
 __serial = None
 
 def __open_port(ser):
-    ser.baudrate = 9600
+    ser.baudrate = 2400
     ser.timeout = 3
     ser.writeTimeout = 3
+    ser.parity = serial.PARITY_NONE
+    ser.stopbits = serial.STOPBITS_ONE
+    ser.bytesize = serial.EIGHTBITS
     try:
         ser.open()
     except Exception, ex:
