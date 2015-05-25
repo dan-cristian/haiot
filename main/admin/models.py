@@ -268,6 +268,25 @@ class SystemMonitor(db.Model, graphs.SystemMonitorGraph, DbEvent):
     def __repr__(self):
         return '{} {} {}'.format(self.id, self.name, self.updated_on)
 
+class Ups(db.Model, graphs.UpsGraph, DbEvent):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True)
+    system_name = db.Column(db.String(50))
+    port = db.Column(db.String(50))
+    input_voltage = db.Column(db.Float)
+    remaining_minutes = db.Column(db.Float)
+    output_voltage = db.Column(db.Float)
+    load_percent = db.Column(db.Float)
+    power_frequency = db.Column(db.Float)
+    battery_voltage = db.Column(db.Float)
+    temperature = db.Column(db.Float)
+    power_failed = db.Column(db.Boolean(), default=False)
+    beeper_on =db.Column(db.Boolean(), default=False)
+    test_in_progress = db.Column(db.Boolean(), default=False)
+    other_status= db.Column(db.String(50))
+    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+    def __repr__(self):
+        return '{} {} {}'.format(self.id, self.name, self.updated_on)
 
 class SystemDisk(db.Model, graphs.SystemDiskGraph, DbEvent):
     id = db.Column(db.Integer, primary_key=True)
