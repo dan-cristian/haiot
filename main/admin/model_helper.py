@@ -236,6 +236,7 @@ def populate_tables(model_auto_update=False):
     check_table_schema(models.SystemMonitor, model_auto_update)
     check_table_schema(models.SystemDisk, model_auto_update)
     check_table_schema(models.Sensor, model_auto_update)
+    check_table_schema(models.Ups, model_auto_update)
     #if len(models.Sensor.query.all()) == 0:
         #logger.info('Populating Sensor with a test value')
         #sens = models.Sensor(address='ADDRESSTEST')
