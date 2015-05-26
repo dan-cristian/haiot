@@ -2,7 +2,7 @@ __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
 import sys
 import time
-import logging
+import os
 from watchdog.observers import Observer
 from watchdog.events import LoggingEventHandler, FileSystemEventHandler
 from pydispatch import dispatcher
@@ -29,7 +29,7 @@ class EventHandler(FileSystemEventHandler):
         pass
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO,format='%(asctime)s - %(message)s',datefmt='%Y-%m-%d %H:%M:%S')
+    #logging.basicConfig(level=logging.INFO,format='%(asctime)s - %(message)s',datefmt='%Y-%m-%d %H:%M:%S')
     path = sys.argv[1] if len(sys.argv) > 1 else '.'
     event_handler = EventHandler()
     observer = Observer()
@@ -52,8 +52,11 @@ def init():
     global __observer, initialised
     path = model_helper.get_param(constant.P_MOTION_VIDEO_PATH)
     logger.info('Initialising file watchdog for folder={}'.format(path))
-    event_handler = EventHandler()
-    __observer = Observer()
-    __observer.schedule(event_handler, path, recursive=True)
-    initialised = True
-    __observer.start()
+    if os.path.exists(path):
+        event_handler = EventHandler()
+        __observer = Observer()
+        __observer.schedule(event_handler, path, recursive=True)
+        initialised = True
+        __observer.start()
+    else:
+        logger.warning('Filewatch not initialised watch path={} not found'.format(path))
