@@ -117,8 +117,9 @@ def populate_tables(model_auto_update=False):
             ['13', constant.P_MQTT_HOST_3, 'iot.eclipse.org'],
             ['14', constant.P_MQTT_PORT_3, '1883'],
             ['15', constant.P_PLOTLY_ALTERNATE_CONFIG, '.plotly.credentials'],
-            ['16', constant.P_FLASK_WEB_PORT, '8080']
-
+            ['16', constant.P_FLASK_WEB_PORT, '8080'],
+            ['17', constant.P_MOTION_VIDEO_PATH, '/media/temp/motion'],
+            ['18', constant.P_YOUTUBE_CREDENTIAL_FILE, '.youtube.credentials']
         ]
     check_table_schema(models.Parameter, model_auto_update)
     if len(models.Parameter.query.all()) < len(param_list):
@@ -247,6 +248,8 @@ def populate_tables(model_auto_update=False):
     import alarm, heat, sensor, relay, health_monitor, graph_plotly, node, io_bbb, webui, main, ddns
     from transport import mqtt_io
     #import transport.mqtt_io
+    from cloud import youtube
+    from sysutils import filewatch
 
     module_list_dict = {'default':[
         [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
@@ -257,12 +260,14 @@ def populate_tables(model_auto_update=False):
         [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
                     [5, get_mod_name(sensor), True, 4],[6, get_mod_name(relay), True, 5],
         [7, get_mod_name(heat), True, 6],[8, get_mod_name(alarm), False, 7],[9, get_mod_name(graph_plotly), True, 8],
-        [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), True, 10],[12, get_mod_name(ddns), True, 11]],
+        [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), True, 10],[12, get_mod_name(ddns), True, 11],
+        [13, get_mod_name(youtube), True, 12], [14, get_mod_name(filewatch), True, 13]],
         'nas':[
         [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
                     [5, get_mod_name(sensor), True, 4],[6, get_mod_name(relay), False, 5],
         [7, get_mod_name(heat), False, 6],[8, get_mod_name(alarm), False, 7],[9, get_mod_name(graph_plotly), True, 8],
-        [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), True, 10],[12, get_mod_name(ddns), True, 11]],
+        [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), True, 10],[12, get_mod_name(ddns), True, 11]
+        [13, get_mod_name(youtube), True, 12], [14, get_mod_name(filewatch), True, 13]],
         'pi-power':[
         [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
                     [5, get_mod_name(sensor), True, 4],[6, get_mod_name(relay), True, 5],
