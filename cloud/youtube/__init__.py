@@ -184,7 +184,7 @@ def upload_file(file):
 
             try:
                 time.sleep(1)
-                test_open = open(file, 'w+')
+                test_open = open(file, 'r')
                 test_open.close()
                 initialize_upload(__youtube, __args)
             except errors.HttpError, ex:
