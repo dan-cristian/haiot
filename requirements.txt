@@ -17,7 +17,6 @@ python-dateutil>=0.0
 hiplogging>=0.0
 schedule
 google-api-python-client
-oauth2client
 watchdog
 #uncomment on RPI
 #RPi.GPIO
