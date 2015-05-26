@@ -184,13 +184,13 @@ def upload_file(file):
 
             try:
                 time.sleep(1)
-                test_open = open(file, 'r')
+                test_open = open(file, 'w+')
                 test_open.close()
                 initialize_upload(__youtube, __args)
             except errors.HttpError, ex:
                 logger.warning('Error while uploading file={}, err={}'.format(file, ex))
             except Exception, ex:
-                logger.warning('Exception on upload file={}, err={}'.format(file, ex))
+                logger.debug('Exception on upload file={}, err={}'.format(file, ex))
 
     else:
         logger.warning('Trying to upload youtube file={} when not connected to youtube'.format(file))
