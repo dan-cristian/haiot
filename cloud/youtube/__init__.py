@@ -180,7 +180,9 @@ def upload_file(file):
             logger.warning('Not existent file={} to be uploaded to youtube'.format(file))
         else:
             __args.file = file
+            __args.description = os.path.basename(file)
             try:
+                time.sleep(5)
                 initialize_upload(__youtube, __args)
             except errors.HttpError, ex:
                 logger.warning('Error while uploading file={}, err={}'.format(file, ex))
