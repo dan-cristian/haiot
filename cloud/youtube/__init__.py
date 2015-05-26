@@ -196,7 +196,7 @@ def upload_file(file):
         logger.warning('Trying to upload youtube file={} when not connected to youtube'.format(file))
 
 def file_watcher_event(event, file, is_directory):
-    logger.info('Received file watch event={} file={}'.format(event, file))
+    logger.debug('Received file watch event={} file={}'.format(event, file))
     if event == 'modified':
         upload_file(file)
 
