@@ -182,7 +182,7 @@ def upload_file(file):
         else:
             __args.file = file
             __args.title = os.path.basename(file)
-            time.sleep(1)
+            time.sleep(3)
             if not os.access(file, os.R_OK):
                 logger.warning('Cannot access for upload file {}'.format(file))
             else:
@@ -196,6 +196,7 @@ def upload_file(file):
                     except Exception, ex:
                         logger.info('Unexpected error on upload, file {}, err={}'.format(file, ex))
                 except Exception, ex:
+                    ex.errno
                     logger.info('Locked file {}, err={}'.format(file, ex))
 
     else:
