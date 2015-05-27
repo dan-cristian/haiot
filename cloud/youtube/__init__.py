@@ -243,7 +243,6 @@ if __name__ == '__main__':
 
 def thread_run():
     global __file_list_last_change, __uploaded_file_list_date
-    __file_list_last_change = {}
     try:
         for file in __file_list_last_change.keys():
             lapsed = (utils.get_base_location_now_date() - __file_list_last_change[file]).total_seconds()
