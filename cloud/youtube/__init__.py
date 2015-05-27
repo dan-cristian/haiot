@@ -149,12 +149,13 @@ def resumable_upload(insert_request):
   retry = 0
   while response is None:
     try:
-      logger.info('Uploading file {}'.format(insert_request.resumable._filename))
+      file = insert_request.resumable._filename
+      logger.debug('Uploading file {}'.format(file))
       status, response = insert_request.next_chunk()
       if 'id' in response:
-        logger.info('Video id {} was successfully uploaded.'.format(response['id']))
+        logger.info('Video id {} file {} was successfully uploaded.'.format(response['id'], file))
       else:
-        logger.warning('The upload failed with an unexpected response {}'.format(response))
+        logger.warning('The upload for {} failed with an unexpected response {}'.format(file, response))
     except errors.HttpError, e:
       if e.resp.status in RETRIABLE_STATUS_CODES:
         error = "A retriable HTTP error %d occurred:\n%s" % (e.resp.status, e.content)
@@ -167,10 +168,10 @@ def resumable_upload(insert_request):
       print error
       retry += 1
       if retry > MAX_RETRIES:
-        logger.warning('No longer attempting to retry upload')
+        logger.warning('No longer attempting to retry upload for file {}'.format(file))
       max_sleep = 2 ** retry
       sleep_seconds = random.random() * max_sleep
-      logger.info('Sleeping %f seconds and then retrying...' % sleep_seconds)
+      logger.info('Sleeping {} seconds and then retrying upload for {}'.format(sleep_seconds, file))
       time.sleep(sleep_seconds)
 
 def upload_file(file):
@@ -181,22 +182,24 @@ def upload_file(file):
         else:
             __args.file = file
             __args.title = os.path.basename(file)
-
+            time.sleep(1)
             try:
-                time.sleep(1)
-                #test_open = open(file, 'w+')
-                #test_open.close()
-                initialize_upload(__youtube, __args)
-            except errors.HttpError, ex:
-                logger.warning('Error while uploading file={}, err={}'.format(file, ex))
+                test_open = open(file, 'r')
+                test_open.close()
+                try:
+                    initialize_upload(__youtube, __args)
+                except errors.HttpError, ex:
+                    logger.warning('Error while uploading file={}, err={}'.format(file, ex))
+                except Exception, ex:
+                    logger.info('Unexpected error on upload, file {}, err={}'.format(file, ex))
             except Exception, ex:
-                logger.info('Exception on upload file={}, err={}'.format(file, ex))
+                logger.info('Locked file {}, err={}'.format(file, ex))
 
     else:
         logger.warning('Trying to upload youtube file={} when not connected to youtube'.format(file))
 
 def file_watcher_event(event, file, is_directory):
-    logger.info('Received file watch event={} file={}'.format(event, file))
+    logger.debug('Received file watch event={} file={}'.format(event, file))
     if event == 'modified':
         upload_file(file)
 
