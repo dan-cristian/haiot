@@ -183,7 +183,7 @@ def upload_file(file):
             __args.title = os.path.basename(file)
 
             try:
-                time.sleep(1)
+                time.sleep(3)
                 test_open = open(file, 'w+')
                 test_open.close()
                 initialize_upload(__youtube, __args)
