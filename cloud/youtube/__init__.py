@@ -182,7 +182,7 @@ def upload_file(file):
         else:
             __args.file = file
             __args.title = os.path.basename(file)
-            time.sleep(3)
+            time.sleep(1)
             if not os.access(file, os.R_OK):
                 logger.warning('Cannot access for upload file {}'.format(file))
             else:
