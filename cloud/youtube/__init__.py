@@ -255,7 +255,7 @@ def thread_run():
                 __uploaded_file_list_date[file] = utils.get_base_location_now_date()
                 if len(__uploaded_file_list_date) > 100:
                     __uploaded_file_list_date.clear()
-        i += 1
+            i += 1
     except Exception, ex:
         logger.warning('Exception on youtube thread run, err={}'.format(ex))
 
