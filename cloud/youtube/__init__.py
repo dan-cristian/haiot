@@ -246,7 +246,7 @@ def thread_run():
     try:
         for file in __file_list_last_change.keys():
             lapsed = (utils.get_base_location_now_date() - __file_list_last_change[file]).total_seconds()
-            if lapsed > 15:
+            if lapsed > 30:
                 if file in __uploaded_file_list_date.keys():
                     logger.warning('Duplicate video upload for file {}'.format(file))
                 upload_file(file)
