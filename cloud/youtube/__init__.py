@@ -187,7 +187,7 @@ def upload_file(file):
                 logger.warning('Cannot access for upload file {}'.format(file))
             else:
                 try:
-                    test_open = open(file, 'w')
+                    test_open = open(file, 'r')
                     test_open.close()
                     try:
                         initialize_upload(__youtube, __args)
