@@ -23,11 +23,12 @@ from oauth2client.tools import argparser, run_flow
 from pydispatch import dispatcher
 
 from main import logger
-from common import constant
-from main.admin import model_helper
+from common import constant, utils
+from main.admin import model_helper, thread_pool
 
 initialised = False
-
+__file_list = {}
+__uploaded_file_list = {}
 # Explicitly tell the underlying HTTP transport library not to retry, since
 # we are handling retry logic ourselves.
 httplib2.RETRIES = 1
@@ -209,10 +210,12 @@ def upload_file(file):
     else:
         logger.warning('Trying to upload youtube file={} when not connected to youtube'.format(file))
 
+
 def file_watcher_event(event, file, is_directory):
     logger.debug('Received file watch event={} file={}'.format(event, file))
     if event == 'modified':
-        upload_file(file)
+        __file_list[file] = utils.get_base_location_now_date()
+        #upload_file(file)
 
 #https://developers.google.com/youtube/v3/guides/uploading_a_video
 if __name__ == '__main__':
@@ -238,6 +241,22 @@ if __name__ == '__main__':
   except errors.HttpError, e:
     print "An HTTP error %d occurred:\n%s" % (e.resp.status, e.content)
 
+def thread_run():
+    global __file_list, __uploaded_file_list
+    try:
+        for file in __file_list.keys():
+            lapsed = (utils.get_base_location_now_date() - __file_list[file]).total_seconds()
+            if lapsed > 15:
+                if file in __uploaded_file_list.keys():
+                    logger.warning('Duplicate video upload for file {}'.format(file))
+                upload_file(file)
+                __file_list.pop(file)
+                __uploaded_file_list[file] = utils.get_base_location_now_date()
+                if len(__uploaded_file_list) > 100:
+                    __uploaded_file_list.clear()
+    except Exception, ex:
+        logger.warning('Exception on youtube thread run, err={}'.format(ex))
+
 def init():
     global initialised, __CLIENT_SECRETS_FILE, __youtube
     try:
@@ -245,7 +264,9 @@ def init():
         logger.info('Initialising youtube with credential from {}'.format(__CLIENT_SECRETS_FILE))
         __youtube = get_authenticated_service([])
         dispatcher.connect(file_watcher_event, signal=constant.SIGNAL_FILE_WATCH, sender=dispatcher.Any)
+        thread_pool.add_callable(thread_run, run_interval_second=15)
         initialised = True
         #upload_file('c:\\temp\\01-20150512215655-alert.avi')
     except Exception, ex:
         logger.warning('Unable to initialise youtube uploader, err={}'.format(ex))
+
