@@ -247,7 +247,7 @@ def thread_run():
         i = 0
         for file in __file_list_last_change.keys():
             lapsed = (utils.get_base_location_now_date() - __file_list_last_change[file]).total_seconds()
-            if lapsed > 30:
+            if lapsed > 15:
                 if file in __uploaded_file_list_date.keys():
                     logger.warning('Duplicate video upload for file {}'.format(file))
                 upload_file(file)
@@ -266,7 +266,7 @@ def init():
         logger.info('Initialising youtube with credential from {}'.format(__CLIENT_SECRETS_FILE))
         __youtube = get_authenticated_service([])
         dispatcher.connect(file_watcher_event, signal=constant.SIGNAL_FILE_WATCH, sender=dispatcher.Any)
-        thread_pool.add_callable(thread_run, run_interval_second=15)
+        thread_pool.add_callable(thread_run, run_interval_second=10)
         initialised = True
         #upload_file('c:\\temp\\01-20150512215655-alert.avi')
     except Exception, ex:
