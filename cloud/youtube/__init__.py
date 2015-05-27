@@ -4,13 +4,7 @@ import httplib
 import httplib2
 import os
 import random
-import sys
 import time
-try:
-    import fcntl
-    fcntl_import = True
-except ImportError:
-    fcntl_import = False
 
 from apiclient import discovery, errors, http
 #from apiclient.discovery import build
@@ -195,8 +189,6 @@ def upload_file(file):
             else:
                 try:
                     test_open = open(file, 'r')
-                    #fcntl.lockf(test_open, fcntl.LOCK_EX | fcntl.LOCK_NB)
-                    #fcntl.lockf(test_open, fcntl.LOCK_UN)
                     test_open.close()
                     try:
                         initialize_upload(__youtube, __args)
@@ -212,7 +204,7 @@ def upload_file(file):
 
 
 def file_watcher_event(event, file, is_directory):
-    logger.debug('Received file watch event={} file={}'.format(event, file))
+    logger.info('Received file watch event={} file={}'.format(event, file))
     if event == 'modified' and not is_directory:
         __file_list_last_change[file] = utils.get_base_location_now_date()
         #upload_file(file)
