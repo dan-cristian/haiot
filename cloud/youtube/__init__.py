@@ -183,17 +183,20 @@ def upload_file(file):
             __args.file = file
             __args.title = os.path.basename(file)
             time.sleep(1)
-            try:
-                test_open = open(file, 'r')
-                test_open.close()
+            if not os.access(file, 'w'):
+                logger.warning('Cannot access for upload file {}'.format(file))
+            else:
                 try:
-                    initialize_upload(__youtube, __args)
-                except errors.HttpError, ex:
-                    logger.warning('Error while uploading file={}, err={}'.format(file, ex))
+                    test_open = open(file, 'w')
+                    test_open.close()
+                    try:
+                        initialize_upload(__youtube, __args)
+                    except errors.HttpError, ex:
+                        logger.warning('Error while uploading file={}, err={}'.format(file, ex))
+                    except Exception, ex:
+                        logger.info('Unexpected error on upload, file {}, err={}'.format(file, ex))
                 except Exception, ex:
-                    logger.info('Unexpected error on upload, file {}, err={}'.format(file, ex))
-            except Exception, ex:
-                logger.info('Locked file {}, err={}'.format(file, ex))
+                    logger.info('Locked file {}, err={}'.format(file, ex))
 
     else:
         logger.warning('Trying to upload youtube file={} when not connected to youtube'.format(file))
@@ -203,6 +206,7 @@ def file_watcher_event(event, file, is_directory):
     if event == 'modified':
         upload_file(file)
 
+#https://developers.google.com/youtube/v3/guides/uploading_a_video
 if __name__ == '__main__':
   argparser.add_argument("--file", required=True, help="Video file to upload")
   argparser.add_argument("--title", help="Video title", default="Test Title")
