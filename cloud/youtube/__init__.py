@@ -27,8 +27,8 @@ from common import constant, utils
 from main.admin import model_helper, thread_pool
 
 initialised = False
-__file_list = {}
-__uploaded_file_list = {}
+__file_list_last_change = {}
+__uploaded_file_list_date = {}
 # Explicitly tell the underlying HTTP transport library not to retry, since
 # we are handling retry logic ourselves.
 httplib2.RETRIES = 1
@@ -214,7 +214,7 @@ def upload_file(file):
 def file_watcher_event(event, file, is_directory):
     logger.debug('Received file watch event={} file={}'.format(event, file))
     if event == 'modified':
-        __file_list[file] = utils.get_base_location_now_date()
+        __file_list_last_change[file] = utils.get_base_location_now_date()
         #upload_file(file)
 
 #https://developers.google.com/youtube/v3/guides/uploading_a_video
@@ -242,18 +242,20 @@ if __name__ == '__main__':
     print "An HTTP error %d occurred:\n%s" % (e.resp.status, e.content)
 
 def thread_run():
-    global __file_list, __uploaded_file_list
+    global __file_list_last_change, __uploaded_file_list_date
     try:
-        for file in __file_list.keys():
-            lapsed = (utils.get_base_location_now_date() - __file_list[file]).total_seconds()
-            if lapsed > 15:
-                if file in __uploaded_file_list.keys():
+        i = 0
+        for file in __file_list_last_change.keys():
+            lapsed = (utils.get_base_location_now_date() - __file_list_last_change[file]).total_seconds()
+            if lapsed > 30:
+                if file in __uploaded_file_list_date.keys():
                     logger.warning('Duplicate video upload for file {}'.format(file))
                 upload_file(file)
-                __file_list.pop(file)
-                __uploaded_file_list[file] = utils.get_base_location_now_date()
-                if len(__uploaded_file_list) > 100:
-                    __uploaded_file_list.clear()
+                __file_list_last_change.pop(i)
+                __uploaded_file_list_date[file] = utils.get_base_location_now_date()
+                if len(__uploaded_file_list_date) > 100:
+                    __uploaded_file_list_date.clear()
+        i += 1
     except Exception, ex:
         logger.warning('Exception on youtube thread run, err={}'.format(ex))
 
