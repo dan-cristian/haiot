@@ -220,9 +220,9 @@ def populate_tables(model_auto_update=False):
         elif constant.HOST_NAME=='server':
             priority = 3
         elif constant.HOST_NAME=='ex-std-node466.prod.rhcloud.com':
-            priority = 1
+            priority = 4
         else:
-            priority=random.randint(3, 100)
+            priority=random.randint(10, 100)
         db.session.add(models.Node('', name=constant.HOST_NAME, ip=constant.HOST_MAIN_IP, priority=priority,
                                    mac=constant.HOST_MAC, is_master_logging=master_logging))
         commit()
