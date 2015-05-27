@@ -194,7 +194,8 @@ def upload_file(file):
             else:
                 try:
                     test_open = open(file, 'r')
-                    fcntl.lockf(test_open, fcntl.LOCK_EX)
+                    fcntl.lockf(test_open.fileno(), fcntl.LOCK_EX)
+                    fcntl.lockf(test_open.fileno(), fcntl.LOCK_UN)
                     test_open.close()
                     try:
                         initialize_upload(__youtube, __args)
