@@ -190,7 +190,7 @@ def upload_file(file):
             except errors.HttpError, ex:
                 logger.warning('Error while uploading file={}, err={}'.format(file, ex))
             except Exception, ex:
-                logger.debug('Exception on upload file={}, err={}'.format(file, ex))
+                logger.info('Exception on upload file={}, err={}'.format(file, ex))
 
     else:
         logger.warning('Trying to upload youtube file={} when not connected to youtube'.format(file))
