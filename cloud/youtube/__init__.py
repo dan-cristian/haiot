@@ -183,9 +183,9 @@ def upload_file(file):
             __args.title = os.path.basename(file)
 
             try:
-                time.sleep(3)
-                test_open = open(file, 'w+')
-                test_open.close()
+                time.sleep(1)
+                #test_open = open(file, 'w+')
+                #test_open.close()
                 initialize_upload(__youtube, __args)
             except errors.HttpError, ex:
                 logger.warning('Error while uploading file={}, err={}'.format(file, ex))
