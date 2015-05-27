@@ -243,19 +243,18 @@ if __name__ == '__main__':
 
 def thread_run():
     global __file_list_last_change, __uploaded_file_list_date
+    __file_list_last_change = {}
     try:
-        i = 0
         for file in __file_list_last_change.keys():
             lapsed = (utils.get_base_location_now_date() - __file_list_last_change[file]).total_seconds()
             if lapsed > 15:
                 if file in __uploaded_file_list_date.keys():
                     logger.warning('Duplicate video upload for file {}'.format(file))
                 upload_file(file)
-                __file_list_last_change.pop(i)
+                del __file_list_last_change[file]
                 __uploaded_file_list_date[file] = utils.get_base_location_now_date()
                 if len(__uploaded_file_list_date) > 100:
                     __uploaded_file_list_date.clear()
-            i += 1
     except Exception, ex:
         logger.warning('Exception on youtube thread run, err={}'.format(ex))
 
