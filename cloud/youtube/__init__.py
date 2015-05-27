@@ -6,6 +6,11 @@ import os
 import random
 import sys
 import time
+try:
+    import fcntl
+    fcntl_import = True
+except ImportError:
+    fcntl_import = False
 
 from apiclient import discovery, errors, http
 #from apiclient.discovery import build
@@ -183,11 +188,13 @@ def upload_file(file):
             __args.file = file
             __args.title = os.path.basename(file)
             time.sleep(1)
+
             if not os.access(file, os.R_OK):
                 logger.warning('Cannot access for upload file {}'.format(file))
             else:
                 try:
                     test_open = open(file, 'r')
+                    fcntl.lockf(test_open, fcntl.LOCK_EX)
                     test_open.close()
                     try:
                         initialize_upload(__youtube, __args)
@@ -196,7 +203,6 @@ def upload_file(file):
                     except Exception, ex:
                         logger.info('Unexpected error on upload, file {}, err={}'.format(file, ex))
                 except Exception, ex:
-                    ex.errno
                     logger.info('Locked file {}, err={}'.format(file, ex))
 
     else:
