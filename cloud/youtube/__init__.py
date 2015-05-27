@@ -213,7 +213,7 @@ def upload_file(file):
 
 def file_watcher_event(event, file, is_directory):
     logger.debug('Received file watch event={} file={}'.format(event, file))
-    if event == 'modified':
+    if event == 'modified' and not is_directory:
         __file_list_last_change[file] = utils.get_base_location_now_date()
         #upload_file(file)
 
