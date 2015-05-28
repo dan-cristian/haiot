@@ -3,8 +3,12 @@ __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 import sys
 import time
 import os
-from watchdog.observers import Observer
-from watchdog.events import LoggingEventHandler, FileSystemEventHandler
+try:
+    from watchdog.observers import Observer
+    from watchdog.events import LoggingEventHandler, FileSystemEventHandler
+    __inotify_import_ok = True
+except Exception, ex:
+    __inotify_import_ok = False
 from pydispatch import dispatcher
 from main import logger
 from main.admin import model_helper
@@ -49,14 +53,17 @@ def unload():
     initialised = False
 
 def init():
-    global __observer, initialised
-    path = model_helper.get_param(constant.P_MOTION_VIDEO_PATH)
-    logger.info('Initialising file watchdog for folder={}'.format(path))
-    if os.path.exists(path):
-        event_handler = EventHandler()
-        __observer = Observer()
-        __observer.schedule(event_handler, path, recursive=True)
-        initialised = True
-        __observer.start()
+    global __observer, initialised, __inotify_import_ok
+    if __inotify_import_ok:
+        path = model_helper.get_param(constant.P_MOTION_VIDEO_PATH)
+        logger.info('Initialising file watchdog for folder={}'.format(path))
+        if os.path.exists(path):
+            event_handler = EventHandler()
+            __observer = Observer()
+            __observer.schedule(event_handler, path, recursive=True)
+            initialised = True
+            __observer.start()
+        else:
+            logger.warning('Filewatch not initialised watch path={} not found'.format(path))
     else:
-        logger.warning('Filewatch not initialised watch path={} not found'.format(path))
+        logger.info('Inotify observer not available,  not initialising file watch')
