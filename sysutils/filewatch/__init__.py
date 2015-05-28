@@ -17,20 +17,21 @@ from common import constant
 initialised = False
 __observer = None
 
-class EventHandler(FileSystemEventHandler):
-    def on_any_event(self, event):
-        #logger.info('File event={}'.format(event))
-        dispatcher.send(constant.SIGNAL_FILE_WATCH, event=event.event_type, file=event.src_path,
-                        is_directory=event.is_directory)
-        #print event
-    def on_created(self, event):
-        pass
-    def on_modified(self, event):
-        pass
-    def on_deleted(self, event):
-        pass
-    def on_moved(self, event):
-        pass
+if __inotify_import_ok:
+    class EventHandler(FileSystemEventHandler):
+        def on_any_event(self, event):
+            #logger.info('File event={}'.format(event))
+            dispatcher.send(constant.SIGNAL_FILE_WATCH, event=event.event_type, file=event.src_path,
+                            is_directory=event.is_directory)
+            #print event
+        def on_created(self, event):
+            pass
+        def on_modified(self, event):
+            pass
+        def on_deleted(self, event):
+            pass
+        def on_moved(self, event):
+            pass
 
 if __name__ == "__main__":
     #logging.basicConfig(level=logging.INFO,format='%(asctime)s - %(message)s',datefmt='%Y-%m-%d %H:%M:%S')
@@ -47,9 +48,10 @@ if __name__ == "__main__":
     observer.join()
 
 def unload():
-    global __observer, initialised
-    observer.stop()
-    observer.join()
+    global __observer, initialised, __inotify_import_ok
+    if __inotify_import_ok:
+        observer.stop()
+        observer.join()
     initialised = False
 
 def init():
