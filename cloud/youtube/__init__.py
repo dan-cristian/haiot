@@ -175,7 +175,7 @@ def resumable_upload(insert_request):
       time.sleep(sleep_seconds)
 
 def upload_file(file):
-    global initialised, __args
+    global initialised, __args, __uploaded_file_list_date
     if initialised:
         if not os.path.exists(file):
             logger.warning('Not existent file={} to be uploaded to youtube'.format(file))
@@ -192,6 +192,8 @@ def upload_file(file):
                     test_open.close()
                     try:
                         initialize_upload(__youtube, __args)
+                        __uploaded_file_list_date[file] = utils.get_base_location_now_date()
+                        del __file_list_last_change[file]
                     except errors.HttpError, ex:
                         logger.warning('Error while uploading file={}, err={}'.format(file, ex))
                     except Exception, ex:
@@ -240,12 +242,11 @@ def thread_run():
             lapsed = (utils.get_base_location_now_date() - __file_list_last_change[file]).total_seconds()
             if lapsed > 30:
                 if file in __uploaded_file_list_date.keys():
-                    logger.warning('Duplicate video upload for file {}'.format(file))
-                upload_file(file)
-                del __file_list_last_change[file]
-                __uploaded_file_list_date[file] = utils.get_base_location_now_date()
-                if len(__uploaded_file_list_date) > 100:
-                    __uploaded_file_list_date.clear()
+                    logger.warning('Skip duplicate video upload for file {}'.format(file))
+                else:
+                    upload_file(file)
+                    if len(__uploaded_file_list_date) > 100:
+                        __uploaded_file_list_date.clear()
     except Exception, ex:
         logger.warning('Exception on youtube thread run, err={}'.format(ex))
 
