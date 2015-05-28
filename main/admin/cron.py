@@ -9,8 +9,8 @@ from common import variable
 initialised = False
 def openshift_keepalive():
     try:
-        if variable.NODE_THIS_IS_MASTER_OVERALL:
-            req = requests.get('http://iot-dancristian.rhcloud.com')
+        #if variable.NODE_THIS_IS_MASTER_OVERALL:
+        req = requests.get('http://iot-dancristian.rhcloud.com')
     except Exception, ex:
         logger.info('Error keeping openshift alive, err={}'.format(ex))
 
