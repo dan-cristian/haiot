@@ -1,6 +1,6 @@
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
-from main import logger
+import logging
 
 def thread_run():
     logger.debug('Processing template_run')
