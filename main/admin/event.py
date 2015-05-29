@@ -53,6 +53,7 @@ def on_models_committed(sender, changes):
                             transport.send_message_json(json = txt)
                 else:
                     pass
+            #todo: process rules
     except Exception, ex:
         logger.critical('Error in DB commit hook, {}'.format(ex))
 

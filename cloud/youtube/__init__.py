@@ -238,15 +238,21 @@ if __name__ == '__main__':
 def thread_run():
     global __file_list_last_change, __uploaded_file_list_date
     try:
-        for file in __file_list_last_change.keys():
-            lapsed = (utils.get_base_location_now_date() - __file_list_last_change[file]).total_seconds()
-            if lapsed > 30:
-                if file in __uploaded_file_list_date.keys():
-                    logger.warning('Skip duplicate video upload for file {}'.format(file))
-                else:
-                    upload_file(file)
-                    if len(__uploaded_file_list_date) > 100:
-                        __uploaded_file_list_date.clear()
+        found_for_upload = True
+        while found_for_upload:
+            found_for_upload = False
+            for file in __file_list_last_change.keys():
+                lapsed = (utils.get_base_location_now_date() - __file_list_last_change[file]).total_seconds()
+                if lapsed > 30:
+                    if file in __uploaded_file_list_date.keys():
+                        logger.warning('Skip duplicate video upload for file {}'.format(file))
+                    else:
+                        upload_file(file)
+                        found_for_upload = True
+                        if len(__uploaded_file_list_date) > 100:
+                            __uploaded_file_list_date.clear()
+                        #force upload on fifo principles to maintain movie time order when uploaded
+                        break
     except Exception, ex:
         logger.warning('Exception on youtube thread run, err={}'.format(ex))
 
