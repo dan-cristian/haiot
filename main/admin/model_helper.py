@@ -387,7 +387,7 @@ def populate_tables(model_auto_update=False):
             [25, '96000003BDFE5D28', 'boiler sus'], [25, '53000004F296DD28', 'boiler mijloc'],
             [25, 'C8000004F28B0728', 'boiler jos'], [2, '41000003BE099C28', 'living'],
             [1, 'AA000003BDE6C728', 'bucatarie'], [27, 'E400000155E72D26', 'pod fata'],
-            [4, 'B5000004F3285F28', 'dormitor'], [23, 'f9:01','fridge'], [49, 'f3:01', 'congelator']
+            [4, 'B5000004F3285F28', 'dormitor'], [23, 'f3:01','fridge'], [49, 'f9:01', 'congelator']
         ]
     if len(models.ZoneSensor.query.all()) < len(zonesensor_list):
         logger.info('Populating ZoneSensor with default values')
