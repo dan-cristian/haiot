@@ -27,6 +27,7 @@ class DbEvent:
                             ignore_only_updated_on_change=True, debug=False, graph_save_frequency=0):
         try:
             if current_record:
+                #if a record in db already exists
                 if not current_record.last_save_to_graph:
                     current_record.last_save_to_graph = datetime.min
                 save_to_graph_elapsed = (utils.get_base_location_now_date() -
@@ -38,6 +39,7 @@ class DbEvent:
                     current_record.save_to_graph = False
                 current_record.notify_transport_enabled = notify_transport_enabled
             else:
+                #this is a new record
                 new_record.save_to_graph = save_to_graph
                 new_record.notify_transport_enabled = notify_transport_enabled
 
@@ -323,10 +325,12 @@ class GpioPin(db.Model, DbEvent):
     pin_index = db.Column(db.String(50))#bcm format, 0 to n
     pin_value = db.Column(db.Integer) # 0, 1 or None
     pin_direction = db.Column(db.String(4)) #in, out, None
+    description = db.Column(db.String(50))
     is_active = db.Column(db.Boolean) # if pin was setup(exported) through this app. will be unexported when app exit
 
     def __repr__(self):
-        return 'host {} code {} type {} value {}'.format(self.host_name, self.pin_code, self.pin_type, self.pin_value)
+        return 'host={} code={} desc={} type={} value={}'.format(self.host_name, self.pin_code, self.description,
+                                                                 self.pin_type, self.pin_value)
 
 class ZoneAlarm(db.Model, DbEvent):
     id = db.Column(db.Integer, primary_key=True)
@@ -368,3 +372,21 @@ class ZoneHeatRelay(db.Model, DbEvent):
 
     def __repr__(self):
         return 'host {} {} {} {}'.format(self.gpio_host_name, self.gpio_pin_code, self.heat_pin_name, self.heat_is_on)
+
+class ZoneCustomRelay(db.Model, DbEvent):
+    id = db.Column(db.Integer, primary_key=True)
+    #friendly display name for pin mapping
+    relay_pin_name = db.Column(db.String(50))
+    zone_id = db.Column(db.Integer, unique=True)
+    gpio_pin_code = db.Column(db.String(50)) #user friendly format, e.g. P8_11
+    gpio_host_name = db.Column(db.String(50))
+    relay_is_on = db.Column(db.Boolean)
+    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __init__(self, zone_id='', gpio_pin_code='', host_name=''):
+        self.zone_id = zone_id
+        self.gpio_pin_code = gpio_pin_code
+        self.gpio_host_name = host_name
+
+    def __repr__(self):
+        return 'host {} {} {} {}'.format(self.gpio_host_name, self.gpio_pin_code, self.relay_pin_name, self.relay_is_on)
