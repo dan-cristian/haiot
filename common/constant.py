@@ -6,7 +6,7 @@ SIGNAL_MQTT_RECEIVED = 'signal-from-mqtt-data-received'
 SIGNAL_HEAT = 'signal-from-heat'
 SIGNAL_GPIO = 'signal-from-GPIO'
 SIGNAL_FILE_WATCH = 'signal-from-file-watch'
-
+SIGNAL_DB_CHANGE_FOR_RULES = 'signal_db_change_for_rules'
 
 
 ERROR_CONNECT_MAX_RETRY_COUNT = 2

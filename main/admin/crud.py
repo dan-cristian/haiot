@@ -126,7 +126,7 @@ simple_filters = {
 
 from .models import Zone, SchedulePattern, HeatSchedule, Sensor
 from .models import Module, Parameter, TemperatureTarget, ZoneSensor, Node#, GraphPlotly
-from .models import SystemMonitor, SystemDisk, GpioPin, ZoneAlarm, ZoneHeatRelay
+from .models import SystemMonitor, SystemDisk, GpioPin, ZoneAlarm, ZoneHeatRelay, ZoneCustomRelay
 
 register_crud(admin, '/', 'main-entry', Module, filters=simple_filters)
 register_crud(admin, '/module', 'module', Module, filters=simple_filters)
@@ -143,3 +143,4 @@ register_crud(user, '/systemdisk', 'systemdisk', SystemDisk, filters=simple_filt
 register_crud(user, '/gpiopin', 'gpiopin', GpioPin, filters=simple_filters)
 register_crud(user, '/zonealarm', 'zonealarm', ZoneAlarm, filters=simple_filters)
 register_crud(user, '/zoneheatrelay', 'zoneheatrelay', ZoneHeatRelay, filters=simple_filters)
+register_crud(user, '/zonecustomrelay', 'zonecustomrelay', ZoneCustomRelay, filters=simple_filters)

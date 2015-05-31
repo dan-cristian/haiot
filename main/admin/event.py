@@ -31,7 +31,9 @@ def handle_local_event_db_post(model, row):
         txt = model_helper.model_row_to_json(row, operation='update')
         transport.send_message_json(json = txt)
 
+
 def handle_event_mqtt_received(client, userdata, topic, obj):
+    #executed on every mqqt message received
     #global __mqtt_lock
     #__mqtt_lock.acquire()
     try:
@@ -41,10 +43,12 @@ def handle_event_mqtt_received(client, userdata, topic, obj):
         pass
 
 def on_models_committed(sender, changes):
+    #executed on all db commits
     try:
         for obj, change in changes:
             #avoid recursion
             if hasattr(obj, 'notify_transport_enabled'):
+                #only send mqtt message once for db saves intended to be distributed
                 if obj.notify_transport_enabled:
                     if hasattr(obj, 'notified_on_db_commit'):
                         if not obj.notified_on_db_commit:
@@ -53,12 +57,14 @@ def on_models_committed(sender, changes):
                             transport.send_message_json(json = txt)
                 else:
                     pass
-            #todo: process rules
+            #send object to rule parser, if connected
+            dispatcher.send(constant.SIGNAL_DB_CHANGE_FOR_RULES, obj=obj, change=change)
     except Exception, ex:
         logger.critical('Error in DB commit hook, {}'.format(ex))
 
 
 def mqtt_thread_run():
+    #runs periodically and executes received mqqt messages from queue
     #global __mqtt_lock
     #__mqtt_lock.acquire()
     try:
@@ -128,8 +134,8 @@ def mqtt_thread_run():
 
 def init():
     #http://pydispatcher.sourceforge.net/
-    #dispatcher.connect(handle_event_sensor, signal=common.constant.SIGNAL_SENSOR, sender=dispatcher.Any)
     dispatcher.connect(handle_local_event_db_post, signal=common.constant.SIGNAL_SENSOR_DB_POST, sender=dispatcher.Any)
     dispatcher.connect(handle_event_mqtt_received, signal=common.constant.SIGNAL_MQTT_RECEIVED, sender=dispatcher.Any)
+
     thread_pool.add_callable(mqtt_thread_run, run_interval_second=1)
 
