@@ -245,7 +245,7 @@ def populate_tables(model_auto_update=False):
         #db.session.add(sens)
         #commit(db.session)
 
-    import alarm, heat, sensor, relay, health_monitor, graph_plotly, node, io_bbb, webui, main, ddns
+    import alarm, heat, sensor, relay, health_monitor, graph_plotly, node, io_bbb, webui, main, ddns, rules
     from transport import mqtt_io
     #import transport.mqtt_io
     from cloud import youtube
@@ -255,13 +255,16 @@ def populate_tables(model_auto_update=False):
         [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
                     [5, get_mod_name(sensor), False, 4],[6, get_mod_name(relay), False, 5],
         [7, get_mod_name(heat), False, 6],[8, get_mod_name(alarm), False, 7],[9, get_mod_name(graph_plotly), True, 8],
-        [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), True, 10],[12, get_mod_name(ddns), False, 11]],
+        [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), True, 10],[12, get_mod_name(ddns), False, 11],
+        [13, get_mod_name(youtube), False, 12], [14, get_mod_name(filewatch), False, 13],
+        [15, get_mod_name(rules), True, 14]],
         'netbook':[
         [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
                     [5, get_mod_name(sensor), True, 4],[6, get_mod_name(relay), True, 5],
         [7, get_mod_name(heat), True, 6],[8, get_mod_name(alarm), False, 7],[9, get_mod_name(graph_plotly), True, 8],
         [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), True, 10],[12, get_mod_name(ddns), True, 11],
-        [13, get_mod_name(youtube), True, 12], [14, get_mod_name(filewatch), True, 13]],
+        [13, get_mod_name(youtube), True, 12], [14, get_mod_name(filewatch), True, 13],
+        [15, get_mod_name(rules), True, 14]],
         'nas':[
         [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
                     [5, get_mod_name(sensor), True, 4],[6, get_mod_name(relay), False, 5],
@@ -376,6 +379,20 @@ def populate_tables(model_auto_update=False):
             for pair in heat_relay_list[host_name]:
                 db.session.add(models.ZoneHeatRelay(zone_id=pair[0], gpio_pin_code=pair[1], host_name=host_name,
                                                     is_main_heat_source=(pair[0] == heat_main_source_zone_id)))
+        commit()
+
+    check_table_schema(models.ZoneCustomRelay, model_auto_update)
+    custom_relay_list={
+        #37=back valve
+        'beaglebone': [[37, 'P9_24']]
+    }
+    if len(models.ZoneCustomRelay.query.all()) < len(custom_relay_list):
+        models.ZoneCustomRelay.query.delete()
+        commit()
+        for host_name in custom_relay_list.keys():
+            logger.info('Populating ZoneCustomRelay for {} with default values'.format(host_name))
+            for pair in custom_relay_list[host_name]:
+                db.session.add(models.ZoneCustomRelay(zone_id=pair[0], gpio_pin_code=pair[1], host_name=host_name))
         commit()
 
     #if True:

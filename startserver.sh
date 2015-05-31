@@ -21,6 +21,8 @@ function run_app {
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 echo "Current dir on start is $DIR"
 must_run=true
+echo "Getting latest version from git"
+git pull --no-edit
 while $must_run; do
     run_app $1 $2 $3 $4 $5 $6 $7 $8 $9 $10
     if [ $exit_code == 131 ]; then

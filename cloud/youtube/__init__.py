@@ -246,6 +246,7 @@ def thread_run():
                 if lapsed > 30:
                     if file in __uploaded_file_list_date.keys():
                         logger.warning('Skip duplicate video upload for file {}'.format(file))
+                        #pass
                     else:
                         upload_file(file)
                         found_for_upload = True
