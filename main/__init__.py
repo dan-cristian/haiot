@@ -86,6 +86,8 @@ def signal_handler(signal, frame):
 
 def execute_command(command, node=None):
     global exit_code
+    exit_code = 0
+
     if command == 'restart_app':
         exit_code = 131
     elif command == 'upgrade_app':
@@ -93,7 +95,9 @@ def execute_command(command, node=None):
     elif command == 'shutdown_app':
         exit_code = 133
     elif command == 'wake':
+        logger.info('Sending wol magic packet to MAC {}'.format(node.mac))
         wol.send_magic_packet(node.mac)
+
     if exit_code != 0:
         unload()
 
