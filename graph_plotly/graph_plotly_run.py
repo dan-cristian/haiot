@@ -227,7 +227,7 @@ class PlotlyGraph:
                         self.data[i]['name'] = data_line['name']
                     i += 1
         except Exception, ex:
-            logger.eror('Err add_data data={}'.format(data))
+            logger.error('Err add_data data={}'.format(data))
         finally:
             self.lock.release()
 
