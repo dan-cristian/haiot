@@ -18,6 +18,7 @@ hiplogging>=0.0
 schedule
 google-api-python-client
 watchdog
+wakeonlan
 #uncomment on RPI
 #RPi.GPIO
 #uncomment on beaglebone
