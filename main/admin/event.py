@@ -82,7 +82,7 @@ def mqtt_thread_run():
                         execute_command = obj['execute_command']
                         host_name = obj['name']
                         if host_name == constant.HOST_NAME and execute_command != '':
-                            main.execute_command(execute_command)
+                            main.execute_command(execute_command, node=node)
                 elif table == utils.get_table_name(models.ZoneHeatRelay):
                     if heat.initialised:
                         heat.heat_update(obj)
