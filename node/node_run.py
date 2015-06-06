@@ -38,6 +38,7 @@ def node_update(obj={}):
                                                         utils.get_model_field_name(models.Node.is_master_logging))
             node.priority = utils.get_object_field_value(obj, utils.get_model_field_name(models.Node.priority))
             node.ip = utils.get_object_field_value(obj, utils.get_model_field_name(models.Node.ip))
+            node.mac = utils.get_object_field_value(obj, utils.get_model_field_name(models.Node.mac))
             node.execute_command = utils.get_object_field_value(obj,
                                                         utils.get_model_field_name(models.Node.execute_command))
             node.updated_on = utils.get_base_location_now_date()
