@@ -64,7 +64,7 @@ def __search_ups(port_no):
                 logger.info('Got serial response [{}] on ups init port {}'.format(response, port_no))
                 __serial = ser
                 __ups = LegrandUps()
-                __ups.Id = str(response).replace(' ', '')
+                __ups.Id = str(response).replace(' ', '').replace('\r','')
                 __ups.Name = 'Legrand Nicky ' + __ups.Id
                 __ups.Port = port_no
                 break

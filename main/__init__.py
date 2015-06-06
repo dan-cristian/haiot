@@ -5,7 +5,7 @@ import sys
 import socket
 import datetime
 import signal
-
+from wakeonlan import wol
 from flask_sqlalchemy import SQLAlchemy #workaround for resolve issue
 from flask import Flask
 from flask_sqlalchemy import models_committed
@@ -84,14 +84,16 @@ def signal_handler(signal, frame):
     exit_code = 1
     unload()
 
-def execute_command(command):
+def execute_command(command, node=None):
     global exit_code
-    if command=='restart_app':
+    if command == 'restart_app':
         exit_code = 131
-    elif command=='upgrade_app':
+    elif command == 'upgrade_app':
         exit_code = 132
-    elif command=='shutdown_app':
+    elif command == 'shutdown_app':
         exit_code = 133
+    elif command == 'wake':
+        wol.send_magic_packet(node.mac)
     if exit_code != 0:
         unload()
 
