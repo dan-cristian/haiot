@@ -91,9 +91,8 @@ __youtube = None
 
 
 def get_authenticated_service(args):
-  flow = flow_from_clientsecrets(__CLIENT_SECRETS_FILE,
-    scope=YOUTUBE_UPLOAD_SCOPE,
-    message=MISSING_CLIENT_SECRETS_MESSAGE)
+  flow = flow_from_clientsecrets(__CLIENT_SECRETS_FILE, scope=YOUTUBE_UPLOAD_SCOPE,
+                                 message=MISSING_CLIENT_SECRETS_MESSAGE)
 
   storage = Storage("%s-oauth2.json" % __name__)
   credentials = storage.get()
@@ -101,8 +100,7 @@ def get_authenticated_service(args):
   if credentials is None or credentials.invalid:
     credentials = run_flow(flow, storage, args)
 
-  return discovery.build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
-    http=credentials.authorize(httplib2.Http()))
+  return discovery.build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION, http=credentials.authorize(httplib2.Http()))
 
 def initialize_upload(youtube, options):
   tags = None
@@ -175,7 +173,7 @@ def resumable_upload(insert_request):
       time.sleep(sleep_seconds)
 
 def upload_file(file):
-    global initialised, __args, __uploaded_file_list_date
+    global initialised, __args, __uploaded_file_list_date, __youtube
     if initialised:
         if not os.path.exists(file):
             logger.warning('Not existent file={} to be uploaded to youtube'.format(file))
@@ -204,6 +202,22 @@ def upload_file(file):
     else:
         logger.warning('Trying to upload youtube file={} when not connected to youtube'.format(file))
 
+#not yet used
+def add_video_to_playlist(videoID, playlistID):
+    global __youtube
+    add_video_request=youtube.playlistItem().insert(part="snippet",
+      body={
+            'snippet': {
+              'playlistId': playlistID,
+              'resourceId': {
+                      'kind': 'youtube#video',
+                  'videoId': videoID
+                }
+            #'position': 0
+            }
+        }
+    )
+    add_video_request.execute()
 
 def file_watcher_event(event, file, is_directory):
     #logger.info('Received file watch event={} file={}'.format(event, file))
