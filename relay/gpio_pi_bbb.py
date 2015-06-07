@@ -10,7 +10,7 @@ from main.admin.model_helper import commit
 __pins_setup_list = []
 
 def __get_gpio_db_pin(bcm_id=None):
-    gpio_pin = models.GpioPin.query.filter_by(pin_index = bcm_id, host_name = constant.HOST_NAME).first()
+    gpio_pin = models.GpioPin.query.filter_by(pin_index_bcm=bcm_id, host_name = constant.HOST_NAME).first()
     return gpio_pin
 
 def __write_to_file_as_root(file, value):
@@ -85,7 +85,7 @@ def __unsetup_pin(bcm_id=''):
         if __write_to_file_as_root('/sys/class/gpio/unexport', bcm_id):
             logger.info('Pin {} unexport OK'.format(bcm_id))
         __pins_setup_list.remove(bcm_id)
-        gpio_pin = models.GpioPin.query.filter_by(pin_index = bcm_id, host_name = constant.HOST_NAME).first()
+        gpio_pin = models.GpioPin.query.filter_by(pin_index_bcm=bcm_id, host_name = constant.HOST_NAME).first()
         if gpio_pin:
             gpio_pin.is_active = False
         else:
@@ -97,7 +97,7 @@ def __is_pin_setup(bcm_id=''):
     try:
         file = open('/sys/class/gpio/gpio{}/value'.format(bcm_id), 'r')
         file.close()
-        gpio_pin = models.GpioPin.query.filter_by(pin_index = bcm_id, host_name = constant.HOST_NAME).first()
+        gpio_pin = models.GpioPin.query.filter_by(pin_index_bcm=bcm_id, host_name = constant.HOST_NAME).first()
         if gpio_pin and not gpio_pin.is_active:
             logger.warning('Gpio pin={} is used not via me, conflict with ext. apps or unclean stop?'.format(bcm_id))
             gpio_pin.is_active = True
@@ -148,7 +148,7 @@ def get_pin_bcm(bcm_id=''):
         __set_pin_dir_in(bcm_id)
     if __is_pin_setup(bcm_id):
         pin_value = __read_line(bcm_id)
-        gpio_pin = models.GpioPin.query.filter_by(pin_index = bcm_id, host_name = constant.HOST_NAME).first()
+        gpio_pin = models.GpioPin.query.filter_by(pin_index_bcm = bcm_id, host_name = constant.HOST_NAME).first()
         if gpio_pin:
             gpio_pin.pin_value = pin_value
             commit()
