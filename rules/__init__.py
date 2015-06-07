@@ -26,7 +26,7 @@ def parse_rules(obj, change):
             #calling rule methods with first param type equal to passed object type
             if type(obj) == type(first_param):
                 result = getattr(rules, func[0])(obj=obj, field_changed_list=field_changed_list)
-                print result
+                logger.debug('Rule returned {}'.format(result))
 
 
 def thread_run():

@@ -17,7 +17,7 @@ def relay_update(gpio_pin_code=None, pin_value=None):
         gpiopin = models.GpioPin.query.filter_by(pin_code=gpio_pin_code, host_name=constant.HOST_NAME).first()
         result = None
         if gpiopin:
-            pin_value = relay_set(pin=gpiopin.pin_index, value=pin_value, from_web=False)
+            pin_value = relay_set(pin_bcm=gpiopin.pin_index, value=pin_value, from_web=False)
             result = pin_value
             gpiopin.pin_value = pin_value
             gpiopin.notify_transport_enabled = False
@@ -28,6 +28,7 @@ def relay_update(gpio_pin_code=None, pin_value=None):
         logger.warning('Error updating relay state err={}'.format(ex))
     return result
 
+#pin expected format is bcm
 def relay_get(pin=None, from_web=False):
     message = 'Get relay state for pin {}'.format(pin)
     logger.info(message)
@@ -43,12 +44,12 @@ def relay_get(pin=None, from_web=False):
     else:
         return pin_value
 
-def relay_set(pin=None, value=None, from_web=False):
+def relay_set(pin_bcm=None, value=None, from_web=False):
     value = int(value)
-    message = 'Set relay state {} for pin {}'.format(value, pin)
+    message = 'Set relay state {} for pin {}'.format(value, pin_bcm)
     #logger.info(message)
     if constant.HOST_MACHINE_TYPE in [constant.MACHINE_TYPE_RASPBERRY, constant.MACHINE_TYPE_BEAGLEBONE]:
-        pin_value = gpio_pi_bbb.set_pin_bcm(pin, value)
+        pin_value = gpio_pi_bbb.set_pin_bcm(pin_bcm, value)
     else:
         message += ' error not running on gpio enabled devices'
         pin_value = None
@@ -64,6 +65,40 @@ def return_web_message(pin_value, ok_message='', err_message=''):
         return ok_message + '\n' + constant.SCRIPT_RESPONSE_OK + '=' + pin_value
     else:
         return err_message + '\n'
+
+def gpio_record_update(json_object):
+    #save sensor state to db, except for current node
+    #carefull not to trigger infinite recursion updates
+    try:
+        host_name = utils.get_object_field_value(json_object, 'name')
+        logger.debug('Received gpio state update from {}'.format(host_name))
+        if host_name == constant.HOST_NAME:
+            #execute local pin change related actions like turn on/off a relay
+            global initialised
+            if initialised:
+                #FIXME: complete this
+                pin = utils.get_object_field_value(json_object, 'pin_index')
+                value = utils.get_object_field_value(json_object, 'pin_value')
+                relay_set(pin_bcm=pin, value=value, from_web=False)
+
+        else:
+            id = utils.get_object_field_value(json_object, 'id')
+            record = models.GpioPin(id=id)
+            assert isinstance(record, models.GpioPin)
+            record.pin_type = utils.get_object_field_value(json_object, 'pin_type')
+            record.pin_code = utils.get_object_field_value(json_object, 'pin_code')
+            record.pin_index_bcm = utils.get_object_field_value(json_object, 'pin_index')
+            record.pin_value = utils.get_object_field_value(json_object, 'pin_value')
+            record.pin_direction = utils.get_object_field_value(json_object, 'pin_direction')
+            record.is_active = utils.get_object_field_value(json_object, 'is_active')
+            record.updated_on = utils.get_base_location_now_date()
+            current_record = models.GpioPin.query.filter_by(id=id).first()
+            record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=False,
+                                       save_to_graph=False)
+            db.session.commit()
+    except Exception, ex:
+        logger.warning('Error on sensor update, err {}'.format(ex))
+    pass
 
 def unload():
     global initialised
@@ -94,7 +129,7 @@ def init():
         elif value == '':
             response = return_web_message(pin_value=None, err_message='Argument [value] not provided')
         else:
-            response = relay_set(pin=pin, value=value, from_web=True)
+            response = relay_set(pin_bcm=pin, value=value, from_web=True)
         return response
     initialised = True
 

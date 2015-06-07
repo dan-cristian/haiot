@@ -324,9 +324,9 @@ def populate_tables(model_auto_update=False):
                     pincode = '0'+str(pin)
                     gpio.pin_code = 'P'+str(rail)+'_'+pincode[-2:]
                     if bbb_bcm_map.has_key(gpio.pin_code):
-                        gpio.pin_index = bbb_bcm_map[gpio.pin_code]
+                        gpio.pin_index_bcm = bbb_bcm_map[gpio.pin_code]
                     else:
-                        gpio.pin_index = ''
+                        gpio.pin_index_bcm = ''
                     db.session.add(gpio)
         commit()
 
@@ -341,7 +341,7 @@ def populate_tables(model_auto_update=False):
                 gpio.pin_type = constant.GPIO_PIN_TYPE_PI
                 gpio.host_name = host_name
                 gpio.pin_code = str(pin)
-                gpio.pin_index = pin
+                gpio.pin_index_bcm = pin
                 db.session.add(gpio)
         commit()
 
