@@ -12,6 +12,7 @@ import graph_plotly
 import node
 import sensor
 import heat
+import relay
 
 
 __mqtt_event_list = []
@@ -19,17 +20,25 @@ __mqtt_event_list = []
 
 def handle_local_event_db_post(model, row):
     #executed on local db changes done via web ui only
-    print 'Signal was sent by model {} row {}'.format(model, row)
+    processed = False
+    #print 'Signal was sent by model {} row {}'.format(model, row)
     if str(models.Parameter) in str(model):
-        logger.info('Detected Parameter change ' + row)
+        processed = True
     elif str(models.Module) in str(model):
-        logger.info('Detected Module change, applying potential changes')
         if row.host_name == constant.HOST_NAME:
             main.init_module(row.name, row.active)
-    elif str(models.Node) in str(model):
-        logger.info('Detected Node change, applying potential changes')
+            processed = True
+    elif str(models.Node) in str(model) or str(models.GpioPin) in str(model):
         txt = model_helper.model_row_to_json(row, operation='update')
-        transport.send_message_json(json = txt)
+        if transport.mqtt_io.client_connected:
+            transport.send_message_json(json = txt)
+        else:
+            #execute event directly as a shortcut as mqtt is not available
+            handle_event_mqtt_received(None, None, 'direct-event', txt)
+        processed = True
+
+    if processed:
+        logger.info('Detected {} record change, row={}, trigger executed'.format(model, row))
 
 
 def handle_event_mqtt_received(client, userdata, topic, obj):

@@ -6,7 +6,7 @@ from common import utils
 from main import logger
 from plotly import graph_objs
 import plotly.plotly as py
-from plotly.exceptions import PlotlyError, PlotlyAccountError, PlotlyListEntryError
+from plotly.exceptions import PlotlyError, PlotlyAccountError, PlotlyListEntryError, PlotlyRequestError
 
 #list of series unique identifier used to determine trace order remote, key is graph name
 #each trace id list starts with a standard reference element used to get graph url, not ideal!
@@ -127,11 +127,18 @@ def get_reference_trace_for_append(graph_unique_name='', shape_type=''):
 def download_trace_id_list(graph_unique_name='', shape_type=''):
     logger.info('Downloading online traces in memory, graph {} shape {}'.format(graph_unique_name, shape_type))
     start_date = utils.get_base_location_now_date()
+    result = -1
     try:
         result=py.file_ops.mkdirs(get_folder_name())
         logger.debug('Created archiving folder {} result {}'.format(get_folder_name(), result))
+    except PlotlyRequestError, ex:
+        if hasattr(ex, 'HTTPError'):
+            msg = str(ex.HTTPError) + ex.HTTPError.response.content
+        else:
+            msg = str(ex)
+        logger.info('Ignoring error on create archive folder {} err={}'.format(get_folder_name(), msg))
     except Exception, ex:
-        logger.warning('Unable to create archive folder {} err {}'.format(get_folder_name(), ex))
+        logger.warning('Unable to create archive folder {} err={} res={}'.format(get_folder_name(), ex, result))
 
     global g_reference_trace_id
     #reseting known series and graphs to download again clean
@@ -217,17 +224,21 @@ class PlotlyGraph:
         self.lock.acquire()
         try:
             if len(self.data) == 0:
+                #init data records on first add
                 self.data = data
             else:
                 i = 0
                 for data_line in data:
+                    if len(self.data) <= i:
+                        #missing records
+                        self.data.append(data_line)
                     if len(data_line['x']) > 0:
                         self.data[i]['x'].append(data_line['x'][0])
                         self.data[i]['y'].append(data_line['y'][0])
                         self.data[i]['name'] = data_line['name']
                     i += 1
         except Exception, ex:
-            logger.warning('Err add_data data={}'.format(data))
+            logger.warning('Err {} add_data data={}'.format(ex, data))
         finally:
             self.lock.release()
 
