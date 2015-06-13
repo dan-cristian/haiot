@@ -409,10 +409,11 @@ class ZoneCustomRelay(db.Model, DbEvent):
     relay_is_on = db.Column(db.Boolean)
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    def __init__(self, zone_id='', gpio_pin_code='', host_name=''):
+    def __init__(self, zone_id='', gpio_pin_code='', host_name='', relay_pin_name=''):
         self.zone_id = zone_id
         self.gpio_pin_code = gpio_pin_code
         self.gpio_host_name = host_name
+        self.relay_pin_name = relay_pin_name
 
     def __repr__(self):
         return 'host {} {} {} {}'.format(self.gpio_host_name, self.gpio_pin_code, self.relay_pin_name, self.relay_is_on)
