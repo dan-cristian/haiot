@@ -307,7 +307,8 @@ def populate_tables(model_auto_update=False):
 
     check_table_schema(models.GpioPin, model_auto_update)
     bbb_bcm_map={
-        'P9_11':30, 'P9_12':60, 'P9_13':31, 'P9_14':40, 'P9_15':48, 'P9_16':51, 'P9_24':15, 'P9_23':49, 'P9_22':2,
+        'P9_11':30, 'P9_12':60, 'P9_13':31, 'P9_14':40, 'P9_15':48, 'P9_16':51, 'P9_24':15, 'P9_23':49,
+        'P9_22':2,  'P9_21':3,
         'P8_07':66, 'P8_08':67, 'P8_09':69, 'P8_11':45, 'P8_12':44, 'P8_15':47, 'P8_16':46
     }
     if len(models.GpioPin.query.filter_by(pin_type=constant.GPIO_PIN_TYPE_BBB,
@@ -384,7 +385,7 @@ def populate_tables(model_auto_update=False):
     check_table_schema(models.ZoneCustomRelay, model_auto_update)
     custom_relay_list={
         #37=back valve 36=front valve
-        'beaglebone': [[37, 'P9_24', 'back_pump'], [36, 'P9_23', 'front_pump']]
+        'beaglebone': [[37, 'P9_24', 'back_pump'], [36, 'P9_21', 'front_pump']]
     }
     if len(models.ZoneCustomRelay.query.all()) < len(custom_relay_list):
         models.ZoneCustomRelay.query.delete()
