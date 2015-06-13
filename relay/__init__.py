@@ -67,27 +67,18 @@ def return_web_message(pin_value, ok_message='', err_message=''):
         return err_message + '\n'
 
 def gpio_record_update(json_object):
-    #save sensor state to db, except for current node
+    #save relay io state to db, except for current node
     #carefull not to trigger infinite recursion updates
     try:
         host_name = utils.get_object_field_value(json_object, 'name')
-        logger.debug('Received gpio state update from {}'.format(host_name))
-        if host_name == constant.HOST_NAME:
-            #execute local pin change related actions like turn on/off a relay
-            global initialised
-            if initialised:
-                #FIXME: complete this
-                pin = utils.get_object_field_value(json_object, 'pin_index')
-                value = utils.get_object_field_value(json_object, 'pin_value')
-                relay_set(pin_bcm=pin, value=value, from_web=False)
-
-        else:
+        logger.info('Received gpio state update from {}'.format(host_name))
+        if host_name != constant.HOST_NAME:
             id = utils.get_object_field_value(json_object, 'id')
             record = models.GpioPin(id=id)
             assert isinstance(record, models.GpioPin)
             record.pin_type = utils.get_object_field_value(json_object, 'pin_type')
             record.pin_code = utils.get_object_field_value(json_object, 'pin_code')
-            record.pin_index_bcm = utils.get_object_field_value(json_object, 'pin_index')
+            record.pin_index_bcm = utils.get_object_field_value(json_object, 'pin_index_bcm')
             record.pin_value = utils.get_object_field_value(json_object, 'pin_value')
             record.pin_direction = utils.get_object_field_value(json_object, 'pin_direction')
             record.is_active = utils.get_object_field_value(json_object, 'is_active')
@@ -97,8 +88,45 @@ def gpio_record_update(json_object):
                                        save_to_graph=False)
             db.session.commit()
     except Exception, ex:
-        logger.warning('Error on sensor update, err {}'.format(ex))
+        logger.warning('Error on gpio state update, err {}'.format(ex))
     pass
+
+def zone_custom_relay_record_update(json_object):
+    #save relay state to db, except for current node
+    #carefull not to trigger infinite recursion updates
+    try:
+        host_name = utils.get_object_field_value(json_object, 'name')
+        logger.info('Received custom relay state update from {}'.format(host_name))
+        if host_name == constant.HOST_NAME:
+            #execute local pin change related actions like turn on/off a relay
+            global initialised
+            if initialised:
+                #FIXME: complete this
+                gpio_pin_code = utils.get_object_field_value(json_object, 'gpio_pin_code')
+                gpio_record = models.GpioPin.query.filter_by(gpio_pin_code=gpio_pin_code,
+                                                             host_name=constant.HOST_NAME).first()
+                if gpio_record:
+                    value = 1 if utils.get_object_field_value(json_object, 'relay_is_on') else 0
+                    relay_set(pin_bcm=gpio_record.pin_index_bcm, value=value, from_web=False)
+                else:
+                    logger.warning('Could not find gpio record for custom relay pin code={}'.format(gpio_pin_code))
+
+        else:
+            id = utils.get_object_field_value(json_object, 'id')
+            record = models.ZoneCustomRelay(id=id)
+            assert isinstance(record, models.ZoneCustomRelay)
+            record.relay_pin_name = utils.get_object_field_value(json_object, 'relay_pin_name')
+            record.zone_id = utils.get_object_field_value(json_object, 'zone_id')
+            record.gpio_pin_code = utils.get_object_field_value(json_object, 'gpio_pin_code')
+            record.gpio_host_name = utils.get_object_field_value(json_object, 'gpio_host_name')
+            record.relay_is_on = utils.get_object_field_value(json_object, 'relay_is_on')
+            record.updated_on = utils.get_base_location_now_date()
+            current_record = models.ZoneCustomRelay.query.filter_by(id=id).first()
+            record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=False,
+                                       save_to_graph=False)
+            db.session.commit()
+    except Exception, ex:
+        logger.warning('Error on zone custom relay update, err {}'.format(ex))
 
 def unload():
     global initialised
