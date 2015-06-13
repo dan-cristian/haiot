@@ -383,8 +383,8 @@ def populate_tables(model_auto_update=False):
 
     check_table_schema(models.ZoneCustomRelay, model_auto_update)
     custom_relay_list={
-        #37=back valve
-        'beaglebone': [[37, 'P9_24']]
+        #37=back valve 36=front valve
+        'beaglebone': [[37, 'P9_24', 'back_pump'], [36, 'P9_23', 'front_pump']]
     }
     if len(models.ZoneCustomRelay.query.all()) < len(custom_relay_list):
         models.ZoneCustomRelay.query.delete()
@@ -392,7 +392,8 @@ def populate_tables(model_auto_update=False):
         for host_name in custom_relay_list.keys():
             logger.info('Populating ZoneCustomRelay for {} with default values'.format(host_name))
             for pair in custom_relay_list[host_name]:
-                db.session.add(models.ZoneCustomRelay(zone_id=pair[0], gpio_pin_code=pair[1], host_name=host_name))
+                db.session.add(models.ZoneCustomRelay(zone_id=pair[0], gpio_pin_code=pair[1], host_name=host_name,
+                                                      relay_pin_name=pair[2]))
         commit()
 
     #if True:
