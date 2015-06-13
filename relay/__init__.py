@@ -17,7 +17,7 @@ def relay_update(gpio_pin_code=None, pin_value=None):
         gpiopin = models.GpioPin.query.filter_by(pin_code=gpio_pin_code, host_name=constant.HOST_NAME).first()
         result = None
         if gpiopin:
-            pin_value = relay_set(pin_bcm=gpiopin.pin_index, value=pin_value, from_web=False)
+            pin_value = relay_set(pin_bcm=gpiopin.pin_index_bcm, value=pin_value, from_web=False)
             result = pin_value
             gpiopin.pin_value = pin_value
             gpiopin.notify_transport_enabled = False
