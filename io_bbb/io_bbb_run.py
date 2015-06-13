@@ -34,10 +34,10 @@ def register_gpios():
                                                       host_name=constant.HOST_NAME).first()
             if gpio_pin:
                 #record this pin as used to enable clean shutdown
-                if gpio_pin.pin_index != '':
-                    gpio_pi_bbb.get_pin_bcm(gpio_pin.pin_index)
+                if gpio_pin.pin_index_bcm != '':
+                    gpio_pi_bbb.get_pin_bcm(gpio_pin.pin_index_bcm)
                 GPIO.setup(zonealarm.gpio_pin_code, GPIO.IN)
-                gpio_pi_bbb.set_pin_edge(gpio_pin.pin_index, 'both')
+                gpio_pi_bbb.set_pin_edge(gpio_pin.pin_index_bcm, 'both')
                 try:
                     GPIO.add_event_detect(zonealarm.gpio_pin_code, GPIO.BOTH)#, callback=event_detected, bouncetime=300)
                     __pool_pin_codes.append(zonealarm.gpio_pin_code)
