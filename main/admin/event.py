@@ -21,7 +21,7 @@ __mqtt_event_list = []
 def handle_local_event_db_post(model, row):
     #executed on local db changes done via web ui only
     processed = False
-    #print 'Signal was sent by model {} row {}'.format(model, row)
+    logger.info('Local DB change sent by model {} row {}'.format(model, row))
     if str(models.Parameter) in str(model):
         processed = True
     elif str(models.Module) in str(model):
