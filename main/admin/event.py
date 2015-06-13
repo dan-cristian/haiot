@@ -28,7 +28,8 @@ def handle_local_event_db_post(model, row):
         if row.host_name == constant.HOST_NAME:
             main.init_module(row.name, row.active)
             processed = True
-    elif str(models.Node) in str(model) or str(models.GpioPin) in str(model):
+    elif str(models.Node) in str(model) \
+            or str(models.GpioPin) in str(model) or str(models.ZoneCustomRelay) in str(model):
         txt = model_helper.model_row_to_json(row, operation='update')
         if transport.mqtt_io.client_connected:
             transport.send_message_json(json = txt)
@@ -97,6 +98,11 @@ def mqtt_thread_run():
                         heat.heat_update(obj)
                 elif table == utils.get_table_name(models.Sensor):
                     sensor.sensor_update(obj)
+                elif table == utils.get_table_name(models.ZoneCustomRelay):
+                    relay.zone_custom_relay_record_update(obj)
+                elif table == utils.get_table_name(models.GpioPin):
+                    relay.gpio_record_update(obj)
+
 
             if constant.JSON_MESSAGE_TYPE in obj:
                 if variable.NODE_THIS_IS_MASTER_LOGGING:
