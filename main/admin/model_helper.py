@@ -104,129 +104,25 @@ def populate_tables(model_auto_update=False):
     with open(utils.get_app_root_path() + 'scripts/config/default_db_values.json', 'r') as f:
         db_values_json = json.load(f)
 
-    param_list=[
-            ['1', constant.P_MZP_SERVER_URL, 'http://192.168.0.10'],
-            ['2', constant.P_OWSERVER_HOST_1, '127.0.0.1'],
-            ['3', constant.P_OWSERVER_PORT_1, '4304'],
-            ['4', constant.P_MQTT_HOST_1, '192.168.0.9'],
-            ['5', constant.P_MQTT_PORT_1, '1883'],
-            ['6', constant.P_MQTT_TOPIC, 'iot/main'],
-            ['7', constant.P_MQTT_HOST_2, '192.168.0.115'],
-            ['8', constant.P_MQTT_PORT_2, '1883'],
-            ['9', constant.P_PLOTLY_USERNAME, 'xxx'],#not used
-            ['10', constant.P_PLOTLY_APIKEY, 'zzz'],#not used
-            ['11', constant.P_DDNS_RACKSPACE_CONFIG_FILE, '/home/dcristian/.rackspace.ddnsupdate.config.json'],
-            ['12', constant.P_USESUDO_DISKTOOLS, 'False'],
-            ['13', constant.P_MQTT_HOST_3, 'iot.eclipse.org'],
-            ['14', constant.P_MQTT_PORT_3, '1883'],
-            ['15', constant.P_PLOTLY_ALTERNATE_CONFIG, '.plotly.credentials'],
-            ['16', constant.P_FLASK_WEB_PORT, '8080'],
-            ['17', constant.P_MOTION_VIDEO_PATH, '/media/temp/motion'],
-            ['18', constant.P_YOUTUBE_CREDENTIAL_FILE, '.youtube.credentials']
-        ]
-    check_table_schema(models.Parameter, model_auto_update)
-    if len(models.Parameter.query.all()) < len(param_list):
-        logger.info('Populating Parameter with default values')
-        models.Parameter.query.delete()
-        for param_tuple in param_list:
-            param=models.Parameter(id=param_tuple[0], name=param_tuple[1], value=param_tuple[2])
-            db.session.add(param)
-            commit()
-
-    table_collection = [models.Zone, models.ZoneCustomRelay, models.Scheduler]
+    table_collection = [models.Parameter, models.Zone, models.ZoneCustomRelay, models.Scheduler,
+                        models.TemperatureTarget, models.SchedulePattern, models.SystemMonitor,
+                        models.SystemDisk, models.Sensor, models.Ups, models.ZoneSensor, models.ZoneAlarm]
 
     for table in table_collection:
         table_str = utils.get_table_name(table)
         check_table_schema(table, model_auto_update)
-        default_values=db_values_json[table_str]
-        if len(models.Scheduler.query.all()) < len(default_values):
-            logger.info('Populating {} with default values'.format(table_str))
-            table.query.delete()
-            commit()
-            for config_record in default_values:
-                new_record = table()
-                for field in config_record:
-                    setattr(new_record, field, config_record[field])
-                db.session.add(new_record)
-            commit()
-
-    #check_table_schema(models.Zone, model_auto_update)
-    #zones = [[1,'bucatarie'], [2,'living'],[3,'beci mic'],[4,'dormitor'],[5,'baie mare'],
-    #         [6,'bebe'],[7,'curte fata'],[8,'hol intrare'],[9,'beci mare'],[10,'scari beci'],[11,'etaj hol'],
-    #         [12,'curte fata'],[13,'living tv'],[14,'usa poarta'],[15,'usa casa'],[16, 'usa portita'],
-    #         [17,'usa garaj mare'], [18, 'buton usa'], [19, 'heat main'], [20, 'heat living'], [21, 'heat birou'],
-    #         [22, 'heat bucatarie'], [23, 'fridge'], [24, 'powermeter'], [25,'boiler'], [26,'congelator'],
-    #         [27,'pod fata'], [28,'drum fata'],[29,'hol beci'],[30,'power beci'],[31,'gas heater'],
-    #         [32,'watermain'],[33,'watersecond'],[34,'horn'],[35,'gas meter'],[36,'front valve'],
-    #         [37,'back valve'],[38,'puffer'],[39,'back pump'],[40,'back lights'],[41,'front lights'],
-    #         [42,'hotwater mater'], [43,'headset'],[44,'heat dormitor'],[45,'powerserver'],[46,'ups main'],
-    #         [47,'birou'], [48, 'solar jos'], [49, 'congelator']
-    #         ]
-    #if len(models.Zone.query.all()) < len(zones):
-    #    logger.info('Populating Zone with default values')
-    #    models.Zone.query.delete()
-    #    for pair in zones:
-    #        db.session.add(models.Zone(pair[0], pair[1]))
-    #    commit()
-
-    temptarget_list=[
-            [ 1, '.', 18],
-            [ 2, '0', 20],
-            [ 3, 'a', 20.5],
-            [ 4, '1', 21],
-            [ 5, 'b', 21.5],
-            [ 6, '2', 22],
-            [ 7, 'c', 22.5],
-            [ 8, '3', 23],
-            [ 9, 'd', 23.5],
-            [10, '4', 24],
-            [11, 'e', 24.5]
-            ]
-    check_table_schema(models.TemperatureTarget, model_auto_update)
-    if len(models.TemperatureTarget.query.all()) < len(temptarget_list):
-        logger.info('Populating Temperature Target with default values')
-        models.TemperatureTarget.query.delete()
-        for tuple in temptarget_list:
-            record=models.TemperatureTarget(id=tuple[0], code=tuple[1], target=tuple[2])
-            db.session.add(record)
-        commit()
-
-    value_list=[
-            # hour in day, 24 hr format  0    4    8    12   16   20   
-            [1, 'week-bucatarie',       '.... ..22 .... .... ..22 2222'],
-            [2, 'weekend-bucatarie',    '.... .... 2222 2222 2222 2222'],
-            [3, 'week-living',          '.... .... .... .... ..22 2222'],
-            [4, 'weekend-living',       '.... .... 2222 2222 2222 2222'],
-            [5, 'week-birou',           '.... .... .... .... ..22 2222'],
-            [6, 'weekend-birou',        '.... .... 2222 2222 2222 2222'],
-            [7, 'week-dormitor',        'bbbb bbb. .... .... .... bbbb'],
-            [8, 'weekend-dormitor',     'bbbb bbb. .... .bbb .... bbbb']
-            ]
-    check_table_schema(models.SchedulePattern, model_auto_update)
-    if len(models.SchedulePattern.query.all()) < len(value_list):
-        logger.info('Populating Schedule Pattern with default values')
-        models.SchedulePattern.query.delete()
-        for tuple in value_list:
-            record=models.SchedulePattern(id=tuple[0], name=tuple[1], pattern=tuple[2])
-            db.session.add(record)
-        commit()
-
-    value_list=[
-            #id, zone_id, week_id, weekend_id
-            [1,  1, 1, 2], #bucatarie
-            [2,  2, 3, 4], #living
-            [3, 47, 5, 6], #birou
-            [4,  4, 7, 8], #dormitor   
-            ]
-    check_table_schema(models.HeatSchedule, model_auto_update)
-    if len(models.HeatSchedule.query.all()) < len(value_list):
-        logger.info('Populating Heat Schedule with default values')
-        models.HeatSchedule.query.delete()
-        for tuple in value_list:
-            record=models.HeatSchedule(id=tuple[0], zone_id=tuple[1], pattern_week_id=tuple[2],
-                                       pattern_weekend_id=tuple[3])
-            db.session.add(record)
-        commit()
+        if hasattr(db_values_json, table_str):
+            default_values = db_values_json[table_str]
+            if len(models.Scheduler.query.all()) < len(default_values):
+                logger.info('Populating {} with default values'.format(table_str))
+                table.query.delete()
+                commit()
+                for config_record in default_values:
+                    new_record = table()
+                    for field in config_record:
+                        setattr(new_record, field, config_record[field])
+                    db.session.add(new_record)
+                commit()
 
     check_table_schema(models.Node, model_auto_update)
     if len(models.Node.query.filter_by(name=constant.HOST_NAME).all()) == 0:
@@ -253,18 +149,6 @@ def populate_tables(model_auto_update=False):
         commit()
     node_obj = models.Node.query.filter_by(name=constant.HOST_NAME).first()
     constant.HOST_PRIORITY = node_obj.priority
-
-    check_table_schema(models.SystemMonitor, model_auto_update)
-    check_table_schema(models.SystemDisk, model_auto_update)
-    check_table_schema(models.Sensor, model_auto_update)
-    check_table_schema(models.Ups, model_auto_update)
-
-    #if len(models.Sensor.query.all()) == 0:
-        #logger.info('Populating Sensor with a test value')
-        #sens = models.Sensor(address='ADDRESSTEST')
-        #db.session.add(models.Sensor(0, address='ADDRESSTEST'))
-        #db.session.add(sens)
-        #commit(db.session)
 
     import alarm, heat, sensor, relay, health_monitor, graph_plotly, node, io_bbb, webui, main, ddns, rules
     from transport import mqtt_io
@@ -366,76 +250,4 @@ def populate_tables(model_auto_update=False):
                 gpio.pin_index_bcm = pin
                 db.session.add(gpio)
         commit()
-
-    check_table_schema(models.ZoneAlarm, model_auto_update)
-    zonealarm_list={
-        #47-birou, 1-bucatarie, 2-living, 3-beci mic, 9-beci mare, 10-scari beci, 11-etaj hol
-        'beaglebone':[[47, 'P8_11'],[1,'P8_08'],[2,'P8_16'],[3,'P8_12'],[9,'P8_09'],[10,'P8_07'], [11,'P8_15']]
-    }
-    if len(models.ZoneAlarm.query.all()) < len(zonealarm_list):
-        for host_name in zonealarm_list.keys():
-            logger.info('Populating ZoneAlarm for {} with default values'.format(host_name))
-            models.ZoneAlarm.query.delete()
-            commit()
-            for pair in zonealarm_list[host_name]:
-                db.session.add(models.ZoneAlarm(pair[0], pair[1], host_name))
-        commit()
-
-    check_table_schema(models.ZoneHeatRelay, model_auto_update)
-    #fixme: mapping not correct
-    heat_relay_list={
-        #1=bucatarie, 2=living, 47=birou, 4=dormitor
-        'beaglebone': [[1, 'P9_13'], [2, 'P9_12'], [47, 'P9_11'], [4, 'P9_15']],
-        #19=heat main
-        'pi-power': [[19, '24']]
-        #for test only
-        #,'netbook':[[47, 'P9_13']]
-    }
-    #,[4,'P8_16']
-    heat_main_source_zone_id=19
-    if len(models.ZoneHeatRelay.query.all()) < len(heat_relay_list):
-        models.ZoneHeatRelay.query.delete()
-        commit()
-        for host_name in heat_relay_list.keys():
-            logger.info('Populating ZoneHeatRelay for {} with default values'.format(host_name))
-            for pair in heat_relay_list[host_name]:
-                db.session.add(models.ZoneHeatRelay(zone_id=pair[0], gpio_pin_code=pair[1], host_name=host_name,
-                                                    is_main_heat_source=(pair[0] == heat_main_source_zone_id)))
-        commit()
-
-    #check_table_schema(models.ZoneCustomRelay, model_auto_update)
-    #custom_relay_list={
-    #    #37=back valve 36=front valve
-    #    'beaglebone': [[37, 'P9_24', 'back_pump'], [36, 'P9_21', 'front_pump']]
-    #}
-    #if len(models.ZoneCustomRelay.query.all()) < len(custom_relay_list):
-    #    models.ZoneCustomRelay.query.delete()
-    #    commit()
-    #    for host_name in custom_relay_list.keys():
-    #        logger.info('Populating ZoneCustomRelay for {} with default values'.format(host_name))
-    #        for pair in custom_relay_list[host_name]:
-    #            db.session.add(models.ZoneCustomRelay(zone_id=pair[0], gpio_pin_code=pair[1], host_name=host_name,
-    #                                                  relay_pin_name=pair[2]))
-    #    commit()
-
-    #if True:
-    check_table_schema(models.ZoneSensor, model_auto_update)
-    zonesensor_list=[
-            [34, '5C000004F344F828','horn'],[3,'95000003BDF98428','beci mic'],[48,'D9000004F3BFA428', 'solar jos'],
-            [38,'04000004F3DE2128', 'puffer sus'],[38,'AE000003BDFFB928', 'puffer mijloc'],
-            [38,'12000004F3428528', 'puffer jos'], [31,'66000003BE22ED28', 'gas heater'],
-            [25, '96000003BDFE5D28', 'boiler sus'], [25, '53000004F296DD28', 'boiler mijloc'],
-            [25, 'C8000004F28B0728', 'boiler jos'], [2, '41000003BE099C28', 'living'],
-            [1, 'AA000003BDE6C728', 'bucatarie'], [27, 'E400000155E72D26', 'pod fata'],
-            [4, 'B5000004F3285F28', 'dormitor'], [23, 'f3:01','fridge'], [49, 'f9:01', 'congelator']
-        ]
-
-    if len(models.ZoneSensor.query.all()) < len(zonesensor_list):
-        logger.info('Populating ZoneSensor with default values')
-        models.ZoneSensor.query.delete()
-        commit()
-        for pair in zonesensor_list:
-            db.session.add(models.ZoneSensor(zone_id=pair[0], sensor_address=pair[1], sensor_name=pair[2]))
-        commit()
-
 
