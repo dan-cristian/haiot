@@ -417,3 +417,18 @@ class ZoneCustomRelay(db.Model, DbEvent):
 
     def __repr__(self):
         return 'host {} {} {} {}'.format(self.gpio_host_name, self.gpio_pin_code, self.relay_pin_name, self.relay_is_on)
+
+class Scheduler(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True)
+    minutes = db.Column(db.String(20))
+    hours = db.Column(db.String(20))
+    dayofmonth = db.Column(db.String(20))
+    month = db.Column(db.String(20))
+    dayofweek = db.Column(db.String(20))
+    year = db.Column(db.String(20), default='*')
+    command = db.Column(db.String(50))
+    is_active = db.Column(db.Boolean, default=False)
+
+    def __repr__(self):
+        return '{} {} {} {}'.format(self.is_active, self.command)

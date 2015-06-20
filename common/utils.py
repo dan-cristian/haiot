@@ -86,3 +86,6 @@ def get_base_location_now_date():
     delta =  utc.localize(now) - tz.localize(now)
     local_date_as_base = now + delta
     return local_date_as_base
+
+def get_app_root_path():
+    return os.getcwd() + '/'

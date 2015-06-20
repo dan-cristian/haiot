@@ -3,7 +3,7 @@ import random
 import sys
 import datetime
 import uuid
-
+import json
 from sqlalchemy.exc import IntegrityError, OperationalError, InvalidRequestError
 
 from main import logger
@@ -101,6 +101,9 @@ def read_drop_table(table, original_exception, drop_without_user_ask=False):
         raise original_exception
 
 def populate_tables(model_auto_update=False):
+    with open(utils.get_app_root_path() + 'scripts/config/default_db_values.json', 'r') as f:
+        db_values_json = json.load(f)
+
     param_list=[
             ['1', constant.P_MZP_SERVER_URL, 'http://192.168.0.10'],
             ['2', constant.P_OWSERVER_HOST_1, '127.0.0.1'],
@@ -130,24 +133,41 @@ def populate_tables(model_auto_update=False):
             db.session.add(param)
             commit()
 
-    check_table_schema(models.Zone, model_auto_update)
-    zones = [[1,'bucatarie'], [2,'living'],[3,'beci mic'],[4,'dormitor'],[5,'baie mare'],
-             [6,'bebe'],[7,'curte fata'],[8,'hol intrare'],[9,'beci mare'],[10,'scari beci'],[11,'etaj hol'],
-             [12,'curte fata'],[13,'living tv'],[14,'usa poarta'],[15,'usa casa'],[16, 'usa portita'],
-             [17,'usa garaj mare'], [18, 'buton usa'], [19, 'heat main'], [20, 'heat living'], [21, 'heat birou'],
-             [22, 'heat bucatarie'], [23, 'fridge'], [24, 'powermeter'], [25,'boiler'], [26,'congelator'],
-             [27,'pod fata'], [28,'drum fata'],[29,'hol beci'],[30,'power beci'],[31,'gas heater'],
-             [32,'watermain'],[33,'watersecond'],[34,'horn'],[35,'gas meter'],[36,'front valve'],
-             [37,'back valve'],[38,'puffer'],[39,'back pump'],[40,'back lights'],[41,'front lights'],
-             [42,'hotwater mater'], [43,'headset'],[44,'heat dormitor'],[45,'powerserver'],[46,'ups main'],
-             [47,'birou'], [48, 'solar jos'], [49, 'congelator']
-             ]
-    if len(models.Zone.query.all()) < len(zones):
-        logger.info('Populating Zone with default values')
-        models.Zone.query.delete()
-        for pair in zones:
-            db.session.add(models.Zone(pair[0], pair[1]))
-        commit()
+    table_collection = [models.Zone, models.ZoneCustomRelay, models.Scheduler]
+
+    for table in table_collection:
+        table_str = utils.get_table_name(table)
+        check_table_schema(table, model_auto_update)
+        default_values=db_values_json[table_str]
+        if len(models.Scheduler.query.all()) < len(default_values):
+            logger.info('Populating {} with default values'.format(table_str))
+            table.query.delete()
+            commit()
+            for config_record in default_values:
+                new_record = table()
+                for field in config_record:
+                    setattr(new_record, field, config_record[field])
+                db.session.add(new_record)
+            commit()
+
+    #check_table_schema(models.Zone, model_auto_update)
+    #zones = [[1,'bucatarie'], [2,'living'],[3,'beci mic'],[4,'dormitor'],[5,'baie mare'],
+    #         [6,'bebe'],[7,'curte fata'],[8,'hol intrare'],[9,'beci mare'],[10,'scari beci'],[11,'etaj hol'],
+    #         [12,'curte fata'],[13,'living tv'],[14,'usa poarta'],[15,'usa casa'],[16, 'usa portita'],
+    #         [17,'usa garaj mare'], [18, 'buton usa'], [19, 'heat main'], [20, 'heat living'], [21, 'heat birou'],
+    #         [22, 'heat bucatarie'], [23, 'fridge'], [24, 'powermeter'], [25,'boiler'], [26,'congelator'],
+    #         [27,'pod fata'], [28,'drum fata'],[29,'hol beci'],[30,'power beci'],[31,'gas heater'],
+    #         [32,'watermain'],[33,'watersecond'],[34,'horn'],[35,'gas meter'],[36,'front valve'],
+    #         [37,'back valve'],[38,'puffer'],[39,'back pump'],[40,'back lights'],[41,'front lights'],
+    #         [42,'hotwater mater'], [43,'headset'],[44,'heat dormitor'],[45,'powerserver'],[46,'ups main'],
+    #         [47,'birou'], [48, 'solar jos'], [49, 'congelator']
+    #         ]
+    #if len(models.Zone.query.all()) < len(zones):
+    #    logger.info('Populating Zone with default values')
+    #    models.Zone.query.delete()
+    #    for pair in zones:
+    #        db.session.add(models.Zone(pair[0], pair[1]))
+    #    commit()
 
     temptarget_list=[
             [ 1, '.', 18],
@@ -238,6 +258,7 @@ def populate_tables(model_auto_update=False):
     check_table_schema(models.SystemDisk, model_auto_update)
     check_table_schema(models.Sensor, model_auto_update)
     check_table_schema(models.Ups, model_auto_update)
+
     #if len(models.Sensor.query.all()) == 0:
         #logger.info('Populating Sensor with a test value')
         #sens = models.Sensor(address='ADDRESSTEST')
@@ -382,20 +403,20 @@ def populate_tables(model_auto_update=False):
                                                     is_main_heat_source=(pair[0] == heat_main_source_zone_id)))
         commit()
 
-    check_table_schema(models.ZoneCustomRelay, model_auto_update)
-    custom_relay_list={
-        #37=back valve 36=front valve
-        'beaglebone': [[37, 'P9_24', 'back_pump'], [36, 'P9_21', 'front_pump']]
-    }
-    if len(models.ZoneCustomRelay.query.all()) < len(custom_relay_list):
-        models.ZoneCustomRelay.query.delete()
-        commit()
-        for host_name in custom_relay_list.keys():
-            logger.info('Populating ZoneCustomRelay for {} with default values'.format(host_name))
-            for pair in custom_relay_list[host_name]:
-                db.session.add(models.ZoneCustomRelay(zone_id=pair[0], gpio_pin_code=pair[1], host_name=host_name,
-                                                      relay_pin_name=pair[2]))
-        commit()
+    #check_table_schema(models.ZoneCustomRelay, model_auto_update)
+    #custom_relay_list={
+    #    #37=back valve 36=front valve
+    #    'beaglebone': [[37, 'P9_24', 'back_pump'], [36, 'P9_21', 'front_pump']]
+    #}
+    #if len(models.ZoneCustomRelay.query.all()) < len(custom_relay_list):
+    #    models.ZoneCustomRelay.query.delete()
+    #    commit()
+    #    for host_name in custom_relay_list.keys():
+    #        logger.info('Populating ZoneCustomRelay for {} with default values'.format(host_name))
+    #        for pair in custom_relay_list[host_name]:
+    #            db.session.add(models.ZoneCustomRelay(zone_id=pair[0], gpio_pin_code=pair[1], host_name=host_name,
+    #                                                  relay_pin_name=pair[2]))
+    #    commit()
 
     #if True:
     check_table_schema(models.ZoneSensor, model_auto_update)
@@ -408,6 +429,7 @@ def populate_tables(model_auto_update=False):
             [1, 'AA000003BDE6C728', 'bucatarie'], [27, 'E400000155E72D26', 'pod fata'],
             [4, 'B5000004F3285F28', 'dormitor'], [23, 'f3:01','fridge'], [49, 'f9:01', 'congelator']
         ]
+
     if len(models.ZoneSensor.query.all()) < len(zonesensor_list):
         logger.info('Populating ZoneSensor with default values')
         models.ZoneSensor.query.delete()
@@ -415,3 +437,5 @@ def populate_tables(model_auto_update=False):
         for pair in zonesensor_list:
             db.session.add(models.ZoneSensor(zone_id=pair[0], sensor_address=pair[1], sensor_name=pair[2]))
         commit()
+
+
