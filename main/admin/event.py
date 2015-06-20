@@ -31,6 +31,7 @@ def handle_local_event_db_post(model, row):
     elif str(models.Node) in str(model) \
             or str(models.GpioPin) in str(model) or str(models.ZoneCustomRelay) in str(model):
         txt = model_helper.model_row_to_json(row, operation='update')
+        #fixme: execute critical events directly
         if transport.mqtt_io.client_connected:
             transport.send_message_json(json = txt)
         else:
