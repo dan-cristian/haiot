@@ -274,7 +274,7 @@ def thread_run():
 def init():
     global initialised, __CLIENT_SECRETS_FILE, __youtube
     try:
-        __CLIENT_SECRETS_FILE = os.getcwd() + '/' + model_helper.get_param(constant.P_YOUTUBE_CREDENTIAL_FILE)
+        __CLIENT_SECRETS_FILE = utils.get_app_root_path() + model_helper.get_param(constant.P_YOUTUBE_CREDENTIAL_FILE)
         logger.info('Initialising youtube with credential from {}'.format(__CLIENT_SECRETS_FILE))
         __youtube = get_authenticated_service([])
         dispatcher.connect(file_watcher_event, signal=constant.SIGNAL_FILE_WATCH, sender=dispatcher.Any)

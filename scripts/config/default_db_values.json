@@ -1,0 +1,93 @@
+{
+  "Zone": [
+    {"id":1, "name":"bucatarie"},
+    {"id":2, "name":"living"},
+    {"id":3, "name":"beci mic"},
+    {"id":4, "name":"dormitor"},
+    {"id":5, "name":"baie mare"},
+    {"id":6, "name":"bebe"},
+    {"id":7, "name":"curte fata"},
+    {"id":8, "name":"hol intrare"},
+    {"id":9, "name":"beci mare"},
+    {"id":10, "name":"scari beci"},
+    {"id":11, "name":"etaj hol"},
+    {"id":12, "name":"curte fata"},
+    {"id":13, "name":"living tv"},
+    {"id":14, "name":"usa poarta"},
+    {"id":15, "name":"usa casa"},
+    {"id":16, "name":"usa portita"},
+    {"id":17, "name":"usa garaj mare"},
+    {"id":18, "name":"buton usa"},
+    {"id":19, "name":"heat main"},
+    {"id":20, "name":"heat living"},
+    {"id":21, "name":"heat birou"},
+    {"id":22, "name":"heat bucatarie"},
+    {"id":23, "name":"fridge"},
+    {"id":24, "name":"powermeter"},
+    {"id":25, "name":"boiler"},
+    {"id":26, "name":"congelator"},
+    {"id":27, "name":"pod fata"},
+    {"id":28, "name":"drum fata"},
+    {"id":29, "name":"hol beci"},
+    {"id":30, "name":"power beci"},
+    {"id":31, "name":"gas heater"},
+    {"id":32, "name":"watermain"},
+    {"id":33, "name":"watersecond"},
+    {"id":34, "name":"horn"},
+    {"id":35, "name":"gas meter"},
+    {"id":36, "name":"front valve"},
+    {"id":37, "name":"back valve"},
+    {"id":38, "name":"puffer"},
+    {"id":39, "name":"back pump"},
+    {"id":40, "name":"back lights"},
+    {"id":41, "name":"front lights"},
+    {"id":42, "name":"hotwater mater"},
+    {"id":43, "name":"headset"},
+    {"id":44, "name":"heat dormitor"},
+    {"id":45, "name":"powerserver"},
+    {"id":46, "name":"ups main"},
+    {"id":47, "name":"birou"},
+    {"id":48, "name":"solar jos"},
+    {"id":49, "name":"congelator"}
+  ],
+
+  "Scheduler": [
+    {
+      "name": "frontvalve_relay_on",
+      "minutes": "0",
+      "hours": "5",
+      "dayofmonth": "*",
+      "month": "5-10",
+      "dayofweek": "*",
+      "year": "*",
+      "command": "relay on zone=frontvalve"
+    },
+    {
+      "name": "frontvalve_relay_off",
+      "minutes": "5",
+      "hours": "5",
+      "dayofmonth": "*",
+      "month": "5-10",
+      "dayofweek": "*",
+      "year": "*",
+      "command": "relay off zone=frontvalve"
+    }
+  ],
+  "ZoneCustomerRelay": [
+    {
+      "relay_pin_name": "back_pump",
+      "zone_id": "37",
+      "gpio_pin_code": "P9_24",
+      "gpio_host_name": "beaglebone",
+      "relay_is_on": "0"
+    },
+    {
+      "relay_pin_name": "front_pump",
+      "zone_id": "36",
+      "gpio_pin_code": "P9_21",
+      "gpio_host_name": "beaglebone",
+      "relay_is_on": "0"
+    }
+  ]
+}
+
