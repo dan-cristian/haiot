@@ -11,6 +11,7 @@ import models
 from common import constant, utils
 from main import db
 
+__db_values_json = None
 
 def model_row_to_json(obj, operation=''):
     try:
@@ -44,8 +45,10 @@ def model_row_to_json(obj, operation=''):
         logger.critical('Error convert model obj to json, err {}'.format(ex))
 
 def get_param(name):
+    global __db_values_json
     try:
-        val = models.Parameter.query.filter_by(name=name).first().value
+        val = __db_values_json["Parameter"][name]
+        #val = models.Parameter.query.filter_by(name=name).first().value
         return val
     except ValueError, ex:
         logger.warning('Unable to get parameter {} error {}'.format(name, ex))
@@ -103,8 +106,9 @@ def read_drop_table(table, original_exception, drop_without_user_ask=False):
 def populate_tables(model_auto_update=False):
     var_path = utils.get_app_root_path() + 'scripts/config/default_db_values.json'
     logger.info('Loading variables from config file [{}]'.format(var_path))
+    global __db_values_json
     with open(var_path, 'r') as f:
-        db_values_json = json.load(f)
+        __db_values_json = json.load(f)
 
     table_collection = [models.Parameter, models.Zone, models.ZoneCustomRelay, models.Scheduler,
                         models.TemperatureTarget, models.SchedulePattern, models.SystemMonitor,
@@ -113,8 +117,8 @@ def populate_tables(model_auto_update=False):
     for table in table_collection:
         table_str = utils.get_table_name(table)
         check_table_schema(table, model_auto_update)
-        if hasattr(db_values_json, table_str):
-            default_values = db_values_json[table_str]
+        if hasattr(__db_values_json, table_str):
+            default_values = __db_values_json[table_str]
             if len(models.Scheduler.query.all()) < len(default_values):
                 logger.info('Populating {} with default values'.format(table_str))
                 table.query.delete()
