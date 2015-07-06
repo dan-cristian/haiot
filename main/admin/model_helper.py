@@ -101,7 +101,9 @@ def read_drop_table(table, original_exception, drop_without_user_ask=False):
         raise original_exception
 
 def populate_tables(model_auto_update=False):
-    with open(utils.get_app_root_path() + 'scripts/config/default_db_values.json', 'r') as f:
+    var_path = utils.get_app_root_path() + 'scripts/config/default_db_values.json'
+    logger.info('Loading variables from config file [{}]'.format(var_path))
+    with open(var_path, 'r') as f:
         db_values_json = json.load(f)
 
     table_collection = [models.Parameter, models.Zone, models.ZoneCustomRelay, models.Scheduler,
