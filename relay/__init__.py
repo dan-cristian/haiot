@@ -46,8 +46,8 @@ def relay_get(pin=None, from_web=False):
 
 def relay_set(pin_bcm=None, value=None, from_web=False):
     value = int(value)
-    message = 'Set relay state {} for pin {}'.format(value, pin_bcm)
-    #logger.info(message)
+    message = 'Set relay state [{}] for pin [{}] from web=[]'.format(value, pin_bcm, from_web)
+    logger.info(message)
     if constant.HOST_MACHINE_TYPE in [constant.MACHINE_TYPE_RASPBERRY, constant.MACHINE_TYPE_BEAGLEBONE]:
         pin_value = gpio_pi_bbb.set_pin_bcm(pin_bcm, value)
     else:
@@ -106,7 +106,8 @@ def zone_custom_relay_record_update(json_object):
                                                              host_name=constant.HOST_NAME).first()
                 if gpio_record:
                     value = 1 if utils.get_object_field_value(json_object, 'relay_is_on') else 0
-                    relay_set(pin_bcm=gpio_record.pin_index_bcm, value=value, from_web=False)
+                    pin_bcm = gpio_record.pin_index_bcm
+                    relay_set(pin_bcm=pin_bcm, value=value, from_web=False)
                 else:
                     logger.warning('Could not find gpio record for custom relay pin code={}'.format(gpio_pin_code))
 
