@@ -122,7 +122,7 @@ class SchedulePattern(db.Model):
     name = db.Column(db.String(50))
     pattern = db.Column(db.String(24))
 
-    def __init__(self, id, name, pattern):
+    def __init__(self, id=None, name='', pattern=''):
         if id:
             self.id = id
         self.name = name
@@ -160,8 +160,9 @@ class TemperatureTarget(db.Model):
     code = db.Column(db.String(1))
     target = db.Column(db.Float)
 
-    def __init__(self, id, code, target):
-        self.id = id
+    def __init__(self, id=None, code='', target=''):
+        if id:
+            self.id = id
         self.code = code
         self.target = target
 
@@ -226,7 +227,7 @@ class Parameter(db.Model):
     name = db.Column(db.String(50), unique=True)
     value = db.Column(db.String(255))
 
-    def __init__(self, id='', name='', value=''):
+    def __init__(self, id='', name='default', value='default'):
         if id:
             self.id = id
         self.name = name
