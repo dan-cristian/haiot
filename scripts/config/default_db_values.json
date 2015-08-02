@@ -74,7 +74,7 @@
     {"name": "frontvalve_relay_off","minutes": "5", "hours": "5", "dayofmonth": "*", "month": "5-10",
       "dayofweek": "*", "year": "*", "command": "relay off zone=frontvalve"}
   ],
-  "ZoneCustomerRelay": [
+  "ZoneCustomRelay": [
     {"relay_pin_name": "back_pump", "zone_id": "37", "gpio_pin_code": "P9_24", "gpio_host_name": "beaglebone","relay_is_on": "0"},
     {"relay_pin_name": "front_pump", "zone_id": "36", "gpio_pin_code": "P9_21", "gpio_host_name": "beaglebone", "relay_is_on": "0"}
   ],
