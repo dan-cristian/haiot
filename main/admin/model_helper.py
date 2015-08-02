@@ -47,8 +47,8 @@ def model_row_to_json(obj, operation=''):
 def get_param(name):
     global __db_values_json
     try:
-        val = __db_values_json["Parameter"][name]
-        #val = models.Parameter.query.filter_by(name=name).first().value
+        #val = __db_values_json["Parameter"][name]
+        val = models.Parameter.query.filter_by(name=name).first().value
         return val
     except ValueError, ex:
         logger.warning('Unable to get parameter {} error {}'.format(name, ex))
@@ -117,7 +117,7 @@ def populate_tables(model_auto_update=False):
     for table in table_collection:
         table_str = utils.get_table_name(table)
         check_table_schema(table, model_auto_update)
-        if hasattr(__db_values_json, table_str):
+        if table_str in __db_values_json:
             default_values = __db_values_json[table_str]
             if len(models.Scheduler.query.all()) < len(default_values):
                 logger.info('Populating {} with default values'.format(table_str))
@@ -125,6 +125,7 @@ def populate_tables(model_auto_update=False):
                 commit()
                 for config_record in default_values:
                     new_record = table()
+                    #setattr(new_record, config_record, default_values[config_record])
                     for field in config_record:
                         setattr(new_record, field, config_record[field])
                     db.session.add(new_record)
