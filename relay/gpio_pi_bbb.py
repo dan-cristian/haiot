@@ -20,9 +20,9 @@ def __write_to_file_as_root(file, value):
             if res == 0:
                 return True
             else:
-                logger.warning('Error writing value {} to file {} result={}'.format(value, file, res))
+                logger.warning('Error writing value [{}] to file {} result={}'.format(value, file, res))
     except Exception, ex:
-        logger.warning('Exception writing value {} to file {} err='.format(value, file, ex))
+        logger.warning('Exception writing value [{}] to file {} err='.format(value, file, ex))
 
 def __setup_pin(bcm_id=''):
     try:

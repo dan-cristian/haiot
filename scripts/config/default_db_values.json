@@ -77,7 +77,7 @@
   "ZoneCustomRelay": [
     {"relay_pin_name": "back_pump", "zone_id": "39", "gpio_pin_code": "P9_24", "gpio_host_name": "beaglebone","relay_is_on": "0"},
     {"relay_pin_name": "back_valve", "zone_id": "37", "gpio_pin_code": "P9_23", "gpio_host_name": "beaglebone","relay_is_on": "0"},
-    {"relay_pin_name": "back_lights", "zone_id": "40", "gpio_pin_code": "P9_2", "gpio_host_name": "beaglebone","relay_is_on": "0"},
+    {"relay_pin_name": "back_lights", "zone_id": "40", "gpio_pin_code": "P9_22", "gpio_host_name": "beaglebone","relay_is_on": "0"},
     {"relay_pin_name": "front_pump", "zone_id": "36", "gpio_pin_code": "P9_21", "gpio_host_name": "beaglebone", "relay_is_on": "0"}
   ],
 
