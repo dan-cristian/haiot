@@ -70,15 +70,15 @@
 
   "Scheduler": [
     {"name": "frontvalve_relay_on","minutes": "0","hours": "5", "dayofmonth": "*", "month": "5-10",
-      "dayofweek": "*", "year": "*", "command": "relay on zone=frontvalve"},
+      "dayofweek": "*", "year": "*", "command": "relay on zone_name='front valve'"},
     {"name": "frontvalve_relay_off","minutes": "5", "hours": "5", "dayofmonth": "*", "month": "5-10",
-      "dayofweek": "*", "year": "*", "command": "relay off zone=frontvalve"}
+      "dayofweek": "*", "year": "*", "command": "relay off zone_name='front valve'"}
   ],
   "ZoneCustomRelay": [
-    {"relay_pin_name": "back_pump", "zone_id": "39", "gpio_pin_code": "P9_24", "gpio_host_name": "beaglebone","relay_is_on": "0"},
-    {"relay_pin_name": "back_valve", "zone_id": "37", "gpio_pin_code": "P9_23", "gpio_host_name": "beaglebone","relay_is_on": "0"},
-    {"relay_pin_name": "back_lights", "zone_id": "40", "gpio_pin_code": "P9_22", "gpio_host_name": "beaglebone","relay_is_on": "0"},
-    {"relay_pin_name": "front_pump", "zone_id": "36", "gpio_pin_code": "P9_21", "gpio_host_name": "beaglebone", "relay_is_on": "0"}
+    {"relay_pin_name": "back pump relay", "zone_id": "39", "gpio_pin_code": "P9_24", "gpio_host_name": "beaglebone","relay_is_on": "0"},
+    {"relay_pin_name": "back valve relay", "zone_id": "37", "gpio_pin_code": "P9_23", "gpio_host_name": "beaglebone","relay_is_on": "0"},
+    {"relay_pin_name": "back lights relay", "zone_id": "40", "gpio_pin_code": "P9_22", "gpio_host_name": "beaglebone","relay_is_on": "0"},
+    {"relay_pin_name": "front valve relay", "zone_id": "36", "gpio_pin_code": "P9_21", "gpio_host_name": "beaglebone", "relay_is_on": "0"}
   ],
 
   "TemperatureTarget": [
