@@ -277,6 +277,8 @@ class Node(db.Model, DbEvent, graphs.NodeGraph):
         self.priority = priority
         self.mac = mac
         self.is_master_logging = is_master_logging
+        self.run_overall_cycles = 0
+        self.master_overall_cycles = 0
 
     def __repr__(self):
         return 'Node {} ip {}'.format(self.name,  self.ip)
