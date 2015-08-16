@@ -120,7 +120,7 @@ def populate_tables(model_auto_update=False):
         check_table_schema(table, model_auto_update)
         if table_str in __db_values_json:
             default_values = __db_values_json[table_str]
-            if len(models.Scheduler.query.all()) < len(default_values):
+            if len(table.query.all()) < len(default_values):
                 logger.info('Populating {} with default values'.format(table_str))
                 table.query.delete()
                 commit()

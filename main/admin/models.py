@@ -131,30 +131,6 @@ class SchedulePattern(db.Model):
     def __repr__(self):
         return self.name[:len('1234-5678-9012-3456-7890-1234')]
 
-#FIXME: replace with CRONTAB format
-# m = *, w = *, we = *, d = *, st = 09:00, et = 09:05
-class ScheduleRange(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    month = db.Column(db.String(1))     # 1 - 12, *,
-    week = db.Column(db.String(1))      # 1 - 5
-    weekend = db.Column(db.String(1))   # * = week & weekend, 1=weekday, 2=weekend day
-    day = db.Column(db.String(1))
-    start_time = db.Column(db.String(5))
-    end_time = db.Column(db.String(5))
-
-    def __init__(self, id, month, week, day, start_time, end_time):
-        if id:
-            self.id = id
-        self.month = month
-        self.week = week
-        self.day = day
-        self.start_time = start_time
-        self.end_time = end_time
-
-    def __repr__(self):
-        return '{} {}'.format(self.id, self.month, self.week, self.day, self.start_time, self.end_time)
-
-
 class TemperatureTarget(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(1))
@@ -182,8 +158,9 @@ class HeatSchedule(db.Model):
     #                                backref=db.backref('schedule_pattern_weekend', lazy='dynamic'))
     active = db.Column(db.Boolean, default=True)
 
-    def __init__(self, id, zone_id, pattern_week_id, pattern_weekend_id):
-        self.id = id
+    def __init__(self, id=None, zone_id=None, pattern_week_id=None, pattern_weekend_id=None):
+        if id:
+            self.id = id
         self.zone_id= zone_id
         self.pattern_week_id= pattern_week_id
         self.pattern_weekend_id= pattern_weekend_id
@@ -227,7 +204,7 @@ class Parameter(db.Model):
     name = db.Column(db.String(50), unique=True)
     value = db.Column(db.String(255))
 
-    def __init__(self, id='', name='default', value='default'):
+    def __init__(self, id=None, name='default', value='default'):
         if id:
             self.id = id
         self.name = name
@@ -386,14 +363,14 @@ class ZoneHeatRelay(db.Model, DbEvent):
     id = db.Column(db.Integer, primary_key=True)
     #friendly display name for pin mapping
     heat_pin_name = db.Column(db.String(50))
-    zone_id = db.Column(db.Integer, unique=True)
+    zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'))
     gpio_pin_code = db.Column(db.String(50)) #user friendly format, e.g. P8_11
     gpio_host_name = db.Column(db.String(50))
     heat_is_on = db.Column(db.Boolean)
     is_main_heat_source = db.Column(db.Boolean)
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    def __init__(self, zone_id='', gpio_pin_code='', host_name='', is_main_heat_source=False):
+    def __init__(self, zone_id=None, gpio_pin_code='', host_name='', is_main_heat_source=False):
         self.zone_id = zone_id
         self.gpio_pin_code = gpio_pin_code
         self.gpio_host_name = host_name
@@ -406,7 +383,7 @@ class ZoneCustomRelay(db.Model, DbEvent):
     id = db.Column(db.Integer, primary_key=True)
     #friendly display name for pin mapping
     relay_pin_name = db.Column(db.String(50))
-    zone_id = db.Column(db.Integer, unique=True)
+    zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'))
     gpio_pin_code = db.Column(db.String(50)) #user friendly format, e.g. P8_11
     gpio_host_name = db.Column(db.String(50))
     relay_is_on = db.Column(db.Boolean)
