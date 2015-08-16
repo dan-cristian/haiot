@@ -103,7 +103,7 @@
     {"id":5, "name":"week-birou",       "pattern":".... .... .... .... ..22 2222"},
     {"id":6, "name":"weekend-birou",    "pattern":".... .... 2222 2222 2222 2222"},
     {"id":7, "name":"week-dormitor",    "pattern":"bbbb bbb. .... .... .... bbbb"},
-    {"id":9, "name":"weekend-dormitor", "pattern":"bbbb bbb. .... .bbb .... bbbb"}
+    {"id":8, "name":"weekend-dormitor", "pattern":"bbbb bbb. .... .bbb .... bbbb"}
   ],
 
   "HeatSchedule": [
@@ -114,11 +114,11 @@
   ],
 
   "ZoneHeatRelay":[
-    {"zone_id":1 , "gpio_pin_code": "P9_13", "host_name": "beaglebone", "is_main_heat_source": "False"},
-    {"zone_id":2 , "gpio_pin_code": "P9_12", "host_name": "beaglebone", "is_main_heat_source": "False"},
-    {"zone_id":47 , "gpio_pin_code": "P9_11", "host_name": "beaglebone", "is_main_heat_source": "False"},
-    {"zone_id":4 , "gpio_pin_code": "P9_15", "host_name": "beaglebone", "is_main_heat_source": "False"},
-    {"zone_id":19 , "gpio_pin_code": "24", "host_name": "pi-power", "is_main_heat_source": "True"}
+    {"zone_id":1 , "gpio_pin_code": "P9_13", "host_name": "beaglebone", "is_main_heat_source": "0"},
+    {"zone_id":2 , "gpio_pin_code": "P9_12", "host_name": "beaglebone", "is_main_heat_source": "0"},
+    {"zone_id":47 , "gpio_pin_code": "P9_11", "host_name": "beaglebone", "is_main_heat_source": "0"},
+    {"zone_id":4 , "gpio_pin_code": "P9_15", "host_name": "beaglebone", "is_main_heat_source": "0"},
+    {"zone_id":19 , "gpio_pin_code": "24", "host_name": "pi-power", "is_main_heat_source": "1"}
   ],
 
   "ZoneSensor": [
