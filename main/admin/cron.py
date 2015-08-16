@@ -4,9 +4,13 @@ import requests
 import schedule
 from main import logger
 from main.admin import thread_pool
-from common import variable
+
+from apscheduler.schedulers.background import BackgroundScheduler
 
 initialised = False
+sched = BackgroundScheduler()
+
+
 def openshift_keepalive():
     try:
         #if variable.NODE_THIS_IS_MASTER_OVERALL:
@@ -24,6 +28,9 @@ def init():
     logger.info('cron module initialising')
     setup_tasks()
     thread_pool.add_callable(thread_run, run_interval_second=60)
+    global sched
+    logger.info('apschedule module initialising')
+    sched.start()
     global initialised
     initialised = True
 
