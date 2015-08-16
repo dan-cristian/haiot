@@ -157,7 +157,9 @@ def populate_tables(model_auto_update=False):
     node_obj = models.Node.query.filter_by(name=constant.HOST_NAME).first()
     constant.HOST_PRIORITY = node_obj.priority
 
-    import alarm, heat, sensor, relay, health_monitor, graph_plotly, node, io_bbb, webui, main, ddns, rules
+    import alarm, heat, sensor, relay, health_monitor, graph_plotly, node, io_bbb, webui, main, ddns
+    import cron, rules #always cron before rules
+
     from transport import mqtt_io
     #import transport.mqtt_io
     from cloud import youtube
@@ -166,7 +168,7 @@ def populate_tables(model_auto_update=False):
     module_list_dict = {'default':[
         [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
                     [5, get_mod_name(sensor), False, 4],[6, get_mod_name(relay), False, 5],
-        [7, get_mod_name(heat), False, 6],[8, get_mod_name(alarm), False, 7],[9, get_mod_name(graph_plotly), True, 8],
+        [7, get_mod_name(heat), False, 6],[8, get_mod_name(alarm), False, 7],[9, get_mod_name(graph_plotly), False, 8],
         [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), True, 10],[12, get_mod_name(ddns), False, 11],
         [13, get_mod_name(youtube), False, 12], [14, get_mod_name(filewatch), False, 13],
         [15, get_mod_name(rules), True, 14]],
@@ -180,7 +182,7 @@ def populate_tables(model_auto_update=False):
         'nas':[
         [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
                     [5, get_mod_name(sensor), True, 4],[6, get_mod_name(relay), False, 5],
-        [7, get_mod_name(heat), False, 6],[8, get_mod_name(alarm), False, 7],[9, get_mod_name(graph_plotly), True, 8],
+        [7, get_mod_name(heat), False, 6],[8, get_mod_name(alarm), False, 7],[9, get_mod_name(graph_plotly), False, 8],
         [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), True, 10],[12, get_mod_name(ddns), True, 11],
         [13, get_mod_name(youtube), True, 12], [14, get_mod_name(filewatch), True, 13]],
         'pi-power':[

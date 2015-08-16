@@ -181,7 +181,8 @@ def download_trace_id_list(graph_unique_name='', shape_type=''):
                 if 'text' in serie:
                     remote_id_text=serie['text']
                 else:
-                    logger.warning('Could not find serie {} field in graph {}'.format(remote_name,graph_unique_name))
+                    #FIXME: plotly api changed, fix this!
+                    #logger.warning('Could not find serie [{}] field in graph [{}]'.format(remote_name,graph_unique_name))
                     remote_id_text = remote_name
                 add_new_serie(graph_unique_name=graph_unique_name, url=graph_url, trace_unique_id=remote_id_text)
         except PlotlyError, ex:
