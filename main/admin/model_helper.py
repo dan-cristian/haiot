@@ -110,7 +110,7 @@ def populate_tables(model_auto_update=False):
     with open(var_path, 'r') as f:
         __db_values_json = json.load(f)
 
-    table_collection = [models.Parameter, models.Zone, models.Scheduler, models.ZoneCustomRelay,
+    table_collection = [models.Parameter, models.Zone, models.ZoneCustomRelay,
                         models.TemperatureTarget, models.SchedulePattern, models.HeatSchedule, models.ZoneHeatRelay,
                         models.ZoneSensor, models.ZoneAlarm,
                         models.SystemMonitor, models.SystemDisk, models.Sensor, models.Ups]
