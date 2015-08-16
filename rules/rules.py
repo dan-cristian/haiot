@@ -17,10 +17,10 @@ def rule_sensor_temp_target(obj = models.Sensor(), field_changed_list = []):
     temp = obj.temperature
     return 'rule temp ok'
 
-@sched.scheduled_job('cron', day='*', hour=23, minute='*/1')
+@sched.scheduled_job('cron', day='*', hour='*', minute='*/2')
 def rule_water_front_on():
     logger.info('water on')
 
-@sched.scheduled_job('cron', day='*', hour=23, minute='*/2')
+@sched.scheduled_job('cron', day='*', hour='*', minute='*/3')
 def rule_water_front_off():
     logger.info('water off')
