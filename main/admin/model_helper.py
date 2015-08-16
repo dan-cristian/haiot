@@ -110,9 +110,10 @@ def populate_tables(model_auto_update=False):
     with open(var_path, 'r') as f:
         __db_values_json = json.load(f)
 
-    table_collection = [models.Parameter, models.Zone, models.ZoneCustomRelay, models.Scheduler,
-                        models.TemperatureTarget, models.SchedulePattern, models.SystemMonitor,
-                        models.SystemDisk, models.Sensor, models.Ups, models.ZoneSensor, models.ZoneAlarm]
+    table_collection = [models.Parameter, models.Zone, models.Scheduler, models.ZoneCustomRelay,
+                        models.TemperatureTarget, models.SchedulePattern, models.HeatSchedule, models.ZoneHeatRelay,
+                        models.ZoneSensor, models.ZoneAlarm,
+                        models.SystemMonitor, models.SystemDisk, models.Sensor, models.Ups]
 
     for table in table_collection:
         table_str = utils.get_table_name(table)
@@ -175,7 +176,7 @@ def populate_tables(model_auto_update=False):
         'netbook':[
         [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
                     [5, get_mod_name(sensor), True, 4],[6, get_mod_name(relay), True, 5],
-        [7, get_mod_name(heat), True, 6],[8, get_mod_name(alarm), False, 7],[9, get_mod_name(graph_plotly), True, 8],
+        [7, get_mod_name(heat), True, 6],[8, get_mod_name(alarm), False, 7],[9, get_mod_name(graph_plotly), False, 8],
         [10, get_mod_name(io_bbb), False, 9],[11, get_mod_name(webui), True, 10],[12, get_mod_name(ddns), True, 11],
         [13, get_mod_name(youtube), True, 12], [14, get_mod_name(filewatch), True, 13],
         [15, get_mod_name(rules), True, 14]],
