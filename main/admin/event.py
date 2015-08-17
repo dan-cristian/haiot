@@ -85,6 +85,7 @@ def mqtt_thread_run():
             #events received via mqtt transport
             table = None
             #fixme: make it generic to work with any transport
+            source_host = obj[constant.JSON_PUBLISH_SOURCE_HOST]
             if constant.JSON_PUBLISH_TABLE in obj:
                 table = str(obj[constant.JSON_PUBLISH_TABLE])
                 if table == utils.get_table_name(models.Node):#'Node':
@@ -92,7 +93,9 @@ def mqtt_thread_run():
                     if 'execute_command' in obj:
                         execute_command = obj['execute_command']
                         host_name = obj['name']
-                        if host_name == constant.HOST_NAME and execute_command != '':
+                        #execute command on target host or on current host (usefull when target is down - e.g. wake cmd
+                        if (host_name == constant.HOST_NAME or source_host == constant.HOST_NAME) \
+                                and execute_command != '':
                             main.execute_command(execute_command, node=node)
                 elif table == utils.get_table_name(models.ZoneHeatRelay):
                     if heat.initialised:
@@ -107,11 +110,10 @@ def mqtt_thread_run():
 
             if constant.JSON_MESSAGE_TYPE in obj:
                 if variable.NODE_THIS_IS_MASTER_LOGGING:
-                    if obj['source_host'] != constant.HOST_NAME:
+                    if source_host != constant.HOST_NAME:
                         levelname = obj['level']
                         msg = obj['message']
                         msgdatetime = obj['datetime']
-                        source_host = obj['source_host']
                         message = '{}, {}, {}'.format(source_host, msgdatetime, msg)
                         remote_logger
                         if levelname == 'INFO':
