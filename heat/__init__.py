@@ -61,6 +61,6 @@ def unload():
 def init():
     logger.info('Heat module initialising')
     dispatcher.connect(handle_event_heat, signal=constant.SIGNAL_HEAT, sender=dispatcher.Any)
-    thread_pool.add_callable(heat_loop.thread_run, 45)
+    thread_pool.add_interval_callable(heat_loop.thread_run, 45)
     global initialised
     initialised = True

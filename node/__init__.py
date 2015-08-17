@@ -15,7 +15,7 @@ def unload():
 def init():
     logger.info('Node module initialising')
     #node_run.init()
-    thread_pool.add_callable_progress(node_run.thread_run, run_interval_second=10,progress_func=node_run.get_progress)
+    thread_pool.add_interval_callable_progress(node_run.thread_run, run_interval_second=10,progress_func=node_run.get_progress)
     global initialised
     initialised = True
 

@@ -31,7 +31,7 @@ def unload():
 def init():
     logger.info('Alarm module initialising')
     alarm_loop.init()
-    thread_pool.add_callable(alarm_loop.thread_run)
+    thread_pool.add_interval_callable(alarm_loop.thread_run)
     dispatcher.connect(handle_event_alarm, signal=constant.SIGNAL_GPIO, sender=dispatcher.Any)
     global initialised
     initialised = True

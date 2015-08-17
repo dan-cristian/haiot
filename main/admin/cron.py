@@ -5,10 +5,8 @@ import schedule
 from main import logger
 from main.admin import thread_pool
 
-from apscheduler.schedulers.background import BackgroundScheduler
-
 initialised = False
-sched = BackgroundScheduler()
+
 
 
 def openshift_keepalive():
@@ -27,7 +25,7 @@ def thread_run():
 def init():
     logger.info('cron module initialising')
     setup_tasks()
-    thread_pool.add_callable(thread_run, run_interval_second=60)
+    thread_pool.add_interval_callable(thread_run, run_interval_second=60)
     global sched
     logger.info('apschedule module initialising')
     sched.start()

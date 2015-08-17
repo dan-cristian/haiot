@@ -15,7 +15,7 @@ def unload():
 
 def init():
     logger.info('Template module initialising')
-    thread_pool.add_callable(template_run.thread_run, run_interval_second=60)
+    thread_pool.add_interval_callable(template_run.thread_run, run_interval_second=60)
     global initialised
     initialised = True
 

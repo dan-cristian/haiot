@@ -141,4 +141,4 @@ def init():
         initialised = True
     if initialised:
         logger.info('Plotly is connected')
-        thread_pool.add_callable(graph_plotly_run.thread_run, run_interval_second=60)
+        thread_pool.add_interval_callable(graph_plotly_run.thread_run, run_interval_second=60)

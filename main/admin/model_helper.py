@@ -159,10 +159,8 @@ def populate_tables(model_auto_update=False):
     constant.HOST_PRIORITY = node_obj.priority
 
     import alarm, heat, sensor, relay, health_monitor, graph_plotly, node, io_bbb, webui, main, ddns
-    import cron, rules #always cron before rules
+    import rules #always cron before rules
 
-    from transport import mqtt_io
-    #import transport.mqtt_io
     from cloud import youtube
     from sysutils import filewatch
 
