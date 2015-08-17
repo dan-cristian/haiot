@@ -177,6 +177,7 @@ def upload_file(file):
     if initialised:
         if not os.path.exists(file):
             logger.warning('Not existent file={} to be uploaded to youtube'.format(file))
+            del __file_list_last_change[file]
         else:
             __args.file = file
             __args.title = os.path.basename(file)
