@@ -6,6 +6,7 @@ from main import logger
 from main.admin import thread_pool
 from common import constant
 from apscheduler.schedulers.background import BackgroundScheduler
+scheduler = None
 try:
     #this does not currently work on BusyBox routers
     #http://flexget.com/ticket/2741
@@ -54,11 +55,13 @@ def init():
     global __func_list
     global scheduler
     logger.info('Rules module initialising')
-    __func_list = getmembers(rules_run, isfunction)
+    if scheduler:
+        __func_list = getmembers(rules_run, isfunction)
+        scheduler.start()
+    else:
+        logger.warning('Rules not initialised as scheduler is not available')
     thread_pool.add_interval_callable(thread_run, run_interval_second=60)
     dispatcher.connect(parse_rules, signal=constant.SIGNAL_DB_CHANGE_FOR_RULES, sender=dispatcher.Any)
-    if scheduler:
-        scheduler.start()
     global initialised
     initialised = True
 
