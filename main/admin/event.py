@@ -96,7 +96,8 @@ def mqtt_thread_run():
                         #execute command on target host or on current host (usefull when target is down - e.g. wake cmd
                         if (host_name == constant.HOST_NAME or source_host == constant.HOST_NAME) \
                                 and execute_command != '':
-                            main.execute_command(execute_command, node=node)
+                            server_node = models.Node.query.filter_by(name=host_name).first()
+                            main.execute_command(execute_command, node=server_node)
                 elif table == utils.get_table_name(models.ZoneHeatRelay):
                     if heat.initialised:
                         heat.heat_update(obj)
