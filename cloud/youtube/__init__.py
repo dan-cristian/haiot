@@ -278,7 +278,7 @@ def init():
         logger.info('Initialising youtube with credential from {}'.format(__CLIENT_SECRETS_FILE))
         __youtube = get_authenticated_service([])
         dispatcher.connect(file_watcher_event, signal=constant.SIGNAL_FILE_WATCH, sender=dispatcher.Any)
-        thread_pool.add_callable(thread_run, run_interval_second=10)
+        thread_pool.add_interval_callable(thread_run, run_interval_second=10)
         initialised = True
         #upload_file('c:\\temp\\01-20150512215655-alert.avi')
     except Exception, ex:

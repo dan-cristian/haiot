@@ -3,55 +3,60 @@ from main import logger
 import time
 from datetime import datetime
 
-callable_list=[]
-callable_progress_list={}
-exec_interval_list={}
-exec_last_date_list={}
-thread_pool_enabled = True
+__callable_list=[]
+__callable_progress_list={}
+__exec_interval_list={}
+__exec_last_date_list={}
+__thread_pool_enabled = True
+__dict_future_func={}
 
-dict_future_func={}
+__immediate_executor = None
 
-def add_callable(func, run_interval_second=60):
+def add_interval_callable(func, run_interval_second=60):
     print_name = func.func_globals['__name__']+'.'+ func.func_name
     logger.info('Added for processing callable ' + print_name)
-    callable_list.append(func)
-    exec_last_date_list[func]=datetime.now()
-    exec_interval_list[func]=run_interval_second
+    __callable_list.append(func)
+    __exec_last_date_list[func]=datetime.now()
+    __exec_interval_list[func]=run_interval_second
 
-def add_callable_progress(func, run_interval_second=60, progress_func=None):
-    add_callable(func, run_interval_second=run_interval_second)
-    callable_progress_list[func] = progress_func
+def add_interval_callable_progress(func, run_interval_second=60, progress_func=None):
+    add_interval_callable(func, run_interval_second=run_interval_second)
+    __callable_progress_list[func] = progress_func
 
 def remove_callable(func):
     pass
 
 def unload():
-    global thread_pool_enabled
-    thread_pool_enabled = False
+    global __thread_pool_enabled
+    __thread_pool_enabled = False
 
 def get_thread_status():
-    global dict_future_func
-    return dict_future_func
+    global __dict_future_func
+    return __dict_future_func
 
-def main():
-    global thread_pool_enabled
-    thread_pool_enabled = True
+def run_thread_pool():
+    global __thread_pool_enabled
+    __thread_pool_enabled = True
+    #init immediate jobs thread pool
+    global __immediate_executor
+    __immediate_executor = concurrent.futures.ThreadPoolExecutor(max_workers=10)
     #https://docs.python.org/3.3/library/concurrent.futures.html
-    global dict_future_func
-    dict_future_func={}
+    global __dict_future_func
+    __dict_future_func={}
     with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-        while thread_pool_enabled:
-            if len(callable_list) != len(dict_future_func):
-                logger.info('Initialising thread processing with {} functions'.format(len(callable_list)))
-                dict_future_func = {executor.submit(call_obj): call_obj for call_obj in callable_list}
-            for future_obj in dict_future_func :
-                func=dict_future_func [future_obj]
+        while __thread_pool_enabled:
+            if len(__callable_list) != len(__dict_future_func):
+                logger.info('Initialising interval thread processing with {} functions'.format(len(__callable_list)))
+                __dict_future_func = {executor.submit(call_obj): call_obj for call_obj in __callable_list}
+            for future_obj in __dict_future_func :
+                func=__dict_future_func [future_obj]
                 print_name = func.func_globals['__name__']+'.'+ func.func_name
-                exec_interval = exec_interval_list.get(func, None)
+                exec_interval = __exec_interval_list.get(func, None)
                 if not exec_interval:
                     logger.warning('No exec interval set for thread function ' + print_name)
-                last_exec_date = exec_last_date_list.get(func, None)
+                last_exec_date = __exec_last_date_list.get(func, None)
                 elapsed_seconds = (datetime.now() - last_exec_date).total_seconds()
+                #when function is done check if needs to run again or if is running for too long
                 if future_obj.done():
                     try:
                         result = future_obj.result()
@@ -59,17 +64,23 @@ def main():
                     except Exception, exc:
                         logger.error('Exception {} in {}'.format(exc, print_name, exc_info=True))
                     #print('%s=%s' % (print_name, future_obj.result()))
+                    #run the function again at given interval
                     if elapsed_seconds and elapsed_seconds > exec_interval:
-                        del dict_future_func[future_obj]
-                        dict_future_func[executor.submit(func)] = func
-                        exec_last_date_list[func] = datetime.now()
+                        del __dict_future_func[future_obj]
+                        __dict_future_func[executor.submit(func)] = func
+                        __exec_last_date_list[func] = datetime.now()
                 elif future_obj.running():
                     if elapsed_seconds>1*30:
                         logger.debug('Threaded function {} is long running for {} seconds'.format(
                             print_name,elapsed_seconds))
-                        if callable_progress_list.has_key(func):
-                            progress_status=callable_progress_list[func].func_globals['progress_status']
+                        if __callable_progress_list.has_key(func):
+                            progress_status=__callable_progress_list[func].func_globals['progress_status']
                             logger.warning('Progress Status is {}'.format(progress_status))
             time.sleep(2)
         executor.shutdown()
-        logger.info('Thread pool processor exit')
+        logger.info('Interval thread pool processor exit')
+
+#immediately runs submitted job using a thread pool
+def do_job(function):
+    global __immediate_executor
+    __immediate_executor.submit(function)

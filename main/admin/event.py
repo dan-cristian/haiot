@@ -153,5 +153,5 @@ def init():
     dispatcher.connect(handle_local_event_db_post, signal=common.constant.SIGNAL_SENSOR_DB_POST, sender=dispatcher.Any)
     dispatcher.connect(handle_event_mqtt_received, signal=common.constant.SIGNAL_MQTT_RECEIVED, sender=dispatcher.Any)
 
-    thread_pool.add_callable(mqtt_thread_run, run_interval_second=1)
+    thread_pool.add_interval_callable(mqtt_thread_run, run_interval_second=1)
 
