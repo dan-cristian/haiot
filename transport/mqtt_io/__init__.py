@@ -139,7 +139,7 @@ def init():
                     if client_connected:
                         mqtt_client.on_message = receiver.on_message
                         mqtt_client.on_disconnect = on_disconnect
-                        thread_pool.add_callable(receiver.thread_run, run_interval_second=10)
+                        thread_pool.add_interval_callable(receiver.thread_run, run_interval_second=10)
                         #mqtt_client.loop_start()
                         initialised = True
                         client_connecting = False

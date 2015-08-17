@@ -111,7 +111,7 @@ def unload():
 
     global shutting_down
     shutting_down = True
-    admin.thread_pool.thread_pool_enabled = False
+    admin.thread_pool.__thread_pool_enabled = False
     if webui.initialised:
         webui.unload()
     if mqtt_io.initialised:
@@ -241,10 +241,10 @@ def init():
     logger.info('Initialising modules')
     init_modules()
 
-    logger.info('Initialising threads')
+    logger.info('Initialising generic processing threads')
     from admin import thread_pool
     import threading
-    t = threading.Thread(target=thread_pool.main)
+    t = threading.Thread(target=thread_pool.run_thread_pool())
     t.daemon = True
     t.start()
 

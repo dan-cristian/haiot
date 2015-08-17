@@ -62,9 +62,9 @@ def relay_set(pin_bcm=None, value=None, from_web=False):
 
 def return_web_message(pin_value, ok_message='', err_message=''):
     if pin_value:
-        return ok_message + '\n' + constant.SCRIPT_RESPONSE_OK + '=' + pin_value
+        return 'OK: {} \n {}={}'.format(ok_message, constant.SCRIPT_RESPONSE_OK, pin_value)
     else:
-        return err_message + '\n'
+        return 'ERR: {} \n {}={}'.format(err_message, constant.SCRIPT_RESPONSE_NOTOK, pin_value)
 
 def gpio_record_update(json_object):
     #save relay io state to db, except for current node
@@ -139,7 +139,7 @@ def init():
     logger.info("Relay initialising")
     global initialised
 
-    @app.route('/relay/get')
+    @app.route('/apiv1/relay/get')
     def relay_get_web():
         pin=request.args.get('pin', '').strip()
         if pin == '':
@@ -148,7 +148,7 @@ def init():
             response = relay_get(pin=pin, from_web=True)
         return response
 
-    @app.route('/relay/set')
+    @app.route('/apiv1/relay/set')
     def relay_set_web():
         pin=request.args.get('pin', '').strip()
         value=request.args.get('value', '').strip()

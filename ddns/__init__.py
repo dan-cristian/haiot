@@ -15,6 +15,6 @@ def unload():
 
 def init():
     logger.info('DDNS module initialising')
-    thread_pool.add_callable(ddns_run.thread_run, run_interval_second=120)
+    thread_pool.add_interval_callable(ddns_run.thread_run, run_interval_second=120)
     global initialised
     initialised = True
