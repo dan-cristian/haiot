@@ -6,8 +6,13 @@ from main import logger
 from main.admin import thread_pool
 from common import constant
 from apscheduler.schedulers.background import BackgroundScheduler
-scheduler = BackgroundScheduler()
-import rules_run
+try:
+    #this does not currently work on BusyBox routers
+    #http://flexget.com/ticket/2741
+    scheduler = BackgroundScheduler()
+    import rules_run
+except Exception,ex:
+    scheduler = None
 
 initialised = False
 __func_list = None
@@ -50,7 +55,8 @@ def init():
     __func_list = getmembers(rules_run, isfunction)
     thread_pool.add_interval_callable(thread_run, run_interval_second=60)
     dispatcher.connect(parse_rules, signal=constant.SIGNAL_DB_CHANGE_FOR_RULES, sender=dispatcher.Any)
-    scheduler.start()
+    if scheduler:
+        scheduler.start()
     global initialised
     initialised = True
 
