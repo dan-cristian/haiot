@@ -10,9 +10,11 @@ try:
     #this does not currently work on BusyBox routers
     #http://flexget.com/ticket/2741
     scheduler = BackgroundScheduler()
-    import rules_run
 except Exception,ex:
     scheduler = None
+
+if scheduler:
+    import rules_run
 
 initialised = False
 __func_list = None
