@@ -22,10 +22,10 @@ def rule_sensor_temp_target(obj = models.Sensor(), field_changed_list = []):
     return 'rule temp ok'
 
 ######## CRON RULES ################
-@scheduler.scheduled_job('cron', day='*', hour='*', minute='*/10', second='*')
+@scheduler.scheduled_job('cron', day='*', hour='*', minute='*/10')
 def rule_water_front_on(): do_job(water_front_on)
 
-@scheduler.scheduled_job('cron', day='*', hour='*', minute='*/20', second='*')
+@scheduler.scheduled_job('cron', day='*', hour='*', minute='*/20')
 def rule_water_front_off(): do_job(water_front_off)
 
 
