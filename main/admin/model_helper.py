@@ -13,6 +13,8 @@ from main import db
 
 __db_values_json = None
 
+table_collection = None
+
 def model_row_to_json(obj, operation=''):
     try:
         safe_obj = {}
@@ -109,11 +111,11 @@ def populate_tables(model_auto_update=False):
     global __db_values_json
     with open(var_path, 'r') as f:
         __db_values_json = json.load(f)
-
+    global table_collection
     table_collection = [models.Parameter, models.Zone, models.ZoneCustomRelay,
-                        models.TemperatureTarget, models.SchedulePattern, models.HeatSchedule, models.ZoneHeatRelay,
-                        models.ZoneSensor, models.ZoneAlarm,
-                        models.SystemMonitor, models.SystemDisk, models.Sensor, models.Ups]
+        models.TemperatureTarget, models.SchedulePattern, models.HeatSchedule, models.ZoneHeatRelay,
+        models.ZoneSensor, models.ZoneAlarm,
+        models.SystemMonitor, models.SystemDisk, models.Sensor, models.Ups]
 
     for table in table_collection:
         table_str = utils.get_table_name(table)

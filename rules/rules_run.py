@@ -22,7 +22,7 @@ def rule_sensor_temp_target(obj = models.Sensor(), field_changed_list = []):
     return 'rule temp ok'
 
 ######## CRON RULES ################
-@scheduler.scheduled_job('cron', day='*', hour='*', minute='*/10')
+@scheduler.scheduled_job('cron', day='*', hour='*', minute='*/10', second='*/5')
 def rule_water_front_on(): do_job(water_front_on)
 
 @scheduler.scheduled_job('cron', day='*', hour='*', minute='*/20')
@@ -34,7 +34,8 @@ def rule_water_front_off(): do_job(water_front_off)
 def water_front_on():
     logger.info('water on')
     with app.test_client() as c:
-        msg = c.get('/apiv1/relay/get?pin=1').data
+        msg = c.get('/apiv1/db_update/model_name=ZoneCustomRelay&'
+                    'filter_name=relay_pin_name&filter_value=back pump relay&field_name=relay_is_on&field_value=1').data
         logger.info(msg)
     #with app.test_request_context():
     #    logger.info(redirect('/apiv1/relay/get'))

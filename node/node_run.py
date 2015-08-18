@@ -21,6 +21,7 @@ def node_update(obj={}):
         logger.debug('Received node state update from {}'.format(node_host_name))
         #avoid node to update itself in infinite recursion
         if node_host_name != constant.HOST_NAME:
+            '''
             node = models.Node.query.filter_by(name=node_host_name).first()
             if node is None:
                 node = models.Node()
@@ -43,6 +44,9 @@ def node_update(obj={}):
                                                         utils.get_model_field_name(models.Node.execute_command))
             node.updated_on = utils.get_base_location_now_date()
             commit()
+            '''
+            models.Node().save_changed_fields_from_json_object(json_object=obj, unique_key_name='name',
+                                                               notify_transport_enabled=False, save_to_graph=False)
         else:
             logger.debug('Skipping node DB save, this node is master = {}'.format(
                 variable.NODE_THIS_IS_MASTER_OVERALL))
