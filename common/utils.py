@@ -7,6 +7,7 @@ import datetime
 from main import logger
 import math
 import pytz
+import importlib
 
 from collections import namedtuple
 
@@ -89,3 +90,11 @@ def get_base_location_now_date():
 
 def get_app_root_path():
     return os.getcwd() + '/'
+
+#http://stackoverflow.com/questions/1176136/convert-string-to-python-class-object
+def class_for_name(module_name, class_name):
+    # load the module, will raise ImportError if module cannot be loaded
+    m = importlib.import_module(module_name)
+    # get the class, will raise AttributeError if class cannot be found
+    c = getattr(m, class_name)
+    return c

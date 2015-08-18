@@ -22,28 +22,58 @@ class DbEvent:
     def get_deepcopy(self):
         return deepcopy(self)
 
+    def json_to_record(self, json_object):
+        for field in json_object:
+            if hasattr(self, field):
+                setattr(self, field, json_object[field])
+        return self
+
+    #copies fields from a json object to an existing or new db record
+    def save_changed_fields_from_json_object(self,json_object=None, unique_key_name=None,
+                                            notify_transport_enabled=False, save_to_graph=False,
+                                            ignore_only_updated_on_change=True, debug=False, graph_save_frequency=0):
+        try:
+            new_record = self.json_to_record(json_object)
+            #let flask assign an id in case unique key name is different, to avoid key integrity error
+            if not unique_key_name:
+                unique_key_name = 'id'
+            else:
+                new_record.id = None
+            if hasattr(new_record, unique_key_name):
+                unique_key_value = getattr(new_record, unique_key_name)
+                kwargs = {unique_key_name:unique_key_value}
+                new_record.updated_on = utils.get_base_location_now_date()
+                current_record = self.query.filter_by(**kwargs).first()
+                self.save_changed_fields(current_record=current_record, new_record=new_record,
+                                         notify_transport_enabled=False, save_to_graph=False)
+                db.session.commit()
+            else:
+                logger.warning('Unique key not found in json record, save aborted')
+        except Exception, ex:
+            logger.error('Exception save json to db {}'.format(ex))
+
     #graph_save_frequency in seconds
     def save_changed_fields(self,current_record='',new_record='',notify_transport_enabled=False, save_to_graph=False,
                             ignore_only_updated_on_change=True, debug=False, graph_save_frequency=0):
         try:
-            if current_record:
-                #if a record in db already exists
-                if not current_record.last_save_to_graph:
-                    current_record.last_save_to_graph = datetime.min
-                save_to_graph_elapsed = (utils.get_base_location_now_date() -
-                                         current_record.last_save_to_graph).total_seconds()
-                current_record.last_commit_field_changed_list=[]
-                if save_to_graph_elapsed > graph_save_frequency:
-                    current_record.save_to_graph = save_to_graph
+            if hasattr(self, 'save_to_graph'):#not all models inherit graph
+                if current_record:
+                    #if a record in db already exists
+                    if not current_record.last_save_to_graph:
+                        current_record.last_save_to_graph = datetime.min
+                    save_to_graph_elapsed = (utils.get_base_location_now_date() -
+                                             current_record.last_save_to_graph).total_seconds()
+                    if save_to_graph_elapsed > graph_save_frequency:
+                        current_record.save_to_graph = save_to_graph
+                    else:
+                        current_record.save_to_graph = False
                 else:
-                    current_record.save_to_graph = False
-                current_record.notify_transport_enabled = notify_transport_enabled
-            else:
-                #this is a new record
-                new_record.save_to_graph = save_to_graph
-                new_record.notify_transport_enabled = notify_transport_enabled
+                    #this is a new record
+                    new_record.save_to_graph = save_to_graph
 
             if current_record:
+                current_record.last_commit_field_changed_list=[]
+                current_record.notify_transport_enabled = notify_transport_enabled
                 for column in new_record.query.statement._columns._all_col_set:
                     column_name = str(column)
                     new_value = getattr(new_record, column_name)
@@ -67,6 +97,7 @@ class DbEvent:
                                 'updated_on' in current_record.last_commit_field_changed_list:
                     current_record.notify_transport_enabled = False
             else:
+                new_record.notify_transport_enabled = notify_transport_enabled
                 for column in new_record.query.statement._columns._all_col_set:
                     column_name = str(column)
                     new_value = getattr(new_record, column_name)
@@ -389,7 +420,9 @@ class ZoneCustomRelay(db.Model, DbEvent):
     relay_is_on = db.Column(db.Boolean)
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    def __init__(self, zone_id='', gpio_pin_code='', host_name='', relay_pin_name=''):
+    def __init__(self, id=None, zone_id='', gpio_pin_code='', host_name='', relay_pin_name=''):
+        if id:
+           self.id = id
         self.zone_id = zone_id
         self.gpio_pin_code = gpio_pin_code
         self.gpio_host_name = host_name
