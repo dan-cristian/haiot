@@ -6,6 +6,7 @@ from main import logger, app
 from main.admin import models
 from main.admin.thread_pool import do_job
 try:
+    #sometimes I get "ImportError: cannot import name scheduler" so trying two import methods
     from rules import scheduler
 except Exception:
     from . import scheduler
@@ -24,12 +25,14 @@ def rule_sensor_temp_target(obj = models.Sensor(), field_changed_list = []):
     return 'rule temp ok'
 
 ######## CRON RULES ################
-@scheduler.scheduled_job('cron', day='*', hour='8', minute='0', second='0')
-def rule_water_front_on(): do_job(water_front_on)
+try:
+    @scheduler.scheduled_job('cron', day='*', hour='8', minute='0', second='0')
+    def rule_water_front_on(): do_job(water_front_on)
 
-@scheduler.scheduled_job('cron', day='*', hour='8', minute='5', second='0')
-def rule_water_front_off(): do_job(water_front_off)
-
+    @scheduler.scheduled_job('cron', day='*', hour='8', minute='5', second='0')
+    def rule_water_front_off(): do_job(water_front_off)
+except Exception, ex:
+    logger.error('Unable to initialise apscheduler based rules, err={}'.format(ex))
 
 ###### JOBS executed asyncronously via a thread pool ######
 
