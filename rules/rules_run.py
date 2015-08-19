@@ -5,8 +5,10 @@ from flask import url_for, redirect
 from main import logger, app
 from main.admin import models
 from main.admin.thread_pool import do_job
-from rules import scheduler
-
+try:
+    from rules import scheduler
+except Exception:
+    from . import scheduler
 #two types of rules are supported:
 #1: cron based rules
 #https://apscheduler.readthedocs.org/en/v2.1.2/cronschedule.html
