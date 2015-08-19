@@ -244,7 +244,7 @@ def init():
     logger.info('Initialising generic processing threads')
     from admin import thread_pool
     import threading
-    t = threading.Thread(target=thread_pool.run_thread_pool())
+    t = threading.Thread(target=thread_pool.run_thread_pool)
     t.daemon = True
     t.start()
 
@@ -254,6 +254,7 @@ def init():
     global initialised, shutting_down
     initialised = True
 
+    #trap all DB changes
     @models_committed.connect_via(app)
     def on_models_committed(sender, changes):
         from main.admin import event

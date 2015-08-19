@@ -58,10 +58,10 @@ def on_models_committed(sender, changes):
     try:
         for obj, change in changes:
             #avoid recursion
-            if hasattr(obj, 'notify_transport_enabled'):
+            if hasattr(obj, constant.JSON_PUBLISH_NOTIFY_TRANSPORT):
                 #only send mqtt message once for db saves intended to be distributed
                 if obj.notify_transport_enabled:
-                    if hasattr(obj, 'notified_on_db_commit'):
+                    if hasattr(obj, constant.JSON_PUBLISH_NOTIFY_DB_COMMIT):
                         if not obj.notified_on_db_commit:
                             obj.notified_on_db_commit = True
                             txt = model_helper.model_row_to_json(obj, operation=change)
