@@ -13,6 +13,7 @@ try:
     scheduler = BackgroundScheduler()
 except Exception,ex:
     scheduler = None
+    logger.warning('Cannot initialise apscheduler')
 
 if scheduler:
     import rules_run
