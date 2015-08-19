@@ -26,9 +26,6 @@ def init():
     logger.info('cron module initialising')
     setup_tasks()
     thread_pool.add_interval_callable(thread_run, run_interval_second=60)
-    global sched
-    logger.info('apschedule module initialising')
-    sched.start()
     global initialised
     initialised = True
 

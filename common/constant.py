@@ -85,6 +85,8 @@ JSON_PUBLISH_GRAPH_ID='graph_id_'
 JSON_PUBLISH_GRAPH_LEGEND='graph_legend_'
 JSON_PUBLISH_SAVE_TO_GRAPH='save_to_graph'
 JSON_PUBLISH_FIELDS_CHANGED='last_commit_field_changed_list'
+JSON_PUBLISH_NOTIFY_TRANSPORT = 'notify_transport_enabled'
+JSON_PUBLISH_NOTIFY_DB_COMMIT = 'notified_on_db_commit'
 
 GPIO_PIN_TYPE_BBB='bbb'
 GPIO_PIN_TYPE_PI='pi'
