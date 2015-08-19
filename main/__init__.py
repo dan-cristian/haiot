@@ -95,6 +95,7 @@ def execute_command(command, node=None):
     elif command == 'shutdown_app':
         exit_code = 133
     elif command == 'wake':
+        #http://techie-blog.blogspot.ro/2014/03/making-wake-on-lan-wol-work-in-windows.html
         logger.info('Sending wol magic packet to MAC {}'.format(node.mac))
         wol.send_magic_packet(node.mac)
 
