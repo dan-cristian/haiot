@@ -59,9 +59,11 @@ def init():
     if scheduler:
         __func_list = getmembers(rules_run, isfunction)
         scheduler.start()
+        logger.info('Scheduler started')
     else:
         logger.warning('Rules not initialised as scheduler is not available')
     thread_pool.add_interval_callable(thread_run, run_interval_second=60)
+    #connect rules processor for all db chages trigger
     dispatcher.connect(parse_rules, signal=constant.SIGNAL_DB_CHANGE_FOR_RULES, sender=dispatcher.Any)
     global initialised
     initialised = True
