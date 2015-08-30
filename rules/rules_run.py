@@ -29,13 +29,13 @@ try:
     @scheduler.scheduled_job('cron', day='*', hour='23', minute='28', second='0')
     def rule_water_front_on(): do_job(water_front_on)
 
-    @scheduler.scheduled_job('cron', day='*', hour='23', minute='28', second='0')
+    @scheduler.scheduled_job('cron', day='*', hour='23', minute='29', second='0')
     def rule_water_front_off(): do_job(water_front_off)
 
-    @scheduler.scheduled_job('cron', day='*', hour='23', minute='28', second='0')
+    @scheduler.scheduled_job('cron', day='*', hour='23', minute='30', second='0')
     def rule_water_front_on(): do_job(water_back_on)
 
-    @scheduler.scheduled_job('cron', day='*', hour='23', minute='28', second='0')
+    @scheduler.scheduled_job('cron', day='*', hour='23', minute='31', second='0')
     def rule_water_front_off(): do_job(water_back_off)
 
 
