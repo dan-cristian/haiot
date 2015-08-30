@@ -1,31 +1,11 @@
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
 import os
+from pydispatch import dispatcher
 from main import app, logger, db
 from main.admin.model_helper import commit
 from flask import request, abort, send_file, render_template
 from common import constant, utils
-
-@app.route('/apiv1/relay/get_pin')
-def relay_get_web():
-    pin=request.args.get('pin', '').strip()
-    if pin == '':
-        response = return_web_message(pin_value=None, err_message='Argument [pin] not provided')
-    else:
-        response = relay_get(pin=pin, from_web=True)
-    return response
-
-@app.route('/apiv1/relay/set_pin')
-def relay_set_web():
-    pin=request.args.get('pin', '').strip()
-    value=request.args.get('value', '').strip()
-    if pin == '':
-        response = return_web_message(pin_value=None, err_message='Argument [pin] not provided')
-    elif value == '':
-        response = return_web_message(pin_value=None, err_message='Argument [value] not provided')
-    else:
-        response = relay_update(gpio_pin_code=pin, pin_value=value, from_web=True)
-    return response
 
 def return_web_message(pin_value, ok_message='', err_message=''):
     if pin_value:
@@ -46,6 +26,7 @@ def generic_db_update(model_name, filter_name, filter_value, field_name, field_v
                 setattr(record, field_name, field_value)
                 db.session.add(record)
                 commit()
+                dispatcher.send(signal=constant.SIGNAL_SENSOR_DB_POST, model=table, row=record)
                 return  '%s: %s' % (constant.SCRIPT_RESPONSE_OK, record)
             else:
                 msg = 'Field {} not found in record {}'.format(field_name, record)
