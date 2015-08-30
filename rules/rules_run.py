@@ -26,16 +26,16 @@ def rule_sensor_temp_target(obj = models.Sensor(), field_changed_list = []):
 
 ######## CRON RULES ################
 try:
-    @scheduler.scheduled_job('cron', day='*', hour='10', minute='10', second='0')
+    @scheduler.scheduled_job('cron', day='*', hour='10', minute='16', second='*')
     def rule_water_front_on(): do_job(water_front_on)
 
-    @scheduler.scheduled_job('cron', day='*', hour='10', minute='11', second='0')
+    @scheduler.scheduled_job('cron', day='*', hour='10', minute='17', second='*')
     def rule_water_front_off(): do_job(water_front_off)
 
-    @scheduler.scheduled_job('cron', day='*', hour='10', minute='12', second='0')
+    @scheduler.scheduled_job('cron', day='*', hour='10', minute='18', second='*')
     def rule_water_front_on(): do_job(water_back_on)
 
-    @scheduler.scheduled_job('cron', day='*', hour='10', minute='13', second='0')
+    @scheduler.scheduled_job('cron', day='*', hour='10', minute='19', second='*')
     def rule_water_front_off(): do_job(water_back_off)
 
 
