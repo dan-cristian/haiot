@@ -7,6 +7,9 @@ from main.admin.model_helper import commit
 import graphs
 from common import utils
 
+#TODO: read this
+#http://lucumr.pocoo.org/2011/7/19/sqlachemy-and-you/
+
 class DbEvent:
     def __init__(self):
         pass
@@ -431,17 +434,21 @@ class ZoneCustomRelay(db.Model, DbEvent):
     def __repr__(self):
         return 'host {} {} {} {}'.format(self.gpio_host_name, self.gpio_pin_code, self.relay_pin_name, self.relay_is_on)
 
-class Scheduler(db.Model):
+class Rule(db.Model, DbEvent):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True)
-    minutes = db.Column(db.String(20))
-    hours = db.Column(db.String(20))
-    dayofmonth = db.Column(db.String(20))
+    second= db.Column(db.String(20))
+    minute = db.Column(db.String(2))
+    hour = db.Column(db.String(20))
+    day_of_week = db.Column(db.String(20))
+    week = db.Column(db.String(20))
+    day = db.Column(db.String(20))
     month = db.Column(db.String(20))
-    dayofweek = db.Column(db.String(20))
-    year = db.Column(db.String(20), default='*')
+    year = db.Column(db.String(20))
     command = db.Column(db.String(50))
+    start_date = db.Column(db.DateTime())
     is_active = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
         return '{} {} {} {}'.format(self.is_active, self.command)
+

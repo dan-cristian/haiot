@@ -1,19 +1,19 @@
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 import time
-from flask import url_for, redirect
 from main import logger, app
 from main.admin import models
 from main.admin.thread_pool import do_job
 try:
     #sometimes I get "ImportError: cannot import name scheduler" so trying two import methods
-    from rules import scheduler
+    from rule import scheduler
 except Exception:
     from . import scheduler
 #two types of rules are supported:
 #1: cron based rules
 #https://apscheduler.readthedocs.org/en/v2.1.2/cronschedule.html
-#2: value changed rules, first obj parameter is mandatory
+#2: value changed rules, first obj parameter is mandatory. function will execute for object changed
+# that have type=obj
 
 ####### VALUE TRIGGER RULES ########
 def rule_node(obj = models.Node(), field_changed_list = []):

@@ -8,7 +8,7 @@ from main.admin import thread_pool
 initialised = False
 
 
-
+#fixme: replace schedule with apschedule
 def openshift_keepalive():
     try:
         #if variable.NODE_THIS_IS_MASTER_OVERALL:

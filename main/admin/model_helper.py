@@ -112,17 +112,18 @@ def populate_tables(model_auto_update=False):
     with open(var_path, 'r') as f:
         __db_values_json = json.load(f)
     global table_collection
-    table_collection = [models.Parameter, models.Zone, models.ZoneCustomRelay,
+    table_collection = [models.Parameter, models.Module,
+        models.Zone, models.ZoneCustomRelay,
         models.TemperatureTarget, models.SchedulePattern, models.HeatSchedule, models.ZoneHeatRelay,
         models.ZoneSensor, models.ZoneAlarm,
-        models.SystemMonitor, models.SystemDisk, models.Sensor, models.Ups]
+        models.SystemMonitor, models.SystemDisk, models.Sensor, models.Ups, models.Rule]
 
     for table in table_collection:
         table_str = utils.get_table_name(table)
         check_table_schema(table, model_auto_update)
         if table_str in __db_values_json:
             default_values = __db_values_json[table_str]
-            if len(table.query.all()) < len(default_values):
+            if len(table.query.all()) != len(default_values):
                 logger.info('Populating {} with default values'.format(table_str))
                 table.query.delete()
                 commit()
@@ -161,11 +162,12 @@ def populate_tables(model_auto_update=False):
     constant.HOST_PRIORITY = node_obj.priority
 
     import alarm, heat, sensor, relay, health_monitor, graph_plotly, node, io_bbb, webui, main, ddns
-    import rules #always cron before rules
+    import rule #always cron before rules
 
     from cloud import youtube
     from sysutils import filewatch
 
+    '''
     module_list_dict = {'default':[
         [1, get_mod_name(main), True, 0],[2, get_mod_name(node), True, 1],[3, get_mod_name(health_monitor), True, 2],
                     [5, get_mod_name(sensor), False, 4],[6, get_mod_name(relay), False, 5],
@@ -211,6 +213,7 @@ def populate_tables(model_auto_update=False):
         ]
         }
 
+
     check_table_schema(models.Module, model_auto_update)
     if module_list_dict.has_key(constant.HOST_NAME):
         module_list = module_list_dict[constant.HOST_NAME]
@@ -227,6 +230,8 @@ def populate_tables(model_auto_update=False):
             db.session.add(models.Module(id=tuple[0], host_name=constant.HOST_NAME,
                                          name=tuple[1], active=tuple[2], start_order=tuple[3]))
             commit()
+    '''
+
 
     check_table_schema(models.GpioPin, model_auto_update)
     bbb_bcm_map={
