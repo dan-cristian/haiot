@@ -55,7 +55,7 @@ def init_module(module_name, module_is_active):
             logger.info('Module {} initialising'.format(module_name))
             dynclass.init()
         else:
-            logger.info('Module {} already initialised'.format(module_name))
+            logger.info('Module {} already initialised, skipping init'.format(module_name))
     else:
         logger.info("Module {} is marked as not active".format(module_name))
         if dynclass.initialised:
@@ -70,8 +70,15 @@ def init_modules():
     import admin.model_helper
     from common import constant
 
-    module_list = admin.models.Module.query.filter_by(host_name=constant.HOST_NAME).order_by(
-        admin.models.Module.start_order).all()
+    #module_list = admin.models.Module.query.filter_by(host_name=constant.HOST_NAME).order_by(
+    #    admin.models.Module.start_order).all()
+    m = admin.models.Module
+
+    #http://docs.sqlalchemy.org/en/rel_0_9/core/sqlelement.html
+    #fixme: only init once
+    module_list = m.query.filter(m.host_name.in_([constant.HOST_NAME, 'default'])).order_by(m.start_order).all()
+
+
     for mod in module_list:
         assert isinstance(mod, admin.models.Module)
         #webui will block at init, postpone init for end
