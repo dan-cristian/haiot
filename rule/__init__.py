@@ -52,12 +52,19 @@ def unload():
     global initialised
     initialised = False
 
+def rule_record_update(record):
+    #fixme: apply rule change
+    pass
+
 def init():
     global __func_list
     global scheduler
     logger.info('Rules module initialising')
     if scheduler:
+        #load all function entries from hardcoded rule script
         __func_list = getmembers(rules_run, isfunction)
+        #fixme: load additional rule entries from DB (these can be updated while app is running)
+
         scheduler.start()
         logger.info('Scheduler started')
     else:

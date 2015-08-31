@@ -17,6 +17,27 @@
     {"name": "P_MOTION_VIDEO_PATH", "value": "/media/temp/motion"},
     {"name": "P_YOUTUBE_CREDENTIAL_FILE", "value": ".youtube.credentials"}
   ],
+  "Module": [
+    {"id":1,  "host_name":"default", "name":"main",           "active":"1", "start_order":"1"},
+    {"id":3,  "host_name":"default", "name":"health_monitor", "active":"1", "start_order":"3"},
+    {"id":5,  "host_name":"default", "name":"sensor",         "active":"1", "start_order":"5"},
+    {"id":7,  "host_name":"default", "name":"relay",          "active":"0", "start_order":"7"},
+    {"id":9,  "host_name":"default", "name":"heat",           "active":"1", "start_order":"9"},
+    {"id":11, "host_name":"default", "name":"alarm",          "active":"1", "start_order":"11"},
+    {"id":13, "host_name":"default", "name":"graph_plotly",   "active":"1", "start_order":"13"},
+    {"id":15, "host_name":"default", "name":"io_bbb",         "active":"1", "start_order":"15"},
+    {"id":17, "host_name":"default", "name":"webui",          "active":"1", "start_order":"17"},
+    {"id":19, "host_name":"default", "name":"ddns",           "active":"0", "start_order":"19"},
+    {"id":21, "host_name":"default", "name":"youtube",        "active":"1", "start_order":"21"},
+    {"id":23, "host_name":"default", "name":"filewatch",      "active":"1", "start_order":"23"},
+    {"id":25, "host_name":"default", "name":"rules",          "active":"1", "start_order":"25"},
+
+    {"id":119, "host_name":"nas", "active":"1", "start_order":"19", "name":"ddns"},
+    {"id":219, "host_name":"netbook", "active":"1", "start_order":"19", "name":"ddns"}
+
+
+  ],
+
   "Zone": [
     {"id":1, "name":"bucatarie"},
     {"id":2, "name":"living"},

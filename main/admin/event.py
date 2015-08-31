@@ -13,23 +13,28 @@ import node
 import sensor
 import heat
 import relay
+import rule
 
 
 __mqtt_event_list = []
 #__mqtt_lock = threading.Lock()
 
 def handle_local_event_db_post(model, row):
-    #executed on local db changes done via web ui only
+    #executed on local db changes done via web ui only (includes API calls)
     processed = False
     logger.info('Local DB change sent by model {} row {}'.format(model, row))
     if str(models.Parameter) in str(model):
+        #fixme: update app if params are changing to avoid need for restart
         processed = True
+    #no need to propagate changes to other nodes
     elif str(models.Module) in str(model):
         if row.host_name == constant.HOST_NAME:
             main.init_module(row.name, row.active)
             processed = True
+    #propagate changes to all nodes as eac must execute db sync or other commands locally
     elif str(models.Node) in str(model) \
-            or str(models.GpioPin) in str(model) or str(models.ZoneCustomRelay) in str(model):
+            or str(models.GpioPin) in str(model) or str(models.ZoneCustomRelay) in str(model) \
+            or str(models.Rule) in str(model):
         txt = model_helper.model_row_to_json(row, operation='update')
         #fixme: execute critical events directly
         if transport.mqtt_io.client_connected:
@@ -107,6 +112,8 @@ def mqtt_thread_run():
                     relay.zone_custom_relay_record_update(obj)
                 elif table == utils.get_table_name(models.GpioPin):
                     relay.gpio_record_update(obj)
+                elif table == utils.get_table_name(models.Rule):
+                    rule.rule_record_update(obj)
 
 
             if constant.JSON_MESSAGE_TYPE in obj:
