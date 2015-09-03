@@ -76,8 +76,8 @@ def init_modules():
 
     #http://docs.sqlalchemy.org/en/rel_0_9/core/sqlelement.html
     #fixme: only init once
-    module_list = m.query.filter(m.host_name.in_([constant.HOST_NAME, 'default'])).order_by(m.start_order).all()
-
+    #keep host name default to '' rather than None (which does not work on filter in)
+    module_list = m.query.filter(m.host_name.in_([constant.HOST_NAME, ""])).order_by(m.start_order).all()
 
     for mod in module_list:
         assert isinstance(mod, admin.models.Module)

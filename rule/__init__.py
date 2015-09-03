@@ -4,6 +4,7 @@ from inspect import getmembers, isfunction
 from pydispatch import dispatcher
 from main import logger
 from main.admin import thread_pool
+from main.admin import models
 from common import constant
 from apscheduler.schedulers.background import BackgroundScheduler
 scheduler = None
@@ -53,8 +54,21 @@ def unload():
     initialised = False
 
 def rule_record_update(record):
-    #fixme: apply rule change
+    logger.info("Rule definitions changed in db")
+    __load_rules_from_db()
     pass
+
+def __load_rules_from_db():
+    logger.info("Loading rule definition from db")
+    #keep host name default to '' rather than None (which does not work on filter in)
+    '''
+    rule_list = models.Rule.query.filter(models.Rule.host_name.in_([constant.HOST_NAME, ""])).all()
+    scheduler.remove_all_jobs()
+    for rule in rule_list:
+        method_to_call = getattr(rules_run, rule.command)
+        scheduler.add_job(method_to_call, 'cron', year=rule.year, month=rule.month, day=rule.day, week=rule.week,
+                               day_of_week=rule.day_of_week, hour=rule.hour, minute=rule.minute, second=rule.second)
+    '''
 
 def init():
     global __func_list
@@ -63,8 +77,7 @@ def init():
     if scheduler:
         #load all function entries from hardcoded rule script
         __func_list = getmembers(rules_run, isfunction)
-        #fixme: load additional rule entries from DB (these can be updated while app is running)
-
+        __load_rules_from_db()
         scheduler.start()
         logger.info('Scheduler started')
     else:
