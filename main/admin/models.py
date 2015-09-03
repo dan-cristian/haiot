@@ -436,6 +436,7 @@ class ZoneCustomRelay(db.Model, DbEvent):
 
 class Rule(db.Model, DbEvent):
     id = db.Column(db.Integer, primary_key=True)
+    host_name = db.Column(db.String(50))
     name = db.Column(db.String(50), unique=True)
     second= db.Column(db.String(20))
     minute = db.Column(db.String(2))
@@ -447,8 +448,16 @@ class Rule(db.Model, DbEvent):
     year = db.Column(db.String(20))
     command = db.Column(db.String(50))
     start_date = db.Column(db.DateTime())
+
     is_active = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
-        return '{} {} {} {}'.format(self.is_active, self.command)
+        return '{} {}'.format(self.is_active, self.command)
+
+    def __init__(self, id='', host_name=''):
+        #keep host name default to '' rather than None (which does not work on filter in)
+        if id:
+            self.id = id
+        self.host_name = host_name
+
 
