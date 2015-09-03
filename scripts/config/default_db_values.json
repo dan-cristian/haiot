@@ -18,24 +18,22 @@
     {"name": "P_YOUTUBE_CREDENTIAL_FILE", "value": ".youtube.credentials"}
   ],
   "Module": [
-    {"id":1,  "host_name":"default", "name":"main",           "active":"1", "start_order":"1"},
-    {"id":3,  "host_name":"default", "name":"health_monitor", "active":"1", "start_order":"3"},
-    {"id":5,  "host_name":"default", "name":"sensor",         "active":"1", "start_order":"5"},
-    {"id":7,  "host_name":"default", "name":"relay",          "active":"0", "start_order":"7"},
-    {"id":9,  "host_name":"default", "name":"heat",           "active":"1", "start_order":"9"},
-    {"id":11, "host_name":"default", "name":"alarm",          "active":"1", "start_order":"11"},
-    {"id":13, "host_name":"default", "name":"graph_plotly",   "active":"1", "start_order":"13"},
-    {"id":15, "host_name":"default", "name":"io_bbb",         "active":"1", "start_order":"15"},
-    {"id":17, "host_name":"default", "name":"webui",          "active":"1", "start_order":"17"},
-    {"id":19, "host_name":"default", "name":"ddns",           "active":"0", "start_order":"19"},
-    {"id":21, "host_name":"default", "name":"youtube",        "active":"1", "start_order":"21"},
-    {"id":23, "host_name":"default", "name":"filewatch",      "active":"1", "start_order":"23"},
-    {"id":25, "host_name":"default", "name":"rules",          "active":"1", "start_order":"25"},
+    {"id":1,  "active":"1", "start_order":"1", "name":"main"},
+    {"id":3,  "active":"1", "start_order":"3", "name":"health_monitor"},
+    {"id":5,  "active":"1", "start_order":"5", "name":"sensor"},
+    {"id":7,  "active":"0", "start_order":"7", "name":"relay"},
+    {"id":9,  "active":"1", "start_order":"9", "name":"heat"},
+    {"id":11, "active":"1", "start_order":"11", "name":"alarm"},
+    {"id":13, "active":"1", "start_order":"13", "name":"graph_plotly"},
+    {"id":15, "active":"1", "start_order":"15", "name":"io_bbb"},
+    {"id":17, "active":"1", "start_order":"17", "name":"webui"},
+    {"id":19, "active":"0", "start_order":"19", "name":"ddns"},
+    {"id":21, "active":"1", "start_order":"21", "name":"cloud.youtube"},
+    {"id":23, "active":"1", "start_order":"23", "name":"sysutils.filewatch"},
+    {"id":25, "active":"1", "start_order":"25", "name":"rule"},
 
-    {"id":119, "host_name":"nas", "active":"1", "start_order":"19", "name":"ddns"},
+    {"id":119, "host_name":"nas",     "active":"1", "start_order":"19", "name":"ddns"},
     {"id":219, "host_name":"netbook", "active":"1", "start_order":"19", "name":"ddns"}
-
-
   ],
 
   "Zone": [
@@ -169,6 +167,12 @@
     {"zone_id":9 , "gpio_pin_code":"P8_09", "gpio_host_name": "beaglebone", "alarm_pin_name": "beci mare"},
     {"zone_id":10 , "gpio_pin_code":"P8_07", "gpio_host_name": "beaglebone", "alarm_pin_name": "scari beci"},
     {"zone_id":11 , "gpio_pin_code":"P8_15", "gpio_host_name": "beaglebone", "alarm_pin_name": "etaj hol"}
+  ],
+  "Rule": [
+    {"command":"water_front_on", "month":"5-10", "hour":"07", "minute":"30"},
+    {"command":"water_front_off", "month":"5-10", "hour":"07", "minute":"32"},
+    {"command":"water_back_on", "month":"5-10", "hour":"07", "minute":"33"},
+    {"command":"water_back_off", "month":"5-10", "hour":"07", "minute":"30"}
   ]
 }
 
