@@ -11,6 +11,7 @@ except Exception:
     from . import scheduler
 #two types of rules are supported:
 #1: cron based rules
+#https://apscheduler.readthedocs.org/en/latest/userguide.html#adding-jobs
 #https://apscheduler.readthedocs.org/en/v2.1.2/cronschedule.html
 #2: value changed rules, first obj parameter is mandatory. function will execute for object changed
 # that have type=obj
@@ -45,6 +46,8 @@ except Exception, ex:
     logger.error('Unable to initialise apscheduler based rules, err={}'.format(ex))
 
 ###### JOBS executed asyncronously via a thread pool ######
+def test():
+    logger.info("Test rule")
 
 def back_pump_on():
     logger.info('back pump on')

@@ -60,15 +60,24 @@ def rule_record_update(record):
 
 def __load_rules_from_db():
     logger.info("Loading rule definition from db")
-    #keep host name default to '' rather than None (which does not work on filter in)
-    '''
-    rule_list = models.Rule.query.filter(models.Rule.host_name.in_([constant.HOST_NAME, ""])).all()
-    scheduler.remove_all_jobs()
-    for rule in rule_list:
-        method_to_call = getattr(rules_run, rule.command)
-        scheduler.add_job(method_to_call, 'cron', year=rule.year, month=rule.month, day=rule.day, week=rule.week,
-                               day_of_week=rule.day_of_week, hour=rule.hour, minute=rule.minute, second=rule.second)
-    '''
+    #keep host name default to '' rather than None (which does not work on filter in_)
+    try:
+        rule_list = models.Rule.query.filter(models.Rule.host_name.in_([constant.HOST_NAME, ""])).all()
+        scheduler.remove_all_jobs()
+        for rule in rule_list:
+            method_to_call = getattr(rules_run, rule.command)
+            year = rule.year if rule.year != '' else None
+            month = rule.month if rule.month != '' else None
+            day = rule.day if rule.day != '' else None
+            week = rule.week if rule.week != '' else None
+            day_of_week = rule.day_of_week if rule.day_of_week != '' else None
+            hour = rule.hour if rule.hour != '' else None
+            minute = rule.minute if rule.minute != '' else None
+            second = rule.second if rule.second != '' else None
+            scheduler.add_job(method_to_call, 'cron', year=year, month=month, day=day, week=week,
+                              day_of_week=day_of_week, hour=hour, minute=minute, second=second)
+    except Exception, ex:
+        logger.error("Unable to load rules from db", ex)
 
 def init():
     global __func_list
