@@ -448,7 +448,6 @@ class Rule(db.Model, DbEvent):
     year = db.Column(db.String(20))
     command = db.Column(db.String(50))
     start_date = db.Column(db.DateTime())
-
     is_active = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
