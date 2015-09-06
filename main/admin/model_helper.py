@@ -50,7 +50,8 @@ def get_param(name):
     global __db_values_json
     try:
         #val = __db_values_json["Parameter"][name]
-        val = models.Parameter.query.filter_by(name=name).first().value
+        #val = models.Parameter.query.filter_by(name=name).first().value
+        val = query_filter_first(models.Parameter, filter=models.Parameter.name.in_([name])).value
         return val
     except ValueError, ex:
         logger.warning('Unable to get parameter {} error {}'.format(name, ex))
@@ -61,15 +62,40 @@ def get_param(name):
         raise ex
 
 def commit():
+    time_start=utils.get_base_location_now_date()
     try:
         db.session.commit()
+        time_end = utils.get_base_location_now_date()
     except IntegrityError, ex:
+        time_end = utils.get_base_location_now_date()
         #db.session.rollback()
         logger.warning('Unable to commit DB session={}, rolled back, err={}'.format(db.session, ex))
     except InvalidRequestError, ex:
+        time_end = utils.get_base_location_now_date()
         logger.warning('Error on commit, session={}, ignoring, err={}'.format(db.session, ex))
     except Exception, ex:
-        logger.warning('Exception on commit, session={} err={}'.format(db.session, ex))
+        time_end = utils.get_base_location_now_date()
+        elapsed = (time_end - time_start).seconds
+        logger.warning('Exception on commit, session={} err={} secondslapsed={}'.format(db.session, ex, elapsed))
+
+def __check_for_long_query(result, start_time):
+    elapsed = (utils.get_base_location_now_date() - start_time).seconds
+    if elapsed>1:
+        logger.warning("Long running DB query, seconds elapsed={}, result={}".format(elapsed, result))
+    return result
+
+def query_all(model):
+    start_time = utils.get_base_location_now_date()
+    return __check_for_long_query(model.query.all(), start_time)
+
+
+def query_filter_all(model, filter):
+    start_time = utils.get_base_location_now_date()
+    return __check_for_long_query(model.query.filter(filter).all(), start_time)
+
+def query_filter_first(model, filter):
+    start_time = utils.get_base_location_now_date()
+    return __check_for_long_query(model.query.filter(filter).first(), start_time)
 
 
 def get_mod_name(module):
@@ -77,7 +103,8 @@ def get_mod_name(module):
 
 def check_table_schema(table, model_auto_update=False):
     try:
-        count = table.query.all()
+        #count = table.query.all()
+        count = query_all(table)
     except OperationalError, oex:
         logger.critical('Table {} schema in DB seems outdated, err {}, DROP it and recreate (y/n)?'.format(oex, table))
         read_drop_table(table, oex, model_auto_update)
