@@ -22,7 +22,7 @@
     {"id":3,  "active":"1", "start_order":"3", "name":"health_monitor"},
     {"id":5,  "active":"1", "start_order":"5", "name":"sensor"},
     {"id":7,  "active":"0", "start_order":"7", "name":"relay"},
-    {"id":9,  "active":"1", "start_order":"9", "name":"heat"},
+    {"id":9,  "active":"0", "start_order":"9", "name":"heat"},
     {"id":11, "active":"1", "start_order":"11", "name":"alarm"},
     {"id":13, "active":"1", "start_order":"13", "name":"graph_plotly"},
     {"id":15, "active":"0", "start_order":"15", "name":"io_bbb"},
@@ -32,6 +32,7 @@
     {"id":23, "active":"1", "start_order":"23", "name":"sysutils.filewatch"},
     {"id":25, "active":"1", "start_order":"25", "name":"rule"},
 
+    {"id":109, "host_name":"nas",     "active":"1", "start_order":"19", "name":"heat"},
     {"id":119, "host_name":"nas",     "active":"1", "start_order":"19", "name":"ddns"},
     {"id":219, "host_name":"netbook", "active":"1", "start_order":"19", "name":"ddns"}
   ],
@@ -133,11 +134,11 @@
   ],
 
   "ZoneHeatRelay":[
-    {"zone_id":1 , "gpio_pin_code": "P9_13", "host_name": "beaglebone", "is_main_heat_source": "0"},
-    {"zone_id":2 , "gpio_pin_code": "P9_12", "host_name": "beaglebone", "is_main_heat_source": "0"},
-    {"zone_id":47 , "gpio_pin_code": "P9_11", "host_name": "beaglebone", "is_main_heat_source": "0"},
-    {"zone_id":4 , "gpio_pin_code": "P9_15", "host_name": "beaglebone", "is_main_heat_source": "0"},
-    {"zone_id":19 , "gpio_pin_code": "24", "host_name": "pi-power", "is_main_heat_source": "1"}
+    {"zone_id":1,"heat_pin_name":"bucatarie","gpio_pin_code":"P9_13","host_name":"beaglebone","is_main_heat_source":"0"},
+    {"zone_id":2,"heat_pin_name":"living","gpio_pin_code":"P9_12","host_name":"beaglebone", "is_main_heat_source":"0"},
+    {"zone_id":47,"heat_pin_name":"birou","gpio_pin_code": "P9_11","host_name":"beaglebone", "is_main_heat_source":"0"},
+    {"zone_id":4,"heat_pin_name":"dormitor","gpio_pin_code":"P9_15","host_name":"beaglebone","is_main_heat_source":"0"},
+    {"zone_id":19,"heat_pin_name":"heat main","gpio_pin_code":"24","host_name":"pi-power","is_main_heat_source":"1"}
   ],
 
   "ZoneSensor": [
