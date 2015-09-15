@@ -67,16 +67,19 @@ def __load_rules_from_db():
         scheduler.remove_all_jobs()
         for rule in rule_list:
             method_to_call = getattr(rules_run, rule.command)
-            year = rule.year if rule.year != '' else None
-            month = rule.month if rule.month != '' else None
-            day = rule.day if rule.day != '' else None
-            week = rule.week if rule.week != '' else None
-            day_of_week = rule.day_of_week if rule.day_of_week != '' else None
-            hour = rule.hour if rule.hour != '' else None
-            minute = rule.minute if rule.minute != '' else None
-            second = rule.second if rule.second != '' else None
-            scheduler.add_job(method_to_call, 'cron', year=year, month=month, day=day, week=week,
-                              day_of_week=day_of_week, hour=hour, minute=minute, second=second)
+            if rule.is_active:
+                year = rule.year if rule.year != '' else None
+                month = rule.month if rule.month != '' else None
+                day = rule.day if rule.day != '' else None
+                week = rule.week if rule.week != '' else None
+                day_of_week = rule.day_of_week if rule.day_of_week != '' else None
+                hour = rule.hour if rule.hour != '' else None
+                minute = rule.minute if rule.minute != '' else None
+                second = rule.second if rule.second != '' else None
+                scheduler.add_job(method_to_call, 'cron', year=year, month=month, day=day, week=week,
+                                  day_of_week=day_of_week, hour=hour, minute=minute, second=second)
+            else:
+                logger.info("Rule {} is marked as inactive, skipping".format(rule.command))
     except Exception, ex:
         logger.error("Unable to load rules from db", ex)
 
