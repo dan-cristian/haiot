@@ -176,12 +176,13 @@
     {"zone_id":10 , "gpio_pin_code":"P8_07", "gpio_host_name": "beaglebone", "alarm_pin_name": "scari beci"},
     {"zone_id":11 , "gpio_pin_code":"P8_15", "gpio_host_name": "beaglebone", "alarm_pin_name": "etaj hol"}
   ],
+
   "Rule": [
-    {"command":"test", "second":"*/5"},
-    {"command":"water_front_on", "month":"5-10", "hour":"07", "minute":"30"},
-    {"command":"water_front_off", "month":"5-10", "hour":"07", "minute":"32"},
-    {"command":"water_back_on", "month":"5-10", "hour":"07", "minute":"33"},
-    {"command":"water_back_off", "month":"5-10", "hour":"07", "minute":"30"}
+    {"command":"test", "second":"*/5", "is_active":"0"},
+    {"command":"water_front_on", "month":"5-10", "hour":"07", "minute":"30", "is_active":"1"},
+    {"command":"water_front_off", "month":"5-10", "hour":"07", "minute":"32", "is_active":"1"},
+    {"command":"water_back_on", "month":"5-10", "hour":"07", "minute":"33", "is_active":"1"},
+    {"command":"water_back_off", "month":"5-10", "hour":"07", "minute":"30", "is_active":"1"}
   ]
 }
 
