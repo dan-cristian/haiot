@@ -60,3 +60,6 @@ def init():
 def home():
     return '<a href="/user/node">Node</a>'
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
