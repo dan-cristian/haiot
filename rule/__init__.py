@@ -81,7 +81,7 @@ def __load_rules_from_db():
             else:
                 logger.info("Rule {} is marked as inactive, skipping".format(rule.command))
     except Exception, ex:
-        logger.error("Unable to load rules from db", ex)
+        logger.error("Unable to load rules from db, err={}".format(ex, exc_info=True))
 
 def init():
     global __func_list
