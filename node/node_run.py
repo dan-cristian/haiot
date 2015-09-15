@@ -7,7 +7,6 @@ import random
 from common import constant, variable, utils
 from main.admin import models
 from main.admin.model_helper import commit
-from main import db
 from transport import mqtt_io
 
 first_run = True
@@ -122,9 +121,10 @@ def update_master_state():
 def announce_node_state():
     try:
         logger.debug('I tell everyone my node state')
-        current_record = models.Node.query.filter_by(name=constant.HOST_NAME).first()
-
+        #current_record = models.Node.query.filter_by(name=constant.HOST_NAME).first()
         node = models.Node()
+        current_record = models.Node().query_filter_first(filter=models.Node.name.in_([constant.HOST_NAME, ""]))
+
         node.name = constant.HOST_NAME
         if not current_record:
             node.priority = random.randint(1, 100)

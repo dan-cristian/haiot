@@ -6,7 +6,6 @@ from main import logger
 from main.admin import thread_pool
 from main.admin import models
 from common import constant
-from main.admin.model_helper import query_filter_all
 from apscheduler.schedulers.background import BackgroundScheduler
 scheduler = None
 try:
@@ -64,7 +63,7 @@ def __load_rules_from_db():
     #keep host name default to '' rather than None (which does not work on filter in_)
     try:
         #rule_list = models.Rule.query.filter(models.Rule.host_name.in_([constant.HOST_NAME, ""])).all()
-        rule_list = query_filter_all(model=models.Rule, filter=models.Rule.host_name.in_([constant.HOST_NAME, ""]))
+        rule_list = models.Rule().query_filter_all(filter=models.Rule.host_name.in_([constant.HOST_NAME, ""]))
         scheduler.remove_all_jobs()
         for rule in rule_list:
             method_to_call = getattr(rules_run, rule.command)
