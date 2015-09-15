@@ -51,7 +51,7 @@ def get_param(name):
     try:
         #val = __db_values_json["Parameter"][name]
         #val = models.Parameter.query.filter_by(name=name).first().value
-        val = query_filter_first(models.Parameter, filter=models.Parameter.name.in_([name])).value
+        val = models.Parameter().query_filter_first(filter=models.Parameter.name.in_([name])).value
         return val
     except ValueError, ex:
         logger.warning('Unable to get parameter {} error {}'.format(name, ex))
@@ -78,33 +78,13 @@ def commit():
         elapsed = (time_end - time_start).seconds
         logger.warning('Exception on commit, session={} err={} secondslapsed={}'.format(db.session, ex, elapsed))
 
-def __check_for_long_query(result, start_time):
-    elapsed = (utils.get_base_location_now_date() - start_time).seconds
-    if elapsed>1:
-        logger.warning("Long running DB query, seconds elapsed={}, result={}".format(elapsed, result))
-    return result
-
-def query_all(model):
-    start_time = utils.get_base_location_now_date()
-    return __check_for_long_query(model.query.all(), start_time)
-
-
-def query_filter_all(model, filter):
-    start_time = utils.get_base_location_now_date()
-    return __check_for_long_query(model.query.filter(filter).all(), start_time)
-
-def query_filter_first(model, filter):
-    start_time = utils.get_base_location_now_date()
-    return __check_for_long_query(model.query.filter(filter).first(), start_time)
-
-
 def get_mod_name(module):
     return str(module).split("'")[1]
 
 def check_table_schema(table, model_auto_update=False):
     try:
         #count = table.query.all()
-        count = query_all(table)
+        count = table().query_all()
     except OperationalError, oex:
         logger.critical('Table {} schema in DB seems outdated, err {}, DROP it and recreate (y/n)?'.format(oex, table))
         read_drop_table(table, oex, model_auto_update)
@@ -150,9 +130,9 @@ def populate_tables(model_auto_update=False):
         check_table_schema(table, model_auto_update)
         if table_str in __db_values_json:
             default_values = __db_values_json[table_str]
-            if len(table.query.all()) != len(default_values):
+            if len(table().query_all()) != len(default_values):
                 logger.info('Populating {} with default values'.format(table_str))
-                table.query.delete()
+                table().delete()
                 commit()
                 for config_record in default_values:
                     new_record = table()

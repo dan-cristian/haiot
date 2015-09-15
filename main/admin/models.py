@@ -10,6 +10,30 @@ from common import utils
 #TODO: read this
 #http://lucumr.pocoo.org/2011/7/19/sqlachemy-and-you/
 
+class DbBase:
+    def __check_for_long_query(self, result, start_time):
+        elapsed = (utils.get_base_location_now_date() - start_time).seconds
+        if elapsed>1:
+            logger.warning("Long running DB query, seconds elapsed={}, result={}".format(elapsed, result))
+        return result
+
+    def query_all(self):
+        start_time = utils.get_base_location_now_date()
+        return self.__check_for_long_query(self.query.all(), start_time)
+
+    def query_filter_all(self, filter):
+        start_time = utils.get_base_location_now_date()
+        return self.__check_for_long_query(self.query.filter(filter).all(), start_time)
+
+    def query_filter_first(self, filter):
+        start_time = utils.get_base_location_now_date()
+        return self.__check_for_long_query(self.query.filter(filter).first(), start_time)
+
+    def delete(self):
+        start_time = utils.get_base_location_now_date()
+        return self.__check_for_long_query(self.query.delete(), start_time)
+
+
 class DbEvent:
     def __init__(self):
         pass
@@ -55,9 +79,11 @@ class DbEvent:
         except Exception, ex:
             logger.error('Exception save json to db {}'.format(ex))
 
+
+
     #graph_save_frequency in seconds
     def save_changed_fields(self,current_record='',new_record='',notify_transport_enabled=False, save_to_graph=False,
-                            ignore_only_updated_on_change=True, debug=False, graph_save_frequency=0):
+                            ignore_only_updated_on_change=True, debug=False, graph_save_frequency=0, filter=None):
         try:
             if hasattr(self, 'save_to_graph'):#not all models inherit graph
                 if current_record:
@@ -121,7 +147,9 @@ class DbEvent:
         #else:
         #    logger.warning('Incorrect parameters received on save changed fields to db')
 
-class Module(db.Model):
+
+
+class Module(db.Model, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     host_name = db.Column(db.String(50))
     name = db.Column(db.String(50))
@@ -139,7 +167,7 @@ class Module(db.Model):
     def __repr__(self):
         return 'Module {} {}, {}'.format(self.id, self.host_name, self.name[:50])
 
-class Zone(db.Model):
+class Zone(db.Model, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
 
@@ -151,7 +179,7 @@ class Zone(db.Model):
     def __repr__(self):
         return 'Zone id {} {}'.format(self.id, self.name[:20])
 
-class SchedulePattern(db.Model):
+class SchedulePattern(db.Model, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
     pattern = db.Column(db.String(24))
@@ -165,7 +193,7 @@ class SchedulePattern(db.Model):
     def __repr__(self):
         return self.name[:len('1234-5678-9012-3456-7890-1234')]
 
-class TemperatureTarget(db.Model):
+class TemperatureTarget(db.Model, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(1))
     target = db.Column(db.Float)
@@ -180,7 +208,7 @@ class TemperatureTarget(db.Model):
         return '{} code {}={}'.format(self.id, self.code, self.target)
 
 
-class HeatSchedule(db.Model):
+class HeatSchedule(db.Model, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'), nullable=False)
     #zone = db.relationship('Zone', backref=db.backref('heat schedule zone', lazy='dynamic'))
@@ -204,7 +232,7 @@ class HeatSchedule(db.Model):
                 self.pattern_week_id, self.pattern_weekend_id)
 
 
-class Sensor(db.Model, graphs.SensorGraph, DbEvent):
+class Sensor(db.Model, graphs.SensorGraph, DbEvent, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     address = db.Column(db.String(50), unique=True)
     type = db.Column(db.String(50))
@@ -233,7 +261,7 @@ class Sensor(db.Model, graphs.SensorGraph, DbEvent):
         return 'Sensor {}, {}{}'.format(self.type, self.sensor_name, self.address)
     
 
-class Parameter(db.Model):
+class Parameter(db.Model, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True)
     value = db.Column(db.String(255))
@@ -247,7 +275,7 @@ class Parameter(db.Model):
     def __repr__(self):
         return '{}, {}'.format(self.name, self.value)
 
-class ZoneSensor(db.Model):
+class ZoneSensor(db.Model, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     sensor_name = db.Column(db.String(50))
     zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'))
@@ -263,7 +291,7 @@ class ZoneSensor(db.Model):
     def __repr__(self):
         return 'ZoneSensor zone {} sensor {}'.format(self.zone_id,  self.sensor_name)
 
-class Node(db.Model, DbEvent, graphs.NodeGraph):
+class Node(db.Model, DbEvent, graphs.NodeGraph, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
     ip = db.Column(db.String(15))
@@ -295,7 +323,7 @@ class Node(db.Model, DbEvent, graphs.NodeGraph):
         return 'Node {} ip {}'.format(self.name,  self.ip)
 
 
-class SystemMonitor(db.Model, graphs.SystemMonitorGraph, DbEvent):
+class SystemMonitor(db.Model, graphs.SystemMonitorGraph, DbEvent, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True)
     cpu_usage_percent = db.Column(db.Float)
@@ -307,7 +335,7 @@ class SystemMonitor(db.Model, graphs.SystemMonitorGraph, DbEvent):
     def __repr__(self):
         return '{} {} {}'.format(self.id, self.name, self.updated_on)
 
-class Ups(db.Model, graphs.UpsGraph, DbEvent):
+class Ups(db.Model, graphs.UpsGraph, DbEvent, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True)
     system_name = db.Column(db.String(50))
@@ -327,7 +355,7 @@ class Ups(db.Model, graphs.UpsGraph, DbEvent):
     def __repr__(self):
         return '{} {} {}'.format(self.id, self.name, self.updated_on)
 
-class SystemDisk(db.Model, graphs.SystemDiskGraph, DbEvent):
+class SystemDisk(db.Model, graphs.SystemDiskGraph, DbEvent, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     serial = db.Column(db.String(50), unique=True)
     system_name = db.Column(db.String(50))
@@ -354,7 +382,7 @@ class SystemDisk(db.Model, graphs.SystemDiskGraph, DbEvent):
     def __repr__(self):
         return '{} {} {} {} {}'.format(self.id, self.serial,  self.system_name, self.hdd_name, self.hdd_disk_dev)
 
-class GpioPin(db.Model, DbEvent):
+class GpioPin(db.Model, DbEvent, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     host_name = db.Column(db.String(50))
     pin_type = db.Column(db.String(50)) #bbb, pi
@@ -372,7 +400,7 @@ class GpioPin(db.Model, DbEvent):
         return 'host={} code={} desc={} type={} value={}'.format(self.host_name, self.pin_code, self.description,
                                                                  self.pin_type, self.pin_value)
 
-class ZoneAlarm(db.Model, DbEvent):
+class ZoneAlarm(db.Model, DbEvent, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     #friendly display name for pin mapping
     alarm_pin_name = db.Column(db.String(50))
@@ -393,7 +421,7 @@ class ZoneAlarm(db.Model, DbEvent):
     def __repr__(self):
         return 'host {} gpiopin {} {}'.format(self.gpio_host_name, self.gpio_pin_code, self.alarm_pin_name)
 
-class ZoneHeatRelay(db.Model, DbEvent):
+class ZoneHeatRelay(db.Model, DbEvent, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     #friendly display name for pin mapping
     heat_pin_name = db.Column(db.String(50))
@@ -413,7 +441,7 @@ class ZoneHeatRelay(db.Model, DbEvent):
     def __repr__(self):
         return 'host {} {} {} {}'.format(self.gpio_host_name, self.gpio_pin_code, self.heat_pin_name, self.heat_is_on)
 
-class ZoneCustomRelay(db.Model, DbEvent):
+class ZoneCustomRelay(db.Model, DbEvent, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     #friendly display name for pin mapping
     relay_pin_name = db.Column(db.String(50))
@@ -434,7 +462,7 @@ class ZoneCustomRelay(db.Model, DbEvent):
     def __repr__(self):
         return 'host {} {} {} {}'.format(self.gpio_host_name, self.gpio_pin_code, self.relay_pin_name, self.relay_is_on)
 
-class Rule(db.Model, DbEvent):
+class Rule(db.Model, DbEvent, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     host_name = db.Column(db.String(50))
     name = db.Column(db.String(50), unique=True)

@@ -27,14 +27,21 @@
     {"id":13, "active":"1", "start_order":"13", "name":"graph_plotly"},
     {"id":15, "active":"0", "start_order":"15", "name":"io_bbb"},
     {"id":17, "active":"1", "start_order":"17", "name":"webui"},
-    {"id":19, "active":"0", "start_order":"19", "name":"ddns"},
-    {"id":21, "active":"1", "start_order":"21", "name":"cloud.youtube"},
+    {"id":19, "active":"1", "start_order":"19", "name":"ddns"},
+    {"id":21, "active":"0", "start_order":"21", "name":"cloud.youtube"},
     {"id":23, "active":"1", "start_order":"23", "name":"sysutils.filewatch"},
     {"id":25, "active":"1", "start_order":"25", "name":"rule"},
+    {"id":27, "active":"1", "start_order":"27", "name":"node"},
 
-    {"id":109, "host_name":"nas",     "active":"1", "start_order":"19", "name":"heat"},
-    {"id":119, "host_name":"nas",     "active":"1", "start_order":"19", "name":"ddns"},
-    {"id":219, "host_name":"netbook", "active":"1", "start_order":"19", "name":"ddns"}
+    {"id":121, "active":"1", "start_order":"21", "name":"cloud.youtube", "host_name":"nas"},
+
+    {"id":219, "active":"1", "start_order":"19", "name":"relay", "host_name":"pi-power"},
+
+    {"id":309, "active":"1", "start_order":"19", "name":"heat", "host_name":"beaglebone"},
+    {"id":307, "active":"1", "start_order":"7",  "name":"relay", "host_name":"beaglebone"},
+    {"id":311, "active":"1", "start_order":"11", "name":"alarm", "host_name":"beaglebone"},
+    {"id":315, "active":"1", "start_order":"15", "name":"io_bbb", "host_name":"beaglebone"}
+
   ],
 
   "Zone": [
