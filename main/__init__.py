@@ -41,49 +41,67 @@ from . import logger
 
 def my_import(name):
     #http://stackoverflow.com/questions/547829/how-to-dynamically-load-a-python-class
-    mod = __import__(name)
-    components = name.split('.')
-    for comp in components[1:]:
-        mod = getattr(mod, comp)
-    return mod
+    try:
+        mod = __import__(name)
+        components = name.split('.')
+        for comp in components[1:]:
+            mod = getattr(mod, comp)
+        return mod
+    except Exception, ex:
+        logger.warning("Unabel to import module {}, err={}".format(name, ex))
+        return None
 
 def init_module(module_name, module_is_active):
     dynclass = my_import(module_name)
-    if module_is_active:
-        logger.info('Module {} is marked as active'.format(module_name))
-        if not dynclass.initialised:
-            logger.info('Module {} initialising'.format(module_name))
-            dynclass.init()
+    if dynclass:
+        if module_is_active:
+            logger.info('Module {} is marked as active'.format(module_name))
+            if not dynclass.initialised:
+                logger.info('Module {} initialising'.format(module_name))
+                dynclass.init()
+            else:
+                logger.info('Module {} already initialised, skipping init'.format(module_name))
         else:
-            logger.info('Module {} already initialised, skipping init'.format(module_name))
+            logger.info("Module {} is marked as not active ".format(module_name))
+            if dynclass.initialised:
+                logger.info('Module {} has been deactivated, unloading'.format(module_name))
+                dynclass.unload()
+                del dynclass
+            else:
+                logger.info('Module {} already disabled, skipping unload'.format(module_name))
     else:
-        logger.info("Module {} is marked as not active".format(module_name))
-        if dynclass.initialised:
-            logger.info('Module {} has been deactivated, unloading'.format(module_name))
-            dynclass.unload()
-            del dynclass
-        else:
-            logger.info('Module {} already disabled'.format(module_name))
+        logger.critical("Module {} cannot be loaded".format(module_name))
 
 def init_modules():
     import admin.models
     import admin.model_helper
     from common import constant
 
-    #module_list = admin.models.Module.query.filter_by(host_name=constant.HOST_NAME).order_by(
-    #    admin.models.Module.start_order).all()
     m = admin.models.Module
 
     #http://docs.sqlalchemy.org/en/rel_0_9/core/sqlelement.html
-    #fixme: only init once
+
     #keep host name default to '' rather than None (which does not work on filter in)
-    module_list = m.query.filter(m.host_name.in_([constant.HOST_NAME, ""])).order_by(m.start_order).all()
+
+    #TODO: remove if ok, module_list = m.query.filter(m.host_name.in_([constant.HOST_NAME, ""])).order_by(m.start_order).all()
+
+    #get the unique/distinct list of all modules defined in config, generic or host specific ones
+    module_list = m.query.filter(m.host_name.in_([constant.HOST_NAME, ""])).group_by(m.start_order).all()
 
     for mod in module_list:
         assert isinstance(mod, admin.models.Module)
-        #webui will block at init, postpone init for end
         if mod.name != 'main':
-            init_module(mod.name, mod.active)
+            #check if there is a host specific module and use it with priority over generic one
+
+            mod_host_specific = m().query_filter_first(m.host_name.in_([constant.HOST_NAME]), m.name.in_([mod.name]))
+
+            #mod_host_specific = m.query.filter(m.host_name.in_([constant.HOST_NAME]), m.name.in_([mod.name]))
+            if mod_host_specific:
+                logger.info("Initialising host specific module definition")
+                init_module(mod_host_specific.name, mod_host_specific.active)
+            else:
+                logger.info("Initialising generic module definition")
+                init_module(mod.name, mod.active)
 
 def signal_handler(signal, frame):
     logger.info('I got signal {} frame {}, exiting'.format(signal, frame))
@@ -204,13 +222,15 @@ def init():
     app = Flask('main')
     #app.config['TESTING'] = True
     app.config.update(DEBUG=True, SQLALCHEMY_ECHO = False, SQLALCHEMY_DATABASE_URI=DB_LOCATION)
-
+    app.config['SECRET_KEY'] = 'secret'
+    app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
     logger.info('Initialising SQLAlchemy')
     db = SQLAlchemy(app)
     db.create_all()
 
     logger.info('Checking db tables')
     import admin.model_helper
+    import admin.models
     global MODEL_AUTO_UPDATE
     admin.model_helper.populate_tables(MODEL_AUTO_UPDATE)
 

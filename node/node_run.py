@@ -123,7 +123,7 @@ def announce_node_state():
         logger.debug('I tell everyone my node state')
         #current_record = models.Node.query.filter_by(name=constant.HOST_NAME).first()
         node = models.Node()
-        current_record = models.Node().query_filter_first(filter=models.Node.name.in_([constant.HOST_NAME, ""]))
+        current_record = models.Node().query_filter_first(models.Node.name.in_([constant.HOST_NAME, ""]))
 
         node.name = constant.HOST_NAME
         if not current_record:
@@ -148,8 +148,6 @@ def announce_node_state():
         node.notify_transport_enabled = True
         node.save_changed_fields(current_record=current_record, new_record=node, notify_transport_enabled=True,
                                    save_to_graph=True, graph_save_frequency=120)
-
-        #commit()
     except Exception, ex:
         logger.error('Unable to announce my state, err={}'.format(ex))
 

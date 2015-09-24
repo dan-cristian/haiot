@@ -5,33 +5,43 @@ from copy import deepcopy
 from main import db
 from main.admin.model_helper import commit
 import graphs
-from common import utils
+from common import utils, performance
 
 #TODO: read this
 #http://lucumr.pocoo.org/2011/7/19/sqlachemy-and-you/
 
 class DbBase:
-    def __check_for_long_query(self, result, start_time):
-        elapsed = (utils.get_base_location_now_date() - start_time).seconds
-        if elapsed>1:
-            logger.warning("Long running DB query, seconds elapsed={}, result={}".format(elapsed, result))
+    def __check_for_long_query(self, result, start_time, function):
+        query_details = function.im_self
+        elapsed = performance.add_query(start_time, query_details=query_details)
+        if elapsed > 1000:
+            logger.warning("Long running DB query, seconds elapsed={}, result={}".format(elapsed, query_details))
         return result
 
-    def query_all(self):
+    def __get_result(self, function):
         start_time = utils.get_base_location_now_date()
-        return self.__check_for_long_query(self.query.all(), start_time)
+        result = function()
+        return self.__check_for_long_query(result, start_time, function)
+
+    def query_all(self):
+        function = self.query.all
+        return self.__get_result(function)
 
     def query_filter_all(self, filter):
-        start_time = utils.get_base_location_now_date()
-        return self.__check_for_long_query(self.query.filter(filter).all(), start_time)
+        function = self.query.filter(filter).all
+        return self.__get_result(function)
 
-    def query_filter_first(self, filter):
-        start_time = utils.get_base_location_now_date()
-        return self.__check_for_long_query(self.query.filter(filter).first(), start_time)
+    def query_filter_first(self, *filter):
+        function = self.query.filter(*filter).first
+        return self.__get_result(function)
+
+#    def query_filters_first(self, *filter):
+#        function = self.query.filter(*filter).first
+#        return self.__get_result(function)
 
     def delete(self):
-        start_time = utils.get_base_location_now_date()
-        return self.__check_for_long_query(self.query.delete(), start_time)
+        function = self.query.delete
+        return self.__get_result(function)
 
 
 class DbEvent:
