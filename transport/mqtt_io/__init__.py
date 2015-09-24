@@ -6,7 +6,7 @@ import sys
 from main.admin import thread_pool
 from main import logger
 from main.admin import model_helper
-from common import constant
+from common import constant, utils
 import receiver
 import sender
 import socket
@@ -34,6 +34,7 @@ client_connected = False
 topic='no_topic_defined'
 client_connecting = False
 mqtt_msg_count_per_minute = 0
+last_connect_attempt = None
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect_paho(client, userdata, flags, rc):
@@ -84,9 +85,9 @@ def unload():
 
 def init():
     if mqtt_mosquitto_exists:
-        logger.info("Using mosquitto as mqtt client")
+        logger.info("INIT, Using mosquitto as mqtt client")
     elif mqtt_paho_exists:
-        logger.info("Using paho as mqtt client")
+        logger.info("INIT, Using paho as mqtt client")
     else:
         logger.critical("No mqtt client enabled via import")
         raise Exception("No mqtt client enabled via import")
@@ -152,6 +153,8 @@ def init():
                     time.sleep(constant.ERROR_CONNECT_PAUSE_SECOND)
                 finally:
                     client_connecting = False
+                    global last_connect_attempt
+                    last_connect_attempt = utils.get_base_location_now_date()
             if client_connected:
                 break
             else:

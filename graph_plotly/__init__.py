@@ -120,22 +120,26 @@ def init():
                 logger.info('Plotly config found in environment var: {}, path={}'.format(env_var, alt_path))
                 alt_path = str(alt_path) + '/../data/.plotly.credentials'
         logger.info("Plotly standard config empty, trying alt_path={}".format(alt_path))
-        with open(alt_path, 'r') as cred_file:
-            data = cred_file.read().replace('\n','')
-        if len(data) > 0:
-            cred_obj = utils.json2obj(data)
-            username=cred_obj['username']
-            api_key=cred_obj['api_key']
-            if username and api_key:
-                py.sign_in(username, api_key)
-                global initialised
-                initialised = True
-            #else:
-            #    logger.info("Plotly init from db folder config {}{} not ok, trying with db data".format(os.getcwd(),
-            #        credential_file))
-            #    #alternate way if reading data from DB
-            #    py.sign_in(model_helper.get_param(constant.P_PLOTLY_USERNAME),
-            #               model_helper.get_param(constant.P_PLOTLY_APIKEY))
+        try:
+            with open(alt_path, 'r') as cred_file:
+                data = cred_file.read().replace('\n','')
+            if len(data) > 0:
+                cred_obj = utils.json2obj(data)
+                username=cred_obj['username']
+                api_key=cred_obj['api_key']
+                if username and api_key:
+                    py.sign_in(username, api_key)
+                    global initialised
+                    initialised = True
+                #else:
+                #    logger.info("Plotly init from db folder config {}{} not ok, trying with db data".format(os.getcwd(),
+                #        credential_file))
+                #    #alternate way if reading data from DB
+                #    py.sign_in(model_helper.get_param(constant.P_PLOTLY_USERNAME),
+                #               model_helper.get_param(constant.P_PLOTLY_APIKEY))
+
+        except Exception, ex:
+            logger.warning("error reading plotly credentials {}".format(ex))
     else:
         logger.info("Plotly standard config found with username {}".format(py.get_credentials()['username']))
         initialised = True

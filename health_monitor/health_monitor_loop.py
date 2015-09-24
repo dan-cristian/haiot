@@ -67,54 +67,60 @@ def __read_all_hdd_smart():
                     if constant.OS in constant.OS_LINUX and use_sudo:
                         smart_out = subprocess.check_output(['sudo', 'smartctl', '-a', record.hdd_disk_dev,
                                                              '-n', 'sleep'], stderr=subprocess.STDOUT)
-                    else:
+                    else: #in windows
                         smart_out = subprocess.check_output(['smartctl', '-a', record.hdd_disk_dev, '-n', 'sleep'],
                                                             stderr=subprocess.STDOUT)
                 except subprocess.CalledProcessError, exc:
                     smart_out = exc.output
                     if ERR_TEXT_NO_DEV in smart_out or ERR_TEXT_NO_DEV_3 in smart_out:
                         raise exc
-                output.reset()
-                output.write(smart_out)
-                output.seek(0)
-                pos = -1
-                while pos != output.tell() and current_disk_valid:
-                    pos = output.tell()
-                    line = output.readline()
-                    if constant.SMARTCTL_ERROR_NO_DISK in line:
-                        current_disk_valid = False
-                        logger.debug('First disk that cannot be read is {}'.format(record.hdd_disk_dev))
-                    if constant.SMARTCTL_TEMP_ID in line:
-                        words = line.split(None)
-                        record.temperature = utils.round_sensor_value(words[9])
-                        # print 'Temp is {}'.format(temp)
-                    if constant.SMARTCTL_ERROR_SECTORS in line:
-                        words = line.split(None)
-                        record.sector_error_count = words[9]
-                        # print 'Offline sectors with error is {}'.format(errcount)
-                    if constant.SMARTCTL_START_STOP_COUNT in line:
-                        words = line.split(None)
-                        record.start_stop_count = words[9]
-                    if constant.SMARTCTL_LOAD_CYCLE_COUNT in line:
-                        words = line.split(None)
-                        record.load_cycle_count = words[9]
-                    if constant.SMARTCTL_STATUS in line:
-                        words = line.split(': ')
-                        record.smart_status = words[1].replace('\r', '').replace('\n', '').strip()
-                        # print 'SMART Status is {}'.format(status)
-                    if constant.SMARTCTL_MODEL_DEVICE in line:
-                        words = line.split(': ')
-                        record.device = words[1].replace('\r', '').replace('\n', '').lstrip()
-                        # print 'Device is {}'.format(device)
-                    if constant.SMARTCTL_MODEL_FAMILY in line:
-                        words = line.split(': ')
-                        record.family = words[1].replace('\r', '').replace('\n', '').lstrip()
-                        # print 'Family is {}'.format(family)
-                    if constant.SMARTCTL_SERIAL_NUMBER in line:
-                        words = line.split(': ')
-                        record.serial = words[1].replace('\r', '').replace('\n', '').lstrip()
-                        # print 'Serial is {}'.format(serial)
-                # print ('Disk dev is {}'.format(disk_dev))
+                except Exception, ex:
+                    smart_out = None
+                    current_disk_valid = False
+                    logger.warning("Error checking smart status {}".format(ex))
+
+                if smart_out:
+                    output.reset()
+                    output.write(smart_out)
+                    output.seek(0)
+                    pos = -1
+                    while pos != output.tell() and current_disk_valid:
+                        pos = output.tell()
+                        line = output.readline()
+                        if constant.SMARTCTL_ERROR_NO_DISK in line:
+                            current_disk_valid = False
+                            logger.debug('First disk that cannot be read is {}'.format(record.hdd_disk_dev))
+                        if constant.SMARTCTL_TEMP_ID in line:
+                            words = line.split(None)
+                            record.temperature = utils.round_sensor_value(words[9])
+                            # print 'Temp is {}'.format(temp)
+                        if constant.SMARTCTL_ERROR_SECTORS in line:
+                            words = line.split(None)
+                            record.sector_error_count = words[9]
+                            # print 'Offline sectors with error is {}'.format(errcount)
+                        if constant.SMARTCTL_START_STOP_COUNT in line:
+                            words = line.split(None)
+                            record.start_stop_count = words[9]
+                        if constant.SMARTCTL_LOAD_CYCLE_COUNT in line:
+                            words = line.split(None)
+                            record.load_cycle_count = words[9]
+                        if constant.SMARTCTL_STATUS in line:
+                            words = line.split(': ')
+                            record.smart_status = words[1].replace('\r', '').replace('\n', '').strip()
+                            # print 'SMART Status is {}'.format(status)
+                        if constant.SMARTCTL_MODEL_DEVICE in line:
+                            words = line.split(': ')
+                            record.device = words[1].replace('\r', '').replace('\n', '').lstrip()
+                            # print 'Device is {}'.format(device)
+                        if constant.SMARTCTL_MODEL_FAMILY in line:
+                            words = line.split(': ')
+                            record.family = words[1].replace('\r', '').replace('\n', '').lstrip()
+                            # print 'Family is {}'.format(family)
+                        if constant.SMARTCTL_SERIAL_NUMBER in line:
+                            words = line.split(': ')
+                            record.serial = words[1].replace('\r', '').replace('\n', '').lstrip()
+                            # print 'Serial is {}'.format(serial)
+                    # print ('Disk dev is {}'.format(disk_dev))
                 record.updated_on = utils.get_base_location_now_date()
                 if record.serial is None or record.serial == '':
                     logger.debug('This hdd will be skipped, probably does not exist if serial not retrieved')
@@ -163,23 +169,27 @@ def __read_hddparm(disk_dev=''):
                 hddparm_out = ex1.output
                 if ERR_TEXT_NO_DEV in hddparm_out or ERR_TEXT_NO_DEV_2 in hddparm_out:
                     raise ex1
-            output.reset()
-            output.write(hddparm_out)
-            output.seek(0)
-            pos = -1
-            while pos != output.tell():
-                pos = output.tell()
-                line = output.readline()
-                if constant.HDPARM_STATUS in line:
-                    words = line.split(': ')
-                    power_status = words[1].replace('\r', '').replace('\n', '').replace('/', '-').lstrip()
-                    if power_status == 'active-idle':
-                        power_status = 1 + constant.HOST_PRIORITY
-                    elif power_status == 'standby':
-                        power_status = 0
-                    else:
-                        power_status = -1 - constant.HOST_PRIORITY
-                    return power_status
+            except Exception, ex:
+                logger.warning("Error running process, err={}".format(ex))
+                hddparm_out = None
+            if hddparm_out:
+                output.reset()
+                output.write(hddparm_out)
+                output.seek(0)
+                pos = -1
+                while pos != output.tell():
+                    pos = output.tell()
+                    line = output.readline()
+                    if constant.HDPARM_STATUS in line:
+                        words = line.split(': ')
+                        power_status = words[1].replace('\r', '').replace('\n', '').replace('/', '-').lstrip()
+                        if power_status == 'active-idle':
+                            power_status = 1 + constant.HOST_PRIORITY
+                        elif power_status == 'standby':
+                            power_status = 0
+                        else:
+                            power_status = -1 - constant.HOST_PRIORITY
+                        return power_status
         else:
             power_status = 'not available'
             return power_status
@@ -219,33 +229,36 @@ def __get_uptime_linux_days():
     f.close()
     return uptime_seconds / (60 * 60 * 24)
 
-
+#fixme: does not work always, depends on regional settings
 def __get_uptime_win_days():
     """Returns a datetime.timedelta instance representing the uptime in a Windows 2000/NT/XP machine"""
-    cmd = "net statistics server"
-    p = subprocess.Popen(cmd, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-    (child_stdin, child_stdout) = (p.stdin, p.stdout)
-    lines = child_stdout.readlines()
-    child_stdin.close()
-    child_stdout.close()
-    lines = [line.strip() for line in lines if line.strip()]
-    date, time, ampm = lines[1].split()[2:5]
-    # print date, time, ampm
-    if str(date[2]).isdigit():
-        separator = date[1]
-    else:
-        separator = date[2]
-    d, m, y = [v for v in date.split(separator)]
-    m = datetime.datetime.strptime(m, '%b').month
-    y = datetime.datetime.strptime(y, '%y').year
-    H, M, S = [int(v) for v in time.split(':')]
-    if ampm.lower() == 'pm':
-        H += 12
-    now = utils.get_base_location_now_date()
-    then = datetime.datetime(int(y), int(m), int(d), H, M)
-    diff = now - then
-    return diff.days
-
+    try:
+        cmd = "net statistics server"
+        p = subprocess.Popen(cmd, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        (child_stdin, child_stdout) = (p.stdin, p.stdout)
+        lines = child_stdout.readlines()
+        child_stdin.close()
+        child_stdout.close()
+        lines = [line.strip() for line in lines if line.strip()]
+        date, time, ampm = lines[1].split()[2:5]
+        # print date, time, ampm
+        if str(date[2]).isdigit():
+            separator = date[1]
+        else:
+            separator = date[2]
+        d, m, y = [v for v in date.split(separator)]
+        m = datetime.datetime.strptime(m, '%b').month
+        y = datetime.datetime.strptime(y, '%y').year
+        H, M, S = [int(v) for v in time.split(':')]
+        if ampm.lower() == 'pm':
+            H += 12
+        now = utils.get_base_location_now_date()
+        then = datetime.datetime(int(y), int(m), int(d), H, M)
+        diff = now - then
+        return diff.days
+    except Exception, ex:
+        logger.warning("Unable to get uptime windows, err={}".format(ex))
+        return 0
 
 def __get_cpu_utilisation_linux():
     previous_procstat_list = None
