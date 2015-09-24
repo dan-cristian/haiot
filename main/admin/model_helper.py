@@ -8,12 +8,12 @@ from sqlalchemy.exc import IntegrityError, OperationalError, InvalidRequestError
 
 from main import logger
 import models
-from common import constant, utils
+from common import constant, utils, performance
 from main import db
 
 __db_values_json = None
-
 table_collection = None
+
 
 def model_row_to_json(obj, operation=''):
     try:
@@ -49,34 +49,31 @@ def model_row_to_json(obj, operation=''):
 def get_param(name):
     global __db_values_json
     try:
-        #val = __db_values_json["Parameter"][name]
-        #val = models.Parameter.query.filter_by(name=name).first().value
-        val = models.Parameter().query_filter_first(filter=models.Parameter.name.in_([name])).value
+        val = models.Parameter().query_filter_first(models.Parameter.name.in_([name])).value
         return val
     except ValueError, ex:
         logger.warning('Unable to get parameter {} error {}'.format(name, ex))
         raise ValueError
     except Exception, ex:
-        logger.critical('Exception {} when getting param {}'.format(ex, name))
+        logger.critical('Exception when getting param {}, err={}'.format(name, ex))
         #db.session.rollback()
         raise ex
 
+
 def commit():
-    time_start=utils.get_base_location_now_date()
+    time_start = utils.get_base_location_now_date()
+    query_details = "COMMIT " + str(db.session.identity_map)
     try:
         db.session.commit()
-        time_end = utils.get_base_location_now_date()
     except IntegrityError, ex:
-        time_end = utils.get_base_location_now_date()
         #db.session.rollback()
         logger.warning('Unable to commit DB session={}, rolled back, err={}'.format(db.session, ex))
     except InvalidRequestError, ex:
-        time_end = utils.get_base_location_now_date()
         logger.warning('Error on commit, session={}, ignoring, err={}'.format(db.session, ex))
     except Exception, ex:
-        time_end = utils.get_base_location_now_date()
-        elapsed = (time_end - time_start).seconds
-        logger.warning('Exception on commit, session={} err={} secondslapsed={}'.format(db.session, ex, elapsed))
+        logger.warning('Exception on commit, session={} err={}'.format(db.session, ex))
+    performance.add_query(time_start, query_details=query_details)
+
 
 def get_mod_name(module):
     return str(module).split("'")[1]
@@ -131,7 +128,7 @@ def populate_tables(model_auto_update=False):
         if table_str in __db_values_json:
             default_values = __db_values_json[table_str]
             if len(table().query_all()) != len(default_values):
-                logger.info('Populating {} with default values'.format(table_str))
+                logger.info('Populating {} with default values as config record count != db count'.format(table_str))
                 table().delete()
                 commit()
                 for config_record in default_values:
@@ -169,7 +166,7 @@ def populate_tables(model_auto_update=False):
     constant.HOST_PRIORITY = node_obj.priority
 
     import alarm, heat, sensor, relay, health_monitor, graph_plotly, node, io_bbb, webui, main, ddns
-    import rule #always cron before rules
+    #import rule #always cron before rules
 
     from cloud import youtube
     from sysutils import filewatch

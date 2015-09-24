@@ -13,7 +13,7 @@ import node
 import sensor
 import heat
 import relay
-import rule
+#import rule
 
 
 __mqtt_event_list = []

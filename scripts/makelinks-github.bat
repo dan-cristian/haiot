@@ -19,7 +19,7 @@ mklink /J  scripts %T%\scripts
 mklink /J  ddns %T%\ddns
 mklink /J  cloud %T%\cloud
 mklink /J  sysutils %T%\sysutils
-mklink /J  rules %T%\rules
+mklink /J  rule %T%\rule
 
 del LICENSE
 mklink /H LICENSE %T%\LICENSE
@@ -45,3 +45,5 @@ del requirements.txt
 mklink /H requirements.txt %T%\requirements.txt
 
 rem mklink /J   %T%\
+
+call push.bat
