@@ -181,6 +181,8 @@ class Zone(db.Model, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
 
+    active_heat_schedule_pattern_id = db.Column(db.Integer)
+
     def __init__(self, id='', name=''):
         if id:
             self.id = id
