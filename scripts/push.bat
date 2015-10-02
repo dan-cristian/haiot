@@ -1,3 +1,3 @@
-git add -A
+git add -A :/
 git commit  -m "%COMPUTERNAME% %USERNAME%" -a
 git push
