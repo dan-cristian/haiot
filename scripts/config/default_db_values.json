@@ -35,7 +35,8 @@
 
     {"id":121, "active":"1", "start_order":"21", "name":"cloud.youtube", "host_name":"nas"},
 
-    {"id":219, "active":"1", "start_order":"19", "name":"relay", "host_name":"pi-power"},
+    {"id":207, "active":"1", "start_order":"7", "name":"relay", "host_name":"pi-power"},
+    {"id":209, "active":"1", "start_order":"9", "name":"heat", "host_name":"pi-power"},
 
     {"id":309, "active":"1", "start_order":"19", "name":"heat", "host_name":"beaglebone"},
     {"id":307, "active":"1", "start_order":"7",  "name":"relay", "host_name":"beaglebone"},
