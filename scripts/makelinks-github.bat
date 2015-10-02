@@ -46,4 +46,4 @@ mklink /H requirements.txt %T%\requirements.txt
 
 rem mklink /J   %T%\
 
-call push.bat
+call scripts/push.bat
