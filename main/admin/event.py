@@ -86,76 +86,79 @@ def mqtt_thread_run():
     try:
         last_count = len(__mqtt_event_list)
         for obj in __mqtt_event_list:
-            __mqtt_event_list.remove(obj)
-            #events received via mqtt transport
-            table = None
-            #fixme: make it generic to work with any transport
-            source_host = obj[constant.JSON_PUBLISH_SOURCE_HOST]
-            if constant.JSON_PUBLISH_TABLE in obj:
-                table = str(obj[constant.JSON_PUBLISH_TABLE])
-                if table == utils.get_table_name(models.Node):#'Node':
-                    node.node_run.node_update(obj)
-                    if 'execute_command' in obj:
-                        execute_command = obj['execute_command']
-                        host_name = obj['name']
-                        #execute command on target host or on current host (usefull when target is down - e.g. wake cmd
-                        if (host_name == constant.HOST_NAME or source_host == constant.HOST_NAME) \
-                                and execute_command != '':
-                            server_node = models.Node.query.filter_by(name=host_name).first()
-                            main.execute_command(execute_command, node=server_node)
-                elif table == utils.get_table_name(models.ZoneHeatRelay):
-                    if heat.initialised:
-                        heat.heat_update(obj)
-                elif table == utils.get_table_name(models.Sensor):
-                    sensor.sensor_update(obj)
-                elif table == utils.get_table_name(models.ZoneCustomRelay):
-                    relay.zone_custom_relay_record_update(obj)
-                elif table == utils.get_table_name(models.GpioPin):
-                    relay.gpio_record_update(obj)
-                elif table == utils.get_table_name(models.Rule):
-                    rule.rule_record_update(obj)
+            try:
+                __mqtt_event_list.remove(obj)
+                #events received via mqtt transport
+                table = None
+                #fixme: make it generic to work with any transport
+                source_host = obj[constant.JSON_PUBLISH_SOURCE_HOST]
+                if constant.JSON_PUBLISH_TABLE in obj:
+                    table = str(obj[constant.JSON_PUBLISH_TABLE])
+                    if table == utils.get_table_name(models.Node):#'Node':
+                        node.node_run.node_update(obj)
+                        if 'execute_command' in obj:
+                            execute_command = obj['execute_command']
+                            host_name = obj['name']
+                            #execute command on target host or on current host (usefull when target is down - e.g. wake cmd
+                            if (host_name == constant.HOST_NAME or source_host == constant.HOST_NAME) \
+                                    and execute_command != '':
+                                server_node = models.Node.query.filter_by(name=host_name).first()
+                                main.execute_command(execute_command, node=server_node)
+                    elif table == utils.get_table_name(models.ZoneHeatRelay):
+                        if heat.initialised:
+                            heat.heat_update(obj)
+                    elif table == utils.get_table_name(models.Sensor):
+                        sensor.sensor_update(obj)
+                    elif table == utils.get_table_name(models.ZoneCustomRelay):
+                        relay.zone_custom_relay_record_update(obj)
+                    elif table == utils.get_table_name(models.GpioPin):
+                        relay.gpio_record_update(obj)
+                    elif table == utils.get_table_name(models.Rule):
+                        rule.rule_record_update(obj)
 
 
-            if constant.JSON_MESSAGE_TYPE in obj:
-                if variable.NODE_THIS_IS_MASTER_LOGGING:
-                    if source_host != constant.HOST_NAME:
-                        levelname = obj['level']
-                        msg = obj['message']
-                        msgdatetime = obj['datetime']
-                        message = '{}, {}, {}'.format(source_host, msgdatetime, msg)
-                        remote_logger
-                        if levelname == 'INFO':
-                            remote_logger.info(message)
-                        elif levelname == 'WARNING':
-                            remote_logger.warning(message)
-                        elif levelname == 'CRITICAL':
-                            remote_logger.critical(message)
-                        elif levelname == 'ERROR':
-                            remote_logger.error(message)
-                        elif levelname == 'DEBUG':
-                            remote_logger.debug(message)
-                    #else:
-                        #logger.warning('This node is master logging but emits remote logs, is a circular reference')
+                if constant.JSON_MESSAGE_TYPE in obj:
+                    if variable.NODE_THIS_IS_MASTER_LOGGING:
+                        if source_host != constant.HOST_NAME:
+                            levelname = obj['level']
+                            msg = obj['message']
+                            msgdatetime = obj['datetime']
+                            message = '{}, {}, {}'.format(source_host, msgdatetime, msg)
+                            remote_logger
+                            if levelname == 'INFO':
+                                remote_logger.info(message)
+                            elif levelname == 'WARNING':
+                                remote_logger.warning(message)
+                            elif levelname == 'CRITICAL':
+                                remote_logger.critical(message)
+                            elif levelname == 'ERROR':
+                                remote_logger.error(message)
+                            elif levelname == 'DEBUG':
+                                remote_logger.debug(message)
+                        #else:
+                            #logger.warning('This node is master logging but emits remote logs, is a circular reference')
 
-            if variable.NODE_THIS_IS_MASTER_OVERALL:
-                if constant.JSON_PUBLISH_GRAPH_X in obj:
-                    if obj[constant.JSON_PUBLISH_SAVE_TO_GRAPH]:
-                        if graph_plotly.initialised:
-                            start = utils.get_base_location_now_date()
-                            graph_plotly.upload_data(obj)
-                            elapsed = (utils.get_base_location_now_date() - start).total_seconds()
-                            logger.debug('Plotly upload took {}s'.format(elapsed))
+                if variable.NODE_THIS_IS_MASTER_OVERALL:
+                    if constant.JSON_PUBLISH_GRAPH_X in obj:
+                        if obj[constant.JSON_PUBLISH_SAVE_TO_GRAPH]:
+                            if graph_plotly.initialised:
+                                start = utils.get_base_location_now_date()
+                                graph_plotly.upload_data(obj)
+                                elapsed = (utils.get_base_location_now_date() - start).total_seconds()
+                                logger.debug('Plotly upload took {}s'.format(elapsed))
+                            else:
+                                logger.debug('Graph not initialised on obj upload to graph')
                         else:
-                            logger.debug('Graph not initialised on obj upload to graph')
+                            pass
                     else:
-                        pass
-                else:
-                    logger.debug('Mqtt event without graphing capabilities {}'.format(obj))
+                        logger.debug('Mqtt event without graphing capabilities {}'.format(obj))
 
-            if len(__mqtt_event_list) > last_count:
-                logger.debug('Not keeping up with {} mqtt events'.format(len(__mqtt_event_list)))
+                if len(__mqtt_event_list) > last_count:
+                    logger.debug('Not keeping up with {} mqtt events'.format(len(__mqtt_event_list)))
+            except Exception, ex:
+                logger.critical("Error processing mqtt={}, err={}".format(obj, ex))
     except Exception, ex:
-        logger.critical("Error processing mqtt: {}".format(ex))
+        logger.critical("General error processing mqtt: {}".format(ex))
     finally:
         #__mqtt_lock.release()
         pass
