@@ -61,6 +61,9 @@ def __update_zone_heat(zone, heat_schedule, sensor):
                         commit()
                         if sensor.temperature:
                             heat_is_on = __decide_action(zone, sensor.temperature, temperature.target)
+                            zone.heat_is_on = heat_is_on
+                    else:
+                        heat_is_on = zone.heat_is_on
                 else:
                     logger.critical('Unknown temperature pattern code {}'.format(temperature_code))
             else:
