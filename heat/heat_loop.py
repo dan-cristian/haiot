@@ -54,10 +54,13 @@ def __update_zone_heat(zone, heat_schedule, sensor):
                 temperature_code = pattern[hour]
                 temperature = models.TemperatureTarget.query.filter_by(code=temperature_code).first()
                 if temperature:
-                    logger.info('Active pattern for zone {} is {} temp {}'.format(zone.name, schedule_pattern.name,
+                    if zone.active_heat_schedule_pattern_id != schedule_pattern.id:
+                        logger.info('Pattern in zone {} is {} target={}'.format(zone.name, schedule_pattern.name,
                                                                                          temperature.target))
-                    if sensor.temperature:
-                        heat_is_on = __decide_action(zone, sensor.temperature, temperature.target)
+                        zone.active_heat_schedule_pattern_id = schedule_pattern.id
+                        commit()
+                        if sensor.temperature:
+                            heat_is_on = __decide_action(zone, sensor.temperature, temperature.target)
                 else:
                     logger.critical('Unknown temperature pattern code {}'.format(temperature_code))
             else:

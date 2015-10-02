@@ -69,23 +69,8 @@ def gpio_record_update(json_object):
         host_name = utils.get_object_field_value(json_object, 'name')
         logger.info('Received gpio state update from {}'.format(host_name))
         if host_name != constant.HOST_NAME:
-            '''id = utils.get_object_field_value(json_object, 'id')
-            record = models.GpioPin(id=id)
-            assert isinstance(record, models.GpioPin)
-            record.pin_type = utils.get_object_field_value(json_object, 'pin_type')
-            record.pin_code = utils.get_object_field_value(json_object, 'pin_code')
-            record.pin_index_bcm = utils.get_object_field_value(json_object, 'pin_index_bcm')
-            record.pin_value = utils.get_object_field_value(json_object, 'pin_value')
-            record.pin_direction = utils.get_object_field_value(json_object, 'pin_direction')
-            record.is_active = utils.get_object_field_value(json_object, 'is_active')
-            record.updated_on = utils.get_base_location_now_date()
-            current_record = models.GpioPin.query.filter_by(id=id).first()
-            record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=False,
-                                       save_to_graph=False)'''
             models.GpioPin().save_changed_fields_from_json_object(json_object=json_object,
                                                     notify_transport_enabled=False, save_to_graph=False)
-
-            #db.session.commit()
     except Exception, ex:
         logger.warning('Error on gpio state update, err {}'.format(ex))
     pass
