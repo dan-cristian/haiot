@@ -14,8 +14,10 @@ class DbBase:
     def __check_for_long_query(self, result, start_time, function):
         query_details = function.im_self
         elapsed = performance.add_query(start_time, query_details=query_details)
-        if elapsed > 1000:
-            logger.warning("Long running DB query, seconds elapsed={}, result={}".format(elapsed, query_details))
+        if elapsed > 5000:#with sqlite a long query will throw an error
+            logger.critical("Long running DB query, seconds elapsed={}, result={}".format(elapsed, query_details))
+            db.session.rollback()
+            logger.info("Session was rolled back")
         return result
 
     def __get_result(self, function):
