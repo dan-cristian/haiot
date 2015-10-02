@@ -182,6 +182,7 @@ class Zone(db.Model, DbBase):
     name = db.Column(db.String(50))
 
     active_heat_schedule_pattern_id = db.Column(db.Integer)
+    heat_is_on = db.Column(db.Boolean)
 
     def __init__(self, id='', name=''):
         if id:
