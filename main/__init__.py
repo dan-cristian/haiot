@@ -241,7 +241,7 @@ def init():
         message_type = 'logging'
         message = ''
         level = ''
-        source_host = constant.HOST_NAME
+        source_host_ = constant.HOST_NAME #field name must be identical with constant.JSON_PUBLISH_SOURCE_HOST
         datetime = utils.date_serialised(utils.get_base_location_now_date())
 
     import logging
