@@ -19,6 +19,8 @@ def __save_heat_state_db(zone='', heat_is_on=''):
             zone_heat_relay.updated_on = utils.get_base_location_now_date()
             logger.info('Heat state changed to is-on={} in zone {}'.format(heat_is_on, zone.name))
             zone_heat_relay.notify_transport_enabled = True
+            #save latest heat state for caching purposes
+            zone.heat_is_on = heat_is_on
             commit()
         #else:
         #    logger.debug('Heat state [{}] unchanged in zone {}'.format(heat_is_on, zone.name))
@@ -61,7 +63,6 @@ def __update_zone_heat(zone, heat_schedule, sensor):
                         commit()
                         if sensor.temperature:
                             heat_is_on = __decide_action(zone, sensor.temperature, temperature.target)
-                            zone.heat_is_on = heat_is_on
                     else:
                         heat_is_on = zone.heat_is_on
                 else:
@@ -93,10 +94,10 @@ def loop_zones():
         if heatrelay_main_source:
             main_source_zone = models.Zone.query.filter_by(id=heatrelay_main_source.zone_id).first()
             if main_source_zone:
-                __save_heat_state_db(zone=main_source_zone, heat_is_on=heat_is_on)
+                if main_source_zone.heat_is_on != heat_is_on:#avoid setting relay state too often
+                    __save_heat_state_db(zone=main_source_zone, heat_is_on=heat_is_on)
             else:
-                logger.critical('No heat main source can be located using zone id {}'.format(
-                    heatrelay_main_source.zone_id))
+                logger.critical('No heat main_src found using zone id {}'.format(heatrelay_main_source.zone_id))
         else:
             logger.critical('No heat main source is defined in db')
     except Exception, ex:
