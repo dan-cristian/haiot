@@ -43,7 +43,9 @@
     {"id":311, "active":"1", "start_order":"11", "name":"alarm", "host_name":"beaglebone"},
     {"id":315, "active":"1", "start_order":"15", "name":"io_bbb", "host_name":"beaglebone"},
 
-    {"id":403, "active":"1", "start_order":"3", "name":"health_monitor", "host_name":"EN62395"}
+    {"id":403, "active":"1", "start_order":"3", "name":"health_monitor", "host_name":"EN62395"},
+
+    {"id":509, "active":"1", "start_order":"9", "name":"heat", "host_name":"netbook"}
 
 
   ],
@@ -145,11 +147,11 @@
   ],
 
   "ZoneHeatRelay":[
-    {"zone_id":1,"heat_pin_name":"bucatarie","gpio_pin_code":"P9_13","host_name":"beaglebone","is_main_heat_source":"0"},
-    {"zone_id":2,"heat_pin_name":"living","gpio_pin_code":"P9_12","host_name":"beaglebone", "is_main_heat_source":"0"},
-    {"zone_id":47,"heat_pin_name":"birou","gpio_pin_code": "P9_11","host_name":"beaglebone", "is_main_heat_source":"0"},
-    {"zone_id":4,"heat_pin_name":"dormitor","gpio_pin_code":"P9_15","host_name":"beaglebone","is_main_heat_source":"0"},
-    {"zone_id":19,"heat_pin_name":"heat main","gpio_pin_code":"24","host_name":"pi-power","is_main_heat_source":"1"}
+    {"zone_id":1,"heat_pin_name":"bucatarie","gpio_pin_code":"P9_13","gpio_host_name":"beaglebone","is_main_heat_source":"0"},
+    {"zone_id":2,"heat_pin_name":"living","gpio_pin_code":"P9_12","gpio_host_name":"beaglebone", "is_main_heat_source":"0"},
+    {"zone_id":47,"heat_pin_name":"birou","gpio_pin_code": "P9_11","gpio_host_name":"beaglebone", "is_main_heat_source":"0"},
+    {"zone_id":4,"heat_pin_name":"dormitor","gpio_pin_code":"P9_15","gpio_host_name":"beaglebone","is_main_heat_source":"0"},
+    {"zone_id":19,"heat_pin_name":"heat main","gpio_pin_code":"24","gpio_host_name":"pi-power","is_main_heat_source":"1"}
   ],
 
   "ZoneSensor": [
@@ -182,7 +184,7 @@
   ],
 
   "Rule": [
-    {"command":"test", "second":"*/5", "is_active":"1"},
+    {"command":"test", "second":"*/5", "is_active":"0"},
     {"command":"water_front_on", "month":"5-10", "hour":"07", "minute":"30", "is_active":"1"},
     {"command":"water_front_off", "month":"5-10", "hour":"07", "minute":"32", "is_active":"1"},
     {"command":"water_back_on", "month":"5-10", "hour":"07", "minute":"33", "is_active":"1"},
