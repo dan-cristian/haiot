@@ -13,7 +13,7 @@ import node
 import sensor
 import heat
 import relay
-#import rule
+import rule
 
 
 __mqtt_event_list = []
@@ -154,6 +154,8 @@ def mqtt_thread_run():
 
             if len(__mqtt_event_list) > last_count:
                 logger.debug('Not keeping up with {} mqtt events'.format(len(__mqtt_event_list)))
+    except Exception, ex:
+        logger.critical("Error processing mqtt: {}".format(ex))
     finally:
         #__mqtt_lock.release()
         pass
