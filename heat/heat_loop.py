@@ -1,11 +1,9 @@
 __author__ = 'dcristian'
 
-from main import logger
 import datetime
-from pydispatch import dispatcher
+from main import logger
 from main.admin import models
 from main.admin.model_helper import commit
-from main import db
 
 from common import constant, utils
 import transport
@@ -56,10 +54,15 @@ def __update_zone_heat(zone, heat_schedule, sensor):
                 temperature_code = pattern[hour]
                 temperature = models.TemperatureTarget.query.filter_by(code=temperature_code).first()
                 if temperature:
-                    if zone.active_heat_schedule_pattern_id != schedule_pattern.id:
+                    if not zone.last_heat_status_update:
+                        zone.last_heat_status_update = datetime.datetime.min
+                    elapsed_since_heat_changed = (utils.get_base_location_now_date()
+                                                  - zone.last_heat_status_update).total_seconds()
+                    if zone.active_heat_schedule_pattern_id != schedule_pattern.id and elapsed_since_heat_changed > 600:
                         logger.info('Pattern in zone {} is {} target={}'.format(zone.name, schedule_pattern.name,
                                                                                          temperature.target))
                         zone.active_heat_schedule_pattern_id = schedule_pattern.id
+                        zone.last_heat_status_update = utils.get_base_location_now_date()
                         commit()
                         if sensor.temperature:
                             heat_is_on = __decide_action(zone, sensor.temperature, temperature.target)
@@ -86,8 +89,8 @@ def loop_zones():
                 sensor = models.Sensor.query.filter_by(address=zonesensor.sensor_address).first()
                 if heat_schedule.active and sensor:
                     sensor_last_update_seconds = (utils.get_base_location_now_date()-sensor.updated_on).total_seconds()
-                    if sensor_last_update_seconds > 60 * 60:
-                        logger.warning('Sensor {} not updated in last 60 minutes, unusual'.format(sensor.sensor_name))
+                    if sensor_last_update_seconds > 120 * 60:
+                        logger.warning('Sensor {} not updated in last 120 minutes, unusual'.format(sensor.sensor_name))
                     if __update_zone_heat(zone, heat_schedule, sensor):
                         heat_is_on = True
         heatrelay_main_source = models.ZoneHeatRelay.query.filter_by(is_main_heat_source=True).first()
