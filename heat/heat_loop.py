@@ -28,14 +28,13 @@ def __save_heat_state_db(zone='', heat_is_on=''):
 def __decide_action(zone, current_temperature, target_temperature):
     assert isinstance(zone, models.Zone)
     if current_temperature < target_temperature:
-        logger.info('Heat must be ON in {} temp {} target {}'.format(zone.name, current_temperature,
-                                                                      target_temperature))
         heat_is_on = True
     else:
-        logger.info('Heat must be OFF in {} temp {} target {}'.format(zone.name, current_temperature,
-                                                                       target_temperature))
         heat_is_on = False
-    __save_heat_state_db(zone=zone, heat_is_on=heat_is_on)
+    if zone.heat_is_on != heat_is_on:
+        logger.info('Heat is {} in {} temp={} target={}'.format(heat_is_on, zone.name, current_temperature,
+                                                                target_temperature))
+        __save_heat_state_db(zone=zone, heat_is_on=heat_is_on)
     return heat_is_on
 
 def __update_zone_heat(zone, heat_schedule, sensor):
@@ -54,22 +53,23 @@ def __update_zone_heat(zone, heat_schedule, sensor):
                 temperature_code = pattern[hour]
                 temperature_target = models.TemperatureTarget.query.filter_by(code=temperature_code).first()
                 if temperature_target:
-                    if not zone.last_heat_status_update:
-                        zone.last_heat_status_update = datetime.datetime.min
-                    elapsed_since_heat_changed = (utils.get_base_location_now_date()
-                                                  - zone.last_heat_status_update).total_seconds()
-                    if temperature_target.target != zone.heat_target_temperature:
-                    #if zone.active_heat_schedule_pattern_id != schedule_pattern.id and elapsed_since_heat_changed > 600:
-                        logger.info('Pattern in zone {} is {} target={}'.format(zone.name, schedule_pattern.name,
-                                                                                         temperature_target.target))
+                    #if not zone.last_heat_status_update:
+                    #    zone.last_heat_status_update = datetime.datetime.min
+                    #elapsed_since_heat_changed = (utils.get_base_location_now_date()
+                    #                              - zone.last_heat_status_update).total_seconds()
+                    #if temperature_target.target != zone.heat_target_temperature:
+                    if zone.active_heat_schedule_pattern_id != schedule_pattern.id:
+                        logger.info('Pattern in zone {} changed to {}, target={}'.format(zone.name,
+                                                                schedule_pattern.name, temperature_target.target))
                         zone.active_heat_schedule_pattern_id = schedule_pattern.id
-                        zone.last_heat_status_update = utils.get_base_location_now_date()
-                        zone.heat_target_temperature = temperature_target.target
-                        commit()
-                        if sensor.temperature:
-                            heat_is_on = __decide_action(zone, sensor.temperature, temperature_target.target)
-                    else:
-                        heat_is_on = zone.heat_is_on
+
+                    zone.last_heat_status_update = utils.get_base_location_now_date()
+                    zone.heat_target_temperature = temperature_target.target
+                    commit()
+                    if sensor.temperature:
+                        heat_is_on = __decide_action(zone, sensor.temperature, temperature_target.target)
+                    #else:
+                    #    heat_is_on = zone.heat_is_on
                 else:
                     logger.critical('Unknown temperature pattern code {}'.format(temperature_code))
             else:
