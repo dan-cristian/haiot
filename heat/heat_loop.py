@@ -52,20 +52,22 @@ def __update_zone_heat(zone, heat_schedule, sensor):
             pattern = str(schedule_pattern.pattern).replace('-', '').replace(' ','')
             if len(pattern) == 24:
                 temperature_code = pattern[hour]
-                temperature = models.TemperatureTarget.query.filter_by(code=temperature_code).first()
-                if temperature:
+                temperature_target = models.TemperatureTarget.query.filter_by(code=temperature_code).first()
+                if temperature_target:
                     if not zone.last_heat_status_update:
                         zone.last_heat_status_update = datetime.datetime.min
                     elapsed_since_heat_changed = (utils.get_base_location_now_date()
                                                   - zone.last_heat_status_update).total_seconds()
-                    if zone.active_heat_schedule_pattern_id != schedule_pattern.id and elapsed_since_heat_changed > 600:
+                    if temperature_target.target != zone.heat_target_temperature:
+                    #if zone.active_heat_schedule_pattern_id != schedule_pattern.id and elapsed_since_heat_changed > 600:
                         logger.info('Pattern in zone {} is {} target={}'.format(zone.name, schedule_pattern.name,
-                                                                                         temperature.target))
+                                                                                         temperature_target.target))
                         zone.active_heat_schedule_pattern_id = schedule_pattern.id
                         zone.last_heat_status_update = utils.get_base_location_now_date()
+                        zone.heat_target_temperature = temperature_target.target
                         commit()
                         if sensor.temperature:
-                            heat_is_on = __decide_action(zone, sensor.temperature, temperature.target)
+                            heat_is_on = __decide_action(zone, sensor.temperature, temperature_target.target)
                     else:
                         heat_is_on = zone.heat_is_on
                 else:
@@ -76,6 +78,8 @@ def __update_zone_heat(zone, heat_schedule, sensor):
         logger.error('Error updatezoneheat, err={}'.format(ex, exc_info=True))
     return heat_is_on
 
+#iterate zones and decide heat state for each zone and also for master zone (main heat system)
+#if one zone requires heat master zone will be on
 def loop_zones():
     try:
         heat_is_on = False
