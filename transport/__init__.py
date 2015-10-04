@@ -1,6 +1,6 @@
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
-from main import logger
+from main.logger_helper import Log
 import transport_run
 from transport import mqtt_io
 
@@ -20,20 +20,20 @@ def thread_run():
         if mqtt_io.sender.send_message(json):
             __send_json_queue.remove(json)
     if len(__send_json_queue) > 20:
-        logger.warning("{} messages are pending in transport send queue".format(len(__send_json_queue)))
+        Log.logger.warning("{} messages are pending in transport send queue".format(len(__send_json_queue)))
 
 def unload():
     from main.admin import thread_pool
-    logger.info('Transport unloading')
+    Log.logger.info('Transport unloading')
     # ...
-    thread_pool.remove_callable(transport_run.thread_run)
+    thread_pool.remove_callable(thread_run)
     global initialised
     initialised = False
 
 
 def init():
     from main.admin import thread_pool
-    logger.info('Transport initialising')
+    Log.logger.info('Transport initialising')
     thread_pool.add_interval_callable(thread_run, run_interval_second=1)
     mqtt_io.init()
     global initialised

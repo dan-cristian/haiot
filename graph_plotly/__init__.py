@@ -1,37 +1,36 @@
-from __builtin__ import isinstance
-
 __author__ = 'dcristian'
 
-from main import logger
-import datetime
+import os
+
 import plotly.plotly as py
 from plotly import graph_objs
-from plotly.exceptions import PlotlyError, PlotlyAccountError, PlotlyListEntryError
-from common import constant, utils
+from plotly.exceptions import PlotlyAccountError
+
+from main.logger_helper import Log
+from common import Constant, utils
 from main.admin import model_helper, thread_pool
-import os
 import graph_plotly_run
 
 initialised = False
 
 def upload_data(obj):
     try:
-        logger.debug('Trying to upload plotly obj {}'.format(obj))
-        if constant.JSON_PUBLISH_GRAPH_X in obj:
-            axis_x_field = obj[constant.JSON_PUBLISH_GRAPH_X]
-            graph_id_field = obj[constant.JSON_PUBLISH_GRAPH_ID]
-            graph_legend_field = obj[constant.JSON_PUBLISH_GRAPH_LEGEND]
-            graph_shape_fields = obj[constant.JSON_PUBLISH_GRAPH_SHAPE]
-            graph_y_fields = obj[constant.JSON_PUBLISH_GRAPH_Y]
-            changed_fields = obj[constant.JSON_PUBLISH_FIELDS_CHANGED]
+        Log.logger.debug('Trying to upload plotly obj {}'.format(obj))
+        if Constant.JSON_PUBLISH_GRAPH_X in obj:
+            axis_x_field = obj[Constant.JSON_PUBLISH_GRAPH_X]
+            graph_id_field = obj[Constant.JSON_PUBLISH_GRAPH_ID]
+            graph_legend_field = obj[Constant.JSON_PUBLISH_GRAPH_LEGEND]
+            graph_shape_fields = obj[Constant.JSON_PUBLISH_GRAPH_SHAPE]
+            graph_y_fields = obj[Constant.JSON_PUBLISH_GRAPH_Y]
+            changed_fields = obj[Constant.JSON_PUBLISH_FIELDS_CHANGED]
             #intersect lists and get only graphable fields that had values changed
             list_axis_y = list(set(graph_y_fields) & set(changed_fields))
             if len(list_axis_y)==0:
-                logger.debug('Ignoring graph upload graph={} changed={} obj={}'.format(graph_y_fields,
+                Log.logger.debug('Ignoring graph upload graph={} changed={} obj={}'.format(graph_y_fields,
                                                                                        changed_fields, obj))
-            logger.debug('Trying to upload y axis {}'.format(list_axis_y))
+            Log.logger.debug('Trying to upload y axis {}'.format(list_axis_y))
             if axis_x_field in obj and graph_id_field in obj:
-                table = obj[constant.JSON_PUBLISH_TABLE]
+                table = obj[Constant.JSON_PUBLISH_TABLE]
                 trace_unique_id = obj[graph_id_field] #unique record/trace identifier
                 x_val = obj[axis_x_field]
                 graph_legend_item_name = obj[graph_legend_field] #unique key for legend
@@ -56,24 +55,24 @@ def upload_data(obj):
                         if graph_unique_name in graph_plotly_run.g_trace_id_list_per_graph:
                             trace_unique_id_pattern = graph_plotly_run.g_trace_id_list_per_graph[graph_unique_name]
                         else:
-                            logger.warning('Unable to get a reference pattern, graph {}'.format(graph_unique_name))
+                            Log.logger.warning('Unable to get a reference pattern, graph {}'.format(graph_unique_name))
                         known_graph_url = graph_plotly_run.get_graph_url_from_memory(graph_unique_name)
                         if trace_unique_id in trace_unique_id_pattern:
                             trace_list = graph_plotly_run.populate_trace_for_extend(x=x, y=y,
                                     graph_legend_item_name=graph_legend_item_name, trace_unique_id=trace_unique_id,
                                     trace_unique_id_pattern=trace_unique_id_pattern, shape_type=shape)
-                            logger.debug('Extending graph {}'.format(graph_unique_name, shape))
+                            Log.logger.debug('Extending graph {}'.format(graph_unique_name, shape))
                             fileopt = 'extend'
                         else:
                             trace_list = graph_plotly_run.populate_trace_for_append(x=x, y=y,
                                         graph_legend_item_name=graph_legend_item_name,trace_unique_id=trace_unique_id,
                                         shape_type=shape)
-                            logger.debug('Appending graph {}'.format(graph_unique_name))
+                            Log.logger.debug('Appending graph {}'.format(graph_unique_name))
                             fileopt = 'append'
                         data = graph_objs.Data(trace_list)
                         try:
                             if known_graph_url is None:
-                                logger.warning('Graph {} is setting up, dropping data'.format(graph_unique_name))
+                                Log.logger.warning('Graph {} is setting up, dropping data'.format(graph_unique_name))
                             else:
                                 graph_plotly_run.add_graph_data(data=data, graph_unique_name=graph_unique_name,
                                                                 trace_unique_id = trace_unique_id, file_opt=fileopt)
@@ -81,20 +80,20 @@ def upload_data(obj):
                                 #fig = graph_objs.Figure(data=data, layout=get_layout(graph_unique_name))
                                 #url = py.plot(fig, filename=graph_unique_name, fileopt=fileopt, auto_open=False)
                                 #if url != known_graph_url:
-                                #    logger.warning('Original graph {} removed from plotly'.format(graph_unique_name))
+                                #    Log.logger.warning('Original graph {} removed from plotly'.format(graph_unique_name))
                                 #    upload_reference_graph(graph_unique_name)
                                 #if fileopt=='append' or fileopt=='new':
                                 #    add_new_serie(graph_unique_name, url, trace_unique_id)
                         except PlotlyAccountError, ex:
-                            logger.warning('Unable to plot graph, err {}'.format(ex))
+                            Log.logger.warning('Unable to plot graph, err {}'.format(ex))
                     index += 1
             else:
-                logger.critical('Graphable object missing axis_x [{}], graph_id [{}], in obj {}'.format(axis_x_field,
+                Log.logger.critical('Graphable object missing axis_x [{}], graph_id [{}], in obj {}'.format(axis_x_field,
                                                                                           graph_id_field, obj))
         else:
-            logger.critical('Graphable object missing axis X field {}'.format(constant.JSON_PUBLISH_GRAPH_X))
+            Log.logger.critical('Graphable object missing axis X field {}'.format(Constant.JSON_PUBLISH_GRAPH_X))
     except Exception, ex:
-        logger.exception('General error saving graph, err {} obj={}'.format(ex, obj))
+        Log.logger.exception('General error saving graph, err {} obj={}'.format(ex, obj))
 
 def unload():
     global initialised
@@ -109,17 +108,17 @@ def init():
         env_var='PLOTLY_CREDENTIALS_PATH'
         alt_path = os.environ.get(env_var)
         if not alt_path:
-            logger.info('Plotly config not in environment var: {}'.format(env_var))
+            Log.logger.info('Plotly config not in environment var: {}'.format(env_var))
             env_var = 'OPENSHIFT_REPO_DIR'
             alt_path = os.environ.get(env_var)
             if alt_path is None:
-                logger.info('Plotly config not in environment var: {}'.format(env_var))
-                credential_file = model_helper.get_param(constant.P_PLOTLY_ALTERNATE_CONFIG)
+                Log.logger.info('Plotly config not in environment var: {}'.format(env_var))
+                credential_file = model_helper.get_param(Constant.P_PLOTLY_ALTERNATE_CONFIG)
                 alt_path = os.getcwd()+'/'+credential_file
             else:
-                logger.info('Plotly config found in environment var: {}, path={}'.format(env_var, alt_path))
+                Log.logger.info('Plotly config found in environment var: {}, path={}'.format(env_var, alt_path))
                 alt_path = str(alt_path) + '/../data/.plotly.credentials'
-        logger.info("Plotly standard config empty, trying alt_path={}".format(alt_path))
+        Log.logger.info("Plotly standard config empty, trying alt_path={}".format(alt_path))
         try:
             with open(alt_path, 'r') as cred_file:
                 data = cred_file.read().replace('\n','')
@@ -132,17 +131,17 @@ def init():
                     global initialised
                     initialised = True
                 #else:
-                #    logger.info("Plotly init from db folder config {}{} not ok, trying with db data".format(os.getcwd(),
+                #    Log.logger.info("Plotly init from db folder config {}{} not ok, trying with db data".format(os.getcwd(),
                 #        credential_file))
                 #    #alternate way if reading data from DB
                 #    py.sign_in(model_helper.get_param(constant.P_PLOTLY_USERNAME),
                 #               model_helper.get_param(constant.P_PLOTLY_APIKEY))
 
         except Exception, ex:
-            logger.warning("error reading plotly credentials {}".format(ex))
+            Log.logger.warning("error reading plotly credentials {}".format(ex))
     else:
-        logger.info("Plotly standard config found with username {}".format(py.get_credentials()['username']))
+        Log.logger.info("Plotly standard config found with username {}".format(py.get_credentials()['username']))
         initialised = True
     if initialised:
-        logger.info('Plotly is connected')
+        Log.logger.info('Plotly is connected')
         thread_pool.add_interval_callable(graph_plotly_run.thread_run, run_interval_second=60)

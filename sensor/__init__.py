@@ -2,10 +2,9 @@ __author__ = 'dcristian'
 
 #! venv/bin/python
 
-import datetime
 from main.admin import thread_pool, db
-from main import logger
-from common import utils, constant
+from main.logger_helper import Log
+from common import utils, Constant
 import owsensor_loop
 import rfxcom_run
 import ups_legrand_run
@@ -18,9 +17,9 @@ def sensor_update(obj):
     #save sensor state to db, except for current node
     try:
         sensor_host_name = utils.get_object_field_value(obj, 'name')
-        logger.debug('Received sensor state update from {}'.format(sensor_host_name))
+        Log.logger.debug('Received sensor state update from {}'.format(sensor_host_name))
         #avoid node to update itself in infinite recursion
-        if sensor_host_name != constant.HOST_NAME:
+        if sensor_host_name != Constant.HOST_NAME:
             address = utils.get_object_field_value(obj, 'address')
             record = models.Sensor(address=address)
             assert isinstance(record, models.Sensor)
@@ -48,7 +47,7 @@ def sensor_update(obj):
                                        save_to_graph=False)
             commit()
     except Exception, ex:
-        logger.warning('Error on sensor update, err {}'.format(ex))
+        Log.logger.warning('Error on sensor update, err {}'.format(ex))
         db.session.rollback()
 
 def unload():
@@ -60,7 +59,7 @@ def unload():
     initialised = False
 
 def init():
-    logger.info('Sensor module initialising')
+    Log.logger.info('Sensor module initialising')
     if owsensor_loop.init():
         thread_pool.add_interval_callable(owsensor_loop.thread_run, run_interval_second=60)
     if rfxcom_run.init():

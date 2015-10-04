@@ -1,10 +1,11 @@
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
-from main import logger
 import time
 import datetime
 import random
-from common import constant, variable, utils
+
+from main.logger_helper import Log
+from common import Constant, variable, utils
 from main.admin import models
 from main.admin.model_helper import commit
 from transport import mqtt_io
@@ -17,9 +18,9 @@ node_state_uuid = None
 def node_update(obj={}):
     try:
         node_host_name = utils.get_object_field_value(obj, 'name')
-        logger.debug('Received node state update from {}'.format(node_host_name))
+        Log.logger.debug('Received node state update from {}'.format(node_host_name))
         #avoid node to update itself in infinite recursion
-        if node_host_name != constant.HOST_NAME:
+        if node_host_name != Constant.HOST_NAME:
             '''
             node = models.Node.query.filter_by(name=node_host_name).first()
             if node is None:
@@ -47,18 +48,18 @@ def node_update(obj={}):
             models.Node().save_changed_fields_from_json_object(json_object=obj, unique_key_name='name',
                                                                notify_transport_enabled=False, save_to_graph=False)
         else:
-            logger.debug('Skipping node DB save, this node is master = {}'.format(
+            Log.logger.debug('Skipping node DB save, this node is master = {}'.format(
                 variable.NODE_THIS_IS_MASTER_OVERALL))
             sent_date = utils.get_object_field_value(obj, 'event_sent_datetime')
             if not sent_date is None:
                 event_sent_date_time = utils.parse_to_date(sent_date)
                 seconds_elapsed = (utils.get_base_location_now_date()-event_sent_date_time).total_seconds()
                 if seconds_elapsed>15:
-                    logger.warning('Very slow mqtt, delay is {} seconds rate msg {}/min'.format(seconds_elapsed,
+                    Log.logger.warning('Very slow mqtt, delay is {} seconds rate msg {}/min'.format(seconds_elapsed,
                                                                                     mqtt_io.mqtt_msg_count_per_minute))
 
     except Exception, ex:
-        logger.warning('Error on node update, err {}'.format(ex))
+        Log.logger.warning('Error on node update, err {}'.format(ex))
 
 def check_if_no_masters_overall():
     node_masters = models.Node.query.filter_by(is_master_overall=True).all()
@@ -74,31 +75,31 @@ def update_master_state():
             #if recently alive, in order of id prio
             if node.updated_on >= alive_date_time and (not master_overall_selected):
                 if node.is_master_overall:
-                    logger.debug('Node {} is already master, all good we have a master'.format(node.name))
+                    Log.logger.debug('Node {} is already master, all good we have a master'.format(node.name))
                     master_overall_selected = True
                 else:
-                    logger.info('Node {} will become a master'.format(node.name))
-                    if node.name == constant.HOST_NAME:
+                    Log.logger.info('Node {} will become a master'.format(node.name))
+                    if node.name == Constant.HOST_NAME:
                         node.is_master_overall = True
                         node.notify_enabled_ = True
                         commit()
                     master_overall_selected = True
             else:
                 if master_overall_selected and node.is_master_overall:
-                    logger.debug('Node {} should lose master status, if alive'.format(node.name))
-                    if node.name == constant.HOST_NAME:
+                    Log.logger.debug('Node {} should lose master status, if alive'.format(node.name))
+                    if node.name == Constant.HOST_NAME:
                         node.is_master_overall = False
                         node.notify_enabled_ = True
                         commit()
             #applying node master status locally, if changed in db
-            if node.name == constant.HOST_NAME:
+            if node.name == Constant.HOST_NAME:
                 variable.NODE_THIS_IS_MASTER_LOGGING =  node.is_master_logging
 
                 if variable.NODE_THIS_IS_MASTER_OVERALL != node.is_master_overall:
                     if not node.is_master_overall:
                         #disabling local mastership immediately
                         variable.NODE_THIS_IS_MASTER_OVERALL = node.is_master_overall
-                        logger.info('Immediate change in node mastership, local node is master={}'.format(
+                        Log.logger.info('Immediate change in node mastership, local node is master={}'.format(
                             variable.NODE_THIS_IS_MASTER_OVERALL))
                     else:
                         global since_when_i_should_be_master
@@ -106,26 +107,26 @@ def update_master_state():
                         seconds_elapsed = (utils.get_base_location_now_date() - since_when_i_should_be_master).total_seconds()
                         if check_if_no_masters_overall() or seconds_elapsed > 10:
                             variable.NODE_THIS_IS_MASTER_OVERALL = node.is_master_overall
-                            logger.info('Change in node mastership, local node is master={}'.format(
+                            Log.logger.info('Change in node mastership, local node is master={}'.format(
                                 variable.NODE_THIS_IS_MASTER_OVERALL))
                             since_when_i_should_be_master = datetime.datetime.max
                         else:
-                            logger.info('Waiting to set master status, sec. lapsed={}'.format(seconds_elapsed))
+                            Log.logger.info('Waiting to set master status, sec. lapsed={}'.format(seconds_elapsed))
                         if not variable.NODE_THIS_IS_MASTER_OVERALL:
                             #record date when cluster agreed I must be master
                             if since_when_i_should_be_master == datetime.datetime.max:
                                 since_when_i_should_be_master = utils.get_base_location_now_date()
     except Exception, ex:
-        logger.warning('Error try_become_master, err {}'.format(ex))
+        Log.logger.warning('Error try_become_master, err {}'.format(ex))
 
 def announce_node_state():
     try:
-        logger.debug('I tell everyone my node state')
+        Log.logger.debug('I tell everyone my node state')
         #current_record = models.Node.query.filter_by(name=constant.HOST_NAME).first()
         node = models.Node()
-        current_record = models.Node().query_filter_first(models.Node.name.in_([constant.HOST_NAME, ""]))
+        current_record = models.Node().query_filter_first(models.Node.name.in_([Constant.HOST_NAME, ""]))
 
-        node.name = constant.HOST_NAME
+        node.name = Constant.HOST_NAME
         if not current_record:
             node.priority = random.randint(1, 100)
             node.run_overall_cycles = 0
@@ -141,7 +142,7 @@ def announce_node_state():
                 node.master_overall_cycles = 0
         node.event_sent_datetime= utils.get_base_location_now_date()
         node.updated_on = utils.get_base_location_now_date()
-        node.ip = constant.HOST_MAIN_IP
+        node.ip = Constant.HOST_MAIN_IP
         if variable.NODE_THIS_IS_MASTER_OVERALL:
             node.master_overall_cycles += 1
         node.run_overall_cycles += 1
@@ -149,7 +150,7 @@ def announce_node_state():
         node.save_changed_fields(current_record=current_record, new_record=node, notify_transport_enabled=True,
                                    save_to_graph=True, graph_save_frequency=120)
     except Exception, ex:
-        logger.error('Unable to announce my state, err={}'.format(ex))
+        Log.logger.error('Unable to announce my state, err={}'.format(ex))
 
 progress_status = None
 def get_progress():
@@ -157,15 +158,15 @@ def get_progress():
     return progress_status
 
 def thread_run():
-    logger.debug('Processing node_run')
+    Log.logger.debug('Processing node_run')
     global first_run
     global progress_status
     if first_run:
         progress_status='Sleep on first run'
-        logger.info('On first node run I will sleep some seconds to get state updates')
+        Log.logger.info('On first node run I will sleep some seconds to get state updates')
         time.sleep(10)
         first_run = False
-        logger.info('Sleep done on first node run')
+        Log.logger.info('Sleep done on first node run')
     progress_status='Updating master state'
     update_master_state()
     progress_status='Announcing node state'

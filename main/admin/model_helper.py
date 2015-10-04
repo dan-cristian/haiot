@@ -1,14 +1,14 @@
 __author__ = 'dcristian'
 import random
 import sys
-import datetime
 import uuid
 import json
+
 from sqlalchemy.exc import IntegrityError, OperationalError, InvalidRequestError
 
-from main import logger
+from main.logger_helper import Log
 import models
-from common import constant, utils, performance
+from common import Constant, utils, performance
 from main import db
 
 __db_values_json = None
@@ -23,11 +23,11 @@ def model_row_to_json(obj, operation=''):
         obj.event_uuid = str(uuid.uuid4())
         table_cols=obj._sa_class_manager
         for attr in table_cols:
-            safe_obj[constant.JSON_PUBLISH_TABLE]=str(table_cols[attr]).split('.')[0]
+            safe_obj[Constant.JSON_PUBLISH_TABLE]=str(table_cols[attr]).split('.')[0]
             break
 
         #safe_obj[constant.JSON_PUBLISH_RECORD_OPERATION]=operation
-        safe_obj[constant.JSON_PUBLISH_SOURCE_HOST]=str(constant.HOST_NAME)
+        safe_obj[Constant.JSON_PUBLISH_SOURCE_HOST]=str(Constant.HOST_NAME)
         #safe_obj[constant.JSON_PUBLISH_DATE]=str(utils.get_base_location_now_date())
         #safe_obj[constant.JSON_PUBLISH_TARGET_HOST]=constant.JSON_PUBLISH_VALUE_TARGET_HOST_ALL
         #removing infinite recursions and class noise
@@ -41,7 +41,7 @@ def model_row_to_json(obj, operation=''):
                 if value is not None and not hasattr(value,'_sa_class_manager'):
                     safe_obj[attr] = value
                 else:
-                    logger.debug('Ignoring obj to json, not simple primitive {}'.format(value))
+                    Log.logger.debug('Ignoring obj to json, not simple primitive {}'.format(value))
         return utils.safeobj2json(safe_obj)
     except Exception, ex:
         logger.critical('Error convert model obj to json, err {}'.format(ex))
@@ -52,7 +52,7 @@ def get_param(name):
         val = models.Parameter().query_filter_first(models.Parameter.name.in_([name])).value
         return val
     except ValueError, ex:
-        logger.warning('Unable to get parameter {} error {}'.format(name, ex))
+        Log.logger.warning('Unable to get parameter {} error {}'.format(name, ex))
         raise ValueError
     except Exception, ex:
         logger.critical('Exception when getting param {}, err={}'.format(name, ex))
@@ -67,11 +67,11 @@ def commit():
         db.session.commit()
     except IntegrityError, ex:
         #db.session.rollback()
-        logger.warning('Unable to commit DB session={}, rolled back, err={}'.format(db.session, ex))
+        Log.logger.warning('Unable to commit DB session={}, rolled back, err={}'.format(db.session, ex))
     except InvalidRequestError, ex:
-        logger.warning('Error on commit, session={}, ignoring, err={}'.format(db.session, ex))
+        Log.logger.warning('Error on commit, session={}, ignoring, err={}'.format(db.session, ex))
     except Exception, ex:
-        logger.warning('Exception on commit, session={} err={}'.format(db.session, ex))
+        Log.logger.warning('Exception on commit, session={} err={}'.format(db.session, ex))
     performance.add_query(time_start, query_details=query_details)
 
 
@@ -86,9 +86,9 @@ def check_table_schema(table, model_auto_update=False):
         logger.critical('Table {} schema in DB seems outdated, err {}, DROP it and recreate (y/n)?'.format(oex, table))
         read_drop_table(table, oex, model_auto_update)
     except InvalidRequestError:
-        logger.warning('Error on check table schema {}, ignoring'.format(table))
+        Log.logger.warning('Error on check table schema {}, ignoring'.format(table))
     except Exception, ex:
-        logger.warning('Unexpected error on check table, err={}'.format(ex))
+        Log.logger.warning('Unexpected error on check table, err={}'.format(ex))
 
 def read_drop_table(table, original_exception, drop_without_user_ask=False):
     if not drop_without_user_ask:
@@ -96,22 +96,22 @@ def read_drop_table(table, original_exception, drop_without_user_ask=False):
     else:
         x='y'
     if x=='y':
-        logger.warning('Dropping table {}'.format(table))
+        Log.logger.warning('Dropping table {}'.format(table))
         try:
             table_name=table.query._primary_entity.entity_zero._with_polymorphic_selectable.description
             result = db.engine.execute('DROP TABLE '+table_name)
             commit()
         except Exception, ex:
-            logger.info('Something went wrong on drop, ignoring err {}'.format(ex))
+            Log.logger.info('Something went wrong on drop, ignoring err {}'.format(ex))
             db.session.rollback()
-        logger.info('Creating missing schema object after table drop')
+        Log.logger.info('Creating missing schema object after table drop')
         db.create_all()
     else:
         raise original_exception
 
 def populate_tables(model_auto_update=False):
     var_path = utils.get_app_root_path() + 'scripts/config/default_db_values.json'
-    logger.info('Loading variables from config file [{}]'.format(var_path))
+    Log.logger.info('Loading variables from config file [{}]'.format(var_path))
     global __db_values_json
     with open(var_path, 'r') as f:
         __db_values_json = json.load(f)
@@ -128,7 +128,7 @@ def populate_tables(model_auto_update=False):
         if table_str in __db_values_json:
             default_values = __db_values_json[table_str]
             if len(table().query_all()) != len(default_values):
-                logger.info('Populating {} with default values as config record count != db count'.format(table_str))
+                Log.logger.info('Populating {} with default values as config record count != db count'.format(table_str))
                 table().delete()
                 commit()
                 for config_record in default_values:
@@ -140,30 +140,30 @@ def populate_tables(model_auto_update=False):
                 commit()
 
     check_table_schema(models.Node, model_auto_update)
-    if len(models.Node.query.filter_by(name=constant.HOST_NAME).all()) == 0:
-        logger.info('Populating Node {} with default values'.format(constant.HOST_NAME))
+    if len(models.Node.query.filter_by(name=Constant.HOST_NAME).all()) == 0:
+        Log.logger.info('Populating Node {} with default values'.format(Constant.HOST_NAME))
         master_logging = False
-        if constant.HOST_NAME=='nas':
+        if Constant.HOST_NAME=='nas':
             master_logging = True
             priority = 2
-        elif constant.HOST_NAME=='netbook':
+        elif Constant.HOST_NAME=='netbook':
             priority = 0
-        elif constant.HOST_NAME=='server':
+        elif Constant.HOST_NAME=='server':
             priority = 3
-        elif constant.HOST_NAME=='ex-std-node466.prod.rhcloud.com':
+        elif Constant.HOST_NAME=='ex-std-node466.prod.rhcloud.com':
             priority = 4
         else:
             priority=random.randint(10, 100)
-        db.session.add(models.Node('', name=constant.HOST_NAME, ip=constant.HOST_MAIN_IP, priority=priority,
-                                   mac=constant.HOST_MAC, is_master_logging=master_logging))
+        db.session.add(models.Node('', name=Constant.HOST_NAME, ip=Constant.HOST_MAIN_IP, priority=priority,
+                                   mac=Constant.HOST_MAC, is_master_logging=master_logging))
         commit()
     else:
         #reseting execute_command field to avoid running last command before shutdown
-        node_obj = models.Node.query.filter_by(name=constant.HOST_NAME).first()
+        node_obj = models.Node.query.filter_by(name=Constant.HOST_NAME).first()
         node_obj.execute_command = ''
         commit()
-    node_obj = models.Node.query.filter_by(name=constant.HOST_NAME).first()
-    constant.HOST_PRIORITY = node_obj.priority
+    node_obj = models.Node.query.filter_by(name=Constant.HOST_NAME).first()
+    Constant.HOST_PRIORITY = node_obj.priority
 
 
     check_table_schema(models.GpioPin, model_auto_update)
@@ -172,16 +172,16 @@ def populate_tables(model_auto_update=False):
         'P9_22':2,  'P9_21':3,
         'P8_07':66, 'P8_08':67, 'P8_09':69, 'P8_11':45, 'P8_12':44, 'P8_15':47, 'P8_16':46
     }
-    if len(models.GpioPin.query.filter_by(pin_type=constant.GPIO_PIN_TYPE_BBB,
-                                          host_name=constant.HOST_NAME).all()) != 46*2: #P8_ and P9_ with 46 pins
-        models.GpioPin.query.filter_by(pin_type=constant.GPIO_PIN_TYPE_BBB, host_name=constant.HOST_NAME).delete()
+    if len(models.GpioPin.query.filter_by(pin_type=Constant.GPIO_PIN_TYPE_BBB,
+                                          host_name=Constant.HOST_NAME).all()) != 46*2: #P8_ and P9_ with 46 pins
+        models.GpioPin.query.filter_by(pin_type=Constant.GPIO_PIN_TYPE_BBB, host_name=Constant.HOST_NAME).delete()
         commit()
         for host_name in ['beaglebone', 'netbook', 'EN62395']:
-            logger.info('Populating GpioPins with default beabglebone {} values'.format(host_name))
+            Log.logger.info('Populating GpioPins with default beabglebone {} values'.format(host_name))
             for rail in range(8,10): #last range is not part of the loop
                 for pin in range(01, 47):
                     gpio = models.GpioPin()
-                    gpio.pin_type = constant.GPIO_PIN_TYPE_BBB
+                    gpio.pin_type = Constant.GPIO_PIN_TYPE_BBB
                     gpio.host_name = host_name
                     pincode = '0'+str(pin)
                     gpio.pin_code = 'P'+str(rail)+'_'+pincode[-2:]
@@ -193,14 +193,14 @@ def populate_tables(model_auto_update=False):
         commit()
 
     #fixme: check for other PI revisions
-    if len(models.GpioPin.query.filter_by(pin_type=constant.GPIO_PIN_TYPE_PI,host_name=constant.HOST_NAME).all()) != 26:
-        models.GpioPin.query.filter_by(pin_type=constant.GPIO_PIN_TYPE_PI, host_name=constant.HOST_NAME).delete()
+    if len(models.GpioPin.query.filter_by(pin_type=Constant.GPIO_PIN_TYPE_PI,host_name=Constant.HOST_NAME).all()) != 26:
+        models.GpioPin.query.filter_by(pin_type=Constant.GPIO_PIN_TYPE_PI, host_name=Constant.HOST_NAME).delete()
         commit()
         for host_name in ['pi-power', 'pi-bell', 'netbook', 'EN62395']:
-            logger.info('Populating GpioPins with default raspberry pi {} values'.format(host_name))
+            Log.logger.info('Populating GpioPins with default raspberry pi {} values'.format(host_name))
             for pin in range(01, 27): # -1
                 gpio = models.GpioPin()
-                gpio.pin_type = constant.GPIO_PIN_TYPE_PI
+                gpio.pin_type = Constant.GPIO_PIN_TYPE_PI
                 gpio.host_name = host_name
                 gpio.pin_code = str(pin)
                 gpio.pin_index_bcm = pin

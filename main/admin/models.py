@@ -1,7 +1,7 @@
 from datetime import datetime
-
-from main import logger
 from copy import deepcopy
+
+from main.logger_helper import Log
 from main import db
 from main.admin.model_helper import commit
 import graphs
@@ -17,7 +17,7 @@ class DbBase:
         if elapsed > 5000:#with sqlite a long query will throw an error
             logger.critical("Long running DB query, seconds elapsed={}, result={}".format(elapsed, query_details))
             db.session.rollback()
-            logger.info("Session was rolled back")
+            Log.logger.info("Session was rolled back")
         return result
 
     def __get_result(self, function):
@@ -87,7 +87,7 @@ class DbEvent:
                                          notify_transport_enabled=False, save_to_graph=False)
                 db.session.commit()
             else:
-                logger.warning('Unique key not found in json record, save aborted')
+                Log.logger.warning('Unique key not found in json record, save aborted')
         except Exception, ex:
             logger.error('Exception save json to db {}'.format(ex))
 
@@ -129,7 +129,7 @@ class DbEvent:
                             except Exception, ex:
                                 obj_type = str(type(self))
                             if debug:
-                                logger.info('{} {}={} oldvalue={}'.format(obj_type, column_name, new_value, old_value))
+                                Log.logger.info('{} {}={} oldvalue={}'.format(obj_type, column_name, new_value, old_value))
                         setattr(current_record, column_name, new_value)
                         current_record.last_commit_field_changed_list.append(column_name)
                 if len(current_record.last_commit_field_changed_list) == 0:
@@ -151,13 +151,13 @@ class DbEvent:
         except Exception, ex:
             logger.critical('Error when saving db changes {}, err={}'.format(new_record, ex))
             if len(db.session.dirty) > 0:
-                logger.info('Session dirty records={}, rolling back'.format(len(db.session.dirty)))
+                Log.logger.info('Session dirty records={}, rolling back'.format(len(db.session.dirty)))
                 db.session.rollback()
             else:
-                logger.info('No session dirty records')
+                Log.logger.info('No session dirty records')
             raise ex
         #else:
-        #    logger.warning('Incorrect parameters received on save changed fields to db')
+        #    Log.logger.warning('Incorrect parameters received on save changed fields to db')
 
 
 

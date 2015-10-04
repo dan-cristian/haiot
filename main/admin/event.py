@@ -1,8 +1,8 @@
 from pydispatch import dispatcher
-import threading
-from main import logger, remote_logger
+
+from main.logger_helper import Log
 from main.admin import thread_pool
-from common import constant, variable, utils
+from common import Constant, variable, utils
 import common.utils
 import transport
 import models
@@ -15,20 +15,19 @@ import heat
 import relay
 import rule
 
-
 __mqtt_event_list = []
 #__mqtt_lock = threading.Lock()
 
 def handle_local_event_db_post(model, row):
     #executed on local db changes done via web ui only (includes API calls)
     processed = False
-    logger.info('Local DB change sent by model {} row {}'.format(model, row))
+    Log.logger.info('Local DB change sent by model {} row {}'.format(model, row))
     if str(models.Parameter) in str(model):
         #fixme: update app if params are changing to avoid need for restart
         processed = True
     #no need to propagate changes to other nodes
     elif str(models.Module) in str(model):
-        if row.host_name == constant.HOST_NAME:
+        if row.host_name == Constant.HOST_NAME:
             main.init_module(row.name, row.active)
             processed = True
     #propagate changes to all nodes as eac must execute db sync or other commands locally
@@ -45,7 +44,7 @@ def handle_local_event_db_post(model, row):
         processed = True
 
     if processed:
-        logger.info('Detected {} record change, row={}, trigger executed'.format(model, row))
+        Log.logger.info('Detected {} record change, row={}, trigger executed'.format(model, row))
 
 
 def handle_event_mqtt_received(client, userdata, topic, obj):
@@ -63,10 +62,10 @@ def on_models_committed(sender, changes):
     try:
         for obj, change in changes:
             #avoid recursion
-            if hasattr(obj, constant.JSON_PUBLISH_NOTIFY_TRANSPORT):
+            if hasattr(obj, Constant.JSON_PUBLISH_NOTIFY_TRANSPORT):
                 #only send mqtt message once for db saves intended to be distributed
                 if obj.notify_transport_enabled:
-                    if hasattr(obj, constant.JSON_PUBLISH_NOTIFY_DB_COMMIT):
+                    if hasattr(obj, Constant.JSON_PUBLISH_NOTIFY_DB_COMMIT):
                         if not obj.notified_on_db_commit:
                             obj.notified_on_db_commit = True
                             txt = model_helper.model_row_to_json(obj, operation=change)
@@ -74,9 +73,9 @@ def on_models_committed(sender, changes):
                 else:
                     pass
             #send object to rule parser, if connected
-            dispatcher.send(constant.SIGNAL_DB_CHANGE_FOR_RULES, obj=obj, change=change)
+            dispatcher.send(Constant.SIGNAL_DB_CHANGE_FOR_RULES, obj=obj, change=change)
     except Exception, ex:
-        logger.critical('Error in DB commit hook, {}'.format(ex))
+        Log.logger.critical('Error in DB commit hook, {}'.format(ex))
 
 
 def mqtt_thread_run():
@@ -91,16 +90,16 @@ def mqtt_thread_run():
                 #events received via mqtt transport
                 table = None
                 #fixme: make it generic to work with any transport
-                source_host = obj[constant.JSON_PUBLISH_SOURCE_HOST]
-                if constant.JSON_PUBLISH_TABLE in obj:
-                    table = str(obj[constant.JSON_PUBLISH_TABLE])
+                source_host = obj[Constant.JSON_PUBLISH_SOURCE_HOST]
+                if Constant.JSON_PUBLISH_TABLE in obj:
+                    table = str(obj[Constant.JSON_PUBLISH_TABLE])
                     if table == utils.get_table_name(models.Node):#'Node':
                         node.node_run.node_update(obj)
                         if 'execute_command' in obj:
                             execute_command = obj['execute_command']
                             host_name = obj['name']
                             #execute command on target host or on current host (usefull when target is down - e.g. wake cmd
-                            if (host_name == constant.HOST_NAME or source_host == constant.HOST_NAME) \
+                            if (host_name == Constant.HOST_NAME or source_host == Constant.HOST_NAME) \
                                     and execute_command != '':
                                 server_node = models.Node.query.filter_by(name=host_name).first()
                                 main.execute_command(execute_command, node=server_node)
@@ -117,56 +116,55 @@ def mqtt_thread_run():
                         rule.rule_record_update(obj)
 
 
-                if constant.JSON_MESSAGE_TYPE in obj:
+                if Constant.JSON_MESSAGE_TYPE in obj:
                     if variable.NODE_THIS_IS_MASTER_LOGGING:
-                        if source_host != constant.HOST_NAME:
+                        if source_host != Constant.HOST_NAME:
                             levelname = obj['level']
                             msg = obj['message']
                             msgdatetime = obj['datetime']
                             message = '{}, {}, {}'.format(source_host, msgdatetime, msg)
-                            remote_logger
                             if levelname == 'INFO':
-                                remote_logger.info(message)
+                                Log.remote_logger.info(message)
                             elif levelname == 'WARNING':
-                                remote_logger.warning(message)
+                                Log.remote_logger.warning(message)
                             elif levelname == 'CRITICAL':
-                                remote_logger.critical(message)
+                                Log.remote_logger.critical(message)
                             elif levelname == 'ERROR':
-                                remote_logger.error(message)
+                                Log.remote_logger.error(message)
                             elif levelname == 'DEBUG':
-                                remote_logger.debug(message)
+                                Log.remote_logger.debug(message)
                         #else:
-                            #logger.warning('This node is master logging but emits remote logs, is a circular reference')
+                            #Log.logger.warning('This node is master logging but emits remote logs, is a circular reference')
 
                 if variable.NODE_THIS_IS_MASTER_OVERALL:
-                    if constant.JSON_PUBLISH_GRAPH_X in obj:
-                        if obj[constant.JSON_PUBLISH_SAVE_TO_GRAPH]:
+                    if Constant.JSON_PUBLISH_GRAPH_X in obj:
+                        if obj[Constant.JSON_PUBLISH_SAVE_TO_GRAPH]:
                             if graph_plotly.initialised:
                                 start = utils.get_base_location_now_date()
                                 graph_plotly.upload_data(obj)
                                 elapsed = (utils.get_base_location_now_date() - start).total_seconds()
-                                logger.debug('Plotly upload took {}s'.format(elapsed))
+                                Log.logger.debug('Plotly upload took {}s'.format(elapsed))
                             else:
-                                logger.debug('Graph not initialised on obj upload to graph')
+                                Log.logger.debug('Graph not initialised on obj upload to graph')
                         else:
                             pass
                     else:
-                        logger.debug('Mqtt event without graphing capabilities {}'.format(obj))
+                        Log.logger.debug('Mqtt event without graphing capabilities {}'.format(obj))
 
                 if len(__mqtt_event_list) > last_count:
-                    logger.debug('Not keeping up with {} mqtt events'.format(len(__mqtt_event_list)))
+                    Log.logger.debug('Not keeping up with {} mqtt events'.format(len(__mqtt_event_list)))
             except Exception, ex:
-                logger.critical("Error processing mqtt={}, err={}".format(obj, ex))
+                Log.logger.critical("Error processing mqtt={}, err={}".format(obj, ex))
     except Exception, ex:
-        logger.critical("General error processing mqtt: {}".format(ex))
+        Log.logger.critical("General error processing mqtt: {}".format(ex))
     finally:
         #__mqtt_lock.release()
         pass
 
 def init():
     #http://pydispatcher.sourceforge.net/
-    dispatcher.connect(handle_local_event_db_post, signal=common.constant.SIGNAL_SENSOR_DB_POST, sender=dispatcher.Any)
-    dispatcher.connect(handle_event_mqtt_received, signal=common.constant.SIGNAL_MQTT_RECEIVED, sender=dispatcher.Any)
+    dispatcher.connect(handle_local_event_db_post, signal=common.Constant.SIGNAL_SENSOR_DB_POST, sender=dispatcher.Any)
+    dispatcher.connect(handle_event_mqtt_received, signal=common.Constant.SIGNAL_MQTT_RECEIVED, sender=dispatcher.Any)
 
     thread_pool.add_interval_callable(mqtt_thread_run, run_interval_second=1)
 

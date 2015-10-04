@@ -2,16 +2,17 @@ __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
 import os
 from pydispatch import dispatcher
-from main import app, logger, db
+from main import app, db
+from main.logger_helper import Log
 from main.admin.model_helper import commit
 from flask import request, abort, send_file, render_template
-from common import constant, utils
+from common import Constant, utils
 
 def return_web_message(pin_value, ok_message='', err_message=''):
     if pin_value:
-        return 'OK: {} \n {}={}'.format(ok_message, constant.SCRIPT_RESPONSE_OK, pin_value)
+        return 'OK: {} \n {}={}'.format(ok_message, Constant.SCRIPT_RESPONSE_OK, pin_value)
     else:
-        return 'ERR: {} \n {}={}'.format(err_message, constant.SCRIPT_RESPONSE_NOTOK, pin_value)
+        return 'ERR: {} \n {}={}'.format(err_message, Constant.SCRIPT_RESPONSE_NOTOK, pin_value)
 
 @app.route('/apiv1/db_update/model_name=<model_name>&filter_name=<filter_name>'
            '&filter_value=<filter_value>&field_name=<field_name>&field_value=<field_value>')
@@ -26,20 +27,20 @@ def generic_db_update(model_name, filter_name, filter_value, field_name, field_v
                 setattr(record, field_name, field_value)
                 db.session.add(record)
                 commit()
-                dispatcher.send(signal=constant.SIGNAL_SENSOR_DB_POST, model=table, row=record)
-                return  '%s: %s' % (constant.SCRIPT_RESPONSE_OK, record)
+                dispatcher.send(signal=Constant.SIGNAL_SENSOR_DB_POST, model=table, row=record)
+                return  '%s: %s' % (Constant.SCRIPT_RESPONSE_OK, record)
             else:
                 msg = 'Field {} not found in record {}'.format(field_name, record)
-                logger.warning(msg)
-                return  '%s: %s' % (constant.SCRIPT_RESPONSE_NOTOK, msg)
+                Log.logger.warning(msg)
+                return  '%s: %s' % (Constant.SCRIPT_RESPONSE_NOTOK, msg)
         else:
             msg = 'No records returned for filter_name={} and filter_value={}'.format(filter_name, filter_value)
-            logger.warning(msg)
-            return  '%s: %s' % (constant.SCRIPT_RESPONSE_NOTOK, msg)
+            Log.logger.warning(msg)
+            return  '%s: %s' % (Constant.SCRIPT_RESPONSE_NOTOK, msg)
     except Exception, ex:
         msg = 'Exception on /apiv1/db_update: {}'.format(ex)
-        logger.error(msg)
-        return  '%s: %s' % (constant.SCRIPT_RESPONSE_NOTOK, msg)
+        Log.logger.error(msg)
+        return  '%s: %s' % (Constant.SCRIPT_RESPONSE_NOTOK, msg)
 
 def return_error(message):
     return message

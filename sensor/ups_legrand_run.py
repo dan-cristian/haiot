@@ -1,10 +1,11 @@
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
-import serial
 import time
-from main import logger
-from main.admin import models
-from common import constant, utils
+
+import serial
+
+from main.logger_helper import Log
+from common import Constant, utils
 import serial_common
 from main.admin import models
 
@@ -12,7 +13,7 @@ initialised = False
 __serial = None
 __ups = None
 
-class LegrandUps():
+class LegrandUps:
     Id = None
     Name = None
     Port = None
@@ -35,7 +36,7 @@ def __open_port(ser):
     try:
         ser.open()
     except Exception, ex:
-        logger.warning('Unable to open serial port {}'.format(ser.port))
+        Log.logger.warning('Unable to open serial port {}'.format(ser.port))
 
 def __write_read_port(ser, command):
     response = None
@@ -47,9 +48,9 @@ def __write_read_port(ser, command):
             time.sleep(0.3)
             response = str(ser.readline()).replace('\n','')
         except Exception, ex:
-            logger.warning('Error writing to serial {}, err={}'.format(ser.port, ex))
+            Log.logger.warning('Error writing to serial {}, err={}'.format(ser.port, ex))
     else:
-        logger.warning('Error writing to closed serial {}'.format(ser.port))
+        Log.logger.warning('Error writing to closed serial {}'.format(ser.port))
     return response
 
 def __search_ups(port_no):
@@ -61,7 +62,7 @@ def __search_ups(port_no):
         for i in range(0, 4):
             response = __write_read_port(ser, 'I\r')
             if response != '':
-                logger.info('Got serial response [{}] on ups init port {}'.format(response, port_no))
+                Log.logger.info('Got serial response [{}] on ups init port {}'.format(response, port_no))
                 __serial = ser
                 __ups = LegrandUps()
                 __ups.Id = str(response).replace(' ', '').replace('\r','')
@@ -69,7 +70,7 @@ def __search_ups(port_no):
                 __ups.Port = port_no
                 break
             else:
-                logger.info('Got empty response on ups init port {}'.format(port_no))
+                Log.logger.info('Got empty response on ups init port {}'.format(port_no))
     if __serial is None:
         ser.close()
 
@@ -96,7 +97,7 @@ def __read_ups_status():
 
             record = models.Ups()
             record.name = __ups.Name
-            record.system_name = constant.HOST_NAME
+            record.system_name = Constant.HOST_NAME
             record.input_voltage = __ups.InputVoltage
             record.remaining_minutes = __ups.RemainingMinutes
             record.battery_voltage = __ups.BatteryVoltage
@@ -108,15 +109,15 @@ def __read_ups_status():
             record.other_status = __ups.OtherStatus
             record.power_failed = __ups.PowerFailed
             record.updated_on = utils.get_base_location_now_date()
-            current_record = models.Ups.query.filter_by(system_name=constant.HOST_NAME).first()
+            current_record = models.Ups.query.filter_by(system_name=Constant.HOST_NAME).first()
             record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
                                    save_to_graph=True)
 
-            #logger.info('UPS remaining={} load={}'.format(__ups.RemainingMinutes, __ups.LoadPercent))
+            #Log.logger.info('UPS remaining={} load={}'.format(__ups.RemainingMinutes, __ups.LoadPercent))
         else:
-            logger.warning('Unexpected number of parameters {} on ups status read'.format(len(atoms)))
+            Log.logger.warning('Unexpected number of parameters {} on ups status read'.format(len(atoms)))
     else:
-        logger.info('Read empty UPS status')
+        Log.logger.info('Read empty UPS status')
 
 def unload():
     global initialised
@@ -134,16 +135,16 @@ def init():
         #    portpath = None
         #    #fixme windows autodetect version
         if len(serial_list) > 0:
-            logger.info('Looking for Legrand UPS on {} serial ports'.format(len(serial_list)))
+            Log.logger.info('Looking for Legrand UPS on {} serial ports'.format(len(serial_list)))
             for device in serial_list:
                 __search_ups(device)
                 if __serial is not None:
                     break
             initialised = True
         else:
-            logger.info('No standard open serial ports detected on this system')
+            Log.logger.info('No standard open serial ports detected on this system')
     except Exception, ex:
-        logger.warning('Unable to open ups port, err {}'.format(ex))
+        Log.logger.warning('Unable to open ups port, err {}'.format(ex))
     return initialised
 
 def thread_run():
