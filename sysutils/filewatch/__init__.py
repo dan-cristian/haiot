@@ -10,9 +10,9 @@ try:
 except Exception, ex:
     __inotify_import_ok = False
 from pydispatch import dispatcher
-from main import logger
+from main.logger_helper import Log
 from main.admin import model_helper
-from common import constant
+from common import Constant
 
 initialised = False
 __observer = None
@@ -20,8 +20,8 @@ __observer = None
 if __inotify_import_ok:
     class EventHandler(FileSystemEventHandler):
         def on_any_event(self, event):
-            #logger.info('File event={}'.format(event))
-            dispatcher.send(constant.SIGNAL_FILE_WATCH, event=event.event_type, file=event.src_path,
+            #Log.logger.info('File event={}'.format(event))
+            dispatcher.send(Constant.SIGNAL_FILE_WATCH, event=event.event_type, file=event.src_path,
                             is_directory=event.is_directory)
             #print event
         def on_created(self, event):
@@ -57,8 +57,8 @@ def unload():
 def init():
     global __observer, initialised, __inotify_import_ok
     if __inotify_import_ok:
-        path = model_helper.get_param(constant.P_MOTION_VIDEO_PATH)
-        logger.info('Initialising file watchdog for folder={}'.format(path))
+        path = model_helper.get_param(Constant.P_MOTION_VIDEO_PATH)
+        Log.logger.info('Initialising file watchdog for folder={}'.format(path))
         if os.path.exists(path):
             event_handler = EventHandler()
             __observer = Observer()
@@ -66,6 +66,6 @@ def init():
             initialised = True
             __observer.start()
         else:
-            logger.warning('Filewatch not initialised watch path={} not found'.format(path))
+            Log.logger.warning('Filewatch not initialised watch path={} not found'.format(path))
     else:
-        logger.info('Inotify observer not available,  not initialising file watch')
+        Log.logger.info('Inotify observer not available,  not initialising file watch')

@@ -3,15 +3,15 @@ __author__ = 'dcristian'
 # ! /usr/bin/env python
 import socket
 import subprocess
-import datetime
 import select
 import urllib2
 import urllib
 
-from main import logger
-from common import constant, utils
+from main.logger_helper import Log
+from common import Constant, utils
 from main.admin import model_helper
 import transport
+
 
 #http://owfs.sourceforge.net/owpython.html
 topic = "mzp/iot/alarm"
@@ -48,7 +48,7 @@ def get_prefix(pinindex, value):
 
 
 def alert(pinindex, status):
-    host = model_helper.get_param(constant.P_MZP_SERVER_URL)
+    host = model_helper.get_param(Constant.P_MZP_SERVER_URL)
     request = host + 'cmd?command=alarmevent&pinindex=' + pinindex \
               + '&status=' + status + '&datetime=' + urllib.quote(str(utils.get_base_location_now_date())) + '&action=none'
     #request=urllib.quote(request)
@@ -64,15 +64,15 @@ def alert(pinindex, status):
 def init():
     try:
         global tailproc, tailpipe
-        logger.info('Watching file ' + gpio_file)
+        Log.logger.info('Watching file ' + gpio_file)
         tailproc = subprocess.Popen(['tail', '-f', gpio_file], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        if constant.OS in constant.OS_LINUX:
+        if Constant.OS in Constant.OS_LINUX:
             tailpipe = select.poll()
             tailpipe.register(tailproc.stdout)
         else:
-            logger.critical('Publish GPIO via tail -f not available in OS ' + constant.OS)
+            Log.logger.critical('Publish GPIO via tail -f not available in OS ' + Constant.OS)
     except WindowsError:
-        logger.warning('Cannot open tail, maybe not running on Linux, os='+ constant.OS)
+        Log.logger.warning('Cannot open tail, maybe not running on Linux, os='+ Constant.OS)
 
 def unload():
     # Blocking call that processes network traffic, dispatches callbacks and
@@ -83,11 +83,11 @@ def unload():
     tailpipe.terminate()
 
 def thread_run():
-    if constant.OS in constant.OS_LINUX:
+    if Constant.OS in Constant.OS_LINUX:
         global tailpipe, tailproc
         if tailpipe.poll(1):
             do_line(tailproc.stdout.readline())
     else:
-        logger.warning('Ignoring read alarm tail file in OS ' + constant.OS)
+        Log.logger.warning('Ignoring read alarm tail file in OS ' + Constant.OS)
     return 'Alarm ok'
 

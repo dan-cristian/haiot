@@ -1,12 +1,13 @@
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
 import httplib
-import httplib2
 import os
 import random
 import time
 
+import httplib2
 from apiclient import discovery, errors, http
+
 #from apiclient.discovery import build
 #from apiclient.errors import HttpError
 #from apiclient.http import MediaFileUpload
@@ -16,8 +17,8 @@ from oauth2client.tools import argparser, run_flow
 
 from pydispatch import dispatcher
 
-from main import logger
-from common import constant, utils
+from main.logger_helper import Log
+from common import Constant, utils
 from main.admin import model_helper, thread_pool
 
 initialised = False
@@ -148,12 +149,12 @@ def resumable_upload(insert_request):
   while response is None:
     try:
       file = insert_request.resumable._filename
-      logger.debug('Uploading file {}'.format(file))
+      Log.logger.debug('Uploading file {}'.format(file))
       status, response = insert_request.next_chunk()
       if 'id' in response:
-        logger.info('Video id {} file {} was successfully uploaded.'.format(response['id'], file))
+        Log.logger.info('Video id {} file {} was successfully uploaded.'.format(response['id'], file))
       else:
-        logger.warning('The upload for {} failed with an unexpected response {}'.format(file, response))
+        Log.logger.warning('The upload for {} failed with an unexpected response {}'.format(file, response))
     except errors.HttpError, e:
       if e.resp.status in RETRIABLE_STATUS_CODES:
         error = "A retriable HTTP error %d occurred:\n%s" % (e.resp.status, e.content)
@@ -166,17 +167,17 @@ def resumable_upload(insert_request):
       print error
       retry += 1
       if retry > MAX_RETRIES:
-        logger.warning('No longer attempting to retry upload for file {}'.format(file))
+        Log.logger.warning('No longer attempting to retry upload for file {}'.format(file))
       max_sleep = 2 ** retry
       sleep_seconds = random.random() * max_sleep
-      logger.info('Sleeping {} seconds and then retrying upload for {}'.format(sleep_seconds, file))
+      Log.logger.info('Sleeping {} seconds and then retrying upload for {}'.format(sleep_seconds, file))
       time.sleep(sleep_seconds)
 
 def upload_file(file):
     global initialised, __args, __uploaded_file_list_date, __youtube
     if initialised:
         if not os.path.exists(file):
-            logger.warning('Not existent file={} to be uploaded to youtube'.format(file))
+            Log.logger.warning('Not existent file={} to be uploaded to youtube'.format(file))
             del __file_list_last_change[file]
         else:
             __args.file = file
@@ -184,7 +185,7 @@ def upload_file(file):
             time.sleep(1)
 
             if not os.access(file, os.R_OK):
-                logger.warning('Cannot access for upload file {}'.format(file))
+                Log.logger.warning('Cannot access for upload file {}'.format(file))
             else:
                 try:
                     test_open = open(file, 'r')
@@ -194,14 +195,14 @@ def upload_file(file):
                         __uploaded_file_list_date[file] = utils.get_base_location_now_date()
                         del __file_list_last_change[file]
                     except errors.HttpError, ex:
-                        logger.warning('Error while uploading file={}, err={}'.format(file, ex))
+                        Log.logger.warning('Error while uploading file={}, err={}'.format(file, ex))
                     except Exception, ex:
-                        logger.info('Unexpected error on upload, file {}, err={}'.format(file, ex))
+                        Log.logger.info('Unexpected error on upload, file {}, err={}'.format(file, ex))
                 except Exception, ex:
-                    logger.info('Locked file {}, err={}'.format(file, ex))
+                    Log.logger.info('Locked file {}, err={}'.format(file, ex))
 
     else:
-        logger.warning('Trying to upload youtube file={} when not connected to youtube'.format(file))
+        Log.logger.warning('Trying to upload youtube file={} when not connected to youtube'.format(file))
 
 #not yet used
 def add_video_to_playlist(videoID, playlistID):
@@ -221,7 +222,7 @@ def add_video_to_playlist(videoID, playlistID):
     add_video_request.execute()
 
 def file_watcher_event(event, file, is_directory):
-    #logger.info('Received file watch event={} file={}'.format(event, file))
+    #Log.logger.info('Received file watch event={} file={}'.format(event, file))
     if event == 'modified' and not is_directory:
         __file_list_last_change[file] = utils.get_base_location_now_date()
         #upload_file(file)
@@ -260,7 +261,7 @@ def thread_run():
                 lapsed = (utils.get_base_location_now_date() - __file_list_last_change[file]).total_seconds()
                 if lapsed > 30:
                     if file in __uploaded_file_list_date.keys():
-                        logger.debug('Skip duplicate video upload for file {}'.format(file))
+                        Log.logger.debug('Skip duplicate video upload for file {}'.format(file))
                         #pass
                     else:
                         upload_file(file)
@@ -270,18 +271,18 @@ def thread_run():
                         #force upload on fifo principles to maintain movie time order when uploaded
                         break
     except Exception, ex:
-        logger.warning('Exception on youtube thread run, err={}'.format(ex))
+        Log.logger.warning('Exception on youtube thread run, err={}'.format(ex))
 
 def init():
     global initialised, __CLIENT_SECRETS_FILE, __youtube
     try:
-        __CLIENT_SECRETS_FILE = utils.get_app_root_path() + model_helper.get_param(constant.P_YOUTUBE_CREDENTIAL_FILE)
-        logger.info('Initialising youtube with credential from {}'.format(__CLIENT_SECRETS_FILE))
+        __CLIENT_SECRETS_FILE = utils.get_app_root_path() + model_helper.get_param(Constant.P_YOUTUBE_CREDENTIAL_FILE)
+        Log.logger.info('Initialising youtube with credential from {}'.format(__CLIENT_SECRETS_FILE))
         __youtube = get_authenticated_service([])
-        dispatcher.connect(file_watcher_event, signal=constant.SIGNAL_FILE_WATCH, sender=dispatcher.Any)
+        dispatcher.connect(file_watcher_event, signal=Constant.SIGNAL_FILE_WATCH, sender=dispatcher.Any)
         thread_pool.add_interval_callable(thread_run, run_interval_second=10)
         initialised = True
         #upload_file('c:\\temp\\01-20150512215655-alert.avi')
     except Exception, ex:
-        logger.warning('Unable to initialise youtube uploader, err={}'.format(ex))
+        Log.logger.warning('Unable to initialise youtube uploader, err={}'.format(ex))
 

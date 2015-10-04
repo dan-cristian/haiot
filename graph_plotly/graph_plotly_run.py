@@ -2,11 +2,14 @@ __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
 import datetime
 import threading
-from common import utils
-from main import logger
+
 from plotly import graph_objs
 import plotly.plotly as py
 from plotly.exceptions import PlotlyError, PlotlyAccountError, PlotlyListEntryError, PlotlyRequestError
+
+from common import utils
+from main.logger_helper import Log
+
 
 #list of series unique identifier used to determine trace order remote, key is graph name
 #each trace id list starts with a standard reference element used to get graph url, not ideal!
@@ -48,7 +51,7 @@ def populate_trace_for_extend(x=[], y=[], graph_legend_item_name='', trace_uniqu
         else:
             trace_empty = graph_objs.Scatter(x=[], y=[], line = graph_objs.Line(shape=shape_type))
             trace_list.append(trace_empty)
-    logger.debug('Extending graph serie {} {}'.format(graph_legend_item_name, trace_unique_id))
+    Log.logger.debug('Extending graph serie {} {}'.format(graph_legend_item_name, trace_unique_id))
     return trace_list
 
 def populate_trace_for_append(x=[], y=[], graph_legend_item_name='', trace_unique_id='', show_legend=True,
@@ -57,7 +60,7 @@ def populate_trace_for_append(x=[], y=[], graph_legend_item_name='', trace_uniqu
     trace_append = graph_objs.Scatter(x=x, y=y, name=graph_legend_item_name, text=trace_unique_id,
                                       showlegend=show_legend, line = graph_objs.Line(shape=shape_type))
     trace_list = [trace_append]
-    logger.debug('Appending new graph serie {} {}'.format(graph_legend_item_name, trace_unique_id))
+    Log.logger.debug('Appending new graph serie {} {}'.format(graph_legend_item_name, trace_unique_id))
     return trace_list
 
 #check if graph exists in memory. Used this function rather than checking graph dict variable directly
@@ -91,11 +94,11 @@ def upload_reference_graph(graph_unique_name=''):
         py.plot(fig, filename=graph_unique_name, fileopt='overwrite', auto_open=False)
         #clean graph from memory to force graph traces reload in the right order
         clean_graph_memory(graph_unique_name)
-        logger.info('New reference graph {} uploaded ok'.format(graph_unique_name))
+        Log.logger.info('New reference graph {} uploaded ok'.format(graph_unique_name))
     except PlotlyListEntryError, ex:
-        logger.warning('Error uploading new reference graph {} err {}'.format(graph_unique_name, ex))
+        Log.logger.warning('Error uploading new reference graph {} err {}'.format(graph_unique_name, ex))
     except PlotlyAccountError, ex:
-        logger.warning('Unable to upload new reference graph {} err {}'.format(graph_unique_name, ex))
+        Log.logger.warning('Unable to upload new reference graph {} err {}'.format(graph_unique_name, ex))
 
 
 
@@ -125,20 +128,20 @@ def get_reference_trace_for_append(graph_unique_name='', shape_type=''):
                               mode='none', showlegend=False, line = graph_objs.Line(shape=shape_type))
 
 def download_trace_id_list(graph_unique_name='', shape_type=''):
-    logger.info('Downloading online traces in memory, graph {} shape {}'.format(graph_unique_name, shape_type))
+    Log.logger.info('Downloading online traces in memory, graph {} shape {}'.format(graph_unique_name, shape_type))
     start_date = utils.get_base_location_now_date()
     result = -1
     try:
         result=py.file_ops.mkdirs(get_folder_name())
-        logger.debug('Created archiving folder {} result {}'.format(get_folder_name(), result))
+        Log.logger.debug('Created archiving folder {} result {}'.format(get_folder_name(), result))
     except PlotlyRequestError, ex:
         if hasattr(ex, 'HTTPError'):
             msg = str(ex.HTTPError) + ex.HTTPError.response.content
         else:
             msg = str(ex)
-        logger.info('Ignoring error on create archive folder {} err={}'.format(get_folder_name(), msg))
+        Log.logger.info('Ignoring error on create archive folder {} err={}'.format(get_folder_name(), msg))
     except Exception, ex:
-        logger.warning('Unable to create archive folder {} err={} res={}'.format(get_folder_name(), ex, result))
+        Log.logger.warning('Unable to create archive folder {} err={} res={}'.format(get_folder_name(), ex, result))
 
     global g_reference_trace_id
     #reseting known series and graphs to download again clean
@@ -161,7 +164,7 @@ def download_trace_id_list(graph_unique_name='', shape_type=''):
         except PlotlyError, ex:
             #usually first try will give an error
             if i>1:
-                logger.info('Error extending graph {} in pass {}, err={}'.format(graph_unique_name, i, ex))
+                Log.logger.info('Error extending graph {} in pass {}, err={}'.format(graph_unique_name, i, ex))
             #first time failed, so second time we try an extend, but trace definition will change
             trace_list[0]=trace_ref_extend
             if i>1:
@@ -174,7 +177,7 @@ def download_trace_id_list(graph_unique_name='', shape_type=''):
                 if 'name' in serie:
                     remote_name=serie['name']
                 else:
-                    logger.warning('Unable to find name field in graph, skipping')
+                    Log.logger.warning('Unable to find name field in graph, skipping')
                     remote_name = 'N/A'
                 #remote_x=serie['x']
                 #remote_y=serie['y']
@@ -182,15 +185,15 @@ def download_trace_id_list(graph_unique_name='', shape_type=''):
                     remote_id_text=serie['text']
                 else:
                     #FIXME: plotly api changed, fix this!
-                    #logger.warning('Could not find serie [{}] field in graph [{}]'.format(remote_name,graph_unique_name))
+                    #Log.logger.warning('Could not find serie [{}] field in graph [{}]'.format(remote_name,graph_unique_name))
                     remote_id_text = remote_name
                 add_new_serie(graph_unique_name=graph_unique_name, url=graph_url, trace_unique_id=remote_id_text)
         except PlotlyError, ex:
-            logger.warning('Unable to get figure {} err={}'.format(graph_url, ex))
+            Log.logger.warning('Unable to get figure {} err={}'.format(graph_url, ex))
     else:
         logger.critical('Unable to get or setup remote graph {}'.format(graph_unique_name))
     elapsed = (utils.get_base_location_now_date()-start_date).seconds
-    logger.info('Download {} completed in {} seconds'.format(graph_unique_name, elapsed))
+    Log.logger.info('Download {} completed in {} seconds'.format(graph_unique_name, elapsed))
 
 def add_graph_data(data, graph_unique_name, trace_unique_id, file_opt):
     if graph_list.has_key(graph_unique_name):
@@ -210,7 +213,7 @@ def __upload_cached_plotly_data():
             graph.upload_data()
 
 def thread_run():
-    logger.debug('Processing graph_plotly_run')
+    Log.logger.debug('Processing graph_plotly_run')
     __upload_cached_plotly_data()
     return 'Processed graph_plotly_run'
 
@@ -239,7 +242,7 @@ class PlotlyGraph:
                         self.data[i]['name'] = data_line['name']
                     i += 1
         except Exception, ex:
-            logger.warning('Err {} add_data data={}'.format(ex, data))
+            Log.logger.warning('Err {} add_data data={}'.format(ex, data))
         finally:
             self.lock.release()
 
@@ -253,11 +256,11 @@ class PlotlyGraph:
                 self.data = [] #reset data as it was uploaded
                 known_graph_url = get_graph_url_from_memory(self.graph_unique_name)
                 if url != known_graph_url:
-                    logger.warning('Original graph {} removed from plotly'.format(self.graph_unique_name))
+                    Log.logger.warning('Original graph {} removed from plotly'.format(self.graph_unique_name))
                     upload_reference_graph(self.graph_unique_name)
                     if self.file_opt=='append' or self.file_opt=='new':
                         add_new_serie(self.graph_unique_name, url, self.trace_unique_id)
         except PlotlyAccountError, ex:
-            logger.warning('Unable to plot graph, err {}'.format(ex))
+            Log.logger.warning('Unable to plot graph, err {}'.format(ex))
         finally:
             self.lock.release()

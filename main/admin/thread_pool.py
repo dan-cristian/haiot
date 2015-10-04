@@ -1,7 +1,9 @@
-import concurrent.futures
-from main import logger
 import time
 from datetime import datetime
+
+import concurrent.futures
+
+from main.logger_helper import Log
 
 __callable_list=[]
 __callable_progress_list={}
@@ -14,7 +16,7 @@ __immediate_executor = None
 
 def add_interval_callable(func, run_interval_second=60):
     print_name = func.func_globals['__name__']+'.'+ func.func_name
-    logger.info('Added for processing callable ' + print_name)
+    Log.logger.info('Added for processing callable ' + print_name)
     __callable_list.append(func)
     __exec_last_date_list[func]=datetime.now()
     __exec_interval_list[func]=run_interval_second
@@ -46,21 +48,21 @@ def run_thread_pool():
     with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
         while __thread_pool_enabled:
             if len(__callable_list) != len(__dict_future_func):
-                logger.info('Initialising interval thread processing with {} functions'.format(len(__callable_list)))
+                Log.logger.info('Initialising interval thread processing with {} functions'.format(len(__callable_list)))
                 __dict_future_func = {executor.submit(call_obj): call_obj for call_obj in __callable_list}
             for future_obj in __dict_future_func :
                 func=__dict_future_func [future_obj]
                 print_name = func.func_globals['__name__']+'.'+ func.func_name
                 exec_interval = __exec_interval_list.get(func, None)
                 if not exec_interval:
-                    logger.warning('No exec interval set for thread function ' + print_name)
+                    Log.logger.warning('No exec interval set for thread function ' + print_name)
                 last_exec_date = __exec_last_date_list.get(func, None)
                 elapsed_seconds = (datetime.now() - last_exec_date).total_seconds()
                 #when function is done check if needs to run again or if is running for too long
                 if future_obj.done():
                     try:
                         result = future_obj.result()
-                        logger.debug('Thread result={}'.format(result))
+                        Log.logger.debug('Thread result={}'.format(result))
                     except Exception, exc:
                         logger.error('Exception {} in {}'.format(exc, print_name, exc_info=True))
                     #print('%s=%s' % (print_name, future_obj.result()))
@@ -71,14 +73,14 @@ def run_thread_pool():
                         __exec_last_date_list[func] = datetime.now()
                 elif future_obj.running():
                     if elapsed_seconds>1*30:
-                        logger.debug('Threaded function {} is long running for {} seconds'.format(
+                        Log.logger.debug('Threaded function {} is long running for {} seconds'.format(
                             print_name,elapsed_seconds))
                         if __callable_progress_list.has_key(func):
                             progress_status=__callable_progress_list[func].func_globals['progress_status']
-                            logger.warning('Progress Status is {}'.format(progress_status))
+                            Log.logger.warning('Progress Status is {}'.format(progress_status))
             time.sleep(2)
         executor.shutdown()
-        logger.info('Interval thread pool processor exit')
+        Log.logger.info('Interval thread pool processor exit')
 
 #immediately runs submitted job using a thread pool
 def do_job(function):

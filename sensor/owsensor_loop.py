@@ -4,11 +4,12 @@ Created on Mar 9, 2015
 @author: dcristian
 '''
 import pyownet.protocol
-import datetime
-from main import logger
-from common import constant, utils
+
+from main.logger_helper import Log
+from common import Constant, utils
 from main.admin import model_helper
 from main.admin import models
+
 
 def do_device (owproxy):
     sensors = owproxy.dir('/', slash=True, bus=False)
@@ -32,7 +33,7 @@ def do_device (owproxy):
                 dev=get_unknown(sensor, owproxy, dev)
             save_to_db(dev)
         except pyownet.protocol.ConnError:
-            logger.warning('Connection error owserver')
+            Log.logger.warning('Connection error owserver')
     return 'Read {} sensors'.format(len(sensors))
 
 
@@ -66,7 +67,7 @@ def save_to_db(dev):
         record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
                                    save_to_graph=True)
     except Exception, ex:
-        logger.warning('Error saving sensor to DB, err {}'.format(ex))
+        Log.logger.warning('Error saving sensor to DB, err {}'.format(ex))
     #finally:
     #    db_lock.release()
 
@@ -119,21 +120,21 @@ def get_unknown (sensor, owproxy, dev):
 initialised = False
 owproxy=None
 def init():
-    logger.info('Initialising owssensor')
+    Log.logger.info('Initialising owssensor')
     global owproxy, initialised
     try:
-        host = model_helper.get_param(constant.P_OWSERVER_HOST_1)
-        port = str(model_helper.get_param(constant.P_OWSERVER_PORT_1))
+        host = model_helper.get_param(Constant.P_OWSERVER_HOST_1)
+        port = str(model_helper.get_param(Constant.P_OWSERVER_PORT_1))
         owproxy = pyownet.protocol.proxy(host=host, port=port)
         initialised = True
     except Exception, ex:
-        logger.info('Unable to connect to 1-wire owserver host {} port {}'.format(host, port))
+        Log.logger.info('Unable to connect to 1-wire owserver host {} port {}'.format(host, port))
         initialised = False
     return initialised
 
 def thread_run():
     global initialised
-    logger.debug('Processing sensors')
+    Log.logger.debug('Processing sensors')
     if initialised:
         return do_device(owproxy)
 
