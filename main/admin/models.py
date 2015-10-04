@@ -15,7 +15,7 @@ class DbBase:
         query_details = function.im_self
         elapsed = performance.add_query(start_time, query_details=query_details)
         if elapsed > 5000:#with sqlite a long query will throw an error
-            logger.critical("Long running DB query, seconds elapsed={}, result={}".format(elapsed, query_details))
+            Log.logger.critical("Long running DB query, seconds elapsed={}, result={}".format(elapsed, query_details))
             db.session.rollback()
             Log.logger.info("Session was rolled back")
         return result
@@ -89,7 +89,7 @@ class DbEvent:
             else:
                 Log.logger.warning('Unique key not found in json record, save aborted')
         except Exception, ex:
-            logger.error('Exception save json to db {}'.format(ex))
+            Log.logger.error('Exception save json to db {}'.format(ex))
 
 
 
@@ -149,7 +149,7 @@ class DbEvent:
             if hasattr(new_record, 'last_save_to_graph'):
                 new_record.last_save_to_graph = utils.get_base_location_now_date()
         except Exception, ex:
-            logger.critical('Error when saving db changes {}, err={}'.format(new_record, ex))
+            Log.logger.critical('Error when saving db changes {}, err={}'.format(new_record, ex))
             if len(db.session.dirty) > 0:
                 Log.logger.info('Session dirty records={}, rolling back'.format(len(db.session.dirty)))
                 db.session.rollback()
