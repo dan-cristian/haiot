@@ -44,7 +44,7 @@ def model_row_to_json(obj, operation=''):
                     Log.logger.debug('Ignoring obj to json, not simple primitive {}'.format(value))
         return utils.safeobj2json(safe_obj)
     except Exception, ex:
-        logger.critical('Error convert model obj to json, err {}'.format(ex))
+        Log.logger.critical('Error convert model obj to json, err {}'.format(ex))
 
 def get_param(name):
     global __db_values_json
@@ -55,7 +55,7 @@ def get_param(name):
         Log.logger.warning('Unable to get parameter {} error {}'.format(name, ex))
         raise ValueError
     except Exception, ex:
-        logger.critical('Exception when getting param {}, err={}'.format(name, ex))
+        Log.logger.critical('Exception when getting param {}, err={}'.format(name, ex))
         #db.session.rollback()
         raise ex
 
@@ -83,7 +83,7 @@ def check_table_schema(table, model_auto_update=False):
         #count = table.query.all()
         count = table().query_all()
     except OperationalError, oex:
-        logger.critical('Table {} schema in DB seems outdated, err {}, DROP it and recreate (y/n)?'.format(oex, table))
+        Log.logger.critical('Table {} schema in DB seems outdated, err {}, DROP it and recreate (y/n)?'.format(oex, table))
         read_drop_table(table, oex, model_auto_update)
     except InvalidRequestError:
         Log.logger.warning('Error on check table schema {}, ignoring'.format(table))

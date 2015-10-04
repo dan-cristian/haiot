@@ -169,6 +169,7 @@
     {"zone_id":1 , "sensor_address": "AA000003BDE6C728", "sensor_name": "bucatarie"},
     {"zone_id":27 , "sensor_address": "E400000155E72D26", "sensor_name": "pod fata"},
     {"zone_id":4 , "sensor_address": "B5000004F3285F28", "sensor_name": "dormitor"},
+    {"zone_id":47 , "sensor_address": "EF000003BDE17928", "sensor_name": "birou"},
     {"zone_id":23 , "sensor_address": "f3:01", "sensor_name": "fridge"},
     {"zone_id":26 , "sensor_address": "f9:01", "sensor_name": "congelator"}
   ],

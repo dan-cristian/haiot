@@ -64,7 +64,7 @@ def run_thread_pool():
                         result = future_obj.result()
                         Log.logger.debug('Thread result={}'.format(result))
                     except Exception, exc:
-                        logger.error('Exception {} in {}'.format(exc, print_name, exc_info=True))
+                        Log.logger.error('Exception {} in {}'.format(exc, print_name, exc_info=True))
                     #print('%s=%s' % (print_name, future_obj.result()))
                     #run the function again at given interval
                     if elapsed_seconds and elapsed_seconds > exec_interval:
