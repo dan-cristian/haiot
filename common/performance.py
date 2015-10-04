@@ -1,6 +1,6 @@
 __author__ = 'dcristian'
 import utils
-from main import logger
+from main.logger_helper import Log
 
 query_count = None
 query_cumulative_time_miliseconds = None
@@ -21,8 +21,8 @@ def add_query(start_time, query_details=None):
 
         if max_query_time_miliseconds < elapsed:
             max_query_time_miliseconds = elapsed
-            logger.info("Longest query details:{}".format(query_details))
-            logger.info("Count={} avg={} min={} max={}".format(query_count,
+            Log.logger.info("Longest query details:{}".format(query_details))
+            Log.logger.info("Count={} avg={} min={} max={}".format(query_count,
                         query_cumulative_time_miliseconds/query_count,
                         min_query_time_miliseconds, max_query_time_miliseconds))
 
@@ -31,7 +31,7 @@ def add_query(start_time, query_details=None):
 
         query_count += 1
         query_cumulative_time_miliseconds += elapsed
-        logger.debug("Count={} avg={} min={} max={}".format(query_count,
+        Log.logger.debug("Count={} avg={} min={} max={}".format(query_count,
                         query_cumulative_time_miliseconds/query_count,
                         min_query_time_miliseconds, max_query_time_miliseconds))
         return elapsed

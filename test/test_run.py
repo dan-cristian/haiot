@@ -59,7 +59,7 @@ def test4():
     print url
 
 def thread_run():
-    logger.info('Processing TEST_run')
+    Log.logger.info('Processing TEST_run')
     #py.sign_in("dancri77", "lw2w6fz9xk")
     #test4()
     #test2()

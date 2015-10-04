@@ -1,12 +1,12 @@
 __author__ = 'dcristian'
 
 import datetime
-from main import logger
+
+from main.logger_helper import Log
 from main.admin import models
 from main.admin.model_helper import commit
+from common import utils
 
-from common import constant, utils
-import transport
 
 def __save_heat_state_db(zone='', heat_is_on=''):
     assert isinstance(zone, models.Zone)
@@ -15,15 +15,15 @@ def __save_heat_state_db(zone='', heat_is_on=''):
         #if zone_heat_relay.heat_is_on != heat_is_on:
             zone_heat_relay.heat_is_on = heat_is_on
             zone_heat_relay.updated_on = utils.get_base_location_now_date()
-            logger.info('Heat state changed to is-on={} in zone {}'.format(heat_is_on, zone.name))
+            Log.logger.info('Heat state changed to is-on={} in zone {}'.format(heat_is_on, zone.name))
             zone_heat_relay.notify_transport_enabled = True
             #save latest heat state for caching purposes
             zone.heat_is_on = heat_is_on
             commit()
         #else:
-        #    logger.debug('Heat state [{}] unchanged in zone {}'.format(heat_is_on, zone.name))
+        #    Log.logger.debug('Heat state [{}] unchanged in zone {}'.format(heat_is_on, zone.name))
     else:
-        logger.warning('No heat relay found in zone {}'.format(zone.name))
+        Log.logger.warning('No heat relay found in zone {}'.format(zone.name))
 
 def __decide_action(zone, current_temperature, target_temperature):
     assert isinstance(zone, models.Zone)
@@ -32,14 +32,14 @@ def __decide_action(zone, current_temperature, target_temperature):
     else:
         heat_is_on = False
     if zone.heat_is_on != heat_is_on:
-        logger.info('Heat is {} in {} temp={} target={}'.format(heat_is_on, zone.name, current_temperature,
+        Log.logger.info('Heat is {} in {} temp={} target={}'.format(heat_is_on, zone.name, current_temperature,
                                                                 target_temperature))
         __save_heat_state_db(zone=zone, heat_is_on=heat_is_on)
     return heat_is_on
 
 def __update_zone_heat(zone, heat_schedule, sensor):
+    heat_is_on = False
     try:
-        heat_is_on = False
         minute = utils.get_base_location_now_date().minute
         hour = utils.get_base_location_now_date().hour
         weekday = datetime.datetime.today().weekday()
@@ -59,7 +59,7 @@ def __update_zone_heat(zone, heat_schedule, sensor):
                     #                              - zone.last_heat_status_update).total_seconds()
                     #if temperature_target.target != zone.heat_target_temperature:
                     if zone.active_heat_schedule_pattern_id != schedule_pattern.id:
-                        logger.info('Pattern in zone {} changed to {}, target={}'.format(zone.name,
+                        Log.logger.info('Pattern in zone {} changed to {}, target={}'.format(zone.name,
                                                                 schedule_pattern.name, temperature_target.target))
                         zone.active_heat_schedule_pattern_id = schedule_pattern.id
 
@@ -71,11 +71,11 @@ def __update_zone_heat(zone, heat_schedule, sensor):
                     #else:
                     #    heat_is_on = zone.heat_is_on
                 else:
-                    logger.critical('Unknown temperature pattern code {}'.format(temperature_code))
+                    Log.logger.critical('Unknown temperature pattern code {}'.format(temperature_code))
             else:
-                logger.warning('Incorrect temp pattern [{}] in zone {}, length is not 24'.format(pattern, zone.name))
+                Log.logger.warning('Incorrect temp pattern [{}] in zone {}, length is not 24'.format(pattern, zone.name))
     except Exception, ex:
-        logger.error('Error updatezoneheat, err={}'.format(ex, exc_info=True))
+        Log.logger.error('Error updatezoneheat, err={}'.format(ex, exc_info=True))
     return heat_is_on
 
 #iterate zones and decide heat state for each zone and also for master zone (main heat system)
@@ -94,7 +94,7 @@ def loop_zones():
                 if heat_schedule.active and sensor:
                     sensor_last_update_seconds = (utils.get_base_location_now_date()-sensor.updated_on).total_seconds()
                     if sensor_last_update_seconds > 120 * 60:
-                        logger.warning('Sensor {} not updated in last 120 minutes, unusual'.format(sensor.sensor_name))
+                        Log.logger.warning('Sensor {} not updated in last 120 minutes, unusual'.format(sensor.sensor_name))
                     if __update_zone_heat(zone, heat_schedule, sensor):
                         heat_is_on = True
         heatrelay_main_source = models.ZoneHeatRelay.query.filter_by(is_main_heat_source=True).first()
@@ -104,11 +104,11 @@ def loop_zones():
                 if main_source_zone.heat_is_on != heat_is_on:#avoid setting relay state too often
                     __save_heat_state_db(zone=main_source_zone, heat_is_on=heat_is_on)
             else:
-                logger.critical('No heat main_src found using zone id {}'.format(heatrelay_main_source.zone_id))
+                Log.logger.critical('No heat main_src found using zone id {}'.format(heatrelay_main_source.zone_id))
         else:
-            logger.critical('No heat main source is defined in db')
+            Log.logger.critical('No heat main source is defined in db')
     except Exception, ex:
-        logger.error('Error loop_zones, err={}'.format(ex, exc_info=True))
+        Log.logger.error('Error loop_zones, err={}'.format(ex, exc_info=True))
 
 progress_status = None
 def get_progress():
@@ -117,7 +117,7 @@ def get_progress():
 
 def thread_run():
     global progress_status
-    logger.debug('Processing heat')
+    Log.logger.debug('Processing heat')
     progress_status = 'Looping zones'
     loop_zones()
     return 'Heat ok'

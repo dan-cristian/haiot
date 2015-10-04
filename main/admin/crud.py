@@ -4,7 +4,7 @@ from flask import Blueprint, request, redirect, url_for, render_template
 from flask.views import MethodView
 from wtforms.ext.sqlalchemy.orm import model_form
 from main import db
-from common import constant
+from common import Constant
 from pydispatch import dispatcher
 
 
@@ -95,7 +95,7 @@ class CRUDView(MethodView):
         db.session.add(obj)
         db.session.commit()
         #process triggers on actions initiated by user
-        dispatcher.send(signal=constant.SIGNAL_SENSOR_DB_POST, model=self.model, row=obj)
+        dispatcher.send(signal=Constant.SIGNAL_SENSOR_DB_POST, model=self.model, row=obj)
         return redirect(self.path)
 
 def register_crud(app, url, endpoint, model, decorators=[], **kwargs):

@@ -1,8 +1,9 @@
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
-from main import logger
 from collections import OrderedDict
-from common import constant
+
+from main.logger_helper import Log
+from common import Constant
 
 description_system_type = None
 description_machine = None
@@ -12,7 +13,7 @@ description_revision = None
 description_cpu_model = None
 
 def init():
-    if constant.IS_OS_LINUX():
+    if Constant.IS_OS_LINUX():
         sysinfo = OrderedDict()
         with open('/proc/cpuinfo') as f:
             for line in f:
@@ -36,7 +37,7 @@ def init():
                     words = line.split(':')
                     sysinfo[words[0].strip().lower()] = words[1].strip()
                 except Exception, ex:
-                    logger.debug('get sysinfo line split error [{}] line [{}]'.format(ex, line))
+                    Log.logger.debug('get sysinfo line split error [{}] line [{}]'.format(ex, line))
             global description_model_name, description_machine, description_system_type, description_hardware, \
                 description_revision, description_cpu_model
             if 'model name' in sysinfo:     description_model_name = sysinfo['model name']
@@ -47,17 +48,17 @@ def init():
             if 'cpu model' in sysinfo:      description_cpu_model = sysinfo['cpu model']
 
             if description_hardware and 'AM33XX' in description_hardware:
-                constant.HOST_MACHINE_TYPE = constant.MACHINE_TYPE_BEAGLEBONE
-                constant.IS_MACHINE_BEAGLEBONE = True
+                Constant.HOST_MACHINE_TYPE = Constant.MACHINE_TYPE_BEAGLEBONE
+                Constant.IS_MACHINE_BEAGLEBONE = True
             if description_hardware and 'BCM2708' in description_hardware:
-                constant.HOST_MACHINE_TYPE = constant.MACHINE_TYPE_RASPBERRY
-                constant.IS_MACHINE_RASPBERRYPI = True
+                Constant.HOST_MACHINE_TYPE = Constant.MACHINE_TYPE_RASPBERRY
+                Constant.IS_MACHINE_RASPBERRYPI = True
             if description_system_type and 'Atheros' in description_system_type:
-                constant.HOST_MACHINE_TYPE = constant.MACHINE_TYPE_OPENWRT
-                constant.IS_MACHINE_OPENWRT = True
+                Constant.HOST_MACHINE_TYPE = Constant.MACHINE_TYPE_OPENWRT
+                Constant.IS_MACHINE_OPENWRT = True
             if description_model_name and 'Intel' in description_model_name:
-                constant.HOST_MACHINE_TYPE = constant.MACHINE_TYPE_INTEL_LINUX
-                constant.IS_MACHINE_INTEL = True
-    elif constant.IS_OS_WINDOWS():
+                Constant.HOST_MACHINE_TYPE = Constant.MACHINE_TYPE_INTEL_LINUX
+                Constant.IS_MACHINE_INTEL = True
+    elif Constant.IS_OS_WINDOWS():
         import platform
-        constant.HOST_MACHINE_TYPE = platform.machine()
+        Constant.HOST_MACHINE_TYPE = platform.machine()

@@ -1,6 +1,8 @@
 __author__ = 'dcristian'
 import threading
-from main import logger
+
+from main.logger_helper import Log
+
 
 class FlaskInThread (threading.Thread):
 
@@ -26,7 +28,7 @@ class FlaskInThread (threading.Thread):
         start the server
         """
         try:
-            logger.info('Starting flask web ui on host {} port {}'.format(self._host,  self._port))
+            Log.logger.info('Starting flask web ui on host {} port {}'.format(self._host,  self._port))
             self._app.run(host=self._host, port=self._port, debug = self._debug, use_reloader=self._use_reloader)
         except Exception, ex:
             logger.error('Error init flask on host {} port {}, err={}'.format(self._host,  self._port, ex))

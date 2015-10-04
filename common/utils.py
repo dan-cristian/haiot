@@ -1,15 +1,16 @@
 __author__ = 'dcristian'
-import sys
 import os
 import json
 import re
 import datetime
-from main import logger
 import math
-import pytz
 import importlib
-
 from collections import namedtuple
+
+import pytz
+
+from main.logger_helper import Log
+
 
 #http://stackoverflow.com/questions/6578986/how-to-convert-json-data-into-a-python-object
 def _json_object_hook(d):
@@ -41,7 +42,8 @@ def unsafeobj2json(obj):
     return safeobj2json(safe_obj)
 
 def get_object_name(obj):
-    str(obj._sa_class_manager.itervalues().next()).split('.')[0]
+    return str(obj._sa_class_manager.itervalues().next()).split('.')[0]
+
 def get_object_field_value(obj={}, field_name=None):
     #field_name = str(field_obj).split('.')[1]
     if obj.has_key(field_name):
@@ -56,7 +58,7 @@ def get_model_field_name(field_obj):
     if len(words) >1:
         return words[1]
     else:
-        logger.critical('Unexpected words count in get_model_field_name={}'.format(field_obj))
+        Log.logger.critical('Unexpected words count in get_model_field_name={}'.format(field_obj))
         return None
 
 def parse_to_date(strdate):
@@ -65,7 +67,7 @@ def parse_to_date(strdate):
         strdate= strdate.replace('T',' ')
         strdate = datetime.datetime.strptime(strdate, "%Y-%m-%d %H:%M:%S.%f")
     else:
-        logger.warning('Warning, unexpected date format in parse []'.format(strdate))
+        Log.logger.warning('Warning, unexpected date format in parse []'.format(strdate))
     return strdate
 
 def get_table_name(model_obj):

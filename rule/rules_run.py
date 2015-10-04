@@ -1,9 +1,11 @@
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 import time
-from main import logger, app
+
+from main.logger_helper import Log
+from main import app
 from main.admin import models
-from main.admin.thread_pool import do_job
+
 try:
     #sometimes I get "ImportError: cannot import name scheduler" so trying two import methods
     from rule import scheduler
@@ -47,29 +49,29 @@ except Exception, ex:
 
 ###### JOBS executed asyncronously via a thread pool ######
 def test():
-    logger.info("Test rule")
+    Log.logger.info("Test rule")
 
 def back_pump_on():
-    logger.info('back pump on')
+    Log.logger.info('back pump on')
     __update_custom_relay('back pump relay',1)
     #with app.test_request_context():
-    #    logger.info(redirect('/apiv1/relay/get'))
+    #    Log.logger.info(redirect('/apiv1/relay/get'))
     # start the pump
     # open valve
 
 def back_pump_off():
-    logger.info('back pump off')
+    Log.logger.info('back pump off')
     __update_custom_relay('back pump relay',0)
 
 
 def water_front_on():
-    logger.info('water front on')
+    Log.logger.info('water front on')
     back_pump_on()
     __update_custom_relay('front valve relay',1)
 
 
 def water_front_off():
-    logger.info('water front off')
+    Log.logger.info('water front off')
     __update_custom_relay('front valve relay',0)
     # let the pump build some pressure
     time.sleep(5)
@@ -77,13 +79,13 @@ def water_front_off():
     back_pump_off()
 
 def water_back_on():
-    logger.info('water back on')
+    Log.logger.info('water back on')
     back_pump_on()
     __update_custom_relay('back valve relay',1)
 
 
 def water_back_off():
-    logger.info('water back off')
+    Log.logger.info('water back off')
     __update_custom_relay('back valve relay',0)
     # let the pump build some pressure
     time.sleep(5)
@@ -95,4 +97,4 @@ def __update_custom_relay(relay_pin_name, power_is_on):
         msg = c.get('/apiv1/db_update/model_name=ZoneCustomRelay&'
                 'filter_name=relay_pin_name&filter_value={}&field_name=relay_is_on&field_value={}'.
                 format(relay_pin_name, power_is_on)).data
-    logger.info(msg)
+    Log.logger.info(msg)
