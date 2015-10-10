@@ -31,10 +31,11 @@ def my_import(name):
             mod = getattr(mod, comp)
         return mod
     except Exception, ex:
-        Log.Log.logger.warning("Unabel to import module {}, err={}".format(name, ex))
+        Log.logger.warning("Unabel to import module {}, err={}".format(name, ex))
         return None
 
 def init_module(module_name, module_is_active):
+    Log.logger.info("Importing module {}".format(module_name))
     dynclass = my_import(module_name)
     if dynclass:
         if module_is_active:
@@ -185,8 +186,9 @@ def init():
         Log.logger.info('Initialised logging via transport proxy')
 
 
-    Log.logger.info('Initialising events')
+    Log.logger.info('Initialising events - import')
     from admin import event
+    Log.logger.info('Initialising events - init')
     event.init()
     Log.logger.info('Collecting system info')
     from admin import system_info

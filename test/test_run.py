@@ -1,9 +1,10 @@
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
-import logging
-from plotly.graph_objs import *
+from main import Log
 import plotly.plotly as py
-from plotly import graph_objs
+from plotly.graph_objs import *
+import plotly.tools as tls
+import plotly
 from plotly.grid_objs import Column, Grid
 import datetime
 from common import utils
@@ -58,9 +59,17 @@ def test4():
     url=py.grid_ops.append_rows([row], grid_url="https://plot.ly/~dancri77/816") #shortcut
     print url
 
+def test5():
+    column_1 = Column([1, 2, 3], 'column 1')
+    column_2 = Column(['a', 'b', datetime.datetime.now()], 'column 2') # Tabular data can be numbers, strings, or dates
+    grid = Grid([column_1, column_2])
+    url = py.grid_ops.upload(grid,
+                         'grid example',      # name of the grid in your plotly account
+                         world_readable=True, # public or private
+                         auto_open=True)      # open the grid in the browser
 def thread_run():
     Log.logger.info('Processing TEST_run')
     #py.sign_in("dancri77", "lw2w6fz9xk")
-    #test4()
+    #test5()
     #test2()
     return 'Processed TEST_run'
