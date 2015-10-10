@@ -13,6 +13,8 @@ import graph_plotly_run
 
 initialised = False
 
+#uploads data directly to a graph object in plotly
+#not very reliable since plotly changed the API
 def upload_data(obj):
     try:
         Log.logger.debug('Trying to upload plotly obj {}'.format(obj))
@@ -76,20 +78,98 @@ def upload_data(obj):
                             else:
                                 graph_plotly_run.add_graph_data(data=data, graph_unique_name=graph_unique_name,
                                                                 trace_unique_id = trace_unique_id, file_opt=fileopt)
-
-                                #fig = graph_objs.Figure(data=data, layout=get_layout(graph_unique_name))
-                                #url = py.plot(fig, filename=graph_unique_name, fileopt=fileopt, auto_open=False)
-                                #if url != known_graph_url:
-                                #    Log.logger.warning('Original graph {} removed from plotly'.format(graph_unique_name))
-                                #    upload_reference_graph(graph_unique_name)
-                                #if fileopt=='append' or fileopt=='new':
-                                #    add_new_serie(graph_unique_name, url, trace_unique_id)
                         except PlotlyAccountError, ex:
                             Log.logger.warning('Unable to plot graph, err {}'.format(ex))
                     index += 1
             else:
                 Log.logger.critical('Graphable object missing axis_x [{}], graph_id [{}], in obj {}'.format(axis_x_field,
                                                                                           graph_id_field, obj))
+        else:
+            Log.logger.critical('Graphable object missing axis X field {}'.format(Constant.JSON_PUBLISH_GRAPH_X))
+    except Exception, ex:
+        Log.logger.exception('General error saving graph, err {} obj={}'.format(ex, obj))
+
+#upload data to a grid object in plotly. grid will be used as main source to generate graphs
+def upload_data_to_grid(obj):
+    try:
+        Log.logger.debug('Trying to upload plotly grid record {}'.format(obj))
+        if Constant.JSON_PUBLISH_GRAPH_X in obj:
+            #name of x field
+            axis_x_field = obj[Constant.JSON_PUBLISH_GRAPH_X]
+            graph_id_field = obj[Constant.JSON_PUBLISH_GRAPH_ID]
+            graph_legend_field = obj[Constant.JSON_PUBLISH_GRAPH_LEGEND]
+            graph_shape_fields = obj[Constant.JSON_PUBLISH_GRAPH_SHAPE]
+            graph_y_fields = obj[Constant.JSON_PUBLISH_GRAPH_Y]
+            #names of fields that have value changed to record smallest amount of data
+            changed_fields = obj[Constant.JSON_PUBLISH_FIELDS_CHANGED]
+            #intersect lists and get only graphable fields that had values changed
+            list_axis_y = list(set(graph_y_fields) & set(changed_fields))
+            if len(list_axis_y)==0:
+                Log.logger.debug('Ignoring graph upload graph={} changed fields={} obj={}'.format(graph_y_fields,
+                                                                                      changed_fields, obj))
+            else:
+                Log.logger.debug('Trying to upload y axis {}'.format(list_axis_y))
+                if axis_x_field in obj and graph_id_field in obj:
+                    table = obj[Constant.JSON_PUBLISH_TABLE]
+                    trace_unique_id = obj[graph_id_field] #unique record/trace identifier
+                    x_val = obj[axis_x_field]
+                    graph_legend_item_name = obj[graph_legend_field] #unique key for legend
+                    x_val = utils.parse_to_date(x_val)
+                    x = x_val
+                    index = 0
+                    for axis_y in list_axis_y:
+                        if axis_y in obj:
+                            trace_list = []
+                            y=obj[axis_y]
+                            #shape visual type for this trace
+                            shape = graph_shape_fields[index]
+                            #unique name used for grid on upload
+                            grid_base_name = str(table)
+                            graph_plotly_run.add_grid_data(grid_unique_name=grid_base_name, x=x, y=y,
+                                                           axis_x_name=axis_x_field, axis_y_name=axis_y,
+                                                           record_unique_id_name=graph_legend_field,
+                                                           record_unique_id_value=graph_legend_item_name)
+                            '''
+                            #unique name used for graph on upload
+                            graph_base_name = str(table+' '+axis_y)
+                            #full name and path to enable archiving
+                            graph_unique_name = graph_plotly_run.get_graph_full_name_path(graph_base_name)
+                            if not graph_plotly_run.graph_url_exists_in_memory(graph_unique_name):
+                                #download series order list to ensure graph consistency, usually done at app start
+                                #or when trace is created
+                                graph_plotly_run.download_trace_id_list(graph_unique_name=graph_unique_name,
+                                                                        shape_type=shape)
+                            if graph_unique_name in graph_plotly_run.g_trace_id_list_per_graph:
+                                trace_unique_id_pattern = graph_plotly_run.g_trace_id_list_per_graph[graph_unique_name]
+                            else:
+                                Log.logger.warning('Unable to get a reference pattern, graph {}'.format(graph_unique_name))
+                            known_graph_url = graph_plotly_run.get_graph_url_from_memory(graph_unique_name)
+                            if trace_unique_id in trace_unique_id_pattern:
+                                trace_list = graph_plotly_run.populate_trace_for_extend(x=x, y=y,
+                                        graph_legend_item_name=graph_legend_item_name, trace_unique_id=trace_unique_id,
+                                        trace_unique_id_pattern=trace_unique_id_pattern, shape_type=shape)
+                                Log.logger.debug('Extending graph {}'.format(graph_unique_name, shape))
+                                fileopt = 'extend'
+                            else:
+                                trace_list = graph_plotly_run.populate_trace_for_append(x=x, y=y,
+                                            graph_legend_item_name=graph_legend_item_name,trace_unique_id=trace_unique_id,
+                                            shape_type=shape)
+                                Log.logger.debug('Appending graph {}'.format(graph_unique_name))
+                                fileopt = 'append'
+                            data = graph_objs.Data(trace_list)
+                            try:
+                                if known_graph_url is None:
+                                    Log.logger.warning('Graph {} is setting up, dropping data'.format(graph_unique_name))
+                                else:
+                                    graph_plotly_run.add_graph_data(data=data, graph_unique_name=graph_unique_name,
+                                                                    trace_unique_id = trace_unique_id, file_opt=fileopt)
+                            except PlotlyAccountError, ex:
+                                Log.logger.warning('Unable to plot graph, err {}'.format(ex))
+                            '''
+                        index += 1
+                else:
+                    Log.logger.critical('Graphable object missing axis_x [{}], graph_id [{}], in obj {}'.format(axis_x_field,
+                                                                                              graph_id_field, obj))
         else:
             Log.logger.critical('Graphable object missing axis X field {}'.format(Constant.JSON_PUBLISH_GRAPH_X))
     except Exception, ex:

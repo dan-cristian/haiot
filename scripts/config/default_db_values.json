@@ -24,7 +24,7 @@
     {"id":7,  "active":"0", "start_order":"7", "name":"relay"},
     {"id":9,  "active":"0", "start_order":"9", "name":"heat"},
     {"id":11, "active":"1", "start_order":"11", "name":"alarm"},
-    {"id":13, "active":"1", "start_order":"13", "name":"graph_plotly"},
+    {"id":13, "active":"1", "start_order":"13", "name":"cloud.graph_plotly"},
     {"id":15, "active":"0", "start_order":"15", "name":"io_bbb"},
     {"id":17, "active":"1", "start_order":"17", "name":"webui"},
     {"id":19, "active":"1", "start_order":"19", "name":"ddns"},
@@ -45,7 +45,8 @@
 
     {"id":403, "active":"1", "start_order":"3", "name":"health_monitor", "host_name":"EN62395"},
 
-    {"id":509, "active":"1", "start_order":"9", "name":"heat", "host_name":"netbook"}
+    {"id":509, "active":"1", "start_order":"9", "name":"heat", "host_name":"netbook"},
+    {"id":599, "active":"1", "start_order":"9", "name":"test", "host_name":"netbook"}
 
 
   ],
