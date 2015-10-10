@@ -258,8 +258,8 @@ class PlotlyGrid:
 
     def add_data(self, x, y, axis_x_name, axis_y_name, record_unique_id_name, record_unique_id_value):
         while self.uploading_data:
-            Log.logger.info("Not adding data to grid {} as it is uploading currently".format(self.grid_unique_name))
-            threading._sleep(5)
+            # Log.logger.info("Not adding data to grid {} as it is uploading currently".format(self.grid_unique_name))
+            threading._sleep(1)
         self.axis_x_name = axis_x_name
         # this column has the primary key - usually a datetime type (updated_on)
         if axis_x_name not in self.columns_cache:
@@ -327,6 +327,8 @@ class PlotlyGrid:
             for column_name in self.columns_cache.keys():
                 if column_name != self.axis_x_name:
                     value = self.columns_cache[column_name][index]
+                    if value is None:
+                        value = ''
                     row.append(value)
             upload_rows.append(row)
             index += 1
