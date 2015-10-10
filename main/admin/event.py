@@ -8,7 +8,7 @@ import transport
 import models
 import main
 import model_helper
-import graph_plotly
+
 import node
 import sensor
 import heat
@@ -139,9 +139,13 @@ def mqtt_thread_run():
                 if variable.NODE_THIS_IS_MASTER_OVERALL:
                     if Constant.JSON_PUBLISH_GRAPH_X in obj:
                         if obj[Constant.JSON_PUBLISH_SAVE_TO_GRAPH]:
+                            # lazy init as plotly is an optional module
+                            from cloud import graph_plotly
                             if graph_plotly.initialised:
                                 start = utils.get_base_location_now_date()
-                                graph_plotly.upload_data(obj)
+                                #initial implementation
+                                #graph_plotly.upload_data(obj)
+                                graph_plotly.upload_data_to_grid(obj)
                                 elapsed = (utils.get_base_location_now_date() - start).total_seconds()
                                 Log.logger.debug('Plotly upload took {}s'.format(elapsed))
                             else:
