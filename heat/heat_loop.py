@@ -127,9 +127,15 @@ def loop_heat_relay():
             pin_state_int = relay.relay_get(pin_bcm=gpio_pin.pin_index_bcm)
             pin_state = (pin_state_int == 1)
             if heat_relay.heat_is_on != pin_state:
-                Log.logger.warning("Inconsistent heat status zone={}, db status={}, actual={}, correcting".format(
+                Log.logger.warning("Inconsistent heat relay status relay={}, db status={}, actual={}, correcting".format(
                     heat_relay.heat_pin_name, heat_relay.heat_is_on, pin_state_int))
                 heat_relay.heat_is_on = pin_state
+                commit()
+            zone = models.Zone().query_filter_first(models.Zone.id.in_([heat_relay.zone_id]))
+            if zone and (zone.heat_is_on != heat_relay.heat_is_on):
+                Log.logger.warning("Inconsistent heat status in zone={}, db status={}, actual={}, correcting".format(
+                    zone.name, zone.heat_is_on, heat_relay.heat_is_on))
+                zone.heat_is_on = heat_relay.heat_is_on
                 commit()
             #else:
             #    Log.logger.info("Heat pin {} status equal to gpio status {}".format(heat_relay.heat_is_on, pin_state_int))
