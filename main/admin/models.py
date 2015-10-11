@@ -73,7 +73,12 @@ class DbEvent:
     def json_to_record(self, json_object):
         for field in json_object:
             if hasattr(self, field):
-                setattr(self, field, json_object[field])
+                #fixme: really bad performance
+                if utils.is_date_string(str(json_object[field])):
+                    value = utils.date_deserialiser(str(json_object[field]))
+                else:
+                    value = json_object[field]
+                setattr(self, field, value)
         return self
 
     #copies fields from a json object to an existing or new db record
@@ -139,6 +144,7 @@ class DbEvent:
                                 obj_type = str(type(self))
                             if debug:
                                 Log.logger.info('{} {}={} oldvalue={}'.format(obj_type, column_name, new_value, old_value))
+
                         setattr(current_record, column_name, new_value)
                         current_record.last_commit_field_changed_list.append(column_name)
                 if len(current_record.last_commit_field_changed_list) == 0:

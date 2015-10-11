@@ -15,9 +15,14 @@ from main.logger_helper import Log
 #http://stackoverflow.com/questions/6578986/how-to-convert-json-data-into-a-python-object
 def _json_object_hook(d):
     return namedtuple('X', d.keys())(*d.values())
+
+def is_date_string(date_str):
+    return re.search("....-..-..T..:..:..\.......", date_str)
+
 def date_deserialiser(json):
-    if re.search("....-..-..T..:..:..\.......", json):
-        return datetime.datetime.strptime(json, "%Y-%m-%d %H:%M:%S.%f")
+    if is_date_string(json):
+        new_json = json.replace("T", " ")
+        return datetime.datetime.strptime(new_json, "%Y-%m-%d %H:%M:%S.%f")
     else:
         return json
 def date_serialised(obj):
