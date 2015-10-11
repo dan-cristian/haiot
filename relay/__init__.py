@@ -32,9 +32,9 @@ def relay_update(gpio_pin_code=None, pin_value=None, from_web=False):
 #pin expected format is bcm
 def relay_get(pin_bcm=None, from_web=False):
     message = 'Get relay state for pin {}'.format(pin_bcm)
-    Log.logger.info(message)
     if Constant.HOST_MACHINE_TYPE in [Constant.MACHINE_TYPE_RASPBERRY, Constant.MACHINE_TYPE_BEAGLEBONE]:
         pin_value = gpio_pi_bbb.get_pin_bcm(pin_bcm)
+        Log.logger.info(message + str(" val=".format(pin_value)))
     else:
         message += ' error not running on gpio enabled devices'
         pin_value = None
