@@ -217,7 +217,7 @@ def add_grid_data(grid_unique_name, x, y, axis_x_name, axis_y_name, record_uniqu
     global __grid_list
     if grid_unique_name not in __grid_list:
         grid = PlotlyGrid()
-        grid.grid_unique_name = "grids/" + grid_unique_name #grid_unique_name #"grids/" + grid_unique_name
+        grid.grid_unique_name = grid_unique_name #"grids/" + grid_unique_name
         __grid_list[grid_unique_name] = grid
     __grid_list[grid_unique_name].add_data(x, y, axis_x_name=axis_x_name, axis_y_name=axis_y_name,
                                            record_unique_id_name=record_unique_id_name,
@@ -241,7 +241,7 @@ def thread_run():
 
 
 class PlotlyGrid:
-    save_interval_seconds = 300
+    save_interval_seconds = 120
 
     def __init__(self):
         # table name stored in this grid
@@ -267,6 +267,9 @@ class PlotlyGrid:
             self.columns_cache[axis_x_name] = []
         if axis_y_name not in self.columns_cache:
             self.columns_cache[axis_y_name] = []
+        if record_unique_id_name not in self.columns_cache:
+            self.columns_cache[record_unique_id_name] = []
+
         self.columns_cache[axis_x_name].append(x)
         self.max_row_count = len(self.columns_cache[axis_x_name])
         # populate each columns with rows, keep no of rows identical in all columns
@@ -275,9 +278,11 @@ class PlotlyGrid:
                 # fill in with empty rows to ensure each column has same no. of records
                 while len(self.columns_cache[column_name]) < self.max_row_count:
                     self.columns_cache[column_name].append(None)
-            # replace last appended None value above with current y value
+            # replace last appended None value above with current y & unique record value
             if column_name == axis_y_name:
                 self.columns_cache[column_name][self.max_row_count - 1] = y
+            if column_name == record_unique_id_name:
+                self.columns_cache[column_name][self.max_row_count - 1] = record_unique_id_value
 
     def _create_or_get_grid(self):
         grid = models.PlotlyCache().query_filter_first(models.PlotlyCache.grid_name.in_([self.grid_unique_name]))
@@ -321,6 +326,7 @@ class PlotlyGrid:
             plotly_cache_record.column_name_list = my_column_list
             plotly_cache_record.save_changed_fields(new_record=plotly_cache_record, notify_transport_enabled=True,
                                    save_to_graph=False)
+        Log.logger.info("Uploading {} grid completed".format(self.grid_unique_name))
 
     def _update_grid(self):
         # append empty new columns that were not yet uploaded to cloud grid
@@ -358,6 +364,7 @@ class PlotlyGrid:
             Log.logger.info("Appending grid {} rows={}".format(self.grid_unique_name, len(upload_rows)))
             # upload all rows. column order and number of columns must match the grid in the cloud
             py.grid_ops.append_rows(grid_url=self.grid_url, rows=upload_rows)
+        Log.logger.info("Uploading {} grid completed".format(self.grid_unique_name))
 
     def upload_data(self):
         try:
@@ -375,9 +382,12 @@ class PlotlyGrid:
         except HTTPError, er:
             Log.logger.warning("Error uploading plotly grid={}, er={} cause={}".format(self.grid_unique_name,
                                                                                        er, er.response.text))
+            if "file already exists" in er.response.text:
+                Log.logger.critical("Fatal error, unable to resume saving data to plotly grid")
+
             if "throttled" in er.response.text:
                 PlotlyGrid.save_interval_seconds = min(1200, PlotlyGrid.save_interval_seconds + 60)
-            Log.logger.info("Plotly upload interval increased to {}s".format(PlotlyGrid.save_interval_seconds))
+                Log.logger.info("Plotly upload interval is {}s".format(PlotlyGrid.save_interval_seconds))
         except Exception, ex:
             Log.logger.warning("Exception uploading plotly grid={}, er={}".format(self.grid_unique_name, ex))
         finally:

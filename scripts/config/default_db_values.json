@@ -59,7 +59,8 @@
     {"id":403, "active":"1", "start_order":"3", "name":"health_monitor", "host_name":"EN62395"},
 
     {"id":509, "active":"1", "start_order":"9", "name":"heat", "host_name":"netbook"},
-    {"id":599, "active":"0", "start_order":"9", "name":"test", "host_name":"netbook"}
+    {"id":599, "active":"0", "start_order":"9", "name":"test", "host_name":"netbook"},
+    {"id":513, "active":"1", "start_order":"13", "name":"cloud.graph_plotly", "host_name":"netbook"}
 
 
   ],
