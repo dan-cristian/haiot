@@ -8,7 +8,10 @@ from wakeonlan import wol
 from flask_sqlalchemy import SQLAlchemy #workaround for resolve issue
 from flask import Flask
 from flask_sqlalchemy import models_committed
+
 from main.logger_helper import Log
+
+
 
 #location for sqlite db
 DB_LOCATION=None
@@ -137,11 +140,15 @@ def init():
     #carefull with order of imports
     import common
     from main import logger_helper
-    from common import utils, Constant
+    from common import utils
 
     common.init_simple()
     logger_helper.Log.init_logging()
     signal.signal(signal.SIGTERM, signal_handler)
+
+    Log.logger.info('Collecting system info')
+    from main import system_info
+    system_info.init()
 
     common.init()
 
@@ -191,9 +198,6 @@ def init():
     from admin import event
     Log.logger.info('Initialising events - init')
     event.init()
-    Log.logger.info('Collecting system info')
-    from admin import system_info
-    system_info.init()
     from common import Constant
     Log.logger.info('Machine type is {}'.format(Constant.HOST_MACHINE_TYPE))
     Log.logger.info('Initialising modules')
@@ -206,7 +210,7 @@ def init():
     t.daemon = True
     t.start()
 
-    from admin import cron
+    from main import cron
     cron.init()
 
     global initialised, shutting_down
