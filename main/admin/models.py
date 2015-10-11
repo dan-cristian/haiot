@@ -36,6 +36,10 @@ class DbBase:
         function = self.query.filter(filter).all
         return self.__get_result(function)
 
+    def query_filter_all(self, *filter):
+        function = self.query.filter(*filter).all
+        return self.__get_result(function)
+
     # example with multiple filters
     # m().query_filter_first(m.host_name.in_([Constant.HOST_NAME]), m.name.in_([mod.name]))
     def query_filter_first(self, *filter):
@@ -516,6 +520,8 @@ class PlotlyCache(db.Model, DbEvent, DbBase):
     grid_name = db.Column(db.String(50), unique=True)
     grid_url = db.Column(db.String(250))
     column_name_list = db.Column(db.String(250))
+    created_by_node_name = db.Column(db.String(50))
+    announced_on = db.Column(db.DateTime())
 
     def __repr__(self):
         return '{} {}'.format(self.grid_name, self.grid_url)
