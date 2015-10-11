@@ -150,6 +150,7 @@ def init():
     from main import system_info
     system_info.init()
 
+    from common import Constant
     common.init()
 
     global app, db, DB_LOCATION
@@ -198,7 +199,7 @@ def init():
     from admin import event
     Log.logger.info('Initialising events - init')
     event.init()
-    from common import Constant
+
     Log.logger.info('Machine type is {}'.format(Constant.HOST_MACHINE_TYPE))
     Log.logger.info('Initialising modules')
     init_modules()
