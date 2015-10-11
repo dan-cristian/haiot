@@ -12,6 +12,7 @@ from requests import HTTPError
 
 from common import utils
 from main.logger_helper import Log
+from main.admin import models
 
 
 #list of series unique identifier used to determine trace order remote, key is graph name
@@ -231,7 +232,7 @@ def __upload_cached_plotly_data():
     #        graph.upload_data()
 
     for grid in __grid_list.values():
-        if (utils.get_base_location_now_date() - grid.last_save).total_seconds() > 60:
+        if (utils.get_base_location_now_date() - grid.last_save).total_seconds() > 300:
             grid.upload_data()
 
 def thread_run():
@@ -255,7 +256,6 @@ class PlotlyGrid:
         self.axis_x_name = None
         self.grid_url = None
 
-
     def add_data(self, x, y, axis_x_name, axis_y_name, record_unique_id_name, record_unique_id_value):
         while self.uploading_data:
             # Log.logger.info("Not adding data to grid {} as it is uploading currently".format(self.grid_unique_name))
@@ -278,8 +278,15 @@ class PlotlyGrid:
             if column_name == axis_y_name:
                 self.columns_cache[column_name][self.max_row_count - 1] = y
 
-    def create_or_get_grid(self):
-        pass
+    def _create_or_get_grid(self):
+        grid = models.PlotlyCache().query_filter_first(models.PlotlyCache.grid_name.in_([self.grid_unique_name]))
+        if grid:
+            self.grid_url = grid.grid_url
+            # loading the column names for appending data in the right order
+            self.column_name_list_uploaded = grid.column_name_list.split(",")
+            self._update_grid()
+        else:
+            self._upload_new_grid()
 
     def _upload_new_grid(self):
         # grid was not retrieved yet from plotly, create it
@@ -299,6 +306,17 @@ class PlotlyGrid:
         for grid_column in upload_columns:
             if grid_column.name not in self.column_name_list_uploaded:
                 self.column_name_list_uploaded.append(grid_column.name)
+        # save to db cache. expect record to be empty
+        plotly_cache_record = models.PlotlyCache().query_filter_first(
+            models.PlotlyCache.grid_name.in_([self.grid_unique_name]))
+        if plotly_cache_record:
+            Log.logger.critical("While uploading a new grid found a cached one in DB, unexpected failure!")
+        else:
+            plotly_cache_record = models.PlotlyCache(grid_name=self.grid_unique_name)
+            plotly_cache_record.grid_url = self.grid_url
+            my_column_list = ','.join(map(str, self.column_name_list_uploaded))
+            plotly_cache_record.column_name_list = my_column_list
+
 
     def _update_grid(self):
         # append empty new columns that were not yet uploaded to cloud grid
@@ -344,7 +362,7 @@ class PlotlyGrid:
             if self.grid_url:
                 self._update_grid()
             else:
-                self._upload_new_grid()
+                self._create_or_get_grid()
             # delete from cache all rows that have been uploaded
             for column_name in self.columns_cache.keys():
                 self.columns_cache[column_name] = []
