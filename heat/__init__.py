@@ -12,7 +12,7 @@ import relay
 
 initialised=False
 
-#execute when heat status change is signaled
+# execute when heat status change is signaled. changes gpio pin status
 def heat_update(obj_dict={}):
     try:
         source_host_name = utils.get_object_field_value(obj_dict, Constant.JSON_PUBLISH_SOURCE_HOST)
