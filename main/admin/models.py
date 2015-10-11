@@ -511,4 +511,17 @@ class Rule(db.Model, DbEvent, DbBase):
             self.id = id
         self.host_name = host_name
 
+class PlotlyCache(db.Model, DbEvent, DbBase):
+    id = db.Column(db.Integer, primary_key=True)
+    grid_name = db.Column(db.String(50), unique=True)
+    grid_url = db.Column(db.String(250))
+    column_name_list = db.Column(db.String(250))
 
+    def __repr__(self):
+        return '{} {}'.format(self.grid_name, self.grid_url)
+
+    def __init__(self, id='', grid_name=''):
+        #keep host name default to '' rather than None (which does not work on filter in)
+        if id:
+            self.id = id
+        self.grid_name = grid_name
