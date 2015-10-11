@@ -232,7 +232,7 @@ def __upload_cached_plotly_data():
     #        graph.upload_data()
 
     for grid in __grid_list.values():
-        if (utils.get_base_location_now_date() - grid.last_save).total_seconds() > 300:
+        if (utils.get_base_location_now_date() - grid.last_save).total_seconds() > 600:
             grid.upload_data()
 
 def thread_run():
