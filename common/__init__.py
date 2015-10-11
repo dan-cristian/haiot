@@ -113,7 +113,8 @@ def init():
     except Exception, ex:
         Log.logger.warning('Cannot obtain main IP accurately, probably not connected to Internet, ex={}'.format(ex))
         Constant.HOST_MAIN_IP=socket.gethostbyname(socket.gethostname())
-    Log.logger.info('Running on OS {} HOST {} IP {}'.format(Constant.OS, Constant.HOST_NAME, Constant.HOST_MAIN_IP))
+    Log.logger.info('Running on OS {} HOST {} IP {} MACHINE {}'.format(Constant.OS, Constant.HOST_NAME,
+                                                                    Constant.HOST_MAIN_IP, Constant.HOST_MACHINE_TYPE))
 
 def init_simple():
     Constant.OS = os.name
