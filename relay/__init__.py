@@ -34,7 +34,7 @@ def relay_get(pin_bcm=None, from_web=False):
     message = 'Get relay state for pin {}'.format(pin_bcm)
     if Constant.HOST_MACHINE_TYPE in [Constant.MACHINE_TYPE_RASPBERRY, Constant.MACHINE_TYPE_BEAGLEBONE]:
         pin_value = gpio_pi_bbb.get_pin_bcm(pin_bcm)
-        Log.logger.info(message + str(" val=".format(pin_value)))
+        Log.logger.info(message + str(" val={}".format(pin_value)))
     else:
         message += ' error not running on gpio enabled devices'
         pin_value = None
