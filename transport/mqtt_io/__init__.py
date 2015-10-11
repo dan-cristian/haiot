@@ -3,7 +3,7 @@ __author__ = 'dcristian'
 import time
 import socket
 
-from main.admin import thread_pool
+from main import thread_pool
 from main.logger_helper import Log
 from main.admin import model_helper
 from common import Constant, utils

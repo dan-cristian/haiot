@@ -1,14 +1,13 @@
 from pydispatch import dispatcher
 
 from main.logger_helper import Log
-from main.admin import thread_pool
+from main import thread_pool
 from common import Constant, variable, utils
 import common.utils
 import transport
 import models
 import main
 import model_helper
-
 import node
 import sensor
 import heat

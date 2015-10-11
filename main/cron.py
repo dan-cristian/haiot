@@ -4,7 +4,7 @@ import requests
 import schedule
 
 from main.logger_helper import Log
-from main.admin import thread_pool
+from main import thread_pool
 
 initialised = False
 

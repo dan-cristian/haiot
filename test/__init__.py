@@ -1,6 +1,6 @@
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
-from main import Log
+from main import Log, thread_pool
 import test_run
 from main.admin import thread_pool
 initialised = False

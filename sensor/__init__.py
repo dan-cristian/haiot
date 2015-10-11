@@ -2,7 +2,8 @@ __author__ = 'dcristian'
 
 #! venv/bin/python
 
-from main.admin import thread_pool, db
+from main.admin import db
+from main import thread_pool
 from main.logger_helper import Log
 from common import utils, Constant
 import owsensor_loop
