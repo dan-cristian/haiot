@@ -217,7 +217,7 @@ def add_grid_data(grid_unique_name, x, y, axis_x_name, axis_y_name, record_uniqu
     global __grid_list
     if grid_unique_name not in __grid_list:
         grid = PlotlyGrid()
-        grid.grid_unique_name = grid_unique_name #"grids/" + grid_unique_name
+        grid.grid_unique_name = "grids/" + grid_unique_name #grid_unique_name #"grids/" + grid_unique_name
         __grid_list[grid_unique_name] = grid
     __grid_list[grid_unique_name].add_data(x, y, axis_x_name=axis_x_name, axis_y_name=axis_y_name,
                                            record_unique_id_name=record_unique_id_name,
