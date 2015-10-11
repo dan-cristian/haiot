@@ -13,7 +13,7 @@ import sensor
 import heat
 import relay
 import rule
-import cloud.graph_plotly
+
 
 __mqtt_event_list = []
 #__mqtt_lock = threading.Lock()
@@ -82,6 +82,7 @@ def mqtt_thread_run():
     #runs periodically and executes received mqqt messages from queue
     #global __mqtt_lock
     #__mqtt_lock.acquire()
+    from cloud import graph_plotly
     try:
         last_count = len(__mqtt_event_list)
         for obj in __mqtt_event_list:
@@ -115,7 +116,7 @@ def mqtt_thread_run():
                     elif table == utils.get_table_name(models.Rule):
                         rule.rule_record_update(obj)
                     elif table == utils.get_table_name(models.PlotlyCache):
-                        cloud.graph_plotly.cache_record_update(obj)
+                        graph_plotly.cache_record_update(obj)
 
 
                 if Constant.JSON_MESSAGE_TYPE in obj:
@@ -142,12 +143,12 @@ def mqtt_thread_run():
                     if Constant.JSON_PUBLISH_GRAPH_X in obj:
                         if obj[Constant.JSON_PUBLISH_SAVE_TO_GRAPH]:
                             # lazy init as plotly is an optional module
-                            import cloud.graph_plotly
-                            if cloud.graph_plotly.initialised:
+                            from cloud import graph_plotly
+                            if graph_plotly.initialised:
                                 start = utils.get_base_location_now_date()
                                 #initial implementation
                                 #graph_plotly.upload_data(obj)
-                                cloud.graph_plotly.upload_data_to_grid(obj)
+                                graph_plotly.upload_data_to_grid(obj)
                                 elapsed = (utils.get_base_location_now_date() - start).total_seconds()
                                 Log.logger.debug('Plotly upload took {}s'.format(elapsed))
                             else:
