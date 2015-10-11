@@ -14,7 +14,6 @@ from common import utils
 from main.logger_helper import Log
 from main.admin import models
 
-
 #list of series unique identifier used to determine trace order remote, key is graph name
 #each trace id list starts with a standard reference element used to get graph url, not ideal!
 #e.g.{'Sensor temperature':['ref','ADDRESS1', 'ADDRESS2', ...], 'System cpu usage':['ref','server','beaglebone',...]}
@@ -311,8 +310,8 @@ class PlotlyGrid:
             if grid_column.name not in self.column_name_list_uploaded:
                 self.column_name_list_uploaded.append(grid_column.name)
         # save to db cache. expect record to be empty
-        plotly_cache_record = models.PlotlyCache().query_filter_first(
-            models.PlotlyCache.grid_name.in_([self.grid_unique_name]))
+        plotly_cache_record = models.PlotlyCache().query_filter_first(models.PlotlyCache.grid_name.in_(
+            [self.grid_unique_name]))
         if plotly_cache_record:
             Log.logger.critical("While uploading a new grid found a cached one in DB, unexpected failure!")
         else:
@@ -320,7 +319,8 @@ class PlotlyGrid:
             plotly_cache_record.grid_url = self.grid_url
             my_column_list = ','.join(map(str, self.column_name_list_uploaded))
             plotly_cache_record.column_name_list = my_column_list
-
+            plotly_cache_record.save_changed_fields(new_record=plotly_cache_record, notify_transport_enabled=True,
+                                   save_to_graph=False)
 
     def _update_grid(self):
         # append empty new columns that were not yet uploaded to cloud grid
