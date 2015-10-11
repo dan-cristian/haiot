@@ -8,6 +8,7 @@ import time
 import httplib2
 from apiclient import discovery, errors, http
 
+
 #from apiclient.discovery import build
 #from apiclient.errors import HttpError
 #from apiclient.http import MediaFileUpload
@@ -19,7 +20,8 @@ from pydispatch import dispatcher
 
 from main.logger_helper import Log
 from common import Constant, utils
-from main.admin import model_helper, thread_pool
+from main.admin import model_helper
+from main import thread_pool
 
 initialised = False
 __file_list_last_change = {}

@@ -6,7 +6,7 @@ from pydispatch import dispatcher
 from apscheduler.schedulers.background import BackgroundScheduler
 
 from main.logger_helper import Log
-from main.admin import thread_pool
+from main import thread_pool
 from main.admin import models
 from common import Constant
 

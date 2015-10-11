@@ -4,7 +4,7 @@ from pydispatch import dispatcher
 
 import heat_loop
 from main.logger_helper import Log
-from main.admin import thread_pool
+from main import thread_pool
 from main.admin import models
 from common import Constant, utils
 from main.admin.model_helper import commit

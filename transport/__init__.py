@@ -23,7 +23,7 @@ def thread_run():
         Log.logger.warning("{} messages are pending in transport send queue".format(len(__send_json_queue)))
 
 def unload():
-    from main.admin import thread_pool
+    from main import thread_pool
     Log.logger.info('Transport unloading')
     # ...
     thread_pool.remove_callable(thread_run)
@@ -32,7 +32,7 @@ def unload():
 
 
 def init():
-    from main.admin import thread_pool
+    from main import thread_pool
     Log.logger.info('Transport initialising')
     thread_pool.add_interval_callable(thread_run, run_interval_second=1)
     mqtt_io.init()

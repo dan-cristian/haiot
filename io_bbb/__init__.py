@@ -1,7 +1,7 @@
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 from main.logger_helper import Log
-from main.admin import thread_pool
+from main import thread_pool
 import io_bbb_run
 
 initialised=False
