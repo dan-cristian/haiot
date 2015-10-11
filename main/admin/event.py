@@ -13,6 +13,7 @@ import sensor
 import heat
 import relay
 import rule
+import cloud
 
 __mqtt_event_list = []
 #__mqtt_lock = threading.Lock()
@@ -113,6 +114,8 @@ def mqtt_thread_run():
                         relay.gpio_record_update(obj)
                     elif table == utils.get_table_name(models.Rule):
                         rule.rule_record_update(obj)
+                    elif table == utils.get_table_name(models.PlotlyCache):
+                        cloud.graph_plotly.cache_record_update(obj)
 
 
                 if Constant.JSON_MESSAGE_TYPE in obj:
