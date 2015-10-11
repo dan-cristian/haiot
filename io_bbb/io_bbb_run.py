@@ -80,7 +80,7 @@ def __check_for_events():
     for pin_code in __pool_pin_codes:
         if GPIO.event_detected(pin_code):
             state = GPIO.input(pin_code)
-            Log.logger.info('Pooling event detected gpio {} val {}'.format(pin_code, state))
+            #Log.logger.info('Pooling event detected gpio {} val {}'.format(pin_code, state))
             dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=pin_code, direction='in', pin_value=state)
 
 def init():
