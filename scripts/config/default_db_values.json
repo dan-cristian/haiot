@@ -1,4 +1,14 @@
 {
+  "Node": [
+    {"id":1,  "priority":"0", "name":"netbook"},
+    {"id":2,  "priority":"1", "name":"nas"},
+    {"id":3,  "priority":"2", "name":"server"},
+    {"id":4,  "priority":"3", "name":"ex-std-node466.prod.rhcloud.com"},
+    {"id":5,  "priority":"4", "name":"beaglebone"},
+    {"id":6,  "priority":"5", "name":"pi-power"},
+    {"id":7,  "priority":"6", "name":"pi-bell"}
+  ],
+
   "Parameter": [
     {"name": "MZP_SERVER_URL", "value":"http://192.168.0.10"},
     {"name": "OWSERVER_HOST_1", "value": "127.0.0.1"},
@@ -46,7 +56,7 @@
     {"id":403, "active":"1", "start_order":"3", "name":"health_monitor", "host_name":"EN62395"},
 
     {"id":509, "active":"1", "start_order":"9", "name":"heat", "host_name":"netbook"},
-    {"id":599, "active":"1", "start_order":"9", "name":"test", "host_name":"netbook"}
+    {"id":599, "active":"0", "start_order":"9", "name":"test", "host_name":"netbook"}
 
 
   ],

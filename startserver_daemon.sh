@@ -19,7 +19,7 @@ stop() {
 	me=`basename $0`
 	log "Stopping script $me"
     cd $DIR
-    ./scripts/stopserver.sh
+    ./scripts/stopserver.sh 2>&1 | logger -t haiot
 }
 
 log "Executing script with parameter $1 $2 $3"

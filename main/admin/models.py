@@ -313,13 +313,15 @@ class Node(db.Model, DbEvent, graphs.NodeGraph, DbBase):
     name = db.Column(db.String(50))
     ip = db.Column(db.String(15))
     mac = db.Column(db.String(17))
+    os_type = db.Column(db.String(50))
+    machine_type = db.Column(db.String(50))
     app_start_time = db.Column(db.DateTime())
     is_master_overall = db.Column(db.Boolean(), default=False)
     is_master_db_archive = db.Column(db.Boolean(), default=False)
     is_master_graph = db.Column(db.Boolean(), default=False)
     is_master_rule = db.Column(db.Boolean(), default=False)
     is_master_logging = db.Column(db.Boolean(), default=False)
-    priority = db.Column(db.Integer)
+    priority = db.Column(db.Integer) # used to decide who becomes main master in case several hosts are active
     master_overall_cycles = db.Column(db.Integer) #count of update cycles while node was master
     run_overall_cycles = db.Column(db.Integer) #count of total update cycles
     execute_command=db.Column(db.String(50))

@@ -21,43 +21,18 @@ def node_update(obj={}):
         Log.logger.debug('Received node state update from {}'.format(node_host_name))
         #avoid node to update itself in infinite recursion
         if node_host_name != Constant.HOST_NAME:
-            '''
-            node = models.Node.query.filter_by(name=node_host_name).first()
-            if node is None:
-                node = models.Node()
-                db.session.add(node)
-            node.name = node_host_name
-            node.is_master_graph = utils.get_object_field_value(obj,
-                                                        utils.get_model_field_name(models.Node.is_master_graph))
-            node.is_master_db_archive = utils.get_object_field_value(obj,
-                                                        utils.get_model_field_name(models.Node.is_master_db_archive))
-            node.is_master_overall = utils.get_object_field_value(obj,
-                                                        utils.get_model_field_name(models.Node.is_master_overall))
-            node.is_master_rule = utils.get_object_field_value(obj,
-                                                        utils.get_model_field_name(models.Node.is_master_rule))
-            node.is_master_logging = utils.get_object_field_value(obj,
-                                                        utils.get_model_field_name(models.Node.is_master_logging))
-            node.priority = utils.get_object_field_value(obj, utils.get_model_field_name(models.Node.priority))
-            node.ip = utils.get_object_field_value(obj, utils.get_model_field_name(models.Node.ip))
-            node.mac = utils.get_object_field_value(obj, utils.get_model_field_name(models.Node.mac))
-            node.execute_command = utils.get_object_field_value(obj,
-                                                        utils.get_model_field_name(models.Node.execute_command))
-            node.updated_on = utils.get_base_location_now_date()
-            commit()
-            '''
             models.Node().save_changed_fields_from_json_object(json_object=obj, unique_key_name='name',
                                                                notify_transport_enabled=False, save_to_graph=False)
         else:
             Log.logger.debug('Skipping node DB save, this node is master = {}'.format(
                 variable.NODE_THIS_IS_MASTER_OVERALL))
             sent_date = utils.get_object_field_value(obj, 'event_sent_datetime')
-            if not sent_date is None:
+            if sent_date is not None:
                 event_sent_date_time = utils.parse_to_date(sent_date)
                 seconds_elapsed = (utils.get_base_location_now_date()-event_sent_date_time).total_seconds()
                 if seconds_elapsed>15:
                     Log.logger.warning('Very slow mqtt, delay is {} seconds rate msg {}/min'.format(seconds_elapsed,
                                                                                     mqtt_io.mqtt_msg_count_per_minute))
-
     except Exception, ex:
         Log.logger.warning('Error on node update, err {}'.format(ex))
 
@@ -128,7 +103,7 @@ def announce_node_state():
 
         node.name = Constant.HOST_NAME
         if not current_record:
-            node.priority = random.randint(1, 100)
+            node.priority = random.randint(1, 100) # todo: clarify why 1 -100?
             node.run_overall_cycles = 0
             node.master_overall_cycles = 0
         else:
@@ -146,6 +121,8 @@ def announce_node_state():
         if variable.NODE_THIS_IS_MASTER_OVERALL:
             node.master_overall_cycles += 1
         node.run_overall_cycles += 1
+        node.os_type = Constant.OS
+        node.machine_type = Constant.HOST_MACHINE_TYPE
         node.notify_transport_enabled = True
         node.save_changed_fields(current_record=current_record, new_record=node, notify_transport_enabled=True,
                                    save_to_graph=True, graph_save_frequency=120)

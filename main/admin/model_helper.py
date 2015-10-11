@@ -116,7 +116,7 @@ def populate_tables(model_auto_update=False):
     with open(var_path, 'r') as f:
         __db_values_json = json.load(f)
     global table_collection
-    table_collection = [models.Parameter, models.Module,
+    table_collection = [models.Node, models.Parameter, models.Module,
         models.Zone, models.ZoneCustomRelay,
         models.TemperatureTarget, models.SchedulePattern, models.HeatSchedule, models.ZoneHeatRelay,
         models.ZoneSensor, models.ZoneAlarm,
@@ -140,6 +140,7 @@ def populate_tables(model_auto_update=False):
                 commit()
 
     check_table_schema(models.Node, model_auto_update)
+    '''
     if len(models.Node.query.filter_by(name=Constant.HOST_NAME).all()) == 0:
         Log.logger.info('Populating Node {} with default values'.format(Constant.HOST_NAME))
         master_logging = False
@@ -158,52 +159,56 @@ def populate_tables(model_auto_update=False):
                                    mac=Constant.HOST_MAC, is_master_logging=master_logging))
         commit()
     else:
-        #reseting execute_command field to avoid running last command before shutdown
-        node_obj = models.Node.query.filter_by(name=Constant.HOST_NAME).first()
-        node_obj.execute_command = ''
-        commit()
+    '''
+    # reseting execute_command field to avoid running last command before shutdown
     node_obj = models.Node.query.filter_by(name=Constant.HOST_NAME).first()
+    node_obj.execute_command = ''
     Constant.HOST_PRIORITY = node_obj.priority
+    commit()
 
-
+    node_list = models.Node().query_all()
     check_table_schema(models.GpioPin, model_auto_update)
+    #todo: worth implementing beabglebone white?
+    # populate all beaglebone black pins in db for all nodes. only used ones are mapped below, extend if more are used
+    # mapping found here: https://insigntech.files.wordpress.com/2013/09/bbb_pinouts.jpg
     bbb_bcm_map={
         'P9_11':30, 'P9_12':60, 'P9_13':31, 'P9_14':40, 'P9_15':48, 'P9_16':51, 'P9_24':15, 'P9_23':49,
         'P9_22':2,  'P9_21':3,
         'P8_07':66, 'P8_08':67, 'P8_09':69, 'P8_11':45, 'P8_12':44, 'P8_15':47, 'P8_16':46
     }
-    if len(models.GpioPin.query.filter_by(pin_type=Constant.GPIO_PIN_TYPE_BBB,
-                                          host_name=Constant.HOST_NAME).all()) != 46*2: #P8_ and P9_ with 46 pins
-        models.GpioPin.query.filter_by(pin_type=Constant.GPIO_PIN_TYPE_BBB, host_name=Constant.HOST_NAME).delete()
-        commit()
-        for host_name in ['beaglebone', 'netbook', 'EN62395']:
-            Log.logger.info('Populating GpioPins with default beabglebone {} values'.format(host_name))
-            for rail in range(8,10): #last range is not part of the loop
-                for pin in range(01, 47):
-                    gpio = models.GpioPin()
-                    gpio.pin_type = Constant.GPIO_PIN_TYPE_BBB
-                    gpio.host_name = host_name
-                    pincode = '0'+str(pin)
-                    gpio.pin_code = 'P'+str(rail)+'_'+pincode[-2:]
-                    if bbb_bcm_map.has_key(gpio.pin_code):
-                        gpio.pin_index_bcm = bbb_bcm_map[gpio.pin_code]
-                    else:
-                        gpio.pin_index_bcm = ''
-                    db.session.add(gpio)
-        commit()
+    for node in node_list:
+        if node.machine_type == Constant.MACHINE_TYPE_BEAGLEBONE:
+            if len(models.GpioPin.query.filter_by(pin_type=Constant.GPIO_PIN_TYPE_BBB,
+                                      host_name=node.name).all()) != 46*2: #P8_ and P9_ rows have 46 pins
+                models.GpioPin.query.filter_by(pin_type=Constant.GPIO_PIN_TYPE_BBB, host_name=node.name).delete()
+                commit()
+                Log.logger.info('Populating default {} GpioPins on {} '.format(node.machine_type, node.name))
+                for rail in range(8,10): #last range is not part of the loop
+                    for pin in range(01, 47):
+                        gpio = models.GpioPin()
+                        gpio.pin_type = Constant.GPIO_PIN_TYPE_BBB
+                        gpio.host_name = node.name
+                        pincode = '0'+str(pin)
+                        gpio.pin_code = 'P'+str(rail)+'_'+pincode[-2:]
+                        if bbb_bcm_map.has_key(gpio.pin_code):
+                            gpio.pin_index_bcm = bbb_bcm_map[gpio.pin_code]
+                        else:
+                            gpio.pin_index_bcm = ''
+                        db.session.add(gpio)
+                commit()
 
-    #fixme: check for other PI revisions
-    if len(models.GpioPin.query.filter_by(pin_type=Constant.GPIO_PIN_TYPE_PI,host_name=Constant.HOST_NAME).all()) != 26:
-        models.GpioPin.query.filter_by(pin_type=Constant.GPIO_PIN_TYPE_PI, host_name=Constant.HOST_NAME).delete()
-        commit()
-        for host_name in ['pi-power', 'pi-bell', 'netbook', 'EN62395']:
-            Log.logger.info('Populating GpioPins with default raspberry pi {} values'.format(host_name))
-            for pin in range(01, 27): # -1
-                gpio = models.GpioPin()
-                gpio.pin_type = Constant.GPIO_PIN_TYPE_PI
-                gpio.host_name = host_name
-                gpio.pin_code = str(pin)
-                gpio.pin_index_bcm = pin
-                db.session.add(gpio)
-        commit()
+        #fixme: check for other PI revisions
+        if node.machine_type == Constant.MACHINE_TYPE_RASPBERRY:
+            if len(models.GpioPin.query.filter_by(pin_type=Constant.GPIO_PIN_TYPE_PI,host_name=node.name).all()) != 26:
+                models.GpioPin.query.filter_by(pin_type=Constant.GPIO_PIN_TYPE_PI, host_name=node.name).delete()
+                commit()
+                Log.logger.info('Populating default {} GpioPins on {} '.format(node.machine_type, node.name))
+                for pin in range(01, 27): # -1
+                    gpio = models.GpioPin()
+                    gpio.pin_type = Constant.GPIO_PIN_TYPE_PI
+                    gpio.host_name = node.name
+                    gpio.pin_code = str(pin)
+                    gpio.pin_index_bcm = pin
+                    db.session.add(gpio)
+                commit()
 
