@@ -281,6 +281,7 @@ class PlotlyGrid:
     def _create_or_get_grid(self):
         grid = models.PlotlyCache().query_filter_first(models.PlotlyCache.grid_name.in_([self.grid_unique_name]))
         if grid:
+            Log.logger.info("Loading {} grid metadata from db cache".format(self.grid_unique_name))
             self.grid_url = grid.grid_url
             # loading the column names for appending data in the right order
             self.column_name_list_uploaded = grid.column_name_list.split(",")
@@ -289,6 +290,7 @@ class PlotlyGrid:
             self._upload_new_grid()
 
     def _upload_new_grid(self):
+        Log.logger.info("Uploading new {} grid metadata to plot.ly".format(self.grid_unique_name))
         # grid was not retrieved yet from plotly, create it
         upload_columns = []
         # create column list for grid upload, put first column = x axis
