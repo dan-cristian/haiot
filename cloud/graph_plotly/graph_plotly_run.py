@@ -11,6 +11,7 @@ from plotly.grid_objs import Column, Grid
 from requests import HTTPError
 
 from common import utils
+from common import Constant
 from main.logger_helper import Log
 from main.admin import models
 
@@ -234,9 +235,24 @@ def __upload_cached_plotly_data():
         if (utils.get_base_location_now_date() - grid.last_save).total_seconds() > PlotlyGrid.save_interval_seconds:
             grid.upload_data()
 
+# let other nodes know the grid urls I got when uploading new grids
+def __announce_grid_cache():
+    grids_i_created = models.PlotlyCache().query_filter_all(models.PlotlyCache.created_by_node_name.in_(
+        [Constant.HOST_NAME]))
+    for grid in grids_i_created:
+        new_record = models.PlotlyCache()
+        new_record.created_by_node_name = grid.created_by_node_name
+        new_record.column_name_list = grid.column_name_list
+        new_record.grid_url = grid.grid_url
+        new_record.grid_name = grid.grid_name
+        new_record.announced_on = utils.get_base_location_now_date()
+        grid.save_changed_fields(current_record=grid, new_record=new_record, notify_transport_enabled=True,
+                                   save_to_graph=False)
+
 def thread_run():
     Log.logger.debug('Processing graph_plotly_run')
     __upload_cached_plotly_data()
+    __announce_grid_cache()
     return 'Processed graph_plotly_run'
 
 
@@ -324,6 +340,7 @@ class PlotlyGrid:
             plotly_cache_record.grid_url = self.grid_url
             my_column_list = ','.join(map(str, self.column_name_list_uploaded))
             plotly_cache_record.column_name_list = my_column_list
+            plotly_cache_record.created_by_node_name = Constant.HOST_NAME
             plotly_cache_record.save_changed_fields(new_record=plotly_cache_record, notify_transport_enabled=True,
                                    save_to_graph=False)
         Log.logger.info("Uploading {} grid completed".format(self.grid_unique_name))
