@@ -232,7 +232,7 @@ def __upload_cached_plotly_data():
     #        graph.upload_data()
 
     for grid in __grid_list.values():
-        if (utils.get_base_location_now_date() - grid.last_save).total_seconds() > 600:
+        if (utils.get_base_location_now_date() - grid.last_save).total_seconds() > PlotlyGrid.save_interval_seconds:
             grid.upload_data()
 
 def thread_run():
@@ -242,6 +242,8 @@ def thread_run():
 
 
 class PlotlyGrid:
+    save_interval_seconds = 300
+
     def __init__(self):
         # table name stored in this grid
         self.grid_unique_name = None
@@ -369,9 +371,13 @@ class PlotlyGrid:
             for column_name in self.columns_cache.keys():
                 self.columns_cache[column_name] = []
             self.last_save = utils.get_base_location_now_date()
+            PlotlyGrid.save_interval_seconds = max(300, PlotlyGrid.save_interval_seconds - 60)
         except HTTPError, er:
             Log.logger.warning("Error uploading plotly grid={}, er={} cause={}".format(self.grid_unique_name,
                                                                                        er, er.response.text))
+            if "throttled" in er.response.text:
+                PlotlyGrid.save_interval_seconds = min(1200, PlotlyGrid.save_interval_seconds + 60)
+            Log.logger.info("Plotly upload interval increased to {}s".format(PlotlyGrid.save_interval_seconds))
         except Exception, ex:
             Log.logger.warning("Exception uploading plotly grid={}, er={}".format(self.grid_unique_name, ex))
         finally:
