@@ -35,10 +35,10 @@ def my_import(name):
         return None
 
 def init_module(module_name, module_is_active):
-    Log.logger.info("Importing module {}".format(module_name))
-    dynclass = my_import(module_name)
-    if dynclass:
-        if module_is_active:
+    if module_is_active:
+        Log.logger.info("Importing module {}".format(module_name))
+        dynclass = my_import(module_name)
+        if dynclass:
             Log.logger.info('Module {} is marked as active'.format(module_name))
             if not dynclass.initialised:
                 Log.logger.info('Module {} initialising'.format(module_name))
@@ -46,15 +46,16 @@ def init_module(module_name, module_is_active):
             else:
                 Log.logger.info('Module {} already initialised, skipping init'.format(module_name))
         else:
-            Log.logger.info("Module {} is marked as not active ".format(module_name))
-            if dynclass.initialised:
+            Log.logger.critical("Module {} failed to load".format(module_name))
+    else:
+        Log.logger.info("Module {} is marked as not active, skipping load".format(module_name))
+        '''    if dynclass.initialised:
                 Log.logger.info('Module {} has been deactivated, unloading'.format(module_name))
                 dynclass.unload()
                 del dynclass
             else:
                 Log.logger.info('Module {} already disabled, skipping unload'.format(module_name))
-    else:
-        Log.logger.critical("Module {} cannot be loaded".format(module_name))
+        '''
 
 def init_modules():
     import admin.models
