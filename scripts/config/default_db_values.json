@@ -39,11 +39,12 @@
     {"id":17, "active":"1", "start_order":"17", "name":"webui"},
     {"id":19, "active":"1", "start_order":"19", "name":"ddns"},
     {"id":21, "active":"0", "start_order":"21", "name":"cloud.youtube"},
-    {"id":23, "active":"1", "start_order":"23", "name":"sysutils.filewatch"},
+    {"id":23, "active":"0", "start_order":"23", "name":"sysutils.filewatch"},
     {"id":25, "active":"1", "start_order":"25", "name":"rule"},
     {"id":27, "active":"1", "start_order":"27", "name":"node"},
 
     {"id":121, "active":"1", "start_order":"21", "name":"cloud.youtube", "host_name":"nas"},
+    {"id":123, "active":"1", "start_order":"23", "name":"sysutils.filewatch"},
 
     {"id":207, "active":"1", "start_order":"7", "name":"relay", "host_name":"pi-power"},
     {"id":209, "active":"1", "start_order":"9", "name":"heat", "host_name":"pi-power"},

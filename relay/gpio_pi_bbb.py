@@ -17,7 +17,9 @@ def __get_gpio_db_pin(bcm_id=None):
 def __write_to_file_as_root(file, value):
     try:
         if Constant.OS in Constant.OS_LINUX :
-            res = os.system('echo {} | sudo tee --append  {}'.format(str(value), file))
+            string_out = 'echo {} | sudo tee --append  {}'.format(str(value), file)
+            Log.logger.info("Writing to console [{}]".format(string_out))
+            res = os.system(string_out)
             if res == 0:
                 return True
             else:
@@ -51,7 +53,7 @@ def __set_pin_dir_out(bcm_id=''):
         #file.close()
         __setup_pin(bcm_id)
         if __write_to_file_as_root(file='/sys/class/gpio/gpio{}/direction'.format(bcm_id), value='out'):
-            Log.logger.info('Pin {} direction out OK'.format(bcm_id))
+            Log.logger.info('Set pin {} direction OUT is OK'.format(bcm_id))
             gpio_pin = __get_gpio_db_pin(bcm_id)
             if gpio_pin:
                 gpio_pin.pin_direction = 'out'
@@ -68,7 +70,7 @@ def __set_pin_dir_in(bcm_id=''):
         #file.close()
         __setup_pin(bcm_id)
         if __write_to_file_as_root(file='/sys/class/gpio/gpio{}/direction'.format(bcm_id), value='in'):
-            Log.logger.info('Pin {} direction in OK'.format(bcm_id))
+            Log.logger.info('Set pin {} direction IN is OK'.format(bcm_id))
             gpio_pin = __get_gpio_db_pin(bcm_id)
             if gpio_pin:
                 gpio_pin.pin_direction = 'in'
@@ -169,6 +171,7 @@ def set_pin_bcm(bcm_id=None, pin_value=None):
             if get_pin_bcm(bcm_id=bcm_id) != pin_value:
                 __write_line(bcm_id, pin_value)
             result = get_pin_bcm(bcm_id)
+            Log.logger.info('Set pin={} value={} result_value={}'.format(bcm_id, pin_value, result))
             if result is None:
                 Log.logger.warning('Get pin {} returned None result'.format(bcm_id))
             return result
