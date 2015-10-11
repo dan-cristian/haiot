@@ -224,5 +224,5 @@ def init():
         Log.logger.info("Plotly standard config found with username {}".format(py.get_credentials()['username']))
         initialised = True
     if initialised:
-        Log.logger.info('Plotly is connected')
+        Log.logger.info('Plotly is connected with username={}'.format(username))
         thread_pool.add_interval_callable(graph_plotly_run.thread_run, run_interval_second=60)
