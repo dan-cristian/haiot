@@ -1,6 +1,6 @@
 __author__ = 'dcristian'
 
-from main.admin import thread_pool
+from main import thread_pool
 import health_monitor_loop
 from main.logger_helper import Log
 

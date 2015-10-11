@@ -13,6 +13,7 @@ from main.logger_helper import Log
 
 
 
+
 #location for sqlite db
 DB_LOCATION=None
 app=None
@@ -121,12 +122,12 @@ def execute_command(command, node=None):
 
 def unload():
     Log.logger.info('Main module is unloading, application will exit')
-    import webui, admin.thread_pool, relay
+    import webui, main.thread_pool, relay
     from transport import mqtt_io
 
     global shutting_down
     shutting_down = True
-    admin.thread_pool.__thread_pool_enabled = False
+    main.thread_pool.__thread_pool_enabled = False
     if webui.initialised:
         webui.unload()
     if mqtt_io.initialised:
@@ -205,7 +206,7 @@ def init():
     init_modules()
 
     Log.logger.info('Initialising generic processing threads')
-    from admin import thread_pool
+    from main import thread_pool
     import threading
     t = threading.Thread(target=thread_pool.run_thread_pool)
     t.daemon = True

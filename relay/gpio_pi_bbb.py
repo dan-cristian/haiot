@@ -157,6 +157,7 @@ def get_pin_bcm(bcm_id=''):
     else:
         Log.logger.critical('Unable to get pin bcm {}'.format(bcm_id))
 
+# set gpio pin and return the actual pin state
 def set_pin_bcm(bcm_id=None, pin_value=None):
     '''BCM pin id format. Value is 0 or 1. Return value is 0 or 1, confirms pin state'''
     if pin_value is None or bcm_id is None:

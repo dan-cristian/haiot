@@ -4,7 +4,7 @@ from pydispatch import dispatcher
 from main.logger_helper import Log
 from main.admin import models
 import alarm_loop
-from main.admin import thread_pool
+from main import thread_pool
 from common import Constant, utils
 from main.admin.model_helper import commit
 

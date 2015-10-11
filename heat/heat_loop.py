@@ -5,8 +5,8 @@ import datetime
 from main.logger_helper import Log
 from main.admin import models
 from main.admin.model_helper import commit
-from common import utils
-
+from common import utils, Constant
+import relay
 
 def __save_heat_state_db(zone='', heat_is_on=''):
     assert isinstance(zone, models.Zone)
@@ -83,7 +83,7 @@ def __update_zone_heat(zone, heat_schedule, sensor):
 def loop_zones():
     try:
         heat_is_on = False
-        zone_list = models.Zone.query.all()
+        zone_list = models.Zone().query_all()
         global progress_status
         for zone in zone_list:
             progress_status = 'do zone {}'.format(zone.name)
@@ -109,6 +109,25 @@ def loop_zones():
             Log.logger.critical('No heat main source is defined in db')
     except Exception, ex:
         Log.logger.error('Error loop_zones, err={}'.format(ex, exc_info=True))
+
+# check actual heat relay status in db in case relay pin was modified externally
+def loop_heat_relay():
+    heat_relay_list = models.ZoneHeatRelay().query_filter_all(
+        models.ZoneHeatRelay.gpio_host_name.in_([Constant.HOST_NAME]))
+    for heat_relay in heat_relay_list:
+        gpio_pin = models.GpioPin().query_filter_first(models.GpioPin.host_name.in_([Constant.HOST_NAME]),
+                                                       models.GpioPin.pin_code.in_([heat_relay.gpio_pin_code]))
+        if gpio_pin:
+            pin_state = relay.relay_get(pin_bcm=gpio_pin.pin_index_bcm)
+            pin_state = (pin_state == 1)
+            if heat_relay.heat_is_on != pin_state:
+                Log.logger.warning("Inconsistent heat status zone={}, db status={}, actual={}, correcting".format(
+                    heat_relay.heat_pin_name, heat_relay.heat_is_on, pin_state))
+                heat_relay.heat_is_on = pin_state
+                commit()
+        else:
+            Log.logger.warning("Cannot find gpiopin_bcm for heat relay={} zone={}".format(heat_relay.gpio_pin_code,
+                                                                                      heat_relay.heat_pin_name))
 
 progress_status = None
 def get_progress():
