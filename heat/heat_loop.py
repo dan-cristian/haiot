@@ -37,6 +37,7 @@ def __decide_action(zone, current_temperature, target_temperature):
         __save_heat_state_db(zone=zone, heat_is_on=heat_is_on)
     return heat_is_on
 
+# return the required heat state in a zone (True - on, False - off)
 def __update_zone_heat(zone, heat_schedule, sensor):
     heat_is_on = False
     try:
@@ -48,10 +49,13 @@ def __update_zone_heat(zone, heat_schedule, sensor):
         else:
             schedule_pattern=models.SchedulePattern.query.filter_by(id=heat_schedule.pattern_weekend_id).first()
         if schedule_pattern:
+            # strip formatting characters that are not used to represent target temperature
             pattern = str(schedule_pattern.pattern).replace('-', '').replace(' ','')
+            # check pattern validity
             if len(pattern) == 24:
                 temperature_code = pattern[hour]
                 temperature_target = models.TemperatureTarget.query.filter_by(code=temperature_code).first()
+
                 if temperature_target:
                     #if not zone.last_heat_status_update:
                     #    zone.last_heat_status_update = datetime.datetime.min
@@ -76,6 +80,8 @@ def __update_zone_heat(zone, heat_schedule, sensor):
                 Log.logger.warning('Incorrect temp pattern [{}] in zone {}, length is not 24'.format(pattern, zone.name))
     except Exception, ex:
         Log.logger.error('Error updatezoneheat, err={}'.format(ex, exc_info=True))
+    Log.logger.info("Temp in {} has target={} and current={}, heat should be={}".format(zone.name, temperature_target,
+                                                                                 sensor.temperature, heat_is_on))
     return heat_is_on
 
 #iterate zones and decide heat state for each zone and also for master zone (main heat system)
