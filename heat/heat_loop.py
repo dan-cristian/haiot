@@ -37,9 +37,9 @@ def __decide_action(zone, current_temperature, target_temperature):
         Log.logger.info('Heat must change, is {} in {} temp={} target={}'.format(heat_is_on, zone.name,
                                                                             current_temperature, target_temperature))
         __save_heat_state_db(zone=zone, heat_is_on=heat_is_on)
-    else:
-        Log.logger.info('Heat should not change, is {} in {} temp={} target={}'.format(heat_is_on, zone.name,
-                                                                            current_temperature, target_temperature))
+    #else:
+    #    Log.logger.info('Heat should not change, is {} in {} temp={} target={}'.format(heat_is_on, zone.name,
+    #                                                                        current_temperature, target_temperature))
     return heat_is_on
 
 
@@ -80,9 +80,9 @@ def __update_zone_heat(zone, heat_schedule, sensor):
                 Log.logger.warning('Incorrect temp pattern [{}] in zone {}, length is not 24'.format(pattern, zone.name))
     except Exception, ex:
         Log.logger.error('Error updatezoneheat, err={}'.format(ex, exc_info=True))
-    Log.logger.info("Temp in {} has target={} and current={}, heat should be={}".format(zone.name,
-                                                                                zone.heat_target_temperature,
-                                                                                 sensor.temperature, heat_is_on))
+    #Log.logger.info("Temp in {} has target={} and current={}, heat should be={}".format(zone.name,
+    #                                                                            zone.heat_target_temperature,
+    #                                                                             sensor.temperature, heat_is_on))
     return heat_is_on
 
 #iterate zones and decide heat state for each zone and also for master zone (main heat system)
@@ -127,9 +127,15 @@ def loop_heat_relay():
             pin_state_int = relay.relay_get(pin_bcm=gpio_pin.pin_index_bcm)
             pin_state = (pin_state_int == 1)
             zone = models.Zone().query_filter_first(models.Zone.id.in_([heat_relay.zone_id]))
-            if (heat_relay.heat_is_on != pin_state) or (zone.heat_is_on != heat_relay.heat_is_on):
-                Log.logger.warning("Inconsistent heat status in zone={}, relay_status={}, correcting".format(
-                    zone.name, pin_state_int))
+            relay_inconsistency = heat_relay.heat_is_on != pin_state
+            zone_inconsistency = zone.heat_is_on != heat_relay.heat_is_on
+            if relay_inconsistency:
+                Log.logger.warning("Inconsistent heat relay status relay={} db_relay_status={} pin_status={}".format(
+                    heat_relay.heat_pin_name, heat_relay.heat_is_on, pin_state_int))
+            if zone_inconsistency:
+                Log.logger.warning("Inconsistent zone heat status zone={} db_heat_status={} db_relay_status={}".format(
+                    zone.name, zone.heat_is_on, heat_relay.heat_is_on))
+            if relay_inconsistency or zone_inconsistency:
                 __save_heat_state_db(zone=zone, heat_is_on=pin_state)
             #else:
             #    Log.logger.info("Heat pin {} status equal to gpio status {}".format(heat_relay.heat_is_on, pin_state_int))

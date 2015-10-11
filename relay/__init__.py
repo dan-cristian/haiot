@@ -34,7 +34,7 @@ def relay_get(pin_bcm=None, from_web=False):
     message = 'Get relay state for pin {}'.format(pin_bcm)
     if Constant.HOST_MACHINE_TYPE in [Constant.MACHINE_TYPE_RASPBERRY, Constant.MACHINE_TYPE_BEAGLEBONE]:
         pin_value = gpio_pi_bbb.get_pin_bcm(pin_bcm)
-        Log.logger.info(message + str(" val={}".format(pin_value)))
+        #Log.logger.info(message + str(" val={}".format(pin_value)))
     else:
         message += ' error not running on gpio enabled devices'
         pin_value = None
@@ -49,7 +49,7 @@ def relay_get(pin_bcm=None, from_web=False):
 #set gpio pin without updating DB, so make sure it's used only after DB update trigger
 def relay_set(pin_bcm=None, value=None, from_web=False):
     value = int(value)
-    message = 'Set relay state [{}] for pin [{}] from web=[]'.format(value, pin_bcm, from_web)
+    message = 'Set relay state [{}] for pin [{}] from web=[{}]'.format(value, pin_bcm, from_web)
     Log.logger.info(message)
     if Constant.HOST_MACHINE_TYPE in [Constant.MACHINE_TYPE_RASPBERRY, Constant.MACHINE_TYPE_BEAGLEBONE]:
         pin_value = gpio_pi_bbb.set_pin_bcm(pin_bcm, value)
