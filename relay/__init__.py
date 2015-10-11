@@ -9,6 +9,7 @@ import gpio_pi_bbb
 
 initialised=False
 
+
 def relay_update(gpio_pin_code=None, pin_value=None, from_web=False):
     result = None
     #return pin value after state set
@@ -27,6 +28,7 @@ def relay_update(gpio_pin_code=None, pin_value=None, from_web=False):
         Log.logger.warning('Error updating relay state err={}'.format(ex))
     return result
 
+
 #pin expected format is bcm
 def relay_get(pin_bcm=None, from_web=False):
     message = 'Get relay state for pin {}'.format(pin_bcm)
@@ -42,6 +44,7 @@ def relay_get(pin_bcm=None, from_web=False):
     #    return return_web_message(pin_value=pin_value, ok_message=message, err_message=message)
     #else:
     return pin_value
+
 
 #set gpio pin without updating DB, so make sure it's used only after DB update trigger
 def relay_set(pin_bcm=None, value=None, from_web=False):
@@ -61,7 +64,6 @@ def relay_set(pin_bcm=None, value=None, from_web=False):
     return pin_value
 
 
-
 def gpio_record_update(json_object):
     #save relay io state to db, except for current node
     #carefull not to trigger infinite recursion updates
@@ -73,7 +75,7 @@ def gpio_record_update(json_object):
                                                     notify_transport_enabled=False, save_to_graph=False)
     except Exception, ex:
         Log.logger.warning('Error on gpio state update, err {}'.format(ex))
-    pass
+
 
 def zone_custom_relay_record_update(json_object):
     #save relay state to db, except for current node
@@ -101,6 +103,7 @@ def zone_custom_relay_record_update(json_object):
     except Exception, ex:
         Log.logger.warning('Error on zone custom relay update, err {}'.format(ex))
 
+
 def unload():
     global initialised
     if Constant.HOST_MACHINE_TYPE in [Constant.MACHINE_TYPE_RASPBERRY, Constant.MACHINE_TYPE_BEAGLEBONE]:
@@ -108,10 +111,8 @@ def unload():
         gpio_pi_bbb.unload()
     initialised = False
 
+
 def init():
     Log.logger.info("Relay initialising")
     global initialised
     initialised = True
-
-
-
