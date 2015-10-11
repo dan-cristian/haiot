@@ -158,6 +158,7 @@ def init():
     #use auto setup as described here: https://plot.ly/python/getting-started/ to avoid passwords in code
     #or less secure sign_in code below
     #py.sign_in(model_helper.get_param(constant.P_PLOTLY_USERNAME),model_helper.get_param(constant.P_PLOTLY_APIKEY))
+    username = ""
     if py.get_credentials()['username'] == '' or py.get_credentials()['api_key'] == '':
         env_var='PLOTLY_CREDENTIALS_PATH'
         alt_path = os.environ.get(env_var)
@@ -178,8 +179,8 @@ def init():
                 data = cred_file.read().replace('\n','')
             if len(data) > 0:
                 cred_obj = utils.json2obj(data)
-                username=cred_obj['username']
-                api_key=cred_obj['api_key']
+                username = cred_obj['username']
+                api_key = cred_obj['api_key']
                 if username and api_key:
                     py.sign_in(username, api_key)
                     global initialised
