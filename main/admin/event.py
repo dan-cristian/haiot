@@ -170,8 +170,8 @@ def mqtt_thread_run():
 
 def init():
     #http://pydispatcher.sourceforge.net/
-    dispatcher.connect(handle_local_event_db_post, signal=common.Constant.SIGNAL_SENSOR_DB_POST, sender=dispatcher.Any)
-    dispatcher.connect(handle_event_mqtt_received, signal=common.Constant.SIGNAL_MQTT_RECEIVED, sender=dispatcher.Any)
+    dispatcher.connect(handle_local_event_db_post, signal=Constant.SIGNAL_SENSOR_DB_POST, sender=dispatcher.Any)
+    dispatcher.connect(handle_event_mqtt_received, signal=Constant.SIGNAL_MQTT_RECEIVED, sender=dispatcher.Any)
 
     thread_pool.add_interval_callable(mqtt_thread_run, run_interval_second=1)
 

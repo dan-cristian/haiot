@@ -122,6 +122,8 @@ owproxy=None
 def init():
     Log.logger.info('Initialising owssensor')
     global owproxy, initialised
+    host = "none"
+    port = "none"
     try:
         host = model_helper.get_param(Constant.P_OWSERVER_HOST_1)
         port = str(model_helper.get_param(Constant.P_OWSERVER_PORT_1))

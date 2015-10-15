@@ -32,9 +32,9 @@ class DbBase:
     # example with one filter
     # models.Rule().query_filter_all(filter=models.Rule.host_name.in_([Constant.HOST_NAME, ""]))
     #
-    def query_filter_all(self, filter):
-        function = self.query.filter(filter).all
-        return self.__get_result(function)
+    #def query_filter_all(self, filter):
+    #    function = self.query.filter(filter).all
+    #    return self.__get_result(function)
 
     def query_filter_all(self, *filter):
         function = self.query.filter(*filter).all

@@ -16,6 +16,7 @@ __last_minute = 0
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
+    json = msg
     try:
         global __last_message_received, __last_minute
         if utils.get_base_location_now_date().minute != __last_minute:
