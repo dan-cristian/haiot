@@ -45,7 +45,7 @@ try:
     pass
 
 except Exception, ex:
-    logger.error('Unable to initialise apscheduler based rules, err={}'.format(ex))
+    Log.logger.error('Unable to initialise apscheduler based rules, err={}'.format(ex))
 
 ###### JOBS executed asyncronously via a thread pool ######
 def test():

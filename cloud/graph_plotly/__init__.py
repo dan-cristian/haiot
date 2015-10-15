@@ -19,7 +19,7 @@ initialised = False
 def cache_record_update(obj):
     source_host_name = utils.get_object_field_value(obj, Constant.JSON_PUBLISH_SOURCE_HOST)
     if source_host_name != Constant.HOST_NAME:
-        Log.logger.info("Received plotly cache update from {}".format(source_host_name))
+        #Log.logger.info("Received plotly cache update from {}".format(source_host_name))
         models.PlotlyCache().save_changed_fields_from_json_object(json_object=obj, notify_transport_enabled=False,
                                                                   save_to_graph=False)
 
