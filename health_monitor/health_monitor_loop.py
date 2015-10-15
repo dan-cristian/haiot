@@ -157,6 +157,7 @@ def get_device_name_linux_style(dev):
 
 def __read_hddparm(disk_dev=''):
     output = cStringIO.StringIO()
+    hddparm_out = "None"
     global ERR_TEXT_NO_DEV
     try:
         if import_module_psutil_exist:
@@ -221,13 +222,14 @@ def __get_mem_avail_percent_linux():
 
 
 def __get_uptime_linux_days():
+    uptime_seconds = 0
     try:
         f = open('/proc/uptime')
         line = f.readline()
         uptime_seconds = float(line.split()[0])
+        f.close()
     except Exception, ex:
         Log.logger.warning('Unable to read uptime err {}'.format(ex))
-    f.close()
     return uptime_seconds / (60 * 60 * 24)
 
 #fixme: does not work always, depends on regional settings
@@ -311,6 +313,7 @@ def __get_cpu_utilisation_linux():
     return CPU_Percentage
 
 def __get_cpu_temperature():
+    temp = -1
     if Constant.IS_OS_WINDOWS():
         #http://stackoverflow.com/questions/3262603/accessing-cpu-temperature-in-python
         global import_module_wmi_ok
@@ -324,7 +327,6 @@ def __get_cpu_temperature():
                 Log.logger.error('Unable to get temperature using wmi, err={}'.format(ex))
         else:
             Log.logger.warning('Unable to get CPU temp, no function available')
-            temp = -1
     else:
         if Constant.IS_MACHINE_RASPBERRYPI:
             path = '/sys/class/thermal/thermal_zone0/temp'
@@ -387,18 +389,18 @@ def __read_system_attribs():
         Log.logger.exception('Error saving system to DB err={}'.format(ex))
 
 def __check_log_file_size():
-    if not logger_helper.LOG_FILE is None:
+    if not logger_helper.Log.LOG_FILE is None:
         try:
-            size = os.path.getsize(logger_helper.LOG_FILE)
+            size = os.path.getsize(logger_helper.Log.LOG_FILE)
             if size > 1024 * 1024 * 10:
-                Log.logger.info('Log file {} size is {}, truncating'.format(logger_helper.LOG_FILE, size))
-                shutil.copy(logger_helper.LOG_FILE, logger_helper.LOG_FILE+'.last')
-                file = open(logger_helper.LOG_FILE, mode='rw+')
+                Log.logger.info('Log file {} size is {}, truncating'.format(logger_helper.Log.LOG_FILE, size))
+                shutil.copy(logger_helper.Log.LOG_FILE, logger_helper.Log.LOG_FILE+'.last')
+                file = open(logger_helper.Log.LOG_FILE, mode='rw+')
                 file.truncate()
                 file.seek(0)
                 file.close()
         except Exception, ex:
-            Log.logger.warning('Cannot retrieve or truncate log file {} err={}'.format(logger_helper.LOG_FILE, ex))
+            Log.logger.warning('Cannot retrieve or truncate log file {} err={}'.format(logger_helper.Log.LOG_FILE, ex))
 
 '''
 /proc/diskstats

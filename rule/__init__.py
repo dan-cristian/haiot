@@ -52,7 +52,7 @@ def thread_run():
 def unload():
     Log.logger.info('Rules module unloading')
     #...
-    thread_pool.remove_callable(rules_run.thread_run)
+    thread_pool.remove_callable(thread_run)
     global initialised
     initialised = False
 
@@ -66,7 +66,7 @@ def __load_rules_from_db():
     #keep host name default to '' rather than None (which does not work on filter in_)
     try:
         #rule_list = models.Rule.query.filter(models.Rule.host_name.in_([constant.HOST_NAME, ""])).all()
-        rule_list = models.Rule().query_filter_all(filter=models.Rule.host_name.in_([Constant.HOST_NAME, ""]))
+        rule_list = models.Rule().query_filter_all(models.Rule.host_name.in_([Constant.HOST_NAME, ""]))
         scheduler.remove_all_jobs()
         for rule in rule_list:
             method_to_call = getattr(rules_run, rule.command)
