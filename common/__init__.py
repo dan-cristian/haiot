@@ -101,6 +101,8 @@ class Constant:
     JSON_PUBLISH_FIELDS_CHANGED='last_commit_field_changed_list'
     JSON_PUBLISH_NOTIFY_TRANSPORT = 'notify_transport_enabled'
     JSON_PUBLISH_NOTIFY_DB_COMMIT = 'notified_on_db_commit'
+    # use exact field name from class DbBase
+    JSON_PUBLISH_RECORD_UUID = 'record_uuid'
 
     GPIO_PIN_TYPE_BBB='bbb'
     GPIO_PIN_TYPE_PI='pi'
