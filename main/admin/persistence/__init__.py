@@ -4,7 +4,6 @@ __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 from common import Constant
 from common import utils
 from main import Log
-from main.admin.model_helper import commit
 
 # saves record to local database
 def save_to_history(obj, upload_to_cloud=False):

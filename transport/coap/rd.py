@@ -18,7 +18,6 @@ import sys
 import fnmatch
 
 from twisted.internet import defer
-from twisted.internet.protocol import DatagramProtocol
 from twisted.internet import reactor
 from twisted.python import log
 
