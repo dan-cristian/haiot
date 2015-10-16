@@ -400,6 +400,7 @@ class Ups(db.Model, graphs.UpsGraph, DbEvent, DbBase):
     test_in_progress = db.Column(db.Boolean(), default=False)
     other_status= db.Column(db.String(50))
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+
     def __repr__(self):
         return '{} {} {}'.format(self.id, self.name, self.updated_on)
 
@@ -559,6 +560,7 @@ tables used to store historical data
 column names must match the source model names as save is done automatically
 '''
 
+
 class NodeHistory(db.Model, DbBase):
     __bind_key__ = 'reporting'
     __tablename__ = 'node_history'
@@ -567,7 +569,7 @@ class NodeHistory(db.Model, DbBase):
     master_overall_cycles = db.Column(db.Integer) #count of update cycles while node was master
     run_overall_cycles = db.Column(db.Integer) #count of total update cycles
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
-    uuid = db.Column(db.String(16))
+    record_uuid = db.Column(db.String(16))
 
     def __repr__(self):
         return '{} {}'.format(self.id, self.name)
@@ -577,12 +579,12 @@ class SensorHistory(db.Model, DbBase):
     __bind_key__ = 'reporting'
     __tablename__ = 'sensor_history'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50))
+    sensor_name = db.Column(db.String(50))
     address = db.Column(db.String(50))
     temperature = db.Column(db.Float)
     humidity = db.Column(db.Float)
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
-    uuid = db.Column(db.String(16))
+    record_uuid = db.Column(db.String(16))
 
     def __repr__(self):
         return '{} {}'.format(self.id, self.name)
@@ -597,7 +599,7 @@ class SystemMonitorHistory(db.Model, DbBase):
     memory_available_percent = db.Column(db.Float)
     uptime_days = db.Column(db.Integer)
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
-    uuid = db.Column(db.String(16))
+    record_uuid = db.Column(db.String(16))
 
     def __repr__(self):
         return '{} {} {}'.format(self.id, self.name, self.updated_on)
@@ -622,7 +624,7 @@ class UpsHistory(db.Model, DbBase):
     test_in_progress = db.Column(db.Boolean(), default=False)
     other_status = db.Column(db.String(50))
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
-    uuid = db.Column(db.String(16))
+    record_uuid = db.Column(db.String(16))
 
     def __repr__(self):
         return '{} {} {}'.format(self.id, self.name, self.updated_on)
@@ -650,7 +652,7 @@ class SystemDiskHistory(db.Model, DbBase):
     last_reads_elapsed = db.Column(db.Float)
     last_writes_elapsed = db.Column(db.Float)
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
-    uuid = db.Column(db.String(16))
+    record_uuid = db.Column(db.String(16))
 
     def __init__(self):
         self.hdd_disk_dev = ''
