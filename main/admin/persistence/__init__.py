@@ -6,7 +6,7 @@ from common import utils
 from main import Log
 
 # saves record to local database
-def save_to_history(obj, upload_to_cloud=False):
+def save_to_history(obj, save_to_local_db=False, upload_to_cloud=False):
     try:
         Log.logger.debug('Trying to save historical record {}'.format(obj))
         if Constant.JSON_PUBLISH_GRAPH_X in obj:
@@ -47,6 +47,8 @@ def save_to_history(obj, upload_to_cloud=False):
                                 setattr(new_record, axis_x_field, x)
                                 setattr(new_record, axis_y, y)
                                 setattr(new_record, graph_legend_field, graph_legend_item_name)
+                                setattr(new_record, Constant.JSON_PUBLISH_RECORD_UUID,
+                                        obj[Constant.JSON_PUBLISH_RECORD_UUID])
                                 new_record.add_record_to_db()
                             except Exception, ex:
                                 Log.logger.critical("Cannot save history db err={} record={}".format(ex, obj))

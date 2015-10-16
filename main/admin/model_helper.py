@@ -26,7 +26,7 @@ def model_row_to_json(obj, operation=''):
             break
 
         #safe_obj[constant.JSON_PUBLISH_RECORD_OPERATION]=operation
-        safe_obj[Constant.JSON_PUBLISH_SOURCE_HOST]=str(Constant.HOST_NAME)
+        safe_obj[Constant.JSON_PUBLISH_SOURCE_HOST] = str(Constant.HOST_NAME)
         #safe_obj[constant.JSON_PUBLISH_DATE]=str(utils.get_base_location_now_date())
         #safe_obj[constant.JSON_PUBLISH_TARGET_HOST]=constant.JSON_PUBLISH_VALUE_TARGET_HOST_ALL
         #removing infinite recursions and class noise
