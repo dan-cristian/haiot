@@ -25,7 +25,11 @@
     {"name": "P_PLOTLY_ALTERNATE_CONFIG", "value": ".plotly.credentials"},
     {"name": "P_FLASK_WEB_PORT", "value": "8080"},
     {"name": "P_MOTION_VIDEO_PATH", "value": "/media/temp/motion"},
-    {"name": "P_YOUTUBE_CREDENTIAL_FILE", "value": ".youtube.credentials"}
+    {"name": "P_YOUTUBE_CREDENTIAL_FILE", "value": ".youtube.credentials"},
+    {"name": "DB_REPORTING_LOCATION_ENABLED", "value": "1", "description":"1 for recording data, 0 disabled"},
+    {"name": "DB_REPORTING_LOCATION", "value": "mysql+mysqlconnector://<user>:<passwd>@192.168.0.9/haiot-reporting"},
+    {"name": "DB_REPORTING_USER", "value": "haiot"},
+    {"name": "DB_REPORTING_PASS", "value": "haiot"}
   ],
   "Module": [
     {"id":1,  "active":"1", "start_order":"1", "name":"main"},
@@ -60,7 +64,7 @@
 
     {"id":509, "active":"1", "start_order":"9", "name":"heat", "host_name":"netbook"},
     {"id":599, "active":"0", "start_order":"9", "name":"test", "host_name":"netbook"},
-    {"id":513, "active":"1", "start_order":"13", "name":"cloud.graph_plotly", "host_name":"netbook"}
+    {"id":513, "active":"0", "start_order":"13", "name":"cloud.graph_plotly", "host_name":"netbook"}
 
 
   ],

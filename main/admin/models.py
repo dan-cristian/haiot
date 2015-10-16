@@ -10,11 +10,12 @@ from common import utils, performance
 #TODO: read this
 #http://lucumr.pocoo.org/2011/7/19/sqlachemy-and-you/
 
+# inherit this to use performance tracked queries
 class DbBase:
     def __check_for_long_query(self, result, start_time, function):
         query_details = function.im_self
         elapsed = performance.add_query(start_time, query_details=query_details)
-        if elapsed > 5000:#with sqlite a long query will throw an error
+        if elapsed > 5000:  # with sqlite a long query will throw an error
             Log.logger.critical("Long running DB query, seconds elapsed={}, result={}".format(elapsed, query_details))
             db.session.rollback()
             Log.logger.info("Session was rolled back")
@@ -54,7 +55,11 @@ class DbBase:
         function = self.query.delete
         return self.__get_result(function)
 
+    def add_record_to_db(self):
+        db.session.add(self)
+        commit()
 
+# inherit this to enable easy record changes save and publish
 class DbEvent:
     def __init__(self):
         pass
@@ -73,7 +78,7 @@ class DbEvent:
     def json_to_record(self, json_object):
         for field in json_object:
             if hasattr(self, field):
-                #fixme: really bad performance
+                # fixme: really bad performance
                 if utils.is_date_string(str(json_object[field])):
                     value = utils.date_deserialiser(str(json_object[field]))
                 else:
@@ -81,13 +86,13 @@ class DbEvent:
                 setattr(self, field, value)
         return self
 
-    #copies fields from a json object to an existing or new db record
+    # copies fields from a json object to an existing or new db record
     def save_changed_fields_from_json_object(self,json_object=None, unique_key_name=None,
-                                            notify_transport_enabled=False, save_to_graph=False,
-                                            ignore_only_updated_on_change=True, debug=False, graph_save_frequency=0):
+                                             notify_transport_enabled=False, save_to_graph=False,
+                                             ignore_only_updated_on_change=True, debug=False, graph_save_frequency=0):
         try:
             new_record = self.json_to_record(json_object)
-            #let flask assign an id in case unique key name is different, to avoid key integrity error
+            # let flask assign an id in case unique key name is different, to avoid key integrity error
             if not unique_key_name:
                 unique_key_name = 'id'
             else:
@@ -111,20 +116,23 @@ class DbEvent:
     def save_changed_fields(self,current_record='',new_record='',notify_transport_enabled=False, save_to_graph=False,
                             ignore_only_updated_on_change=True, debug=False, graph_save_frequency=0, filter=None):
         try:
-            if hasattr(self, 'save_to_graph'):#not all models inherit graph
+            if hasattr(self, 'save_to_graph'):  # not all models inherit graph
                 if current_record:
-                    #if a record in db already exists
+                    # if a record in db already exists
                     if not current_record.last_save_to_graph:
                         current_record.last_save_to_graph = datetime.min
                     save_to_graph_elapsed = (utils.get_base_location_now_date() -
                                              current_record.last_save_to_graph).total_seconds()
                     if save_to_graph_elapsed > graph_save_frequency:
                         current_record.save_to_graph = save_to_graph
+                        current_record.save_to_history = save_to_graph
                     else:
                         current_record.save_to_graph = False
+                        current_record.save_to_history = False
                 else:
-                    #this is a new record
+                    # this is a new record
                     new_record.save_to_graph = save_to_graph
+                    new_record.save_to_history = save_to_graph
 
             if current_record:
                 current_record.last_commit_field_changed_list=[]
@@ -297,6 +305,8 @@ class Parameter(db.Model, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True)
     value = db.Column(db.String(255))
+    description = db.Column(db.String(255))
+
 
     def __init__(self, id=None, name='default', value='default'):
         if id:
@@ -369,6 +379,7 @@ class SystemMonitor(db.Model, graphs.SystemMonitorGraph, DbEvent, DbBase):
     def __repr__(self):
         return '{} {} {}'.format(self.id, self.name, self.updated_on)
 
+
 class Ups(db.Model, graphs.UpsGraph, DbEvent, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True)
@@ -388,6 +399,7 @@ class Ups(db.Model, graphs.UpsGraph, DbEvent, DbBase):
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
     def __repr__(self):
         return '{} {} {}'.format(self.id, self.name, self.updated_on)
+
 
 class SystemDisk(db.Model, graphs.SystemDiskGraph, DbEvent, DbBase):
     id = db.Column(db.Integer, primary_key=True)
@@ -415,6 +427,7 @@ class SystemDisk(db.Model, graphs.SystemDiskGraph, DbEvent, DbBase):
 
     def __repr__(self):
         return '{} {} {} {} {}'.format(self.id, self.serial,  self.system_name, self.hdd_name, self.hdd_disk_dev)
+
 
 class GpioPin(db.Model, DbEvent, DbBase):
     id = db.Column(db.Integer, primary_key=True)
@@ -537,3 +550,102 @@ class PlotlyCache(db.Model, DbEvent, DbBase):
         if id:
             self.id = id
         self.grid_name = grid_name
+
+'''
+tables used to store historical data
+column names must match the source model names as save is done automatically
+'''
+
+class NodeHistory(db.Model, DbBase):
+    __bind_key__ = 'reporting'
+    __tablename__ = 'node_history'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50))
+    master_overall_cycles = db.Column(db.Integer) #count of update cycles while node was master
+    run_overall_cycles = db.Column(db.Integer) #count of total update cycles
+    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return '{} {}'.format(self.id, self.name)
+
+
+class SensorHistory(db.Model, DbBase):
+    __bind_key__ = 'reporting'
+    __tablename__ = 'sensor_history'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50))
+    address = db.Column(db.String(50))
+    temperature = db.Column(db.Float)
+    humidity = db.Column(db.Float)
+    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return '{} {}'.format(self.id, self.name)
+
+class SystemMonitorHistory(db.Model, DbBase):
+    __bind_key__ = 'reporting'
+    __tablename__ = 'systemmonitor_history'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50))
+    cpu_usage_percent = db.Column(db.Float)
+    cpu_temperature = db.Column(db.Float)
+    memory_available_percent = db.Column(db.Float)
+    uptime_days = db.Column(db.Integer)
+    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return '{} {} {}'.format(self.id, self.name, self.updated_on)
+
+
+class UpsHistory(db.Model, DbBase):
+    __bind_key__ = 'reporting'
+    __tablename__ = 'ups_history'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50))
+    system_name = db.Column(db.String(50))
+    port = db.Column(db.String(50))
+    input_voltage = db.Column(db.Float)
+    remaining_minutes = db.Column(db.Float)
+    output_voltage = db.Column(db.Float)
+    load_percent = db.Column(db.Float)
+    power_frequency = db.Column(db.Float)
+    battery_voltage = db.Column(db.Float)
+    temperature = db.Column(db.Float)
+    power_failed = db.Column(db.Boolean(), default=False)
+    beeper_on = db.Column(db.Boolean(), default=False)
+    test_in_progress = db.Column(db.Boolean(), default=False)
+    other_status = db.Column(db.String(50))
+    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return '{} {} {}'.format(self.id, self.name, self.updated_on)
+
+
+class SystemDiskHistory(db.Model, DbBase):
+    __bind_key__ = 'reporting'
+    __tablename__ = 'systemdisk_history'
+    id = db.Column(db.Integer, primary_key=True)
+    serial = db.Column(db.String(50))
+    system_name = db.Column(db.String(50))
+    hdd_name = db.Column(db.String(50)) #netbook /dev/sda
+    hdd_device = db.Column(db.String(50)) #usually empty?
+    hdd_disk_dev = db.Column(db.String(50)) #/dev/sda
+    temperature = db.Column(db.Float)
+    sector_error_count = db.Column(db.Integer)
+    smart_status = db.Column(db.String(50))
+    power_status = db.Column(db.Integer)
+    load_cycle_count = db.Column(db.Integer)
+    start_stop_count = db.Column(db.Integer)
+    last_reads_completed_count = db.Column(db.Float)
+    last_reads_datetime = db.Column(db.DateTime())
+    last_writes_completed_count = db.Column(db.Float)
+    last_writes_datetime = db.Column(db.DateTime())
+    last_reads_elapsed = db.Column(db.Float)
+    last_writes_elapsed = db.Column(db.Float)
+    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __init__(self):
+        self.hdd_disk_dev = ''
+
+    def __repr__(self):
+        return '{} {} {} {} {}'.format(self.id, self.serial,  self.system_name, self.hdd_name, self.hdd_disk_dev)
