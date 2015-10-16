@@ -44,11 +44,22 @@ def save_to_history(obj, save_to_local_db=False, upload_to_cloud=False):
                             try:
                                 class_table = getattr(models, dest_table)
                                 new_record = class_table()
-                                setattr(new_record, axis_x_field, x)
+                                field_pairs = [[axis_x_field, x], [axis_y, y],
+                                               [graph_legend_field, graph_legend_item_name],
+                                               [Constant.JSON_PUBLISH_RECORD_UUID, obj[Constant.JSON_PUBLISH_RECORD_UUID]]]
+                                for pair in field_pairs:
+                                    if hasattr(new_record, pair[0]):
+                                        setattr(new_record, pair[0], pair[1])
+                                    else:
+                                        source_host = obj[Constant.JSON_PUBLISH_SOURCE_HOST]
+                                        Log.logger.warning('History field [{}] to save is not in DB, source={}'.format(
+                                            pair[0], source_host))
+                                '''
                                 setattr(new_record, axis_y, y)
                                 setattr(new_record, graph_legend_field, graph_legend_item_name)
                                 setattr(new_record, Constant.JSON_PUBLISH_RECORD_UUID,
                                         obj[Constant.JSON_PUBLISH_RECORD_UUID])
+                                '''
                                 new_record.add_record_to_db()
                             except Exception, ex:
                                 Log.logger.critical("Cannot save history db err={} record={}".format(ex, obj))
