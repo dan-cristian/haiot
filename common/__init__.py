@@ -34,6 +34,8 @@ class Constant:
     IS_MACHINE_INTEL = False
     IS_MACHINE_OPENWRT = False
 
+    HAS_LOCAL_DB_REPORTING_CAPABILITY = False
+
     @staticmethod
     def IS_OS_WINDOWS():
         return Constant.OS in Constant.OS_WINDOWS
@@ -60,6 +62,10 @@ class Constant:
     P_FLASK_WEB_PORT='P_FLASK_WEB_PORT'
     P_MOTION_VIDEO_PATH = 'P_MOTION_VIDEO_PATH'
     P_YOUTUBE_CREDENTIAL_FILE = 'P_YOUTUBE_CREDENTIAL_FILE'
+    DB_REPORTING_LOCATION_ENABLED = 'DB_REPORTING_LOCATION_ENABLED'
+    DB_REPORTING_LOCATION = 'DB_REPORTING_LOCATION'
+    DB_REPORTING_USER = 'DB_REPORTING_USER'
+    DB_REPORTING_PASS = 'DB_REPORTING_PASS'
 
     SMARTCTL_MODEL_FAMILY='Model Family:'
     SMARTCTL_MODEL_DEVICE='Device Model:'
@@ -89,7 +95,9 @@ class Constant:
     JSON_PUBLISH_GRAPH_SHAPE='graph_shape_'
     JSON_PUBLISH_GRAPH_ID='graph_id_'
     JSON_PUBLISH_GRAPH_LEGEND='graph_legend_'
+    # use exact field names from class BaseGraph
     JSON_PUBLISH_SAVE_TO_GRAPH='save_to_graph'
+    JSON_PUBLISH_SAVE_TO_HISTORY='save_to_history'
     JSON_PUBLISH_FIELDS_CHANGED='last_commit_field_changed_list'
     JSON_PUBLISH_NOTIFY_TRANSPORT = 'notify_transport_enabled'
     JSON_PUBLISH_NOTIFY_DB_COMMIT = 'notified_on_db_commit'

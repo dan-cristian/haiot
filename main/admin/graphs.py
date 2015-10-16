@@ -1,11 +1,13 @@
 __author__ = 'dcristian'
 
+
 class BaseGraph:
     def __init__(self):
         pass
 
-    save_to_graph = False #if true this record will be uploaded to a graph
-    last_save_to_graph = None #last date, used to upload with a certain frequency
+    save_to_graph = False  # if true this record will be uploaded to a graph
+    last_save_to_graph = None  # last date, used to upload with a certain frequency
+    save_to_history = False  # if true this record will be saved to master node database for reporting
     @property
     def graph_x_(self): raise NotImplementedError
     @property
@@ -14,6 +16,7 @@ class BaseGraph:
     def graph_id_(self): raise NotImplementedError
     @property
     def graph_legend_(self): raise NotImplementedError
+
 
 class SensorGraph(BaseGraph):
     def __init__(self):
@@ -25,6 +28,7 @@ class SensorGraph(BaseGraph):
     graph_id_ = 'address'
     graph_legend_ = 'sensor_name'
 
+
 class SystemMonitorGraph(BaseGraph):
     def __init__(self):
         pass
@@ -34,6 +38,7 @@ class SystemMonitorGraph(BaseGraph):
     graph_shape_ = ['spline','spline','hv', 'spline']
     graph_id_ = 'name'
     graph_legend_ = 'name'
+
 
 class SystemDiskGraph(BaseGraph):
     def __init__(self):
@@ -46,6 +51,7 @@ class SystemDiskGraph(BaseGraph):
     graph_id_ = 'serial'
     graph_legend_ = 'hdd_name'
 
+
 class NodeGraph(BaseGraph):
     def __init__(self):
         pass
@@ -54,6 +60,7 @@ class NodeGraph(BaseGraph):
     graph_shape_ = ['hv', 'hv']
     graph_id_ = 'name'
     graph_legend_ = 'name'
+
 
 class UpsGraph(BaseGraph):
     def __init__(self):
