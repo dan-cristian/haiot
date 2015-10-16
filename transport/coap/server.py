@@ -5,10 +5,8 @@ Created on 08-09-2012
 '''
 
 import sys
-import datetime
 
 from twisted.internet import defer
-from twisted.internet.protocol import DatagramProtocol
 from twisted.internet import reactor
 from twisted.python import log
 

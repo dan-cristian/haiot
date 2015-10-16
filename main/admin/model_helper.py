@@ -1,5 +1,4 @@
 __author__ = 'dcristian'
-import random
 import sys
 import uuid
 import json

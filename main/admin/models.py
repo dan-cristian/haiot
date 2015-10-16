@@ -1,5 +1,6 @@
 from datetime import datetime
 from copy import deepcopy
+import uuid
 
 from main.logger_helper import Log
 from main import db
@@ -12,6 +13,8 @@ from common import utils, performance
 
 # inherit this to use performance tracked queries
 class DbBase:
+    record_uuid = uuid.uuid1()
+
     def __check_for_long_query(self, result, start_time, function):
         query_details = function.im_self
         elapsed = performance.add_query(start_time, query_details=query_details)
@@ -67,7 +70,7 @@ class DbEvent:
     notified_on_db_commit=False
     notify_transport_enabled=False
     event_sent_datetime = None
-    event_uuid = None
+
     operation_type=None
     last_commit_field_changed_list = []
 

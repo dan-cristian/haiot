@@ -6,8 +6,6 @@ Created on 08-09-2012
 
 import sys
 
-from twisted.internet.defer import Deferred
-from twisted.internet.protocol import DatagramProtocol
 from twisted.internet import reactor
 from twisted.python import log
 
