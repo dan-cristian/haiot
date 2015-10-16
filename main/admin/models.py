@@ -13,7 +13,7 @@ from common import utils, performance
 
 # inherit this to use performance tracked queries
 class DbBase:
-    record_uuid = uuid.uuid1()
+    record_uuid = None
 
     def __check_for_long_query(self, result, start_time, function):
         query_details = function.im_self
@@ -567,6 +567,7 @@ class NodeHistory(db.Model, DbBase):
     master_overall_cycles = db.Column(db.Integer) #count of update cycles while node was master
     run_overall_cycles = db.Column(db.Integer) #count of total update cycles
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+    uuid = db.Column(db.String(16))
 
     def __repr__(self):
         return '{} {}'.format(self.id, self.name)
@@ -581,6 +582,7 @@ class SensorHistory(db.Model, DbBase):
     temperature = db.Column(db.Float)
     humidity = db.Column(db.Float)
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+    uuid = db.Column(db.String(16))
 
     def __repr__(self):
         return '{} {}'.format(self.id, self.name)
@@ -595,6 +597,7 @@ class SystemMonitorHistory(db.Model, DbBase):
     memory_available_percent = db.Column(db.Float)
     uptime_days = db.Column(db.Integer)
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+    uuid = db.Column(db.String(16))
 
     def __repr__(self):
         return '{} {} {}'.format(self.id, self.name, self.updated_on)
@@ -619,6 +622,7 @@ class UpsHistory(db.Model, DbBase):
     test_in_progress = db.Column(db.Boolean(), default=False)
     other_status = db.Column(db.String(50))
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+    uuid = db.Column(db.String(16))
 
     def __repr__(self):
         return '{} {} {}'.format(self.id, self.name, self.updated_on)
@@ -646,6 +650,7 @@ class SystemDiskHistory(db.Model, DbBase):
     last_reads_elapsed = db.Column(db.Float)
     last_writes_elapsed = db.Column(db.Float)
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+    uuid = db.Column(db.String(16))
 
     def __init__(self):
         self.hdd_disk_dev = ''
