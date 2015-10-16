@@ -5,7 +5,7 @@ from pydispatch import dispatcher
 from main import app, db
 from main.logger_helper import Log
 from main.admin.model_helper import commit
-from flask import request, abort, send_file, render_template
+from flask import abort, send_file, render_template
 from common import Constant, utils
 
 def return_web_message(pin_value, ok_message='', err_message=''):

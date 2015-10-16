@@ -3,7 +3,6 @@ from pydispatch import dispatcher
 from main.logger_helper import Log
 from main import thread_pool
 from common import Constant, variable, utils
-import common.utils
 import transport
 import models
 import main
@@ -156,7 +155,7 @@ def mqtt_thread_run():
                                 start = utils.get_base_location_now_date()
                                 # initial implementation
                                 # graph_plotly.upload_data(obj)
-                                graph_plotly.upload_data_to_grid(obj)
+                                persistence.save_to_history(obj, upload_to_cloud=True)
                                 elapsed = (utils.get_base_location_now_date() - start).total_seconds()
                                 Log.logger.debug('Plotly upload took {}s'.format(elapsed))
                             else:
