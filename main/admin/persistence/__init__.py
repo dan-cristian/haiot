@@ -46,7 +46,10 @@ def save_to_history(obj, save_to_local_db=False, upload_to_cloud=False):
                                 new_record = class_table()
                                 field_pairs = [[axis_x_field, x], [axis_y, y],
                                                [graph_legend_field, graph_legend_item_name],
-                                               [Constant.JSON_PUBLISH_RECORD_UUID, obj[Constant.JSON_PUBLISH_RECORD_UUID]]]
+                                               [Constant.JSON_PUBLISH_RECORD_UUID,
+                                                obj[Constant.JSON_PUBLISH_RECORD_UUID]],
+                                               [Constant.JSON_PUBLISH_SOURCE_HOST,
+                                                obj[Constant.JSON_PUBLISH_SOURCE_HOST]]]
                                 for pair in field_pairs:
                                     if hasattr(new_record, pair[0]):
                                         setattr(new_record, pair[0], pair[1])
