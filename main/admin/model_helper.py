@@ -71,7 +71,7 @@ def commit():
         Log.logger.warning('Error on commit, session={}, ignoring, err={}'.format(db.session, ex))
     except Exception, ex:
         Log.logger.warning('Exception on commit, session={} err={}'.format(db.session, ex))
-        db.session.rollback()
+        db.session.remove()
     performance.add_query(time_start, query_details=query_details)
 
 
