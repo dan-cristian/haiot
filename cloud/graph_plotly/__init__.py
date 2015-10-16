@@ -100,6 +100,7 @@ def upload_data(obj):
     except Exception, ex:
         Log.logger.exception('General error saving graph, err {} obj={}'.format(ex, obj))
 
+'''
 #upload data to a grid object in plotly. grid will be used as main source to generate graphs
 def upload_data_to_grid(obj):
     try:
@@ -148,7 +149,7 @@ def upload_data_to_grid(obj):
             Log.logger.critical('Graphable object missing axis X field {}'.format(Constant.JSON_PUBLISH_GRAPH_X))
     except Exception, ex:
         Log.logger.exception('General error saving graph, err {} obj={}'.format(ex, obj))
-
+'''
 def unload():
     global initialised
     thread_pool.remove_callable(graph_plotly_run.thread_run)

@@ -72,6 +72,7 @@ def commit():
         Log.logger.warning('Error on commit, session={}, ignoring, err={}'.format(db.session, ex))
     except Exception, ex:
         Log.logger.warning('Exception on commit, session={} err={}'.format(db.session, ex))
+        db.session.rollback()
     performance.add_query(time_start, query_details=query_details)
 
 
@@ -141,26 +142,7 @@ def populate_tables(model_auto_update=False):
                 commit()
 
     check_table_schema(models.Node, model_auto_update)
-    '''
-    if len(models.Node.query.filter_by(name=Constant.HOST_NAME).all()) == 0:
-        Log.logger.info('Populating Node {} with default values'.format(Constant.HOST_NAME))
-        master_logging = False
-        if Constant.HOST_NAME=='nas':
-            master_logging = True
-            priority = 2
-        elif Constant.HOST_NAME=='netbook':
-            priority = 0
-        elif Constant.HOST_NAME=='server':
-            priority = 3
-        elif Constant.HOST_NAME=='ex-std-node466.prod.rhcloud.com':
-            priority = 4
-        else:
-            priority=random.randint(10, 100)
-        db.session.add(models.Node('', name=Constant.HOST_NAME, ip=Constant.HOST_MAIN_IP, priority=priority,
-                                   mac=Constant.HOST_MAC, is_master_logging=master_logging))
-        commit()
-    else:
-    '''
+
     # reseting execute_command field to avoid running last command before shutdown
     node_obj = models.Node.query.filter_by(name=Constant.HOST_NAME).first()
     node_obj.execute_command = ''

@@ -13,6 +13,7 @@ import sensor
 import heat
 import relay
 import rule
+import persistence
 
 
 __mqtt_event_list = []
@@ -99,7 +100,7 @@ def mqtt_thread_run():
                         if 'execute_command' in obj:
                             execute_command = obj['execute_command']
                             host_name = obj['name']
-                            #execute command on target host or on current host (usefull when target is down - e.g. wake cmd
+                            # execute command on target host or on current host (usefull when target is down - e.g. wake cmd
                             if (host_name == Constant.HOST_NAME or source_host == Constant.HOST_NAME) \
                                     and execute_command != '':
                                 server_node = models.Node.query.filter_by(name=host_name).first()
@@ -139,29 +140,31 @@ def mqtt_thread_run():
                         #else:
                             #Log.logger.warning('This node is master logging but emits remote logs, is a circular reference')
 
-                if variable.NODE_THIS_IS_MASTER_OVERALL:
-                    if Constant.JSON_PUBLISH_GRAPH_X in obj:
+                # if record has fields that enables persistence (in cloud or local)
+                if Constant.JSON_PUBLISH_GRAPH_X in obj:
+                    if Constant.JSON_PUBLISH_SAVE_TO_HISTORY in obj:
+                        # if record must be saved to local db
+                        if obj[Constant.JSON_PUBLISH_SAVE_TO_HISTORY] and Constant.HAS_LOCAL_DB_REPORTING_CAPABILITY:
+                            persistence.save_to_history(obj)
+                    if variable.NODE_THIS_IS_MASTER_OVERALL:
+                        # if record is marked to be uploaded to a graph
                         if obj[Constant.JSON_PUBLISH_SAVE_TO_GRAPH]:
+                            persistence.save_to_history(obj, upload_to_cloud=True)
                             # lazy init as plotly is an optional module
                             from cloud import graph_plotly
                             if graph_plotly.initialised:
                                 start = utils.get_base_location_now_date()
-                                #initial implementation
-                                #graph_plotly.upload_data(obj)
+                                # initial implementation
+                                # graph_plotly.upload_data(obj)
                                 graph_plotly.upload_data_to_grid(obj)
                                 elapsed = (utils.get_base_location_now_date() - start).total_seconds()
                                 Log.logger.debug('Plotly upload took {}s'.format(elapsed))
                             else:
                                 Log.logger.debug('Graph not initialised on obj upload to graph')
-                        else:
-                            pass
-                    else:
-                        Log.logger.debug('Mqtt event without graphing capabilities {}'.format(obj))
-
                 if len(__mqtt_event_list) > last_count:
                     Log.logger.debug('Not keeping up with {} mqtt events'.format(len(__mqtt_event_list)))
             except Exception, ex:
-                Log.logger.critical("Error processing mqtt={}, err={}".format(obj, ex))
+                Log.logger.critical("Error processing err={}, mqtt={}".format(ex, obj))
     except Exception, ex:
         Log.logger.critical("General error processing mqtt: {}".format(ex))
     finally:

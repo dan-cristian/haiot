@@ -14,8 +14,11 @@ from main.logger_helper import Log
 
 
 
-#location for sqlite db
+# location for main db - sqlite db
 DB_LOCATION=None
+# location for storing historical reporting data
+DB_REPORTING_LOCATION=None
+
 app=None
 db=None
 initialised = False
@@ -160,6 +163,7 @@ def init():
     app = Flask('main')
     #app.config['TESTING'] = True
     app.config.update(DEBUG=True, SQLALCHEMY_ECHO = False, SQLALCHEMY_DATABASE_URI=DB_LOCATION)
+
     app.config['SECRET_KEY'] = 'secret'
     app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
     Log.logger.info('Initialising SQLAlchemy')
@@ -172,6 +176,23 @@ def init():
     global MODEL_AUTO_UPDATE
     admin.model_helper.populate_tables(MODEL_AUTO_UPDATE)
 
+    reporting_enabled = admin.model_helper.get_param(Constant.DB_REPORTING_LOCATION_ENABLED)
+    if reporting_enabled == "1":
+        # http://docs.sqlalchemy.org/en/rel_0_9/dialects/mysql.html#module-sqlalchemy.dialects.mysql.mysqlconnector
+        user = admin.model_helper.get_param(Constant.DB_REPORTING_USER)
+        passwd = admin.model_helper.get_param(Constant.DB_REPORTING_PASS)
+        uri = str(admin.model_helper.get_param(Constant.DB_REPORTING_LOCATION))
+        uri_final = uri.replace('<user>', user).replace('<passwd>', passwd)
+        SQLALCHEMY_BINDS = {
+            'reporting': uri_final
+            #, 'appmeta':      'sqlite:////path/to/appmeta.db'
+        }
+        app.config['SQLALCHEMY_BINDS'] = SQLALCHEMY_BINDS
+        try:
+            db.create_all(bind='reporting')
+            Constant.HAS_LOCAL_DB_REPORTING_CAPABILITY = True
+        except Exception, ex:
+            Log.logger.warning("Local DB reporting capability is not available, err={}".format(ex))
     import transport
     transport.init()
 
