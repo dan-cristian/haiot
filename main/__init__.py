@@ -191,6 +191,7 @@ def init():
         try:
             db.create_all(bind='reporting')
             Constant.HAS_LOCAL_DB_REPORTING_CAPABILITY = True
+            admin.model_helper.check_history_tables()
         except Exception, ex:
             Log.logger.warning("Local DB reporting capability is not available, err={}".format(ex))
     import transport

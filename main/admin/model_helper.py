@@ -79,16 +79,26 @@ def get_mod_name(module):
     return str(module).split("'")[1]
 
 def check_table_schema(table, model_auto_update=False):
+    recreate_table = False
+    ex_msg = None
     try:
         #count = table.query.all()
         count = table().query_all()
     except OperationalError, oex:
-        Log.logger.critical('Table {} schema in DB seems outdated, err {}, DROP it and recreate (y/n)?'.format(oex, table))
-        read_drop_table(table, oex, model_auto_update)
+        recreate_table = True
+        ex_msg = str(oex)
     except InvalidRequestError:
         Log.logger.warning('Error on check table schema {}, ignoring'.format(table))
     except Exception, ex:
-        Log.logger.warning('Unexpected error on check table, err={}'.format(ex))
+        if "ProgrammingError" in str(ex):
+            recreate_table = True
+            ex_msg = str(ex)
+        else:
+            Log.logger.warning('Unexpected error on check table, err={}'.format(ex))
+    if recreate_table:
+        Log.logger.critical('Table {} schema in DB seems outdated, err {}, DROP it and recreate (y/n)?'.format(ex_msg,
+                                                                                                               table))
+        read_drop_table(table, ex_msg, model_auto_update)
 
 def read_drop_table(table, original_exception, drop_without_user_ask=False):
     if not drop_without_user_ask:
@@ -98,7 +108,8 @@ def read_drop_table(table, original_exception, drop_without_user_ask=False):
     if x=='y':
         Log.logger.warning('Dropping table {}'.format(table))
         try:
-            table_name=table.query._primary_entity.entity_zero._with_polymorphic_selectable.description
+            table_name = table.query._primary_entity.entity_zero._with_polymorphic_selectable.description
+            # fixme: does not work with multiple db sources
             result = db.engine.execute('DROP TABLE '+table_name)
             commit()
         except Exception, ex:
@@ -108,6 +119,14 @@ def read_drop_table(table, original_exception, drop_without_user_ask=False):
         db.create_all()
     else:
         raise original_exception
+
+def check_history_tables():
+    table_collection = [
+        models.NodeHistory, models.SensorHistory, models.SystemDiskHistory, models.SystemMonitorHistory,
+        models.UpsHistory]
+    for table in table_collection:
+        table_str = utils.get_table_name(table)
+        check_table_schema(table, model_auto_update=True)
 
 def populate_tables(model_auto_update=False):
     var_path = utils.get_app_root_path() + 'scripts/config/default_db_values.json'
