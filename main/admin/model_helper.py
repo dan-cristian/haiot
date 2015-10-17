@@ -163,7 +163,11 @@ def populate_tables(model_auto_update=False):
 
     # reseting execute_command field to avoid running last command before shutdown
     node_obj = models.Node.query.filter_by(name=Constant.HOST_NAME).first()
-    node_obj.execute_command = ''
+    if node_obj:
+        node_obj.execute_command = ''
+    else:
+        node_obj = models.Node()
+        node_obj.add_record_to_session()
     node_obj.machine_type = Constant.HOST_MACHINE_TYPE
     Constant.HOST_PRIORITY = node_obj.priority
     commit()

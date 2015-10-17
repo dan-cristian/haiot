@@ -62,6 +62,8 @@ class DbBase:
         db.session.add(self)
         commit()
 
+    def add_record_to_session(self):
+        db.session.add(self)
 
 # inherit this to enable easy record changes save and publish
 class DbEvent:
