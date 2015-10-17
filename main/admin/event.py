@@ -57,25 +57,26 @@ def handle_event_mqtt_received(client, userdata, topic, obj):
         #__mqtt_lock.release()
         pass
 
+
 def on_models_committed(sender, changes):
-    #executed on all db commits
+    # executed on all db commits
     try:
         for obj, change in changes:
-            #avoid recursion
+            # avoid recursion
             if hasattr(obj, Constant.JSON_PUBLISH_NOTIFY_TRANSPORT):
-                #only send mqtt message once for db saves intended to be distributed
+                # only send mqtt message once for db saves intended to be distributed
                 if obj.notify_transport_enabled:
                     if hasattr(obj, Constant.JSON_PUBLISH_NOTIFY_DB_COMMIT):
                         if not obj.notified_on_db_commit:
                             obj.notified_on_db_commit = True
                             txt = model_helper.model_row_to_json(obj, operation=change)
-                            transport.send_message_json(json = txt)
+                            transport.send_message_json(json=txt)
                 else:
                     pass
             #send object to rule parser, if connected
             dispatcher.send(Constant.SIGNAL_DB_CHANGE_FOR_RULES, obj=obj, change=change)
     except Exception, ex:
-        Log.logger.critical('Error in DB commit hook, {}'.format(ex))
+        Log.logger.exception('Error in DB commit hook, {}'.format(ex))
 
 
 def mqtt_thread_run():
