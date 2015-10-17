@@ -8,8 +8,9 @@ from common import Constant
 from pydispatch import dispatcher
 
 
-admin = Blueprint('admin', __name__, template_folder='templates')
-user = Blueprint('user', __name__, template_folder='templates')
+admin = Blueprint('admin', __name__, template_folder='../../webui/templates')
+user = Blueprint('user', __name__, template_folder='../../webui/templates')
+
 
 class CRUDView(MethodView):
     list_template = 'admin/listview.html'

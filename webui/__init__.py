@@ -42,7 +42,7 @@ def init():
     from main.admin import admin, user
     app.register_blueprint(admin, url_prefix='/admin')
     app.register_blueprint(user, url_prefix='/user')
-    import api_v1
+    from webui.api import api_v1
     global initialised
     if BIND_IP is not None and BIND_PORT is not None:
         host = BIND_IP
