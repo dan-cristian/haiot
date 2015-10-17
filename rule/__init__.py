@@ -36,13 +36,14 @@ def parse_rules(obj, change):
             field_changed_list = obj.last_commit_field_changed_list
         else:
             field_changed_list = []
-        for func in __func_list:
-            if func[1].func_defaults and len(func[1].func_defaults) > 0:
-                first_param = func[1].func_defaults[0]
-                #calling rule methods with first param type equal to passed object type
-                if type(obj) == type(first_param):
-                    result = getattr(rules_run, func[0])(obj=obj, field_changed_list=field_changed_list)
-                    Log.logger.debug('Rule returned {}'.format(result))
+        if __func_list:
+            for func in __func_list:
+                if func[1].func_defaults and len(func[1].func_defaults) > 0:
+                    first_param = func[1].func_defaults[0]
+                    #calling rule methods with first param type equal to passed object type
+                    if type(obj) == type(first_param):
+                        result = getattr(rules_run, func[0])(obj=obj, field_changed_list=field_changed_list)
+                        Log.logger.debug('Rule returned {}'.format(result))
     except Exception:
         Log.logger.exception('Error parsing rules')
 
