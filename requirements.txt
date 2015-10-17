@@ -21,6 +21,7 @@ google-api-python-client
 watchdog
 wakeonlan
 apscheduler
+pygal
 #uncomment on RPI
 #RPi.GPIO
 #uncomment on beaglebone
