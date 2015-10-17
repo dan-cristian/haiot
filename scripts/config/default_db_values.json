@@ -46,6 +46,8 @@
     {"id":23, "active":"0", "start_order":"23", "name":"sysutils.filewatch"},
     {"id":25, "active":"1", "start_order":"25", "name":"rule"},
     {"id":27, "active":"1", "start_order":"27", "name":"node"},
+    {"id":29, "active":"1", "start_order":"29", "name":"webui.chart"},
+    {"id":31, "active":"1", "start_order":"31", "name":"webui.api"},
 
     {"id":113, "active":"1", "start_order":"13", "name":"cloud.graph_plotly", "host_name":"nas"},
     {"id":121, "active":"1", "start_order":"21", "name":"cloud.youtube", "host_name":"nas"},
