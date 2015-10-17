@@ -1,12 +1,14 @@
 {
   "Node": [
     {"id":1,  "priority":"0", "name":"netbook"},
-    {"id":2,  "priority":"1", "name":"nas"},
-    {"id":3,  "priority":"2", "name":"server"},
-    {"id":4,  "priority":"3", "name":"ex-std-node466.prod.rhcloud.com"},
-    {"id":5,  "priority":"4", "name":"beaglebone"},
-    {"id":6,  "priority":"5", "name":"pi-power"},
-    {"id":7,  "priority":"6", "name":"pi-bell"}
+    {"id":2,  "priority":"2", "name":"nas"},
+    {"id":3,  "priority":"3", "name":"server"},
+    {"id":4,  "priority":"4", "name":"ex-std-node466.prod.rhcloud.com"},
+    {"id":5,  "priority":"5", "name":"beaglebone"},
+    {"id":6,  "priority":"6", "name":"pi-power"},
+    {"id":7,  "priority":"7", "name":"pi-bell"},
+    {"id":8,  "priority":"8", "name":"pi-face"}
+
   ],
 
   "Parameter": [
