@@ -58,7 +58,7 @@ class DbBase:
         function = self.query.delete
         return self.__get_result(function)
 
-    def add_record_to_db(self):
+    def add_commit_record_to_db(self):
         db.session.add(self)
         commit()
 
