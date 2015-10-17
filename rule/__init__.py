@@ -12,8 +12,8 @@ from common import Constant
 
 scheduler = None
 try:
-    #this does not currently work on BusyBox routers
-    #http://flexget.com/ticket/2741
+    # fixme: this does not currently work on BusyBox/openwrt routers
+    # http://flexget.com/ticket/2741
     scheduler = BackgroundScheduler()
 except Exception,ex:
     scheduler = None
