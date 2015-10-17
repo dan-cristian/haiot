@@ -25,13 +25,14 @@ if scheduler:
 initialised = False
 __func_list = None
 
+
 def parse_rules(obj, change):
     global __func_list
-    #executed on all db value changes
+    # executed on all db value changes
     Log.logger.debug('Received obj={} change={} for rule parsing'.format(obj, change))
     try:
-        #extract only changed fields
-        if hasattr(obj,'last_commit_field_changed_list'):
+        # extract only changed fields
+        if hasattr(obj, 'last_commit_field_changed_list'):
             field_changed_list = obj.last_commit_field_changed_list
         else:
             field_changed_list = []
@@ -43,7 +44,7 @@ def parse_rules(obj, change):
                     result = getattr(rules_run, func[0])(obj=obj, field_changed_list=field_changed_list)
                     Log.logger.debug('Rule returned {}'.format(result))
     except Exception, ex:
-        Log.logger.critical('Error parsing rules: {}', format(ex))
+        Log.logger.exception('Error parsing rules: {}', format(ex))
 
 def thread_run():
     Log.logger.debug('Processing rules thread_run')
