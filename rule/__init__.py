@@ -43,8 +43,8 @@ def parse_rules(obj, change):
                 if type(obj) == type(first_param):
                     result = getattr(rules_run, func[0])(obj=obj, field_changed_list=field_changed_list)
                     Log.logger.debug('Rule returned {}'.format(result))
-    except Exception, ex:
-        Log.logger.exception('Error parsing rules: {}', format(ex))
+    except Exception:
+        Log.logger.exception('Error parsing rules')
 
 def thread_run():
     Log.logger.debug('Processing rules thread_run')
