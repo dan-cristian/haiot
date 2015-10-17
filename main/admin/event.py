@@ -1,7 +1,7 @@
 from pydispatch import dispatcher
 
 from main.logger_helper import Log
-from main import thread_pool
+from main import thread_pool, persistence
 from common import Constant, variable, utils
 import transport
 import models
@@ -12,7 +12,7 @@ import sensor
 import heat
 import relay
 import rule
-import persistence
+import main.persistence
 
 
 __mqtt_event_list = []
@@ -88,9 +88,9 @@ def mqtt_thread_run():
         for obj in __mqtt_event_list:
             try:
                 __mqtt_event_list.remove(obj)
-                #events received via mqtt transport
+                # events received via mqtt transport
                 table = None
-                #fixme: make it generic to work with any transport
+                # fixme: make it generic to work with any transport
                 source_host = obj[Constant.JSON_PUBLISH_SOURCE_HOST]
                 if Constant.JSON_PUBLISH_TABLE in obj:
                     table = str(obj[Constant.JSON_PUBLISH_TABLE])
@@ -99,7 +99,8 @@ def mqtt_thread_run():
                         if 'execute_command' in obj:
                             execute_command = obj['execute_command']
                             host_name = obj['name']
-                            # execute command on target host or on current host (usefull when target is down - e.g. wake cmd
+                            # execute command on target host or on current host
+                            # (usefull when target is down - e.g. wake cmd
                             if (host_name == Constant.HOST_NAME or source_host == Constant.HOST_NAME) \
                                     and execute_command != '':
                                 server_node = models.Node.query.filter_by(name=host_name).first()
@@ -118,7 +119,6 @@ def mqtt_thread_run():
                     elif table == utils.get_table_name(models.PlotlyCache):
                         graph_plotly.cache_record_update(obj)
 
-
                 if Constant.JSON_MESSAGE_TYPE in obj:
                     if variable.NODE_THIS_IS_MASTER_LOGGING:
                         if source_host != Constant.HOST_NAME:
@@ -136,8 +136,8 @@ def mqtt_thread_run():
                                 Log.remote_logger.error(message)
                             elif levelname == 'DEBUG':
                                 Log.remote_logger.debug(message)
-                        #else:
-                            #Log.logger.warning('This node is master logging but emits remote logs, is a circular reference')
+                        # else:
+                            # Log.logger.warning('This node is master logging but emits remote logs, is a circular reference')
 
                 # if record has fields that enables persistence (in cloud or local)
                 if variable.NODE_THIS_IS_MASTER_OVERALL and Constant.JSON_PUBLISH_GRAPH_X in obj:

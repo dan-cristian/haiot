@@ -1,6 +1,5 @@
 from datetime import datetime
 from copy import deepcopy
-import uuid
 
 from main.logger_helper import Log
 from main import db
@@ -11,6 +10,7 @@ from common import utils, performance
 #TODO: read this
 #http://lucumr.pocoo.org/2011/7/19/sqlachemy-and-you/
 
+
 # inherit this to use performance tracked queries
 class DbBase:
     record_uuid = None
@@ -20,8 +20,8 @@ class DbBase:
         elapsed = performance.add_query(start_time, query_details=query_details)
         if elapsed > 5000:  # with sqlite a long query will throw an error
             Log.logger.critical("Long running DB query, seconds elapsed={}, result={}".format(elapsed, query_details))
-            db.session.rollback()
-            Log.logger.info("Session was rolled back")
+            # db.session.rollback()
+            # Log.logger.info("Session was rolled back")
         return result
 
     def __get_result(self, function):
@@ -61,6 +61,7 @@ class DbBase:
     def add_record_to_db(self):
         db.session.add(self)
         commit()
+
 
 # inherit this to enable easy record changes save and publish
 class DbEvent:
@@ -114,7 +115,6 @@ class DbEvent:
             Log.logger.error('Exception save json to db {}'.format(ex))
 
 
-
     #graph_save_frequency in seconds
     def save_changed_fields(self,current_record='',new_record='',notify_transport_enabled=False, save_to_graph=False,
                             ignore_only_updated_on_change=True, debug=False, graph_save_frequency=0, filter=None):
@@ -144,7 +144,7 @@ class DbEvent:
                     column_name = str(column)
                     new_value = getattr(new_record, column_name)
                     old_value = getattr(current_record, column_name)
-                    #todo: comparison not working for float, because str appends .0
+                    # todo: comparison not working for float, because str appends .0
                     if (not new_value is None) and (str(old_value) != str(new_value)):
                         if column_name != 'updated_on':
                             try:
@@ -222,6 +222,7 @@ class Zone(db.Model, DbBase):
     def __repr__(self):
         return 'Zone id {} {}'.format(self.id, self.name[:20])
 
+
 class SchedulePattern(db.Model, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
@@ -290,11 +291,11 @@ class Sensor(db.Model, graphs.SensorGraph, DbEvent, DbBase):
     pio_b = db.Column(db.Integer)
     sensed_a = db.Column(db.Integer)
     sensed_b = db.Column(db.Integer)
-    battery_level = db.Column(db.Integer) #RFXCOM specific
-    rssi = db.Column(db.Integer) #RFXCOM specific, rssi - distance
+    battery_level = db.Column(db.Integer) # RFXCOM specific, sensor battery
+    rssi = db.Column(db.Integer)  # RFXCOM specific, rssi - distance
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
-    #FIXME: now filled manually, try relations
-    #zone_name = db.Column(db.String(50))
+    # FIXME: now filled manually, try relations
+    # zone_name = db.Column(db.String(50))
     sensor_name = db.Column(db.String(50))
 
     def __init__(self, address=''):
@@ -309,7 +310,6 @@ class Parameter(db.Model, DbBase):
     name = db.Column(db.String(50), unique=True)
     value = db.Column(db.String(255))
     description = db.Column(db.String(255))
-
 
     def __init__(self, id=None, name='default', value='default'):
         if id:
@@ -335,6 +335,7 @@ class ZoneSensor(db.Model, DbBase):
 
     def __repr__(self):
         return 'ZoneSensor zone {} sensor {}'.format(self.zone_id,  self.sensor_name)
+
 
 class Node(db.Model, DbEvent, graphs.NodeGraph, DbBase):
     id = db.Column(db.Integer, primary_key=True)
@@ -451,6 +452,7 @@ class GpioPin(db.Model, DbEvent, DbBase):
         return 'host={} code={} desc={} type={} value={}'.format(self.host_name, self.pin_code, self.description,
                                                                  self.pin_type, self.pin_value)
 
+
 class ZoneAlarm(db.Model, DbEvent, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     #friendly display name for pin mapping
@@ -471,6 +473,7 @@ class ZoneAlarm(db.Model, DbEvent, DbBase):
 
     def __repr__(self):
         return 'host {} gpiopin {} {}'.format(self.gpio_host_name, self.gpio_pin_code, self.alarm_pin_name)
+
 
 class ZoneHeatRelay(db.Model, DbEvent, DbBase):
     id = db.Column(db.Integer, primary_key=True)
@@ -513,6 +516,7 @@ class ZoneCustomRelay(db.Model, DbEvent, DbBase):
     def __repr__(self):
         return 'host {} {} {} {}'.format(self.gpio_host_name, self.gpio_pin_code, self.relay_pin_name, self.relay_is_on)
 
+
 class Rule(db.Model, DbEvent, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     host_name = db.Column(db.String(50))
@@ -533,7 +537,7 @@ class Rule(db.Model, DbEvent, DbBase):
         return '{} {}'.format(self.is_active, self.command)
 
     def __init__(self, id='', host_name=''):
-        #keep host name default to '' rather than None (which does not work on filter in)
+        # keep host name default to '' rather than None (which does not work on filter in)
         if id:
             self.id = id
         self.host_name = host_name
@@ -550,7 +554,7 @@ class PlotlyCache(db.Model, DbEvent, DbBase):
         return '{} {}'.format(self.grid_name, self.grid_url)
 
     def __init__(self, id='', grid_name=''):
-        #keep host name default to '' rather than None (which does not work on filter in)
+        # keep host name default to '' rather than None (which does not work on filter in)
         if id:
             self.id = id
         self.grid_name = grid_name
@@ -566,10 +570,10 @@ class NodeHistory(db.Model, DbBase):
     __tablename__ = 'node_history'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
-    master_overall_cycles = db.Column(db.Integer) #count of update cycles while node was master
-    run_overall_cycles = db.Column(db.Integer) #count of total update cycles
+    master_overall_cycles = db.Column(db.Integer)  # count of update cycles while node was master
+    run_overall_cycles = db.Column(db.Integer)  # count of total update cycles
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
-    record_uuid = db.Column(db.String(16))
+    record_uuid = db.Column(db.String(32))
     source_host_ = db.Column(db.String(50))
 
     def __repr__(self):
@@ -585,11 +589,12 @@ class SensorHistory(db.Model, DbBase):
     temperature = db.Column(db.Float)
     humidity = db.Column(db.Float)
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
-    record_uuid = db.Column(db.String(16))
+    record_uuid = db.Column(db.String(32))
     source_host_ = db.Column(db.String(50))
 
     def __repr__(self):
         return '{} {}'.format(self.id, self.sensor_name)
+
 
 class SystemMonitorHistory(db.Model, DbBase):
     __bind_key__ = 'reporting'
@@ -601,7 +606,7 @@ class SystemMonitorHistory(db.Model, DbBase):
     memory_available_percent = db.Column(db.Float)
     uptime_days = db.Column(db.Integer)
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
-    record_uuid = db.Column(db.String(16))
+    record_uuid = db.Column(db.String(32))
     source_host_ = db.Column(db.String(50))
 
     def __repr__(self):
@@ -627,7 +632,7 @@ class UpsHistory(db.Model, DbBase):
     test_in_progress = db.Column(db.Boolean(), default=False)
     other_status = db.Column(db.String(50))
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
-    record_uuid = db.Column(db.String(16))
+    record_uuid = db.Column(db.String(32))
     source_host_ = db.Column(db.String(50))
 
     def __repr__(self):
@@ -656,7 +661,7 @@ class SystemDiskHistory(db.Model, DbBase):
     last_reads_elapsed = db.Column(db.Float)
     last_writes_elapsed = db.Column(db.Float)
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
-    record_uuid = db.Column(db.String(16))
+    record_uuid = db.Column(db.String(32))
     source_host_ = db.Column(db.String(50))
 
     def __init__(self):
