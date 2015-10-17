@@ -14,27 +14,41 @@ __dict_future_func={}
 
 __immediate_executor = None
 
+def __get_print_name_callable(func):
+    return func.func_globals['__name__']+'.'+ func.func_name
+
 def add_interval_callable(func, run_interval_second=60):
-    print_name = func.func_globals['__name__']+'.'+ func.func_name
-    Log.logger.info('Added for processing callable ' + print_name)
-    __callable_list.append(func)
-    __exec_last_date_list[func]=datetime.now()
-    __exec_interval_list[func]=run_interval_second
+    print_name = __get_print_name_callable(func)
+    if func not in __callable_list:
+        __callable_list.append(func)
+        __exec_last_date_list[func]=datetime.now()
+        __exec_interval_list[func]=run_interval_second
+        Log.logger.info('Added for processing callable ' + print_name)
+    else:
+        Log.logger.info('Callable not added, already there')
+
 
 def add_interval_callable_progress(func, run_interval_second=60, progress_func=None):
     add_interval_callable(func, run_interval_second=run_interval_second)
     __callable_progress_list[func] = progress_func
 
+
 def remove_callable(func):
-    pass
+    print_name = __get_print_name_callable(func)
+    if func in __callable_list:
+        __callable_list.remove(func)
+        Log.logger.info('Removed from processing callable ' + print_name)
+
 
 def unload():
     global __thread_pool_enabled
     __thread_pool_enabled = False
 
+
 def get_thread_status():
     global __dict_future_func
     return __dict_future_func
+
 
 def run_thread_pool():
     global __thread_pool_enabled
