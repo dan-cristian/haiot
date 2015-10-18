@@ -38,7 +38,7 @@ chown -R $USERNAME:$USERNAME .
 
 echo Downloading init service
 cd ~
-wget https://raw.githubusercontent.com/ivankovacevic/userspaceServices/master/userspaceServices
+wget https://raw.githubusercontent.com/dan-cristian/userspaceServices/master/userspaceServices
 chmod +x userspaceServices
 echo Installing init service
 mv userspaceServices /etc/init.d/
