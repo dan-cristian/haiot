@@ -12,28 +12,33 @@ description_hardware = None
 description_revision = None
 description_cpu_model = None
 
+
 def init():
     if Constant.IS_OS_LINUX():
         sysinfo = OrderedDict()
         with open('/proc/cpuinfo') as f:
             for line in f:
                 try:
-                    #beaglebone
-                    #model name      : ARMv7 Processor rev 2 (v7l)
-                    #Hardware        : Generic AM33XX (Flattened Device Tree)
+                    # beaglebone
+                    # model name      : ARMv7 Processor rev 2 (v7l)
+                    # Hardware        : Generic AM33XX (Flattened Device Tree)
 
-                    #router tplink openwrt
-                    #system type             : Atheros AR9344 rev 2
-                    #machine                 : TP-LINK TL-WDR3600/4300/4310
-                    #cpu model               : MIPS 74Kc V4.12
+                    # router tplink openwrt
+                    # system type             : Atheros AR9344 rev 2
+                    # machine                 : TP-LINK TL-WDR3600/4300/4310
+                    # cpu model               : MIPS 74Kc V4.12
 
-                    #raspberry
-                    #model name      : ARMv6-compatible processor rev 7 (v6l)
-                    #Hardware        : BCM2708
-                    #Revision        : 000e
+                    # raspberry
+                    # model name      : ARMv6-compatible processor rev 7 (v6l)
+                    # Hardware        : BCM2708
+                    # Revision        : 000e
 
-                    #debian Intel
-                    #model name      : Intel(R) Celeron(R) CPU 1037U @ 1.80GHz
+                    # raspberry b+
+                    # model name      : ARMv7 Processor rev 5 (v7l)
+                    # Hardware        : BCM2709
+
+                    # debian Intel
+                    # model name      : Intel(R) Celeron(R) CPU 1037U @ 1.80GHz
                     words = line.split(':')
                     sysinfo[words[0].strip().lower()] = words[1].strip()
                 except Exception, ex:
