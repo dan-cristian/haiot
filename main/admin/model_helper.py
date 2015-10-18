@@ -83,7 +83,7 @@ def check_table_schema(table, model_auto_update=False):
     ex_msg = None
     try:
         #count = table.query.all()
-        count = table().query_all()
+        rec = table().query_filter_first()
     except OperationalError, oex:
         recreate_table = True
         ex_msg = str(oex)
