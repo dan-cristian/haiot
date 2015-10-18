@@ -1,5 +1,5 @@
 hostname=pi-face
-rootpw=abc!
+rootpw=test
 mirror=http://mirrordirector.raspbian.org/raspbian/
 release=jessie
 preset=minimal
