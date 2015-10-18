@@ -170,7 +170,7 @@ def init():
     db = SQLAlchemy(app)
     db.create_all()
 
-    Log.logger.info('Checking db tables')
+    Log.logger.info('Checking main db tables')
     import admin.model_helper
     import admin.models
     global MODEL_AUTO_UPDATE
@@ -178,6 +178,7 @@ def init():
 
     reporting_enabled = admin.model_helper.get_param(Constant.DB_REPORTING_LOCATION_ENABLED)
     if reporting_enabled == "1":
+        Log.logger.info('Checking history db tables')
         # http://docs.sqlalchemy.org/en/rel_0_9/dialects/mysql.html#module-sqlalchemy.dialects.mysql.mysqlconnector
         user = admin.model_helper.get_param(Constant.DB_REPORTING_USER)
         passwd = admin.model_helper.get_param(Constant.DB_REPORTING_PASS)
