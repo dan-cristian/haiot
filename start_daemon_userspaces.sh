@@ -56,14 +56,15 @@ done
 
 stop() {
 	me=`basename $0`
-	echo "Stopping script $me"
+	echo "Stopping script"
     cd $DIR
-    ./scripts/stopserver.sh
+    scripts/stopserver.sh
 }
 
 START_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 echo "Current dir on start is $START_DIR, script start parameters are: " $1 $2 $3 $4 $5
 DIR=~/PYC
+echo "Base dir is $DIR"
 if [ "$1" = "stop" ]; then
         stop
 else
