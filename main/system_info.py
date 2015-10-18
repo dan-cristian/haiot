@@ -53,6 +53,9 @@ def init():
             if description_hardware and 'BCM2708' in description_hardware:
                 Constant.HOST_MACHINE_TYPE = Constant.MACHINE_TYPE_RASPBERRY
                 Constant.IS_MACHINE_RASPBERRYPI = True
+            if "ARMv7 Processor rev 5 (v7l)" in description_model_name:
+                Constant.HOST_MACHINE_TYPE = Constant.MACHINE_TYPE_RASPBERRY
+                Constant.IS_MACHINE_RASPBERRYPI = True
             if description_system_type and 'Atheros' in description_system_type:
                 Constant.HOST_MACHINE_TYPE = Constant.MACHINE_TYPE_OPENWRT
                 Constant.IS_MACHINE_OPENWRT = True
