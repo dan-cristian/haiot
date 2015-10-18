@@ -1,25 +1,23 @@
 SET T=c:\development\python\main_app
 cd ..
 mklink /J  alarm %T%\alarm
+mklink /J  cloud %T%\cloud
 mklink /J  common %T%\common
-mklink /J  graph_plotly %T%\graph_plotly
+mklink /J  ddns %T%\ddns
 mklink /J  health_monitor %T%\health_monitor
 mklink /J  heat %T%\heat
 mklink /J  io_bbb %T%\io_bbb
 mklink /J  main %T%\main
-mklink /J  mqtt_io %T%\mqtt_io
 mklink /J  node %T%\node
 mklink /J  relay %T%\relay
-mklink /J  sensor %T%\sensor
-mklink /J  template %T%\template
-mklink /J  transport %T%\transport
-mklink /J  test %T%\test
-mklink /J  webui %T%\webui
-mklink /J  scripts %T%\scripts
-mklink /J  ddns %T%\ddns
-mklink /J  cloud %T%\cloud
-mklink /J  sysutils %T%\sysutils
 mklink /J  rule %T%\rule
+mklink /J  scripts %T%\scripts
+mklink /J  sensor %T%\sensor
+mklink /J  sysutils %T%\sysutils
+mklink /J  template %T%\template
+mklink /J  test %T%\test
+mklink /J  transport %T%\transport
+mklink /J  webui %T%\webui
 
 del LICENSE
 mklink /H LICENSE %T%\LICENSE
@@ -43,6 +41,12 @@ del .gitignore
 mklink /H .gitignore %T%\.gitignore
 del requirements.txt
 mklink /H requirements.txt %T%\requirements.txt
+del requirements-beaglebone.txt
+mklink /H requirements-beaglebone.txt %T%\requirements-beaglebone.txt
+del requirements-rpi.txt
+mklink /H requirements-rpi.txt %T%\requirements-rpi.txt
+del requirements-win.txt
+mklink /H requirements-win.txt %T%\requirements-win.txt
 
 rem mklink /J   %T%\
 
