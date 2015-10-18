@@ -1,1 +1,1 @@
-online_config=https://raw.githubusercontent.com/dan-cristian/haiot/master/scripts/osinstall/pi/online-config.txt
+online_config=http://pastebin.com/raw.php?i=NaCDrB34
