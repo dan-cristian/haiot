@@ -4,7 +4,7 @@ mirror=http://mirrordirector.raspbian.org/raspbian/
 release=jessie
 preset=minimal
 cdebootstrap_cmdline=
-packages=wget
+packages=wget,dos2unix
 rootfs_install_mount_options='noatime,data=writeback,nobarrier,noinit_itable'
 rootfs_mount_options='errors=remount-ro,noatime'
 bootsize=+128M # /boot partition size in megabytes, provide it in the form '+<number>M' (without quotes)
