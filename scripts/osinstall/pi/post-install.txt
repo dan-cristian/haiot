@@ -1,5 +1,5 @@
 echo "Downloading post install script"
-wget --no-check-certificate http://192.168.0.9:999/post-install.sh
+wget --no-check-certificate https://raw.githubusercontent.com/dan-cristian/haiot/master/scripts/osinstall/pi/post-install.sh
 chmod +x post-install.sh
 echo Running post install script
 ./post-install.sh

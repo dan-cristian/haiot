@@ -1,0 +1,3 @@
+psutil>=0.0
+pywin
+wmi>=0.0
