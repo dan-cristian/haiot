@@ -17,11 +17,14 @@ git config --global user.name "Dan Cristian"
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 echo "Current dir on start is $DIR, script start parameters are: " $1 $2 $3 $4 $5
 must_run=true
+DIR=~/PYC
+echo Setting dir to haiot root directory $DIR
+cd $DIR
 echo "Getting latest haiot version from git"
 git pull --no-edit
 exit_code=$?
 if [ $exit_code == 128 ]; then
-        echo "Git pull failed"
+        echo "Git pull failed with code $exit_code, exiting"
         must_run=false
     fi
 
