@@ -11,6 +11,9 @@ function run_app {
     echo "---------------------------------"
 }
 
+git config --global user.email "dan.cristian@gmail.com"
+git config --global user.name "Dan Cristian"
+
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 echo "Current dir on start is $DIR, script start parameters are: " $1 $2 $3 $4 $5
 must_run=true
