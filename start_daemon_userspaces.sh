@@ -56,7 +56,7 @@ done
 
 stop() {
 	me=`basename $0`
-	echo "Stopping script"
+	echo "Stopping script $me"
     cd $DIR
     scripts/stopserver.sh
 }
