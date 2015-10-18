@@ -11,13 +11,14 @@ function run_app {
     echo "---------------------------------"
 }
 
+function start {
 git config --global user.email "dan.cristian@gmail.com"
 git config --global user.name "Dan Cristian"
 
-DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-echo "Current dir on start is $DIR, script start parameters are: " $1 $2 $3 $4 $5
+START_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+echo "Current dir on start is $START_DIR, script start parameters are: " $1 $2 $3 $4 $5
 must_run=true
-DIR=~/PYC
+
 echo Setting dir to haiot root directory $DIR
 cd $DIR
 echo "Getting latest haiot version from git"
@@ -55,3 +56,18 @@ while $must_run; do
         must_run=false
     fi
 done
+}
+
+stop() {
+	me=`basename $0`
+	echo "Stopping script $me"
+    cd $DIR
+    ./scripts/stopserver.sh
+}
+
+DIR=~/PYC
+if [ "$1" = "stop" ]; then
+        stop
+else
+        start
+fi
