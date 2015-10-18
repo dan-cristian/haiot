@@ -1,0 +1,32 @@
+Flask>=0.10.1
+Flask-Bootstrap>=3.3.0.1
+Flask-WTF>=0.11
+Flask-SQLAlchemy>=1.0
+futures>=2.2.0
+#paho-mqtt>=1.1
+mosquitto
+pyownet>=0.8.1
+PyDispatcher>=2.0.5
+WTForms-Alchemy>=0.13.0
+blinker>=0.0
+plotly>=0.0
+#fix for ssl warning
+requests==2.5.3
+#for rfxcom utility
+pyserial>=0.0
+python-dateutil>=0.0
+hiplogging>=0.0
+schedule
+google-api-python-client
+watchdog
+wakeonlan
+apscheduler
+pygal
+#uncomment on RPI
+#RPi.GPIO
+#uncomment on beaglebone
+#Adafruit_BBIO>=0.0
+#not really needed
+#psutil>=0.0
+#pywin
+#wmi>=0.0
