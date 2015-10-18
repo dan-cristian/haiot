@@ -1,5 +1,6 @@
 echo "Downloading post install script"
 wget --no-check-certificate https://raw.githubusercontent.com/dan-cristian/haiot/master/scripts/osinstall/pi/post-install.sh
 chmod +x post-install.sh
-echo Running post install script
+echo Running post install script, pausing for 60 seconds
+sleep 60
 ./post-install.sh

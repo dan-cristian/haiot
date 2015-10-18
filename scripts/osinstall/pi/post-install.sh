@@ -4,7 +4,7 @@ USERNAME=haiot
 USERPASS=haiot
 
 echo "Setting timezone ..."
-echo "Europe/Bucharest" > /etc/timezone 
+echo "Europe/Bucharest" > /etc/timezone
 dpkg-reconfigure -f noninteractive tzdata
 
 echo "Updating apt-get"
