@@ -11,7 +11,7 @@ echo "Updating apt-get"
 apt-get upgrade
 apt-get update
 echo "Installing additional packages"
-apt-get -y install sudo apt-utils mc nano locales python wget owfs git python-rpi.gpio inotify-tools killall
+apt-get -y install sudo apt-utils mc nano locales python wget owfs git python-rpi.gpio inotify-tools
 
 echo "Installing python pip and virtualenv"
 wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py
