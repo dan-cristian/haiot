@@ -1,6 +1,9 @@
 echo "Downloading post install script"
-wget http://pastebin.com/raw.php?i=B45FacDZ
+#this does not work with wget version during install, error as only http and ftp is supported
+#wget --no-check-certificate https://raw.githubusercontent.com/dan-cristian/haiot/master/scripts/osinstall/pi/post-install.sh
+wget --output-document=post-install.sh http://pastebin.com/raw.php?i=B45FacDZ
 chmod +x post-install.sh
-echo Running post install script, pausing first for 60 seconds
-sleep 60
+dos2unix post-install.sh
+echo Running post install script, pausing first for 10 seconds
+sleep 10
 ./post-install.sh
