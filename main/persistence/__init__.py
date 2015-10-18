@@ -49,7 +49,7 @@ def save_to_history(obj, save_to_local_db=False, upload_to_cloud=False):
                                 if graph_plotly.initialised:
                                     from cloud.graph_plotly import graph_plotly_run
                                     # shape visual type for this trace
-                                    shape = graph_shape_fields[index]
+                                    #shape = graph_shape_fields[index]
                                     # unique name used for grid on upload
                                     grid_base_name = str(table)
                                     graph_plotly_run.add_grid_data(grid_unique_name=grid_base_name, x=x, y=y,
