@@ -20,7 +20,7 @@
     {"name": "MQTT_TOPIC", "value": "iot/main"},
     {"name": "MQTT_HOST_2", "value": "192.168.0.115"},
     {"name": "MQTT_PORT_2", "value": "1883"},
-    {"name": "DDNS_RACKSPACE_CONFIG_FILE", "value": "/home/dcristian/.rackspace.ddnsupdate.config.json"},
+    {"name": "DDNS_RACKSPACE_CONFIG_FILE", "value": ".rackspace.ddnsupdate.config.json"},
     {"name": "P_USESUDO_DISKTOOLS", "value": "False"},
     {"name": "MQTT_HOST_3", "value": "iot.eclipse.org"},
     {"name": "MQTT_PORT_3", "value": "1883"},
