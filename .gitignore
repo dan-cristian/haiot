@@ -1,0 +1,6 @@
+/database.db
+venv/
+*.pyc
+.idea/*
+nohup.out
+database.db

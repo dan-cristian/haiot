@@ -1,1 +1,1 @@
-online_config=http://192.168.0.9:999/online-config.txt
+online_config=https://raw.githubusercontent.com/dan-cristian/haiot/master/scripts/osinstall/pi/online-config.txt
