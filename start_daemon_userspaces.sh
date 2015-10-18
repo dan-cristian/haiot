@@ -19,6 +19,9 @@ echo "Current dir on start is $DIR, script start parameters are: " $1 $2 $3 $4 $
 must_run=true
 echo "Getting latest haiot version from git"
 git pull --no-edit
+exit_code=$?
+echo "Git exit code="$exit_code
+
 while $must_run; do
     run_app db_mem model_auto_update syslog=logs2.papertrailapp.com:30445 $1 $2 $3 $4 $5
     if [ $exit_code == 131 ]; then
