@@ -12,9 +12,9 @@ function run_app {
 }
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-echo "Current dir on start is $DIR"
+echo "Current dir on start is $DIR, script start parameters are: " $1 $2 $3 $4 $5
 must_run=true
-echo "Getting latest version from git"
+echo "Getting latest haiot version from git"
 git pull --no-edit
 while $must_run; do
     run_app db_mem model_auto_update syslog=logs2.papertrailapp.com:30445 $1 $2 $3 $4 $5
@@ -39,7 +39,7 @@ while $must_run; do
         must_run=false
     fi
     if [ $exit_code == 1 ]; then
-        echo "App was interrupted with CTRL-C or by exception code[$exit_code]"
+        echo "App was interrupted with CTRL-C or by exception code [$exit_code]"
         must_run=false
     fi
 done
