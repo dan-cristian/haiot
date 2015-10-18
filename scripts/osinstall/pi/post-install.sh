@@ -23,6 +23,7 @@ echo Creating user $USERNAME with password=$USERPASS
 useradd $USERNAME -m
 echo "$USERNAME:$USERPASS" | chpasswd
 adduser $USERNAME sudo
+chsh -s /bin/bash $USERNAME
 
 echo Getting HAIOT application from github
 cd /home/$USERNAME
@@ -49,6 +50,7 @@ echo Creating start links for haiot to be picked up by userspaceServices
 ln -s /home/$USERNAME/PYC/start_daemon_userspaces.sh /home/$USERNAME/.startUp/
 ln -s /home/$USERNAME/PYC/start_daemon_userspaces.sh /home/$USERNAME/.shutDown/
 chown -R $USERNAME:$USERNAME /home/$USERNAME/
+
 
 echo Starting haiot via userspaceServices
 /etc/init.d/userspaceServices restart
