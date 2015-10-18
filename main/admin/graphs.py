@@ -23,7 +23,7 @@ class SensorGraph(BaseGraph):
         pass
 
     graph_x_ = 'updated_on'
-    graph_y_ = ['temperature', 'humidity']
+    graph_y_ = ['temperature', 'humidity', 'counters_a', 'counters_b', 'iad', 'vdd', 'vad']
     graph_shape_ = ['spline','spline']
     graph_id_ = 'address'
     graph_legend_ = 'sensor_name'
