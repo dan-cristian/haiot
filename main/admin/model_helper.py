@@ -203,7 +203,7 @@ def populate_tables(model_auto_update=False):
                         db.session.add(gpio)
                 commit()
 
-        #fixme: check for other PI revisions
+        # fixme: check for other PI revisions
         if node.machine_type == Constant.MACHINE_TYPE_RASPBERRY:
             if len(models.GpioPin.query.filter_by(pin_type=Constant.GPIO_PIN_TYPE_PI,host_name=node.name).all()) != 26:
                 models.GpioPin.query.filter_by(pin_type=Constant.GPIO_PIN_TYPE_PI, host_name=node.name).delete()
@@ -227,7 +227,7 @@ def populate_tables(model_auto_update=False):
                         gpio = models.GpioPin()
                         gpio.pin_type = Constant.GPIO_PIN_TYPE_PI_FACE
                         gpio.host_name = node.name
-                        gpio.pin_code = str(board) + ":" + pin_dir + ":" + str(pin)
+                        gpio.pin_code = str(board) + ":" + pin_dir + ":" + str(pin)  # same as piface.format_pin_code()
                         gpio.pin_index_bcm = pin
                         gpio.board_index = board
                         db.session.add(gpio)
