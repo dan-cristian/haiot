@@ -1,8 +1,9 @@
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
-
+from pydispatch import dispatcher
 from main import Log
 from main import thread_pool
+from common import Constant
 
 # https://piface.github.io/pifacedigitalio/example.html
 __import_ok = False
@@ -17,6 +18,9 @@ except Exception, ex:
     __import_ok = False
     Log.logger.info('Exception on importing pifacedigitalio, err={}'.format(ex))
 
+def format_pin_code(board_index, pin_direction, pin_index):
+    return str(board_index) + ":" + str(pin_direction) + ":" + str(pin_index)
+
 
 def get_pin_value(pin_index=None, board_index=0):
     return pfio.digital_read(pin_num=pin_index, hardware_addr=board_index)
@@ -28,12 +32,19 @@ def set_pin_value(pin_index=None, pin_value=None, board_index=0):
 
 
 def switch_pressed(event):
-    Log.logger.info('Piface input pressed, event={} chip={}'.format(event, event.chip))
+    Log.logger.info('Piface input pressed, event={}'.format(event))
+
+
+def switch_event(event):
+    Log.logger.info('Piface switch event={}'.format(event))
     pin_num = event.pin_num
-
-
-def switch_unpressed(event):
-    Log.logger.info('Piface input released, event={} chip={}'.format(event, event.chip))
+    board_index = event.chip.hardware_addr
+    direction = event.direction # 0 for press/contact, 1 for release/disconnect
+    gpio_pin_code = format_pin_code(board_index=board_index, pin_direction=Constant.GPIO_PIN_DIRECTION_IN,
+                                    pin_index=pin_num)
+    Log.logger.info('Event gpio={}'.format(gpio_pin_code))
+    dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio_pin_code, direction=Constant.GPIO_PIN_DIRECTION_IN,
+                    pin_value=direction, pin_connected=(direction == 0))
 
 
 def thread_run():
@@ -55,8 +66,8 @@ def init():
             __pfd = pfio.PiFaceDigital()
             __listener = pfio.InputEventListener(chip=__pfd)
             for i in range(4):
-                __listener.register(i, pfio.IODIR_ON, switch_pressed)
-                __listener.register(i, pfio.IODIR_OFF, switch_unpressed)
+                __listener.register(i, pfio.IODIR_ON, switch_event)
+                __listener.register(i, pfio.IODIR_OFF, switch_event)
             __listener.activate()
             Log.logger.info("Piface input listener activated")
             thread_pool.add_interval_callable(thread_run, run_interval_second=10)
