@@ -6,6 +6,8 @@ from main import thread_pool
 
 # https://piface.github.io/pifacedigitalio/example.html
 __import_ok = False
+__pfd = None
+__listener = None
 initialised = False
 
 try:
@@ -25,19 +27,43 @@ def set_pin_value(pin_index=None, pin_value=None, board_index=0):
     return get_pin_value(pin_index=pin_index, board_index=board_index)
 
 
+def switch_pressed(event):
+    print "Hello"
+    __pfd.leds[0].value = 1
+
+def switch_unpressed(event):
+    print "Bebop"
+    __pfd.leds[1].value = 1
+
+
 def thread_run():
     pass
 
 
+def unload():
+    Log.logger.info('Piface unloading')
+    if __import_ok:
+        pfio.deinit()
+
+
 def init():
-    Log.logger.info('PiFace module initialising')
+    Log.logger.info('Piface initialising')
     if __import_ok:
         try:
             pfio.init()
+            global __pfd, __listener
+            __pfd = pfio.PiFaceDigital()
+            __listener = pfio.InputEventListener(chip=__pfd)
+            for i in range(4):
+                __listener.register(i, pfio.IODIR_ON, switch_pressed)
+                __listener.register(i, pfio.IODIR_OFF, switch_unpressed)
+            __listener.activate()
+            Log.logger.info("Piface input listener activated")
             thread_pool.add_interval_callable(thread_run, run_interval_second=10)
             global initialised
             initialised = True
+            Log.logger.info('Piface initialised OK')
         except Exception, ex:
-            Log.logger.critical('Module piface not initialised, err={}'.format(ex))
+            Log.logger.critical('Piface not initialised, err={}'.format(ex))
     else:
-        Log.logger.info('Module pifacedigitalio not loaded')
+        Log.logger.info('Piface NOT initialised, module pifacedigitalio unavailable on this system')
