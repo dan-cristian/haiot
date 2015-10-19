@@ -10,7 +10,7 @@ import model_helper
 import node
 import sensor
 import heat
-import relay
+import gpio
 import rule
 import main.persistence
 
@@ -112,9 +112,9 @@ def mqtt_thread_run():
                     elif table == utils.get_table_name(models.Sensor):
                         sensor.sensor_update(obj)
                     elif table == utils.get_table_name(models.ZoneCustomRelay):
-                        relay.zone_custom_relay_record_update(obj)
+                        gpio.zone_custom_relay_record_update(obj)
                     elif table == utils.get_table_name(models.GpioPin):
-                        relay.gpio_record_update(obj)
+                        gpio.gpio_record_update(obj)
                     elif table == utils.get_table_name(models.Rule):
                         rule.rule_record_update(obj)
                     elif table == utils.get_table_name(models.PlotlyCache):

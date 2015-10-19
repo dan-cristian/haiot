@@ -4,10 +4,10 @@
     {"id":2,  "priority":"2", "name":"nas"},
     {"id":3,  "priority":"3", "name":"server"},
     {"id":4,  "priority":"4", "name":"ex-std-node466.prod.rhcloud.com"},
-    {"id":5,  "priority":"5", "name":"beaglebone"},
-    {"id":6,  "priority":"6", "name":"pi-power"},
-    {"id":7,  "priority":"7", "name":"pi-bell"},
-    {"id":8,  "priority":"8", "name":"pi-face"}
+    {"id":5,  "priority":"5", "name":"beaglebone", "machine_type":"beaglebone"},
+    {"id":6,  "priority":"6", "name":"pi-power", "machine_type":"raspberry"},
+    {"id":7,  "priority":"7", "name":"pi-bell", "machine_type":"raspberry"},
+    {"id":8,  "priority":"8", "name":"pi-face", "machine_type":"raspberry"}
 
   ],
 
@@ -134,7 +134,9 @@
     {"relay_pin_name": "back pump relay", "zone_id": "39", "gpio_pin_code": "P9_24", "gpio_host_name": "beaglebone","relay_is_on": "0"},
     {"relay_pin_name": "back valve relay", "zone_id": "37", "gpio_pin_code": "P9_23", "gpio_host_name": "beaglebone","relay_is_on": "0"},
     {"relay_pin_name": "back lights relay", "zone_id": "40", "gpio_pin_code": "P9_22", "gpio_host_name": "beaglebone","relay_is_on": "0"},
-    {"relay_pin_name": "front valve relay", "zone_id": "36", "gpio_pin_code": "P9_21", "gpio_host_name": "beaglebone", "relay_is_on": "0"}
+    {"relay_pin_name": "front valve relay", "zone_id": "36", "gpio_pin_code": "P9_21", "gpio_host_name": "beaglebone", "relay_is_on": "0"},
+    {"relay_pin_name": "test 1", "zone_id": "36", "gpio_pin_code": "0:out:0", "gpio_host_name": "pi-face", "relay_is_on": "0"}
+
   ],
 
   "TemperatureTarget": [

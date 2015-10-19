@@ -208,7 +208,7 @@ def populate_tables(model_auto_update=False):
             if len(models.GpioPin.query.filter_by(pin_type=Constant.GPIO_PIN_TYPE_PI,host_name=node.name).all()) != 26:
                 models.GpioPin.query.filter_by(pin_type=Constant.GPIO_PIN_TYPE_PI, host_name=node.name).delete()
                 commit()
-                Log.logger.info('Populating default {} GpioPins on {} '.format(node.machine_type, node.name))
+                Log.logger.info('Populating standard {} GpioPins on {} '.format(node.machine_type, node.name))
                 for pin in range(01, 27): # -1
                     gpio = models.GpioPin()
                     gpio.pin_type = Constant.GPIO_PIN_TYPE_PI
@@ -216,5 +216,20 @@ def populate_tables(model_auto_update=False):
                     gpio.pin_code = str(pin)
                     gpio.pin_index_bcm = pin
                     db.session.add(gpio)
+            if len(models.GpioPin.query.filter_by(pin_type=Constant.GPIO_PIN_TYPE_PI_FACE,host_name=node.name).all()) \
+                    != 2 * 8 * 4:  # input/output * 8 pins * max 4 boards
+                models.GpioPin.query.filter_by(pin_type=Constant.GPIO_PIN_TYPE_PI_FACE, host_name=node.name).delete()
                 commit()
+                Log.logger.info('Populating pi-face {} pins on {} '.format(node.machine_type, node.name))
+            for board in range(0, 4):
+                for pin_dir in (Constant.GPIO_PIN_DIRECTION_IN, Constant.GPIO_PIN_DIRECTION_OUT):
+                    for pin in range(0, 8): # -1
+                        gpio = models.GpioPin()
+                        gpio.pin_type = Constant.GPIO_PIN_TYPE_PI_FACE
+                        gpio.host_name = node.name
+                        gpio.pin_code = str(board) + ":" + pin_dir + ":" + str(pin)
+                        gpio.pin_index_bcm = pin
+                        gpio.board_index = board
+                        db.session.add(gpio)
+            commit()
 

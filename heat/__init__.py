@@ -8,7 +8,7 @@ from main import thread_pool
 from main.admin import models
 from common import Constant, utils
 from main.admin.model_helper import commit
-import relay
+import gpio
 
 initialised=False
 
@@ -30,7 +30,7 @@ def heat_update(obj_dict={}):
                     pin_value = 1
                 else:
                     pin_value = 0
-                pin_state = relay.relay_update(gpio_pin_code=zone_heat_relay.gpio_pin_code, pin_value=pin_value)
+                pin_state = gpio.relay_update(gpio_pin_code=zone_heat_relay.gpio_pin_code, pin_value=pin_value)
                 if pin_state == pin_value:
                     pin_state = (pin_state == 1)
                     zone_heat_relay.heat_is_on = pin_state

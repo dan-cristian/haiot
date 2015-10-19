@@ -1,10 +1,12 @@
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
-from main import app
-import pygal
 import json
 from urllib2 import urlopen  # python 2 syntax
-from flask import Flask, render_template
+
+import pygal
+from flask import render_template
+
+from main import app
 from main.logger_helper import Log
 from main.admin import models
 
