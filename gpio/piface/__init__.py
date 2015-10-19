@@ -28,12 +28,11 @@ def set_pin_value(pin_index=None, pin_value=None, board_index=0):
 
 
 def switch_pressed(event):
-    print "Hello"
-    __pfd.leds[0].value = 1
+    Log.logger.info('Piface input pressed, event={}'.format(event))
+
 
 def switch_unpressed(event):
-    print "Bebop"
-    __pfd.leds[1].value = 1
+    Log.logger.info('Piface input released, event={}'.format(event))
 
 
 def thread_run():
