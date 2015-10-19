@@ -123,8 +123,11 @@ def unload():
 
 def init():
     Log.logger.info("GPIO initialising")
-    piface.init()
-    std_gpio.init()
-    bbb_io.init()
+    if Constant.IS_MACHINE_RASPBERRYPI:
+        piface.init()
+    if Constant.IS_MACHINE_BEAGLEBONE:
+        bbb_io.init()
+    if Constant.IS_MACHINE_RASPBERRYPI or Constant.IS_MACHINE_BEAGLEBONE:
+        std_gpio.init()
     global initialised
     initialised = True
