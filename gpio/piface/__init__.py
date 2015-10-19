@@ -13,9 +13,9 @@ initialised = False
 try:
     import pifacedigitalio as pfio
     __import_ok = True
-except ImportError:
+except Exception, ex:
     __import_ok = False
-    pass
+    Log.logger.info('Exception on importing pifacedigitalio, err={}'.format(ex))
 
 
 def get_pin_value(pin_index=None, board_index=0):
@@ -28,11 +28,12 @@ def set_pin_value(pin_index=None, pin_value=None, board_index=0):
 
 
 def switch_pressed(event):
-    Log.logger.info('Piface input pressed, event={}'.format(event))
+    Log.logger.info('Piface input pressed, event={} chip={}'.format(event, event.chip))
+    pin_num = event.pin_num
 
 
 def switch_unpressed(event):
-    Log.logger.info('Piface input released, event={}'.format(event))
+    Log.logger.info('Piface input released, event={} chip={}'.format(event, event.chip))
 
 
 def thread_run():
