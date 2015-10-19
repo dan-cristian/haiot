@@ -105,7 +105,10 @@ class Constant:
     JSON_PUBLISH_RECORD_UUID = 'record_uuid'
 
     GPIO_PIN_TYPE_BBB='bbb'
-    GPIO_PIN_TYPE_PI='pi'
+    GPIO_PIN_TYPE_PI='pi-stdgpio'
+    GPIO_PIN_TYPE_PI_FACE='pi-face'
+    GPIO_PIN_DIRECTION_IN = 'in'
+    GPIO_PIN_DIRECTION_OUT = 'out'
 
 def init():
     from main.logger_helper import Log

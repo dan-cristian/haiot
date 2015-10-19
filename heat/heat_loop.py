@@ -1,11 +1,12 @@
 __author__ = 'dcristian'
 
 import datetime
+
 from main.logger_helper import Log
 from main.admin import models
 from main.admin.model_helper import commit
 from common import utils, Constant
-import relay
+import gpio
 
 
 # save heat status and announce to all nodes
@@ -51,9 +52,9 @@ def __update_zone_heat(zone, heat_schedule, sensor):
         hour = utils.get_base_location_now_date().hour
         weekday = datetime.datetime.today().weekday()
         if weekday <= 4: #Monday=0
-            schedule_pattern=models.SchedulePattern.query.filter_by(id=heat_schedule.pattern_week_id).first()
+            schedule_pattern= models.SchedulePattern.query.filter_by(id=heat_schedule.pattern_week_id).first()
         else:
-            schedule_pattern=models.SchedulePattern.query.filter_by(id=heat_schedule.pattern_weekend_id).first()
+            schedule_pattern= models.SchedulePattern.query.filter_by(id=heat_schedule.pattern_weekend_id).first()
         if schedule_pattern:
             # strip formatting characters that are not used to represent target temperature
             pattern = str(schedule_pattern.pattern).replace('-', '').replace(' ','')
@@ -125,7 +126,7 @@ def loop_heat_relay():
         gpio_pin = models.GpioPin().query_filter_first(models.GpioPin.host_name.in_([Constant.HOST_NAME]),
                                                        models.GpioPin.pin_code.in_([heat_relay.gpio_pin_code]))
         if gpio_pin:
-            pin_state_int = relay.relay_get(pin_bcm=gpio_pin.pin_index_bcm)
+            pin_state_int = gpio.relay_get(pin_bcm=gpio_pin.pin_index_bcm)
             pin_state = (pin_state_int == 1)
             zone = models.Zone().query_filter_first(models.Zone.id.in_([heat_relay.zone_id]))
             relay_inconsistency = heat_relay.heat_is_on != pin_state

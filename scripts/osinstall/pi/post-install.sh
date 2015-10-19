@@ -2,6 +2,7 @@
 
 USERNAME=haiot
 USERPASS=haiot
+ENABLE_PIFACE=1
 
 echo "Setting timezone ..."
 echo "Europe/Bucharest" > /etc/timezone
@@ -11,7 +12,9 @@ echo "Updating apt-get"
 apt-get upgrade
 apt-get update
 echo "Installing additional packages"
+# 1-wire support needs owfs
 apt-get -y install sudo apt-utils mc nano locales python wget owfs git python-rpi.gpio inotify-tools
+
 
 echo "Installing python pip and virtualenv"
 wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py
@@ -24,6 +27,23 @@ useradd $USERNAME -m
 echo "$USERNAME:$USERPASS" | chpasswd
 adduser $USERNAME sudo
 chsh -s /bin/bash $USERNAME
+
+if [ "$ENABLE_PIFACE" == "1" ]; then
+    # needed for piface
+    apt-get -y install raspi-config python-pifacedigitalio
+    #enable spi
+    # safest method is to use raspi-config manuallt, and enable SPI in advanced option menu
+    cat /boot/config.txt | grep spi=
+    if [ "$?" == "0" ]; then
+        sed -i 's/spi=off/spi=on/g' /boot/config.txt
+    else
+        echo "dtparam=spi=on" >> /boot/config.txt
+    fi
+    # access rights for piface, by default python-pifacedigitalio assumes username as being = pi
+    gpasswd -a $USERNAME spi
+    # needed to get write access to /sys/class/gpio/
+    gpasswd -a $USERNAME gpio
+fi
 
 echo Getting HAIOT application from github
 cd /home/$USERNAME
@@ -43,14 +63,15 @@ chmod +x userspaceServices
 echo Installing init service
 mv userspaceServices /etc/init.d/
 update-rc.d userspaceServices defaults
+
 echo Testing init service, create working directories for all defined linux users incl. haiot
 /etc/init.d/userspaceServices start
 /etc/init.d/userspaceServices stop
+
 echo Creating start links for haiot to be picked up by userspaceServices
 ln -s /home/$USERNAME/PYC/start_daemon_userspaces.sh /home/$USERNAME/.startUp/
 ln -s /home/$USERNAME/PYC/start_daemon_userspaces.sh /home/$USERNAME/.shutDown/
 chown -R $USERNAME:$USERNAME /home/$USERNAME/
-
 
 echo Starting haiot via userspaceServices
 /etc/init.d/userspaceServices restart

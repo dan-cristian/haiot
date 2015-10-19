@@ -4,11 +4,13 @@ import random
 
 from pydispatch import dispatcher
 
+from main import thread_pool
 from main.logger_helper import Log
 from common import Constant
 from main.admin import models
-from relay import gpio_pi_bbb
+from gpio import gpio_pi_bbb
 
+initialised=False
 __pool_pin_codes=[]
 
 #https://learn.adafruit.com/setting-up-io-python-library-on-beaglebone-black/using-the-bbio-library
@@ -21,6 +23,7 @@ try:
 except:
     Log.logger.info('Module Adafruit_BBIO.GPIO is not installed, module will not be initialised')
     import_module_exist = False
+
 
 def register_gpios():
     global import_module_exist
@@ -60,6 +63,7 @@ def register_gpios():
             Log.logger.critical('Unable to setup GPIO {} zone {} err={}'.format(zonealarm.gpio_pin_code,
                                                                       zonealarm.zone_id, ex))
 
+
 def event_detected(channel):
     try:
         global import_module_exist
@@ -83,8 +87,6 @@ def __check_for_events():
             #Log.logger.info('Pooling event detected gpio {} val {}'.format(pin_code, state))
             dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=pin_code, direction='in', pin_value=state)
 
-def init():
-    register_gpios()
 
 def thread_run():
     Log.logger.debug('Processing Beaglebone IO')
@@ -95,3 +97,19 @@ def thread_run():
     else:
         __check_for_events()
     return 'Processed bbb_io'
+
+def unload():
+    #...
+    thread_pool.remove_callable(thread_run)
+    global initialised
+    initialised = False
+
+def init():
+    Log.logger.info('Beaglebone IO module initialising')
+    try:
+        register_gpios()
+        thread_pool.add_interval_callable(thread_run, run_interval_second=2)
+        global initialised
+        initialised = True
+    except Exception, ex:
+        Log.logger.critical('Module io_bbb not initialised, err={}'.format(ex))

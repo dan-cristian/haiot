@@ -1,12 +1,15 @@
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
 import os
+
 from pydispatch import dispatcher
+from flask import abort, send_file, render_template
+
 from main import app, db
 from main.logger_helper import Log
 from main.admin.model_helper import commit
-from flask import abort, send_file, render_template
 from common import Constant, utils
+
 
 def return_web_message(pin_value, ok_message='', err_message=''):
     if pin_value:

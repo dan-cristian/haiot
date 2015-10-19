@@ -7,8 +7,7 @@ import pyownet.protocol
 
 from main.logger_helper import Log
 from common import Constant, utils
-from main.admin import model_helper
-from main.admin import models
+from main.admin import model_helper, models
 
 
 def do_device (owproxy):
