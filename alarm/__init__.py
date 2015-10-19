@@ -10,10 +10,11 @@ from main.admin.model_helper import commit
 
 initialised=False
 
+
 def handle_event_alarm(gpio_pin_code='', direction='', pin_value=''):
-    pass
     zonealarm= models.ZoneAlarm.query.filter_by(gpio_pin_code=gpio_pin_code).first()
     if zonealarm:
+        Log.logger.info('Got alarm event zoneid={}'.format(zonealarm.zone_id))
         zonealarm.alarm_status = pin_value
         zonealarm.updated_on = utils.get_base_location_now_date()
         zonealarm.notify_transport_enabled= False
@@ -21,12 +22,14 @@ def handle_event_alarm(gpio_pin_code='', direction='', pin_value=''):
     else:
         Log.logger.warning('Unexpected mising zone alarm for gpio code {}'.format(gpio_pin_code))
 
+
 def unload():
     Log.logger.info('Alarm module unloading')
     global initialised
     dispatcher.disconnect(dispatcher.connect(handle_event_alarm, signal=Constant.SIGNAL_GPIO, sender=dispatcher.Any))
     thread_pool.remove_callable(alarm_loop.thread_run)
     initialised = False
+
 
 def init():
     Log.logger.info('Alarm module initialising')
