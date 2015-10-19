@@ -7,6 +7,7 @@ from main.admin.model_helper import commit
 
 import std_gpio
 import piface
+import bbb_io
 
 initialised=False
 
@@ -116,10 +117,14 @@ def unload():
     if Constant.HOST_MACHINE_TYPE in [Constant.MACHINE_TYPE_RASPBERRY, Constant.MACHINE_TYPE_BEAGLEBONE]:
         Log.logger.info('Unloading gpio pins')
         std_gpio.unload()
+        piface.un
     initialised = False
 
 
 def init():
-    Log.logger.info("Relay initialising")
+    Log.logger.info("GPIO initialising")
+    piface.init()
+    std_gpio.init()
+    bbb_io.init()
     global initialised
     initialised = True
