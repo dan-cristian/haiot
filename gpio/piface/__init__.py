@@ -31,18 +31,14 @@ def set_pin_value(pin_index=None, pin_value=None, board_index=0):
     return get_pin_value(pin_index=pin_index, board_index=board_index)
 
 
-def switch_pressed(event):
-    Log.logger.info('Piface input pressed, event={}'.format(event))
-
-
 def switch_event(event):
-    Log.logger.info('Piface switch event={}'.format(event))
+    Log.logger.debug('Piface switch event={}'.format(event))
     pin_num = event.pin_num
     board_index = event.chip.hardware_addr
     direction = event.direction # 0 for press/contact, 1 for release/disconnect
     gpio_pin_code = format_pin_code(board_index=board_index, pin_direction=Constant.GPIO_PIN_DIRECTION_IN,
                                     pin_index=pin_num)
-    Log.logger.info('Event gpio={}'.format(gpio_pin_code))
+    Log.logger.info('Event gpio={} direction={}'.format(gpio_pin_code, direction))
     dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio_pin_code, direction=Constant.GPIO_PIN_DIRECTION_IN,
                     pin_value=direction, pin_connected=(direction == 0))
 
