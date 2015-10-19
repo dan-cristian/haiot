@@ -8,7 +8,7 @@ from main import thread_pool
 from main.logger_helper import Log
 from common import Constant
 from main.admin import models
-from gpio import gpio_pi_bbb
+from gpio import std_gpio
 
 initialised=False
 __pool_pin_codes=[]
@@ -27,7 +27,8 @@ except:
 
 def register_gpios():
     global import_module_exist
-    #global zone_alarm_list
+    # fixme: remove dependency on business objects like ZoneAlarm
+    # global zone_alarm_list
     zone_alarm_list = models.ZoneAlarm.query.all()
     for zonealarm in zone_alarm_list:
         try:
@@ -36,9 +37,9 @@ def register_gpios():
             if gpio_pin:
                 #record this pin as used to enable clean shutdown
                 if gpio_pin.pin_index_bcm != '':
-                    gpio_pi_bbb.get_pin_bcm(gpio_pin.pin_index_bcm)
+                    std_gpio.get_pin_bcm(gpio_pin.pin_index_bcm)
                 GPIO.setup(zonealarm.gpio_pin_code, GPIO.IN)
-                gpio_pi_bbb.set_pin_edge(gpio_pin.pin_index_bcm, 'both')
+                std_gpio.set_pin_edge(gpio_pin.pin_index_bcm, 'both')
                 try:
                     GPIO.add_event_detect(zonealarm.gpio_pin_code, GPIO.BOTH)#, callback=event_detected, bouncetime=300)
                     __pool_pin_codes.append(zonealarm.gpio_pin_code)
@@ -98,17 +99,19 @@ def thread_run():
         __check_for_events()
     return 'Processed bbb_io'
 
+
 def unload():
-    #...
+    # ...
     thread_pool.remove_callable(thread_run)
     global initialised
     initialised = False
+
 
 def init():
     Log.logger.info('Beaglebone IO module initialising')
     try:
         register_gpios()
-        thread_pool.add_interval_callable(thread_run, run_interval_second=2)
+        thread_pool.add_interval_callable(thread_run, run_interval_second=10)
         global initialised
         initialised = True
     except Exception, ex:
