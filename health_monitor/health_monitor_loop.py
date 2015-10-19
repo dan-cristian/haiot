@@ -10,7 +10,7 @@ from collections import OrderedDict
 
 from main.logger_helper import Log
 from common import Constant, utils
-from main.admin import models, model_helper
+from main.admin import model_helper, models
 from main import logger_helper
 
 try:

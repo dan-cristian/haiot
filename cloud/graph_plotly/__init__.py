@@ -8,8 +8,7 @@ from plotly.exceptions import PlotlyAccountError
 
 from main.logger_helper import Log
 from common import Constant, utils
-from main.admin import model_helper
-from main.admin import models
+from main.admin import model_helper, models
 from main import thread_pool
 import graph_plotly_run
 

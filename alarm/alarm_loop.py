@@ -13,6 +13,8 @@ from main.admin import model_helper
 import transport
 
 
+
+
 #http://owfs.sourceforge.net/owpython.html
 topic = "mzp/iot/alarm"
 gpio_file = "/tmp/gpio_input.txt"

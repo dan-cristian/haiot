@@ -12,7 +12,7 @@ initialised=False
 
 def handle_event_alarm(gpio_pin_code='', direction='', pin_value=''):
     pass
-    zonealarm=models.ZoneAlarm.query.filter_by(gpio_pin_code=gpio_pin_code).first()
+    zonealarm= models.ZoneAlarm.query.filter_by(gpio_pin_code=gpio_pin_code).first()
     if zonealarm:
         zonealarm.alarm_status = pin_value
         zonealarm.updated_on = utils.get_base_location_now_date()

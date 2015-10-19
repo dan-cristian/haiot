@@ -439,13 +439,14 @@ class SystemDisk(db.Model, graphs.SystemDiskGraph, DbEvent, DbBase):
 class GpioPin(db.Model, DbEvent, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     host_name = db.Column(db.String(50))
-    pin_type = db.Column(db.String(50)) #bbb, pi
-    pin_code = db.Column(db.String(50)) #friendly format, e.g. for Beagle is P9_11, for PI is same with pin_index
-    pin_index_bcm = db.Column(db.String(50))#bcm format, 0 to n
-    pin_value = db.Column(db.Integer) # 0, 1 or None
-    pin_direction = db.Column(db.String(4)) #in, out, None
+    pin_type = db.Column(db.String(50))  # bbb, pi, piface
+    pin_code = db.Column(db.String(50))  # friendly format, unique for host, Beagle = P9_11, PI = pin_index
+    pin_index_bcm = db.Column(db.String(50))  # bcm format, 0 to n
+    pin_value = db.Column(db.Integer)  # 0, 1 or None
+    pin_direction = db.Column(db.String(4))  # in, out, None
+    board_index = db.Column(db.Integer)  # 0 to n (max 3 for piface)
     description = db.Column(db.String(50))
-    is_active = db.Column(db.Boolean) # if pin was setup(exported) through this app. will be unexported when app exit
+    is_active = db.Column(db.Boolean)  # if pin was setup(exported) through this app. will be unexported when app exit
 
     def __init__(self):
         pass
