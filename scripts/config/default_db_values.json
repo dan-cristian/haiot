@@ -202,7 +202,8 @@
     {"zone_id":3 , "gpio_pin_code":"P8_12", "gpio_host_name": "beaglebone", "alarm_pin_name": "beci mic"},
     {"zone_id":9 , "gpio_pin_code":"P8_09", "gpio_host_name": "beaglebone", "alarm_pin_name": "beci mare"},
     {"zone_id":10 , "gpio_pin_code":"P8_07", "gpio_host_name": "beaglebone", "alarm_pin_name": "scari beci"},
-    {"zone_id":11 , "gpio_pin_code":"P8_15", "gpio_host_name": "beaglebone", "alarm_pin_name": "etaj hol"}
+    {"zone_id":11 , "gpio_pin_code":"P8_15", "gpio_host_name": "beaglebone", "alarm_pin_name": "etaj hol"},
+    {"zone_id":34 , "gpio_pin_code":"0:in:3", "gpio_host_name": "pi-face", "alarm_pin_name": "horn test"}
   ],
 
   "Rule": [
