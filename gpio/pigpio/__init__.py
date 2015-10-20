@@ -40,6 +40,7 @@ def input_event(gpio, level, tick):
 
 def setup_in_ports(gpio_pin_list):
     global __callback, __pi
+    Log.logger.info('Configuring {} gpio input ports'.format(len(gpio_pin_list)))
     if __pi:
         for gpio_pin in gpio_pin_list:
             if gpio_pin.pin_type == Constant.GPIO_PIN_TYPE_PI_STDGPIO:
