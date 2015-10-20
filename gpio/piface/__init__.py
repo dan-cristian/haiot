@@ -31,7 +31,7 @@ def set_pin_value(pin_index=None, pin_value=None, board_index=0):
     return get_pin_value(pin_index=pin_index, board_index=board_index)
 
 
-def switch_event(event):
+def input_event(event):
     Log.logger.debug('Piface switch event={}'.format(event))
     pin_num = event.pin_num
     board_index = event.chip.hardware_addr
@@ -62,8 +62,8 @@ def init():
             __pfd = pfio.PiFaceDigital()
             __listener = pfio.InputEventListener(chip=__pfd)
             for i in range(4):
-                __listener.register(i, pfio.IODIR_ON, switch_event)
-                __listener.register(i, pfio.IODIR_OFF, switch_event)
+                __listener.register(i, pfio.IODIR_ON, input_event)
+                __listener.register(i, pfio.IODIR_OFF, input_event)
             __listener.activate()
             Log.logger.info("Piface input listener activated")
             thread_pool.add_interval_callable(thread_run, run_interval_second=10)

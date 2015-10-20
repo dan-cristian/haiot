@@ -45,9 +45,20 @@ if [ "$ENABLE_PIFACE" == "1" ]; then
     gpasswd -a $USERNAME gpio
 fi
 
+
+
 echo Getting HAIOT application from github
 cd /home/$USERNAME
 git clone http://192.168.0.9:888/PYC.git
+
+echo Downloading pigpio library for gpio access
+wget abyz.co.uk/rpi/pigpio/pigpio.zip
+unzip pigpio.zip
+cd PIGPIO
+echo Compiling pigpio
+apt-get -y install build-essential
+make
+#todo install pigpiod init script
 
 echo Configuring HAIOT application
 cd PYC 
