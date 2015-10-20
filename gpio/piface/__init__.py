@@ -71,6 +71,6 @@ def init():
             initialised = True
             Log.logger.info('Piface initialised OK')
         except Exception, ex:
-            Log.logger.critical('Piface not initialised, err={}'.format(ex))
+            Log.logger.info('Piface not initialised, err={}'.format(ex))
     else:
         Log.logger.info('Piface NOT initialised, module pifacedigitalio unavailable on this system')
