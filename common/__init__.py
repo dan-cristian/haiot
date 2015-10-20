@@ -9,6 +9,7 @@ class Constant:
     SIGNAL_MQTT_RECEIVED = 'signal-from-mqtt-data-received'
     SIGNAL_HEAT = 'signal-from-heat'
     SIGNAL_GPIO = 'signal-from-GPIO'
+    SIGNAL_GPIO_INPUT_PORT_LIST = 'signal-setup-GPIO-input'
     SIGNAL_FILE_WATCH = 'signal-from-file-watch'
     SIGNAL_DB_CHANGE_FOR_RULES = 'signal_db_change_for_rules'
 
@@ -105,8 +106,8 @@ class Constant:
     JSON_PUBLISH_RECORD_UUID = 'record_uuid'
 
     GPIO_PIN_TYPE_BBB='bbb'
-    GPIO_PIN_TYPE_PI='pi-stdgpio'
-    GPIO_PIN_TYPE_PI_FACE='pi-face'
+    GPIO_PIN_TYPE_PI_STDGPIO='pi-stdgpio'
+    GPIO_PIN_TYPE_PI_FACE_SPI='pi-face-spi'
     GPIO_PIN_DIRECTION_IN = 'in'
     GPIO_PIN_DIRECTION_OUT = 'out'
 
