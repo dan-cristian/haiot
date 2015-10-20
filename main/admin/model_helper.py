@@ -205,11 +205,12 @@ def populate_tables(model_auto_update=False):
 
         # fixme: check for other PI revisions
         if node.machine_type == Constant.MACHINE_TYPE_RASPBERRY:
-            if len(models.GpioPin.query.filter_by(pin_type=Constant.GPIO_PIN_TYPE_PI_STDGPIO,host_name=node.name).all()) != 26:
+            if len(models.GpioPin.query.filter_by(
+                    pin_type=Constant.GPIO_PIN_TYPE_PI_STDGPIO,host_name=node.name).all()) != 40:
                 models.GpioPin.query.filter_by(pin_type=Constant.GPIO_PIN_TYPE_PI_STDGPIO, host_name=node.name).delete()
                 commit()
                 Log.logger.info('Populating standard {} GpioPins on {} '.format(node.machine_type, node.name))
-                for pin in range(01, 27): # -1
+                for pin in range(0, 40):
                     gpio = models.GpioPin()
                     gpio.pin_type = Constant.GPIO_PIN_TYPE_PI_STDGPIO
                     gpio.host_name = node.name

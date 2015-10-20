@@ -65,6 +65,7 @@
     {"id":509, "active":"1", "start_order":"9", "name":"heat", "host_name":"netbook"},
     {"id":599, "active":"0", "start_order":"9", "name":"test", "host_name":"netbook"},
     {"id":513, "active":"0", "start_order":"13", "name":"cloud.graph_plotly", "host_name":"netbook"},
+    {"id":511, "active":"1", "start_order":"11", "name":"alarm", "host_name":"netbook"},
 
     {"id":611, "active":"1", "start_order":"11", "name":"alarm", "host_name":"pi-face"}
 
@@ -204,7 +205,9 @@
     {"zone_id":9 , "gpio_pin_code":"P8_09", "gpio_host_name": "beaglebone", "alarm_pin_name": "beci mare"},
     {"zone_id":10 , "gpio_pin_code":"P8_07", "gpio_host_name": "beaglebone", "alarm_pin_name": "scari beci"},
     {"zone_id":11 , "gpio_pin_code":"P8_15", "gpio_host_name": "beaglebone", "alarm_pin_name": "etaj hol"},
-    {"zone_id":34 , "gpio_pin_code":"0:in:3", "gpio_host_name": "pi-face", "alarm_pin_name": "horn test"}
+    {"zone_id":34 , "gpio_pin_code":"0:in:3", "gpio_host_name": "pi-face", "alarm_pin_name": "horn test"},
+    {"zone_id":29 , "gpio_pin_code":"0", "gpio_host_name": "pi-face", "alarm_pin_name": "beci test"}
+
   ],
 
   "Rule": [
