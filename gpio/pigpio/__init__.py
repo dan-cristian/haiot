@@ -54,7 +54,7 @@ def setup_in_ports(gpio_pin_list):
                 gpio_pin_record.pin_direction = Constant.GPIO_PIN_DIRECTION_IN
                 commit()
             else:
-                Log.logger.info('Skipping PiGpio setup for pin {} as type {}'.format(gpio_pin.gpio_pin_code,
+                Log.logger.info('Skipping PiGpio setup for pin {} as type {}'.format(gpio_pin.pin_code,
                                                                                      gpio_pin.pin_type))
     else:
         Log.logger.critical('PiGpio not yet initialised but was asked to setup IN ports. Check module init order.')
