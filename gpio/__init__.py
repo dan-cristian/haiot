@@ -8,6 +8,7 @@ from main.admin.model_helper import commit
 import std_gpio
 import piface
 import bbb_io
+import pigpio
 
 initialised=False
 
@@ -125,9 +126,9 @@ def init():
     Log.logger.info("GPIO initialising")
     if Constant.IS_MACHINE_RASPBERRYPI:
         piface.init()
+        pigpio.init()
     if Constant.IS_MACHINE_BEAGLEBONE:
         bbb_io.init()
-    if Constant.IS_MACHINE_RASPBERRYPI or Constant.IS_MACHINE_BEAGLEBONE:
         std_gpio.init()
     global initialised
     initialised = True
