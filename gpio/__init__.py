@@ -37,9 +37,9 @@ def relay_update(gpio_pin_code=None, pin_value=None, from_web=False):
 def relay_get(gpio_pin=None, from_web=False):
     message = 'Get relay state for pin {}'.format(gpio_pin.pin_index_bcm)
     if Constant.HOST_MACHINE_TYPE in [Constant.MACHINE_TYPE_RASPBERRY, Constant.MACHINE_TYPE_BEAGLEBONE]:
-        if gpio_pin.pin_type in [Constant.GPIO_PIN_TYPE_PI, Constant.GPIO_PIN_TYPE_BBB]:
+        if gpio_pin.pin_type in [Constant.GPIO_PIN_TYPE_PI_STDGPIO, Constant.GPIO_PIN_TYPE_BBB]:
             pin_value = std_gpio.get_pin_bcm(gpio_pin.pin_index_bcm)
-        elif gpio_pin.pin_type == Constant.GPIO_PIN_TYPE_PI_FACE:
+        elif gpio_pin.pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
             pin_value = piface.get_pin_value(pin_index=gpio_pin.pin_index_bcm, board_index=gpio_pin.board_index)
         #Log.logger.info(message + str(" val={}".format(pin_value)))
     else:
@@ -59,9 +59,9 @@ def relay_set(gpio_pin=None, value=None, from_web=False):
     message = 'Set relay state [{}] for pin [{}] from web=[{}]'.format(value, gpio_pin.pin_index_bcm, from_web)
     Log.logger.info(message)
     if Constant.HOST_MACHINE_TYPE in [Constant.MACHINE_TYPE_RASPBERRY, Constant.MACHINE_TYPE_BEAGLEBONE]:
-        if gpio_pin.pin_type in [Constant.GPIO_PIN_TYPE_PI, Constant.GPIO_PIN_TYPE_BBB]:
+        if gpio_pin.pin_type in [Constant.GPIO_PIN_TYPE_PI_STDGPIO, Constant.GPIO_PIN_TYPE_BBB]:
             pin_value = std_gpio.set_pin_bcm(gpio_pin.pin_index_bcm, value)
-        elif gpio_pin.pin_type == Constant.GPIO_PIN_TYPE_PI_FACE:
+        elif gpio_pin.pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
             pin_value = piface.set_pin_value(pin_index=gpio_pin.pin_index_bcm, pin_value=value,
                                              board_index=gpio_pin.board_index)
     else:
