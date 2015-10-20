@@ -47,7 +47,7 @@ def setup_in_ports(gpio_pin_list):
                 Log.logger.info('Set pincode={} type={} index={} as input'.format(gpio_pin.pin_code, gpio_pin.pin_type,
                                                                                   gpio_pin.pin_index_bcm))
                 __pi.set_mode(int(gpio_pin.pin_index_bcm), pigpio.INPUT)
-                __callback.append(__pi.callback(user_gpio=gpio_pin.pin_index_bcm,
+                __callback.append(__pi.callback(user_gpio=int(gpio_pin.pin_index_bcm),
                                                 edge=pigpio.EITHER_EDGE, func=input_event))
                 gpio_pin_record = models.GpioPin().query_filter_first(
                     models.GpioPin.gpio_pin_code.in_[gpio_pin.gpio_pin_code],
