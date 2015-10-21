@@ -76,9 +76,11 @@ def input_event(gpio, level, tick):
         last_tick = pin_tick[0]
     else:
         last_tick = 0
-    if tick < last_tick:
-        Log.logger.info("IN DUPLICATE gpio={} lvl={} tick={} current={} delta={}".format(gpio, level, tick, current, delta))
-    Log.logger.info("IN gpio={} lvl={} tick={} current={} delta={}".format(gpio, level, tick, current, delta))
+    if tick <= last_tick:
+        # Log.logger.info("IN DUPLICATE gpio={} lvl={} tick={} current={} delta={}".format(gpio, level, tick, current, delta))
+        pass
+    else:
+        Log.logger.info("IN gpio={} lvl={} tick={} current={} delta={}".format(gpio, level, tick, current, delta))
     #dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio, direction=Constant.GPIO_PIN_DIRECTION_IN,
     #                pin_value=level, pin_connected=(level == 0))
     __pin_tick_list[gpio] = [tick, level]
