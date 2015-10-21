@@ -56,9 +56,9 @@ or corrupt the data on the SD card.
 
 class InputEvent:
     def __init__(self, gpio, level, tick):
-        self.tick = None
-        self.level = None
-        self.gpio = None
+        self.tick = tick
+        self.level = level
+        self.gpio = gpio
         self.processed = False
 
 
