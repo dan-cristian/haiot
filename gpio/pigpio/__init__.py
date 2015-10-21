@@ -70,8 +70,8 @@ def input_event(gpio, level, tick):
     global __pi, __pin_tick_list
     # assumes pins are pull-up enabled
     pin_tick = __pin_tick_list.get(gpio)
-    Log.logger.info("Received pigpio input gpio={} level={} tick={} cur_tick={}".format(gpio, level, tick,
-                                                                                        __pi.get_current_tick()))
+    Log.logger.info("Got pigpio in gpio={} lvl={} tick={} cur_tick={}".format(gpio, level, tick,
+                                                                              __pi.get_current_tick()))
     #dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio, direction=Constant.GPIO_PIN_DIRECTION_IN,
     #                pin_value=level, pin_connected=(level == 0))
     __pin_tick_list[gpio] = [tick, level]
@@ -99,10 +99,7 @@ def setup_in_ports(gpio_pin_list):
                     # https://learn.sparkfun.com/tutorials/pull-up-resistors
                     __pi.set_pull_up_down(int(gpio_pin.pin_index_bcm), pigpio.PUD_UP)
                     __callback.append(__pi.callback(user_gpio=int(gpio_pin.pin_index_bcm),
-                                                    edge=pigpio.FALLING_EDGE, func=input_event))
-                    __callback.append(__pi.callback(user_gpio=int(gpio_pin.pin_index_bcm),
-                                                    edge=pigpio.RISING_EDGE, func=input_event))
-
+                                                    edge=pigpio.EITHER_EDGE, func=input_event))
                     gpio_pin_record = models.GpioPin().query_filter_first(
                         models.GpioPin.pin_code.in_([gpio_pin.pin_code]),
                         models.GpioPin.host_name.in_([Constant.HOST_NAME]))
