@@ -17,7 +17,6 @@ initialised = False
 __callback = []
 __pi = None
 __callback_thread = None
-__new_event = False
 __pin_tick_list = {}  # {[pin_no, level, was_processed?]}
 
 try:
@@ -54,12 +53,14 @@ It is safe to read all the gpios. If you try to write a system gpio or change it
 or corrupt the data on the SD card.
 '''
 
+
 class InputEvent:
     def __init__(self, gpio, level, tick):
         self.tick = None
         self.level = None
         self.gpio = None
         self.processed = False
+
 
 def get_pin_value(pin_index_bcm=None):
     global __pi
@@ -74,7 +75,7 @@ def set_pin_value(pin_index_bcm=None, pin_value=None):
 
 # tick = microseconds since boot
 def input_event(gpio, level, tick):
-    global __pi, __pin_tick_list, __new_event
+    global __pi, __pin_tick_list
     # assumes pins are pull-up enabled
     pin_tick_event = __pin_tick_list.get(gpio)
     current = __pi.get_current_tick()
@@ -90,7 +91,6 @@ def input_event(gpio, level, tick):
         # ignore record events in the past
         event = InputEvent(gpio, level, tick)
         __pin_tick_list[gpio] = event
-        __new_event = True
         Log.logger.info("IN gpio={} lvl={} tick={} current={} delta={}".format(gpio, level, tick, current, delta))
     #dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio, direction=Constant.GPIO_PIN_DIRECTION_IN,
     #                pin_value=level, pin_connected=(level == 0))
@@ -133,10 +133,10 @@ def setup_in_ports(gpio_pin_list):
 
 
 def thread_run():
-    global initialised, __new_event, __pin_tick_list, __pi
-    if initialised and __new_event:
+    global initialised, __pin_tick_list, __pi
+    if initialised:
         for event in __pin_tick_list.values():
-            if not event.Processed:
+            if not event.processed:
                 delta = __pi.get_current_tick() - event.tick
                 if delta > 100000:
                     event.processed = True
