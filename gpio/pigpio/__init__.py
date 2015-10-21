@@ -70,8 +70,8 @@ def input_event(gpio, level, tick):
     global __pi, __pin_tick_list
     # assumes pins are pull-up enabled
     pin_tick = __pin_tick_list.get(gpio)
-    Log.logger.info("Got pigpio in gpio={} lvl={} tick={} cur_tick={}".format(gpio, level, tick,
-                                                                              __pi.get_current_tick()))
+    delta = __pi.get_current_tick() - tick
+    Log.logger.info("Got pigpio in gpio={} lvl={} tick={} delta={}".format(gpio, level, tick, delta))
     #dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio, direction=Constant.GPIO_PIN_DIRECTION_IN,
     #                pin_value=level, pin_connected=(level == 0))
     __pin_tick_list[gpio] = [tick, level]
