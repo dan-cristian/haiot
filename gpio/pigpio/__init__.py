@@ -4,8 +4,6 @@ __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 # http://abyz.co.uk/rpi/pigpio/python.html
 # https://ms-iot.github.io/content/images/PinMappings/RP2_Pinout.png
 
-from threading import Thread
-import time
 import socket
 from pydispatch import dispatcher
 from main import Log
@@ -43,31 +41,6 @@ def input_event(gpio, level, tick):
     Log.logger.info("Received pigpio input gpio={} level={} tick={}".format(gpio, level, tick))
 
 
-def setup_in_ports_and_wait(gpio_pin_list):
-    global __callback, __pi
-    Log.logger.info('Configuring {} gpio input ports'.format(len(gpio_pin_list)))
-    if __pi:
-        for gpio_pin in gpio_pin_list:
-            if gpio_pin.pin_type == Constant.GPIO_PIN_TYPE_PI_STDGPIO:
-                Log.logger.info('Set pincode={} type={} index={} as input'.format(gpio_pin.pin_code, gpio_pin.pin_type,
-                                                                                  gpio_pin.pin_index_bcm))
-                __pi.set_mode(int(gpio_pin.pin_index_bcm), pigpio.INPUT)
-                __callback.append(__pi.callback(user_gpio=int(gpio_pin.pin_index_bcm),
-                                                edge=pigpio.EITHER_EDGE, func=input_event))
-                gpio_pin_record = models.GpioPin().query_filter_first(models.GpioPin.pin_code.in_([gpio_pin.pin_code]),
-                                                                    models.GpioPin.host_name.in_([Constant.HOST_NAME]))
-                gpio_pin_record.pin_direction = Constant.GPIO_PIN_DIRECTION_IN
-                commit()
-            else:
-                Log.logger.info('Skipping PiGpio setup for pin {} as type {}'.format(gpio_pin.pin_code,
-                                                                                     gpio_pin.pin_type))
-        #while True:
-        #    time.sleep(0.1)
-        Log.logger.info('Exit gpio callback thread loop')
-    else:
-        Log.logger.critical('PiGpio not yet initialised but was asked to setup IN ports. Check module init order.')
-
-
 def setup_in_ports(gpio_pin_list):
     #global __callback_thread
     #Log.logger.info('Socket timeout={}'.format(socket.getdefaulttimeout()))
@@ -75,7 +48,33 @@ def setup_in_ports(gpio_pin_list):
     #__callback_thread = Thread(target = setup_in_ports_and_wait, args=(gpio_pin_list, ))
     #__callback_thread.name = 'callback loop'
     #__callback_thread.start()
-    setup_in_ports_and_wait(gpio_pin_list)
+    global __callback, __pi
+    Log.logger.info('Configuring {} gpio input ports'.format(len(gpio_pin_list)))
+    if __pi:
+        if socket.getdefaulttimeout() is not None:
+            Log.logger.critical('PiGpio callbacks cannot be started as socket timeout is not None')
+        else:
+            for gpio_pin in gpio_pin_list:
+                if gpio_pin.pin_type == Constant.GPIO_PIN_TYPE_PI_STDGPIO:
+                    Log.logger.info('Set pincode={} type={} index={} as input'.format(gpio_pin.pin_code,
+                                                                                      gpio_pin.pin_type,
+                                                                                      gpio_pin.pin_index_bcm))
+                    __pi.set_mode(int(gpio_pin.pin_index_bcm), pigpio.INPUT)
+                    __pi.set_pull_up_down(int(gpio_pin.pin_index_bcm), pigpio.PUD_UP)
+                    __callback.append(__pi.callback(user_gpio=int(gpio_pin.pin_index_bcm),
+                                                    edge=pigpio.EITHER_EDGE, func=input_event))
+                    gpio_pin_record = models.GpioPin().query_filter_first(
+                        models.GpioPin.pin_code.in_([gpio_pin.pin_code]),
+                        models.GpioPin.host_name.in_([Constant.HOST_NAME]))
+                    gpio_pin_record.pin_direction = Constant.GPIO_PIN_DIRECTION_IN
+                    commit()
+                else:
+                    Log.logger.info('Skipping PiGpio setup for pin {} with type {}'.format(gpio_pin.pin_code,
+                                                                                           gpio_pin.pin_type))
+        Log.logger.info('Exit gpio callback thread loop')
+    else:
+        Log.logger.critical('PiGpio not yet initialised but was asked to setup IN ports. Check module init order.')
+
 
 def unload():
     global __pi, __callback
