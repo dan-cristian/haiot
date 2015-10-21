@@ -17,6 +17,7 @@ initialised = False
 __callback = []
 __pi = None
 __callback_thread = None
+__pin_tick_list = {}
 
 try:
     import pigpio
@@ -37,9 +38,21 @@ def set_pin_value(pin_index_bcm=None, pin_value=None):
     return get_pin_value(pin_index_bcm=pin_index_bcm)
 
 
+# tick = microseconds since boot
 def input_event(gpio, level, tick):
-    Log.logger.info("Received pigpio input gpio={} level={} tick={}".format(gpio, level, tick))
-
+    global __pi, __pin_tick_list
+    # assumes pins are pull-up enabled
+    pin_tick = __pin_tick_list.get(gpio)
+    if not pin_tick:
+        __pin_tick_list[gpio] = tick
+        pin_tick = 0
+    if tick - pin_tick > 10000:
+        Log.logger.info("Received pigpio input gpio={} level={} tick={}".format(gpio, level, tick))
+        dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio, direction=Constant.GPIO_PIN_DIRECTION_IN,
+                    pin_value=level, pin_connected=(level == 0))
+    else:
+        # ignore bounce
+        pass
 
 def setup_in_ports(gpio_pin_list):
     #global __callback_thread
@@ -60,6 +73,7 @@ def setup_in_ports(gpio_pin_list):
                                                                                       gpio_pin.pin_type,
                                                                                       gpio_pin.pin_index_bcm))
                     __pi.set_mode(int(gpio_pin.pin_index_bcm), pigpio.INPUT)
+                    # https://learn.sparkfun.com/tutorials/pull-up-resistors
                     __pi.set_pull_up_down(int(gpio_pin.pin_index_bcm), pigpio.PUD_UP)
                     __callback.append(__pi.callback(user_gpio=int(gpio_pin.pin_index_bcm),
                                                     edge=pigpio.EITHER_EDGE, func=input_event))
