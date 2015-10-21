@@ -6,6 +6,7 @@ __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
 from threading import Thread
 import time
+import socket
 from pydispatch import dispatcher
 from main import Log
 from main import thread_pool
@@ -69,6 +70,7 @@ def setup_in_ports_and_wait(gpio_pin_list):
 
 def setup_in_ports(gpio_pin_list):
     global __callback_thread
+    Log.logger.info('Socket timeout={}'.format(socket.getdefaulttimeout()))
     __callback_thread = Thread(target = setup_in_ports_and_wait, args=(gpio_pin_list, ))
     __callback_thread.name = 'callback loop'
     __callback_thread.start()
