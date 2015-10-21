@@ -59,7 +59,7 @@ class InputEvent:
         self.tick = tick
         self.level = level
         self.gpio = gpio
-        self.event_count = None
+        self.event_count = 0
         self.processed = False
 
 
@@ -81,11 +81,10 @@ def input_event(gpio, level, tick):
     pin_tick_event = __pin_tick_list.get(gpio)
     current = __pi.get_current_tick()
     delta = current - tick
-    if pin_tick_event:
-        last_tick = pin_tick_event.tick
-    else:
-        last_tick = 0
-    if tick <= last_tick:
+    if not pin_tick_event:
+        pin_tick_event = InputEvent(gpio, level, tick)
+    last_tick = pin_tick_event.tick
+    if tick < last_tick:
         # Log.logger.info("IN DUPLICATE gpio={} lvl={} tick={} current={} delta={}".format(gpio, level, tick, current, delta))
         pass
     else:
