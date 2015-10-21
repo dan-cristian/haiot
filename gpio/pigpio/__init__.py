@@ -4,6 +4,8 @@ __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 # http://abyz.co.uk/rpi/pigpio/python.html
 # https://ms-iot.github.io/content/images/PinMappings/RP2_Pinout.png
 
+from threading import Thread
+import time
 from pydispatch import dispatcher
 from main import Log
 from main import thread_pool
@@ -15,6 +17,7 @@ __import_ok = False
 initialised = False
 __callback = []
 __pi = None
+__callback_thread = None
 
 try:
     import pigpio
@@ -39,7 +42,7 @@ def input_event(gpio, level, tick):
     Log.logger.info("Received pigpio input gpio={} level={} tick={}".format(gpio, level, tick))
 
 
-def setup_in_ports(gpio_pin_list):
+def setup_in_ports_and_wait(gpio_pin_list):
     global __callback, __pi
     Log.logger.info('Configuring {} gpio input ports'.format(len(gpio_pin_list)))
     if __pi:
@@ -57,8 +60,17 @@ def setup_in_ports(gpio_pin_list):
             else:
                 Log.logger.info('Skipping PiGpio setup for pin {} as type {}'.format(gpio_pin.pin_code,
                                                                                      gpio_pin.pin_type))
+            while True:
+                time.sleep(0.1)
+            Log.logger.info('Exit gpio callback thread loop')
     else:
         Log.logger.critical('PiGpio not yet initialised but was asked to setup IN ports. Check module init order.')
+
+
+def setup_in_ports(gpio_pin_list):
+    global __callback_thread
+    __callback_thread = Thread(target = setup_in_ports_and_wait(gpio_pin_list))
+    __callback_thread.start()
 
 
 def unload():
