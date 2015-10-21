@@ -61,8 +61,8 @@ def setup_in_ports_and_wait(gpio_pin_list):
             else:
                 Log.logger.info('Skipping PiGpio setup for pin {} as type {}'.format(gpio_pin.pin_code,
                                                                                      gpio_pin.pin_type))
-        while True:
-            time.sleep(0.1)
+        #while True:
+        #    time.sleep(0.1)
         Log.logger.info('Exit gpio callback thread loop')
     else:
         Log.logger.critical('PiGpio not yet initialised but was asked to setup IN ports. Check module init order.')
