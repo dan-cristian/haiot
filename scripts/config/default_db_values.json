@@ -154,7 +154,7 @@
   "SchedulePattern": [
     {"id":1, "name":"week-bucatarie",   "pattern":".... ..22 .... .... ..22 2222"},
     {"id":2, "name":"weekend-bucatarie","pattern":".... .... 2222 2222 2222 2222"},
-    {"id":3, "name":"week-living",      "pattern":".... .... .... .... ..22 2222"},
+    {"id":3, "name":"week-living",      "pattern":".... .... .... .... ..33 3333"},
     {"id":4, "name":"weekend-living",   "pattern":".... .... 2222 2222 2222 2222"},
     {"id":5, "name":"week-birou",       "pattern":".... .... .... .... ..22 2222"},
     {"id":6, "name":"weekend-birou",    "pattern":".... .... 2222 2222 2222 2222"},
