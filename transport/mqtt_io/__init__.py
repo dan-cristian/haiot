@@ -91,7 +91,8 @@ def init():
         Log.logger.critical("No mqtt client enabled via import")
         raise Exception("No mqtt client enabled via import")
 
-    socket.setdefaulttimeout(10)
+    # not a good ideea to set a timeout as it will crash pigpio callback
+    # socket.setdefaulttimeout(10)
     try:
         global client_connecting
         if client_connecting:
