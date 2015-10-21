@@ -59,6 +59,7 @@ class InputEvent:
         self.tick = tick
         self.level = level
         self.gpio = gpio
+        self.event_count = None
         self.processed = False
 
 
@@ -90,10 +91,9 @@ def input_event(gpio, level, tick):
     else:
         # ignore record events in the past
         event = InputEvent(gpio, level, tick)
+        event.event_count = pin_tick_event.event_count + 1
         __pin_tick_list[gpio] = event
-        Log.logger.info("IN gpio={} lvl={} tick={} current={} delta={}".format(gpio, level, tick, current, delta))
-    #dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio, direction=Constant.GPIO_PIN_DIRECTION_IN,
-    #                pin_value=level, pin_connected=(level == 0))
+        #Log.logger.info("IN gpio={} lvl={} tick={} current={} delta={}".format(gpio, level, tick, current, delta))
 
 
 def setup_in_ports(gpio_pin_list):
@@ -140,9 +140,11 @@ def thread_run():
                 delta = __pi.get_current_tick() - event.tick
                 if delta > 100000:
                     event.processed = True
+                    Log.logger.info("IN gpio={} lvl={} count={} ".format(event.gpio, event.level, event.event_count))
                     dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=event.gpio,
                                     direction=Constant.GPIO_PIN_DIRECTION_IN,
                                     pin_value=event.level, pin_connected=(event.level == 0))
+
 
 def unload():
     global __pi, __callback
@@ -152,11 +154,11 @@ def unload():
 
 def init():
     Log.logger.info('PiGpio initialising')
+    global initialised
     if __import_ok:
         try:
             global __pi
             __pi = pigpio.pi()
-            global initialised
             # setup this to receive list of ports that must be set as "IN" and have callbacks defined
             dispatcher.connect(setup_in_ports, signal=Constant.SIGNAL_GPIO_INPUT_PORT_LIST, sender=dispatcher.Any)
             initialised = True
