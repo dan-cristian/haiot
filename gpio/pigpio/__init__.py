@@ -55,7 +55,11 @@ or corrupt the data on the SD card.
 
 
 class InputEvent:
+    __seed_id = 0
+
     def __init__(self, gpio, level, tick):
+        self.id = InputEvent.__seed_id
+        InputEvent.__seed_id += 1
         self.tick = tick
         self.level = level
         self.gpio = gpio
@@ -139,6 +143,7 @@ def thread_run():
                 delta = __pi.get_current_tick() - event.tick
                 # debounce time of 0.1 seconds, ignore repetitive state changes
                 if delta > 100000:
+                    # fixme: intermediate events are lost
                     event.processed = True
                     Log.logger.info("IN gpio={} lvl={} count={} ".format(event.gpio, event.level, event.event_count))
                     dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=event.gpio,
