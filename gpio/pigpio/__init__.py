@@ -69,7 +69,7 @@ def setup_in_ports_and_wait(gpio_pin_list):
 
 def setup_in_ports(gpio_pin_list):
     global __callback_thread
-    __callback_thread = Thread(target = setup_in_ports_and_wait(gpio_pin_list))
+    __callback_thread = Thread(target = setup_in_ports_and_wait, args=gpio_pin_list)
     __callback_thread.start()
 
 
