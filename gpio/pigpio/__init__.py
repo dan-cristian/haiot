@@ -2,6 +2,7 @@ __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
 # http://abyz.co.uk/rpi/pigpio/download.html
 # http://abyz.co.uk/rpi/pigpio/python.html
+# https://ms-iot.github.io/content/images/PinMappings/RP2_Pinout.png
 
 from pydispatch import dispatcher
 from main import Log
