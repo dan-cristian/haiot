@@ -135,7 +135,7 @@ def setup_in_ports(gpio_pin_list):
 def thread_run():
     global initialised, __new_event, __pin_tick_list, __pi
     if initialised and __new_event:
-        for event in __pin_tick_list:
+        for event in __pin_tick_list.values():
             if not event.Processed:
                 delta = __pi.get_current_tick() - event.tick
                 if delta > 100000:
