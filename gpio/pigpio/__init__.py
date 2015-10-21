@@ -140,11 +140,11 @@ def thread_run():
                 # debounce time of 0.1 seconds, ignore repetitive state changes
                 if delta > 100000:
                     event.processed = True
-                    event.event_count = 0
                     Log.logger.info("IN gpio={} lvl={} count={} ".format(event.gpio, event.level, event.event_count))
                     dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=event.gpio,
                                     direction=Constant.GPIO_PIN_DIRECTION_IN,
                                     pin_value=event.level, pin_connected=(event.level == 0))
+                    event.event_count = 0
 
 
 def unload():
