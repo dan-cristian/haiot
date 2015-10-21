@@ -69,13 +69,13 @@ def setup_in_ports_and_wait(gpio_pin_list):
 
 
 def setup_in_ports(gpio_pin_list):
-    global __callback_thread
-    Log.logger.info('Socket timeout={}'.format(socket.getdefaulttimeout()))
+    #global __callback_thread
+    #Log.logger.info('Socket timeout={}'.format(socket.getdefaulttimeout()))
     # socket.setdefaulttimeout(None)
-    __callback_thread = Thread(target = setup_in_ports_and_wait, args=(gpio_pin_list, ))
-    __callback_thread.name = 'callback loop'
-    __callback_thread.start()
-
+    #__callback_thread = Thread(target = setup_in_ports_and_wait, args=(gpio_pin_list, ))
+    #__callback_thread.name = 'callback loop'
+    #__callback_thread.start()
+    setup_in_ports_and_wait(gpio_pin_list)
 
 def unload():
     global __pi, __callback
