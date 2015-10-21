@@ -4,6 +4,7 @@ from main.logger_helper import Log
 from common import Constant, utils
 from main.admin import models
 from main.admin.model_helper import commit
+from main import thread_pool
 
 import std_gpio
 import piface
@@ -112,6 +113,11 @@ def zone_custom_relay_record_update(json_object):
     except Exception, ex:
         Log.logger.warning('Error on zone custom relay update, err {}'.format(ex))
 
+def thread_run():
+    pigpio.thread_run()
+    piface.thread_run()
+    bbb_io.thread_run()
+    std_gpio.thread_run()
 
 def unload():
     global initialised
@@ -130,5 +136,6 @@ def init():
     if Constant.IS_MACHINE_BEAGLEBONE:
         bbb_io.init()
         std_gpio.init()
+    thread_pool.add_interval_callable(thread_run, run_interval_second=1)
     global initialised
     initialised = True

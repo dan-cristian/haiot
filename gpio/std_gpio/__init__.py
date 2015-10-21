@@ -8,11 +8,14 @@ from common import Constant
 from main.admin import models
 from main.admin.model_helper import commit
 
+initialised = False
 __pins_setup_list = []
+
 
 def __get_gpio_db_pin(bcm_id=None):
     gpio_pin = models.GpioPin.query.filter_by(pin_index_bcm=bcm_id, host_name = Constant.HOST_NAME).first()
     return gpio_pin
+
 
 def __write_to_file_as_root(file, value):
     try:
@@ -26,6 +29,7 @@ def __write_to_file_as_root(file, value):
                 Log.logger.warning('Error writing value [{}] to file {} result={}'.format(value, file, res))
     except Exception, ex:
         Log.logger.warning('Exception writing value [{}] to file {} err='.format(value, file, ex))
+
 
 def __setup_pin(bcm_id=''):
     try:
@@ -46,6 +50,7 @@ def __setup_pin(bcm_id=''):
     except Exception, ex:
         Log.logger.critical('Unexpected error on pin {} setup, err {}'.format(bcm_id, ex))
 
+
 def __set_pin_dir_out(bcm_id=''):
     try:
         #file = open('/sys/class/gpio/gpio{}/direction'.format(bcm_id), 'a')
@@ -62,6 +67,7 @@ def __set_pin_dir_out(bcm_id=''):
     except Exception, ex:
         Log.logger.warning('Unexpected exception on pin {} direction OUT set, err {}'.format(bcm_id, ex))
         return False
+
 
 def __set_pin_dir_in(bcm_id=''):
     try:
@@ -80,6 +86,7 @@ def __set_pin_dir_in(bcm_id=''):
         Log.logger.warning('Unexpected exception on pin {} direction IN set, err {}'.format(bcm_id, ex))
         return False
 
+
 def __unsetup_pin(bcm_id=''):
     try:
         #file = open('/sys/class/gpio/unexport', 'a')
@@ -95,6 +102,7 @@ def __unsetup_pin(bcm_id=''):
             Log.logger.warning('Unable to find gpio pin with bcmid={} to mark as inactive'.format(bcm_id))
     except Exception, ex:
         Log.logger.critical('Unexpected error on pin {} un-setup, err {}'.format(bcm_id, ex))
+
 
 def __is_pin_setup(bcm_id=''):
     try:
@@ -113,6 +121,7 @@ def __is_pin_setup(bcm_id=''):
         db.session.rollback()
         return False
 
+
 def __is_pin_setup_out(bcm_id=''):
     try:
         file = open('/sys/class/gpio/gpio{}/direction'.format(bcm_id), 'r')
@@ -125,6 +134,7 @@ def __is_pin_setup_out(bcm_id=''):
         Log.logger.warning('Unexpected exception on pin setup check, err {}'.format(ex))
         return False
 
+
 def __read_line(bcm_id=''):
     try:
         file = open('/sys/class/gpio/gpio{}/value'.format(bcm_id), 'r')
@@ -133,6 +143,7 @@ def __read_line(bcm_id=''):
     except Exception, ex:
         Log.logger.critical('Unexpected general exception on pin {} value read, err {}'.format(bcm_id, ex))
         return None
+
 
 def __write_line(bcm_id='', pin_value=''):
     try:
@@ -144,6 +155,7 @@ def __write_line(bcm_id='', pin_value=''):
     except Exception, ex:
         Log.logger.critical('Unexpected general exception on pin {} write, err {}'.format(bcm_id, ex))
         return None
+
 
 def get_pin_bcm(bcm_id=''):
     '''BCM pin id format. Return value is 0 or 1.'''
@@ -185,6 +197,13 @@ def set_pin_edge(bcm_id=None, pin_edge=None):
     __write_to_file_as_root(file='/sys/class/gpio/gpio{}/edge'.format(bcm_id), value=pin_edge)
     Log.logger.info('Writen bcm pin={} EDGE={}'.format(bcm_id, pin_edge))
 
+
+def thread_run():
+    global initialised
+    if initialised:
+        pass
+
+
 def unload():
     #set all pins to low and unexport
     global __pins_setup_list
@@ -193,5 +212,7 @@ def unload():
             set_pin_bcm(bcm_id=bcm_pin, pin_value=0)
         __unsetup_pin(bcm_id=bcm_pin)
 
+
 def init():
-    pass
+    global initialised
+    initialised = True
