@@ -137,8 +137,10 @@ def thread_run():
         for event in __pin_tick_list.values():
             if not event.processed:
                 delta = __pi.get_current_tick() - event.tick
+                # debounce time of 0.1 seconds, ignore repetitive state changes
                 if delta > 100000:
                     event.processed = True
+                    event.event_count = 0
                     Log.logger.info("IN gpio={} lvl={} count={} ".format(event.gpio, event.level, event.event_count))
                     dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=event.gpio,
                                     direction=Constant.GPIO_PIN_DIRECTION_IN,
