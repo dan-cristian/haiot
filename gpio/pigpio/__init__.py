@@ -23,15 +23,15 @@ except Exception, ex:
     Log.logger.info('Exception on importing pigpio, err={}'.format(ex))
 
 
-def get_pin_value(pin_index=None):
+def get_pin_value(pin_index_bcm=None):
     global __pi
-    return __pi.read(pin_index)
+    return __pi.read(pin_index_bcm)
 
 
-def set_pin_value(pin_index=None, pin_value=None):
+def set_pin_value(pin_index_bcm=None, pin_value=None):
     global __pi
-    __pi.write(pin_index, pin_value)
-    return get_pin_value(pin_index=pin_index)
+    __pi.write(pin_index_bcm, pin_value)
+    return get_pin_value(pin_index_bcm=pin_index_bcm)
 
 
 def input_event(gpio, level, tick):
