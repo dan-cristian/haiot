@@ -47,7 +47,7 @@ def input_event(gpio, level, tick):
         __pin_tick_list[gpio] = tick
         pin_tick = 0
 
-    if tick - pin_tick > 10000:
+    if tick - pin_tick > 222333:
         Log.logger.info("Received pigpio input gpio={} level={} tick={}".format(gpio, level, tick))
         dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio, direction=Constant.GPIO_PIN_DIRECTION_IN,
                     pin_value=level, pin_connected=(level == 0))
