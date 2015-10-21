@@ -139,7 +139,7 @@ def thread_run():
             if not event.Processed:
                 delta = __pi.get_current_tick() - event.tick
                 if delta > 100000:
-                    event.Processed = True
+                    event.processed = True
                     dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=event.gpio,
                                     direction=Constant.GPIO_PIN_DIRECTION_IN,
                                     pin_value=event.level, pin_connected=(event.level == 0))
