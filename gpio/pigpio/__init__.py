@@ -43,18 +43,14 @@ def input_event(gpio, level, tick):
     global __pi, __pin_tick_list
     # assumes pins are pull-up enabled
     pin_tick = __pin_tick_list.get(gpio)
-    if not pin_tick:
-        __pin_tick_list[gpio] = tick
-        pin_tick = 0
-
-    if tick - pin_tick > 222333:
+    if not pin_tick or (tick - pin_tick > 50000) or (pin_tick[1] != level):
         Log.logger.info("Received pigpio input gpio={} level={} tick={}".format(gpio, level, tick))
         dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio, direction=Constant.GPIO_PIN_DIRECTION_IN,
                     pin_value=level, pin_connected=(level == 0))
     else:
         # ignore bounce
         pass
-    __pin_tick_list[gpio] = tick
+    __pin_tick_list[gpio] = [tick, level]
 
 def setup_in_ports(gpio_pin_list):
     #global __callback_thread
