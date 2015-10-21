@@ -26,6 +26,33 @@ except Exception, ex:
     __import_ok = False
     Log.logger.info('Exception on importing pigpio, err={}'.format(ex))
 
+'''
+http://abyz.co.uk/rpi/pigpio/index.html
+
+ALL gpios are identified by their Broadcom number.  See elinux.org
+There are 54 gpios in total, arranged in two banks.
+Bank 1 contains gpios 0-31.  Bank 2 contains gpios 32-54.
+A user should only manipulate gpios in bank 1.
+There are at least three types of board.
+Type 1
+
+26 pin header (P1).
+Hardware revision numbers of 2 and 3.
+User gpios 0-1, 4, 7-11, 14-15, 17-18, 21-25.
+Type 2
+
+26 pin header (P1) and an additional 8 pin header (P5).
+Hardware revision numbers of 4, 5, 6, and 15.
+User gpios 2-4, 7-11, 14-15, 17-18, 22-25, 27-31.
+Type 3
+
+40 pin expansion header (J8).
+Hardware revision numbers of 16 or greater.
+User gpios 2-27 (0 and 1 are reserved).
+It is safe to read all the gpios. If you try to write a system gpio or change its mode you can crash the Pi
+or corrupt the data on the SD card.
+'''
+
 
 def get_pin_value(pin_index_bcm=None):
     global __pi
@@ -43,14 +70,12 @@ def input_event(gpio, level, tick):
     global __pi, __pin_tick_list
     # assumes pins are pull-up enabled
     pin_tick = __pin_tick_list.get(gpio)
-    if not pin_tick or (tick - pin_tick[0] > 50000) or (pin_tick[1] != level):
-        Log.logger.info("Received pigpio input gpio={} level={} tick={}".format(gpio, level, tick))
-        dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio, direction=Constant.GPIO_PIN_DIRECTION_IN,
-                    pin_value=level, pin_connected=(level == 0))
-    else:
-        # ignore bounce
-        pass
+    Log.logger.info("Received pigpio input gpio={} level={} tick={} cur_tick={}".format(gpio, level, tick,
+                                                                                        __pi.get_current_tick()))
+    #dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio, direction=Constant.GPIO_PIN_DIRECTION_IN,
+    #                pin_value=level, pin_connected=(level == 0))
     __pin_tick_list[gpio] = [tick, level]
+
 
 def setup_in_ports(gpio_pin_list):
     #global __callback_thread
@@ -74,7 +99,10 @@ def setup_in_ports(gpio_pin_list):
                     # https://learn.sparkfun.com/tutorials/pull-up-resistors
                     __pi.set_pull_up_down(int(gpio_pin.pin_index_bcm), pigpio.PUD_UP)
                     __callback.append(__pi.callback(user_gpio=int(gpio_pin.pin_index_bcm),
-                                                    edge=pigpio.EITHER_EDGE, func=input_event))
+                                                    edge=pigpio.FALLING_EDGE, func=input_event))
+                    __callback.append(__pi.callback(user_gpio=int(gpio_pin.pin_index_bcm),
+                                                    edge=pigpio.RISING_EDGE, func=input_event))
+
                     gpio_pin_record = models.GpioPin().query_filter_first(
                         models.GpioPin.pin_code.in_([gpio_pin.pin_code]),
                         models.GpioPin.host_name.in_([Constant.HOST_NAME]))
