@@ -90,14 +90,16 @@ def __check_for_events():
 
 
 def thread_run():
-    Log.logger.debug('Processing Beaglebone IO')
-    global import_module_exist
-    if not import_module_exist:
-        Log.logger.info('Simulating motion detection for test purposes')
-        event_detected('P8_11')
-    else:
-        __check_for_events()
-    return 'Processed bbb_io'
+    global initialised
+    if initialised:
+        Log.logger.debug('Processing Beaglebone IO')
+        global import_module_exist
+        if not import_module_exist:
+            Log.logger.info('Simulating motion detection for test purposes')
+            event_detected('P8_11')
+        else:
+            __check_for_events()
+        return 'Processed bbb_io'
 
 
 def unload():

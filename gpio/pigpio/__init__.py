@@ -17,7 +17,8 @@ initialised = False
 __callback = []
 __pi = None
 __callback_thread = None
-__pin_tick_list = {}
+__new_event = False
+__pin_tick_list = {}  # {[pin_no, level, was_processed?]}
 
 try:
     import pigpio
@@ -53,6 +54,12 @@ It is safe to read all the gpios. If you try to write a system gpio or change it
 or corrupt the data on the SD card.
 '''
 
+class InputEvent:
+    def __init__(self, gpio, level, tick):
+        self.tick = None
+        self.level = None
+        self.gpio = None
+        self.processed = False
 
 def get_pin_value(pin_index_bcm=None):
     global __pi
@@ -67,7 +74,7 @@ def set_pin_value(pin_index_bcm=None, pin_value=None):
 
 # tick = microseconds since boot
 def input_event(gpio, level, tick):
-    global __pi, __pin_tick_list
+    global __pi, __pin_tick_list, __new_event
     # assumes pins are pull-up enabled
     pin_tick = __pin_tick_list.get(gpio)
     current = __pi.get_current_tick()
@@ -80,11 +87,12 @@ def input_event(gpio, level, tick):
         # Log.logger.info("IN DUPLICATE gpio={} lvl={} tick={} current={} delta={}".format(gpio, level, tick, current, delta))
         pass
     else:
+        event = InputEvent(gpio, level, tick)
+        __pin_tick_list[gpio] = event
+        __new_event = True
         Log.logger.info("IN gpio={} lvl={} tick={} current={} delta={}".format(gpio, level, tick, current, delta))
     #dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio, direction=Constant.GPIO_PIN_DIRECTION_IN,
     #                pin_value=level, pin_connected=(level == 0))
-    __pin_tick_list[gpio] = [tick, level]
-
 
 def setup_in_ports(gpio_pin_list):
     #global __callback_thread
@@ -121,6 +129,18 @@ def setup_in_ports(gpio_pin_list):
     else:
         Log.logger.critical('PiGpio not yet initialised but was asked to setup IN ports. Check module init order.')
 
+
+def thread_run():
+    global initialised, __new_event, __pin_tick_list, __pi
+    if initialised and __new_event:
+        for event in __pin_tick_list:
+            if not event.Processed:
+                delta = __pi.get_current_tick() - event.tick
+                if delta > 100000:
+                    event.Processed = True
+                    dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=event.gpio,
+                                    direction=Constant.GPIO_PIN_DIRECTION_IN,
+                                    pin_value=event.level, pin_connected=(event.level == 0))
 
 def unload():
     global __pi, __callback
