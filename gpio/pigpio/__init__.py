@@ -76,23 +76,25 @@ def set_pin_value(pin_index_bcm=None, pin_value=None):
 def input_event(gpio, level, tick):
     global __pi, __pin_tick_list, __new_event
     # assumes pins are pull-up enabled
-    pin_tick = __pin_tick_list.get(gpio)
+    pin_tick_event = __pin_tick_list.get(gpio)
     current = __pi.get_current_tick()
     delta = current - tick
-    if pin_tick:
-        last_tick = pin_tick[0]
+    if pin_tick_event:
+        last_tick = pin_tick_event.tick
     else:
         last_tick = 0
     if tick <= last_tick:
         # Log.logger.info("IN DUPLICATE gpio={} lvl={} tick={} current={} delta={}".format(gpio, level, tick, current, delta))
         pass
     else:
+        # ignore record events in the past
         event = InputEvent(gpio, level, tick)
         __pin_tick_list[gpio] = event
         __new_event = True
         Log.logger.info("IN gpio={} lvl={} tick={} current={} delta={}".format(gpio, level, tick, current, delta))
     #dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio, direction=Constant.GPIO_PIN_DIRECTION_IN,
     #                pin_value=level, pin_connected=(level == 0))
+
 
 def setup_in_ports(gpio_pin_list):
     #global __callback_thread
