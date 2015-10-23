@@ -4,12 +4,11 @@ mklink /J  alarm %T%\alarm
 mklink /J  cloud %T%\cloud
 mklink /J  common %T%\common
 mklink /J  ddns %T%\ddns
+mklink /J  io_bbb %T%\gpio
 mklink /J  health_monitor %T%\health_monitor
 mklink /J  heat %T%\heat
-mklink /J  io_bbb %T%\io_bbb
 mklink /J  main %T%\main
 mklink /J  node %T%\node
-mklink /J  relay %T%\relay
 mklink /J  rule %T%\rule
 mklink /J  scripts %T%\scripts
 mklink /J  sensor %T%\sensor
