@@ -14,7 +14,6 @@ from main.admin import models
 from main.admin.model_helper import commit
 from common import Constant
 
-from utils import Debounce
 
 __import_ok = False
 initialised = False
@@ -207,21 +206,7 @@ def setup_in_ports(gpio_pin_list):
 
 
 def thread_run():
-    return
-    global initialised, __pin_tick_dict, __pi
-    if initialised:
-        for event in __pin_tick_dict.values():
-            if not event.processed:
-                delta = __pi.get_current_tick() - event.tick
-                # debounce time of 0.1 seconds, ignore repetitive state changes
-                if delta > 100000:
-                    # fixme: intermediate events are lost
-                    event.processed = True
-                    Log.logger.info("IN gpio={} lvl={} count={} ".format(event.gpio, event.level, event.event_count))
-                    dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=event.gpio,
-                                    direction=Constant.GPIO_PIN_DIRECTION_IN,
-                                    pin_value=event.level, pin_connected=(event.level == 0))
-                    event.event_count = 0
+    pass
 
 
 def unload():
