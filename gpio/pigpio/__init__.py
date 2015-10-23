@@ -81,10 +81,8 @@ class InputEvent:
         self.processed = False
 
     def __repr__(self):
-        return 'gpio={} level={} prev={} tick={} count={} processed={}'.format(self.gpio, self.level,
-                                                                               #self.first_level,
-                                                                               self.tick,
-                                                                               self.event_count, self.processed)
+        return 'gpio={} level={} tick={} count={} processed={}'.format(self.gpio, self.level, self.tick,
+                                                                       self.event_count, self.processed)
 
 
 def get_pin_value(pin_index_bcm=None):
@@ -107,7 +105,7 @@ def announce_event(event):
 
 # executed by a haiot thread (not by gpiopd thread)
 def check_notify_event(event):
-    print("Debounce thread started for event {}".format(event))
+    #print("Debounce thread started for event {}".format(event))
     global __pin_tick_dict, __pi, __callback_thread, __lock_dict
     all_events_processed = False
     while not all_events_processed:
@@ -127,7 +125,7 @@ def check_notify_event(event):
                     all_events_processed = False
             finally:
                 lock.release()
-    print("Debounce thread exit")
+    #print("Debounce thread exit")
     __callback_thread = None
 
 # executed by gpiopd thread
