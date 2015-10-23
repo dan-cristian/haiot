@@ -4,7 +4,7 @@ mklink /J  alarm %T%\alarm
 mklink /J  cloud %T%\cloud
 mklink /J  common %T%\common
 mklink /J  ddns %T%\ddns
-mklink /J  io_bbb %T%\gpio
+mklink /J  gpio %T%\gpio
 mklink /J  health_monitor %T%\health_monitor
 mklink /J  heat %T%\heat
 mklink /J  main %T%\main
