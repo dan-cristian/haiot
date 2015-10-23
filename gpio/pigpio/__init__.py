@@ -5,6 +5,8 @@ __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 # https://ms-iot.github.io/content/images/PinMappings/RP2_Pinout.png
 
 import socket
+import time
+from threading import Thread, Lock
 from pydispatch import dispatcher
 from main import Log
 from main import thread_pool
@@ -12,12 +14,24 @@ from main.admin import models
 from main.admin.model_helper import commit
 from common import Constant
 
+from utils import Debounce
+
 __import_ok = False
 initialised = False
 __callback = []
 __pi = None
 __callback_thread = None
-__pin_tick_list = {}  # {[pin_no, level, was_processed?]}
+__pin_tick_dict = {}  # {InputEvent}
+__lock_dict = {}  # lock list for each gpio
+
+
+class Logx():
+
+    class Logger():
+        def info(self, text):
+            print(text)
+
+    logger = Logger()
 
 try:
     import pigpio
@@ -62,9 +76,16 @@ class InputEvent:
         InputEvent.__seed_id += 1
         self.tick = tick
         self.level = level
+        #self.first_level = None
         self.gpio = gpio
         self.event_count = 0
         self.processed = False
+
+    def __repr__(self):
+        return 'gpio={} level={} prev={} tick={} count={} processed={}'.format(self.gpio, self.level,
+                                                                               #self.first_level,
+                                                                               self.tick,
+                                                                               self.event_count, self.processed)
 
 
 def get_pin_value(pin_index_bcm=None):
@@ -78,34 +99,84 @@ def set_pin_value(pin_index_bcm=None, pin_value=None):
     return get_pin_value(pin_index_bcm=pin_index_bcm)
 
 
-# tick = microseconds since boot
+def announce_event(event):
+    Log.logger.info("DISPATCH IN io={} lvl={} count={} tick={}".format(event.gpio, event.level, event.event_count,
+                                                                       event.tick))
+    dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=event.gpio,
+                    direction=Constant.GPIO_PIN_DIRECTION_IN,
+                    pin_value=event.level, pin_connected=(event.level == 0))
+
+# executed by a haiot thread (not by gpiopd thread)
+def check_notify_event(event):
+    print("Debounce thread started for event {}".format(event))
+    global __pin_tick_dict, __pi, __callback_thread, __lock_dict
+    all_events_processed = False
+    while not all_events_processed:
+        time.sleep(0.1)  # latency in detecting changes
+        current_tick = __pi.get_current_tick()
+        all_events_processed = True
+        for event in __pin_tick_dict.values():
+            lock = __lock_dict[event.gpio]
+            lock.acquire()
+            try:
+                # debounce period
+                if not event.processed and (current_tick - event.tick > 100000):
+                    # event old enough to not be a noise event
+                    announce_event(event)
+                    event.processed = True
+                if not event.processed:
+                    all_events_processed = False
+            finally:
+                lock.release()
+    print("Debounce thread exit")
+    __callback_thread = None
+
+# executed by gpiopd thread
 def input_event(gpio, level, tick):
-    global __pi, __pin_tick_list
+    global __pi, __pin_tick_dict
     # assumes pins are pull-up enabled
-    pin_tick_event = __pin_tick_list.get(gpio)
+    pin_tick_event = __pin_tick_dict.get(gpio)
     current = __pi.get_current_tick()
     delta = current - tick
-    if not pin_tick_event:
+    if pin_tick_event and pin_tick_event.processed:
+        # reset event to initial state
+        pin_tick_event.event_count = 0
+        pin_tick_event.processed = False
+    if not pin_tick_event or pin_tick_event.event_count == 0:
         pin_tick_event = InputEvent(gpio, level, tick)
-    last_tick = pin_tick_event.tick
-    if tick < last_tick:
-        # Log.logger.info("IN DUPLICATE gpio={} lvl={} tick={} current={} delta={}".format(gpio, level, tick, current, delta))
-        pass
+        pin_tick_event.event_count += 1
+        __pin_tick_dict[gpio] = pin_tick_event
+        # anounce first state change
+        announce_event(pin_tick_event)
     else:
-        # ignore record events in the past
-        event = InputEvent(gpio, level, tick)
-        event.event_count = pin_tick_event.event_count + 1
-        __pin_tick_list[gpio] = event
-        #Log.logger.info("IN gpio={} lvl={} tick={} current={} delta={}".format(gpio, level, tick, current, delta))
+        if tick < pin_tick_event.tick:
+            # ignore record events in the past
+            Log.logger.debug("Ignore old gpio={} lvl={} tick={} current={} delta={}".format(gpio, level, tick, current,
+                                                                                            delta))
+        else:
+            global __lock_dict
+            lock = __lock_dict.get(gpio)
+            if not lock:
+                lock = Lock()
+                __lock_dict[gpio] = lock
+            lock.acquire()
+            try:
+                pin_tick_event.level = level
+                pin_tick_event.tick = tick
+                pin_tick_event.event_count += 1
+                #Log.logger.info("IN gpio={} lvl={} tick={} current={} delta={}".format(gpio, level, tick, current, delta))
+                # start a thread if not already started to notify the event completion without bounce
+                global __callback_thread
+                if __callback_thread is None:
+                    __callback_thread = Thread(target = check_notify_event, args=(pin_tick_event, ))
+                    __callback_thread.start()
+            finally:
+                lock.release()
 
 
 def setup_in_ports(gpio_pin_list):
-    #global __callback_thread
     #Log.logger.info('Socket timeout={}'.format(socket.getdefaulttimeout()))
     # socket.setdefaulttimeout(None)
-    #__callback_thread = Thread(target = setup_in_ports_and_wait, args=(gpio_pin_list, ))
-    #__callback_thread.name = 'callback loop'
-    #__callback_thread.start()
     global __callback, __pi
     Log.logger.info('Configuring {} gpio input ports'.format(len(gpio_pin_list)))
     if __pi:
@@ -136,9 +207,10 @@ def setup_in_ports(gpio_pin_list):
 
 
 def thread_run():
-    global initialised, __pin_tick_list, __pi
+    return
+    global initialised, __pin_tick_dict, __pi
     if initialised:
-        for event in __pin_tick_list.values():
+        for event in __pin_tick_dict.values():
             if not event.processed:
                 delta = __pi.get_current_tick() - event.tick
                 # debounce time of 0.1 seconds, ignore repetitive state changes
