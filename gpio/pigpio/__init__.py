@@ -68,14 +68,10 @@ or corrupt the data on the SD card.
 
 
 class InputEvent:
-    __seed_id = 0
 
     def __init__(self, gpio, level, tick):
-        self.id = InputEvent.__seed_id
-        InputEvent.__seed_id += 1
         self.tick = tick
         self.level = level
-        #self.first_level = None
         self.gpio = gpio
         self.event_count = 0
         self.processed = False
@@ -99,6 +95,7 @@ def set_pin_value(pin_index_bcm=None, pin_value=None):
 def announce_event(event):
     Log.logger.info("DISPATCH IN io={} lvl={} count={} tick={}".format(event.gpio, event.level, event.event_count,
                                                                        event.tick))
+    # pin connected state assumes pins are pull-up enabled
     dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=event.gpio,
                     direction=Constant.GPIO_PIN_DIRECTION_IN,
                     pin_value=event.level, pin_connected=(event.level == 0))
@@ -128,10 +125,10 @@ def check_notify_event(event):
     #print("Debounce thread exit")
     __callback_thread = None
 
+
 # executed by gpiopd thread
 def input_event(gpio, level, tick):
     global __pi, __pin_tick_dict
-    # assumes pins are pull-up enabled
     pin_tick_event = __pin_tick_dict.get(gpio)
     current = __pi.get_current_tick()
     delta = current - tick
