@@ -18,6 +18,7 @@ except Exception, ex:
     __import_ok = False
     Log.logger.info('Exception on importing pifacedigitalio, err={}'.format(ex))
 
+
 def format_pin_code(board_index, pin_direction, pin_index):
     return str(board_index) + ":" + str(pin_direction) + ":" + str(pin_index)
 
