@@ -30,6 +30,7 @@ def __save_heat_state_db(zone='', heat_is_on=''):
 # triggers heat status update if heat changed
 def __decide_action(zone, current_temperature, target_temperature):
     assert isinstance(zone, models.Zone)
+    heat_is_on = False
     if current_temperature < target_temperature:
         heat_is_on = True
     if current_temperature > target_temperature + float(get_param(Constant.P_TEMPERATURE_THRESHOLD)):
