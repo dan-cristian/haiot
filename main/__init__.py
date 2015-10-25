@@ -158,7 +158,9 @@ def init():
     global app, db, DB_LOCATION
     # from main.logger_helper import LOG_TO_TRANSPORT
     Log.logger.info('Initialising flask')
-    app = Flask('main')
+    # http://stackoverflow.com/questions/20646822/how-to-serve-static-files-in-flask
+    # set the project root directory as the static folder, you can set others.
+    app = Flask('main')  #, static_url_path='')
     # app.config['TESTING'] = True
     app.config.update(DEBUG=True, SQLALCHEMY_ECHO = False, SQLALCHEMY_DATABASE_URI=DB_LOCATION)
 
