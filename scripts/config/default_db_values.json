@@ -31,7 +31,8 @@
     {"name": "DB_REPORTING_LOCATION_ENABLED", "value": "1", "description":"1 for recording data, 0 disabled"},
     {"name": "DB_REPORTING_LOCATION", "value": "mysql+mysqlconnector://<user>:<passwd>@192.168.0.9/haiot-reporting"},
     {"name": "DB_REPORTING_USER", "value": "haiot"},
-    {"name": "DB_REPORTING_PASS", "value": "haiot"}
+    {"name": "DB_REPORTING_PASS", "value": "haiot"},
+    {"name": "P_TEMPERATURE_THRESHOLD", "value": "0.2", "description":"gap in degrees before turning on / off heat"}
   ],
   "Module": [
     {"id":1,  "active":"1", "start_order":"1", "name":"main"},
@@ -155,7 +156,7 @@
     {"id":1, "name":"week-bucatarie",   "pattern":".... ..22 .... .... ..22 2222"},
     {"id":2, "name":"weekend-bucatarie","pattern":".... .... 2222 2222 2222 2222"},
     {"id":3, "name":"week-living",      "pattern":".... .... .... .... ..33 3333"},
-    {"id":4, "name":"weekend-living",   "pattern":".... .... 2222 2222 2222 2222"},
+    {"id":4, "name":"weekend-living",   "pattern":".... .... 2222 2222 2233 3333"},
     {"id":5, "name":"week-birou",       "pattern":".... .... .... .... ..22 2222"},
     {"id":6, "name":"weekend-birou",    "pattern":".... .... 2222 2222 2222 2222"},
     {"id":7, "name":"week-dormitor",    "pattern":"bbbb bbb. .... .... .... bbbb"},
