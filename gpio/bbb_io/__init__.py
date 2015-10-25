@@ -65,7 +65,7 @@ def setup_in_ports(gpio_pin_list):
             except Exception, ex:
                 Log.logger.warning('Unable to add event callback pin={} err={}'.format(gpio_pin.pin_code, ex))
                 try:
-                    GPIO.add_event_detect(gpio_pin.gpio_pin_code, GPIO.FALLING)
+                    GPIO.add_event_detect(gpio_pin.pin_code, GPIO.FALLING)
                     Log.logger.info('OK pooling on gpio {} err='.format(gpio_pin.pin_code, ex))
                     __pool_pin_codes.append(gpio_pin.pin_code)
                 except Exception, ex:
