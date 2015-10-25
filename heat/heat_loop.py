@@ -87,8 +87,9 @@ def __update_zone_heat(zone, heat_schedule, sensor):
     #                                                                             sensor.temperature, heat_is_on))
     return heat_is_on
 
-#iterate zones and decide heat state for each zone and also for master zone (main heat system)
-#if one zone requires heat master zone will be on
+
+# iterate zones and decide heat state for each zone and also for master zone (main heat system)
+# if one zone requires heat master zone will be on
 def loop_zones():
     try:
         heat_is_on = False
@@ -110,7 +111,7 @@ def loop_zones():
         if heatrelay_main_source:
             main_source_zone = models.Zone.query.filter_by(id=heatrelay_main_source.zone_id).first()
             if main_source_zone:
-                if main_source_zone.heat_is_on != heat_is_on:#avoid setting relay state too often
+                if main_source_zone.heat_is_on != heat_is_on:  # avoid setting relay state too often
                     __save_heat_state_db(zone=main_source_zone, heat_is_on=heat_is_on)
             else:
                 Log.logger.critical('No heat main_src found using zone id {}'.format(heatrelay_main_source.zone_id))
@@ -118,6 +119,7 @@ def loop_zones():
             Log.logger.critical('No heat main source is defined in db')
     except Exception, ex:
         Log.logger.error('Error loop_zones, err={}'.format(ex, exc_info=True))
+
 
 # check actual heat relay status in db in case relay pin was modified externally
 def loop_heat_relay():
@@ -148,7 +150,7 @@ def loop_heat_relay():
                 Log.logger.warning("Cannot find gpiopin_bcm for heat relay={} zone={}".format(heat_relay.gpio_pin_code,
                                                                                           heat_relay.heat_pin_name))
         except Exception, ex:
-            Log.logger.exception('Error processing heat relay={}, pin={}, err={}'.format(heat_relay, gpio_pin, ex))
+            Log.logger.exception('Error processing heat relay=[{}] pin=[{}] err={}'.format(heat_relay, gpio_pin, ex))
 
 progress_status = None
 def get_progress():
