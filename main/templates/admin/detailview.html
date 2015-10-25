@@ -1,7 +1,8 @@
 {% extends 'admin/admin.html' %}
 {% block body %}
 	<div class="item-form">		
-		<form class="pure-form pure-form-stacked" action="{{action}}" method="post">
+		<form class="pure-form pure-form-stacked" action="" method="post">
+		<!--form class="pure-form pure-form-stacked" action="{{action}}" method="post"-->
 		    <fieldset>
 		        <legend>Item View</legend>
 			    {% for field in form %}
@@ -9,7 +10,7 @@
 			        {{field(class="pure-input")}}
 		        {% endfor %}
 		        <button type="submit" class="pure-button pure-button-primary pure-input-1-4">Submit</button>
-				<a class="pure-button pure-button-primary button red" href="{{ path +'delete/'+ action.split('/')[-2]}}">delete</a>
+				<a class="pure-button pure-button-primary button red" href="{{path +'delete/'+ action.split('/')[-2]}}">delete</a>
 		    </fieldset>
 		</form>	
 	</div>

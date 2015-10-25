@@ -1,6 +1,6 @@
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
-from flask import request, render_template
+from flask import request, render_template, send_from_directory
 
 from main.logger_helper import Log
 from main import app, BIND_IP, BIND_PORT
@@ -93,9 +93,11 @@ def init():
     flask_thread.start()
     #app.run(debug=True, use_reloader=False, host='0.0.0.0')
 
+
 @app.route('/')
 def home():
-    return '<a href="/user/node">Node</a>'
+    return '<a href="user/node">Node</a>'
+
 
 @app.errorhandler(404)
 def page_not_found(e):
