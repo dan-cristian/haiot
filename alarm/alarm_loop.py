@@ -76,6 +76,7 @@ def init():
     except WindowsError:
         Log.logger.warning('Cannot open tail, maybe not running on Linux, os='+ Constant.OS)
 
+
 def unload():
     # Blocking call that processes network traffic, dispatches callbacks and
     # handles reconnecting.
@@ -83,6 +84,7 @@ def unload():
     # manual interface.
     global tailpipe
     tailpipe.terminate()
+
 
 def thread_run():
     if Constant.OS in Constant.OS_LINUX:

@@ -13,10 +13,9 @@ from gpio import std_gpio
 initialised=False
 __pool_pin_codes=[]
 
-#https://learn.adafruit.com/setting-up-io-python-library-on-beaglebone-black/using-the-bbio-library
-
-#IMPORTANT: installing PyBBIO enables all i/o pins as a dtc is installed
-#https://github.com/graycatlabs/PyBBIO/wiki
+# https://learn.adafruit.com/setting-up-io-python-library-on-beaglebone-black/using-the-bbio-library
+# IMPORTANT: installing PyBBIO enables all i/o pins as a dtc is installed
+# https://github.com/graycatlabs/PyBBIO/wiki
 try:
     import Adafruit_BBIO.GPIO as GPIO
     import_module_exist = True
@@ -35,7 +34,7 @@ def register_gpios():
             gpio_pin = models.GpioPin.query.filter_by(pin_code=zonealarm.gpio_pin_code,
                                                       host_name=Constant.HOST_NAME).first()
             if gpio_pin:
-                #record this pin as used to enable clean shutdown
+                # record this pin as used to enable clean shutdown
                 if gpio_pin.pin_index_bcm != '':
                     std_gpio.get_pin_bcm(gpio_pin.pin_index_bcm)
                 GPIO.setup(zonealarm.gpio_pin_code, GPIO.IN)
@@ -55,8 +54,8 @@ def register_gpios():
                         Log.logger.warning('Unable to add pooling on pin {} err={}'.format(zonealarm.gpio_pin_code, ex))
 
 
-                #Log.logger.info('Testing an input read on this gpio pin')
-                #event_detected(zonealarm.gpio_pin_code)
+                # Log.logger.info('Testing an input read on this gpio pin')
+                # event_detected(zonealarm.gpio_pin_code)
                 import_module_exist = True
             else:
                 Log.logger.warning('Unable to find gpio for zonealarm pin {}'.format(zonealarm.alarm_pin_name))
@@ -74,10 +73,12 @@ def event_detected(channel):
             #FOR TESTING PURPOSES
             state = random.randint(0,2)
         Log.logger.info('IO input detected channel {} status {}'.format(channel, state))
-        dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=channel, direction='in', pin_value=state)
+        dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=channel, direction='in',
+                        pin_value=state, pin_connected=(state == 0))
     except Exception, ex:
         zonealarm = None
         Log.logger.warning('Error io event detected, err {}'.format(ex))
+
 
 #check for events on pins not setup with callback event
 def __check_for_events():
@@ -86,7 +87,8 @@ def __check_for_events():
         if GPIO.event_detected(pin_code):
             state = GPIO.input(pin_code)
             #Log.logger.info('Pooling event detected gpio {} val {}'.format(pin_code, state))
-            dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=pin_code, direction='in', pin_value=state)
+            dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=pin_code, direction='in',
+                            pin_value=state, pin_connected=(state == 0))
 
 
 def thread_run():
