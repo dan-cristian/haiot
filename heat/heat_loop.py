@@ -4,7 +4,7 @@ import datetime
 
 from main.logger_helper import Log
 from main.admin import models
-from main.admin.model_helper import commit
+from main.admin.model_helper import commit, get_param
 from common import utils, Constant
 import gpio
 
@@ -32,7 +32,7 @@ def __decide_action(zone, current_temperature, target_temperature):
     assert isinstance(zone, models.Zone)
     if current_temperature < target_temperature:
         heat_is_on = True
-    else:
+    if current_temperature > target_temperature + float(get_param(Constant.P_TEMPERATURE_THRESHOLD)):
         heat_is_on = False
     if zone.heat_is_on != heat_is_on:
         Log.logger.info('Heat must change, is {} in {} temp={} target={}'.format(heat_is_on, zone.name,
