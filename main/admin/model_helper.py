@@ -128,6 +128,7 @@ def check_history_tables():
         table_str = utils.get_table_name(table)
         check_table_schema(table, model_auto_update=True)
 
+
 def populate_tables(model_auto_update=False):
     var_path = utils.get_app_root_path() + 'scripts/config/default_db_values.json'
     Log.logger.info('Loading variables from config file [{}]'.format(var_path))
@@ -168,7 +169,9 @@ def populate_tables(model_auto_update=False):
     else:
         node_obj = models.Node()
         node_obj.add_record_to_session()
-    node_obj.machine_type = Constant.HOST_MACHINE_TYPE
+    # let this commented for test purposes (make netbook Windows look like PI)
+    if Constant.HOST_NAME != 'netbook':
+        node_obj.machine_type = Constant.HOST_MACHINE_TYPE
     Constant.HOST_PRIORITY = node_obj.priority
     commit()
 

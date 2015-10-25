@@ -12,6 +12,7 @@ import gpio
 
 initialised=False
 
+
 # execute when heat status change is signaled. changes gpio pin status
 def heat_update(obj_dict={}):
     try:
@@ -46,10 +47,12 @@ def heat_update(obj_dict={}):
     except Exception, ex:
         Log.logger.warning('Error updating heat relay state, err {}'.format(ex))
 
+
 def handle_event_heat(zone='', heat_is_on=''):
     assert isinstance(zone, models.Zone)
 
     pass
+
 
 def unload():
     Log.logger.info('Heat module unloading')
@@ -57,6 +60,7 @@ def unload():
     initialised = False
     thread_pool.remove_callable(heat_loop.thread_run)
     dispatcher.disconnect(handle_event_heat, signal=Constant.SIGNAL_HEAT, sender=dispatcher.Any)
+
 
 def init():
     Log.logger.info('Heat module initialising')

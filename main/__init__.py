@@ -41,6 +41,7 @@ def my_import(name):
         Log.logger.warning("Unabel to import module {}, err={}".format(name, ex))
         return None
 
+
 def init_module(module_name, module_is_active):
     if module_is_active:
         Log.logger.info("Importing module {}".format(module_name))
@@ -64,6 +65,7 @@ def init_module(module_name, module_is_active):
                 Log.logger.info('Module {} already disabled, skipping unload'.format(module_name))
         '''
 
+
 def init_modules():
     import admin.models
     import admin.model_helper
@@ -72,23 +74,20 @@ def init_modules():
 
     m = admin.models.Module
 
-    #http://docs.sqlalchemy.org/en/rel_0_9/core/sqlelement.html
-
-    #keep host name default to '' rather than None (which does not work on filter in)
-
-    #TODO: remove if ok, module_list = m.query.filter(m.host_name.in_([constant.HOST_NAME, ""])).order_by(m.start_order).all()
-
-    #get the unique/distinct list of all modules defined in config, generic or host specific ones
+    # http://docs.sqlalchemy.org/en/rel_0_9/core/sqlelement.html
+    # keep host name default to '' rather than None (which does not work on filter in)
+    # TODO: remove if ok, module_list = m.query.filter(m.host_name.in_([constant.HOST_NAME, ""])).order_by(m.start_order).all()
+    # get the unique/distinct list of all modules defined in config, generic or host specific ones
     module_list = m.query.filter(m.host_name.in_([Constant.HOST_NAME, ""])).group_by(m.start_order).all()
 
     for mod in module_list:
         assert isinstance(mod, admin.models.Module)
         if mod.name != 'main':
-            #check if there is a host specific module and use it with priority over generic one
+            # check if there is a host specific module and use it with priority over generic one
 
             mod_host_specific = m().query_filter_first(m.host_name.in_([Constant.HOST_NAME]), m.name.in_([mod.name]))
 
-            #mod_host_specific = m.query.filter(m.host_name.in_([constant.HOST_NAME]), m.name.in_([mod.name]))
+            # mod_host_specific = m.query.filter(m.host_name.in_([constant.HOST_NAME]), m.name.in_([mod.name]))
             if mod_host_specific:
                 Log.logger.info("Initialising host specific module definition")
                 init_module(mod_host_specific.name, mod_host_specific.active)
@@ -125,7 +124,7 @@ def execute_command(command, node=None):
 
 def unload():
     Log.logger.info('Main module is unloading, application will exit')
-    import webui, main.thread_pool, relay
+    import webui, main.thread_pool, gpio
     from transport import mqtt_io
 
     global shutting_down
@@ -135,13 +134,12 @@ def unload():
         webui.unload()
     if mqtt_io.initialised:
         mqtt_io.unload()
-    if relay.initialised:
-        relay.unload()
-
+    if gpio.initialised:
+        gpio.unload()
 
 
 def init():
-    #carefull with order of imports
+    # carefull with order of imports
     import common
     from main import logger_helper
     from common import utils
@@ -158,10 +156,10 @@ def init():
     common.init()
 
     global app, db, DB_LOCATION
-    #from main.logger_helper import LOG_TO_TRANSPORT
+    # from main.logger_helper import LOG_TO_TRANSPORT
     Log.logger.info('Initialising flask')
     app = Flask('main')
-    #app.config['TESTING'] = True
+    # app.config['TESTING'] = True
     app.config.update(DEBUG=True, SQLALCHEMY_ECHO = False, SQLALCHEMY_DATABASE_URI=DB_LOCATION)
 
     app.config['SECRET_KEY'] = 'secret'
@@ -207,6 +205,7 @@ def init():
         datetime = utils.date_serialised(utils.get_base_location_now_date())
 
     import logging
+
     class TransportLogging(logging.Handler):
         def emit(self, record):
             if transport.initialised and transport.mqtt_io.client_connected:
