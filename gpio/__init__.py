@@ -43,7 +43,8 @@ def relay_get(gpio_pin_bcm=None, from_web=False):
         elif gpio_pin_bcm.pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
             # todo: check if pin index is bcm type indeed for piface
             pin_value = piface.get_pin_value(pin_index=gpio_pin_bcm.pin_index_bcm, board_index=gpio_pin_bcm.board_index)
-        #Log.logger.info(message + str(" val={}".format(pin_value)))
+        else:
+            Log.logger.warning('Cannot select gpio method for pin={}'.format(gpio_pin_bcm))
     else:
         message += ' error not running on gpio enabled devices'
         pin_value = None

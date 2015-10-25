@@ -453,7 +453,7 @@ class GpioPin(db.Model, DbEvent, DbBase):
         pass
 
     def __repr__(self):
-        return 'host={} code={} desc={} type={} value={}'.format(self.host_name, self.pin_code, self.description,
+        return 'host={} code={} index={} type={} value={}'.format(self.host_name, self.pin_code, self.pin_index_bcm,
                                                                  self.pin_type, self.pin_value)
 
 
