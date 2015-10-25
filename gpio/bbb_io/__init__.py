@@ -59,18 +59,17 @@ def setup_in_ports(gpio_pin_list):
             GPIO.setup(gpio_pin.pin_code, GPIO.IN)
             std_gpio.set_pin_edge(gpio_pin.pin_index_bcm, 'both')
             try:
-                GPIO.add_event_detect(gpio_pin.gpio_pin_code, GPIO.BOTH)#, callback=event_detected, bouncetime=300)
-                __pool_pin_codes.append(gpio_pin.gpio_pin_code)
-                Log.logger.info('OK callback on gpio {} zone {}'.format(gpio_pin.gpio_pin_code, gpio_pin.zone_id))
+                GPIO.add_event_detect(gpio_pin.pin_code, GPIO.BOTH)#, callback=event_detected, bouncetime=300)
+                __pool_pin_codes.append(gpio_pin.pin_code)
+                Log.logger.info('OK callback on gpio'.format(gpio_pin.pin_code))
             except Exception, ex:
-                Log.logger.warning('Unable to add event callback pin {} zone {}'.format(gpio_pin.gpio_pin_code,
-                                                                                        gpio_pin.zone_id))
+                Log.logger.warning('Unable to add event callback pin={} err={}'.format(gpio_pin.pin_code, ex))
                 try:
                     GPIO.add_event_detect(gpio_pin.gpio_pin_code, GPIO.FALLING)
-                    Log.logger.info('OK pooling on gpio {} err='.format(gpio_pin.gpio_pin_code, ex))
-                    __pool_pin_codes.append(gpio_pin.gpio_pin_code)
+                    Log.logger.info('OK pooling on gpio {} err='.format(gpio_pin.pin_code, ex))
+                    __pool_pin_codes.append(gpio_pin.pin_code)
                 except Exception, ex:
-                    Log.logger.warning('Unable to add pooling on pin {} err={}'.format(gpio_pin.gpio_pin_code, ex))
+                    Log.logger.warning('Unable to add pooling on pin {} err={}'.format(gpio_pin.pin_code, ex))
 
 
 def thread_run():
