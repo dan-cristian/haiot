@@ -1,6 +1,6 @@
 {
   "Node": [
-    {"id":1,  "priority":"0", "name":"netbook"},
+    {"id":1,  "priority":"0", "name":"netbook", "machine_type":"beaglebone"},
     {"id":2,  "priority":"2", "name":"nas"},
     {"id":3,  "priority":"3", "name":"server"},
     {"id":4,  "priority":"4", "name":"ex-std-node466.prod.rhcloud.com"},
@@ -64,7 +64,7 @@
     {"id":403, "active":"1", "start_order":"3", "name":"health_monitor", "host_name":"EN62395"},
 
     {"id":509, "active":"1", "start_order":"9", "name":"heat", "host_name":"netbook"},
-    {"id":599, "active":"0", "start_order":"9", "name":"test", "host_name":"netbook"},
+    {"id":599, "active":"0", "start_order":"99", "name":"test", "host_name":"netbook"},
     {"id":513, "active":"0", "start_order":"13", "name":"cloud.graph_plotly", "host_name":"netbook"},
     {"id":511, "active":"1", "start_order":"11", "name":"alarm", "host_name":"netbook"},
 
@@ -134,8 +134,8 @@
     {"relay_pin_name": "back valve relay", "zone_id": "37", "gpio_pin_code": "P9_23", "gpio_host_name": "beaglebone","relay_is_on": "0"},
     {"relay_pin_name": "back lights relay", "zone_id": "40", "gpio_pin_code": "P9_22", "gpio_host_name": "beaglebone","relay_is_on": "0"},
     {"relay_pin_name": "front valve relay", "zone_id": "36", "gpio_pin_code": "P9_21", "gpio_host_name": "beaglebone", "relay_is_on": "0"},
-    {"relay_pin_name": "test 1", "zone_id": "36", "gpio_pin_code": "0:out:0", "gpio_host_name": "pi-face", "relay_is_on": "0"}
 
+    {"relay_pin_name": "test 1", "zone_id": "36", "gpio_pin_code": "0:out:0", "gpio_host_name": "pi-face", "relay_is_on": "0"}
   ],
 
   "TemperatureTarget": [
@@ -175,7 +175,9 @@
     {"zone_id":2,"heat_pin_name":"living","gpio_pin_code":"P9_12","gpio_host_name":"beaglebone", "is_main_heat_source":"0"},
     {"zone_id":47,"heat_pin_name":"birou","gpio_pin_code": "P9_11","gpio_host_name":"beaglebone", "is_main_heat_source":"0"},
     {"zone_id":4,"heat_pin_name":"dormitor","gpio_pin_code":"P9_15","gpio_host_name":"beaglebone","is_main_heat_source":"0"},
-    {"zone_id":19,"heat_pin_name":"heat main","gpio_pin_code":"24","gpio_host_name":"pi-power","is_main_heat_source":"1"}
+    {"zone_id":19,"heat_pin_name":"heat main","gpio_pin_code":"24","gpio_host_name":"pi-power","is_main_heat_source":"1"},
+
+    {"zone_id":4,"heat_pin_name":"dormitor-test","gpio_pin_code":"P9_15","gpio_host_name":"netbook","is_main_heat_source":"0"}
   ],
 
   "ZoneSensor": [
