@@ -124,6 +124,7 @@ def loop_heat_relay():
     heat_relay_list = models.ZoneHeatRelay().query_filter_all(
         models.ZoneHeatRelay.gpio_host_name.in_([Constant.HOST_NAME]))
     for heat_relay in heat_relay_list:
+        gpio_pin = None
         try:
             gpio_pin = models.GpioPin().query_filter_first(models.GpioPin.host_name.in_([Constant.HOST_NAME]),
                                                            models.GpioPin.pin_code.in_([heat_relay.gpio_pin_code]))
@@ -147,7 +148,7 @@ def loop_heat_relay():
                 Log.logger.warning("Cannot find gpiopin_bcm for heat relay={} zone={}".format(heat_relay.gpio_pin_code,
                                                                                           heat_relay.heat_pin_name))
         except Exception, ex:
-            Log.logger.exception('Error processing heat relay={}, err={}'.format(heat_relay, ex))
+            Log.logger.exception('Error processing heat relay={}, pin={}, err={}'.format(heat_relay, gpio_pin, ex))
 
 progress_status = None
 def get_progress():
