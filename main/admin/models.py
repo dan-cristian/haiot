@@ -305,7 +305,7 @@ class Sensor(db.Model, graphs.SensorGraph, DbEvent, DbBase):
         self.address= address
 
     def __repr__(self):
-        return 'Sensor {}, {}{}'.format(self.type, self.sensor_name, self.address)
+        return '{}, {}, {}, {}'.format(self.type, self.sensor_name, self.address, self.temperature)
     
 
 class Parameter(db.Model, DbBase):
@@ -322,6 +322,7 @@ class Parameter(db.Model, DbBase):
 
     def __repr__(self):
         return '{}, {}'.format(self.name, self.value)
+
 
 class ZoneSensor(db.Model, DbBase):
     id = db.Column(db.Integer, primary_key=True)
