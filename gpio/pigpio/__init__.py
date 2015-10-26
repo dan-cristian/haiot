@@ -179,19 +179,22 @@ def setup_in_ports(gpio_pin_list):
         else:
             for gpio_pin in gpio_pin_list:
                 if gpio_pin.pin_type == Constant.GPIO_PIN_TYPE_PI_STDGPIO:
-                    Log.logger.info('Set pincode={} type={} index={} as input'.format(gpio_pin.pin_code,
-                                                                                      gpio_pin.pin_type,
-                                                                                      gpio_pin.pin_index_bcm))
-                    __pi.set_mode(int(gpio_pin.pin_index_bcm), pigpio.INPUT)
-                    # https://learn.sparkfun.com/tutorials/pull-up-resistors
-                    __pi.set_pull_up_down(int(gpio_pin.pin_index_bcm), pigpio.PUD_UP)
-                    __callback.append(__pi.callback(user_gpio=int(gpio_pin.pin_index_bcm),
-                                                    edge=pigpio.EITHER_EDGE, func=input_event))
-                    gpio_pin_record = models.GpioPin().query_filter_first(
-                        models.GpioPin.pin_code.in_([gpio_pin.pin_code]),
-                        models.GpioPin.host_name.in_([Constant.HOST_NAME]))
-                    gpio_pin_record.pin_direction = Constant.GPIO_PIN_DIRECTION_IN
-                    commit()
+                    try:
+                        Log.logger.info('Set pincode={} type={} index={} as input'.format(gpio_pin.pin_code,
+                                                                                          gpio_pin.pin_type,
+                                                                                          gpio_pin.pin_index_bcm))
+                        __pi.set_mode(int(gpio_pin.pin_index_bcm), pigpio.INPUT)
+                        # https://learn.sparkfun.com/tutorials/pull-up-resistors
+                        __pi.set_pull_up_down(int(gpio_pin.pin_index_bcm), pigpio.PUD_UP)
+                        __callback.append(__pi.callback(user_gpio=int(gpio_pin.pin_index_bcm),
+                                                        edge=pigpio.EITHER_EDGE, func=input_event))
+                        gpio_pin_record = models.GpioPin().query_filter_first(
+                            models.GpioPin.pin_code.in_([gpio_pin.pin_code]),
+                            models.GpioPin.host_name.in_([Constant.HOST_NAME]))
+                        gpio_pin_record.pin_direction = Constant.GPIO_PIN_DIRECTION_IN
+                        commit()
+                    except Exception, ex:
+                        Log.logger.critical('Unable to setup pigpio pin, er={}'.format(ex))
                 else:
                     Log.logger.info('Skipping PiGpio setup for pin {} with type {}'.format(gpio_pin.pin_code,
                                                                                            gpio_pin.pin_type))
@@ -217,6 +220,8 @@ def init():
         try:
             global __pi
             __pi = pigpio.pi()
+            # test if daemon is on
+            __pi.get_current_tick()
             # setup this to receive list of ports that must be set as "IN" and have callbacks defined
             dispatcher.connect(setup_in_ports, signal=Constant.SIGNAL_GPIO_INPUT_PORT_LIST, sender=dispatcher.Any)
             initialised = True
