@@ -44,7 +44,7 @@ def init():
         gpio_pin = models.GpioPin().query_filter_first(models.GpioPin.pin_code.in_([alarm.gpio_pin_code]),
                                                      models.GpioPin.host_name.in_([Constant.HOST_NAME]))
         if gpio_pin:
-            Log.logger.info('Setting up alarm port pin={} type={}'.format(gpio_pin.pin_code, gpio_pin.pin_type))
+            Log.logger.info('Schedule setup alarm port pin={} type={}'.format(gpio_pin.pin_code, gpio_pin.pin_type))
             port_list.append(gpio_pin)
         else:
             Log.logger.warning('Unexpected empty gpio pin response for alarm setup')
