@@ -216,9 +216,9 @@ def unload():
 def init():
     Log.logger.info('PiGpio initialising')
     global initialised
+    global __pi
     if __import_ok:
         try:
-            global __pi
             __pi = pigpio.pi()
             # test if daemon is on
             __pi.get_current_tick()
@@ -228,6 +228,7 @@ def init():
             Log.logger.info('PiGpio initialised OK')
         except Exception, ex:
             Log.logger.info('Unable to initialise PiGpio, err={}'.format(ex))
+            __pi = None
             initialised = False
     else:
         Log.logger.info('PiGpio NOT initialised, module unavailable on this system')
