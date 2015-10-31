@@ -1,0 +1,43 @@
+# FIXME This has no error checking
+        # Mount root
+        if [ "${FSTYPE}" != "unknown" ]; then
+                #mount ${roflag} -t ${FSTYPE} ${ROOTFLAGS} ${ROOT} ${rootmnt}
+                echo "Copy in RAM started"
+                mkdir /ramboottmp
+                mount ${roflag} -t ${FSTYPE} ${ROOTFLAGS} ${ROOT} /ramboottmp
+                mount -t tmpfs -o size=100% none ${rootmnt}
+                cd ${rootmnt}
+                cp -rfa /ramboottmp/* ${rootmnt}
+                umount /ramboottmp
+                echo "Copy in RAM DONE, now applying only delta overlay files from ${rootmnt}/ram-changes-overlay/ to ${rootmnt}"
+                cp -rfa ${rootmnt}/ram-changes-overlay/* ${rootmnt}
+                sleep 5
+                echo "Removing copied overlay files from ${rootmnt}/ram-changes-overlay/"
+                rm -rf ${rootmnt}/ram-changes-overlay/*
+                sleep 20
+        else
+                mount ${roflag} ${ROOTFLAGS} ${ROOT} ${rootmnt}
+        fi
+-----alternate version----
+# FIXME This has no error checking
+        # Mount root
+        if [ "${FSTYPE}" != "unknown" ]; then
+                #mount ${roflag} -t ${FSTYPE} ${ROOTFLAGS} ${ROOT} ${rootmnt}
+                log_begin_msg "Copy in RAM started"
+                mkdir /ramboottmp
+                mount ${roflag} -t ${FSTYPE} ${ROOTFLAGS} ${ROOT} /ramboottmp
+                mount -t tmpfs -o size=100% none ${rootmnt}
+                cd ${rootmnt}
+                cp -rfa /ramboottmp/* ${rootmnt}
+                log_end_msg
+                umount /ramboottmp
+                log_begin_msg "Copy in RAM DONE, now applying only delta overlay files from ${rootmnt}/ram-changes-overlay/ to ${rootmnt}"
+                cp -rfa ${rootmnt}/ram-changes-overlay/* ${rootmnt}
+                log_end_msg
+                log_begin_msg "Removing copied overlay files from ${rootmnt}/ram-changes-overlay/"
+                rm -rf ${rootmnt}/ram-changes-overlay/*
+                log_end_msg
+                sleep 2
+        else
+                mount ${roflag} ${ROOTFLAGS} ${ROOT} ${rootmnt}
+        fi
