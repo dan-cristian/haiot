@@ -13,7 +13,7 @@ apt-get upgrade
 apt-get update
 echo "Installing additional packages"
 # 1-wire support needs owfs
-apt-get -y install sudo apt-utils mc nano locales python wget owfs git python-rpi.gpio inotify-tools
+apt-get -y install dialog sudo apt-utils mc nano locales python wget owfs git python-rpi.gpio inotify-tools
 
 
 echo "Installing python pip and virtualenv"
@@ -58,10 +58,15 @@ cd PIGPIO
 echo Compiling pigpio
 apt-get -y install build-essential
 make
+echo Installing pigpio
+make install
+cp /home/$USERNAME/PYC/scripts/pigpio_daemon.sh /etc/init.d
+chmod +x /etc/init.d/pigpio_daemon.sh
+#python setup.py install
 #todo install pigpiod init script
 
 echo Configuring HAIOT application
-cd PYC 
+cd /home/$USERNAME/PYC
 chmod +x scripts/*sh*
 chmod +x *.sh
 scripts/setup.sh.bat
