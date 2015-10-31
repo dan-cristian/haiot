@@ -60,8 +60,9 @@ apt-get -y install build-essential
 make
 echo Installing pigpio
 make install
-cp /home/$USERNAME/PYC/scripts/pigpio_daemon.sh /etc/init.d
-chmod +x /etc/init.d/pigpio_daemon.sh
+cp /home/$USERNAME/PYC/scripts/pigpio_daemon /etc/init.d
+chmod +x /etc/init.d/pigpio_daemon
+update-rc.d pigpio_daemon defaults
 #python setup.py install
 #todo install pigpiod init script
 
@@ -72,7 +73,7 @@ chmod +x *.sh
 scripts/setup.sh.bat
 chown -R $USERNAME:$USERNAME .
 
-echo Downloading init service
+echo Downloading haiot init service
 cd ~
 wget https://raw.githubusercontent.com/dan-cristian/userspaceServices/master/userspaceServices
 chmod +x userspaceServices
