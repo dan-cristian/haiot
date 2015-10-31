@@ -63,6 +63,7 @@ make install
 cp /home/$USERNAME/PYC/scripts/pigpio_daemon /etc/init.d
 chmod +x /etc/init.d/pigpio_daemon
 update-rc.d pigpio_daemon defaults
+
 #python setup.py install
 #todo install pigpiod init script
 
@@ -94,6 +95,9 @@ echo Starting haiot via userspaceServices
 /etc/init.d/userspaceServices restart
 
 echo "Removing not needed files and cleaning apt files"
+apt-get -y remove build-essential
+rm -r /home/$USERNAME/PIGPIO
+rm /home/$USERNAME/pigpio.zip
 rm /usr/share/doc -r
 rm /usr/share/man -r
 apt-get -y autoremove

@@ -1,0 +1,11 @@
+/mnt/
+/proc/
+/tmp/
+/sys/
+/dev/
+/media/
+/run/
+/var/cache/
+/var/lib/openhab/workspace/
+/var/tmp/
+/var/spool/
