@@ -22,7 +22,7 @@ sleep 1
 mkdir -p $MNT_DIR
 mount /dev/mmcblk0p2 $MNT_DIR
 mkdir -p $MNT_DIR/$OVERLAY_DIR
-rsync --dry-run --delete-delay --exclude-from=/home/$USERNAME/PYC/scripts/osinstall/pi/rsync-ram-overlay-exclude.txt --log-file=$LOG -rlHpEAXogtv --compare-dest=/ $MNT_DIR / $MNT_DIR/$OVERLAY_DIR
+rsync --dry-run --delete-delay --exclude-from=/home/$USERNAME/PYC/scripts/osinstall/pi/rsync-ram-overlay-exclude.txt --log-file=$LOG -rlHpEAXogtv --compare-dest=$MNT_DIR/ / $MNT_DIR/$OVERLAY_DIR/
 find $MNT_DIR/$OVERLAY_DIR -type d -empty -delete >> $LOG
 umount $MNT_DIR
 
