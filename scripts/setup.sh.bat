@@ -6,15 +6,15 @@ sudo pip install virtualenv
 virtualenv venv
 source venv/bin/activate
 echo Ensure pip latest version
-pip install --upgrade pip
+pip install --no-cache-dir --upgrade pip
 #latest needed for apscheduler
-pip install --upgrade setuptools
+pip install --no-cache-dir --upgrade setuptools
 echo Install mandatory requirements
-pip install -r requirements.txt
+pip install --no-cache-dir -r requirements.txt
 echo Install optional requirements, you can ignore errors
-pip install -r requirements-beaglebone.txt
-pip install -r requirements-rpi.txt
-pip install -r requirements-win.txt
+pip install --no-cache-dir -r requirements-beaglebone.txt
+pip install --no-cache-dir -r requirements-rpi.txt
+pip install --no-cache-dir -r requirements-win.txt
 
 echo Installing mysql connector
 wget http://dev.mysql.com/get/Downloads/Connector-Python/mysql-connector-python-2.1.3.zip
