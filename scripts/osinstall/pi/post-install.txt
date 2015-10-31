@@ -1,9 +1,22 @@
-echo "Reboot the system and run this script again as you will get errors"
-#this does not work with wget version during install, error as only http and ftp is supported
-wget --no-check-certificate https://raw.githubusercontent.com/dan-cristian/haiot/master/scripts/osinstall/pi/post-install.sh
-#wget --output-document=post-install.sh http://pastebin.com/raw.php?i=B45FacDZ
-chmod +x post-install.sh
-dos2unix post-install.sh
-echo Running post install script, pausing first for 10 seconds
-sleep 10
-./post-install.sh
+cat /root/.profile | grep post-install
+if [ "$?" == "0" ]; then
+        cat /root/.profile | grep #post-install
+        if [ "$?" == "0" ]; then
+            echo "Post-install script already executed"
+        else
+            echo "Dowloading post-install.sh script to complete haiot setup"
+            wget --no-check-certificate https://raw.githubusercontent.com/dan-cristian/haiot/master/scripts/osinstall/pi/post-install.sh
+            chmod +x post-install.sh
+            dos2unix post-install.sh
+            echo "Running post install script, pausing first for 10 seconds"
+            sleep 10
+            ./post-install.sh
+            sed -i 's|'post-install.txt'|#post-install.txt|g' .profile
+        fi
+    else
+        echo "Adding post-install script to root .profile to be executed at first login"
+        cp post-install.txt /root/
+        chmod +x /root/post-install.txt
+        echo "post-install.txt" >> .profile
+fi
+
