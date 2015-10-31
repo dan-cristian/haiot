@@ -20,7 +20,7 @@ echo "Installing python pip and virtualenv"
 wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py
 python get-pip.py
 rm get-pip.py
-pip install virtualenv
+pip install --no-cache-dir virtualenv
 
 echo Creating user $USERNAME with password=$USERPASS
 useradd $USERNAME -m
@@ -54,15 +54,17 @@ git clone http://192.168.0.9:888/PYC.git
 echo Downloading pigpio library for gpio access
 wget abyz.co.uk/rpi/pigpio/pigpio.zip
 unzip pigpio.zip
-cd PIGPIO
-echo Compiling pigpio
 apt-get -y install build-essential
+echo Compiling pigpio
+cd PIGPIO
 make
 echo Installing pigpio
 make install
 cp /home/$USERNAME/PYC/scripts/pigpio_daemon /etc/init.d
 chmod +x /etc/init.d/pigpio_daemon
 update-rc.d pigpio_daemon defaults
+rm -r /home/$USERNAME/PIGPIO
+rm /home/$USERNAME/pigpio.zip
 
 #python setup.py install
 #todo install pigpiod init script
@@ -96,8 +98,6 @@ echo Starting haiot via userspaceServices
 
 echo "Removing not needed files and cleaning apt files"
 apt-get -y remove build-essential
-rm -r /home/$USERNAME/PIGPIO
-rm /home/$USERNAME/pigpio.zip
 rm /usr/share/doc -r
 rm /usr/share/man -r
 apt-get -y autoremove
