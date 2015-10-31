@@ -10,3 +10,4 @@
 /var/tmp/
 /var/spool/
 /ram-changes-overlay/
+/boot/
