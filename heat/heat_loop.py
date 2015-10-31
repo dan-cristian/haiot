@@ -31,7 +31,7 @@ def __save_heat_state_db(zone='', heat_is_on=''):
 def __decide_action(zone, current_temperature, target_temperature):
     assert isinstance(zone, models.Zone)
     threshold = float(get_param(Constant.P_TEMPERATURE_THRESHOLD))
-    heat_is_on = False
+    heat_is_on = zone.heat_is_on
     if current_temperature < target_temperature:
         heat_is_on = True
     if current_temperature > (target_temperature + threshold):
