@@ -9,3 +9,4 @@
 /var/lib/openhab/workspace/
 /var/tmp/
 /var/spool/
+/ram-changes-overlay/
