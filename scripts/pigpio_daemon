@@ -24,9 +24,6 @@ DAEMON=/usr/local/bin/pigpiod
 PIDFILE=/var/run/pigpiod.pid
 PIGPIOD_OPTS="-s 10"
 
-# Load the VERBOSE setting and other rcS variables
-. /lib/init/vars.sh
-
 # Define LSB log_* functions.
 # Depend on lsb-base (>= 3.2-14) to ensure that this file is present
 # and status_of_proc is working.
@@ -38,7 +35,7 @@ test -x $DAEMON || exit 5
 case "$1" in
   start)
 	log_daemon_msg "Starting $DESC" "$NAME"
-	start-stop-daemon --start --quiet --oknodo --pidfile $PIDFILE --startas $DAEMON -- -p $PIDFILE $PIGPIOD_OPTS
+	start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON -- $PIGPIOD_OPTS
 	status=$?
 	log_end_msg $status
 	;;
