@@ -21,7 +21,7 @@ NAME="pigpiod"
 SCRIPTNAME=/etc/init.d/$NAME
 LOCKFILE=/var/run/$NAME.lock
 DAEMON=/usr/local/bin/pigpiod
-PIDFILE=/var/run/pigpiod.pid
+PIDFILE=/var/run/pigpio.pid
 PIGPIOD_OPTS="-s 10"
 
 # Define LSB log_* functions.
