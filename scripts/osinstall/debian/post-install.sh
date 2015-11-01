@@ -6,13 +6,15 @@ USERNAME=haiot
 USERPASS=haiot
 
 #http://linuxconfig.org/enable-ssh-root-login-on-debian-linux-server
+#how to avoid ssl cert errors!
+#pip install --index-url=http://pypi.python.org/simple/ --trusted-host pypi.python.org  pythonPackage
 
 echo "Updating apt-get"
 apt-get -y upgrade
 apt-get -y update
 echo "Installing additional packages"
 # 1-wire support needs owfs
-apt-get -y install dialog sudo apt-utils mc nano python wget owfs git inotify-tools localepurge
+apt-get -y install dialog sudo apt-utils mc nano python wget owfs git inotify-tools fuse mc
 
 cd /root
 echo "Installing python pip and virtualenv"
