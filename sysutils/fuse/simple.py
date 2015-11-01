@@ -8,6 +8,8 @@ import errno
 
 from fuse import FUSE, FuseOSError, Operations
 
+# http://www.stavros.io/posts/python-fuse-filesystem/
+# http://rabexc.org/posts/io-performance-in-python
 
 class Passthrough(Operations):
     def __init__(self, root):
