@@ -14,7 +14,7 @@ apt-get -y upgrade
 apt-get -y update
 echo "Installing additional packages"
 # 1-wire support needs owfs
-apt-get -y install dialog sudo apt-utils mc nano python wget owfs git inotify-tools fuse mc
+apt-get -y install dialog sudo apt-utils mc nano python wget owfs git inotify-tools fuse mc hubicfuse
 
 cd /root
 echo "Installing python pip and virtualenv"

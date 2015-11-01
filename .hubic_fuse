@@ -1,6 +1,3 @@
-[hubic]
-email = dan.cristian@gmail.com
-password = 4x3zUf8UMni9
 client_id = api_hubic_yr1VyKkj76RRHLD4YXoZ6SsFN4KZXg8A
 client_secret = 19Ux2ornYk2zjteXX5UKFxKcdPmoSeWNbnWTIa5mPNqN1hzLrjqFP40yuyEi8Fon
-redirect_uri = http://localhost/
+refresh_token=RX9o6jSgPwF8WeNAriJVX5Qcyz96s3gZxZmB2U3ABRiqaA6bAUETKp7nC5CRDEXC
