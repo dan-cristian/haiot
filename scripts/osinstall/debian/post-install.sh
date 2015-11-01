@@ -14,7 +14,8 @@ apt-get -y upgrade
 apt-get -y update
 echo "Installing additional packages"
 # 1-wire support needs owfs
-apt-get -y install dialog sudo apt-utils mc nano python wget owfs git inotify-tools fuse mc hubicfuse
+apt-get -y install dialog sudo apt-utils mc nano python wget owfs git inotify-tools mc ca-certificates
+
 
 cd /root
 echo "Installing python pip and virtualenv"
@@ -34,6 +35,7 @@ echo "Installing duplicity and hubic"
 # http://www.yvangodard.me/hubic-backup-duplicity-backend-pyrax/
 # https://www.tiernanotoole.ie/2015/04/01/Duplicity_Hubic.html
 apt-get -y purge duplicity
+apt-get -y install fuse
 # http://serverfault.com/questions/22414/how-can-i-run-debian-stable-but-install-some-packages-from-testing
 echo "Package: *
 Pin: release a=unstable
@@ -53,6 +55,36 @@ client_secret = <hubicclientsecret>
 redirect_uri = http://localhost/" > /home/$USERNAME/.hubic_credentials
 chown $USERNAME /home/$USERNAME/.hubic_credentials
 chmod 700 /home/$USERNAME/.hubic_credentials
+
+
+echo "Installing webmin"
+echo "deb http://download.webmin.com/download/repository sarge contrib
+deb http://webmin.mirror.somersettechsolutions.co.uk/repository sarge contrib" > /etc/apt/sources.list.d/webmin.list
+wget http://www.webmin.com/jcameron-key.asc
+apt-key add jcameron-key.asc
+apt-get update
+apt-get -y install webmin
+apt-get -f install
+
+echo "Installing mdd"
+# http://zackreed.me/articles/84-snapraid-with-mhddfs?view=comments
+apt-get install -y mhddfs
+
+echo "Installing hubicfuse"
+# https://github.com/TurboGit/hubicfuse
+cd /root
+git clone https://github.com/TurboGit/hubicfuse.git
+apt-get install -y gcc make curl libfuse-dev pkg-config \
+            libcurl4-openssl-dev libxml2-dev libssl-dev libjson-c-dev \
+            libmagic-dev
+cd hubicfuse
+./configure
+make
+make install
+apt-get remove -y gcc make curl libfuse-dev pkg-config \
+            libcurl4-openssl-dev libxml2-dev libssl-dev libjson-c-dev \
+            libmagic-dev
+echo "run hubic_token script to create $HOME/.hubicfuse file"
 
 echo "Getting HAIOT application from github"
 cd /home/$USERNAME
