@@ -11,12 +11,12 @@ if [ "$?" == "0" ]; then
         echo "Running HAIOT post install script, pausing for 10 seconds, CTRL+C to interrupt"
         sleep 10
         ./post-install.sh
-        sed -i 's|'post-install.txt'|#post-install.txt|g' .profile
+        sed -i 's|'post-install.txt'|#post-install.txt|g' /root/.profile
     fi
 else
     echo "Adding post-install script to root .profile to be executed at first login"
     cp post-install.txt /root/
     chmod +x /root/post-install.txt
-    echo "./post-install.txt" >> .profile
+    echo "./post-install.txt" >> /root/.profile
 fi
 
