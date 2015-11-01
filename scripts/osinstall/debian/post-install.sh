@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "Starting haiot post-install script, press CTRL+C to abort"
+sleep 5
 USERNAME=haiot
 USERPASS=haiot
 
