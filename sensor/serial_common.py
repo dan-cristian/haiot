@@ -1,20 +1,18 @@
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
 import glob
-
 import serial
-
 from main.logger_helper import Log
 
 
 def get_portpath_linux(product_name):
-    #/sys/bus/usb/devices/2-1.2/2-1.2:1.0/ttyUSB0/tty/ttyUSB0/dev
-    #/sys/bus/usb/devices/2-1.2/product
+    # /sys/bus/usb/devices/2-1.2/2-1.2:1.0/ttyUSB0/tty/ttyUSB0/dev
+    # /sys/bus/usb/devices/2-1.2/product
     Log.logger.info('Searching for {} devices on linux'.format(product_name))
     path_list = glob.glob('/sys/bus/usb/devices/*/*/*/*/tty*/dev')
     for path in path_list:
         words = path.split('/')
-        dev_path = '/dev/'+words[len(words)-2]
+        dev_path = '/dev/' + words[len(words) - 2]
         root_path = ''
         for index in range(0, len(words) - 5):
             root_path = root_path + '/' + words[index]
@@ -26,13 +24,14 @@ def get_portpath_linux(product_name):
             return dev_path
     return None
 
+
 def get_standard_serial_device_list():
     valid_list = []
     ser = serial.Serial()
     ser.baudrate = 9600
     ser.timeout = 3
     ser.writeTimeout = 3
-    for port_no in range(0,5):
+    for port_no in range(0, 5):
         ser.port = port_no
         try:
             ser.open()

@@ -13,6 +13,9 @@ from common import utils, performance
 
 # inherit this to use performance tracked queries
 class DbBase:
+    def __init__(self):
+        pass
+
     record_uuid = None
 
     def __check_for_long_query(self, result, start_time, function):
@@ -40,14 +43,14 @@ class DbBase:
     #    function = self.query.filter(filter).all
     #    return self.__get_result(function)
 
-    def query_filter_all(self, *filter):
-        function = self.query.filter(*filter).all
+    def query_filter_all(self, *query_filter):
+        function = self.query.filter(*query_filter).all
         return self.__get_result(function)
 
     # example with multiple filters
     # m().query_filter_first(m.host_name.in_([Constant.HOST_NAME]), m.name.in_([mod.name]))
-    def query_filter_first(self, *filter):
-        function = self.query.filter(*filter).first
+    def query_filter_first(self, *query_filter):
+        function = self.query.filter(*query_filter).first
         return self.__get_result(function)
 
 #    def query_filters_first(self, *filter):
@@ -117,10 +120,9 @@ class DbEvent:
         except Exception, ex:
             Log.logger.error('Exception save json to db {}'.format(ex))
 
-
-    #graph_save_frequency in seconds
-    def save_changed_fields(self,current_record='',new_record='',notify_transport_enabled=False, save_to_graph=False,
-                            ignore_only_updated_on_change=True, debug=False, graph_save_frequency=0, filter=None):
+    # graph_save_frequency in seconds
+    def save_changed_fields(self, current_record='', new_record='', notify_transport_enabled=False, save_to_graph=False,
+                            ignore_only_updated_on_change=True, debug=False, graph_save_frequency=0, query_filter=None):
         try:
             if hasattr(self, 'save_to_graph'):  # not all models inherit graph
                 if current_record:
@@ -198,6 +200,7 @@ class Module(db.Model, DbBase):
     start_order = db.Column(db.Integer)
 
     def __init__(self, id='', host_name='', name='', active=False, start_order='999'):
+        super(Module, self).__init__()
         if id:
             self.id = id
         self.host_name = host_name
@@ -218,6 +221,7 @@ class Zone(db.Model, DbBase):
     heat_target_temperature = db.Column(db.Integer)
 
     def __init__(self, id='', name=''):
+        super(Zone, self).__init__()
         if id:
             self.id = id
         self.name = name
@@ -232,6 +236,7 @@ class SchedulePattern(db.Model, DbBase):
     pattern = db.Column(db.String(24))
 
     def __init__(self, id=None, name='', pattern=''):
+        super(SchedulePattern, self).__init__()
         if id:
             self.id = id
         self.name = name
@@ -246,6 +251,7 @@ class TemperatureTarget(db.Model, DbBase):
     target = db.Column(db.Float)
 
     def __init__(self, id=None, code='', target=''):
+        super(TemperatureTarget, self).__init__()
         if id:
             self.id = id
         self.code = code
@@ -268,6 +274,7 @@ class HeatSchedule(db.Model, DbBase):
     active = db.Column(db.Boolean, default=True)
 
     def __init__(self, id=None, zone_id=None, pattern_week_id=None, pattern_weekend_id=None):
+        super(HeatSchedule, self).__init__()
         if id:
             self.id = id
         self.zone_id= zone_id
@@ -302,6 +309,7 @@ class Sensor(db.Model, graphs.SensorGraph, DbEvent, DbBase):
     sensor_name = db.Column(db.String(50))
 
     def __init__(self, address=''):
+        super(Sensor, self).__init__()
         self.address= address
 
     def __repr__(self):
@@ -315,6 +323,7 @@ class Parameter(db.Model, DbBase):
     description = db.Column(db.String(255))
 
     def __init__(self, id=None, name='default', value='default'):
+        super(Parameter, self).__init__()
         if id:
             self.id = id
         self.name = name
@@ -332,7 +341,8 @@ class ZoneSensor(db.Model, DbBase):
     sensor_address = db.Column(db.String(50), db.ForeignKey('sensor.address'))
     #sensor = db.relationship('Sensor', backref=db.backref('ZoneSensor(sensor)', lazy='dynamic'))
 
-    def __init__(self, zone_id='', sensor_address ='', sensor_name=''):
+    def __init__(self, zone_id='', sensor_address='', sensor_name=''):
+        super(ZoneSensor, self).__init__()
         self.sensor_address= sensor_address
         self.zone_id = zone_id
         self.sensor_name = sensor_name
@@ -361,6 +371,7 @@ class Node(db.Model, DbEvent, graphs.NodeGraph, DbBase):
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def __init__(self, id=None, name=None, ip=None, priority=None, mac=None, is_master_logging=False):
+        super(Node, self).__init__()
         if id:
             self.id = id
         self.name = name
@@ -432,6 +443,7 @@ class SystemDisk(db.Model, graphs.SystemDiskGraph, DbEvent, DbBase):
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def __init__(self):
+        super(SystemDisk, self).__init__()
         self.hdd_disk_dev = ''
 
     def __repr__(self):
@@ -451,7 +463,7 @@ class GpioPin(db.Model, DbEvent, DbBase):
     is_active = db.Column(db.Boolean)  # if pin was setup(exported) through this app. will be unexported when app exit
 
     def __init__(self):
-        pass
+        super(GpioPin, self).__init__()
 
     def __repr__(self):
         return 'host={} code={} index={} type={} value={}'.format(self.host_name, self.pin_code, self.pin_index_bcm,
@@ -472,6 +484,7 @@ class ZoneAlarm(db.Model, DbEvent, DbBase):
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def __init__(self, zone_id='', gpio_pin_code='', host_name=''):
+        super(ZoneAlarm, self).__init__()
         self.zone_id = zone_id
         self.gpio_pin_code = gpio_pin_code
         self.gpio_host_name = host_name
@@ -492,6 +505,7 @@ class ZoneHeatRelay(db.Model, DbEvent, DbBase):
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def __init__(self, zone_id=None, gpio_pin_code='', host_name='', is_main_heat_source=False):
+        super(ZoneHeatRelay, self).__init__()
         self.zone_id = zone_id
         self.gpio_pin_code = gpio_pin_code
         self.gpio_host_name = host_name
@@ -511,6 +525,7 @@ class ZoneCustomRelay(db.Model, DbEvent, DbBase):
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def __init__(self, id=None, zone_id='', gpio_pin_code='', host_name='', relay_pin_name=''):
+        super(ZoneCustomRelay, self).__init__()
         if id:
            self.id = id
         self.zone_id = zone_id
@@ -543,6 +558,7 @@ class Rule(db.Model, DbEvent, DbBase):
 
     def __init__(self, id='', host_name=''):
         # keep host name default to '' rather than None (which does not work on filter in)
+        super(Rule, self).__init__()
         if id:
             self.id = id
         self.host_name = host_name
@@ -560,6 +576,7 @@ class PlotlyCache(db.Model, DbEvent, DbBase):
 
     def __init__(self, id='', grid_name=''):
         # keep host name default to '' rather than None (which does not work on filter in)
+        super(PlotlyCache, self).__init__()
         if id:
             self.id = id
         self.grid_name = grid_name
@@ -679,6 +696,7 @@ class SystemDiskHistory(db.Model, DbBase):
     source_host_ = db.Column(db.String(50))
 
     def __init__(self):
+        super(SystemDiskHistory, self).__init__()
         self.hdd_disk_dev = ''
 
     def __repr__(self):

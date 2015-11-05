@@ -20,7 +20,7 @@ class BaseGraph:
 
 class SensorGraph(BaseGraph):
     def __init__(self):
-        pass
+        BaseGraph.__init__(self)
 
     graph_x_ = 'updated_on'
     graph_y_ = ['temperature', 'humidity', 'counters_a', 'counters_b', 'iad', 'vdd', 'vad']
@@ -31,7 +31,7 @@ class SensorGraph(BaseGraph):
 
 class SystemMonitorGraph(BaseGraph):
     def __init__(self):
-        pass
+        BaseGraph.__init__(self)
 
     graph_x_ = 'updated_on'
     graph_y_ = ['cpu_usage_percent', 'memory_available_percent', 'uptime_days', 'cpu_temperature']
@@ -42,7 +42,7 @@ class SystemMonitorGraph(BaseGraph):
 
 class SystemDiskGraph(BaseGraph):
     def __init__(self):
-        pass
+        BaseGraph.__init__(self)
     graph_x_ = 'updated_on'
     graph_y_ = ['temperature', 'power_status', 'sector_error_count', 'load_cycle_count', 'start_stop_count',
                 'last_reads_elapsed', 'last_writes_elapsed']
@@ -54,7 +54,7 @@ class SystemDiskGraph(BaseGraph):
 
 class NodeGraph(BaseGraph):
     def __init__(self):
-        pass
+        BaseGraph.__init__(self)
     graph_x_ = 'updated_on'
     graph_y_ = ['master_overall_cycles', 'run_overall_cycles']
     graph_shape_ = ['hv', 'hv']
@@ -64,7 +64,7 @@ class NodeGraph(BaseGraph):
 
 class UpsGraph(BaseGraph):
     def __init__(self):
-        pass
+        BaseGraph.__init__(self)
     graph_x_ = 'updated_on'
     graph_y_ = ['input_voltage', 'load_percent', 'remaining_minutes']
     graph_shape_ = ['hv', 'hv', 'hv']

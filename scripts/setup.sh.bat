@@ -2,7 +2,7 @@
 chmod +x startserver*.sh
 chmod +x scripts/stopserver.sh
 sudo pip install --upgrade pip
-sudo pip install virtualenv
+sudo pip install --upgrade virtualenv
 virtualenv venv
 source venv/bin/activate
 echo Ensure pip latest version

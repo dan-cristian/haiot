@@ -14,7 +14,6 @@ from main.admin import models
 from main.admin.model_helper import commit
 from common import Constant
 
-
 __import_ok = False
 initialised = False
 __callback = []
@@ -24,16 +23,24 @@ __pin_tick_dict = {}  # {InputEvent}
 __lock_dict = {}  # lock list for each gpio
 
 
-class Logx():
+class Logx:
+    def __init__(self):
+        pass
 
-    class Logger():
-        def info(self, text):
+    class Logger:
+        def __init__(self):
+            pass
+
+        @staticmethod
+        def info(text):
             print(text)
 
     logger = Logger()
 
+
 try:
     import pigpio
+
     __import_ok = True
 except Exception, ex:
     __import_ok = False
@@ -68,7 +75,6 @@ or corrupt the data on the SD card.
 
 
 class InputEvent:
-
     def __init__(self, gpio, level, tick):
         self.tick = tick
         self.level = level
@@ -100,9 +106,10 @@ def announce_event(event):
                     direction=Constant.GPIO_PIN_DIRECTION_IN,
                     pin_value=event.level, pin_connected=(event.level == 0))
 
+
 # executed by a haiot thread (not by gpiopd thread)
 def check_notify_event(event):
-    #print("Debounce thread started for event {}".format(event))
+    # print("Debounce thread started for event {}".format(event))
     global __pin_tick_dict, __pi, __callback_thread, __lock_dict
     all_events_processed = False
     while not all_events_processed:
@@ -122,7 +129,7 @@ def check_notify_event(event):
                     all_events_processed = False
             finally:
                 lock.release()
-    #print("Debounce thread exit")
+    # print("Debounce thread exit")
     __callback_thread = None
 
 
@@ -158,18 +165,18 @@ def input_event(gpio, level, tick):
                 pin_tick_event.level = level
                 pin_tick_event.tick = tick
                 pin_tick_event.event_count += 1
-                #Log.logger.info("IN gpio={} lvl={} tick={} current={} delta={}".format(gpio, level, tick, current, delta))
+                # Log.logger.info("IN gpio={} lvl={} tick={} current={} delta={}".format(gpio, level, tick, current, delta))
                 # start a thread if not already started to notify the event completion without bounce
                 global __callback_thread
                 if __callback_thread is None:
-                    __callback_thread = Thread(target = check_notify_event, args=(pin_tick_event, ))
+                    __callback_thread = Thread(target=check_notify_event, args=(pin_tick_event,))
                     __callback_thread.start()
             finally:
                 lock.release()
 
 
 def setup_in_ports(gpio_pin_list):
-    #Log.logger.info('Socket timeout={}'.format(socket.getdefaulttimeout()))
+    # Log.logger.info('Socket timeout={}'.format(socket.getdefaulttimeout()))
     # socket.setdefaulttimeout(None)
     global __callback, __pi
     Log.logger.info('Configuring {} gpio input ports'.format(len(gpio_pin_list)))
@@ -193,8 +200,8 @@ def setup_in_ports(gpio_pin_list):
                             models.GpioPin.host_name.in_([Constant.HOST_NAME]))
                         gpio_pin_record.pin_direction = Constant.GPIO_PIN_DIRECTION_IN
                         commit()
-                    except Exception, ex:
-                        Log.logger.critical('Unable to setup pigpio pin, er={}'.format(ex))
+                    except Exception, ex1:
+                        Log.logger.critical('Unable to setup pigpio pin, er={}'.format(ex1))
                 else:
                     Log.logger.info('Skipping PiGpio setup for pin {} with type {}'.format(gpio_pin.pin_code,
                                                                                            gpio_pin.pin_type))
@@ -226,11 +233,9 @@ def init():
             dispatcher.connect(setup_in_ports, signal=Constant.SIGNAL_GPIO_INPUT_PORT_LIST, sender=dispatcher.Any)
             initialised = True
             Log.logger.info('PiGpio initialised OK')
-        except Exception, ex:
-            Log.logger.info('Unable to initialise PiGpio, err={}'.format(ex))
+        except Exception, ex1:
+            Log.logger.info('Unable to initialise PiGpio, err={}'.format(ex1))
             __pi = None
             initialised = False
     else:
         Log.logger.info('PiGpio NOT initialised, module unavailable on this system')
-
-

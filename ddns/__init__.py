@@ -4,14 +4,16 @@ from main.logger_helper import Log
 from main import thread_pool
 import ddns_run
 
-initialised=False
+initialised = False
+
 
 def unload():
     Log.logger.info('DDNS module unloading')
-    #...
+    # ...
     thread_pool.remove_callable(ddns_run.thread_run)
     global initialised
     initialised = False
+
 
 def init():
     Log.logger.info('DDNS module initialising')

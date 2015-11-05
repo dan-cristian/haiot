@@ -7,7 +7,6 @@ from main import db
 from common import Constant
 from pydispatch import dispatcher
 
-
 admin = Blueprint('admin', __name__, template_folder='../templates')
 user = Blueprint('user', __name__, template_folder='../templates')
 
@@ -31,18 +30,21 @@ class CRUDView(MethodView):
             self.detail_template = detail_template
         self.filters = filters or {}
         self.ObjForm = model_form(self.model, db.session, exclude=exclude)
+
     def render_detail(self, **kwargs):
         return render_template(self.detail_template, path=self.path, **kwargs)
+
     def render_list(self, **kwargs):
         return render_template(self.list_template, path=self.path,
                                filters=self.filters, **kwargs)
+
     def get(self, obj_id='', operation='', filter_name=''):
         if operation == 'new':
             #  we just want an empty form
             form = self.ObjForm()
             action = self.path
             return self.render_detail(form=form, action=action)
-            
+
         if operation == 'delete':
             obj = self.model.query.get(obj_id)
             db.session.delete(obj)
@@ -54,7 +56,6 @@ class CRUDView(MethodView):
             func = self.filters.get(filter_name)
             obj = func(self.model)
             return self.render_list(obj=obj, filter_name=filter_name)
-
 
         if obj_id:
             # this creates the form fields base on the model
@@ -76,6 +77,7 @@ class CRUDView(MethodView):
             else:
                 obj = self.model.query.all()
         return self.render_list(obj=obj)
+
     def post(self, obj_id=''):
         # either load and object to update if obj_id is given
         # else initiate a new object, this will be helpfull
@@ -95,11 +97,14 @@ class CRUDView(MethodView):
 
         db.session.add(obj)
         db.session.commit()
-        #process triggers on actions initiated by user
+        # process triggers on actions initiated by user
         dispatcher.send(signal=Constant.SIGNAL_SENSOR_DB_POST, model=self.model, row=obj)
         return redirect(self.path)
 
-def register_crud(app, url, endpoint, model, decorators=[], **kwargs):
+
+def register_crud(app, url, endpoint, model, decorators=None, **kwargs):
+    if not decorators:
+        decorators = []
     view = CRUDView.as_view(endpoint, endpoint=endpoint, model=model, **kwargs)
     for decorator in decorators:
         view = decorator(view)
@@ -108,6 +113,7 @@ def register_crud(app, url, endpoint, model, decorators=[], **kwargs):
     app.add_url_rule('%s/<operation>/' % url, view_func=view, methods=['GET'])
     app.add_url_rule('%s/<operation>/<int:obj_id>/' % url, view_func=view, methods=['GET'])
     app.add_url_rule('%s/<operation>/<filter_name>/' % url, view_func=view, methods=['GET'])
+
 
 blog_filters = {
     'created_asc': lambda model: model.query.order_by(model.created_on.asc()),
@@ -127,7 +133,7 @@ simple_filters = {
 }
 
 from .models import Zone, SchedulePattern, HeatSchedule, Sensor
-from .models import Module, Parameter, TemperatureTarget, ZoneSensor, Node, Ups#, GraphPlotly
+from .models import Module, Parameter, TemperatureTarget, ZoneSensor, Node, Ups  # , GraphPlotly
 from .models import SystemMonitor, SystemDisk, GpioPin, ZoneAlarm, ZoneHeatRelay, ZoneCustomRelay, Rule
 
 register_crud(admin, '/', 'main-entry', Module, filters=simple_filters)

@@ -1,18 +1,15 @@
 # project/__init__.py
 
-import time
-import sys
 import signal
+import sys
+import time
 
-from wakeonlan import wol
-from flask_sqlalchemy import SQLAlchemy #workaround for resolve issue
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy #workaround for resolve issue
 from flask_sqlalchemy import models_committed
+from wakeonlan import wol
 
 from main.logger_helper import Log
-
-
-
 
 # location for main db - sqlite db
 DB_LOCATION=None
@@ -95,8 +92,8 @@ def init_modules():
                 Log.logger.info("Initialising generic module definition")
                 init_module(mod.name, mod.active)
 
-def signal_handler(signal, frame):
-    Log.logger.info('I got signal {} frame {}, exiting'.format(signal, frame))
+def signal_handler(signal_name, frame):
+    Log.logger.info('I got signal {} frame {}, exiting'.format(signal_name, frame))
     global exit_code
     exit_code = 1
     unload()
@@ -200,6 +197,9 @@ def init():
     transport.init()
 
     class LogMessage:
+        def __init__(self):
+            pass
+
         message_type = 'logging'
         message = ''
         level = ''

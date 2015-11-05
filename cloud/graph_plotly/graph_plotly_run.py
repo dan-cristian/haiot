@@ -43,10 +43,14 @@ def get_layout(title='', ):
     return layout
 
 
-def populate_trace_for_extend(x=[], y=[], graph_legend_item_name='', trace_unique_id='', trace_unique_id_pattern=[],
-                              shape_type=''):
+def populate_trace_for_extend(x=None, y=None, graph_legend_item_name='', trace_unique_id='',
+                              trace_unique_id_pattern=None, shape_type=''):
     #series list must be completely filled in using graph create order
     #'text' param if added generates error
+    if not trace_unique_id_pattern:
+        trace_unique_id_pattern = []
+    if not x:
+        x = []
     trace_pos = trace_unique_id_pattern.index(trace_unique_id)
     trace_list=[]
     for i in range(len(trace_unique_id_pattern)):
@@ -60,9 +64,13 @@ def populate_trace_for_extend(x=[], y=[], graph_legend_item_name='', trace_uniqu
     Log.logger.debug('Extending graph serie {} {}'.format(graph_legend_item_name, trace_unique_id))
     return trace_list
 
-def populate_trace_for_append(x=[], y=[], graph_legend_item_name='', trace_unique_id='', show_legend=True,
+def populate_trace_for_append(x=None, y=None, graph_legend_item_name='', trace_unique_id='', show_legend=True,
                               shape_type=''):
     #'text' param should only be added at trace creation
+    if not y:
+        y = []
+    if not x:
+        x = []
     trace_append = graph_objs.Scatter(x=x, y=y, name=graph_legend_item_name, text=trace_unique_id,
                                       showlegend=show_legend, line = graph_objs.Line(shape=shape_type))
     trace_list = [trace_append]
@@ -367,9 +375,8 @@ class PlotlyGrid:
         rows_left = True
         index = 0
         while index < self.max_row_count:
-            row = []
+            row = [self.columns_cache[self.axis_x_name][index]]
             # adding primary key value
-            row.append(self.columns_cache[self.axis_x_name][index])
             # adding row value from each column at current index position
             for column_name in self.columns_cache.keys():
                 if column_name != self.axis_x_name:
@@ -413,6 +420,9 @@ class PlotlyGrid:
             self.uploading_data = False
 
 class PlotlyGraph:
+    def __init__(self):
+        pass
+
     data = []
     graph_unique_name = None
     trace_unique_id = None

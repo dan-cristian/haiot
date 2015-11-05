@@ -18,8 +18,8 @@
 PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/local/bin
 DESC="pigpiod services launcher"
 NAME="pigpiod"
-SCRIPTNAME=/etc/init.d/$NAME
-LOCKFILE=/var/run/$NAME.lock
+SCRIPTNAME=/etc/init.d/${NAME}
+LOCKFILE=/var/run/${NAME}.lock
 DAEMON=/usr/local/bin/pigpiod
 PIDFILE=/var/run/pigpio.pid
 PIGPIOD_OPTS="-s 10"
@@ -29,24 +29,24 @@ PIGPIOD_OPTS="-s 10"
 # and status_of_proc is working.
 . /lib/lsb/init-functions
 
-test -x $DAEMON || exit 5
+test -x ${DAEMON} || exit 5
 
 
 case "$1" in
   start)
 	log_daemon_msg "Starting $DESC" "$NAME"
-	start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON -- $PIGPIOD_OPTS
+	start-stop-daemon --start --quiet --pidfile ${PIDFILE} --exec ${DAEMON} -- ${PIGPIOD_OPTS}
 	status=$?
-	log_end_msg $status
+	log_end_msg ${status}
 	;;
   stop)
 	log_daemon_msg "Stopping $DESC" "$NAME"	
-	start-stop-daemon --stop --quiet --oknodo --pidfile $PIDFILE
+	start-stop-daemon --stop --quiet --oknodo --pidfile ${PIDFILE}
 	log_end_msg $?
-	rm -f $PIDFILE
+	rm -f ${PIDFILE}
 	;;
   status)
-	status_of_proc $DAEMON "pigpiod"
+	status_of_proc ${DAEMON} "pigpiod"
 	;;
   restart|force-reload)
 	$0 stop && sleep 2 && $0 start

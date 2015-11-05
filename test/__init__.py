@@ -2,13 +2,14 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 from main import Log, thread_pool
 import test_run
-from main.admin import thread_pool
+from main import thread_pool
+
 initialised = False
 
 
 def unload():
-    #...
-    #thread_pool.remove_callable(test_run.thread_run)
+    # ...
+    # thread_pool.remove_callable(test_run.thread_run)
     global initialised
     initialised = False
 

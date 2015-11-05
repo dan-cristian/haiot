@@ -14,8 +14,10 @@ from main.admin import model_helper
 from common import Constant, utils
 
 cache = {}
-#record_id can be found on rackspace with a trick. select multiple records and click on Actions / Edit TTL
-#then with chrome right click on the list, inspect elements. you will find the A record id in a div
+
+
+# record_id can be found on rackspace with a trick. select multiple records and click on Actions / Edit TTL
+# then with chrome right click on the list, inspect elements. you will find the A record id in a div
 
 def __update_ddns_rackspace():
     try:
@@ -25,14 +27,14 @@ def __update_ddns_rackspace():
         global cache
         if cache == {} or cache is None:
             cache = {}
-            cache['auth']={}
-            cache['auth']['expires']=str(utils.get_base_location_now_date())
+            cache['auth'] = {}
+            cache['auth']['expires'] = str(utils.get_base_location_now_date())
 
         # get IP address
         try:
-            cache['ip']=socket.gethostbyname(config['record_name'])
+            cache['ip'] = socket.gethostbyname(config['record_name'])
         except Exception, ex:
-            cache['ip']=None
+            cache['ip'] = None
             Log.logger.warning('Unable to get ip for host {}, err={}'.format(config['record_name'], ex))
         try:
             ip = requests.get('http://icanhazip.com').text.strip()
@@ -74,7 +76,7 @@ def __update_ddns_rackspace():
 
         # update DNS record
         url = 'https://dns.api.rackspacecloud.com/v1.0/' + config['account_id'] + \
-            '/domains/' + config['domain_id'] + '/records/' + config['record_id']
+              '/domains/' + config['domain_id'] + '/records/' + config['record_id']
 
         data = {
             'ttl': config['record_ttl'],
@@ -94,6 +96,7 @@ def __update_ddns_rackspace():
             Log.logger.warning('Unable to update IP, response={}'.format(result))
     except Exception, ex:
         Log.logger.warning('Unable to check and update dns, err={}'.format(ex))
+
 
 def thread_run():
     Log.logger.debug('Processing ddns_run')

@@ -48,7 +48,7 @@ class ReverseProxied(object):
         return self.app(environ, start_response)
 
 @app.route('/exit', methods=['POST'])
-def exit():
+def exit_module():
     Log.logger.info('WebUI module unloading')
     try:
         if not app.testing:
