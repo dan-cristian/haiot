@@ -21,8 +21,8 @@ def __rfx_reading(packet):
             __save_sensor_db(p_id=p_id, p_type=p_type, value_list=packet.values)
             global last_packet_received
             last_packet_received = utils.get_base_location_now_date()
-        except Exception:
-            Log.logger.info('Unknown rfx packet type {}'.format(packet))
+        except Exception, ex:
+            Log.logger.info('Unknown rfx packet type {} err={}'.format(packet, ex))
 
 
 def __save_sensor_db(p_id='', p_type='', value_list=None):
@@ -41,7 +41,7 @@ def __save_sensor_db(p_id='', p_type='', value_list=None):
     if 'Temperature' in value_list: record.temperature = utils.round_sensor_value(value_list['Temperature'])
     if 'Battery numeric' in value_list: record.battery_level = value_list['Battery numeric']
     if 'Rssi numeric' in value_list: record.rssi = value_list['Rssi numeric']
-    current_record = models.Sensor.query.filter_by(address=id).first()
+    current_record = models.Sensor.query.filter_by(address=p_id).first()
     record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
                                save_to_graph=True, ignore_only_updated_on_change=True)
 
