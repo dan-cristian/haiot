@@ -16,6 +16,9 @@ initialised = False
 def get_weather_data(date='20140415', state='IA', city='Ames'):
     """
     Date must be in YYYYMMDD
+    :param city:
+    :param state:
+    :param date:
     """
     api_key = 'f0126014c2b9ba66'
     url = 'http://api.wunderground.com/api/{key}/history_{date}/q/{state}/{city}.json'
@@ -62,6 +65,7 @@ def get_temperature():
     bar_chart = pygal.Line(config)
     bar_chart.x_labels = times
     bar_chart.add('Temp in C', values)
+
 
     return render_template('chart/chart.html',title=title,bar_chart=bar_chart)
 

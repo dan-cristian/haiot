@@ -81,7 +81,8 @@ def __update_zone_heat(zone, heat_schedule, sensor):
                 else:
                     Log.logger.critical('Unknown temperature pattern code {}'.format(temperature_code))
             else:
-                Log.logger.warning('Incorrect temp pattern [{}] in zone {}, length is not 24'.format(pattern, zone.name))
+                Log.logger.warning('Incorrect temp pattern [{}] in zone {}, length is not 24'.format(pattern,
+                                                                                                     zone.name))
     except Exception, ex:
         Log.logger.error('Error updatezoneheat, err={}'.format(ex, exc_info=True))
     #Log.logger.info("Temp in {} has target={} and current={}, heat should be={}".format(zone.name,
@@ -145,7 +146,9 @@ def loop_heat_relay():
                     Log.logger.warning("Inconsistent zone heat status zone={} db_heat_status={} db_relay_status={}".format(
                         zone.name, zone.heat_is_on, heat_relay.heat_is_on))
                 if relay_inconsistency or zone_inconsistency:
-                    __save_heat_state_db(zone=zone, heat_is_on=pin_state)
+                    # fixme: we got flip of states due to inconsistency messages
+                    # __save_heat_state_db(zone=zone, heat_is_on=pin_state)
+                    __save_heat_state_db(zone=zone, heat_is_on=heat_relay.heat_is_on)
                 #else:
                 #    Log.logger.info("Heat pin {} status equal to gpio status {}".format(heat_relay.heat_is_on, pin_state_int))
             else:

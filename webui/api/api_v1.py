@@ -1,10 +1,8 @@
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
 import os
-
 from pydispatch import dispatcher
 from flask import abort, send_file, render_template
-
 from main import app, db
 from main.logger_helper import Log
 from main.admin.model_helper import commit
@@ -17,12 +15,13 @@ def return_web_message(pin_value, ok_message='', err_message=''):
     else:
         return 'ERR: {} \n {}={}'.format(err_message, Constant.SCRIPT_RESPONSE_NOTOK, pin_value)
 
+
 @app.route('/apiv1/db_update/model_name=<model_name>&filter_name=<filter_name>'
            '&filter_value=<filter_value>&field_name=<field_name>&field_value=<field_value>')
 def generic_db_update(model_name, filter_name, filter_value, field_name, field_value):
     try:
         table = utils.class_for_name('main.admin.models', model_name)
-        #http://stackoverflow.com/questions/19506105/flask-sqlalchemy-query-with-keyword-as-variable
+        # http://stackoverflow.com/questions/19506105/flask-sqlalchemy-query-with-keyword-as-variable
         kwargs = {filter_name: filter_value}
         record = table.query.filter_by(**kwargs).first()
         if record:
@@ -31,30 +30,34 @@ def generic_db_update(model_name, filter_name, filter_value, field_name, field_v
                 db.session.add(record)
                 commit()
                 dispatcher.send(signal=Constant.SIGNAL_SENSOR_DB_POST, model=table, row=record)
-                return  '%s: %s' % (Constant.SCRIPT_RESPONSE_OK, record)
+                return '%s: %s' % (Constant.SCRIPT_RESPONSE_OK, record)
             else:
                 msg = 'Field {} not found in record {}'.format(field_name, record)
                 Log.logger.warning(msg)
-                return  '%s: %s' % (Constant.SCRIPT_RESPONSE_NOTOK, msg)
+                return '%s: %s' % (Constant.SCRIPT_RESPONSE_NOTOK, msg)
         else:
             msg = 'No records returned for filter_name={} and filter_value={}'.format(filter_name, filter_value)
             Log.logger.warning(msg)
-            return  '%s: %s' % (Constant.SCRIPT_RESPONSE_NOTOK, msg)
+            return '%s: %s' % (Constant.SCRIPT_RESPONSE_NOTOK, msg)
     except Exception, ex:
         msg = 'Exception on /apiv1/db_update: {}'.format(ex)
         Log.logger.error(msg)
-        return  '%s: %s' % (Constant.SCRIPT_RESPONSE_NOTOK, msg)
+        return '%s: %s' % (Constant.SCRIPT_RESPONSE_NOTOK, msg)
+
 
 def return_error(message):
     return message
+
+
 def return_ok():
     return "all ok"
+
 
 @app.route('/ebooks', defaults={'req_path': ''})
 @app.route('/<path:req_path>')
 def dir_listing(req_path):
     try:
-        #BASE_DIR = '/media/ebooks'
+        # BASE_DIR = '/media/ebooks'
         BASE_DIR = '/temp'
 
         # Joining the base and the requested path

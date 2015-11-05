@@ -8,9 +8,9 @@ if [ -z "$proc_pid" ]; then
 fi
 if [ -n "$proc_pid" ]; then
     echo "Killing proc id [$proc_pid]"
-    kill $proc_pid
+    kill ${proc_pid}
     sleep 2
-    kill -9 $proc_pid > /dev/null 2>&1
+    kill -9 ${proc_pid} > /dev/null 2>&1
 else
     echo "Program is not running or no pid found, nothing to stop"
 fi

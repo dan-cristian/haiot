@@ -19,12 +19,12 @@ def _json_object_hook(d):
 def is_date_string(date_str):
     return re.search("....-..-..T..:..:..\.......", date_str)
 
-def date_deserialiser(json):
-    if is_date_string(json):
-        new_json = json.replace("T", " ")
+def date_deserialiser(json_str):
+    if is_date_string(json_str):
+        new_json = json_str.replace("T", " ")
         return datetime.datetime.strptime(new_json, "%Y-%m-%d %H:%M:%S.%f")
     else:
-        return json
+        return json_str
 def date_serialised(obj):
     return obj.isoformat() if hasattr(obj, 'isoformat') else obj
 def json2obj(data):
@@ -49,8 +49,10 @@ def unsafeobj2json(obj):
 def get_object_name(obj):
     return str(obj._sa_class_manager.itervalues().next()).split('.')[0]
 
-def get_object_field_value(obj={}, field_name=None):
+def get_object_field_value(obj=None, field_name=None):
     #field_name = str(field_obj).split('.')[1]
+    if not obj:
+        obj = {}
     if obj.has_key(field_name):
         return obj[field_name]
     else:

@@ -13,6 +13,7 @@ initialised = False
 
 try:
     import pifacedigitalio as pfio
+
     __import_ok = True
 except Exception, ex:
     __import_ok = False
@@ -36,7 +37,7 @@ def input_event(event):
     Log.logger.debug('Piface switch event={}'.format(event))
     pin_num = event.pin_num
     board_index = event.chip.hardware_addr
-    direction = event.direction # 0 for press/contact, 1 for release/disconnect
+    direction = event.direction  # 0 for press/contact, 1 for release/disconnect
     gpio_pin_code = format_pin_code(board_index=board_index, pin_direction=Constant.GPIO_PIN_DIRECTION_IN,
                                     pin_index=pin_num)
     Log.logger.info('Event gpio={} direction={}'.format(gpio_pin_code, direction))
@@ -71,7 +72,7 @@ def init():
             global initialised
             initialised = True
             Log.logger.info('Piface initialised OK')
-        except Exception, ex:
-            Log.logger.info('Piface not initialised, err={}'.format(ex))
+        except Exception, ex1:
+            Log.logger.info('Piface not initialised, err={}'.format(ex1))
     else:
         Log.logger.info('Piface NOT initialised, module pifacedigitalio unavailable on this system')

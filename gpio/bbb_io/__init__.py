@@ -1,23 +1,22 @@
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 import random
-
 from pydispatch import dispatcher
-
 from main import thread_pool
 from main.logger_helper import Log
 from common import Constant
 from main.admin import models
 from gpio import std_gpio
 
-initialised=False
-__pool_pin_codes=[]
+initialised = False
+__pool_pin_codes = []
 
 # https://learn.adafruit.com/setting-up-io-python-library-on-beaglebone-black/using-the-bbio-library
 # IMPORTANT: installing PyBBIO enables all i/o pins as a dtc is installed
 # https://github.com/graycatlabs/PyBBIO/wiki
 try:
     import Adafruit_BBIO.GPIO as GPIO
+
     import_module_exist = True
 except:
     Log.logger.info('Module Adafruit_BBIO.GPIO is not installed, module will not be initialised')
@@ -30,8 +29,8 @@ def event_detected(channel):
         if import_module_exist:
             state = GPIO.input(channel)
         else:
-            #FOR TESTING PURPOSES
-            state = random.randint(0,2)
+            # FOR TESTING PURPOSES
+            state = random.randint(0, 2)
         Log.logger.info('IO input detected channel {} status {}'.format(channel, state))
         dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=channel, direction='in',
                         pin_value=state, pin_connected=(state == 0))
@@ -46,7 +45,7 @@ def __check_for_events():
     for pin_code in __pool_pin_codes:
         if GPIO.event_detected(pin_code):
             state = GPIO.input(pin_code)
-            #Log.logger.info('Pooling event detected gpio {} val {}'.format(pin_code, state))
+            # Log.logger.info('Pooling event detected gpio {} val {}'.format(pin_code, state))
             dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=pin_code, direction='in',
                             pin_value=state, pin_connected=(state == 0))
 
@@ -59,7 +58,7 @@ def setup_in_ports(gpio_pin_list):
             GPIO.setup(gpio_pin.pin_code, GPIO.IN)
             std_gpio.set_pin_edge(gpio_pin.pin_index_bcm, 'both')
             try:
-                GPIO.add_event_detect(gpio_pin.pin_code, GPIO.BOTH)#, callback=event_detected, bouncetime=300)
+                GPIO.add_event_detect(gpio_pin.pin_code, GPIO.BOTH)  # , callback=event_detected, bouncetime=300)
                 __pool_pin_codes.append(gpio_pin.pin_code)
                 Log.logger.info('OK callback on gpio'.format(gpio_pin.pin_code))
             except Exception, ex:

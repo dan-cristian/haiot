@@ -1,9 +1,7 @@
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
 import time
-
 import serial
-
 from main.logger_helper import Log
 from common import Constant, utils
 import serial_common
@@ -13,7 +11,11 @@ initialised = False
 __serial = None
 __ups = None
 
+
 class LegrandUps:
+    def __init__(self):
+        pass
+
     Id = None
     Name = None
     Port = None
@@ -24,7 +26,8 @@ class LegrandUps:
     PowerFrequency = None
     BatteryVoltage = None
     Temperature = None
-    OtherStatus= None
+    OtherStatus = None
+
 
 def __open_port(ser):
     ser.baudrate = 2400
@@ -38,6 +41,7 @@ def __open_port(ser):
     except Exception, ex:
         Log.logger.warning('Unable to open serial port {}'.format(ser.port))
 
+
 def __write_read_port(ser, command):
     response = None
     if ser.isOpen():
@@ -46,12 +50,13 @@ def __write_read_port(ser, command):
             ser.flushOutput()
             ser.write(command)
             time.sleep(0.3)
-            response = str(ser.readline()).replace('\n','')
+            response = str(ser.readline()).replace('\n', '')
         except Exception, ex:
             Log.logger.warning('Error writing to serial {}, err={}'.format(ser.port, ex))
     else:
         Log.logger.warning('Error writing to closed serial {}'.format(ser.port))
     return response
+
 
 def __search_ups(port_no):
     global __serial, __ups
@@ -65,7 +70,7 @@ def __search_ups(port_no):
                 Log.logger.info('Got serial response [{}] on ups init port {}'.format(response, port_no))
                 __serial = ser
                 __ups = LegrandUps()
-                __ups.Id = str(response).replace(' ', '').replace('\r','')
+                __ups.Id = str(response).replace(' ', '').replace('\r', '')
                 __ups.Name = 'Legrand Nicky ' + __ups.Id
                 __ups.Port = port_no
                 break
@@ -74,12 +79,13 @@ def __search_ups(port_no):
     if __serial is None:
         ser.close()
 
-#(219.7 150.0 226.8 011 49.9 56.2 30.0 00001001
+
+# (219.7 150.0 226.8 011 49.9 56.2 30.0 00001001
 def __read_ups_status():
     global __ups, __serial
     status = __write_read_port(__serial, 'Q1\r')
     if status != '':
-        status = status.replace('(','')
+        status = status.replace('(', '')
         atoms = status.split()
         if len(atoms) >= 8:
             __ups.InputVoltage = utils.round_sensor_value(atoms[0])
@@ -89,7 +95,7 @@ def __read_ups_status():
             __ups.PowerFrequency = atoms[4]
             __ups.BatteryVoltage = atoms[5]
             __ups.Temperature = atoms[6]
-            __ups.OtherStatus= atoms[7]
+            __ups.OtherStatus = atoms[7]
             if len(__ups.OtherStatus) >= 8:
                 __ups.PowerFailed = (__ups.OtherStatus[0] == '1')
                 __ups.TestInProgress = (__ups.OtherStatus[5] == '1')
@@ -111,13 +117,14 @@ def __read_ups_status():
             record.updated_on = utils.get_base_location_now_date()
             current_record = models.Ups.query.filter_by(system_name=Constant.HOST_NAME).first()
             record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
-                                   save_to_graph=True)
+                                       save_to_graph=True)
 
-            #Log.logger.info('UPS remaining={} load={}'.format(__ups.RemainingMinutes, __ups.LoadPercent))
+            # Log.logger.info('UPS remaining={} load={}'.format(__ups.RemainingMinutes, __ups.LoadPercent))
         else:
             Log.logger.warning('Unexpected number of parameters {} on ups status read'.format(len(atoms)))
     else:
         Log.logger.info('Read empty UPS status')
+
 
 def unload():
     global initialised
@@ -125,13 +132,14 @@ def unload():
         __serial.close()
     initialised = False
 
+
 def init():
     global initialised, __serial
     initialised = False
     try:
-        #if constant.OS in constant.OS_LINUX:
+        # if constant.OS in constant.OS_LINUX:
         serial_list = serial_common.get_standard_serial_device_list()
-        #else:
+        # else:
         #    portpath = None
         #    #fixme windows autodetect version
         if len(serial_list) > 0:
@@ -146,6 +154,7 @@ def init():
     except Exception, ex:
         Log.logger.warning('Unable to open ups port, err {}'.format(ex))
     return initialised
+
 
 def thread_run():
     global initialised, __serial

@@ -3,6 +3,9 @@ __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 import socket
 
 class Log:
+    def __init__(self):
+        pass
+
     logger = None
     #default logging
     LOGGING_LEVEL=None
@@ -67,7 +70,7 @@ class Log:
                     ntl = logging.handlers.NTEventLogHandler(appname='haiot')
                     Log.logger.addHandler(ntl)
                 except Exception, ex:
-                    print 'Unable to init syslog handler err=' + ex
+                    print 'Unable to init syslog handler err={}'.format(ex)
         else:
             if not Log.LOG_FILE is None:
                 file_handler = logging.handlers.RotatingFileHandler(Log.LOG_FILE, maxBytes=1024*1024*1, backupCount=3)
