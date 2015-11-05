@@ -1,7 +1,6 @@
 __author__ = 'dcristian'
 
 import os
-
 from main.logger_helper import Log
 from main import db
 from common import Constant
@@ -13,13 +12,13 @@ __pins_setup_list = []
 
 
 def __get_gpio_db_pin(bcm_id=None):
-    gpio_pin = models.GpioPin.query.filter_by(pin_index_bcm=bcm_id, host_name = Constant.HOST_NAME).first()
+    gpio_pin = models.GpioPin.query.filter_by(pin_index_bcm=bcm_id, host_name=Constant.HOST_NAME).first()
     return gpio_pin
 
 
 def __write_to_file_as_root(file, value):
     try:
-        if Constant.OS in Constant.OS_LINUX :
+        if Constant.OS in Constant.OS_LINUX:
             string_out = 'echo {} | sudo tee --append  {}'.format(str(value), file)
             Log.logger.info("Writing to console [{}]".format(string_out))
             res = os.system(string_out)
@@ -33,9 +32,9 @@ def __write_to_file_as_root(file, value):
 
 def __setup_pin(bcm_id=''):
     try:
-        #file = open('/sys/class/gpio/export', 'a')
-        #print >> file, bcm_id
-        #file.close()
+        # file = open('/sys/class/gpio/export', 'a')
+        # print >> file, bcm_id
+        # file.close()
         if __write_to_file_as_root('/sys/class/gpio/export', bcm_id):
             Log.logger.info('Pin {} exported OK'.format(bcm_id))
         if not bcm_id in __pins_setup_list:
@@ -53,9 +52,9 @@ def __setup_pin(bcm_id=''):
 
 def __set_pin_dir_out(bcm_id=''):
     try:
-        #file = open('/sys/class/gpio/gpio{}/direction'.format(bcm_id), 'a')
-        #print >> file, 'out'
-        #file.close()
+        # file = open('/sys/class/gpio/gpio{}/direction'.format(bcm_id), 'a')
+        # print >> file, 'out'
+        # file.close()
         __setup_pin(bcm_id)
         if __write_to_file_as_root(file='/sys/class/gpio/gpio{}/direction'.format(bcm_id), value='out'):
             Log.logger.info('Set pin {} direction OUT is OK'.format(bcm_id))
@@ -71,9 +70,9 @@ def __set_pin_dir_out(bcm_id=''):
 
 def __set_pin_dir_in(bcm_id=''):
     try:
-        #file = open('/sys/class/gpio/gpio{}/direction'.format(bcm_id), 'a')
-        #print >> file, 'in'
-        #file.close()
+        # file = open('/sys/class/gpio/gpio{}/direction'.format(bcm_id), 'a')
+        # print >> file, 'in'
+        # file.close()
         __setup_pin(bcm_id)
         if __write_to_file_as_root(file='/sys/class/gpio/gpio{}/direction'.format(bcm_id), value='in'):
             Log.logger.info('Set pin {} direction IN is OK'.format(bcm_id))
@@ -89,13 +88,13 @@ def __set_pin_dir_in(bcm_id=''):
 
 def __unsetup_pin(bcm_id=''):
     try:
-        #file = open('/sys/class/gpio/unexport', 'a')
-        #print >> file, bcm_id
-        #file.close()
+        # file = open('/sys/class/gpio/unexport', 'a')
+        # print >> file, bcm_id
+        # file.close()
         if __write_to_file_as_root('/sys/class/gpio/unexport', bcm_id):
             Log.logger.info('Pin {} unexport OK'.format(bcm_id))
         __pins_setup_list.remove(bcm_id)
-        gpio_pin = models.GpioPin.query.filter_by(pin_index_bcm=bcm_id, host_name = Constant.HOST_NAME).first()
+        gpio_pin = models.GpioPin.query.filter_by(pin_index_bcm=bcm_id, host_name=Constant.HOST_NAME).first()
         if gpio_pin:
             gpio_pin.is_active = False
         else:
@@ -108,9 +107,10 @@ def __is_pin_setup(bcm_id=''):
     try:
         file = open('/sys/class/gpio/gpio{}/value'.format(bcm_id), 'r')
         file.close()
-        gpio_pin = models.GpioPin.query.filter_by(pin_index_bcm=bcm_id, host_name = Constant.HOST_NAME).first()
+        gpio_pin = models.GpioPin.query.filter_by(pin_index_bcm=bcm_id, host_name=Constant.HOST_NAME).first()
         if gpio_pin and not gpio_pin.is_active:
-            Log.logger.warning('Gpio pin={} is used not via me, conflict with ext. apps or unclean stop?'.format(bcm_id))
+            Log.logger.warning(
+                'Gpio pin={} is used not via me, conflict with ext. apps or unclean stop?'.format(bcm_id))
             gpio_pin.is_active = True
             commit()
         return True
@@ -127,7 +127,7 @@ def __is_pin_setup_out(bcm_id=''):
         file = open('/sys/class/gpio/gpio{}/direction'.format(bcm_id), 'r')
         dir = file.readline()
         file.close()
-        return dir.replace('\n','') == 'out'
+        return dir.replace('\n', '') == 'out'
     except IOError:
         return False
     except Exception, ex:
@@ -138,7 +138,7 @@ def __is_pin_setup_out(bcm_id=''):
 def __read_line(bcm_id=''):
     try:
         file = open('/sys/class/gpio/gpio{}/value'.format(bcm_id), 'r')
-        value = file.readline().replace('\n','')
+        value = file.readline().replace('\n', '')
         return int(value)
     except Exception, ex:
         Log.logger.critical('Unexpected general exception on pin {} value read, err {}'.format(bcm_id, ex))
@@ -147,9 +147,9 @@ def __read_line(bcm_id=''):
 
 def __write_line(bcm_id='', pin_value=''):
     try:
-        #file = open('/sys/class/gpio/gpio{}/value'.format(bcm_id), 'a')
-        #print >> file, pin_value
-        #file.close()
+        # file = open('/sys/class/gpio/gpio{}/value'.format(bcm_id), 'a')
+        # print >> file, pin_value
+        # file.close()
         Log.logger.info('Write bcm pin={} value={}'.format(bcm_id, pin_value))
         __write_to_file_as_root(file='/sys/class/gpio/gpio{}/value'.format(bcm_id), value=pin_value)
     except Exception, ex:
@@ -163,7 +163,7 @@ def get_pin_bcm(bcm_id=''):
         __set_pin_dir_in(bcm_id)
     if __is_pin_setup(bcm_id):
         pin_value = __read_line(bcm_id)
-        gpio_pin = models.GpioPin.query.filter_by(pin_index_bcm = bcm_id, host_name = Constant.HOST_NAME).first()
+        gpio_pin = models.GpioPin.query.filter_by(pin_index_bcm=bcm_id, host_name=Constant.HOST_NAME).first()
         if gpio_pin:
             gpio_pin.pin_value = pin_value
             commit()
@@ -207,7 +207,7 @@ def thread_run():
 
 
 def unload():
-    #set all pins to low and unexport
+    # set all pins to low and unexport
     global __pins_setup_list
     for bcm_pin in __pins_setup_list:
         if __is_pin_setup_out(bcm_id=bcm_pin):

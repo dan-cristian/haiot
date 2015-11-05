@@ -14,11 +14,16 @@ initialised=False
 
 
 # execute when heat status change is signaled. changes gpio pin status
-def heat_update(obj_dict={}):
+def heat_update(obj_dict=None):
+    if not obj_dict:
+        obj_dict = {}
     try:
         source_host_name = utils.get_object_field_value(obj_dict, Constant.JSON_PUBLISH_SOURCE_HOST)
         zone_id = utils.get_object_field_value(obj_dict, utils.get_model_field_name(models.ZoneHeatRelay.zone_id))
-        Log.logger.info('Received heat relay state update from {} for zoneid {}'.format(source_host_name, zone_id))
+        sent_on = utils.get_object_field_value(obj_dict, utils.get_model_field_name(
+            models.ZoneHeatRelay.event_sent_datetime))
+        Log.logger.info('Received heat relay state update from {} for zoneid {} sent_on={}'.format(source_host_name,
+                                                                                                   zone_id, sent_on))
         zone_heat_relay = models.ZoneHeatRelay.query.filter_by(zone_id=zone_id).first()
         if zone_heat_relay:
             gpio_host_name = zone_heat_relay.gpio_host_name
@@ -65,6 +70,6 @@ def unload():
 def init():
     Log.logger.info('Heat module initialising')
     dispatcher.connect(handle_event_heat, signal=Constant.SIGNAL_HEAT, sender=dispatcher.Any)
-    thread_pool.add_interval_callable(heat_loop.thread_run, 45)
+    thread_pool.add_interval_callable(heat_loop.thread_run, 60)
     global initialised
     initialised = True

@@ -15,7 +15,9 @@ since_when_i_should_be_master = datetime.datetime.max
 node_state_uuid = None
 
 #save node state to db, except for current node. no decisions taken on node election
-def node_update(obj={}):
+def node_update(obj=None):
+    if not obj:
+        obj = {}
     try:
         node_host_name = utils.get_object_field_value(obj, 'name')
         Log.logger.debug('Received node state update from {}'.format(node_host_name))

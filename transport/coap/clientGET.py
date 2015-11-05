@@ -13,7 +13,7 @@ import txthings.coap as coap
 import txthings.resource as resource
 
 
-class Agent():
+class Agent:
     """
     Example class which performs single GET request to iot.eclipse.org
     port 5683 (official IANA assigned CoAP port), URI "obs".

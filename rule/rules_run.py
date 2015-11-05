@@ -19,11 +19,15 @@ except Exception:
 # that have type=obj
 
 ####### VALUE TRIGGER RULES ########
-def rule_node(obj = models.Node(), field_changed_list = []):
+def rule_node(obj=models.Node(), field_changed_list=None):
+    if not field_changed_list:
+        field_changed_list = []
     return 'rule node ok'
 
 #min & max temperatures
-def rule_sensor_temp_target(obj = models.Sensor(), field_changed_list = []):
+def rule_sensor_temp_target(obj=models.Sensor(), field_changed_list=None):
+    if not field_changed_list:
+        field_changed_list = []
     temp = obj.temperature
     return 'rule temp ok'
 

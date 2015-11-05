@@ -23,10 +23,10 @@ rm get-pip.py
 pip install --no-cache-dir virtualenv
 
 echo "Creating user $USERNAME with password=$USERPASS"
-useradd $USERNAME -m
+useradd ${USERNAME} -m
 echo "$USERNAME:$USERPASS" | chpasswd
-adduser $USERNAME sudo
-chsh -s /bin/bash $USERNAME
+adduser ${USERNAME} sudo
+chsh -s /bin/bash ${USERNAME}
 
 if [ "$ENABLE_PIFACE" == "1" ]; then
     # needed for piface
@@ -40,15 +40,15 @@ if [ "$ENABLE_PIFACE" == "1" ]; then
         echo "dtparam=spi=on" >> /boot/config.txt
     fi
     # access rights for piface, by default python-pifacedigitalio assumes username as being = pi
-    gpasswd -a $USERNAME spi
+    gpasswd -a ${USERNAME} spi
     # needed to get write access to /sys/class/gpio/
-    gpasswd -a $USERNAME gpio
+    gpasswd -a ${USERNAME} gpio
 fi
 
 
 
 echo "Getting HAIOT application from github"
-cd /home/$USERNAME
+cd /home/${USERNAME}
 git clone http://192.168.0.9:888/PYC.git
 
 echo "Downloading pigpio library for gpio access"
@@ -60,21 +60,21 @@ cd PIGPIO
 make
 echo "Installing pigpio"
 make install
-cp /home/$USERNAME/PYC/scripts/pigpio_daemon /etc/init.d
+cp /home/${USERNAME}/PYC/scripts/pigpio_daemon /etc/init.d
 chmod +x /etc/init.d/pigpio_daemon
 update-rc.d pigpio_daemon defaults
-rm -r /home/$USERNAME/PIGPIO
-rm /home/$USERNAME/pigpio.zip
+rm -r /home/${USERNAME}/PIGPIO
+rm /home/${USERNAME}/pigpio.zip
 
 #python setup.py install
 #todo install pigpiod init script
 
 echo "Configuring HAIOT application"
-cd /home/$USERNAME/PYC
+cd /home/${USERNAME}/PYC
 chmod +x scripts/*sh*
 chmod +x *.sh
 scripts/setup.sh.bat
-chown -R $USERNAME:$USERNAME .
+chown -R ${USERNAME}:${USERNAME} .
 
 echo "Downloading haiot init service"
 cd ~
@@ -89,9 +89,9 @@ echo "Testing init service, create working directories for all defined linux use
 /etc/init.d/userspaceServices stop
 
 echo "Creating start links for haiot to be picked up by userspaceServices"
-ln -s /home/$USERNAME/PYC/start_daemon_userspaces.sh /home/$USERNAME/.startUp/
-ln -s /home/$USERNAME/PYC/start_daemon_userspaces.sh /home/$USERNAME/.shutDown/
-chown -R $USERNAME:$USERNAME /home/$USERNAME/
+ln -s /home/${USERNAME}/PYC/start_daemon_userspaces.sh /home/${USERNAME}/.startUp/
+ln -s /home/${USERNAME}/PYC/start_daemon_userspaces.sh /home/${USERNAME}/.shutDown/
+chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/
 
 echo "Starting haiot via userspaceServices"
 /etc/init.d/userspaceServices restart

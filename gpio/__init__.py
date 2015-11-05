@@ -5,19 +5,18 @@ from common import Constant, utils
 from main.admin import models
 from main.admin.model_helper import commit
 from main import thread_pool
-
 import std_gpio
 import piface
 import bbb_io
 import pigpio
 
-initialised=False
+initialised = False
 
 
 # update hardware pin state and record real pin value in local DB only
 def relay_update(gpio_pin_code=None, pin_value=None, from_web=False):
     result = None
-    #return pin value after state set
+    # return pin value after state set
     try:
         Log.logger.debug('Received relay state update pin {}'.format(gpio_pin_code))
         gpiopin = models.GpioPin.query.filter_by(pin_code=gpio_pin_code, host_name=Constant.HOST_NAME).first()
@@ -45,19 +44,21 @@ def relay_get(gpio_pin_obj=None, from_web=False):
             pin_value = piface.get_pin_value(pin_index=gpio_pin_obj.pin_index_bcm, board_index=gpio_pin_obj.board_index)
         else:
             Log.logger.warning('Cannot select gpio method for pin={}'.format(gpio_pin_obj))
+            pin_value = None
     else:
         message += ' error not running on gpio enabled devices'
         pin_value = None
         Log.logger.warning(message)
 
-    #if from_web:
+    # if from_web:
     #    return return_web_message(pin_value=pin_value, ok_message=message, err_message=message)
-    #else:
+    # else:
     return pin_value
 
 
 # set gpio pin without updating DB, so make sure it's used only after DB update trigger
 def relay_set(gpio_pin=None, value=None, from_web=False):
+    pin_value = None
     value = int(value)
     message = 'Set relay state [{}] for pin [{}] from web=[{}]'.format(value, gpio_pin.pin_index_bcm, from_web)
     Log.logger.info(message)
@@ -69,12 +70,11 @@ def relay_set(gpio_pin=None, value=None, from_web=False):
                                              board_index=gpio_pin.board_index)
     else:
         message += ' error not running on gpio enabled devices'
-        pin_value = None
         Log.logger.warning(message)
 
-    #if from_web:
+    # if from_web:
     #    return return_web_message(pin_value=pin_value, ok_message=message, err_message=message)
-    #else:
+    # else:
     return pin_value
 
 
@@ -86,19 +86,19 @@ def gpio_record_update(json_object):
         Log.logger.info('Received gpio state update from {}'.format(host_name))
         if host_name != Constant.HOST_NAME:
             models.GpioPin().save_changed_fields_from_json_object(json_object=json_object,
-                                                    notify_transport_enabled=False, save_to_graph=False)
+                                                                  notify_transport_enabled=False, save_to_graph=False)
     except Exception, ex:
         Log.logger.warning('Error on gpio state update, err {}'.format(ex))
 
 
 def zone_custom_relay_record_update(json_object):
-    #save relay state to db, except for current node
-    #carefull not to trigger infinite recursion updates
+    # save relay state to db, except for current node
+    # carefull not to trigger infinite recursion updates
     try:
         host_name = utils.get_object_field_value(json_object, 'gpio_host_name')
         Log.logger.info('Received custom relay state update from {}'.format(host_name))
         if host_name == Constant.HOST_NAME:
-            #execute local pin change related actions like turn on/off a relay
+            # execute local pin change related actions like turn on/off a relay
             global initialised
             if initialised:
                 gpio_pin_code = utils.get_object_field_value(json_object, 'gpio_pin_code')
@@ -112,7 +112,8 @@ def zone_custom_relay_record_update(json_object):
 
         else:
             models.ZoneCustomRelay().save_changed_fields_from_json_object(json_object=json_object,
-                                                    notify_transport_enabled=False, save_to_graph=False)
+                                                                          notify_transport_enabled=False,
+                                                                          save_to_graph=False)
     except Exception, ex:
         Log.logger.warning('Error on zone custom relay update, err {}'.format(ex))
 

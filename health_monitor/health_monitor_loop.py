@@ -7,7 +7,6 @@ import time
 import math
 import datetime
 from collections import OrderedDict
-
 from main.logger_helper import Log
 from common import Constant, utils
 from main.admin import model_helper, models
@@ -15,6 +14,7 @@ from main import logger_helper
 
 try:
     import psutil
+
     import_module_psutil_exist = True
 except Exception, ex:
     Log.logger.info('PSUtil module not available')
@@ -23,6 +23,7 @@ except Exception, ex:
 try:
     import wmi
     import pythoncom
+
     import_module_wmi_ok = True
 except Exception, ex:
     Log.logger.info('pywin / wmi module not available')
@@ -32,18 +33,19 @@ ERR_TEXT_NO_DEV = 'failed: No such device'
 ERR_TEXT_NO_DEV_2 = 'HDIO_GET_32BIT failed: Invalid argument'
 ERR_TEXT_NO_DEV_3 = 'Unknown USB bridge'
 
-#http://unix.stackexchange.com/questions/18830/how-to-run-a-specific-program-as-root-without-a-password-prompt
+
+# http://unix.stackexchange.com/questions/18830/how-to-run-a-specific-program-as-root-without-a-password-prompt
 # Cmnd alias specification
-#Cmnd_Alias      SMARTCTL = /usr/sbin/smartctl
-#Cmnd_Alias      HDPARM = /sbin/hdparm
+# Cmnd_Alias      SMARTCTL = /usr/sbin/smartctl
+# Cmnd_Alias      HDPARM = /sbin/hdparm
 # User privilege specification
-#root    ALL=(ALL:ALL) ALL
+# root    ALL=(ALL:ALL) ALL
 # Allow members of group sudo to execute any command
-#%sudo   ALL=(ALL:ALL) ALL
-#%users  ALL=(ALL) NOPASSWD: SMARTCTL
-#%users  ALL=(ALL) NOPASSWD: HDPARM
-#%dialout  ALL=(ALL) NOPASSWD: SMARTCTL
-#%dialout  ALL=(ALL) NOPASSWD: HDPARM
+# %sudo   ALL=(ALL:ALL) ALL
+# %users  ALL=(ALL) NOPASSWD: SMARTCTL
+# %users  ALL=(ALL) NOPASSWD: HDPARM
+# %dialout  ALL=(ALL) NOPASSWD: SMARTCTL
+# %dialout  ALL=(ALL) NOPASSWD: HDPARM
 
 def __read_all_hdd_smart():
     output = cStringIO.StringIO()
@@ -61,14 +63,14 @@ def __read_all_hdd_smart():
                 Log.logger.debug('Processing disk {}'.format(record.hdd_disk_dev))
                 try:
                     record.power_status = __read_hddparm(disk_dev=record.hdd_disk_dev)
-                except Exception, ex:
+                except Exception, ex1:
                     record.power_status = None
                 try:
                     use_sudo = bool(model_helper.get_param(Constant.P_USESUDO_DISKTOOLS))
                     if Constant.OS in Constant.OS_LINUX and use_sudo:
                         smart_out = subprocess.check_output(['sudo', 'smartctl', '-a', record.hdd_disk_dev,
                                                              '-n', 'sleep'], stderr=subprocess.STDOUT)
-                    else: #in windows
+                    else:  # in windows
                         smart_out = subprocess.check_output(['smartctl', '-a', record.hdd_disk_dev, '-n', 'sleep'],
                                                             stderr=subprocess.STDOUT)
                 except subprocess.CalledProcessError, exc:
@@ -121,21 +123,21 @@ def __read_all_hdd_smart():
                             words = line.split(': ')
                             record.serial = words[1].replace('\r', '').replace('\n', '').lstrip()
                             # print 'Serial is {}'.format(serial)
-                    # print ('Disk dev is {}'.format(disk_dev))
+                            # print ('Disk dev is {}'.format(disk_dev))
                 record.updated_on = utils.get_base_location_now_date()
                 if record.serial is None or record.serial == '':
                     Log.logger.debug('This hdd will be skipped, probably does not exist if serial not retrieved')
-                    record.serial = 'serial not available {} {}'.format(Constant.HOST_NAME, record.hdd_disk_dev )
+                    record.serial = 'serial not available {} {}'.format(Constant.HOST_NAME, record.hdd_disk_dev)
                 else:
                     record.hdd_name = '{} {} {}'.format(record.system_name, record.hdd_device, record.hdd_disk_dev)
                     current_record = models.SystemDisk.query.filter_by(hdd_disk_dev=record.hdd_disk_dev,
-                                                                   system_name=record.system_name).first()
+                                                                       system_name=record.system_name).first()
                     record.save_changed_fields(current_record=current_record, new_record=record,
-                                           notify_transport_enabled=True, save_to_graph=True)
+                                               notify_transport_enabled=True, save_to_graph=True)
                 disk_letter = chr(ord(disk_letter) + 1)
                 disk_count += 1
-            except subprocess.CalledProcessError, ex:
-                Log.logger.debug('Invalid disk {} err {}'.format(record.hdd_disk_dev, ex))
+            except subprocess.CalledProcessError, ex1:
+                Log.logger.debug('Invalid disk {} err {}'.format(record.hdd_disk_dev, ex1))
                 current_disk_valid = False
             except Exception as exc:
                 if disk_count > 10:
@@ -208,7 +210,7 @@ def __get_mem_avail_percent_linux():
     with open('/proc/meminfo') as f:
         for line in f:
             try:
-                #MemTotal:        8087892 kB
+                # MemTotal:        8087892 kB
                 meminfo[line.split(':')[0]] = line.split(':')[1].split()[0].strip()
             except Exception, ex:
                 Log.logger.warning('get mem line split error {} line {}'.format(ex, line))
@@ -232,7 +234,8 @@ def __get_uptime_linux_days():
         Log.logger.warning('Unable to read uptime err {}'.format(ex))
     return uptime_seconds / (60 * 60 * 24)
 
-#fixme: does not work always, depends on regional settings
+
+# fixme: does not work always, depends on regional settings
 def __get_uptime_win_days():
     """Returns a datetime.timedelta instance representing the uptime in a Windows 2000/NT/XP machine"""
     try:
@@ -263,6 +266,7 @@ def __get_uptime_win_days():
         Log.logger.warning("Unable to get uptime windows, err={}".format(ex))
         return 0
 
+
 def __get_cpu_utilisation_linux():
     previous_procstat_list = None
     CPU_Percentage = None
@@ -281,8 +285,8 @@ def __get_cpu_utilisation_linux():
                 irq = int(words[6].strip())
                 softirq = int(words[7].strip())
                 steal = int(words[8].strip())
-                #guest = int(words[9].strip())
-                #guest_nice = int(words[10].strip())
+                # guest = int(words[9].strip())
+                # guest_nice = int(words[10].strip())
                 if not previous_procstat_list is None:
                     prevuser = int(previous_procstat_list[1].strip())
                     prevnice = int(previous_procstat_list[2].strip())
@@ -292,8 +296,8 @@ def __get_cpu_utilisation_linux():
                     previrq = int(previous_procstat_list[6].strip())
                     prevsoftirq = int(previous_procstat_list[7].strip())
                     prevsteal = int(previous_procstat_list[8].strip())
-                    #prevguest = int(previous_procstat_list[9].strip())
-                    #prevguest_nice = int(previous_procstat_list[10].strip())
+                    # prevguest = int(previous_procstat_list[9].strip())
+                    # prevguest_nice = int(previous_procstat_list[10].strip())
                     previdle += previowait
                     idle += iowait
                     prevnonidle = prevuser + prevnice + prevsystem + previrq + prevsoftirq + prevsteal
@@ -312,10 +316,11 @@ def __get_cpu_utilisation_linux():
         time.sleep(1)
     return CPU_Percentage
 
+
 def __get_cpu_temperature():
     temp = -1
     if Constant.IS_OS_WINDOWS():
-        #http://stackoverflow.com/questions/3262603/accessing-cpu-temperature-in-python
+        # http://stackoverflow.com/questions/3262603/accessing-cpu-temperature-in-python
         global import_module_wmi_ok
         if import_module_wmi_ok:
             try:
@@ -335,7 +340,7 @@ def __get_cpu_temperature():
         elif Constant.IS_MACHINE_INTEL:
             path = '/sys/devices/virtual/thermal/thermal_zone0/temp'
         else:
-            path=None
+            path = None
         line = '-1'
         if path and os.path.isfile(path):
             file = None
@@ -351,6 +356,7 @@ def __get_cpu_temperature():
         temp = float(line) / 1000
     temp = utils.round_sensor_value(temp)
     return temp
+
 
 def __read_system_attribs():
     global import_module_psutil_exist, progress_status
@@ -368,7 +374,7 @@ def __read_system_attribs():
         else:
             output = cStringIO.StringIO()
             if Constant.OS in Constant.OS_WINDOWS:
-                #fixme: no backup impl in Windows
+                # fixme: no backup impl in Windows
                 return
             else:
                 # this is normally running on OpenWRT
@@ -376,9 +382,11 @@ def __read_system_attribs():
                 record.cpu_usage_percent = __get_cpu_utilisation_linux()
                 record.uptime_days = int(__get_uptime_linux_days())
                 record.cpu_temperature = __get_cpu_temperature()
-                Log.logger.debug('Read mem free {} cpu% {} cpu_temp {} uptime {}'.format(record.memory_available_percent,
-                                                                    record.cpu_usage_percent, record.cpu_temperature,
-                                                                    record.uptime_days))
+                Log.logger.debug(
+                    'Read mem free {} cpu% {} cpu_temp {} uptime {}'.format(record.memory_available_percent,
+                                                                            record.cpu_usage_percent,
+                                                                            record.cpu_temperature,
+                                                                            record.uptime_days))
         progress_status = 'Saving mem cpu uptime to db'
         record.name = Constant.HOST_NAME
         record.updated_on = utils.get_base_location_now_date()
@@ -388,19 +396,21 @@ def __read_system_attribs():
     except Exception, ex:
         Log.logger.exception('Error saving system to DB err={}'.format(ex))
 
+
 def __check_log_file_size():
     if not logger_helper.Log.LOG_FILE is None:
         try:
             size = os.path.getsize(logger_helper.Log.LOG_FILE)
             if size > 1024 * 1024 * 10:
                 Log.logger.info('Log file {} size is {}, truncating'.format(logger_helper.Log.LOG_FILE, size))
-                shutil.copy(logger_helper.Log.LOG_FILE, logger_helper.Log.LOG_FILE+'.last')
+                shutil.copy(logger_helper.Log.LOG_FILE, logger_helper.Log.LOG_FILE + '.last')
                 file = open(logger_helper.Log.LOG_FILE, mode='rw+')
                 file.truncate()
                 file.seek(0)
                 file.close()
         except Exception, ex:
             Log.logger.warning('Cannot retrieve or truncate log file {} err={}'.format(logger_helper.Log.LOG_FILE, ex))
+
 
 '''
 /proc/diskstats
@@ -440,6 +450,7 @@ Description:
 
 '''
 
+
 def __read_disk_stats():
     if Constant.IS_OS_LINUX():
         with open('/proc/diskstats') as f:
@@ -449,10 +460,9 @@ def __read_disk_stats():
                     device_major = words[0]
                     device_name = words[2]
 
-                    #skip for non hdds and partitions (ending with digit)
+                    # skip for non hdds and partitions (ending with digit)
                     if device_major != '8' or device_name[-1:].isdigit():
-                        continue #just to avoid another tab
-
+                        continue  # just to avoid another tab
 
                     reads_completed = utils.round_sensor_value(words[3])
                     writes_completed = utils.round_sensor_value(words[7])
@@ -464,13 +474,13 @@ def __read_disk_stats():
                     record.updated_on = utils.get_base_location_now_date()
 
                     current_record = models.SystemDisk.query.filter_by(hdd_disk_dev=record.hdd_disk_dev,
-                                                                   system_name=record.system_name).first()
-                    #save read/write date time only if count changes
+                                                                       system_name=record.system_name).first()
+                    # save read/write date time only if count changes
                     if current_record:
                         if current_record.serial is None or current_record.serial == '':
                             record.serial = 'serial not available {} {}'.format(Constant.HOST_NAME, record.hdd_disk_dev)
-                        if current_record.hdd_name is None or current_record.hdd_name== '':
-                            record.hdd_name= '{} {}'.format(Constant.HOST_NAME, record.hdd_disk_dev)
+                        if current_record.hdd_name is None or current_record.hdd_name == '':
+                            record.hdd_name = '{} {}'.format(Constant.HOST_NAME, record.hdd_disk_dev)
                         read_elapsed = -1
                         write_elapsed = -1
                         if record.last_reads_completed_count != current_record.last_reads_completed_count:
@@ -482,13 +492,16 @@ def __read_disk_stats():
                         else:
                             record.last_writes_datetime = current_record.last_writes_datetime
                         if current_record.last_reads_datetime:
-                            read_elapsed = (utils.get_base_location_now_date() - record.last_reads_datetime).total_seconds()
+                            read_elapsed = (
+                            utils.get_base_location_now_date() - record.last_reads_datetime).total_seconds()
                             record.last_reads_elapsed = utils.round_sensor_value(read_elapsed)
                         if current_record.last_writes_datetime:
-                            write_elapsed = (utils.get_base_location_now_date() - record.last_writes_datetime).total_seconds()
+                            write_elapsed = (
+                            utils.get_base_location_now_date() - record.last_writes_datetime).total_seconds()
                             record.last_writes_elapsed = utils.round_sensor_value(write_elapsed)
                         Log.logger.debug('Disk {} elapsed read {}s write {}s'.format(device_name,
-                                                                                int(read_elapsed), int(write_elapsed)))
+                                                                                     int(read_elapsed),
+                                                                                     int(write_elapsed)))
                     else:
                         record.last_reads_datetime = utils.get_base_location_now_date()
                         record.last_writes_datetime = utils.get_base_location_now_date()
@@ -496,10 +509,13 @@ def __read_disk_stats():
                     record.save_changed_fields(current_record=current_record, new_record=record,
                                                notify_transport_enabled=True, save_to_graph=True, debug=False)
                 else:
-                    Log.logger.warning('Unexpected lower number of split atoms={} in diskstat={}'.format(len(words), line))
+                    Log.logger.warning(
+                        'Unexpected lower number of split atoms={} in diskstat={}'.format(len(words), line))
+
 
 def init():
     pass
+
 
 progress_status = None
 
@@ -518,6 +534,6 @@ def thread_run():
     progress_status = 'reading disk stats'
     __read_disk_stats()
     progress_status = 'checking log size'
-    #not needed if RotatingFileHandler if used for logging
-    #__check_log_file_size()
+    # not needed if RotatingFileHandler if used for logging
+    # __check_log_file_size()
     progress_status = 'completed'

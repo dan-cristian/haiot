@@ -1,6 +1,6 @@
 __author__ = 'dcristian'
 
-#! venv/bin/python
+# ! venv/bin/python
 
 from main.admin import db
 from main import thread_pool
@@ -12,14 +12,15 @@ import ups_legrand_run
 from main.admin import models
 from main.admin.model_helper import commit
 
-initialised=False
+initialised = False
+
 
 def sensor_update(obj):
-    #save sensor state to db, except for current node
+    # save sensor state to db, except for current node
     try:
         sensor_host_name = utils.get_object_field_value(obj, 'name')
         Log.logger.debug('Received sensor state update from {}'.format(sensor_host_name))
-        #avoid node to update itself in infinite recursion
+        # avoid node to update itself in infinite recursion
         if sensor_host_name != Constant.HOST_NAME:
             address = utils.get_object_field_value(obj, 'address')
             record = models.Sensor(address=address)
@@ -51,13 +52,15 @@ def sensor_update(obj):
         Log.logger.warning('Error on sensor update, err {}'.format(ex))
         db.session.rollback()
 
+
 def unload():
-    #...
+    # ...
     global initialised
     thread_pool.remove_callable(owsensor_loop.thread_run)
     thread_pool.remove_callable(rfxcom_run.thread_run)
     rfxcom_run.unload()
     initialised = False
+
 
 def init():
     Log.logger.info('Sensor module initialising')
