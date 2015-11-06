@@ -88,6 +88,7 @@ apt-get install -y mhddfs
 
 echo "Installing hubicfuse"
 # https://github.com/TurboGit/hubicfuse
+# make sure you apply this fix: https://github.com/TurboGit/hubicfuse/issues/86
 cd /root
 git clone https://github.com/TurboGit/hubicfuse.git
 apt-get install -y gcc make curl libfuse-dev pkg-config \
