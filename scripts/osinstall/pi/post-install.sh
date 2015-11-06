@@ -14,6 +14,8 @@ apt-get -y update
 echo "Installing additional packages"
 # 1-wire support needs owfs
 apt-get -y install dialog sudo apt-utils mc nano locales python wget owfs git python-rpi.gpio inotify-tools
+# run in ram needs busybox for ramfs copy operations, see "local" script sample
+apt-get -y install busybox
 
 
 echo "Installing python pip and virtualenv"
@@ -50,6 +52,14 @@ fi
 echo "Getting HAIOT application from github"
 cd /home/${USERNAME}
 git clone http://192.168.0.9:888/PYC.git
+if [ "$?" == "0" ]; then
+    echo "Dowloaded haiot from local repository"
+    HAIOT_DIR=PYC
+else
+    echo "Downloading haiot from github"
+    git clone https://github.com/dan-cristian/haiot.git
+    HAIOT_DIR=haiot
+fi
 
 echo "Downloading pigpio library for gpio access"
 wget abyz.co.uk/rpi/pigpio/pigpio.zip
@@ -60,7 +70,7 @@ cd PIGPIO
 make
 echo "Installing pigpio"
 make install
-cp /home/${USERNAME}/PYC/scripts/pigpio_daemon /etc/init.d
+cp /home/${USERNAME}/${HAIOT_DIR}/scripts/pigpio_daemon /etc/init.d
 chmod +x /etc/init.d/pigpio_daemon
 update-rc.d pigpio_daemon defaults
 rm -r /home/${USERNAME}/PIGPIO
@@ -70,7 +80,7 @@ rm /home/${USERNAME}/pigpio.zip
 #todo install pigpiod init script
 
 echo "Configuring HAIOT application"
-cd /home/${USERNAME}/PYC
+cd /home/${USERNAME}/${HAIOT_DIR}
 chmod +x scripts/*sh*
 chmod +x *.sh
 scripts/setup.sh.bat
@@ -89,8 +99,8 @@ echo "Testing init service, create working directories for all defined linux use
 /etc/init.d/userspaceServices stop
 
 echo "Creating start links for haiot to be picked up by userspaceServices"
-ln -s /home/${USERNAME}/PYC/start_daemon_userspaces.sh /home/${USERNAME}/.startUp/
-ln -s /home/${USERNAME}/PYC/start_daemon_userspaces.sh /home/${USERNAME}/.shutDown/
+ln -s /home/${USERNAME}/${HAIOT_DIR}/start_daemon_userspaces.sh /home/${USERNAME}/.startUp/
+ln -s /home/${USERNAME}/${HAIOT_DIR}/start_daemon_userspaces.sh /home/${USERNAME}/.shutDown/
 chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/
 
 echo "Starting haiot via userspaceServices"
