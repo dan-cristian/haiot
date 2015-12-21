@@ -16,6 +16,9 @@ echo "Installing additional packages"
 apt-get -y install dialog sudo apt-utils mc nano locales python wget owfs git python-rpi.gpio inotify-tools
 # run in ram needs busybox for ramfs copy operations, see "local" script sample
 apt-get -y install busybox
+# to to able to fix boot fs
+apt-get -y install dosfstools
+
 
 
 echo "Installing python pip and virtualenv"
@@ -78,6 +81,24 @@ rm /home/${USERNAME}/pigpio.zip
 
 #python setup.py install
 #todo install pigpiod init script
+
+echo "Configuring DFRobot screen"
+# http://unix.stackexchange.com/questions/72320/how-can-i-hook-on-to-one-terminals-output-from-another-terminal
+# script -f /dev/tty1
+# cmdline.txt=dwc_otg.lpm_enable=0 console=ttyAMA0,115200 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4
+#   cgroup_enable=memory elevator=deadline rootwait fbcon=font:ProFont6x11 fbcon=map:1 consoleblank=0
+# http://docs.robopeak.net/doku.php?id=rpusbdisp_faq#q12
+# https://www.kernel.org/doc/Documentation/fb/fbcon.txt
+# page 19: http://www.robopeak.com/data/doc/rpusbdisp/RPUD02-rpusbdisp_usermanual-enUS.1.1.pdf
+# https://learn.adafruit.com/adafruit-pitft-28-inch-resistive-touchscreen-display-raspberry-pi/using-the-console
+# stty rows 30 cols 40
+# setfont -f Uni2-VGA8
+apt-get -y install gpm
+
+
+echo "Installing kivy prerequisites"
+# http://kivy.org/docs/installation/installation-linux.html
+apt-get install -y libsdl2-dev
 
 echo "Configuring HAIOT application"
 cd /home/${USERNAME}/${HAIOT_DIR}
