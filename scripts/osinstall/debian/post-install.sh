@@ -24,7 +24,7 @@ apt-get -y upgrade
 apt-get -y update
 OP="Installing additional packages"; echo ${OP}
 # 1-wire support needs owfs
-apt-get -y install dialog sudo apt-utils mc nano python wget owfs git inotify-tools mc ca-certificates unzip
+apt-get -y install dialog sudo apt-utils mc nano python wget owfs git inotify-tools mc ca-certificates unzip zip
 check_err "${OP}" $?
 
 cd /root
