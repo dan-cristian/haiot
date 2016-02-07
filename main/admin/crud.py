@@ -132,14 +132,16 @@ simple_filters = {
     'active': lambda model: model.query.filter_by(is_active=True).all()
 }
 
-from .models import Zone, SchedulePattern, HeatSchedule, Sensor
+from .models import Area, Zone, ZoneArea, SchedulePattern, HeatSchedule, Sensor
 from .models import Module, Parameter, TemperatureTarget, ZoneSensor, Node, Ups  # , GraphPlotly
 from .models import SystemMonitor, SystemDisk, GpioPin, ZoneAlarm, ZoneHeatRelay, ZoneCustomRelay, Rule
 
 register_crud(admin, '/', 'main-entry', Module, filters=simple_filters)
 register_crud(admin, '/module', 'module', Module, filters=simple_filters)
 register_crud(admin, '/parameter', 'parameter', Parameter, filters=simple_filters)
+register_crud(user, '/area', 'area', Area, filters=simple_filters)
 register_crud(user, '/zone', 'zone', Zone, filters=simple_filters)
+register_crud(user, '/zonearea', 'zonearea', ZoneArea, filters=simple_filters)
 register_crud(user, '/schedulepattern', 'schedulepattern', SchedulePattern, filters=simple_filters)
 register_crud(user, '/heatschedule', 'heatschedule', HeatSchedule, filters=simple_filters)
 register_crud(user, '/temperaturetarget', 'temperaturetarget', TemperatureTarget, filters=simple_filters)

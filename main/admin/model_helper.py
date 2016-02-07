@@ -139,7 +139,7 @@ def populate_tables(model_auto_update=False):
         __db_values_json = json.load(f)
     global table_collection
     table_collection = [models.Node, models.Parameter, models.Module,
-                        models.Zone, models.ZoneCustomRelay,
+                        models.Area, models.Zone, models.ZoneArea, models.ZoneCustomRelay,
                         models.TemperatureTarget, models.SchedulePattern, models.HeatSchedule, models.ZoneHeatRelay,
                         models.ZoneSensor, models.ZoneAlarm,
                         models.SystemMonitor, models.SystemDisk, models.Sensor, models.Ups, models.Rule,

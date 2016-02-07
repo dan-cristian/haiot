@@ -1,14 +1,14 @@
 from datetime import datetime
 from copy import deepcopy
-
 from main.logger_helper import Log
 from main import db
 from main.admin.model_helper import commit
 import graphs
 from common import utils, performance
 
-#TODO: read this
-#http://lucumr.pocoo.org/2011/7/19/sqlachemy-and-you/
+
+# TODO: read this
+# http://lucumr.pocoo.org/2011/7/19/sqlachemy-and-you/
 
 
 # inherit this to use performance tracked queries
@@ -39,7 +39,7 @@ class DbBase:
     # example with one filter
     # models.Rule().query_filter_all(filter=models.Rule.host_name.in_([Constant.HOST_NAME, ""]))
     #
-    #def query_filter_all(self, filter):
+    # def query_filter_all(self, filter):
     #    function = self.query.filter(filter).all
     #    return self.__get_result(function)
 
@@ -53,9 +53,9 @@ class DbBase:
         function = self.query.filter(*query_filter).first
         return self.__get_result(function)
 
-#    def query_filters_first(self, *filter):
-#        function = self.query.filter(*filter).first
-#        return self.__get_result(function)
+    #    def query_filters_first(self, *filter):
+    #        function = self.query.filter(*filter).first
+    #        return self.__get_result(function)
 
     def delete(self):
         function = self.query.delete
@@ -74,13 +74,12 @@ class DbEvent:
     def __init__(self):
         pass
 
-    notified_on_db_commit=False
-    notify_transport_enabled=False
+    notified_on_db_commit = False
+    notify_transport_enabled = False
     event_sent_datetime = None
 
-    operation_type=None
+    operation_type = None
     last_commit_field_changed_list = []
-
 
     def get_deepcopy(self):
         return deepcopy(self)
@@ -97,7 +96,7 @@ class DbEvent:
         return self
 
     # copies fields from a json object to an existing or new db record
-    def save_changed_fields_from_json_object(self,json_object=None, unique_key_name=None,
+    def save_changed_fields_from_json_object(self, json_object=None, unique_key_name=None,
                                              notify_transport_enabled=False, save_to_graph=False,
                                              ignore_only_updated_on_change=True, debug=False, graph_save_frequency=0):
         try:
@@ -109,7 +108,7 @@ class DbEvent:
                 new_record.id = None
             if hasattr(new_record, unique_key_name):
                 unique_key_value = getattr(new_record, unique_key_name)
-                kwargs = {unique_key_name:unique_key_value}
+                kwargs = {unique_key_name: unique_key_value}
                 new_record.updated_on = utils.get_base_location_now_date()
                 current_record = self.query.filter_by(**kwargs).first()
                 self.save_changed_fields(current_record=current_record, new_record=new_record,
@@ -143,7 +142,7 @@ class DbEvent:
                     new_record.save_to_history = save_to_graph
 
             if current_record:
-                current_record.last_commit_field_changed_list=[]
+                current_record.last_commit_field_changed_list = []
                 current_record.notify_transport_enabled = notify_transport_enabled
                 for column in new_record.query.statement._columns._all_col_set:
                     column_name = str(column)
@@ -153,13 +152,14 @@ class DbEvent:
                     if (not new_value is None) and (str(old_value) != str(new_value)):
                         if column_name != 'updated_on':
                             try:
-                                obj_type=str(type(self)).split('\'')[1]
-                                obj_type_words=obj_type.split('.')
-                                obj_type=obj_type_words[len(obj_type_words)-1]
+                                obj_type = str(type(self)).split('\'')[1]
+                                obj_type_words = obj_type.split('.')
+                                obj_type = obj_type_words[len(obj_type_words) - 1]
                             except Exception, ex:
                                 obj_type = str(type(self))
                             if debug:
-                                Log.logger.info('{} {}={} oldvalue={}'.format(obj_type, column_name, new_value, old_value))
+                                Log.logger.info(
+                                    '{} {}={} oldvalue={}'.format(obj_type, column_name, new_value, old_value))
 
                         setattr(current_record, column_name, new_value)
                         current_record.last_commit_field_changed_list.append(column_name)
@@ -187,9 +187,8 @@ class DbEvent:
             else:
                 Log.logger.info('No session dirty records')
             raise ex
-        #else:
-        #    Log.logger.warning('Incorrect parameters received on save changed fields to db')
-
+            # else:
+            #    Log.logger.warning('Incorrect parameters received on save changed fields to db')
 
 
 class Module(db.Model, DbBase):
@@ -211,13 +210,14 @@ class Module(db.Model, DbBase):
     def __repr__(self):
         return 'Module {} {}, {}'.format(self.id, self.host_name, self.name[:50])
 
+
 class Zone(db.Model, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
 
     active_heat_schedule_pattern_id = db.Column(db.Integer)
     heat_is_on = db.Column(db.Boolean)
-    last_heat_status_update = db.Column(db.DateTime(), default=datetime.min)
+    last_heat_status_update = db.Column(db.DateTime(), default=None)
     heat_target_temperature = db.Column(db.Integer)
 
     def __init__(self, id='', name=''):
@@ -228,6 +228,50 @@ class Zone(db.Model, DbBase):
 
     def __repr__(self):
         return 'Zone id {} {}'.format(self.id, self.name[:20])
+
+
+class Area(db.Model, DbBase):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50))
+
+    def __init__(self, id='', name=''):
+        super(Area, self).__init__()
+        if id:
+            self.id = id
+        self.name = name
+
+    def __repr__(self):
+        return 'Area id {} {}'.format(self.id, self.name[:20])
+
+
+class ZoneArea(db.Model, DbBase):
+    id = db.Column(db.Integer, primary_key=True)
+    area_id = db.Column(db.Integer, db.ForeignKey('area.id'), nullable=False)
+    zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'), nullable=False)
+
+    def __init__(self, id=''):
+        super(ZoneArea, self).__init__()
+        if id:
+            self.id = id
+
+    def __repr__(self):
+        return 'ZoneArea id {} zone={} area={}'.format(self.id, self.zone_id, self.area_id)
+
+
+class Presence(db.Model, DbBase):
+    id = db.Column(db.Integer, primary_key=True)
+    zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'), nullable=False)
+    last_event_camera_date = db.Column(db.DateTime(), default=None)
+    last_event_alarm_date = db.Column(db.DateTime(), default=None)
+    last_event_io_date = db.Column(db.DateTime(), default=None)
+
+    def __init__(self, id=''):
+        super(Presence, self).__init__()
+        if id:
+            self.id = id
+
+    def __repr__(self):
+        return 'Presence id {} {}'.format(self.id)
 
 
 class SchedulePattern(db.Model, DbBase):
@@ -244,6 +288,7 @@ class SchedulePattern(db.Model, DbBase):
 
     def __repr__(self):
         return self.name[:len('1234-5678-9012-3456-7890-1234')]
+
 
 class TemperatureTarget(db.Model, DbBase):
     id = db.Column(db.Integer, primary_key=True)
@@ -264,26 +309,28 @@ class TemperatureTarget(db.Model, DbBase):
 class HeatSchedule(db.Model, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'), nullable=False)
-    #zone = db.relationship('Zone', backref=db.backref('heat schedule zone', lazy='dynamic'))
+    # zone = db.relationship('Zone', backref=db.backref('heat schedule zone', lazy='dynamic'))
     pattern_week_id = db.Column(db.Integer, db.ForeignKey('schedule_pattern.id'), nullable=False)
     pattern_weekend_id = db.Column(db.Integer, db.ForeignKey('schedule_pattern.id'), nullable=False)
-    #pattern_week = db.relationship('SchedulePattern', foreign_keys='[HeatSchedule.pattern_week_id]',
+    # pattern_week = db.relationship('SchedulePattern', foreign_keys='[HeatSchedule.pattern_week_id]',
     #                               backref=db.backref('schedule_pattern_week', lazy='dynamic'))
-    #pattern_weekend = db.relationship('SchedulePattern', foreign_keys='[HeatSchedule.pattern_weekend_id]',
+    # pattern_weekend = db.relationship('SchedulePattern', foreign_keys='[HeatSchedule.pattern_weekend_id]',
     #                                backref=db.backref('schedule_pattern_weekend', lazy='dynamic'))
+    auto_activate_on_move = db.Column(db.Boolean, default=False)
+    auto_deactivate_on_away = db.Column(db.Boolean, default=False)
     active = db.Column(db.Boolean, default=True)
 
     def __init__(self, id=None, zone_id=None, pattern_week_id=None, pattern_weekend_id=None):
         super(HeatSchedule, self).__init__()
         if id:
             self.id = id
-        self.zone_id= zone_id
-        self.pattern_week_id= pattern_week_id
-        self.pattern_weekend_id= pattern_weekend_id
+        self.zone_id = zone_id
+        self.pattern_week_id = pattern_week_id
+        self.pattern_weekend_id = pattern_weekend_id
 
     def __repr__(self):
         return 'Zone {}, Active {}, Week {}, Weekend {}'.format(self.zone_id, self.active,
-                self.pattern_week_id, self.pattern_weekend_id)
+                                                                self.pattern_week_id, self.pattern_weekend_id)
 
 
 class Sensor(db.Model, graphs.SensorGraph, DbEvent, DbBase):
@@ -301,7 +348,7 @@ class Sensor(db.Model, graphs.SensorGraph, DbEvent, DbBase):
     pio_b = db.Column(db.Integer)
     sensed_a = db.Column(db.Integer)
     sensed_b = db.Column(db.Integer)
-    battery_level = db.Column(db.Integer) # RFXCOM specific, sensor battery
+    battery_level = db.Column(db.Integer)  # RFXCOM specific, sensor battery
     rssi = db.Column(db.Integer)  # RFXCOM specific, rssi - distance
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
     # FIXME: now filled manually, try relations
@@ -310,11 +357,11 @@ class Sensor(db.Model, graphs.SensorGraph, DbEvent, DbBase):
 
     def __init__(self, address=''):
         super(Sensor, self).__init__()
-        self.address= address
+        self.address = address
 
     def __repr__(self):
         return '{}, {}, {}, {}'.format(self.type, self.sensor_name, self.address, self.temperature)
-    
+
 
 class Parameter(db.Model, DbBase):
     id = db.Column(db.Integer, primary_key=True)
@@ -337,18 +384,19 @@ class ZoneSensor(db.Model, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     sensor_name = db.Column(db.String(50))
     zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'))
-    #zone = db.relationship('Zone', backref=db.backref('ZoneSensor(zone)', lazy='dynamic'))
+    # zone = db.relationship('Zone', backref=db.backref('ZoneSensor(zone)', lazy='dynamic'))
     sensor_address = db.Column(db.String(50), db.ForeignKey('sensor.address'))
-    #sensor = db.relationship('Sensor', backref=db.backref('ZoneSensor(sensor)', lazy='dynamic'))
+
+    # sensor = db.relationship('Sensor', backref=db.backref('ZoneSensor(sensor)', lazy='dynamic'))
 
     def __init__(self, zone_id='', sensor_address='', sensor_name=''):
         super(ZoneSensor, self).__init__()
-        self.sensor_address= sensor_address
+        self.sensor_address = sensor_address
         self.zone_id = zone_id
         self.sensor_name = sensor_name
 
     def __repr__(self):
-        return 'ZoneSensor zone {} sensor {}'.format(self.zone_id,  self.sensor_name)
+        return 'ZoneSensor zone {} sensor {}'.format(self.zone_id, self.sensor_name)
 
 
 class Node(db.Model, DbEvent, graphs.NodeGraph, DbBase):
@@ -364,10 +412,10 @@ class Node(db.Model, DbEvent, graphs.NodeGraph, DbBase):
     is_master_graph = db.Column(db.Boolean(), default=False)
     is_master_rule = db.Column(db.Boolean(), default=False)
     is_master_logging = db.Column(db.Boolean(), default=False)
-    priority = db.Column(db.Integer) # used to decide who becomes main master in case several hosts are active
-    master_overall_cycles = db.Column(db.Integer) #count of update cycles while node was master
-    run_overall_cycles = db.Column(db.Integer) #count of total update cycles
-    execute_command=db.Column(db.String(50))
+    priority = db.Column(db.Integer)  # used to decide who becomes main master in case several hosts are active
+    master_overall_cycles = db.Column(db.Integer)  # count of update cycles while node was master
+    run_overall_cycles = db.Column(db.Integer)  # count of total update cycles
+    execute_command = db.Column(db.String(50))
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def __init__(self, id=None, name=None, ip=None, priority=None, mac=None, is_master_logging=False):
@@ -383,7 +431,7 @@ class Node(db.Model, DbEvent, graphs.NodeGraph, DbBase):
         self.master_overall_cycles = 0
 
     def __repr__(self):
-        return 'Node {} ip {}'.format(self.name,  self.ip)
+        return 'Node {} ip {}'.format(self.name, self.ip)
 
 
 class SystemMonitor(db.Model, graphs.SystemMonitorGraph, DbEvent, DbBase):
@@ -412,9 +460,9 @@ class Ups(db.Model, graphs.UpsGraph, DbEvent, DbBase):
     battery_voltage = db.Column(db.Float)
     temperature = db.Column(db.Float)
     power_failed = db.Column(db.Boolean(), default=False)
-    beeper_on =db.Column(db.Boolean(), default=False)
+    beeper_on = db.Column(db.Boolean(), default=False)
     test_in_progress = db.Column(db.Boolean(), default=False)
-    other_status= db.Column(db.String(50))
+    other_status = db.Column(db.String(50))
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def __repr__(self):
@@ -425,9 +473,9 @@ class SystemDisk(db.Model, graphs.SystemDiskGraph, DbEvent, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     serial = db.Column(db.String(50), unique=True)
     system_name = db.Column(db.String(50))
-    hdd_name = db.Column(db.String(50)) #netbook /dev/sda
-    hdd_device = db.Column(db.String(50)) #usually empty?
-    hdd_disk_dev = db.Column(db.String(50)) #/dev/sda
+    hdd_name = db.Column(db.String(50))  # netbook /dev/sda
+    hdd_device = db.Column(db.String(50))  # usually empty?
+    hdd_disk_dev = db.Column(db.String(50))  # /dev/sda
     temperature = db.Column(db.Float)
     sector_error_count = db.Column(db.Integer)
     smart_status = db.Column(db.String(50))
@@ -447,7 +495,7 @@ class SystemDisk(db.Model, graphs.SystemDiskGraph, DbEvent, DbBase):
         self.hdd_disk_dev = ''
 
     def __repr__(self):
-        return '{} {} {} {} {}'.format(self.id, self.serial,  self.system_name, self.hdd_name, self.hdd_disk_dev)
+        return '{} {} {} {} {}'.format(self.id, self.serial, self.system_name, self.hdd_name, self.hdd_disk_dev)
 
 
 class GpioPin(db.Model, DbEvent, DbBase):
@@ -467,19 +515,19 @@ class GpioPin(db.Model, DbEvent, DbBase):
 
     def __repr__(self):
         return 'host={} code={} index={} type={} value={}'.format(self.host_name, self.pin_code, self.pin_index_bcm,
-                                                                 self.pin_type, self.pin_value)
+                                                                  self.pin_type, self.pin_value)
 
 
 class ZoneAlarm(db.Model, DbEvent, DbBase):
     id = db.Column(db.Integer, primary_key=True)
-    #friendly display name for pin mapping
+    # friendly display name for pin mapping
     alarm_pin_name = db.Column(db.String(50))
-    zone_id = db.Column(db.Integer)#, db.ForeignKey('zone.id'))
-    #zone = db.relationship('Zone', backref=db.backref('ZoneAlarm(zone)', lazy='dynamic'))
-    #gpio_pin_code = db.Column(db.String(50), db.ForeignKey('gpio_pin.pin_code'))
+    zone_id = db.Column(db.Integer)  # , db.ForeignKey('zone.id'))
+    # zone = db.relationship('Zone', backref=db.backref('ZoneAlarm(zone)', lazy='dynamic'))
+    # gpio_pin_code = db.Column(db.String(50), db.ForeignKey('gpio_pin.pin_code'))
     gpio_pin_code = db.Column(db.String(50))
     gpio_host_name = db.Column(db.String(50))
-    #gpio_pin = db.relationship('GpioPin', backref=db.backref('ZoneAlarm(gpiopincode)', lazy='dynamic'))
+    # gpio_pin = db.relationship('GpioPin', backref=db.backref('ZoneAlarm(gpiopincode)', lazy='dynamic'))
     alarm_status = db.Column(db.Integer)
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -495,10 +543,10 @@ class ZoneAlarm(db.Model, DbEvent, DbBase):
 
 class ZoneHeatRelay(db.Model, DbEvent, DbBase):
     id = db.Column(db.Integer, primary_key=True)
-    #friendly display name for pin mapping
+    # friendly display name for pin mapping
     heat_pin_name = db.Column(db.String(50))
     zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'))
-    gpio_pin_code = db.Column(db.String(50)) #user friendly format, e.g. P8_11
+    gpio_pin_code = db.Column(db.String(50))  # user friendly format, e.g. P8_11
     gpio_host_name = db.Column(db.String(50))
     heat_is_on = db.Column(db.Boolean)
     is_main_heat_source = db.Column(db.Boolean)
@@ -514,12 +562,13 @@ class ZoneHeatRelay(db.Model, DbEvent, DbBase):
     def __repr__(self):
         return 'host {} {} {} {}'.format(self.gpio_host_name, self.gpio_pin_code, self.heat_pin_name, self.heat_is_on)
 
+
 class ZoneCustomRelay(db.Model, DbEvent, DbBase):
     id = db.Column(db.Integer, primary_key=True)
-    #friendly display name for pin mapping
+    # friendly display name for pin mapping
     relay_pin_name = db.Column(db.String(50))
     zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'))
-    gpio_pin_code = db.Column(db.String(50)) #user friendly format, e.g. P8_11
+    gpio_pin_code = db.Column(db.String(50))  # user friendly format, e.g. P8_11
     gpio_host_name = db.Column(db.String(50))
     relay_is_on = db.Column(db.Boolean)
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -527,7 +576,7 @@ class ZoneCustomRelay(db.Model, DbEvent, DbBase):
     def __init__(self, id=None, zone_id='', gpio_pin_code='', host_name='', relay_pin_name=''):
         super(ZoneCustomRelay, self).__init__()
         if id:
-           self.id = id
+            self.id = id
         self.zone_id = zone_id
         self.gpio_pin_code = gpio_pin_code
         self.gpio_host_name = host_name
@@ -544,7 +593,7 @@ class Rule(db.Model, DbEvent, DbBase):
     command = db.Column(db.String(50))
     hour = db.Column(db.String(20))
     minute = db.Column(db.String(2))
-    second= db.Column(db.String(20))
+    second = db.Column(db.String(20))
     day_of_week = db.Column(db.String(20))
     week = db.Column(db.String(20))
     day = db.Column(db.String(20))
@@ -563,6 +612,7 @@ class Rule(db.Model, DbEvent, DbBase):
             self.id = id
         self.host_name = host_name
 
+
 class PlotlyCache(db.Model, DbEvent, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     grid_name = db.Column(db.String(50), unique=True)
@@ -580,6 +630,7 @@ class PlotlyCache(db.Model, DbEvent, DbBase):
         if id:
             self.id = id
         self.grid_name = grid_name
+
 
 '''
 tables used to store historical data
@@ -676,9 +727,9 @@ class SystemDiskHistory(db.Model, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     serial = db.Column(db.String(50))
     system_name = db.Column(db.String(50))
-    hdd_name = db.Column(db.String(50)) #netbook /dev/sda
-    hdd_device = db.Column(db.String(50)) #usually empty?
-    hdd_disk_dev = db.Column(db.String(50)) #/dev/sda
+    hdd_name = db.Column(db.String(50))  # netbook /dev/sda
+    hdd_device = db.Column(db.String(50))  # usually empty?
+    hdd_disk_dev = db.Column(db.String(50))  # /dev/sda
     temperature = db.Column(db.Float)
     sector_error_count = db.Column(db.Integer)
     smart_status = db.Column(db.String(50))
@@ -700,4 +751,4 @@ class SystemDiskHistory(db.Model, DbBase):
         self.hdd_disk_dev = ''
 
     def __repr__(self):
-        return '{} {} {} {} {}'.format(self.id, self.serial,  self.system_name, self.hdd_name, self.hdd_disk_dev)
+        return '{} {} {} {} {}'.format(self.id, self.serial, self.system_name, self.hdd_name, self.hdd_disk_dev)
