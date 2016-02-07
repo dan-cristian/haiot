@@ -32,7 +32,10 @@
     {"name": "DB_REPORTING_LOCATION", "value": "mysql+mysqlconnector://<user>:<passwd>@192.168.0.9/haiot-reporting"},
     {"name": "DB_REPORTING_USER", "value": "haiot"},
     {"name": "DB_REPORTING_PASS", "value": "haiot"},
-    {"name": "P_TEMPERATURE_THRESHOLD", "value": "0.2", "description":"gap in degrees before turning on / off heat"}
+    {"name": "P_TEMPERATURE_THRESHOLD", "value": "0.2", "description":"gap in degrees before turning on / off heat, to avoid rapid on/off cycles"},
+    {"name": "P_PRESENCE_MOVE_GAP", "value": "60", "description":"minutes with no move to pass before considering presence status as away"},
+    {"name": "P_HEAT_ON_AUTO_INTERVAL", "value": "30", "description":"minutes of move to trigger auto heat on action"},
+    {"name": "P_HEAT_OFF_AUTO_INTERVAL", "value": "1440", "description":"minutes of inactivity to trigger auto heat off action"}
   ],
   "Module": [
     {"id":1,  "active":"1", "start_order":"1", "name":"main"},
@@ -123,6 +126,23 @@
     {"id":48, "name":"solar jos"}
   ],
 
+  "Area": [
+    {"id":1, "name":"house"},
+    {"id":2, "name":"beci"},
+    {"id":3, "name":"parter"},
+    {"id":4, "name":"etaj"},
+    {"id":5, "name":"pod"},
+    {"id":6, "name":"curte"}
+  ],
+
+  "ZoneArea": [
+    {"id":1, "area_id":"1", "zone_id":"1"},
+    {"id":200, "area_id":"2", "zone_id":"3"},
+    {"id":201, "area_id":"2", "zone_id":"9"},
+    {"id":300, "area_id":"3", "zone_id":"1"},
+    {"id":301, "area_id":"3", "zone_id":"2"}
+  ],
+
   "Scheduler": [
     {"name": "frontvalve_relay_on","minutes": "0","hours": "5", "dayofmonth": "*", "month": "5-10",
       "dayofweek": "*", "year": "*", "command": "relay on zone_name='front valve'"},
@@ -134,6 +154,13 @@
     {"relay_pin_name": "back valve relay", "zone_id": "37", "gpio_pin_code": "P9_23", "gpio_host_name": "beaglebone","relay_is_on": "0"},
     {"relay_pin_name": "back lights relay", "zone_id": "40", "gpio_pin_code": "P9_22", "gpio_host_name": "beaglebone","relay_is_on": "0"},
     {"relay_pin_name": "front valve relay", "zone_id": "36", "gpio_pin_code": "P9_21", "gpio_host_name": "beaglebone", "relay_is_on": "0"},
+
+    {"relay_pin_name": "bucatarie music relay", "zone_id": "1", "gpio_pin_code": "23", "gpio_host_name": "pi-power", "relay_is_on": "0"},
+    {"relay_pin_name": "dormitor music relay", "zone_id": "1", "gpio_pin_code": "18", "gpio_host_name": "pi-power", "relay_is_on": "0"},
+    {"relay_pin_name": "living music relay", "zone_id": "1", "gpio_pin_code": "17", "gpio_host_name": "pi-power", "relay_is_on": "0"},
+    {"relay_pin_name": "baie mare music relay", "zone_id": "1", "gpio_pin_code": "27", "gpio_host_name": "pi-power", "relay_is_on": "0"},
+    {"relay_pin_name": "beci music relay", "zone_id": "1", "gpio_pin_code": "22", "gpio_host_name": "pi-power", "relay_is_on": "0"},
+
 
     {"relay_pin_name": "test 1", "zone_id": "36", "gpio_pin_code": "0:out:0", "gpio_host_name": "pi-face", "relay_is_on": "0"}
   ],

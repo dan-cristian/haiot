@@ -54,6 +54,7 @@ def __update_zone_heat(zone, heat_schedule, sensor):
         minute = utils.get_base_location_now_date().minute
         hour = utils.get_base_location_now_date().hour
         weekday = datetime.datetime.today().weekday()
+        # todo: insert here auto heat change based on presence status
         if weekday <= 4: #Monday=0
             schedule_pattern= models.SchedulePattern.query.filter_by(id=heat_schedule.pattern_week_id).first()
         else:
