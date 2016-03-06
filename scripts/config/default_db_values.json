@@ -186,8 +186,8 @@
     {"id":4, "name":"weekend-living",   "pattern":".... .... 2222 2222 3333 3333"},
     {"id":5, "name":"week-birou",       "pattern":".... .... .... .... ..22 2222"},
     {"id":6, "name":"weekend-birou",    "pattern":".... .... ..22 2222 2222 2222"},
-    {"id":7, "name":"week-dormitor",    "pattern":"bbbb bbb. .... .... ...b bbbb"},
-    {"id":8, "name":"weekend-dormitor", "pattern":"bbbb bbb. .... .bbb ...b bbbb"}
+    {"id":7, "name":"week-dormitor",    "pattern":"bbbb bbbb .... .... ...b bbbb"},
+    {"id":8, "name":"weekend-dormitor", "pattern":"bbbb bbbb .... .bbb ...b bbbb"}
   ],
 
   "HeatSchedule": [
