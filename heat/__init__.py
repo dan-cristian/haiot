@@ -20,6 +20,7 @@ def heat_update(obj_dict=None):
     try:
         source_host_name = utils.get_object_field_value(obj_dict, Constant.JSON_PUBLISH_SOURCE_HOST)
         zone_id = utils.get_object_field_value(obj_dict, utils.get_model_field_name(models.ZoneHeatRelay.zone_id))
+        # fixme: remove hard reference to object field
         sent_on = utils.get_object_field_value(obj_dict, "event_sent_datetime")
         Log.logger.info('Received heat relay state update from {} for zoneid {} sent_on={}'.format(source_host_name,
                                                                                                    zone_id, sent_on))
