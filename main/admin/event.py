@@ -97,6 +97,7 @@ def mqtt_thread_run():
                     table = str(obj[Constant.JSON_PUBLISH_TABLE])
                     if table == utils.get_table_name(models.Node):#'Node':
                         node.node_run.node_update(obj)
+                        # fixme: remove hardcoded strings
                         if 'execute_command' in obj:
                             execute_command = obj['execute_command']
                             host_name = obj['name']

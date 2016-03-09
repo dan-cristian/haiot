@@ -165,6 +165,7 @@ class DbEvent:
                         current_record.last_commit_field_changed_list.append(column_name)
                 if len(current_record.last_commit_field_changed_list) == 0:
                     current_record.notify_transport_enabled = False
+                # fixme: remove hardcoded field name
                 elif len(current_record.last_commit_field_changed_list) == 1 and ignore_only_updated_on_change and \
                                 'updated_on' in current_record.last_commit_field_changed_list:
                     current_record.notify_transport_enabled = False
@@ -177,6 +178,7 @@ class DbEvent:
                         new_record.last_commit_field_changed_list.append(column_name)
                 db.session.add(new_record)
             commit()
+            # fixme: remove hardcoded field name
             if hasattr(new_record, 'last_save_to_graph'):
                 new_record.last_save_to_graph = utils.get_base_location_now_date()
         except Exception, ex:
@@ -278,6 +280,8 @@ class SchedulePattern(db.Model, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
     pattern = db.Column(db.String(24))
+    auto_activate_on_move = db.Column(db.Boolean, default=False)
+    auto_deactivate_on_away = db.Column(db.Boolean, default=False)
 
     def __init__(self, id=None, name='', pattern=''):
         super(SchedulePattern, self).__init__()
@@ -316,8 +320,6 @@ class HeatSchedule(db.Model, DbBase):
     #                               backref=db.backref('schedule_pattern_week', lazy='dynamic'))
     # pattern_weekend = db.relationship('SchedulePattern', foreign_keys='[HeatSchedule.pattern_weekend_id]',
     #                                backref=db.backref('schedule_pattern_weekend', lazy='dynamic'))
-    auto_activate_on_move = db.Column(db.Boolean, default=False)
-    auto_deactivate_on_away = db.Column(db.Boolean, default=False)
     active = db.Column(db.Boolean, default=True)
 
     def __init__(self, id=None, zone_id=None, pattern_week_id=None, pattern_weekend_id=None):
