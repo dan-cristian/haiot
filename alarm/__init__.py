@@ -3,7 +3,7 @@ from pydispatch import dispatcher
 
 from main.logger_helper import Log
 from main.admin import models
-import alarm_loop
+#import alarm_loop
 from main import thread_pool
 from common import Constant, utils
 from main.admin.model_helper import commit
@@ -28,14 +28,14 @@ def unload():
     Log.logger.info('Alarm module unloading')
     global initialised
     dispatcher.disconnect(dispatcher.connect(handle_event_alarm, signal=Constant.SIGNAL_GPIO, sender=dispatcher.Any))
-    thread_pool.remove_callable(alarm_loop.thread_run)
+    #thread_pool.remove_callable(alarm_loop.thread_run)
     initialised = False
 
 
 def init():
     Log.logger.info('Alarm module initialising')
-    alarm_loop.init()
-    thread_pool.add_interval_callable(alarm_loop.thread_run)
+    #alarm_loop.init()
+    #thread_pool.add_interval_callable(alarm_loop.thread_run)
     dispatcher.connect(handle_event_alarm, signal=Constant.SIGNAL_GPIO, sender=dispatcher.Any)
     # get list of input gpio ports and communicate them to gpio modules for proper port setup as "IN"
     port_list = []

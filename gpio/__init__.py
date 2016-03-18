@@ -1,5 +1,6 @@
 __author__ = 'dcristian'
 
+
 from main.logger_helper import Log
 from common import Constant, utils
 from main.admin import models
@@ -9,6 +10,7 @@ import std_gpio
 import piface
 import bbb_io
 import pigpio
+import rpi_gpio
 
 initialised = False
 
@@ -123,7 +125,7 @@ def thread_run():
     piface.thread_run()
     bbb_io.thread_run()
     std_gpio.thread_run()
-
+    rpi_gpio.thread_run()
 
 def unload():
     global initialised
@@ -132,6 +134,7 @@ def unload():
         std_gpio.unload()
         piface.unload()
         bbb_io.unload()
+        rpi_gpio.unload()
     initialised = False
 
 
@@ -140,6 +143,7 @@ def init():
     if Constant.IS_MACHINE_RASPBERRYPI:
         piface.init()
         pigpio.init()
+        rpi_gpio.init()
     if Constant.IS_MACHINE_BEAGLEBONE:
         bbb_io.init()
         std_gpio.init()
