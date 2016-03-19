@@ -33,6 +33,9 @@
     <Content Include="requirements-win.txt" />
     <Content Include="requirements.txt" />
     <Content Include="scripts\backup-exclude.txt" />
+    <Content Include="scripts\config\.rackspace.ddnsupdate.config.json" />
+    <Content Include="scripts\config\.youtube.credentials" />
+    <Content Include="scripts\config\default_db_values.json" />
     <Content Include="scripts\installer-config.txt" />
     <Content Include="scripts\osinstall\debian\example-preseed.txt" />
     <Content Include="scripts\osinstall\debian\readme.txt" />
@@ -144,6 +147,7 @@
     <Folder Include="node" />
     <Folder Include="rule" />
     <Folder Include="scripts" />
+    <Folder Include="scripts\config\" />
     <Folder Include="scripts\osinstall\" />
     <Folder Include="scripts\osinstall\debian" />
     <Folder Include="scripts\osinstall\pi" />
