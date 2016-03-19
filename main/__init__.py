@@ -259,6 +259,7 @@ def init():
 
 def run(arg_list):
     if 'debug_remote' in arg_list:
+        # https://github.com/Microsoft/PTVS/wiki/Cross-Platform-Remote-Debugging
         import ptvsd
         ptvsd.enable_attach(secret='secret',address=('0.0.0.0', 5678))
         print 'Enabled remote debugging, waiting 10 seconds for client to attach'
