@@ -146,7 +146,7 @@ class DbEvent:
             if current_record:
                 current_record.last_commit_field_changed_list = []
                 current_record.notify_transport_enabled = notify_transport_enabled
-                for column in new_record.query.statement._columns._all_col_set:
+                for column in new_record.query.statement._columns._all_columns:
                     column_name = str(column)
                     new_value = getattr(new_record, column_name)
                     old_value = getattr(current_record, column_name)
@@ -173,7 +173,7 @@ class DbEvent:
                     current_record.notify_transport_enabled = False
             else:
                 new_record.notify_transport_enabled = notify_transport_enabled
-                for column in new_record.query.statement._columns._all_col_set:
+                for column in new_record.query.statement._columns._all_columns:
                     column_name = str(column)
                     new_value = getattr(new_record, column_name)
                     if new_value:

@@ -15,6 +15,7 @@
     <InterpreterVersion>2.7</InterpreterVersion>
     <CommandLineArguments>model_auto_update</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
+    <PublishUrl>\\nas\private\Development\haiot</PublishUrl>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
