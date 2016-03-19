@@ -163,6 +163,7 @@ def init():
 
     app.config['SECRET_KEY'] = 'secret'
     app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
     Log.logger.info('Initialising SQLAlchemy')
     db = SQLAlchemy(app)
     db.create_all()
