@@ -42,7 +42,7 @@ def get_pin_bcm(bcm_id=''):
         res = GPIO.input(bcm_id)
 
 
-#  https://sourceforge.net/p/raspberry-gpio-python/wiki/Inputs/
+#  https://sourceforge.net/p/raspberry-gpio-python/wiki/Inputs/,  LOW=0, HIGH=1
 def event_detected(channel):
     try:
         global import_module_exist
@@ -52,7 +52,6 @@ def event_detected(channel):
         dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=channel, direction='in',
                         pin_value=state, pin_connected=(state == 0))
     except Exception, ex:
-        zonealarm = None
         Log.logger.warning('Error io event detected, err {}'.format(ex))
 
 
@@ -62,7 +61,7 @@ def setup_in_ports(gpio_pin_list):
         if gpio_pin.pin_type == Constant.GPIO_PIN_TYPE_PI_STDGPIO:
             Log.logger.info('Set pincode={} type={} index={} as input'.format(gpio_pin.pin_code, gpio_pin.pin_type,
                                                                               gpio_pin.pin_index_bcm))
-            GPIO.setup(gpio_pin.pin_code, GPIO.IN)
+            GPIO.setup(gpio_pin.pin_code, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
             try:
                 GPIO.add_event_detect(gpio_pin.pin_code, GPIO.BOTH, callback=event_detected, bouncetime=300)
                 __pool_pin_codes.append(gpio_pin.pin_code)

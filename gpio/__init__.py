@@ -1,6 +1,4 @@
 __author__ = 'dcristian'
-
-
 from main.logger_helper import Log
 from common import Constant, utils
 from main.admin import models
