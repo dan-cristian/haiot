@@ -43,6 +43,7 @@
     <Content Include="scripts\testdata\free.txt" />
     <Content Include="sensor\RFXtrx\COPYING.txt" />
     <Content Include="sensor\RFXtrx\README.txt" />
+    <Content Include="start_daemon_userspaces.sh" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="alarm\__init__.py" />
