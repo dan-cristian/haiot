@@ -1,5 +1,4 @@
 __author__ = 'dcristian'
-
 import os
 from main.logger_helper import Log
 from main import db

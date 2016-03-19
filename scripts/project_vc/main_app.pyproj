@@ -1,0 +1,169 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{ac6fd2f8-a2c2-402b-906d-f06db1ce098c}</ProjectGuid>
+    <ProjectHome>..\..\</ProjectHome>
+    <StartupFile>haiot.py</StartupFile>
+    <SearchPath />
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <InterpreterId>{2af0f10d-7135-4994-9156-5d01c9c11b7e}</InterpreterId>
+    <InterpreterVersion>2.7</InterpreterVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <PropertyGroup>
+    <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
+    <PtvsTargetsFile>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets</PtvsTargetsFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="main\static\404.html" />
+    <Content Include="main\static\pure-min.css" />
+    <Content Include="main\templates\admin\admin.html" />
+    <Content Include="main\templates\admin\detailview.html" />
+    <Content Include="main\templates\admin\listview.html" />
+    <Content Include="main\templates\chart\chart.html" />
+    <Content Include="main\templates\files.html" />
+    <Content Include="requirements-beaglebone.txt" />
+    <Content Include="requirements-rpi.txt" />
+    <Content Include="requirements-win.txt" />
+    <Content Include="requirements.txt" />
+    <Content Include="scripts\backup-exclude.txt" />
+    <Content Include="scripts\installer-config.txt" />
+    <Content Include="scripts\osinstall\debian\example-preseed.txt" />
+    <Content Include="scripts\osinstall\debian\readme.txt" />
+    <Content Include="scripts\osinstall\pi\installer-config.txt" />
+    <Content Include="scripts\osinstall\pi\online-config.txt" />
+    <Content Include="scripts\osinstall\pi\post-install.txt" />
+    <Content Include="scripts\osinstall\pi\rsync-ram-overlay-exclude.txt" />
+    <Content Include="scripts\testdata\free.txt" />
+    <Content Include="sensor\RFXtrx\COPYING.txt" />
+    <Content Include="sensor\RFXtrx\README.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="alarm\__init__.py" />
+    <Compile Include="cloud\graph_plotly\graph_plotly_run.py" />
+    <Compile Include="cloud\graph_plotly\__init__.py" />
+    <Compile Include="cloud\youtube\__init__.py" />
+    <Compile Include="cloud\__init__.py" />
+    <Compile Include="common\performance.py" />
+    <Compile Include="common\utils.py" />
+    <Compile Include="common\variable.py" />
+    <Compile Include="common\__init__.py" />
+    <Compile Include="ddns\ddns_run.py" />
+    <Compile Include="ddns\__init__.py" />
+    <Compile Include="gpio\bbb_io\__init__.py" />
+    <Compile Include="gpio\piface\__init__.py" />
+    <Compile Include="gpio\pigpio\__init__.py" />
+    <Compile Include="gpio\rpi_gpio\__init__.py" />
+    <Compile Include="gpio\std_gpio\__init__.py" />
+    <Compile Include="gpio\__init__.py" />
+    <Compile Include="haiot.py" />
+    <Compile Include="health_monitor\health_monitor_loop.py" />
+    <Compile Include="health_monitor\__init__.py" />
+    <Compile Include="heat\heat_loop.py" />
+    <Compile Include="heat\__init__.py" />
+    <Compile Include="main\admin\crud.py" />
+    <Compile Include="main\admin\event.py" />
+    <Compile Include="main\admin\graphs.py" />
+    <Compile Include="main\admin\models.py" />
+    <Compile Include="main\admin\model_helper.py" />
+    <Compile Include="main\admin\__init__.py" />
+    <Compile Include="main\cron.py" />
+    <Compile Include="main\logger_helper.py" />
+    <Compile Include="main\persistence\__init__.py" />
+    <Compile Include="main\presence.py" />
+    <Compile Include="main\system_info.py" />
+    <Compile Include="main\thread_pool.py" />
+    <Compile Include="main\__init__.py" />
+    <Compile Include="node\node_run.py" />
+    <Compile Include="node\__init__.py" />
+    <Compile Include="rule\rules_run.py" />
+    <Compile Include="rule\__init__.py" />
+    <Compile Include="sensor\owsensor_loop.py" />
+    <Compile Include="sensor\rfxcom_run.py" />
+    <Compile Include="sensor\RFXtrx\dummy.py" />
+    <Compile Include="sensor\RFXtrx\lowlevel.py" />
+    <Compile Include="sensor\RFXtrx\pyserial.py" />
+    <Compile Include="sensor\RFXtrx\__init__.py" />
+    <Compile Include="sensor\serial_common.py" />
+    <Compile Include="sensor\ups_legrand_run.py" />
+    <Compile Include="sensor\__init__.py" />
+    <Compile Include="sysutils\filewatch\__init__.py" />
+    <Compile Include="sysutils\fuse\simple.py" />
+    <Compile Include="sysutils\fuse\__init__.py" />
+    <Compile Include="sysutils\__init__.py" />
+    <Compile Include="template\template_run.py" />
+    <Compile Include="template\__init__.py" />
+    <Compile Include="test\test_run.py" />
+    <Compile Include="test\__init__.py" />
+    <Compile Include="transport\coap\clientGET.py" />
+    <Compile Include="transport\coap\clientPUT.py" />
+    <Compile Include="transport\coap\rd.py" />
+    <Compile Include="transport\coap\server.py" />
+    <Compile Include="transport\coap\__init__.py" />
+    <Compile Include="transport\mqtt_io\receiver.py" />
+    <Compile Include="transport\mqtt_io\sender.py" />
+    <Compile Include="transport\mqtt_io\__init__.py" />
+    <Compile Include="transport\transport_run.py" />
+    <Compile Include="transport\__init__.py" />
+    <Compile Include="webui\api\api_v1.py" />
+    <Compile Include="webui\api\__init__.py" />
+    <Compile Include="webui\chart\__init__.py" />
+    <Compile Include="webui\helpers.py" />
+    <Compile Include="webui\webui_run.py" />
+    <Compile Include="webui\__init__.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="alarm" />
+    <Folder Include="cloud" />
+    <Folder Include="cloud\graph_plotly" />
+    <Folder Include="cloud\youtube" />
+    <Folder Include="common" />
+    <Folder Include="ddns" />
+    <Folder Include="gpio" />
+    <Folder Include="gpio\bbb_io" />
+    <Folder Include="gpio\piface" />
+    <Folder Include="gpio\pigpio" />
+    <Folder Include="gpio\rpi_gpio" />
+    <Folder Include="gpio\std_gpio" />
+    <Folder Include="health_monitor" />
+    <Folder Include="heat" />
+    <Folder Include="main" />
+    <Folder Include="main\admin" />
+    <Folder Include="main\persistence" />
+    <Folder Include="main\static" />
+    <Folder Include="main\templates" />
+    <Folder Include="main\templates\admin" />
+    <Folder Include="main\templates\chart" />
+    <Folder Include="node" />
+    <Folder Include="rule" />
+    <Folder Include="scripts" />
+    <Folder Include="scripts\osinstall\" />
+    <Folder Include="scripts\osinstall\debian" />
+    <Folder Include="scripts\osinstall\pi" />
+    <Folder Include="scripts\testdata" />
+    <Folder Include="sensor" />
+    <Folder Include="sensor\RFXtrx" />
+    <Folder Include="sysutils" />
+    <Folder Include="sysutils\filewatch" />
+    <Folder Include="sysutils\fuse" />
+    <Folder Include="template" />
+    <Folder Include="test" />
+    <Folder Include="transport" />
+    <Folder Include="transport\coap" />
+    <Folder Include="transport\mqtt_io" />
+    <Folder Include="webui" />
+    <Folder Include="webui\api" />
+    <Folder Include="webui\chart" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="{2af0f10d-7135-4994-9156-5d01c9c11b7e}\2.7" />
+  </ItemGroup>
+  <Import Project="$(PtvsTargetsFile)" Condition="Exists($(PtvsTargetsFile))" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="!Exists($(PtvsTargetsFile))" />
+</Project>

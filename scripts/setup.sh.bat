@@ -29,12 +29,12 @@ cd ..
 rm mysql-connector-python-2.1.3.zip
 rm -r mysql-connector-python-2.1.3
 
-echo "Installing pigpio python module, assuming is installed in user home folder"
-cd ../PIGPIO
-python setup.py install
-cd ../PYC
+#echo "Installing pigpio python module, assuming is installed in user home folder"
+#cd ../PIGPIO
+#python setup.py install
+#cd ../PYC
 
-echo "Installing kivy"
+#echo "Installing kivy"
 # http://kivy.org/docs/installation/installation-linux.html
-pip install Cython==0.21.2
-pip install kivy
+#pip install Cython==0.21.2
+#pip install kivy

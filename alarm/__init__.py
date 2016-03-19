@@ -1,6 +1,5 @@
 __author__ = 'dcristian'
 from pydispatch import dispatcher
-
 from main.logger_helper import Log
 from main.admin import models
 #import alarm_loop
