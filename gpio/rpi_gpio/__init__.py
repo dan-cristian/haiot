@@ -62,8 +62,8 @@ def setup_in_ports(gpio_pin_list):
             Log.logger.info('Set pincode={} type={} index={} as input'.format(gpio_pin.pin_code, gpio_pin.pin_type,
                                                                               gpio_pin.pin_index_bcm))
             try:
-                GPIO.setup(gpio_pin.pin_code, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
-                GPIO.add_event_detect(gpio_pin.pin_code, GPIO.BOTH, callback=event_detected, bouncetime=300)
+                GPIO.setup(int(gpio_pin.pin_code), GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
+                GPIO.add_event_detect(int(gpio_pin.pin_code), GPIO.BOTH, callback=event_detected, bouncetime=300)
                 __pool_pin_codes.append(gpio_pin.pin_code)
                 Log.logger.info('OK callback on gpio'.format(gpio_pin.pin_code))
             except Exception, ex:
