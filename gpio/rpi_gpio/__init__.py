@@ -61,13 +61,13 @@ def setup_in_ports(gpio_pin_list):
         if gpio_pin.pin_type == Constant.GPIO_PIN_TYPE_PI_STDGPIO:
             Log.logger.info('Set pincode={} type={} index={} as input'.format(gpio_pin.pin_code, gpio_pin.pin_type,
                                                                               gpio_pin.pin_index_bcm))
-            GPIO.setup(gpio_pin.pin_code, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
             try:
+                GPIO.setup(gpio_pin.pin_code, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
                 GPIO.add_event_detect(gpio_pin.pin_code, GPIO.BOTH, callback=event_detected, bouncetime=300)
                 __pool_pin_codes.append(gpio_pin.pin_code)
                 Log.logger.info('OK callback on gpio'.format(gpio_pin.pin_code))
             except Exception, ex:
-                Log.logger.warning('Unable to add event callback pin={} err={}'.format(gpio_pin.pin_code, ex))
+                Log.logger.warning('Unable to setup & add event callback pin={} err={}'.format(gpio_pin.pin_code, ex))
 
 
 def thread_run():
