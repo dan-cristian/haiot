@@ -26,7 +26,7 @@ if [ $exit_code == 128 ]; then
     fi
 
 while $must_run; do
-    run_app db_mem model_auto_update syslog=logs2.papertrailapp.com:30445 $1 $2 $3 $4 $5
+    run_app db_mem model_auto_update debug_remote sysloglocal $1 $2 $3 $4 $5
     if [ $exit_code == 131 ]; then
         echo "Restarting app"
     fi
