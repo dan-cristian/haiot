@@ -1,4 +1,5 @@
 from datetime import datetime
+import traceback
 from copy import deepcopy
 from main.logger_helper import Log
 from main import db
@@ -182,12 +183,14 @@ class DbEvent:
             if hasattr(new_record, 'last_save_to_graph'):
                 new_record.last_save_to_graph = utils.get_base_location_now_date()
         except Exception, ex:
-            Log.logger.critical('Error when saving db changes {}, err={}'.format(new_record, ex))
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            ex_trace = traceback.format_exception(exc_type, exc_value, exc_traceback)
+            Log.logger.critical('Error when saving db changes [{}], err={}, trace=\n{}'.format(new_record, ex, ex_trace))
             if len(db.session.dirty) > 0:
                 Log.logger.info('Session dirty records={}, rolling back'.format(len(db.session.dirty)))
                 db.session.rollback()
             else:
-                Log.logger.info('No session dirty records')
+                Log.logger.info('No session dirty records to rollback')
             raise ex
             # else:
             #    Log.logger.warning('Incorrect parameters received on save changed fields to db')
