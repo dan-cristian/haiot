@@ -261,8 +261,8 @@ def run(arg_list):
     if 'debug_remote' in arg_list:
         import ptvsd
         ptvsd.enable_attach(secret='secret',address=('0.0.0.0', 5678))
-        print 'Enabled remote debugging, waiting 30 seconds for client to attach'
-        ptvsd.wait_for_attach(timeout=30)
+        print 'Enabled remote debugging, waiting 10 seconds for client to attach'
+        ptvsd.wait_for_attach(timeout=10)
     global DB_LOCATION
     if 'db_disk' in arg_list:
         DB_LOCATION='sqlite:///../database.db'
