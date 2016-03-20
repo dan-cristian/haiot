@@ -13,6 +13,7 @@
 
   "Parameter": [
     {"name": "MZP_SERVER_URL", "value":"http://192.168.0.10"},
+    {"name": "DB_PATH", "value":"/var/ram/database.db", "description": "sqlite application database to persist config and app state"},
     {"name": "OWSERVER_HOST_1", "value": "127.0.0.1"},
     {"name": "OWSERVER_PORT_1", "value": "4304"},
     {"name": "MQTT_HOST_1", "value": "192.168.0.9"},
@@ -20,7 +21,7 @@
     {"name": "MQTT_TOPIC", "value": "iot/main"},
     {"name": "MQTT_HOST_2", "value": "192.168.0.115"},
     {"name": "MQTT_PORT_2", "value": "1883"},
-    {"name": "DDNS_RACKSPACE_CONFIG_FILE", "value": ".rackspace.ddnsupdate.config.json"},
+    {"name": "DDNS_RACKSPACE_CONFIG_FILE", "value": ".rackspace.ddnsupdate.config.json", "description":"conf for ddns, stored in user home"},
     {"name": "P_USESUDO_DISKTOOLS", "value": "False"},
     {"name": "MQTT_HOST_3", "value": "iot.eclipse.org"},
     {"name": "MQTT_PORT_3", "value": "1883"},

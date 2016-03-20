@@ -64,20 +64,20 @@ else
     HAIOT_DIR=haiot
 fi
 
-echo "Downloading pigpio library for gpio access"
-wget abyz.co.uk/rpi/pigpio/pigpio.zip
-unzip pigpio.zip
-apt-get -y install build-essential
-echo "Compiling pigpio"
-cd PIGPIO
-make
-echo "Installing pigpio"
-make install
-cp /home/${USERNAME}/${HAIOT_DIR}/scripts/pigpio_daemon /etc/init.d
-chmod +x /etc/init.d/pigpio_daemon
-update-rc.d pigpio_daemon defaults
-rm -r /home/${USERNAME}/PIGPIO
-rm /home/${USERNAME}/pigpio.zip
+#echo "Downloading pigpio library for gpio access"
+#wget abyz.co.uk/rpi/pigpio/pigpio.zip
+#unzip pigpio.zip
+#apt-get -y install build-essential
+#echo "Compiling pigpio"
+#cd PIGPIO
+#make
+#echo "Installing pigpio"
+#make install
+#cp /home/${USERNAME}/${HAIOT_DIR}/scripts/pigpio_daemon /etc/init.d
+#chmod +x /etc/init.d/pigpio_daemon
+#update-rc.d pigpio_daemon defaults
+#rm -r /home/${USERNAME}/PIGPIO
+#rm /home/${USERNAME}/pigpio.zip
 
 #python setup.py install
 #todo install pigpiod init script
@@ -95,10 +95,25 @@ echo "Configuring DFRobot screen"
 # setfont -f Uni2-VGA8
 apt-get -y install gpm
 
+echo "Installing minimal webmin"
+wget http://prdownloads.sourceforge.net/webadmin/webmin-1.791-minimal.tar.gz
+tar -xvzf webmin-1.791-minimal.tar.gz
+mv webmin-1.791 /opt/
+echo "Configure webmin"
+/opt/webmin-1.791/setup.sh <<EOF
 
-echo "Installing kivy prerequisites"
+
+
+
+admin
+admin123
+admin123
+y
+EOF
+
+#echo "Installing kivy prerequisites"
 # http://kivy.org/docs/installation/installation-linux.html
-apt-get install -y libsdl2-dev
+#apt-get install -y libsdl2-dev
 
 echo "Configuring HAIOT application"
 cd /home/${USERNAME}/${HAIOT_DIR}
@@ -122,6 +137,7 @@ echo "Testing init service, create working directories for all defined linux use
 echo "Creating start links for haiot to be picked up by userspaceServices"
 ln -s /home/${USERNAME}/${HAIOT_DIR}/start_daemon_userspaces.sh /home/${USERNAME}/.startUp/
 ln -s /home/${USERNAME}/${HAIOT_DIR}/start_daemon_userspaces.sh /home/${USERNAME}/.shutDown/
+#set proper owner on all user homedir files (as they were created by root)
 chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/
 
 echo "Starting haiot via userspaceServices"

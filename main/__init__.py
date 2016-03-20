@@ -153,6 +153,9 @@ def init():
     common.init()
 
     global app, db, DB_LOCATION
+    common.load_config_json()
+    DB_LOCATION = "sqlite:///" + common.get_json_param(common.Constant.P_DB_PATH)
+    Log.logger.info('DB file is at ' + DB_LOCATION)
     # from main.logger_helper import LOG_TO_TRANSPORT
     Log.logger.info('Initialising flask')
     # http://stackoverflow.com/questions/20646822/how-to-serve-static-files-in-flask
@@ -160,7 +163,6 @@ def init():
     app = Flask('main')  #, static_url_path='')
     # app.config['TESTING'] = True
     app.config.update(DEBUG=True, SQLALCHEMY_ECHO = False, SQLALCHEMY_DATABASE_URI=DB_LOCATION)
-
     app.config['SECRET_KEY'] = 'secret'
     app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
@@ -170,7 +172,7 @@ def init():
 
     Log.logger.info('Checking main db tables')
     import admin.model_helper
-    import admin.models
+    import admin.models    
     global MODEL_AUTO_UPDATE
     admin.model_helper.populate_tables(MODEL_AUTO_UPDATE)
 
@@ -244,7 +246,7 @@ def init():
     global initialised, shutting_down
     initialised = True
 
-    #trap all DB changes
+    #trap all DB changes and propagate to event.py
     @models_committed.connect_via(app)
     def on_models_committed(sender, changes):
         from main.admin import event
@@ -259,20 +261,13 @@ def init():
 
 def run(arg_list):
     if 'debug_remote' in arg_list:
+        # https://blogs.msdn.microsoft.com/mustafakasap/2016/02/04/py-01-visual-studio-publish-python-script-on-a-unix-machine-remote-debug/
         # https://github.com/Microsoft/PTVS/wiki/Cross-Platform-Remote-Debugging
         import ptvsd
         ptvsd.enable_attach(secret='secret',address=('0.0.0.0', 5678))
         print 'Enabled remote debugging, waiting 10 seconds for client to attach'
         ptvsd.wait_for_attach(timeout=10)
-    global DB_LOCATION
-    if 'db_disk' in arg_list:
-        DB_LOCATION='sqlite:///../database.db'
-    elif 'db_mem' in arg_list:
-        DB_LOCATION='sqlite:////tmp/database.db'
-    else:
-        DB_LOCATION='sqlite:///../database.db'
-        print 'Setting default DB location on disk as {}'.format(DB_LOCATION)
-
+    
     import logging
     from main import logger_helper
     if 'debug' in arg_list:
@@ -304,10 +299,9 @@ def run(arg_list):
             global BIND_PORT
             BIND_PORT = s.split('=')[1]
 
-
     global MODEL_AUTO_UPDATE
     MODEL_AUTO_UPDATE = 'model_auto_update' in arg_list
-    init()
+    init() # will block here until app is closed
     print 'App EXIT'
     global exit_code
     sys.exit(exit_code)

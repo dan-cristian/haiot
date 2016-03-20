@@ -6,9 +6,7 @@ import datetime
 import math
 import importlib
 from collections import namedtuple
-
 import pytz
-
 from main.logger_helper import Log
 
 
