@@ -30,7 +30,7 @@ def handle_local_event_db_post(model, row):
         if row.host_name == Constant.HOST_NAME:
             main.init_module(row.name, row.active)
             processed = True
-    #propagate changes to all nodes as eac must execute db sync or other commands locally
+    #propagate changes to all nodes as each must execute db sync or other commands locally
     elif str(models.Node) in str(model) \
             or str(models.GpioPin) in str(model) or str(models.ZoneCustomRelay) in str(model) \
             or str(models.Rule) in str(model):
