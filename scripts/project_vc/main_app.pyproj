@@ -6,7 +6,8 @@
     <ProjectGuid>{ac6fd2f8-a2c2-402b-906d-f06db1ce098c}</ProjectGuid>
     <ProjectHome>..\..\</ProjectHome>
     <StartupFile>haiot.py</StartupFile>
-    <SearchPath />
+    <SearchPath>
+    </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
@@ -15,7 +16,8 @@
     <InterpreterVersion>2.7</InterpreterVersion>
     <CommandLineArguments>model_auto_update</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
-    <PublishUrl>\\nas\private\Development\haiot</PublishUrl>
+    <PublishUrl>\\nas\private\Development\haiot\</PublishUrl>
+    <IsWindowsApplication>False</IsWindowsApplication>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
@@ -44,6 +46,7 @@
     <Content Include="scripts\osinstall\debian\readme.txt" />
     <Content Include="scripts\osinstall\pi\installer-config.txt" />
     <Content Include="scripts\osinstall\pi\online-config.txt" />
+    <Content Include="scripts\osinstall\pi\post-install.sh" />
     <Content Include="scripts\osinstall\pi\post-install.txt" />
     <Content Include="scripts\osinstall\pi\rsync-ram-overlay-exclude.txt" />
     <Content Include="scripts\testdata\free.txt" />

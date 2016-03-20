@@ -2,12 +2,15 @@ __author__ = 'dcristian'
 import os
 import socket
 from uuid import getnode as get_mac
-
+import json
 
 class Constant:
+    db_values_json = None
+
     def __init__(self):
         pass
 
+    
     SIGNAL_SENSOR = 'signal-from-sensor'
     SIGNAL_SENSOR_DB_POST = 'signal-from-db-post'
     SIGNAL_MQTT_RECEIVED = 'signal-from-mqtt-data-received'
@@ -51,6 +54,7 @@ class Constant:
     SCRIPT_RESPONSE_OK = 'RESULTOK'
     SCRIPT_RESPONSE_NOTOK = 'RESULTNOTOK'
 
+    P_DB_PATH="DB_PATH"
     P_MZP_SERVER_URL = 'MZP_SERVER_URL'
     P_MQTT_HOST_1 = 'MQTT_HOST_1'
     P_MQTT_PORT_1 = 'MQTT_PORT_1'
@@ -115,6 +119,30 @@ class Constant:
     GPIO_PIN_TYPE_PI_FACE_SPI = 'pi-face-spi'
     GPIO_PIN_DIRECTION_IN = 'in'
     GPIO_PIN_DIRECTION_OUT = 'out'
+
+
+def load_config_json():
+    from main.logger_helper import Log
+    try:
+        var_path = utils.get_app_root_path() + 'scripts/config/default_db_values.json'
+        Log.logger.info('Loading variables from config file [{}]'.format(var_path))
+        with open(var_path, 'r') as f:
+            Constant.db_values_json = json.load(f)
+    except Exception, ex:
+        Log.logger.warning('Cannot load config json, ex={}'.format(ex))
+
+
+''' 
+retrieves parameter value from json config file
+'''
+def get_json_param(name):
+    param_fields = Constant.db_values_json["Parameter"]
+    value = None
+    for config_record in param_fields:
+        if config_record["name"] == name:
+            value = config_record["value"]
+            break
+    return value
 
 
 def init():

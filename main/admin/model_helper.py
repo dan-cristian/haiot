@@ -1,7 +1,6 @@
 __author__ = 'dcristian'
 import sys
 import uuid
-import json
 from sqlalchemy.exc import IntegrityError, OperationalError, InvalidRequestError
 from main.logger_helper import Log
 import models
@@ -132,11 +131,6 @@ def check_history_tables():
 
 
 def populate_tables(model_auto_update=False):
-    var_path = utils.get_app_root_path() + 'scripts/config/default_db_values.json'
-    Log.logger.info('Loading variables from config file [{}]'.format(var_path))
-    global __db_values_json
-    with open(var_path, 'r') as f:
-        __db_values_json = json.load(f)
     global table_collection
     table_collection = [models.Node, models.Parameter, models.Module,
                         models.Area, models.Zone, models.ZoneArea, models.ZoneCustomRelay,
@@ -148,8 +142,8 @@ def populate_tables(model_auto_update=False):
     for table in table_collection:
         table_str = utils.get_table_name(table)
         check_table_schema(table, model_auto_update)
-        if table_str in __db_values_json:
-            default_values = __db_values_json[table_str]
+        if table_str in Constant.db_values_json:
+            default_values = Constant.db_values_json[table_str]
             if len(table().query_all()) != len(default_values):
                 Log.logger.info(
                     'Populating {} with default values as config record count != db count'.format(table_str))
