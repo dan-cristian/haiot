@@ -263,11 +263,13 @@ def run(arg_list):
     if 'debug_remote' in arg_list:
         # https://blogs.msdn.microsoft.com/mustafakasap/2016/02/04/py-01-visual-studio-publish-python-script-on-a-unix-machine-remote-debug/
         # https://github.com/Microsoft/PTVS/wiki/Cross-Platform-Remote-Debugging
-        import ptvsd
-        ptvsd.enable_attach(secret='secret',address=('0.0.0.0', 5678))
-        print 'Enabled remote debugging, waiting 10 seconds for client to attach'
-        ptvsd.wait_for_attach(timeout=10)
-    
+        try:
+            import ptvsd
+            ptvsd.enable_attach(secret='secret',address=('0.0.0.0', 5678))
+            print 'Enabled remote debugging, waiting 10 seconds for client to attach'
+            ptvsd.wait_for_attach(timeout=10)
+        except Exception:
+            pass
     import logging
     from main import logger_helper
     if 'debug' in arg_list:

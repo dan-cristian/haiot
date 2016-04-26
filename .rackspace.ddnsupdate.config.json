@@ -1,10 +1,25 @@
 {
+    
+"RCS \u0026 RDS":{
 "username": "dancri77",
 "api_key": "816d214491964763b45f5f65a4e78fb6",
 "account_id": "10043394",
 "domain_id": "4508920",
 "record_id": "A-12717167",
 "record_ttl": "300",
-"record_name": "www.dancristian.ro"
+"record_name": "www.dancristian.ro",
+"isp": "RCS \u0026 RDS"
+},
+
+"UPC Romania SRL":{
+"username": "dancri77",
+"api_key": "816d214491964763b45f5f65a4e78fb6",
+"account_id": "10043394",
+"domain_id": "4508920",
+"record_id": "A-14987804",
+"record_ttl": "300",
+"record_name": "upc.dancristian.ro",
+"isp": "UPC Romania SRL"
 }
 
+}
