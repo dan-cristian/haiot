@@ -30,10 +30,11 @@ def do_device(owproxy):
             else:
                 dev = get_unknown(sensor, owproxy, dev)
             save_to_db(dev)
-        except pyownet.protocol.ConnError:
-            Log.logger.warning('Connection error owserver')
+        except pyownet.protocol.ConnError, er:
+            Log.logger.warning('Connection error owserver: {}'.format(er))
+        except Exception, ex:
+            Log.logger.warning('Error reading sensors: {}'.format(ex))
     return 'Read {} sensors'.format(len(sensors))
-
 
 def save_to_db(dev):
     # global db_lock
