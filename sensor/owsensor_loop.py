@@ -3,38 +3,46 @@ Created on Mar 9, 2015
 
 @author: dcristian
 '''
+
+import traceback
 import pyownet.protocol
 from main.logger_helper import Log
 from common import Constant, utils
 from main.admin import model_helper, models
 
+initialised = False
+owproxy = None
 
-def do_device(owproxy):
+
+def do_device():
+    global owproxy
     sensors = owproxy.dir('/', slash=True, bus=False)
     for sensor in sensors:
         try:
             dev = {}
             sensortype = owproxy.read(sensor + 'type')
             if sensortype == 'DS2423':
-                dev = get_counter(sensor, owproxy, dev)
+                dev = get_counter(sensor, dev)
             elif sensortype == 'DS2413':
-                dev = get_io(sensor, owproxy, dev)
+                dev = get_io(sensor, dev)
             elif sensortype == 'DS18B20':
-                dev = get_temperature(sensor, owproxy, dev)
+                dev = get_temperature(sensor, dev)
             elif sensortype == 'DS2438':
-                dev = get_temperature(sensor, owproxy, dev)
-                dev = get_voltage(sensor, owproxy, dev)
-                dev = get_humidity(sensor, owproxy, dev)
+                dev = get_temperature(sensor, dev)
+                dev = get_voltage(sensor, dev)
+                dev = get_humidity(sensor, dev)
             elif sensortype == 'DS2401':
-                dev = get_bus(sensor, owproxy, dev)
+                dev = get_bus(sensor, dev)
             else:
-                dev = get_unknown(sensor, owproxy, dev)
+                dev = get_unknown(sensor, dev)
             save_to_db(dev)
         except pyownet.protocol.ConnError, er:
             Log.logger.warning('Connection error owserver: {}'.format(er))
         except Exception, ex:
             Log.logger.warning('Error reading sensors: {}'.format(ex))
+            traceback.print_exc()
     return 'Read {} sensors'.format(len(sensors))
+
 
 def save_to_db(dev):
     # global db_lock
@@ -71,48 +79,55 @@ def save_to_db(dev):
         #    db_lock.release()
 
 
-def get_prefix(sensor, owproxy, dev):
+def get_prefix(sensor, dev):
+    global owproxy
     dev['address'] = str(owproxy.read(sensor + 'r_address'))
     dev['type'] = str(owproxy.read(sensor + 'type'))
     return dev
 
 
-def get_bus(sensor, owproxy, dev):
+def get_bus(sensor, dev):
+    global owproxy
     dev = get_prefix(sensor, owproxy, dev)
     return dev
 
 
-def get_temperature(sensor, owproxy, dev):
-    dev = get_prefix(sensor, owproxy, dev)
+def get_temperature(sensor, dev):
+    global owproxy
+    dev = get_prefix(sensor, dev)
     # 2 digits round
     dev['temperature'] = utils.round_sensor_value(owproxy.read(sensor + 'temperature'))
     return dev
 
 
-def get_humidity(sensor, owproxy, dev):
-    dev = get_prefix(sensor, owproxy, dev)
+def get_humidity(sensor, dev):
+    global owproxy
+    dev = get_prefix(sensor, dev)
     dev['humidity'] = utils.round_sensor_value(owproxy.read(sensor + 'humidity'))
     return dev
 
 
-def get_voltage(sensor, owproxy, dev):
-    dev = get_prefix(sensor, owproxy, dev)
+def get_voltage(sensor, dev):
+    global owproxy
+    dev = get_prefix(sensor, dev)
     dev['iad'] = float(owproxy.read(sensor + 'IAD'))
     dev['vad'] = float(owproxy.read(sensor + 'VAD'))
     dev['vdd'] = float(owproxy.read(sensor + 'VDD'))
     return dev
 
 
-def get_counter(sensor, owproxy, dev):
-    dev = get_prefix(sensor, owproxy, dev)
+def get_counter(sensor, dev):
+    global owproxy
+    dev = get_prefix(sensor, dev)
     dev['counters_a'] = int(owproxy.read(sensor + 'counters.A'))
     dev['counters_b'] = int(owproxy.read(sensor + 'counters.B'))
     return dev
 
 
-def get_io(sensor, owproxy, dev):
+def get_io(sensor, dev):
+    global owproxy
     # IMPORTANT: do not use . in field names as it throws error on JSON, only use "_"
-    dev = get_prefix(sensor, owproxy, dev)
+    dev = get_prefix(sensor, dev)
     dev['pio_a'] = str(owproxy.read(sensor + 'PIO.A')).strip()
     dev['pio_b'] = str(owproxy.read(sensor + 'PIO.B')).strip()
     dev['sensed_a'] = str(owproxy.read(sensor + 'sensed.A')).strip()
@@ -120,13 +135,10 @@ def get_io(sensor, owproxy, dev):
     return dev
 
 
-def get_unknown(sensor, owproxy, dev):
+def get_unknown(sensor, dev):
+    global owproxy
     dev = get_prefix(sensor, owproxy, dev)
     return dev
-
-
-initialised = False
-owproxy = None
 
 
 def init():
@@ -149,4 +161,4 @@ def thread_run():
     global initialised
     Log.logger.debug('Processing sensors')
     if initialised:
-        return do_device(owproxy)
+        return do_device()
