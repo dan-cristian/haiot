@@ -39,7 +39,7 @@ def do_device():
         except pyownet.protocol.ConnError, er:
             Log.logger.warning('Connection error owserver: {}'.format(er))
         except pyownet.Error, ex:
-            Log.logger.warning('Error reading sensors: {}'.format(ex))
+            Log.logger.warning('Error reading sensor type={}: {}'.format(sensortype, ex))
         except Exception, ex:
             Log.logger.warning('Other error reading sensors: {}'.format(ex))
             traceback.print_exc()
