@@ -3,6 +3,7 @@ import os
 import socket
 from uuid import getnode as get_mac
 import json
+import utils
 
 class Constant:
     db_values_json = None
@@ -159,8 +160,12 @@ def init():
         Constant.HOST_MAIN_IP = s.getsockname()[0]
         s.close()
     except Exception, ex:
-        Log.logger.warning('Cannot obtain main IP accurately, probably not connected to Internet, ex={}'.format(ex))
-        Constant.HOST_MAIN_IP = socket.gethostbyname(socket.gethostname())
+        Log.logger.warning('Cannot obtain main IP accurately, not connected to Internet?, retry, ex={}'.format(ex))
+        try:
+            Constant.HOST_MAIN_IP = socket.gethostbyname(socket.gethostname())
+        except Exception, ex2:
+            Log.logger.warning('Cannot obtain main IP, no DNS available?, ex={}'.format(ex2))
+            Constant.HOST_MAIN_IP = '127.0.0.1'
     Log.logger.info('Running on OS={} HOST={} IP={} MACHINE={}'.format(Constant.OS, Constant.HOST_NAME,
                                                                        Constant.HOST_MAIN_IP,
                                                                        Constant.HOST_MACHINE_TYPE))
