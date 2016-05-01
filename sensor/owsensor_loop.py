@@ -88,7 +88,7 @@ def get_prefix(sensor, dev):
 
 def get_bus(sensor, dev):
     global owproxy
-    dev = get_prefix(sensor, owproxy, dev)
+    dev = get_prefix(sensor, dev)
     return dev
 
 
@@ -137,7 +137,7 @@ def get_io(sensor, dev):
 
 def get_unknown(sensor, dev):
     global owproxy
-    dev = get_prefix(sensor, owproxy, dev)
+    dev = get_prefix(sensor, dev)
     return dev
 
 
