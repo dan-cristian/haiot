@@ -38,8 +38,10 @@ def do_device():
             save_to_db(dev)
         except pyownet.protocol.ConnError, er:
             Log.logger.warning('Connection error owserver: {}'.format(er))
-        except Exception, ex:
+        except pyownet.Error, ex:
             Log.logger.warning('Error reading sensors: {}'.format(ex))
+        except Exception, ex:
+            Log.logger.warning('Other error reading sensors: {}'.format(ex))
             traceback.print_exc()
     return 'Read {} sensors'.format(len(sensors))
 
