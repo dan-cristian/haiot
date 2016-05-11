@@ -78,7 +78,6 @@ def init():
     from main.admin import admin, user
     app.register_blueprint(admin, url_prefix='/admin')
     app.register_blueprint(user, url_prefix='/user')
-    from webui.api import api_v1
     global initialised
     if BIND_IP is not None and BIND_PORT is not None:
         host = BIND_IP
@@ -91,6 +90,7 @@ def init():
     flask_thread = helpers.FlaskInThread(app, host=host, port=port, debug=True, use_reloader=False)
     initialised = True
     flask_thread.start()
+    from webui.api import api_v1
     #app.run(debug=True, use_reloader=False, host='0.0.0.0')
 
 

@@ -17,7 +17,7 @@ def return_web_message(pin_value, ok_message='', err_message=''):
 
 
 @app.route('/apiv1/db_update/model_name=<model_name>&filter_name=<filter_name>'
-           '&filter_value=<filter_value>&field_name=<field_name>&field_value=<field_value>')
+           '&field_name=<field_name>&filter_value=<filter_value>&field_value=<field_value>')
 def generic_db_update(model_name, filter_name, filter_value, field_name, field_value):
     try:
         table = utils.class_for_name('main.admin.models', model_name)
@@ -52,9 +52,13 @@ def return_error(message):
 def return_ok():
     return "all ok"
 
+@app.route('/api')
+def api():
+    return '<a href="">API TEST</a>'
 
-@app.route('/ebooks', defaults={'req_path': ''})
-@app.route('/<path:req_path>')
+# @app.route('/ebooks', defaults={'req_path': ''})
+
+# @app.route('/<path:req_path>')
 def dir_listing(req_path):
     try:
         # BASE_DIR = '/media/ebooks'
@@ -76,3 +80,5 @@ def dir_listing(req_path):
         return render_template('files.html', files=files)
     except Exception, ex:
         return 'Error request={}, err={}'.format(req_path, ex)
+
+Log.logger.info('API V1 module initialised')
