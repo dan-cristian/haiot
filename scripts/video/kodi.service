@@ -1,0 +1,16 @@
+[Install]
+WantedBy = multi-user.target
+
+[Unit]
+Description=Job that runs Kodi
+After=default.target graphical.target getty.target sound.target
+
+[Service]
+User=root
+Restart=always
+RestartSec=5s
+ExecStart=/usr/bin/xinit /usr/bin/kodi --standalone -- -nocursor
+#ExecStartPost=/bin/bash -c "sleep 15 && systemctl start kodi.socket"
+
+[Install]
+WantedBy=default.target
