@@ -47,15 +47,11 @@ def handle_local_event_db_post(model, row):
 
 
 def handle_event_mqtt_received(client, userdata, topic, obj):
-    # executed on every mqqt message received
+    # executed on every mqqt message received, except those sent by this host
     # global __mqtt_lock
     # __mqtt_lock.acquire()
     try:
-        # ignore messages sent by this node, already processed as local calls
-        if obj[Constant.JSON_PUBLISH_SOURCE_HOST] != str(Constant.HOST_NAME):
-            __mqtt_event_list.append(obj)
-        else:
-            pass
+        __mqtt_event_list.append(obj)
     finally:
         # __mqtt_lock.release()
         pass
