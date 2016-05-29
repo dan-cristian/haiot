@@ -30,16 +30,18 @@ def on_message(client, userdata, msg):
         json = msg.payload[start:end + 1]
         x = json2obj(json)
         Log.logger.debug('Message received is {}'.format(json))
-        start = utils.get_base_location_now_date()
-        dispatcher.send(signal=Constant.SIGNAL_MQTT_RECEIVED, client=client, userdata=userdata, topic=msg.topic, obj=x)
-        elapsed = (utils.get_base_location_now_date() - start).total_seconds()
-        if elapsed > 5:
-            Log.logger.warning('Command received took {} seconds'.format(elapsed))
-        if hasattr(x, 'command') and hasattr(x, 'command_id') and hasattr(x, 'host_target'):
-            if x.host_target == socket.gethostname():
-                Log.logger.info('Executing command {}'.format(x.command))
-            else:
-                print "Received command {} for other host {}".format(x, x.host_target)
+        # ignore messages send by this host
+        if x[Constant.JSON_PUBLISH_SOURCE_HOST] != str(Constant.HOST_NAME):
+            start = utils.get_base_location_now_date()
+            dispatcher.send(signal=Constant.SIGNAL_MQTT_RECEIVED, client=client, userdata=userdata, topic=msg.topic, obj=x)
+            elapsed = (utils.get_base_location_now_date() - start).total_seconds()
+            if elapsed > 5:
+                Log.logger.warning('Command received took {} seconds'.format(elapsed))
+            if hasattr(x, 'command') and hasattr(x, 'command_id') and hasattr(x, 'host_target'):
+                if x.host_target == socket.gethostname():
+                    Log.logger.info('Executing command {}'.format(x.command))
+                else:
+                    print "Received command {} for other host {}".format(x, x.host_target)
     except AttributeError, ex:
         Log.logger.warning('Unknown attribute error in msg {} err {}'.format(json, ex))
     except ValueError, e:
