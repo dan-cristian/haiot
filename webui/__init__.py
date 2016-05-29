@@ -47,6 +47,7 @@ class ReverseProxied(object):
             environ['wsgi.url_scheme'] = scheme
         return self.app(environ, start_response)
 
+
 @app.route('/exit', methods=['POST'])
 def exit_module():
     Log.logger.info('WebUI module unloading')
@@ -68,9 +69,11 @@ def exit_module():
         Log.logger.warning('Unable to shutdown werkzeug, err {}'.format(ex))
     return 'werkzeug not exited'
 
+
 def unload():
     Log.logger.info('Webui module unloading')
     #response = app.test_client().post('/exit')
+
 
 def init():
     Log.logger.info('WebUI module initialising')
@@ -101,4 +104,5 @@ def home():
 
 @app.errorhandler(404)
 def page_not_found(e):
+    Log.logger.error('Page not found:{}'.format(e))
     return render_template('404.html'), 404
