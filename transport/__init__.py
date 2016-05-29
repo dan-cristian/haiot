@@ -7,20 +7,24 @@ from transport import mqtt_io
 initialised = False
 __send_json_queue = []
 
-#exit fast to avoid blocking db commit request?
+
+# exit fast to avoid blocking db commit request?
 def send_message_json(json=''):
     __send_json_queue.append(json)
+
 
 def send_message_obj(obj=''):
     pass
 
+
 def thread_run():
-    #FIXME: complete this, will potentially accumulate too many requests
+    # FIXME: complete this, will potentially accumulate too many requests
     for json in __send_json_queue:
         if mqtt_io.sender.send_message(json):
             __send_json_queue.remove(json)
     if len(__send_json_queue) > 20:
         Log.logger.warning("{} messages are pending in transport send queue".format(len(__send_json_queue)))
+
 
 def unload():
     from main import thread_pool

@@ -16,31 +16,30 @@ import main.persistence
 
 
 __mqtt_event_list = []
-#__mqtt_lock = threading.Lock()
+# __mqtt_lock = threading.Lock()
+
 
 def handle_local_event_db_post(model, row):
-    #executed on local db changes done via web ui only (includes API calls)
+    # executed on local db changes done via web ui only (includes API calls)
     processed = False
     Log.logger.info('Local DB change sent by model {} row {}'.format(model, row))
     if str(models.Parameter) in str(model):
         #fixme: update app if params are changing to avoid need for restart
         processed = True
-    #no need to propagate changes to other nodes
+    # no need to propagate changes to other nodes
     elif str(models.Module) in str(model):
         if row.host_name == Constant.HOST_NAME:
             main.init_module(row.name, row.active)
             processed = True
-    #propagate changes to all nodes as each must execute db sync or other commands locally
+    # propagate changes to all nodes as each must execute db sync or other commands locally
     elif str(models.Node) in str(model) \
             or str(models.GpioPin) in str(model) or str(models.ZoneCustomRelay) in str(model) \
             or str(models.Rule) in str(model):
         txt = model_helper.model_row_to_json(row, operation='update')
-        #fixme: execute critical events directly
+        # execute all events directly first, then broadcast
+        handle_event_mqtt_received(None, None, 'direct-event', utils.json2obj(txt))
         if transport.mqtt_io.client_connected:
-            transport.send_message_json(json = txt)
-        else:
-            #execute event directly as a shortcut as mqtt is not available
-            handle_event_mqtt_received(None, None, 'direct-event', txt)
+            transport.send_message_json(json=txt)
         processed = True
 
     if processed:
@@ -48,13 +47,17 @@ def handle_local_event_db_post(model, row):
 
 
 def handle_event_mqtt_received(client, userdata, topic, obj):
-    #executed on every mqqt message received
-    #global __mqtt_lock
-    #__mqtt_lock.acquire()
+    # executed on every mqqt message received
+    # global __mqtt_lock
+    # __mqtt_lock.acquire()
     try:
-        __mqtt_event_list.append(obj)
+        # ignore messages sent by this node, already processed as local calls
+        if obj[Constant.JSON_PUBLISH_SOURCE_HOST] != str(Constant.HOST_NAME):
+            __mqtt_event_list.append(obj)
+        else:
+            pass
     finally:
-        #__mqtt_lock.release()
+        # __mqtt_lock.release()
         pass
 
 
