@@ -606,10 +606,11 @@ class Rule(db.Model, DbEvent, DbBase):
     month = db.Column(db.String(20))
     year = db.Column(db.String(20))
     start_date = db.Column(db.DateTime())
+    execute_now = db.Column(db.Boolean, default=False)
     is_active = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
-        return '{} {}'.format(self.is_active, self.command)
+        return '{} {}:{}'.format(self.is_active, self.name, self.command)
 
     def __init__(self, id='', host_name=''):
         # keep host name default to '' rather than None (which does not work on filter in)
