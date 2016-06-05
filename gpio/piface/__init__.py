@@ -63,7 +63,8 @@ def init():
             global __pfd, __listener
             __pfd = pfio.PiFaceDigital()
             __listener = pfio.InputEventListener(chip=__pfd)
-            for i in range(4):
+            for i in range(8):
+                Log.logger.info("Piface registering pin {}".format(i))
                 __listener.register(i, pfio.IODIR_ON, input_event)
                 __listener.register(i, pfio.IODIR_OFF, input_event)
             __listener.activate()
