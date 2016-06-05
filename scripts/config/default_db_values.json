@@ -160,6 +160,7 @@
     {"relay_pin_name": "back pump relay pi", "zone_id": "39", "gpio_pin_code": "20", "gpio_host_name": "pi-face","relay_is_on": "0"},
     {"relay_pin_name": "back valve relay pi", "zone_id": "37", "gpio_pin_code": "16", "gpio_host_name": "pi-face","relay_is_on": "0"},
     {"relay_pin_name": "back lights relay pi", "zone_id": "40", "gpio_pin_code": "12", "gpio_host_name": "pi-face","relay_is_on": "0"},
+    {"relay_pin_name": "gate relay", "zone_id": "14", "gpio_pin_code": "5", "gpio_host_name": "pi-face","relay_is_on": "0"},
 
     {"relay_pin_name": "bucatarie music relay", "zone_id": "1", "gpio_pin_code": "23", "gpio_host_name": "pi-power", "relay_is_on": "0"},
     {"relay_pin_name": "dormitor music relay", "zone_id": "4", "gpio_pin_code": "18", "gpio_host_name": "pi-power", "relay_is_on": "0"},
