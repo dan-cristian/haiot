@@ -1,5 +1,3 @@
-__author__ = 'Dan Cristian<dan.cristian@gmail.com>'
-
 from inspect import getmembers, isfunction
 from pydispatch import dispatcher
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -7,6 +5,8 @@ from main.logger_helper import Log
 from main import thread_pool
 from main.admin import models
 from common import Constant
+
+__author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 scheduler = None
 try:
@@ -65,8 +65,9 @@ def rule_record_update(record):
     pass
 
 
+# load rules definition from database into the scheduler object list
 def __load_rules_from_db():
-    Log.logger.info("Loading rule definition from db")
+    Log.logger.info("Loading scheduled rules definition from db")
     # keep host name default to '' rather than None (which does not work on filter in_)
     try:
         # rule_list = models.Rule.query.filter(models.Rule.host_name.in_([constant.HOST_NAME, ""])).all()
@@ -87,9 +88,25 @@ def __load_rules_from_db():
                                   day_of_week=day_of_week, hour=hour, minute=minute, second=second)
             else:
                 Log.logger.info("Rule {} is marked as inactive, skipping".format(rule.command))
-    except Exception, ex:
-        Log.logger.error("Unable to load rules from db, err={}".format(ex, exc_info=True))
+    except Exception, ex1:
+        Log.logger.error("Unable to load rules from db, err={}".format(ex1, exc_info=True))
 
+
+# add dynamic rules into db to allow execution via web interface or API
+def __add_rules_into_db():
+    try:
+        if __func_list:
+            for func in __func_list:
+                if not func[1].func_defaults and not func[1].func_name.startswith('_'):
+                    # add this to DB
+                    record = models.Rule()
+                    record.name = func[1].func_name
+                    record.command = func[1].func_name
+                    record.host_name = Constant.HOST_NAME
+                    record.add_commit_record_to_db()
+
+    except Exception:
+        Log.logger.exception('Error adding rules into db')
 
 def init():
     global __func_list
@@ -98,6 +115,7 @@ def init():
     if scheduler:
         # load all function entries from hardcoded rule script
         __func_list = getmembers(rules_run, isfunction)
+        __add_rules_into_db()
         __load_rules_from_db()
         scheduler.start()
         Log.logger.info('Scheduler started')
