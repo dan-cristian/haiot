@@ -237,7 +237,16 @@
     {"zone_id":9 , "gpio_pin_code":"P8_09", "gpio_host_name": "beaglebone", "alarm_pin_name": "beci mare"},
     {"zone_id":10 , "gpio_pin_code":"P8_07", "gpio_host_name": "beaglebone", "alarm_pin_name": "scari beci"},
     {"zone_id":11 , "gpio_pin_code":"P8_15", "gpio_host_name": "beaglebone", "alarm_pin_name": "etaj hol"},
-    {"zone_id":34 , "gpio_pin_code":"0:in:3", "gpio_host_name": "pi-face", "alarm_pin_name": "horn test"},
+
+    {"zone_id":47 , "gpio_pin_code":"0:in:0", "gpio_host_name": "pi-face", "alarm_pin_name": "0"},
+    {"zone_id":1 , "gpio_pin_code":"0:in:1", "gpio_host_name": "pi-face", "alarm_pin_name": "1"},
+    {"zone_id":2 , "gpio_pin_code":"0:in:2", "gpio_host_name": "pi-face", "alarm_pin_name": "2"},
+    {"zone_id":3 , "gpio_pin_code":"0:in:3", "gpio_host_name": "pi-face", "alarm_pin_name": "3"},
+    {"zone_id":9 , "gpio_pin_code":"0:in:4", "gpio_host_name": "pi-face", "alarm_pin_name": "4"},
+    {"zone_id":10 , "gpio_pin_code":"0:in:5", "gpio_host_name": "pi-face", "alarm_pin_name": "5"},
+    {"zone_id":11 , "gpio_pin_code":"0:in:6", "gpio_host_name": "pi-face", "alarm_pin_name": "6"},
+    {"zone_id":34 , "gpio_pin_code":"0:in:7", "gpio_host_name": "pi-face", "alarm_pin_name": "7"},
+
     {"zone_id":29 , "gpio_pin_code":"18", "gpio_host_name": "pi-face", "alarm_pin_name": "beci test"}
 
   ],
