@@ -25,7 +25,7 @@ def __get_pin_function(bcm_id):
 # set gpio pin and return the actual pin state, LOW=0, HIGH=1
 # https://sourceforge.net/p/raspberry-gpio-python/wiki/Outputs/
 def set_pin_bcm(bcm_id=None, pin_value=None):
-    Log.logger.info('Set rpi.gpio pin {} value {}'.format(bcm_id, pin_value))
+    Log.logger.info('Set rpi.gpio pin {} value {} function {}'.format(bcm_id, pin_value, __get_pin_function(bcm_id)))
     try:
         #if __get_pin_function(bcm_id) != GPIO.OUT:
         GPIO.setup(bcm_id, GPIO.OUT)
@@ -33,17 +33,16 @@ def set_pin_bcm(bcm_id=None, pin_value=None):
             GPIO.output(bcm_id, pin_value)
         else:
             Log.logger.warning('Unable to setup rpi.gpio pin {} as OUT '.format(bcm_id))
-        Log.logger.info('Set done rpi.gpio pin {} value {}'.format(bcm_id, get_pin_bcm(bcm_id)))
+        Log.logger.info('Set done rpi.gpio pin {} value {} function {}'.format(
+            bcm_id, get_pin_bcm(bcm_id), __get_pin_function(bcm_id)))
     except Exception, ex:
         Log.logger.error("Error set_pin_bcm: {}".format(ex), exc_info=1)
 
 
-def get_pin_bcm(bcm_id=''):
+def get_pin_bcm(bcm_id):
     if __get_pin_function(bcm_id) != GPIO.IN:
         Log.logger.warning('Trying to read a rpi.gpio pin {} not set as IN'.format(bcm_id))
-        res = -1
-    else:
-        res = GPIO.input(bcm_id)
+    res = GPIO.input(bcm_id)
 
 
 #  https://sourceforge.net/p/raspberry-gpio-python/wiki/Inputs/,  LOW=0, HIGH=1
