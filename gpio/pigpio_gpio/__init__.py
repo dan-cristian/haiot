@@ -1,9 +1,3 @@
-__author__ = 'Dan Cristian <dan.cristian@gmail.com>'
-
-# http://abyz.co.uk/rpi/pigpio/download.html
-# http://abyz.co.uk/rpi/pigpio/python.html
-# https://ms-iot.github.io/content/images/PinMappings/RP2_Pinout.png
-
 import socket
 import time
 from threading import Thread, Lock
@@ -13,6 +7,13 @@ from main import thread_pool
 from main.admin import models
 from main.admin.model_helper import commit
 from common import Constant
+
+__author__ = 'Dan Cristian <dan.cristian@gmail.com>'
+
+# http://abyz.co.uk/rpi/pigpio/download.html
+# http://abyz.co.uk/rpi/pigpio/python.html
+# https://ms-iot.github.io/content/images/PinMappings/RP2_Pinout.png
+
 
 __import_ok = False
 initialised = False
@@ -40,14 +41,13 @@ class Logx:
 
 try:
     import pigpio
-
     __import_ok = True
 except Exception, ex:
     __import_ok = False
-    Log.logger.info('Exception on importing pigpio, err={}'.format(ex))
+    Log.logger.info('Exception on importing pigpio_gpio, err={}'.format(ex))
 
 '''
-http://abyz.co.uk/rpi/pigpio/index.html
+http://abyz.co.uk/rpi/pigpio_gpio/index.html
 
 ALL gpios are identified by their Broadcom number.  See elinux.org
 There are 54 gpios in total, arranged in two banks.
@@ -201,7 +201,7 @@ def setup_in_ports(gpio_pin_list):
                         gpio_pin_record.pin_direction = Constant.GPIO_PIN_DIRECTION_IN
                         commit()
                     except Exception, ex1:
-                        Log.logger.critical('Unable to setup pigpio pin, er={}'.format(ex1))
+                        Log.logger.critical('Unable to setup pigpio_gpio pin, er={}'.format(ex1))
                 else:
                     Log.logger.info('Skipping PiGpio setup for pin {} with type {}'.format(gpio_pin.pin_code,
                                                                                            gpio_pin.pin_type))
