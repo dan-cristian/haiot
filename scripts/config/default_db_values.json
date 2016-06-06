@@ -250,7 +250,6 @@
   ],
 
   "Rule": [
-    {"command":"test", "second":"*/5", "is_active":"0"},
     {"command":"water_front_on", "month":"5-9", "hour":"07", "minute":"30", "is_active":"1"},
     {"command":"water_front_off", "month":"5-9", "hour":"07", "minute":"32", "is_active":"1"},
     {"command":"water_back_on", "month":"5-9", "hour":"07", "minute":"33", "is_active":"1"},
