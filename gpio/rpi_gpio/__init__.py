@@ -27,7 +27,6 @@ def __get_pin_function(bcm_id=''):
 def set_pin_bcm(bcm_id=None, pin_value=None):
     if __get_pin_function(bcm_id) != GPIO.OUT:
         GPIO.setup(bcm_id, GPIO.OUT)
-
     if __get_pin_function(bcm_id) == GPIO.OUT:
         GPIO.output(bcm_id, pin_value)
     else:
