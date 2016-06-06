@@ -25,6 +25,7 @@ def __get_pin_function(bcm_id=''):
 # set gpio pin and return the actual pin state, LOW=0, HIGH=1
 # https://sourceforge.net/p/raspberry-gpio-python/wiki/Outputs/
 def set_pin_bcm(bcm_id=None, pin_value=None):
+    Log.logger.info('Set rpi.gpio pin {} value {}'.format(bcm_id, pin_value))
     if __get_pin_function(bcm_id) != GPIO.OUT:
         GPIO.setup(bcm_id, GPIO.OUT)
     if __get_pin_function(bcm_id) == GPIO.OUT:
