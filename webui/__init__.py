@@ -72,21 +72,21 @@ def exit_module():
 
 def unload():
     Log.logger.info('Webui module unloading')
-    #response = app.test_client().post('/exit')
+    # response = app.test_client().post('/exit')
 
 
 def init():
     Log.logger.info('WebUI module initialising')
-    #thread_pool.add_callable(webui.thread_run, run_interval_second=60)
+    # thread_pool.add_callable(webui.thread_run, run_interval_second=60)
     from main.admin import admin, user
     app.register_blueprint(admin, url_prefix='/admin')
     app.register_blueprint(user, url_prefix='/user')
-    global initialised
+    global initialised, flask_thread
     if BIND_IP is not None and BIND_PORT is not None:
         host = BIND_IP
         port = BIND_PORT
     else:
-        #otherwise listen on all interfaces
+        # otherwise listen on all interfaces
         host='0.0.0.0'
         port = model_helper.get_param(Constant.P_FLASK_WEB_PORT)
     app.wsgi_app = ReverseProxied(app.wsgi_app)
@@ -94,7 +94,7 @@ def init():
     initialised = True
     flask_thread.start()
     from webui.api import api_v1
-    #app.run(debug=True, use_reloader=False, host='0.0.0.0')
+    # app.run(debug=True, use_reloader=False, host='0.0.0.0')
 
 
 @app.route('/')
