@@ -28,7 +28,7 @@ def set_pin_bcm(bcm_id=None, pin_value=None):
     Log.logger.info('Set rpi.gpio pin {} value {} function {}'.format(bcm_id, pin_value, __get_pin_function(bcm_id)))
     try:
         # if __get_pin_function(bcm_id) != GPIO.OUT:
-        GPIO.setup(bcm_id, GPIO.BOTH)
+        GPIO.setup(bcm_id, GPIO.OUT)
         if __get_pin_function(bcm_id) in {GPIO.OUT, GPIO.BOTH}:
             GPIO.output(bcm_id, pin_value)
         else:
@@ -89,6 +89,7 @@ def thread_run():
 
 def unload():
     # todo: remove callbacks
+    GPIO.cleanup()
     thread_pool.remove_callable(thread_run)
     global initialised
     initialised = False
