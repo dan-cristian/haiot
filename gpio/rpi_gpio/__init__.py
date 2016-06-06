@@ -31,18 +31,20 @@ def set_pin_bcm(bcm_id=None, pin_value=None):
         GPIO.setup(bcm_id, GPIO.OUT)
         if __get_pin_function(bcm_id) in {GPIO.OUT, GPIO.BOTH}:
             GPIO.output(bcm_id, pin_value)
+            set_val = get_pin_bcm(bcm_id)
+            if set_val != pin_value:
+                Log.logger.critical('Rpi.gpio out value not OK, is {} but need {}'.format(bcm_id, set_val, pin_value))
         else:
             Log.logger.warning('Unable to setup rpi.gpio pin {} as OUT '.format(bcm_id))
-        Log.logger.info('Set done rpi.gpio pin {} value {} function {}'.format(
-            bcm_id, get_pin_bcm(bcm_id), __get_pin_function(bcm_id)))
     except Exception, ex:
         Log.logger.error("Error set_pin_bcm: {}".format(ex), exc_info=1)
 
 
 def get_pin_bcm(bcm_id):
-    if __get_pin_function(bcm_id) not in {GPIO.IN, GPIO.BOTH}:
-        Log.logger.warning('Trying to read a rpi.gpio pin {} not set as IN or BOTH'.format(bcm_id))
+    # if __get_pin_function(bcm_id) not in {GPIO.IN, GPIO.BOTH}:
+    #    Log.logger.warning('Trying to read a rpi.gpio pin {} not set as IN or BOTH'.format(bcm_id))
     res = GPIO.input(bcm_id)
+    return res
 
 
 #  https://sourceforge.net/p/raspberry-gpio-python/wiki/Inputs/,  LOW=0, HIGH=1
@@ -51,9 +53,9 @@ def event_detected(channel):
         global import_module_exist
         if import_module_exist:
             state = GPIO.input(channel)
-        Log.logger.info('Event rpi.gpio input detected channel {} status {}'.format(channel, state))
-        dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=channel, direction='in',
-                        pin_value=state, pin_connected=(state == 0))
+            Log.logger.info('Event rpi.gpio input detected channel {} status {}'.format(channel, state))
+            dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=channel, direction='in',
+                            pin_value=state, pin_connected=(state == 0))
     except Exception, ex:
         Log.logger.warning('Error rpi.gpio event detected, err {}'.format(ex))
 
@@ -66,7 +68,7 @@ def setup_in_ports(gpio_pin_list):
                                                                                        gpio_pin.pin_type,
                                                                                        gpio_pin.pin_index_bcm))
             try:
-                GPIO.setup(int(gpio_pin.pin_code), GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
+                GPIO.setup(int(gpio_pin.pin_code), GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
                 GPIO.add_event_detect(int(gpio_pin.pin_code), GPIO.BOTH, callback=event_detected, bouncetime=300)
                 __pool_pin_codes.append(gpio_pin.pin_code)
                 Log.logger.info('OK callback on rpi.gpio'.format(gpio_pin.pin_code))
@@ -82,13 +84,12 @@ def thread_run():
         if not import_module_exist:
             Log.logger.info('Simulating motion detection for test purposes')
             event_detected('P8_11')
-        #else:
+        # else:
         #    __check_for_events()
         return 'Processed rpi.gpio'
 
 
 def unload():
-    # todo: remove callbacks
     GPIO.cleanup()
     thread_pool.remove_callable(thread_run)
     global initialised
