@@ -11,7 +11,7 @@ __pool_pin_codes = []
 try:
     import RPi.GPIO as GPIO
     import_module_exist = True
-except:
+except ImportError:
     Log.logger.info('Module RPI.GPIO is not installed, module will not be initialised')
     import_module_exist = False
 
