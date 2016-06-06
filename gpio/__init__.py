@@ -38,7 +38,10 @@ def relay_get(gpio_pin_obj=None, from_web=False):
     message = 'Get relay state for pin {}'.format(gpio_pin_obj)
     if Constant.HOST_MACHINE_TYPE in [Constant.MACHINE_TYPE_RASPBERRY, Constant.MACHINE_TYPE_BEAGLEBONE]:
         if gpio_pin_obj.pin_type in [Constant.GPIO_PIN_TYPE_PI_STDGPIO, Constant.GPIO_PIN_TYPE_BBB]:
-            pin_value = std_gpio.get_pin_bcm(bcm_id=gpio_pin_obj.pin_index_bcm)
+            if rpi_gpio.initialised:
+                pin_value = rpi_gpio.get_pin_bcm(bcm_id=gpio_pin_obj.pin_index_bcm)
+            else:
+                pin_value = std_gpio.get_pin_bcm(bcm_id=gpio_pin_obj.pin_index_bcm)
         elif gpio_pin_obj.pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
             # todo: check if pin index is bcm type indeed for piface
             pin_value = piface.get_pin_value(pin_index=gpio_pin_obj.pin_index_bcm, board_index=gpio_pin_obj.board_index)
@@ -64,7 +67,10 @@ def relay_set(gpio_pin=None, value=None, from_web=False):
     Log.logger.info(message)
     if Constant.HOST_MACHINE_TYPE in [Constant.MACHINE_TYPE_RASPBERRY, Constant.MACHINE_TYPE_BEAGLEBONE]:
         if gpio_pin.pin_type in [Constant.GPIO_PIN_TYPE_PI_STDGPIO, Constant.GPIO_PIN_TYPE_BBB]:
-            pin_value = std_gpio.set_pin_bcm(gpio_pin.pin_index_bcm, value)
+            if rpi_gpio.initialised:
+                pin_value = rpi_gpio.set_pin_bcm(bcm_id=gpio_pin.pin_index_bcm, pin_value=value)
+            else:
+                pin_value = std_gpio.set_pin_bcm(gpio_pin.pin_index_bcm, value)
         elif gpio_pin.pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
             pin_value = piface.set_pin_value(pin_index=gpio_pin.pin_index_bcm, pin_value=value,
                                              board_index=gpio_pin.board_index)
@@ -124,6 +130,7 @@ def thread_run():
     bbb_io.thread_run()
     std_gpio.thread_run()
     rpi_gpio.thread_run()
+
 
 def unload():
     global initialised
