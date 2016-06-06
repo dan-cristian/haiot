@@ -32,6 +32,7 @@ def set_pin_bcm(bcm_id=None, pin_value=None):
         GPIO.output(bcm_id, pin_value)
     else:
         Log.logger.warning('Unable to setup rpi.gpio pin {} as OUT '.format(bcm_id))
+    Log.logger.info('Set done rpi.gpio pin {} value {}'.format(bcm_id, get_pin_bcm(bcm_id)))
 
 
 def get_pin_bcm(bcm_id=''):
