@@ -31,12 +31,12 @@ def set_pin_bcm(bcm_id=None, pin_value=None):
     if __get_pin_function(bcm_id) == GPIO.OUT:
         GPIO.output(bcm_id, pin_value)
     else:
-        Log.logger.warning('Unable to setup pin {} as OUT '.format(bcm_id))
+        Log.logger.warning('Unable to setup rpi.gpio pin {} as OUT '.format(bcm_id))
 
 
 def get_pin_bcm(bcm_id=''):
     if __get_pin_function(bcm_id) != GPIO.IN:
-        Log.logger.warning('Trying to read a pin {} not set as IN'.format(bcm_id))
+        Log.logger.warning('Trying to read a rpi.gpio pin {} not set as IN'.format(bcm_id))
         res = -1
     else:
         res = GPIO.input(bcm_id)
@@ -52,22 +52,23 @@ def event_detected(channel):
         dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=channel, direction='in',
                         pin_value=state, pin_connected=(state == 0))
     except Exception, ex:
-        Log.logger.warning('Error io event detected, err {}'.format(ex))
+        Log.logger.warning('Error rpi.gpio event detected, err {}'.format(ex))
 
 
 #  define all ports that are used as read/input, BCM format
 def setup_in_ports(gpio_pin_list):
     for gpio_pin in gpio_pin_list:
         if gpio_pin.pin_type == Constant.GPIO_PIN_TYPE_PI_STDGPIO:
-            Log.logger.info('Set pincode={} type={} index={} as input'.format(gpio_pin.pin_code, gpio_pin.pin_type,
-                                                                              gpio_pin.pin_index_bcm))
+            Log.logger.info('Set rpi.gpio pincode={} type={} index={} as input'.format(gpio_pin.pin_code,
+                                                                                       gpio_pin.pin_type,
+                                                                                       gpio_pin.pin_index_bcm))
             try:
                 GPIO.setup(int(gpio_pin.pin_code), GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
                 GPIO.add_event_detect(int(gpio_pin.pin_code), GPIO.BOTH, callback=event_detected, bouncetime=300)
                 __pool_pin_codes.append(gpio_pin.pin_code)
-                Log.logger.info('OK callback on gpio'.format(gpio_pin.pin_code))
+                Log.logger.info('OK callback on rpi.gpio'.format(gpio_pin.pin_code))
             except Exception, ex:
-                Log.logger.warning('Unable to setup & add event callback pin={} err={}'.format(gpio_pin.pin_code, ex))
+                Log.logger.warning('Unable to setup rpi.gpio callback pin={} err={}'.format(gpio_pin.pin_code, ex))
 
 
 def thread_run():
