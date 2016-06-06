@@ -104,7 +104,6 @@ def __add_rules_into_db():
                     record.command = func[1].func_name
                     record.host_name = Constant.HOST_NAME
                     record.add_commit_record_to_db()
-
     except Exception:
         Log.logger.exception('Error adding rules into db')
 

@@ -1,4 +1,5 @@
 import time
+import sys
 from main.logger_helper import Log
 from main import app
 from main.admin import models
@@ -6,7 +7,7 @@ from main.admin import models
 try:
     # sometimes I get "ImportError: cannot import name scheduler" so trying two import methods
     from rule import scheduler
-except Exception:
+except ImportError:
     from . import scheduler
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
@@ -25,7 +26,10 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 def execute_macro(obj=models.Rule(), field_changed_list=None):
     if obj.execute_now:
-        obj.execute_now = False
+        # obj.execute_now = False
+        # obj.commit_record_to_db()
+        # fixme execute macro
+        result = getattr(sys.modules[__name__], obj.command)()
     return 'rule execute macro ok'
 
 
@@ -51,8 +55,8 @@ def rule_sensor_temp_target(obj=models.Sensor(), field_changed_list=None):
 
 # ## MACROS - must not have any parameter and must not start with "_" to exec as API and show in WEB UI#####
 
-def test():
-    Log.logger.info("Test rule")
+def test_code():
+    Log.logger.info("Test rule code")
 
 
 def toggle_gate():
