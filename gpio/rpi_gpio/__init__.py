@@ -26,13 +26,16 @@ def __get_pin_function(bcm_id):
 # https://sourceforge.net/p/raspberry-gpio-python/wiki/Outputs/
 def set_pin_bcm(bcm_id=None, pin_value=None):
     Log.logger.info('Set rpi.gpio pin {} value {}'.format(bcm_id, pin_value))
-    if __get_pin_function(bcm_id) != GPIO.OUT:
-        GPIO.setup(bcm_id, GPIO.OUT)
-    if __get_pin_function(bcm_id) == GPIO.OUT:
-        GPIO.output(bcm_id, pin_value)
-    else:
-        Log.logger.warning('Unable to setup rpi.gpio pin {} as OUT '.format(bcm_id))
-    Log.logger.info('Set done rpi.gpio pin {} value {}'.format(bcm_id, get_pin_bcm(bcm_id)))
+    try:
+        if __get_pin_function(bcm_id) != GPIO.OUT:
+            GPIO.setup(bcm_id, GPIO.OUT)
+        if __get_pin_function(bcm_id) == GPIO.OUT:
+            GPIO.output(bcm_id, pin_value)
+        else:
+            Log.logger.warning('Unable to setup rpi.gpio pin {} as OUT '.format(bcm_id))
+        Log.logger.info('Set done rpi.gpio pin {} value {}'.format(bcm_id, get_pin_bcm(bcm_id)))
+    except Exception, ex:
+        Log.logger.error("Error set_pin_bcm: {}".format(ex), exc_info=1)
 
 
 def get_pin_bcm(bcm_id=''):
