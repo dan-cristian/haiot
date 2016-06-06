@@ -50,7 +50,7 @@ class DbBase:
         return self.__get_result(function)
 
     # example with multiple filters
-    # m().query_filter_first(m.host_name.in_([Constant.HOST_NAME]), m.name.in_([mod.name]))
+    # models.Table().query_filter_first(m.host_name.in_([Constant.HOST_NAME]), m.name.in_([mod.name]))
     def query_filter_first(self, *query_filter):
         function = self.query.filter(*query_filter).first
         return self.__get_result(function)
