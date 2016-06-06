@@ -7,7 +7,7 @@ from main import thread_pool
 import std_gpio
 import piface
 import bbb_io
-import pigpio
+import pigpio_gpio
 import rpi_gpio
 
 initialised = False
@@ -125,7 +125,7 @@ def zone_custom_relay_record_update(json_object):
 
 
 def thread_run():
-    pigpio.thread_run()
+    pigpio_gpio.thread_run()
     piface.thread_run()
     bbb_io.thread_run()
     std_gpio.thread_run()
@@ -147,7 +147,7 @@ def init():
     Log.logger.info("GPIO initialising")
     if Constant.IS_MACHINE_RASPBERRYPI:
         piface.init()
-        pigpio.init()
+        pigpio_gpio.init()
         rpi_gpio.init()
     if Constant.IS_MACHINE_BEAGLEBONE:
         bbb_io.init()
