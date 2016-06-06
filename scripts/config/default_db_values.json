@@ -152,15 +152,10 @@
       "dayofweek": "*", "year": "*", "command": "relay off zone_name='front valve'"}
   ],
   "ZoneCustomRelay": [
-    {"relay_pin_name": "back pump relay", "zone_id": "39", "gpio_pin_code": "P9_24", "gpio_host_name": "beaglebone","relay_is_on": "0"},
-    {"relay_pin_name": "back valve relay", "zone_id": "37", "gpio_pin_code": "P9_23", "gpio_host_name": "beaglebone","relay_is_on": "0"},
-    {"relay_pin_name": "back lights relay", "zone_id": "40", "gpio_pin_code": "P9_22", "gpio_host_name": "beaglebone","relay_is_on": "0"},
-    {"relay_pin_name": "front valve relay", "zone_id": "36", "gpio_pin_code": "P9_21", "gpio_host_name": "beaglebone", "relay_is_on": "0"},
-
-    {"relay_pin_name": "back pump relay pi", "zone_id": "39", "gpio_pin_code": "20", "gpio_host_name": "pi-face","relay_is_on": "0"},
-    {"relay_pin_name": "back valve relay pi", "zone_id": "37", "gpio_pin_code": "16", "gpio_host_name": "pi-face","relay_is_on": "0"},
-    {"relay_pin_name": "back lights relay pi", "zone_id": "40", "gpio_pin_code": "12", "gpio_host_name": "pi-face","relay_is_on": "0"},
-    {"relay_pin_name": "front valve relay pi", "zone_id": "36", "gpio_pin_code": "21", "gpio_host_name": "pi-face", "relay_is_on": "0"},
+    {"relay_pin_name": "back pump relay", "zone_id": "39", "gpio_pin_code": "20", "gpio_host_name": "pi-face","relay_is_on": "0"},
+    {"relay_pin_name": "back valve relay", "zone_id": "37", "gpio_pin_code": "16", "gpio_host_name": "pi-face","relay_is_on": "0"},
+    {"relay_pin_name": "back lights relay", "zone_id": "40", "gpio_pin_code": "12", "gpio_host_name": "pi-face","relay_is_on": "0"},
+    {"relay_pin_name": "front valve relay", "zone_id": "36", "gpio_pin_code": "21", "gpio_host_name": "pi-face", "relay_is_on": "0"},
     {"relay_pin_name": "gate relay", "zone_id": "14", "gpio_pin_code": "5", "gpio_host_name": "pi-face","relay_is_on": "0"},
 
     {"relay_pin_name": "bucatarie music relay", "zone_id": "1", "gpio_pin_code": "23", "gpio_host_name": "pi-power", "relay_is_on": "0"},
@@ -168,7 +163,6 @@
     {"relay_pin_name": "living music relay", "zone_id": "2", "gpio_pin_code": "17", "gpio_host_name": "pi-power", "relay_is_on": "0"},
     {"relay_pin_name": "baie mare music relay", "zone_id": "5", "gpio_pin_code": "27", "gpio_host_name": "pi-power", "relay_is_on": "0"},
     {"relay_pin_name": "beci music relay", "zone_id": "3", "gpio_pin_code": "22", "gpio_host_name": "pi-power", "relay_is_on": "0"},
-
 
     {"relay_pin_name": "test 1", "zone_id": "36", "gpio_pin_code": "0:out:0", "gpio_host_name": "pi-face", "relay_is_on": "0"}
   ],
