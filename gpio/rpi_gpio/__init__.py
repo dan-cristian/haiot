@@ -17,7 +17,7 @@ except ImportError:
 
 
 # https://sourceforge.net/p/raspberry-gpio-python/wiki/Checking%20function%20of%20GPIO%20channels/
-def __get_pin_function(bcm_id=''):
+def __get_pin_function(bcm_id):
     res = GPIO.gpio_function(bcm_id)
     return res
 
