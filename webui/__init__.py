@@ -102,7 +102,7 @@ def home():
     return '<a href="user/node">Node</a>'
 
 
-@app.errorhandler(404)
-def page_not_found(e):
-    Log.logger.error('Page not found:{}'.format(e))
-    return render_template('404.html'), 404
+#@app.errorhandler(404)
+#def page_not_found(e):
+#    Log.logger.error('Page not found:{}'.format(e))
+#    return render_template('404.html'), 404

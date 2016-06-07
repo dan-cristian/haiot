@@ -1,5 +1,3 @@
-__author__ = 'Dan Cristian <dan.cristian@gmail.com>'
-
 import os
 from pydispatch import dispatcher
 from flask import abort, send_file, render_template
@@ -7,6 +5,8 @@ from main import app, db
 from main.logger_helper import Log
 from main.admin.model_helper import commit
 from common import Constant, utils
+
+__author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
 
 def return_web_message(pin_value, ok_message='', err_message=''):
@@ -20,6 +20,7 @@ def return_web_message(pin_value, ok_message='', err_message=''):
            '&field_name=<field_name>&filter_value=<filter_value>&field_value=<field_value>')
 def generic_db_update(model_name, filter_name, filter_value, field_name, field_value):
     try:
+        Log.logger.info("Execute API generic_db_update")
         table = utils.class_for_name('main.admin.models', model_name)
         # http://stackoverflow.com/questions/19506105/flask-sqlalchemy-query-with-keyword-as-variable
         kwargs = {filter_name: filter_value}
@@ -41,7 +42,7 @@ def generic_db_update(model_name, filter_name, filter_value, field_name, field_v
             return '%s: %s' % (Constant.SCRIPT_RESPONSE_NOTOK, msg)
     except Exception, ex:
         msg = 'Exception on /apiv1/db_update: {}'.format(ex)
-        Log.logger.error(msg)
+        Log.logger.error(msg, exc_info=1)
         return '%s: %s' % (Constant.SCRIPT_RESPONSE_NOTOK, msg)
 
 
@@ -51,6 +52,7 @@ def return_error(message):
 
 def return_ok():
     return "all ok"
+
 
 @app.route('/api')
 def api():
