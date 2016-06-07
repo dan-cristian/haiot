@@ -26,10 +26,13 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 def execute_macro(obj=models.Rule(), field_changed_list=None):
     if obj.execute_now:
+        Log.logger.info('Execute macro {} as execute_now is True'.format(obj.command))
         # obj.execute_now = False
         # obj.commit_record_to_db()
         # fixme execute macro
         result = getattr(sys.modules[__name__], obj.command)()
+    else:
+        Log.logger.info('Ignoring execute macro as execute_now is False')
     return 'rule execute macro ok'
 
 
@@ -61,9 +64,9 @@ def test_code():
 
 def toggle_gate():
     Log.logger.info('Rule: toggle gate')
-    __update_custom_relay('gate relay', 1)
+    __update_custom_relay('gate_relay', 1)
     time.sleep(0.5)
-    __update_custom_relay('gate relay', 0)
+    __update_custom_relay('gate_relay', 0)
 
 
 def back_pump_on():
