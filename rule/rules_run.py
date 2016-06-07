@@ -117,10 +117,10 @@ def water_back_off():
 
 # ###### UTILITIES - start with "__" ##########
 
-
+# carefull with API fields order to match app.route definition
 def __update_custom_relay(relay_pin_name, power_is_on):
     with app.test_client() as c:
         msg = c.get('/apiv1/db_update/model_name=ZoneCustomRelay&'
-                    'filter_name=relay_pin_name&filter_value={}&field_name=relay_is_on&field_value={}'.
+                    'filter_name=relay_pin_name&field_name=relay_is_on&filter_value={}&field_value={}'.
                     format(relay_pin_name, power_is_on)).data
     Log.logger.info(msg)
