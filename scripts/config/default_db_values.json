@@ -152,11 +152,11 @@
       "dayofweek": "*", "year": "*", "command": "relay off zone_name='front valve'"}
   ],
   "ZoneCustomRelay": [
-    {"relay_pin_name": "back pump relay", "zone_id": "39", "gpio_pin_code": "20", "gpio_host_name": "pi-face","relay_is_on": "0"},
-    {"relay_pin_name": "back valve relay", "zone_id": "37", "gpio_pin_code": "16", "gpio_host_name": "pi-face","relay_is_on": "0"},
-    {"relay_pin_name": "back lights relay", "zone_id": "40", "gpio_pin_code": "12", "gpio_host_name": "pi-face","relay_is_on": "0"},
-    {"relay_pin_name": "front valve relay", "zone_id": "36", "gpio_pin_code": "21", "gpio_host_name": "pi-face", "relay_is_on": "0"},
-    {"relay_pin_name": "gate relay", "zone_id": "14", "gpio_pin_code": "5", "gpio_host_name": "pi-face","relay_is_on": "0"},
+    {"relay_pin_name": "back_pump_relay", "zone_id": "39", "gpio_pin_code": "20", "gpio_host_name": "pi-face","relay_is_on": "0"},
+    {"relay_pin_name": "back_valve_relay", "zone_id": "37", "gpio_pin_code": "16", "gpio_host_name": "pi-face","relay_is_on": "0"},
+    {"relay_pin_name": "back_lights_relay", "zone_id": "40", "gpio_pin_code": "12", "gpio_host_name": "pi-face","relay_is_on": "0"},
+    {"relay_pin_name": "front_valve_relay", "zone_id": "36", "gpio_pin_code": "21", "gpio_host_name": "pi-face", "relay_is_on": "0"},
+    {"relay_pin_name": "gate_relay", "zone_id": "14", "gpio_pin_code": "5", "gpio_host_name": "pi-face","relay_is_on": "0"},
 
     {"relay_pin_name": "bucatarie music relay", "zone_id": "1", "gpio_pin_code": "23", "gpio_host_name": "pi-power", "relay_is_on": "0"},
     {"relay_pin_name": "dormitor music relay", "zone_id": "4", "gpio_pin_code": "18", "gpio_host_name": "pi-power", "relay_is_on": "0"},
