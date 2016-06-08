@@ -29,7 +29,6 @@ def execute_macro(obj=models.Rule(), field_changed_list=None):
         Log.logger.info('Execute macro {} as execute_now is True'.format(obj.command))
         # obj.execute_now = False
         # obj.commit_record_to_db()
-        # fixme execute macro
         result = getattr(sys.modules[__name__], obj.command)()
     else:
         Log.logger.info('Ignoring execute macro as execute_now is False')
