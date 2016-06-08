@@ -247,7 +247,7 @@ def init():
     global initialised, shutting_down
     initialised = True
 
-    #trap all DB changes and propagate to event.py
+    # trap all DB changes and propagate to event.py
     @models_committed.connect_via(app)
     def on_models_committed(sender, changes):
         from main.admin import event

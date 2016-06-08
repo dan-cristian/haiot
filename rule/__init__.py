@@ -22,10 +22,12 @@ if scheduler:
 
 initialised = False
 __func_list = None
+__event_list = []
 
 
 def parse_rules(obj, change):
     global __func_list
+    global __event_list
     # executed on all db value changes
     Log.logger.debug('Received obj={} change={} for rule parsing'.format(obj, change))
     try:
@@ -40,14 +42,28 @@ def parse_rules(obj, change):
                     first_param = func[1].func_defaults[0]
                     # calling rule methods with first param type equal to passed object type
                     if type(obj) == type(first_param):
+                        # fixme: implement processing queue for rules to avoid sql session errors
+                        # __event_list.append([obj, func[0], field_changed_list])
                         result = getattr(rules_run, func[0])(obj=obj, field_changed_list=field_changed_list)
                         Log.logger.debug('Rule returned {}'.format(result))
     except Exception:
         Log.logger.exception('Error parsing rules')
 
+# unused yet
+def process_events():
+    global __event_list
+    for obj_array in __event_list:
+        try:
+            __event_list.remove(obj_array)
+            result = getattr(rules_run, obj_array[1])(obj=obj_array[0], field_changed_list=obj_array[2])
+            Log.logger.debug('Rule returned {}'.format(result))
+        except Exception, ex:
+            Log.logger.critical("Error processing rule event err={}".format(ex), exc_info=1)
+
 
 def thread_run():
     Log.logger.debug('Processing rules thread_run')
+    process_events()
     return 'Processed rules thread_run'
 
 
@@ -107,6 +123,7 @@ def __add_rules_into_db():
     except Exception:
         Log.logger.exception('Error adding rules into db')
 
+
 def init():
     global __func_list
     global scheduler
@@ -120,7 +137,7 @@ def init():
         Log.logger.info('Scheduler started')
     else:
         Log.logger.warning('Rules not initialised as scheduler is not available')
-    thread_pool.add_interval_callable(thread_run, run_interval_second=60)
+    thread_pool.add_interval_callable(thread_run, run_interval_second=1)
     # connect rules processor for all db chages trigger
     dispatcher.connect(parse_rules, signal=Constant.SIGNAL_DB_CHANGE_FOR_RULES, sender=dispatcher.Any)
     global initialised
