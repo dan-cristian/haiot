@@ -48,6 +48,7 @@ def generic_db_update(model_name, filter_name, filter_value, field_name, field_v
         return '%s: %s' % (Constant.SCRIPT_RESPONSE_NOTOK, msg)
     finally:
         db.session.remove()
+        pass
 
 
 def return_error(message):
