@@ -64,9 +64,9 @@ def test_code():
 
 def toggle_gate():
     Log.logger.info('Rule: toggle gate')
-    __update_custom_relay('gate_relay', 0)
+    __update_custom_relay('gate_relay', True)
     time.sleep(0.5)
-    __update_custom_relay('gate_relay', 1)
+    __update_custom_relay('gate_relay', False)
 
 
 def back_pump_on():

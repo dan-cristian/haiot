@@ -46,6 +46,8 @@ def generic_db_update(model_name, filter_name, filter_value, field_name, field_v
         msg = 'Exception on /apiv1/db_update: {}'.format(ex)
         Log.logger.error(msg, exc_info=1)
         return '%s: %s' % (Constant.SCRIPT_RESPONSE_NOTOK, msg)
+    finally:
+        db.session.remove()
 
 
 def return_error(message):
