@@ -49,6 +49,7 @@ def parse_rules(obj, change):
     except Exception:
         Log.logger.exception('Error parsing rules')
 
+
 # unused yet
 def process_events():
     global __event_list
