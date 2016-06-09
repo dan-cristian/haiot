@@ -127,7 +127,7 @@ def check_history_tables():
         models.UpsHistory]
     for table in table_collection_list:
         table_str = utils.get_table_name(table)
-        check_table_schema(table, model_auto_update=True)
+        check_table_schema(table, model_auto_update=False)
 
 
 def populate_tables(model_auto_update=False):
