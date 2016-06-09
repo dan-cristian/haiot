@@ -65,13 +65,13 @@ def test_code():
 def toggle_gate():
     Log.logger.info('Rule: toggle gate')
     __update_custom_relay('gate_relay', True)
-    time.sleep(0.5)
+    time.sleep(0.1)
     __update_custom_relay('gate_relay', False)
 
 
 def back_pump_on():
     Log.logger.info('Rule: back pump on')
-    __update_custom_relay('back pump relay', 1)
+    __update_custom_relay('back pump relay', True)
     # with app.test_request_context():
     #    Log.logger.info(redirect('/apiv1/relay/get'))
     # start the pump
@@ -80,18 +80,18 @@ def back_pump_on():
 
 def back_pump_off():
     Log.logger.info('back pump off')
-    __update_custom_relay('back pump relay pi', 0)
+    __update_custom_relay('back pump relay pi', False)
 
 
 def water_front_on():
     Log.logger.info('water front on')
     back_pump_on()
-    __update_custom_relay('front valve relay pi', 1)
+    __update_custom_relay('front valve relay pi', True)
 
 
 def water_front_off():
     Log.logger.info('water front off')
-    __update_custom_relay('front valve relay pi', 0)
+    __update_custom_relay('front valve relay pi', False)
     # let the pump build some pressure
     time.sleep(5)
     # pump off if no other zone is on?
@@ -101,12 +101,12 @@ def water_front_off():
 def water_back_on():
     Log.logger.info('water back on')
     back_pump_on()
-    __update_custom_relay('back valve relay pi', 1)
+    __update_custom_relay('back valve relay pi', True)
 
 
 def water_back_off():
     Log.logger.info('water back off')
-    __update_custom_relay('back valve relay pi', 0)
+    __update_custom_relay('back valve relay pi', False)
     # let the pump build some pressure
     time.sleep(5)
     # pump off if no other zone is on?
