@@ -77,8 +77,8 @@ def unload():
 
 
 def rule_record_update(record):
-    Log.logger.info("Rule definitions changed in db")
-    __load_rules_from_db()
+    Log.logger.info("Rule definitions changed in db, ignoring for now")
+    # __load_rules_from_db()
     pass
 
 
