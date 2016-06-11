@@ -41,10 +41,13 @@ def set_pin_bcm(bcm_id=None, pin_value=None):
 
 
 def get_pin_bcm(bcm_id):
-    if __get_pin_function(bcm_id) not in {GPIO.IN, GPIO.OUT}:
-        Log.logger.warning('Trying to read a rpi.gpio pin {} not set as IN or OUT. Setting as OUT.'.format(bcm_id))
+    try:
+        res = GPIO.input(bcm_id)
+    except RuntimeError, rex:
+        Log.logger.warning('Error trying to read input rpi.gpio pin {} err={}. Setting as OUT.'.format(bcm_id, rex))
         GPIO.setup(bcm_id, GPIO.OUT)
-    res = GPIO.input(bcm_id)
+        # retry read
+        res = GPIO.input(bcm_id)
     return res
 
 
