@@ -102,6 +102,12 @@ def home():
     return '<a href="user/node">Node</a>'
 
 
+@app.before_request
+def log_request():
+    # if app.config.get('LOG_REQUESTS'):
+    Log.logger.info('HTTP Request: {}'.format(request.url))
+
+
 @app.errorhandler(404)
 def page_not_found(e):
     Log.logger.error('Page not found:{}'.format(e))
