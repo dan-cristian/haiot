@@ -25,7 +25,8 @@ def generic_db_update(model_name, filter_name, filter_value, field_name, field_v
         # http://stackoverflow.com/questions/19506105/flask-sqlalchemy-query-with-keyword-as-variable
         kwargs = {filter_name: filter_value}
         # avoid getting "This session is in 'committed' state; no further SQL can be emitted within this transaction"
-        db.session = db.create_scoped_session()
+        db.session.remove()
+        # db.session = db.create_scoped_session()
         record = table.query.filter_by(**kwargs).first()
         if record:
             if hasattr(record, field_name):
@@ -47,7 +48,7 @@ def generic_db_update(model_name, filter_name, filter_value, field_name, field_v
         Log.logger.error(msg, exc_info=1)
         return '%s: %s' % (Constant.SCRIPT_RESPONSE_NOTOK, msg)
     finally:
-        db.session.remove()
+        #db.session.remove()
         pass
 
 

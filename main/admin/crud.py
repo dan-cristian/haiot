@@ -4,6 +4,7 @@ from flask import Blueprint, request, redirect, url_for, render_template
 from flask.views import MethodView
 from wtforms.ext.sqlalchemy.orm import model_form
 from main import db
+from main.logger_helper import Log
 from common import Constant
 from pydispatch import dispatcher
 
@@ -79,27 +80,31 @@ class CRUDView(MethodView):
         return self.render_list(obj=obj)
 
     def post(self, obj_id=''):
-        # either load and object to update if obj_id is given
-        # else initiate a new object, this will be helpfull
-        # when we want to create a new object instead of just
-        # editing existing one
-        if obj_id:
-            obj = self.model.query.get(obj_id)
-        else:
-            obj = self.model()
+        try:
+            # either load and object to update if obj_id is given
+            # else initiate a new object, this will be helpfull
+            # when we want to create a new object instead of just
+            # editing existing one
+            if obj_id:
+                obj = self.model.query.get(obj_id)
+            else:
+                obj = self.model()
 
-        ObjForm = model_form(self.model, db.session)
-        # populate the form with the request data
-        form = self.ObjForm(request.form)
-        # this actually populates the obj (the blog post)
-        # from the form, that we have populated from the request post
-        form.populate_obj(obj)
+            ObjForm = model_form(self.model, db.session)
+            # populate the form with the request data
+            form = self.ObjForm(request.form)
+            # this actually populates the obj (the blog post)
+            # from the form, that we have populated from the request post
+            form.populate_obj(obj)
 
-        db.session.add(obj)
-        db.session.commit()
-        # process triggers on actions initiated by user
-        dispatcher.send(signal=Constant.SIGNAL_SENSOR_DB_POST, model=self.model, row=obj)
-        return redirect(self.path)
+            db.session.add(obj)
+            db.session.commit()
+            # process triggers on actions initiated by user
+            dispatcher.send(signal=Constant.SIGNAL_SENSOR_DB_POST, model=self.model, row=obj)
+            return redirect(self.path)
+        except AttributeError, aex:
+            Log.logger.error('Error CRUD POST {}'.format(aex), exc_info=1)
+            return redirect(self.path)
 
 
 def register_crud(app, url, endpoint, model, decorators=None, **kwargs):

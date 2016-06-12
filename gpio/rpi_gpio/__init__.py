@@ -44,7 +44,7 @@ def get_pin_bcm(bcm_id):
     try:
         res = GPIO.input(bcm_id)
     except RuntimeError, rex:
-        Log.logger.warning('Error trying to read input rpi.gpio pin {} err={}. Setting as OUT.'.format(bcm_id, rex))
+        Log.logger.warning('Error reading input rpi.gpio pin {} err={}. Setting as OUT and retry.'.format(bcm_id, rex))
         GPIO.setup(bcm_id, GPIO.OUT)
         # retry read
         res = GPIO.input(bcm_id)
