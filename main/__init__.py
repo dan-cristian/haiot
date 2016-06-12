@@ -255,10 +255,11 @@ def init():
         event.on_models_committed(sender, changes)
 
     Log.logger.info('Feeding dogs with grass until app will exit')
-    #stop app from exiting
+    # stop app from exiting
     while not shutting_down:
         time.sleep(1)
     Log.logger.critical('Looping ended, app will exit')
+
 
 def run(arg_list):
     if 'debug_remote' in arg_list:
@@ -284,7 +285,7 @@ def run(arg_list):
     Log.RUN_IN_LIVE = 'live' in arg_list
 
     for s in arg_list:
-        #carefull with the order for uniqueness, start with longest words first
+        # carefull with the order for uniqueness, start with longest words first
         if 'transport_syslog' in s:
             Log.LOG_TO_TRANSPORT = True
         elif 'syslog=' in s:

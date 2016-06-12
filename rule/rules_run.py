@@ -60,12 +60,15 @@ def rule_sensor_temp_target(obj=models.Sensor(), field_changed_list=None):
 
 def test_code():
     Log.logger.info("Test rule code")
+    __update_custom_relay('test_relay', True)
+    time.sleep(0.3)
+    __update_custom_relay('test_relay', False)
 
 
 def toggle_gate():
     Log.logger.info('Rule: toggle gate')
     __update_custom_relay('gate_relay', True)
-    time.sleep(0.1)
+    time.sleep(0.3)
     __update_custom_relay('gate_relay', False)
 
 
