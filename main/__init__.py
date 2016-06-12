@@ -92,11 +92,13 @@ def init_modules():
                 Log.logger.info("Initialising generic module definition")
                 init_module(mod.name, mod.active)
 
+
 def signal_handler(signal_name, frame):
     Log.logger.info('I got signal {} frame {}, exiting'.format(signal_name, frame))
     global exit_code
     exit_code = 1
     unload()
+
 
 def execute_command(command, node=None):
     global exit_code

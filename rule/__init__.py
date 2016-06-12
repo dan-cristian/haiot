@@ -109,9 +109,10 @@ def __load_rules_from_db():
         Log.logger.error("Unable to load rules from db, err={}".format(ex1, exc_info=True))
 
 
-# add dynamic rules into db to allow execution via web interface or API
+# add dynamic rules into db and sceduler to allow execution via web interface or API
 def __add_rules_into_db():
     try:
+        scheduler.remove_all_jobs()
         if __func_list:
             for func in __func_list:
                 if not func[1].func_defaults and not func[1].func_name.startswith('_'):
@@ -120,9 +121,30 @@ def __add_rules_into_db():
                     record.name = func[1].func_name
                     record.command = func[1].func_name
                     record.host_name = Constant.HOST_NAME
+                    comment = func[1].__doc__
+                    if comment:
+                        pairs = dict(u.split("=") for u in comment.split(";"))
+                        if "month" in pairs.keys():
+                            record.month = pairs["month"]
+                        if "day_of_week" in pairs.keys():
+                            record.day_of_week = pairs["day_of_week"]
+                        if "day" in pairs.keys():
+                            record.day = pairs["day"]
+                        if "hour" in pairs.keys():
+                            record.hour = pairs["hour"]
+                        if "minute" in pairs.keys():
+                            record.minute = pairs["minute"]
+                        if "second" in pairs.keys():
+                            record.second= pairs["second"]
+                        if "is_active" in pairs.keys():
+                            record.is_active = pairs["is_active"]
+                        if record.is_active:
+                            scheduler.add_job(record.command, trigger='cron', year=record.year, month=record.month,
+                                              day=record.day, week=record.week, day_of_week=record.day_of_week,
+                                              second=record.second, hour=record.hour, minute=record.minute)
                     record.add_commit_record_to_db()
-    except Exception:
-        Log.logger.exception('Error adding rules into db')
+    except Exception, ex:
+        Log.logger.exception('Error adding rules into db {}'.format(ex), exc_info=1)
 
 
 def init():

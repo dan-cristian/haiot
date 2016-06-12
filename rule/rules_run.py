@@ -72,9 +72,16 @@ def toggle_gate():
     __update_custom_relay('gate_relay', False)
 
 
+def morning_alarm_dormitor():
+    """day_of_week=1-5;hour=07;minute=15;is_active=1"""
+    Log.logger.info('Rule: morning alarm dormitor')
+    execfile("~/PYC/scripts/audio/mpc-play.sh 6603 music")
+
+
 def back_pump_on():
+    """month=05-09;hour=07;minute=50;is_active=0"""
     Log.logger.info('Rule: back pump on')
-    __update_custom_relay('back pump relay', True)
+    __update_custom_relay('back_pump_relay', True)
     # with app.test_request_context():
     #    Log.logger.info(redirect('/apiv1/relay/get'))
     # start the pump
@@ -82,19 +89,22 @@ def back_pump_on():
 
 
 def back_pump_off():
+    """month=05-09;hour=07;minute=56;is_active=0"""
     Log.logger.info('back pump off')
-    __update_custom_relay('back pump relay pi', False)
+    __update_custom_relay('back_pump_relay', False)
 
 
 def water_front_on():
+    """month=05-09;hour=07;minute=50;is_active=0"""
     Log.logger.info('water front on')
     back_pump_on()
-    __update_custom_relay('front valve relay pi', True)
+    __update_custom_relay('front_valve_relay', True)
 
 
 def water_front_off():
+    """month=05-09;hour=07;minute=52;is_active=0"""
     Log.logger.info('water front off')
-    __update_custom_relay('front valve relay pi', False)
+    __update_custom_relay('front_valve_relay', False)
     # let the pump build some pressure
     time.sleep(5)
     # pump off if no other zone is on?
@@ -102,14 +112,16 @@ def water_front_off():
 
 
 def water_back_on():
+    """month=05-09;hour=07;minute=53;is_active=0"""
     Log.logger.info('water back on')
     back_pump_on()
-    __update_custom_relay('back valve relay pi', True)
+    __update_custom_relay('back_valve_relay', True)
 
 
 def water_back_off():
+    """month=05-09;hour=07;minute=55;is_active=0"""
     Log.logger.info('water back off')
-    __update_custom_relay('back valve relay pi', False)
+    __update_custom_relay('back_valve_relay', False)
     # let the pump build some pressure
     time.sleep(5)
     # pump off if no other zone is on?
@@ -125,7 +137,7 @@ def __update_custom_relay(relay_pin_name, power_is_on):
     # with app.test_client() as c:
     msg = api_v1.generic_db_update(model_name="ZoneCustomRelay", filter_name="relay_pin_name",
                                    field_name="relay_is_on", filter_value=relay_pin_name, field_value=power_is_on)
-        # msg = c.get('/apiv1/db_update/model_name=ZoneCustomRelay&'
-        #            'filter_name=relay_pin_name&field_name=relay_is_on&filter_value={}&field_value={}'.
-        #            format(relay_pin_name, power_is_on)).data
+    #    msg = c.get('/apiv1/db_update/model_name=ZoneCustomRelay&'
+    #                'filter_name=relay_pin_name&field_name=relay_is_on&filter_value={}&field_value={}'.
+    #                format(relay_pin_name, power_is_on)).data
     Log.logger.info(msg)

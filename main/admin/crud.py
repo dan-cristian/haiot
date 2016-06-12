@@ -103,7 +103,7 @@ class CRUDView(MethodView):
             dispatcher.send(signal=Constant.SIGNAL_SENSOR_DB_POST, model=self.model, row=obj)
             return redirect(self.path)
         except AttributeError, aex:
-            Log.logger.error('Error CRUD POST {}'.format(aex), exc_info=1)
+            Log.logger.error('Error CRUD POST {}'.format(aex))
             return redirect(self.path)
 
 
