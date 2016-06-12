@@ -251,13 +251,6 @@
 
     {"zone_id":29 , "gpio_pin_code":"18", "gpio_host_name": "pi-face", "alarm_pin_name": "beci test"}
 
-  ],
-
-  "Rule": [
-    {"command":"water_front_on", "month":"5-9", "hour":"07", "minute":"30", "is_active":"1"},
-    {"command":"water_front_off", "month":"5-9", "hour":"07", "minute":"32", "is_active":"1"},
-    {"command":"water_back_on", "month":"5-9", "hour":"07", "minute":"33", "is_active":"1"},
-    {"command":"water_back_off", "month":"5-9", "hour":"07", "minute":"30", "is_active":"1"}
   ]
 }
 
