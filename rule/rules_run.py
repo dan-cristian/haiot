@@ -1,9 +1,8 @@
 import time
 import sys
 from main.logger_helper import Log
-from main import app
 from main.admin import models
-from webui.api import api_v1
+from rule_common import update_custom_relay
 
 try:
     # sometimes I get "ImportError: cannot import name scheduler" so trying two import methods
@@ -17,6 +16,7 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 # 1: cron based rules
 # https://apscheduler.readthedocs.org/en/latest/userguide.html#adding-jobs
 # https://apscheduler.readthedocs.org/en/v2.1.2/cronschedule.html
+# http://apscheduler.readthedocs.io/en/latest/modules/triggers/cron.html?highlight=day_of_week
 # 2: value changed rules, first obj parameter is mandatory. function will execute for object changed
 # that have type=obj
 
@@ -57,23 +57,25 @@ def rule_sensor_temp_target(obj=models.Sensor(), field_changed_list=None):
 
 
 # ## MACROS - must not have any parameter and must not start with "_" to exec as API and show in WEB UI#####
+# year=*;month=*;week=*;day=*;day_of_week=*;hour=*;minute=*;second=0;is_active=1
 
 def test_code():
+    """second=18;is_active=1"""
     Log.logger.info("Test rule code")
-    __update_custom_relay('test_relay', True)
+    update_custom_relay('test_relay', True)
     time.sleep(0.3)
-    __update_custom_relay('test_relay', False)
+    update_custom_relay('test_relay', False)
 
 
 def toggle_gate():
     Log.logger.info('Rule: toggle gate')
-    __update_custom_relay('gate_relay', True)
+    update_custom_relay('gate_relay', True)
     time.sleep(0.3)
-    __update_custom_relay('gate_relay', False)
+    update_custom_relay('gate_relay', False)
 
 
 def morning_alarm_dormitor():
-    """day_of_week=1-5;hour=07;minute=15;is_active=1"""
+    """day_of_week=1-5;hour=7;minute=15;is_active=1"""
     Log.logger.info('Rule: morning alarm dormitor')
     execfile("~/PYC/scripts/audio/mpc-play.sh 6603 music")
 
@@ -81,7 +83,7 @@ def morning_alarm_dormitor():
 def back_pump_on():
     """month=05-09;hour=07;minute=50;is_active=0"""
     Log.logger.info('Rule: back pump on')
-    __update_custom_relay('back_pump_relay', True)
+    update_custom_relay('back_pump_relay', True)
     # with app.test_request_context():
     #    Log.logger.info(redirect('/apiv1/relay/get'))
     # start the pump
@@ -91,20 +93,20 @@ def back_pump_on():
 def back_pump_off():
     """month=05-09;hour=07;minute=56;is_active=0"""
     Log.logger.info('back pump off')
-    __update_custom_relay('back_pump_relay', False)
+    update_custom_relay('back_pump_relay', False)
 
 
 def water_front_on():
     """month=05-09;hour=07;minute=50;is_active=0"""
     Log.logger.info('water front on')
     back_pump_on()
-    __update_custom_relay('front_valve_relay', True)
+    update_custom_relay('front_valve_relay', True)
 
 
 def water_front_off():
     """month=05-09;hour=07;minute=52;is_active=0"""
     Log.logger.info('water front off')
-    __update_custom_relay('front_valve_relay', False)
+    update_custom_relay('front_valve_relay', False)
     # let the pump build some pressure
     time.sleep(5)
     # pump off if no other zone is on?
@@ -115,29 +117,16 @@ def water_back_on():
     """month=05-09;hour=07;minute=53;is_active=0"""
     Log.logger.info('water back on')
     back_pump_on()
-    __update_custom_relay('back_valve_relay', True)
+    update_custom_relay('back_valve_relay', True)
 
 
 def water_back_off():
     """month=05-09;hour=07;minute=55;is_active=0"""
     Log.logger.info('water back off')
-    __update_custom_relay('back_valve_relay', False)
+    update_custom_relay('back_valve_relay', False)
     # let the pump build some pressure
     time.sleep(5)
     # pump off if no other zone is on?
     back_pump_off()
 
 # ##### MACROS END ##############
-
-
-# ###### UTILITIES - start with "__" ##########
-
-# carefull with API fields order to match app.route definition
-def __update_custom_relay(relay_pin_name, power_is_on):
-    # with app.test_client() as c:
-    msg = api_v1.generic_db_update(model_name="ZoneCustomRelay", filter_name="relay_pin_name",
-                                   field_name="relay_is_on", filter_value=relay_pin_name, field_value=power_is_on)
-    #    msg = c.get('/apiv1/db_update/model_name=ZoneCustomRelay&'
-    #                'filter_name=relay_pin_name&field_name=relay_is_on&filter_value={}&field_value={}'.
-    #                format(relay_pin_name, power_is_on)).data
-    Log.logger.info(msg)

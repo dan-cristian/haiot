@@ -6,6 +6,7 @@ from main import thread_pool
 from main.admin import models
 from common import Constant
 
+
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 scheduler = None
@@ -113,6 +114,7 @@ def __load_rules_from_db():
 def __add_rules_into_db():
     try:
         scheduler.remove_all_jobs()
+        models.Rule().delete()
         if __func_list:
             for func in __func_list:
                 if not func[1].func_defaults and not func[1].func_name.startswith('_'):
@@ -124,24 +126,47 @@ def __add_rules_into_db():
                     comment = func[1].__doc__
                     if comment:
                         pairs = dict(u.split("=") for u in comment.split(";"))
+                        if "year" in pairs.keys():
+                            record.year = pairs["year"]
+                        else:
+                            record.year = "*"
                         if "month" in pairs.keys():
                             record.month = pairs["month"]
+                        else:
+                            record.month = "*"
+                        if "week" in pairs.keys():
+                            record.week = pairs["week"]
+                        else:
+                            record.week = "*"
                         if "day_of_week" in pairs.keys():
                             record.day_of_week = pairs["day_of_week"]
+                        else:
+                            record.day_of_week = "*"
                         if "day" in pairs.keys():
                             record.day = pairs["day"]
+                        else:
+                            record.day = "*"
                         if "hour" in pairs.keys():
                             record.hour = pairs["hour"]
+                        else:
+                            record.hour = "*"
                         if "minute" in pairs.keys():
                             record.minute = pairs["minute"]
+                        else:
+                            record.minute = "*"
                         if "second" in pairs.keys():
-                            record.second= pairs["second"]
+                            record.second = pairs["second"]
+                        else:
+                            record.second = "0"
                         if "is_active" in pairs.keys():
                             record.is_active = pairs["is_active"]
-                        if record.is_active:
-                            scheduler.add_job(record.command, trigger='cron', year=record.year, month=record.month,
+                        if record.is_active is "1":
+                            scheduler.add_job(func[1], trigger='cron', year=record.year, month=record.month,
                                               day=record.day, week=record.week, day_of_week=record.day_of_week,
-                                              second=record.second, hour=record.hour, minute=record.minute)
+                                              second=record.second, hour=record.hour, minute=record.minute,
+                                              max_instances=1,
+                                              misfire_grace_time=None)
+                            Log.logger.info("Adding rule {}:{} to scheduler ".format(record.name, record.command))
                     record.add_commit_record_to_db()
     except Exception, ex:
         Log.logger.exception('Error adding rules into db {}'.format(ex), exc_info=1)
@@ -155,7 +180,7 @@ def init():
         # load all function entries from hardcoded rule script
         __func_list = getmembers(rules_run, isfunction)
         __add_rules_into_db()
-        __load_rules_from_db()
+        #__load_rules_from_db()
         scheduler.start()
         Log.logger.info('Scheduler started')
     else:
