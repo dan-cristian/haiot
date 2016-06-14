@@ -145,19 +145,15 @@
     {"id":301, "area_id":"3", "zone_id":"2"}
   ],
 
-  "Scheduler": [
-    {"name": "frontvalve_relay_on","minutes": "0","hours": "5", "dayofmonth": "*", "month": "5-10",
-      "dayofweek": "*", "year": "*", "command": "relay on zone_name='front valve'"},
-    {"name": "frontvalve_relay_off","minutes": "5", "hours": "5", "dayofmonth": "*", "month": "5-10",
-      "dayofweek": "*", "year": "*", "command": "relay off zone_name='front valve'"}
-  ],
   "ZoneCustomRelay": [
     {"relay_pin_name": "back_pump_relay", "zone_id": "39", "gpio_pin_code": "20", "gpio_host_name": "pi-face","relay_is_on": "0"},
     {"relay_pin_name": "back_valve_relay", "zone_id": "37", "gpio_pin_code": "16", "gpio_host_name": "pi-face","relay_is_on": "0"},
     {"relay_pin_name": "back_lights_relay", "zone_id": "40", "gpio_pin_code": "12", "gpio_host_name": "pi-face","relay_is_on": "0"},
     {"relay_pin_name": "front_valve_relay", "zone_id": "36", "gpio_pin_code": "21", "gpio_host_name": "pi-face", "relay_is_on": "0"},
     {"relay_pin_name": "gate_relay", "zone_id": "14", "gpio_pin_code": "5", "gpio_host_name": "pi-face","relay_is_on": "0"},
+
     {"relay_pin_name": "dormitor_heat_relay", "zone_id": "4", "gpio_pin_code": "4", "gpio_host_name": "pi-face","relay_is_on": "0"},
+    {"relay_pin_name": "main_heat_relay", "zone_id": "19", "gpio_pin_code": "24", "gpio_host_name": "pi-power","relay_is_on": "0"},
 
     {"relay_pin_name": "test_relay", "zone_id": "1", "gpio_pin_code": "6", "gpio_host_name": "pi-face","relay_is_on": "0"},
 
@@ -203,10 +199,10 @@
   ],
 
   "ZoneHeatRelay":[
-    {"zone_id":1,"heat_pin_name":"bucatarie","gpio_pin_code":"P9_13","gpio_host_name":"beaglebone","is_main_heat_source":"0"},
-    {"zone_id":2,"heat_pin_name":"living","gpio_pin_code":"P9_12","gpio_host_name":"beaglebone", "is_main_heat_source":"0"},
-    {"zone_id":47,"heat_pin_name":"birou","gpio_pin_code": "P9_11","gpio_host_name":"beaglebone", "is_main_heat_source":"0"},
-    {"zone_id":4,"heat_pin_name":"dormitor","gpio_pin_code":"P9_15","gpio_host_name":"beaglebone","is_main_heat_source":"0"},
+    {"zone_id":1,"heat_pin_name":"bucatarie","gpio_pin_code":"18","gpio_host_name":"pi-face","is_main_heat_source":"0"},
+    {"zone_id":2,"heat_pin_name":"living","gpio_pin_code":"23","gpio_host_name":"pi-face", "is_main_heat_source":"0"},
+    {"zone_id":47,"heat_pin_name":"birou","gpio_pin_code": "24","gpio_host_name":"pi-face", "is_main_heat_source":"0"},
+    {"zone_id":4,"heat_pin_name":"dormitor","gpio_pin_code":"4","gpio_host_name":"pi-face","is_main_heat_source":"0"},
     {"zone_id":19,"heat_pin_name":"heat main","gpio_pin_code":"24","gpio_host_name":"pi-power","is_main_heat_source":"1"},
 
     {"zone_id":4,"heat_pin_name":"dormitor-test","gpio_pin_code":"P9_15","gpio_host_name":"netbook","is_main_heat_source":"0"}
