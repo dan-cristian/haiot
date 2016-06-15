@@ -656,7 +656,7 @@ class NodeHistory(db.Model, DbBase):
     master_overall_cycles = db.Column(db.Integer)  # count of update cycles while node was master
     run_overall_cycles = db.Column(db.Integer)  # count of total update cycles
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
-    record_uuid = db.Column(db.String(32))
+    record_uuid = db.Column(db.String(36))
     source_host_ = db.Column(db.String(50))
 
     def __repr__(self):
@@ -681,7 +681,7 @@ class SensorHistory(db.Model, DbBase):
     sensed_a = db.Column(db.Integer)
     sensed_b = db.Column(db.Integer)
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
-    record_uuid = db.Column(db.String(32))
+    record_uuid = db.Column(db.String(36))
     source_host_ = db.Column(db.String(50))
 
     def __repr__(self):
@@ -698,7 +698,7 @@ class SystemMonitorHistory(db.Model, DbBase):
     memory_available_percent = db.Column(db.Float)
     uptime_days = db.Column(db.Integer)
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
-    record_uuid = db.Column(db.String(32))
+    record_uuid = db.Column(db.String(36))
     source_host_ = db.Column(db.String(50))
 
     def __repr__(self):
@@ -724,7 +724,7 @@ class UpsHistory(db.Model, DbBase):
     test_in_progress = db.Column(db.Boolean(), default=False)
     other_status = db.Column(db.String(50))
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
-    record_uuid = db.Column(db.String(32))
+    record_uuid = db.Column(db.String(36))
     source_host_ = db.Column(db.String(50))
 
     def __repr__(self):
@@ -753,7 +753,7 @@ class SystemDiskHistory(db.Model, DbBase):
     last_reads_elapsed = db.Column(db.Float)
     last_writes_elapsed = db.Column(db.Float)
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
-    record_uuid = db.Column(db.String(32))
+    record_uuid = db.Column(db.String(36))
     source_host_ = db.Column(db.String(50))
 
     def __init__(self):
