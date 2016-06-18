@@ -100,7 +100,7 @@ class CRUDView(MethodView):
             db.session.add(obj)
             db.session.commit()
             # process triggers on actions initiated by user
-            dispatcher.send(signal=Constant.SIGNAL_SENSOR_DB_POST, model=self.model, row=obj)
+            dispatcher.send(signal=Constant.SIGNAL_UI_DB_POST, model=self.model, row=obj)
             return redirect(self.path)
         except AttributeError, aex:
             Log.logger.error('Error CRUD POST {}'.format(aex))
@@ -140,6 +140,7 @@ simple_filters = {
 from .models import Area, Zone, ZoneArea, Presence, SchedulePattern, HeatSchedule, Sensor
 from .models import Module, Parameter, TemperatureTarget, ZoneSensor, Node, Ups  # , GraphPlotly
 from .models import SystemMonitor, SystemDisk, GpioPin, ZoneAlarm, ZoneHeatRelay, ZoneCustomRelay, Rule
+from .models import CommandOverrideRelay
 
 register_crud(admin, '/', 'main-entry', Module, filters=simple_filters)
 register_crud(admin, '/module', 'module', Module, filters=simple_filters)
@@ -162,3 +163,4 @@ register_crud(user, '/zonealarm', 'zonealarm', ZoneAlarm, filters=simple_filters
 register_crud(user, '/zoneheatrelay', 'zoneheatrelay', ZoneHeatRelay, filters=simple_filters)
 register_crud(user, '/zonecustomrelay', 'zonecustomrelay', ZoneCustomRelay, filters=simple_filters)
 register_crud(user, '/rule', 'rule', Rule, filters=simple_filters)
+register_crud(user, '/commandoverriderelay', 'commandoverriderelay', CommandOverrideRelay, filters=simple_filters)

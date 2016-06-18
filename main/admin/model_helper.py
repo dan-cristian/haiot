@@ -1,4 +1,3 @@
-__author__ = 'dcristian'
 import sys
 import uuid
 from sqlalchemy.exc import IntegrityError, OperationalError, InvalidRequestError
@@ -6,6 +5,8 @@ from main.logger_helper import Log
 import models
 from common import Constant, utils, performance
 from main import db
+
+__author__ = 'dcristian'
 
 __db_values_json = None
 table_collection = None
@@ -137,7 +138,7 @@ def populate_tables(model_auto_update=False):
                         models.TemperatureTarget, models.SchedulePattern, models.HeatSchedule, models.ZoneHeatRelay,
                         models.ZoneSensor, models.ZoneAlarm,
                         models.SystemMonitor, models.SystemDisk, models.Sensor, models.Ups, models.Rule,
-                        models.PlotlyCache]
+                        models.CommandOverrideRelay, models.PlotlyCache]
 
     for table in table_collection:
         table_str = utils.get_table_name(table)
@@ -185,7 +186,7 @@ def populate_tables(model_auto_update=False):
     for node in node_list:
         if node.machine_type == Constant.MACHINE_TYPE_BEAGLEBONE:
             if len(models.GpioPin.query.filter_by(pin_type=Constant.GPIO_PIN_TYPE_BBB,
-                                                  host_name=node.name).all()) != 46 * 2:  # P8_ and P9_ rows have 46 pins
+                                                  host_name=node.name).all()) != 46 * 2:  # P8_ & P9_ rows have 46 pins
                 models.GpioPin.query.filter_by(pin_type=Constant.GPIO_PIN_TYPE_BBB, host_name=node.name).delete()
                 commit()
                 Log.logger.info('Populating default {} GpioPins on {} '.format(node.machine_type, node.name))

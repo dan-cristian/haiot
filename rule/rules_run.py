@@ -2,7 +2,7 @@ import time
 import sys
 from main.logger_helper import Log
 from main.admin import models
-from rule_common import update_custom_relay
+import rule_common
 
 try:
     # sometimes I get "ImportError: cannot import name scheduler" so trying two import methods
@@ -62,16 +62,16 @@ def rule_sensor_temp_target(obj=models.Sensor(), field_changed_list=None):
 def test_code():
     """second=18;is_active=1"""
     Log.logger.info("Test rule code")
-    update_custom_relay('test_relay', True)
+    rule_common.update_custom_relay('test_relay', True)
     time.sleep(0.3)
-    update_custom_relay('test_relay', False)
+    rule_common.update_custom_relay('test_relay', False)
 
 
 def toggle_gate():
     Log.logger.info('Rule: toggle gate')
-    update_custom_relay('gate_relay', True)
+    rule_common.update_custom_relay('gate_relay', True)
     time.sleep(0.3)
-    update_custom_relay('gate_relay', False)
+    rule_common.update_custom_relay('gate_relay', False)
 
 
 def morning_alarm_dormitor():
@@ -83,7 +83,7 @@ def morning_alarm_dormitor():
 def back_pump_on():
     """month=05-09;hour=07;minute=50;is_active=0"""
     Log.logger.info('Rule: back pump on')
-    update_custom_relay('back_pump_relay', True)
+    rule_common.update_custom_relay('back_pump_relay', True)
     # with app.test_request_context():
     #    Log.logger.info(redirect('/apiv1/relay/get'))
     # start the pump
@@ -93,20 +93,20 @@ def back_pump_on():
 def back_pump_off():
     """month=05-09;hour=07;minute=56;is_active=0"""
     Log.logger.info('back pump off')
-    update_custom_relay('back_pump_relay', False)
+    rule_common.update_custom_relay('back_pump_relay', False)
 
 
 def water_front_on():
     """month=05-09;hour=07;minute=50;is_active=0"""
     Log.logger.info('water front on')
     back_pump_on()
-    update_custom_relay('front_valve_relay', True)
+    rule_common.update_custom_relay('front_valve_relay', True)
 
 
 def water_front_off():
     """month=05-09;hour=07;minute=52;is_active=0"""
     Log.logger.info('water front off')
-    update_custom_relay('front_valve_relay', False)
+    rule_common.update_custom_relay('front_valve_relay', False)
     # let the pump build some pressure
     time.sleep(5)
     # pump off if no other zone is on?
@@ -117,16 +117,20 @@ def water_back_on():
     """month=05-09;hour=07;minute=53;is_active=0"""
     Log.logger.info('water back on')
     back_pump_on()
-    update_custom_relay('back_valve_relay', True)
+    rule_common.update_custom_relay('back_valve_relay', True)
 
 
 def water_back_off():
     """month=05-09;hour=07;minute=55;is_active=0"""
     Log.logger.info('water back off')
-    update_custom_relay('back_valve_relay', False)
+    rule_common.update_custom_relay('back_valve_relay', False)
     # let the pump build some pressure
     time.sleep(5)
     # pump off if no other zone is on?
     back_pump_off()
+
+
+def main_heat_on():
+    rule_common.update_command_override_relay('main_heat_relay')
 
 # ##### MACROS END ##############
