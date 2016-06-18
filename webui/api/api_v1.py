@@ -20,7 +20,8 @@ def return_web_message(pin_value, ok_message='', err_message=''):
            '&field_name=<field_name>&filter_value=<filter_value>&field_value=<field_value>')
 def generic_db_update(model_name, filter_name, filter_value, field_name, field_value):
     try:
-        Log.logger.info("Execute API generic_db_update")
+        Log.logger.info("Execute API generic_db_update model={} filter={} filtervalue={} field={} fieldvalue={}"
+                        .format(model_name, filter_name, filter_value, field_name, field_value))
         table = utils.class_for_name('main.admin.models', model_name)
         # http://stackoverflow.com/questions/19506105/flask-sqlalchemy-query-with-keyword-as-variable
         kwargs = {filter_name: filter_value}
@@ -33,7 +34,7 @@ def generic_db_update(model_name, filter_name, filter_value, field_name, field_v
                 setattr(record, field_name, field_value)
                 db.session.add(record)
                 commit()
-                dispatcher.send(signal=Constant.SIGNAL_SENSOR_DB_POST, model=table, row=record)
+                dispatcher.send(signal=Constant.SIGNAL_UI_DB_POST, model=table, row=record)
                 return '%s: %s' % (Constant.SCRIPT_RESPONSE_OK, record)
             else:
                 msg = 'Field {} not found in record {}'.format(field_name, record)

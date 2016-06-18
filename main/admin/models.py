@@ -50,7 +50,8 @@ class DbBase:
         return self.__get_result(function)
 
     # example with multiple filters
-    # models.Table().query_filter_first(m.host_name.in_([Constant.HOST_NAME]), m.name.in_([mod.name]))
+    # m = models.Table
+    # m().query_filter_first(m.host_name.in_([Constant.HOST_NAME]), m.name.in_([mod.name]))
     def query_filter_first(self, *query_filter):
         function = self.query.filter(*query_filter).first
         return self.__get_result(function)
@@ -593,6 +594,21 @@ class ZoneCustomRelay(db.Model, DbEvent, DbBase):
 
     def __repr__(self):
         return 'host {} {} {} {}'.format(self.gpio_host_name, self.gpio_pin_code, self.relay_pin_name, self.relay_is_on)
+
+
+# base class for user or rule events that might override automatic system behaviour
+class CommandOverrideBase(db.Model, DbEvent, DbBase):
+    id = db.Column(db.Integer, primary_key=True)
+    host_name = db.Column(db.String(50))
+    is_gui_source = db.Column(db.Boolean, default=False)  # gui has priority over rule
+    is_rule_source = db.Column(db.Boolean, default=False)
+    start_date = db.Column(db.DateTime(), default=datetime.utcnow)
+    end_date = db.Column(db.DateTime(), default=datetime.utcnow)
+    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class CommandOverrideRelay(CommandOverrideBase):
+    relay_pin_name = db.Column(db.String(50))
 
 
 class Rule(db.Model, DbEvent, DbBase):
