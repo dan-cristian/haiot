@@ -96,7 +96,7 @@ def mqtt_thread_run():
                 source_host = obj[Constant.JSON_PUBLISH_SOURCE_HOST]
                 if Constant.JSON_PUBLISH_TABLE in obj:
                     table = str(obj[Constant.JSON_PUBLISH_TABLE])
-                    if table == utils.get_table_name(models.Node):#'Node':
+                    if table == utils.get_table_name(models.Node):
                         node.node_run.node_update(obj)
                         # fixme: remove hardcoded strings
                         if 'execute_command' in obj:
@@ -176,7 +176,7 @@ def mqtt_thread_run():
 
 # http://pydispatcher.sourceforge.net/
 def init():
-    dispatcher.connect(handle_local_event_db_post, signal=Constant.SIGNAL_SENSOR_DB_POST, sender=dispatcher.Any)
+    dispatcher.connect(handle_local_event_db_post, signal=Constant.SIGNAL_UI_DB_POST, sender=dispatcher.Any)
     dispatcher.connect(handle_event_mqtt_received, signal=Constant.SIGNAL_MQTT_RECEIVED, sender=dispatcher.Any)
     thread_pool.add_interval_callable(mqtt_thread_run, run_interval_second=1)
 

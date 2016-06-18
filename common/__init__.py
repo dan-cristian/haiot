@@ -13,7 +13,7 @@ class Constant:
 
     
     SIGNAL_SENSOR = 'signal-from-sensor'
-    SIGNAL_SENSOR_DB_POST = 'signal-from-db-post'
+    SIGNAL_UI_DB_POST = 'signal-from-db-post'
     SIGNAL_MQTT_RECEIVED = 'signal-from-mqtt-data-received'
     SIGNAL_HEAT = 'signal-from-heat'
     SIGNAL_GPIO = 'signal-from-GPIO'
