@@ -1,6 +1,6 @@
 {
   "Node": [
-    {"id":1,  "priority":"10", "name":"netbook", "machine_type":"beaglebone"},
+    {"id":1,  "priority":"10", "name":"netbook", "machine_type":"raspberry"},
     {"id":2,  "priority":"2", "name":"nas"},
     {"id":3,  "priority":"3", "name":"server"},
     {"id":4,  "priority":"4", "name":"ex-std-node466.prod.rhcloud.com"},
@@ -153,6 +153,7 @@
     {"relay_pin_name": "gate_relay", "zone_id": "14", "gpio_pin_code": "5", "gpio_host_name": "pi-face","relay_is_on": "0"},
     {"relay_pin_name": "dormitor_heat_relay", "zone_id": "4", "gpio_pin_code": "4", "gpio_host_name": "pi-face","relay_is_on": "0"},
     {"relay_pin_name": "test_relay", "zone_id": "1", "gpio_pin_code": "66", "gpio_host_name": "pi-face","relay_is_on": "0"},
+    {"relay_pin_name": "test_relay_netbook", "zone_id": "1", "gpio_pin_code": "1", "gpio_host_name": "netbook","relay_is_on": "0"},
     {"relay_pin_name": "main_heat_relay", "zone_id": "19", "gpio_pin_code": "24", "gpio_host_name": "pi-power","relay_is_on": "0"},
     {"relay_pin_name": "bucatarie_music_relay", "zone_id": "1", "gpio_pin_code": "23", "gpio_host_name": "pi-power", "relay_is_on": "0"},
     {"relay_pin_name": "dormitor_music_relay", "zone_id": "4", "gpio_pin_code": "18", "gpio_host_name": "pi-power", "relay_is_on": "0"},

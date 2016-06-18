@@ -63,7 +63,7 @@ def relay_get(gpio_pin_obj=None, from_web=False):
 def relay_set(gpio_pin=None, value=None, from_web=False):
     pin_value = None
     value = int(value)
-    message = 'Set relay state [{}] for pin [{}] {} from web=[{}]'.format(value, gpio_pin.pin_index_bcm, from_web)
+    message = 'Set relay state [{}] for pin [{}] from web=[{}]'.format(value, gpio_pin.pin_index_bcm, from_web)
     Log.logger.info(message)
     if Constant.HOST_MACHINE_TYPE in [Constant.MACHINE_TYPE_RASPBERRY, Constant.MACHINE_TYPE_BEAGLEBONE]:
         if gpio_pin.pin_type in [Constant.GPIO_PIN_TYPE_PI_STDGPIO, Constant.GPIO_PIN_TYPE_BBB]:
