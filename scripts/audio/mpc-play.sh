@@ -66,6 +66,7 @@ for i in ${!PORT[*]}; do
 			echo2 "Starting RADIO play in zone ${NAME[$i]}, output=[${OUTPUT[$i]}]"
 			mpc -vp $1 clear >> $LOG 2>&1
 			mpc -vp $1 load radios >> $LOG 2>&1
+			mpc -vp $1 volume 25 >> $LOG 2>&1
 			mpc -vp $1 play >> $LOG 2>&1
 			#start amp if needed
                         `dirname $0`/activate-audio-amp.sh
@@ -75,6 +76,7 @@ for i in ${!PORT[*]}; do
 			mpc -vp $1 load $3 >> $LOG 2>&1
 			mpc -vp $1 random on >> $LOG 2>&1
 			mpc -vp $1 repeat on >> $LOG 2>&1
+			mpc -vp $1 volume 25 >> $LOG 2>&1
 			mpc -vp $1 play >> $LOG 2>&1
 			#start amp if needed
                         `dirname $0`/activate-audio-amp.sh
