@@ -1,6 +1,7 @@
 import time
-import datetime
 import sys
+import thread
+import datetime
 from main.logger_helper import Log
 from main.admin import models
 import rule_common
@@ -31,10 +32,16 @@ def execute_macro(obj=models.Rule(), field_changed_list=None):
         Log.logger.info('Execute macro {} as execute_now is True'.format(obj.command))
         # obj.execute_now = False
         # obj.commit_record_to_db()
-        result = getattr(sys.modules[__name__], obj.command)()
+        function = getattr(sys.modules[__name__], obj.command)
+        if obj.is_async:
+            thread.start_new_thread(function, ())
+            result = "rule started async"
+        else:
+            result = function()
     else:
         Log.logger.info('Ignoring execute macro as execute_now is False')
-    return 'rule execute macro ok'
+        result = "Rule not executed as execute_now is False"
+    return result
 
 
 def rule_node(obj=models.Node(), field_changed_list=None):
@@ -61,7 +68,7 @@ def rule_sensor_temp_target(obj=models.Sensor(), field_changed_list=None):
 # year=*;month=*;week=*;day=*;day_of_week=*;hour=*;minute=*;second=0;is_active=1
 
 def test_code():
-    """second=18;is_active=1"""
+    """second=18;is_active=0"""
     Log.logger.info("Test rule code 3")
     rule_common.update_custom_relay('test_relay', True)
     time.sleep(0.5)
@@ -80,6 +87,24 @@ def morning_alarm_dormitor():
     """day_of_week=1-5;hour=7;minute=15;is_active=1"""
     Log.logger.info('Rule: morning alarm dormitor')
     execfile("~/PYC/scripts/audio/mpc-play.sh 6603 music")
+
+
+def water_front_1_minute():
+    """is_async=1"""
+    back_pump_on()
+    water_front_on()
+    time.sleep(60)
+    water_front_off()
+    back_pump_off()
+
+
+def water_back_1_minute():
+    """is_async=1"""
+    back_pump_on()
+    water_back_on()
+    time.sleep(60)
+    water_back_off()
+    back_pump_off()
 
 
 def back_pump_on():
