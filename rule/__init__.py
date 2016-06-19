@@ -188,6 +188,8 @@ def reload_rules():
         __add_rules_into_db()
         __rules_timestamp = new_stamp
         rules_run.test_code()
+    else:
+        Log.logger.info('Reloading skip timestamp {} != {}'.format(__rules_timestamp, new_stamp))
 
 
 def init():
