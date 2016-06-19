@@ -29,11 +29,12 @@ def set_pin_bcm(bcm_id=None, pin_value=None):
     try:
         # if __get_pin_function(bcm_id) != GPIO.OUT:
         GPIO.setup(bcm_id, GPIO.OUT)
-        if __get_pin_function(bcm_id) in {GPIO.OUT, GPIO.BOTH}:
+        if __get_pin_function(bcm_id) in {GPIO.OUT}:
             GPIO.output(bcm_id, pin_value)
             set_val = get_pin_bcm(bcm_id)
             if set_val != pin_value:
                 Log.logger.critical('Rpi.gpio out value not OK, is {} but need {}'.format(bcm_id, set_val, pin_value))
+            return set_val
         else:
             Log.logger.warning('Unable to setup rpi.gpio pin {} as OUT '.format(bcm_id))
     except Exception, ex:
@@ -65,6 +66,7 @@ def event_detected(channel):
 
 
 #  define all ports that are used as read/input, BCM format
+#  https://sourceforge.net/p/raspberry-gpio-python/wiki/Inputs/
 def setup_in_ports(gpio_pin_list):
     for gpio_pin in gpio_pin_list:
         if gpio_pin.pin_type == Constant.GPIO_PIN_TYPE_PI_STDGPIO:
