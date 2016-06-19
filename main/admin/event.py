@@ -1,5 +1,5 @@
 from pydispatch import dispatcher
-
+import threading
 from main.logger_helper import Log
 from main import thread_pool, persistence
 from common import Constant, variable, utils
@@ -16,7 +16,7 @@ import main.persistence
 
 
 __mqtt_event_list = []
-# __mqtt_lock = threading.Lock()
+__mqtt_lock = threading.Lock()
 
 
 # executed on local db changes done via web ui only, including API calls
@@ -40,6 +40,7 @@ def handle_local_event_db_post(model, row):
         txt = model_helper.model_row_to_json(row, operation='update')
         # execute all events directly first, then broadcast
         handle_event_mqtt_received(None, None, 'direct-event', utils.json2obj(txt))
+        mqtt_thread_run()
         if transport.mqtt_io.client_connected:
             transport.send_message_json(json=txt)
         processed = True
@@ -82,8 +83,8 @@ def on_models_committed(sender, changes):
 
 # runs periodically and executes received mqqt messages from queue
 def mqtt_thread_run():
-    # global __mqtt_lock
-    # __mqtt_lock.acquire()
+    global __mqtt_lock
+    __mqtt_lock.acquire()
     from cloud import graph_plotly
     try:
         last_count = len(__mqtt_event_list)
@@ -170,7 +171,7 @@ def mqtt_thread_run():
     except Exception, ex:
         Log.logger.critical("General error processing mqtt: {}".format(ex))
     finally:
-        # __mqtt_lock.release()
+        __mqtt_lock.release()
         pass
 
 
