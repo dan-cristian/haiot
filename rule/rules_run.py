@@ -61,7 +61,7 @@ def rule_sensor_temp_target(obj=models.Sensor(), field_changed_list=None):
 
 def test_code():
     """second=18;is_active=1"""
-    Log.logger.info("Test rule code")
+    Log.logger.info("Test rule code 3")
     rule_common.update_custom_relay('test_relay', True)
     time.sleep(0.3)
     rule_common.update_custom_relay('test_relay', False)
@@ -134,3 +134,4 @@ def main_heat_on():
     rule_common.update_command_override_relay('main_heat_relay')
 
 # ##### MACROS END ##############
+

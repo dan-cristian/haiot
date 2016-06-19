@@ -1,4 +1,6 @@
 from inspect import getmembers, isfunction
+import imp
+import os
 from pydispatch import dispatcher
 from apscheduler.schedulers.background import BackgroundScheduler
 from main.logger_helper import Log
@@ -24,7 +26,7 @@ if scheduler:
 initialised = False
 __func_list = None
 __event_list = []
-
+__rules_timestamp = None
 
 def parse_rules(obj, change):
     global __func_list
@@ -65,6 +67,7 @@ def process_events():
 
 def thread_run():
     Log.logger.debug('Processing rules thread_run')
+    reload_rules()
     process_events()
     return 'Processed rules thread_run'
 
@@ -113,6 +116,9 @@ def __load_rules_from_db():
 # add dynamic rules into db and sceduler to allow execution via web interface or API
 def __add_rules_into_db():
     try:
+        global __func_list
+        # load all function entries from hardcoded rule script
+        __func_list = getmembers(rules_run, isfunction)
         scheduler.remove_all_jobs()
         models.Rule().delete()
         if __func_list:
@@ -172,13 +178,22 @@ def __add_rules_into_db():
         Log.logger.exception('Error adding rules into db {}'.format(ex), exc_info=1)
 
 
+def reload_rules():
+    global __rules_timestamp
+    path = rules_run.__file__
+    new_stamp = os.path.getmtime(path)
+    if new_stamp != __rules_timestamp:
+        Log.logger.info('Reloading rules module due to timestamp change {} != {}'.format(__rules_timestamp, new_stamp))
+        imp.reload(rules_run)
+        __add_rules_into_db()
+        __rules_timestamp = new_stamp
+        rules_run.test_code()
+
+
 def init():
-    global __func_list
     global scheduler
     Log.logger.info('Rules module initialising')
     if scheduler:
-        # load all function entries from hardcoded rule script
-        __func_list = getmembers(rules_run, isfunction)
         __add_rules_into_db()
         #__load_rules_from_db()
         scheduler.start()
