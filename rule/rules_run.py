@@ -89,20 +89,20 @@ def morning_alarm_dormitor():
     execfile("~/PYC/scripts/audio/mpc-play.sh 6603 music")
 
 
-def water_front_1_minute():
+def water_front_3_minute():
     """is_async=1"""
     back_pump_on()
     water_front_on()
-    time.sleep(60)
+    time.sleep(60*3)
     water_front_off()
     back_pump_off()
 
 
-def water_back_1_minute():
+def water_back_3_minute():
     """is_async=1"""
     back_pump_on()
     water_back_on()
-    time.sleep(60)
+    time.sleep(60*3)
     water_back_off()
     back_pump_off()
 
