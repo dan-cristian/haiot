@@ -1,12 +1,12 @@
-__author__ = 'Dan Cristian<dan.cristian@gmail.com>'
-
-from flask import request, render_template, send_from_directory
-
+from flask import request, render_template, send_from_directory, send_file
 from main.logger_helper import Log
 from main import app, BIND_IP, BIND_PORT
 from main.admin import model_helper
 from common import Constant
 import helpers
+
+__author__ = 'Dan Cristian<dan.cristian@gmail.com>'
+
 
 initialised = False
 flask_thread = None
@@ -100,6 +100,11 @@ def init():
 @app.route('/')
 def home():
     return '<a href="user/node">Node</a>'
+
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_file("static/favicon.ico", mimetype='image/ico')
 
 
 @app.before_request
