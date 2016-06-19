@@ -183,13 +183,14 @@ def reload_rules():
     path = rules_run.__file__
     new_stamp = os.path.getmtime(path)
     if new_stamp != __rules_timestamp:
-        Log.logger.info('Reloading rules module due to timestamp change {} != {}'.format(__rules_timestamp, new_stamp))
+        Log.logger.info('Reloading rules module {} due to timestamp change {} != {}'.format(path, __rules_timestamp,
+                                                                                            new_stamp))
         imp.reload(rules_run)
         __add_rules_into_db()
         __rules_timestamp = new_stamp
         rules_run.test_code()
     else:
-        Log.logger.info('Reloading skip timestamp {} != {}'.format(__rules_timestamp, new_stamp))
+        Log.logger.info('Reloading {} skip timestamp {} != {}'.format(path, __rules_timestamp, new_stamp))
 
 
 def init():
