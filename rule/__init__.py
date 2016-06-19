@@ -28,7 +28,9 @@ __func_list = None
 __event_list = []
 __rules_timestamp = None
 
+
 def parse_rules(obj, change):
+    """ running rule method corresponding with obj type """
     global __func_list
     global __event_list
     # executed on all db value changes
@@ -166,6 +168,8 @@ def __add_rules_into_db():
                             record.second = "0"
                         if "is_active" in pairs.keys():
                             record.is_active = pairs["is_active"]
+                        if "is_async" in pairs.keys():
+                            record.is_async= pairs["is_async"]
                         if record.is_active is "1":
                             scheduler.add_job(func[1], trigger='cron', year=record.year, month=record.month,
                                               day=record.day, week=record.week, day_of_week=record.day_of_week,
@@ -184,8 +188,7 @@ def reload_rules():
     path = path.replace(".pyc", ".py")
     new_stamp = os.path.getmtime(path)
     if new_stamp != __rules_timestamp:
-        Log.logger.info('Reloading rules module {} due to timestamp change {} != {}'.format(path, __rules_timestamp,
-                                                                                            new_stamp))
+        Log.logger.info('Reloading rules {} as timestamp changed, {} != {}'.format(path, __rules_timestamp, new_stamp))
         imp.reload(rules_run)
         __add_rules_into_db()
         __rules_timestamp = new_stamp
@@ -204,7 +207,7 @@ def init():
         Log.logger.info('Scheduler started')
     else:
         Log.logger.warning('Rules not initialised as scheduler is not available')
-    thread_pool.add_interval_callable(thread_run, run_interval_second=1)
+    thread_pool.add_interval_callable(thread_run, run_interval_second=3)
     # connect rules processor for all db chages trigger
     dispatcher.connect(parse_rules, signal=Constant.SIGNAL_DB_CHANGE_FOR_RULES, sender=dispatcher.Any)
     global initialised

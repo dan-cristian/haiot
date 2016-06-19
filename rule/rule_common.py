@@ -5,8 +5,9 @@ from main.admin import models
 from common import Constant
 
 
+
 def update_custom_relay(relay_pin_name, power_is_on):
-    ''' carefull with API fields order to match app.route definition '''
+    """carefull with API fields order to match app.route definition """
     # with app.test_client() as c:
     msg = api_v1.generic_db_update(model_name="ZoneCustomRelay", filter_name="relay_pin_name",
                                    field_name="relay_is_on", filter_value=relay_pin_name, field_value=power_is_on)

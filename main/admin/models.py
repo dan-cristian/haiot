@@ -626,6 +626,7 @@ class Rule(db.Model, DbEvent, DbBase):
     year = db.Column(db.String(20))
     start_date = db.Column(db.DateTime())
     execute_now = db.Column(db.Boolean, default=False)
+    is_async = db.Column(db.Boolean, default=False)
     is_active = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
