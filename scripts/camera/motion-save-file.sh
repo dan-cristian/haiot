@@ -3,7 +3,7 @@ LOG=/mnt/log/motion.log
 HUBIC_FUSE_ROOT=/mnt/hubic
 HUBIC_DIR=$HUBIC_FUSE_ROOT/default/motion/
 SRC_DIR=/mnt/motion/tmp/
-OLD_COUNT=10
+OLD_COUNT=100
 
 #1=thread, 2=param, 3=value
 function check_param(){
@@ -26,6 +26,7 @@ echo [`date +%T.%N`] $1 $2 $3 $4 $5
 #upload to hubic
 function upload(){
 fstype=`stat --file-system --format=%T $HUBIC_FUSE_ROOT`
+echo2 "Cloud mount fstype=[$fstype]"
 if [ "$fstype" != "fuseblk" ]; then
   echo2 "Cloud destination is not fuse, but $fstype, aborting!"
   return 1
@@ -44,7 +45,7 @@ if [ $# -ne 0 ]; then
   result=$?
   echo2 "Copy completed result=$result, file $source"
   #workaround to clean temp, hubicfuse bug
-  rm -fv mnt/tmp/hubicfuse/.cloudfuse* >> $LOG 2>&1
+  #rm -fv mnt/tmp/hubicfuse/.cloudfuse* >> $LOG 2>&1
   if [ $result -eq 0 ]; then
     echo2 "Upload OK for file $source, result=[$result]"
     return 0
@@ -143,6 +144,8 @@ find $SRC_DIR -type f -mtime +1 |
 while read source
 do
   if [ -f $source ]; then
+	file_count=`find /mnt/motion/tmp -type f | wc -l`
+	echo2 "FILE COUNT in tmp folder is $file_count"
   	file=`basename $source`
   	lock=/tmp/.motion.move.$file.exclusivelock
   	echo2 "Picking older file tryok #$count tryfail #$count_failed $source"
@@ -183,4 +186,6 @@ done
 move $1 $2
 tune
 #should be last one as it exits on success
-move_failed
+if [ $# -eq 0 ]; then
+  move_failed
+fi
