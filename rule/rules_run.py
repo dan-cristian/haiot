@@ -1,4 +1,5 @@
 import time
+import datetime
 import sys
 from main.logger_helper import Log
 from main.admin import models
@@ -63,14 +64,15 @@ def test_code():
     """second=18;is_active=1"""
     Log.logger.info("Test rule code 3")
     rule_common.update_custom_relay('test_relay', True)
-    time.sleep(0.3)
+    time.sleep(0.5)
     rule_common.update_custom_relay('test_relay', False)
 
 
 def toggle_gate():
-    Log.logger.info('Rule: toggle gate')
+    Log.logger.info('Rule: toggle gate relay on {}'.format(datetime.datetime.now()))
     rule_common.update_custom_relay('gate_relay', True)
-    time.sleep(0.3)
+    time.sleep(0.5)
+    Log.logger.info('Rule: toggle gate relay off{}'.format(datetime.datetime.now()))
     rule_common.update_custom_relay('gate_relay', False)
 
 
