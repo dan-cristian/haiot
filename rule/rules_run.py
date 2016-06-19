@@ -71,7 +71,7 @@ def test_code():
 def toggle_gate():
     Log.logger.info('Rule: toggle gate relay on {}'.format(datetime.datetime.now()))
     rule_common.update_custom_relay('gate_relay', True)
-    time.sleep(0.5)
+    time.sleep(1)
     Log.logger.info('Rule: toggle gate relay off{}'.format(datetime.datetime.now()))
     rule_common.update_custom_relay('gate_relay', False)
 
