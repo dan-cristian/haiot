@@ -3,21 +3,24 @@
 import signal
 import sys
 import time
-
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy #workaround for resolve issue
+from flask_sqlalchemy import SQLAlchemy  # workaround for resolve issue
 from flask_sqlalchemy import models_committed
 from wakeonlan import wol
-
 from main.logger_helper import Log
+
+try:
+    import mysql
+except ImportError:
+    pass
 
 # location for main db - sqlite db
 DB_LOCATION=None
 # location for storing historical reporting data
 DB_REPORTING_LOCATION=None
 
-app=None
-db=None
+app = None
+db = None
 initialised = False
 shutting_down=False
 exit_code = 0
@@ -27,7 +30,7 @@ BIND_PORT = None
 
 
 def my_import(name):
-    #http://stackoverflow.com/questions/547829/how-to-dynamically-load-a-python-class
+    # http://stackoverflow.com/questions/547829/how-to-dynamically-load-a-python-class
     try:
         mod = __import__(name)
         components = name.split('.')
@@ -73,7 +76,6 @@ def init_modules():
 
     # http://docs.sqlalchemy.org/en/rel_0_9/core/sqlelement.html
     # keep host name default to '' rather than None (which does not work on filter in)
-    # TODO: remove if ok, module_list = m.query.filter(m.host_name.in_([constant.HOST_NAME, ""])).order_by(m.start_order).all()
     # get the unique/distinct list of all modules defined in config, generic or host specific ones
     module_list = m.query.filter(m.host_name.in_([Constant.HOST_NAME, ""])).group_by(m.start_order).all()
 
@@ -118,7 +120,7 @@ def execute_command(command, node=None):
     if exit_code != 0:
         unload()
 
-#--------------------------------------------------------------------------#
+#  --------------------------------------------------------------------------  #
 
 
 def unload():
@@ -162,7 +164,7 @@ def init():
     Log.logger.info('Initialising flask')
     # http://stackoverflow.com/questions/20646822/how-to-serve-static-files-in-flask
     # set the project root directory as the static folder, you can set others.
-    app = Flask('main')  #, static_url_path='')
+    app = Flask('main', static_folder='../webui/static')  # , static_url_path='')
     # app.config['TESTING'] = True
     app.config.update(DEBUG=True, SQLALCHEMY_ECHO = False, SQLALCHEMY_DATABASE_URI=DB_LOCATION)
     app.debug = True
@@ -174,8 +176,8 @@ def init():
     db.create_all()
 
     Log.logger.info('Checking main db tables')
+    import admin.models
     import admin.model_helper
-    import admin.models    
     global MODEL_AUTO_UPDATE
     admin.model_helper.populate_tables(MODEL_AUTO_UPDATE)
 
@@ -307,7 +309,7 @@ def run(arg_list):
 
     global MODEL_AUTO_UPDATE
     MODEL_AUTO_UPDATE = 'model_auto_update' in arg_list
-    init() # will block here until app is closed
+    init()  # will block here until app is closed
     print 'App EXIT'
     global exit_code
     sys.exit(exit_code)

@@ -8,12 +8,16 @@ class BaseGraph:
     save_to_graph = False  # if true this record will be uploaded to a graph
     last_save_to_graph = None  # last date, used to upload with a certain frequency
     save_to_history = False  # if true this record will be saved to master node database for reporting
+
     @property
     def graph_x_(self): raise NotImplementedError
+
     @property
     def graph_y_(self): raise NotImplementedError
+
     @property
     def graph_id_(self): raise NotImplementedError
+
     @property
     def graph_legend_(self): raise NotImplementedError
 

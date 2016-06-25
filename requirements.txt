@@ -1,3 +1,4 @@
+mysql
 Flask>=0.10.1
 Flask-Bootstrap>=3.3.0.1
 Flask-WTF>=0.11

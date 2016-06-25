@@ -1,8 +1,4 @@
-__author__ = 'dcristian'
-
-# ! venv/bin/python
-
-from main.admin import db
+from main import db
 from main import thread_pool
 from main.logger_helper import Log
 from common import utils, Constant
@@ -11,6 +7,9 @@ import rfxcom_run
 import ups_legrand_run
 from main.admin import models
 from main.admin.model_helper import commit
+
+__author__ = 'dcristian'
+
 
 initialised = False
 
