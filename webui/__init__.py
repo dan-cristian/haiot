@@ -1,3 +1,4 @@
+import os
 from flask import request, render_template, send_from_directory, send_file
 from main.logger_helper import Log
 from main import app, BIND_IP, BIND_PORT
@@ -78,7 +79,8 @@ def unload():
 def init():
     Log.logger.info('WebUI module initialising')
     # thread_pool.add_callable(webui.thread_run, run_interval_second=60)
-    from main.admin import admin, user
+    from crud import admin, user
+    crud.init_crud()
     app.register_blueprint(admin, url_prefix='/admin')
     app.register_blueprint(user, url_prefix='/user')
     global initialised, flask_thread
@@ -87,9 +89,10 @@ def init():
         port = BIND_PORT
     else:
         # otherwise listen on all interfaces
-        host='0.0.0.0'
+        host = '0.0.0.0'
         port = model_helper.get_param(Constant.P_FLASK_WEB_PORT)
     app.wsgi_app = ReverseProxied(app.wsgi_app)
+    app.config['STATIC_FOLDER'] = os.path.join(os.path.dirname(__file__), 'static')
     flask_thread = helpers.FlaskInThread(app, host=host, port=port, debug=True, use_reloader=False)
     initialised = True
     flask_thread.start()
@@ -104,7 +107,7 @@ def home():
 
 @app.route('/favicon.ico')
 def favicon():
-    return send_file("static/favicon.ico", mimetype='image/ico')
+    return send_file("../webui/static/favicon.ico", mimetype='image/ico')
 
 
 @app.before_request
