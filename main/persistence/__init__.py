@@ -1,9 +1,9 @@
-__author__ = 'Dan Cristian <dan.cristian@gmail.com>'
-
-
 from common import Constant
 from common import utils
 from main import Log
+
+__author__ = 'Dan Cristian <dan.cristian@gmail.com>'
+
 
 
 # saves record to local database

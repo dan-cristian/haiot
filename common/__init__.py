@@ -44,6 +44,8 @@ class Constant:
 
     HAS_LOCAL_DB_REPORTING_CAPABILITY = False
 
+    MAX_REPORT_LINES = 1000
+
     @staticmethod
     def IS_OS_WINDOWS():
         return Constant.OS in Constant.OS_WINDOWS

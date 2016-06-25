@@ -4,9 +4,9 @@ import sys
 from copy import deepcopy
 from main.logger_helper import Log
 from main import db
-from main.admin.model_helper import commit
 import graphs
 from common import utils, performance
+from main.admin.model_helper import commit
 
 
 # TODO: read this
@@ -38,7 +38,12 @@ class DbBase:
         function = self.query.all
         return self.__get_result(function)
 
+    def query_all_count(self):
+        function = self.query.all.count
+        return self.__get_result(function)
+
     # example with one filter
+    # http://docs.sqlalchemy.org/en/latest/orm/tutorial.html
     # models.Rule().query_filter_all(filter=models.Rule.host_name.in_([Constant.HOST_NAME, ""]))
     #
     # def query_filter_all(self, filter):
@@ -59,6 +64,10 @@ class DbBase:
     #    def query_filters_first(self, *filter):
     #        function = self.query.filter(*filter).first
     #        return self.__get_result(function)
+
+    def query_count(self, *query_filter):
+        function = self.query.filter(*query_filter).count
+        return self.__get_result(function)
 
     def delete(self):
         function = self.query.delete

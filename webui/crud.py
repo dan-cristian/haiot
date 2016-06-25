@@ -1,5 +1,3 @@
-# crud.py
-
 from flask import Blueprint, request, redirect, url_for, render_template
 from flask.views import MethodView
 from wtforms.ext.sqlalchemy.orm import model_form
@@ -8,8 +6,8 @@ from main.logger_helper import Log
 from common import Constant
 from pydispatch import dispatcher
 
-admin = Blueprint('admin', __name__, template_folder='../templates')
-user = Blueprint('user', __name__, template_folder='../templates')
+admin = Blueprint('admin', __name__, template_folder='templates')
+user = Blueprint('user', __name__, template_folder='templates')
 
 
 class CRUDView(MethodView):
@@ -36,8 +34,7 @@ class CRUDView(MethodView):
         return render_template(self.detail_template, path=self.path, **kwargs)
 
     def render_list(self, **kwargs):
-        return render_template(self.list_template, path=self.path,
-                               filters=self.filters, **kwargs)
+        return render_template(self.list_template, path=self.path, filters=self.filters, **kwargs)
 
     def get(self, obj_id='', operation='', filter_name=''):
         if operation == 'new':
@@ -120,47 +117,48 @@ def register_crud(app, url, endpoint, model, decorators=None, **kwargs):
     app.add_url_rule('%s/<operation>/<filter_name>/' % url, view_func=view, methods=['GET'])
 
 
-blog_filters = {
-    'created_asc': lambda model: model.query.order_by(model.created_on.asc()),
-    'updated_desc': lambda model: model.query.order_by(model.updated_on.desc()),
-    'last_3': lambda model: model.query.order_by(model.created_on.desc()).limit(3)
-}
+def init_crud():
+    blog_filters = {
+        'created_asc': lambda model: model.query.order_by(model.created_on.asc()),
+        'updated_desc': lambda model: model.query.order_by(model.updated_on.desc()),
+        'last_3': lambda model: model.query.order_by(model.created_on.desc()).limit(3)
+    }
 
-comment_filters = {
-    'invisible': lambda model: model.query.filter_by(visible=False).all(),
-    'visible': lambda model: model.query.filter_by(visible=True).all()
-}
+    comment_filters = {
+        'invisible': lambda model: model.query.filter_by(visible=False).all(),
+        'visible': lambda model: model.query.filter_by(visible=True).all()
+    }
 
-simple_filters = {
-    'id_asc': lambda model: model.query.order_by(model.id.asc()),
-    'id_desc': lambda model: model.query.order_by(model.id.desc()),
-    'active': lambda model: model.query.filter_by(is_active=True).all()
-}
+    simple_filters = {
+        'id_asc': lambda model: model.query.order_by(model.id.asc()),
+        'id_desc': lambda model: model.query.order_by(model.id.desc()),
+        'active': lambda model: model.query.filter_by(is_active=True).all()
+    }
 
-from .models import Area, Zone, ZoneArea, Presence, SchedulePattern, HeatSchedule, Sensor
-from .models import Module, Parameter, TemperatureTarget, ZoneSensor, Node, Ups  # , GraphPlotly
-from .models import SystemMonitor, SystemDisk, GpioPin, ZoneAlarm, ZoneHeatRelay, ZoneCustomRelay, Rule
-from .models import CommandOverrideRelay
+    from main.admin.models import Area, Zone, ZoneArea, Presence, SchedulePattern, HeatSchedule, Sensor
+    from main.admin.models import Module, Parameter, TemperatureTarget, ZoneSensor, Node, Ups  # , GraphPlotly
+    from main.admin.models import SystemMonitor, SystemDisk, GpioPin, ZoneAlarm, ZoneHeatRelay, ZoneCustomRelay, Rule
+    from main.admin.models import CommandOverrideRelay
 
-register_crud(admin, '/', 'main-entry', Module, filters=simple_filters)
-register_crud(admin, '/module', 'module', Module, filters=simple_filters)
-register_crud(admin, '/parameter', 'parameter', Parameter, filters=simple_filters)
-register_crud(user, '/area', 'area', Area, filters=simple_filters)
-register_crud(user, '/zone', 'zone', Zone, filters=simple_filters)
-register_crud(user, '/zonearea', 'zonearea', ZoneArea, filters=simple_filters)
-register_crud(user, '/presence', 'presence', Presence, filters=simple_filters)
-register_crud(user, '/schedulepattern', 'schedulepattern', SchedulePattern, filters=simple_filters)
-register_crud(user, '/heatschedule', 'heatschedule', HeatSchedule, filters=simple_filters)
-register_crud(user, '/temperaturetarget', 'temperaturetarget', TemperatureTarget, filters=simple_filters)
-register_crud(user, '/sensor', 'sensor', Sensor, filters=simple_filters)
-register_crud(user, '/zonesensor', 'zonesensor', ZoneSensor, filters=simple_filters)
-register_crud(user, '/ups', 'ups', Ups, filters=simple_filters)
-register_crud(user, '/node', 'node', Node, filters=simple_filters)
-register_crud(user, '/systemmonitor', 'systemmonitor', SystemMonitor, filters=simple_filters)
-register_crud(user, '/systemdisk', 'systemdisk', SystemDisk, filters=simple_filters)
-register_crud(user, '/gpiopin', 'gpiopin', GpioPin, filters=simple_filters)
-register_crud(user, '/zonealarm', 'zonealarm', ZoneAlarm, filters=simple_filters)
-register_crud(user, '/zoneheatrelay', 'zoneheatrelay', ZoneHeatRelay, filters=simple_filters)
-register_crud(user, '/zonecustomrelay', 'zonecustomrelay', ZoneCustomRelay, filters=simple_filters)
-register_crud(user, '/rule', 'rule', Rule, filters=simple_filters)
-register_crud(user, '/commandoverriderelay', 'commandoverriderelay', CommandOverrideRelay, filters=simple_filters)
+    register_crud(admin, '/', 'main-entry', Module, filters=simple_filters)
+    register_crud(admin, '/module', 'module', Module, filters=simple_filters)
+    register_crud(admin, '/parameter', 'parameter', Parameter, filters=simple_filters)
+    register_crud(user, '/area', 'area', Area, filters=simple_filters)
+    register_crud(user, '/zone', 'zone', Zone, filters=simple_filters)
+    register_crud(user, '/zonearea', 'zonearea', ZoneArea, filters=simple_filters)
+    register_crud(user, '/presence', 'presence', Presence, filters=simple_filters)
+    register_crud(user, '/schedulepattern', 'schedulepattern', SchedulePattern, filters=simple_filters)
+    register_crud(user, '/heatschedule', 'heatschedule', HeatSchedule, filters=simple_filters)
+    register_crud(user, '/temperaturetarget', 'temperaturetarget', TemperatureTarget, filters=simple_filters)
+    register_crud(user, '/sensor', 'sensor', Sensor, filters=simple_filters)
+    register_crud(user, '/zonesensor', 'zonesensor', ZoneSensor, filters=simple_filters)
+    register_crud(user, '/ups', 'ups', Ups, filters=simple_filters)
+    register_crud(user, '/node', 'node', Node, filters=simple_filters)
+    register_crud(user, '/systemmonitor', 'systemmonitor', SystemMonitor, filters=simple_filters)
+    register_crud(user, '/systemdisk', 'systemdisk', SystemDisk, filters=simple_filters)
+    register_crud(user, '/gpiopin', 'gpiopin', GpioPin, filters=simple_filters)
+    register_crud(user, '/zonealarm', 'zonealarm', ZoneAlarm, filters=simple_filters)
+    register_crud(user, '/zoneheatrelay', 'zoneheatrelay', ZoneHeatRelay, filters=simple_filters)
+    register_crud(user, '/zonecustomrelay', 'zonecustomrelay', ZoneCustomRelay, filters=simple_filters)
+    register_crud(user, '/rule', 'rule', Rule, filters=simple_filters)
+    register_crud(user, '/commandoverriderelay', 'commandoverriderelay', CommandOverrideRelay, filters=simple_filters)
