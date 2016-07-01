@@ -1,7 +1,7 @@
 import json
 from urllib2 import urlopen  # python 2 syntax
 import pygal
-from flask import render_template
+from flask import render_template, request
 from main import app
 from main.logger_helper import Log
 from main.admin import models
@@ -43,7 +43,7 @@ def get_weather_data(date='20140415', state='IA', city='Ames'):
     bar_chart.x_labels = times
     bar_chart.add('Temps in F', imp_temps)
 
-    return render_template('chart.html',title=title,bar_chart=bar_chart)
+    return render_template('chart-temp.html',title=title,bar_chart=bar_chart)
 
 
 def __config_graph(title, x_serie):
@@ -57,37 +57,37 @@ def __config_graph(title, x_serie):
 
 
 @app.route('/chart-temp/')
-@app.route('/chart-temp/sensor_name=<sensor_name>')
-def graph_temperature(sensor_name=None):
+def graph_temperature():
+    bar_chart_list = []
     temp_recs = []
-    if sensor_name:
-        count_rec = models.SensorHistory().query_count(models.SensorHistory.sensor_name.in_([sensor_name]))
-        if count_rec < Constant.MAX_REPORT_LINES:
-            temp_recs = models.SensorHistory().query_filter_all(models.SensorHistory.sensor_name.in_([sensor_name]))
-    else:
-        count_rec = models.SensorHistory().query_all_count()
-        if count_rec < Constant.MAX_REPORT_LINES:
-            temp_recs = models.SensorHistory().query_filter_all()
-    values = [i.temperature for i in temp_recs]
-    times = [i.updated_on for i in temp_recs]
-    # create a bar chart
-    config = __config_graph(sensor_name, times)
-    bar_chart = pygal.Line(config)
-    bar_chart.x_labels = times
-    bar_chart.add('Temp °C', values)
+    sensor_name_list = request.args.get('sensor_name')
+    for sensor_name in sensor_name_list.split(';'):
+        # count_rec = models.SensorHistory().query_count(models.SensorHistory.sensor_name.in_([sensor_name]))
+        temp_recs = models.SensorHistory().query_filter_all(models.SensorHistory.sensor_name == sensor_name,
+                                                            models.SensorHistory.updated_on >= '2016-07-01')
+        values = [i.temperature for i in temp_recs]
+        times = [i.updated_on for i in temp_recs]
+        # create a bar chart
+        config = __config_graph(sensor_name, times)
+        bar_chart = pygal.Line(config)
+        bar_chart.x_labels = times
+        bar_chart.add('Temp oC', values)
+        bar_chart_list.append(bar_chart)
+
     if temp_recs:
         title = sensor_name
     else:
         title = "Too many records for {}: {} but max={}".format(sensor_name, count_rec, Constant.MAX_REPORT_LINES)
-    return render_template('chart/chart.html', title=title, bar_chart=bar_chart)
+    return render_template('chart/chart-temp.html', title=title, bar_chart_list=bar_chart_list)
 
 
 @app.route('/chart-ups/key_name=<key_name>')
 def graph_ups(key_name):
-    ups_recs = models.UpsHistory().query_filter_all(~models.UpsHistory.input_voltage.in_([None]))
+    ups_recs = models.UpsHistory().query_filter_all(models.UpsHistory.input_voltage.isnot(None))
     values = [i.input_voltage for i in ups_recs]
     times = [i.updated_on for i in ups_recs]
     pass
+
 
 def unload():
     Log.logger.info('Chart module unloading')
@@ -95,6 +95,7 @@ def unload():
     # thread_pool.remove_callable(template_run.thread_run)
     global initialised
     initialised = False
+
 
 def init():
     Log.logger.info('Chart module initialising')
