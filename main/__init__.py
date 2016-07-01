@@ -10,7 +10,7 @@ from main.logger_helper import Log
 try:
     import pymysql
 except ImportError, ex:
-    Log.logger.warning("Unable to import pymysql, err={}".format(ex))
+    print "Unable to import pymysql, err={}".format(ex)
 
 # location for main db - sqlite db
 DB_LOCATION = None
