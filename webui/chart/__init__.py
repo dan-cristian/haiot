@@ -1,6 +1,7 @@
 import json
 from urllib2 import urlopen  # python 2 syntax
 import pygal
+from datetime import datetime
 from flask import render_template, request
 from main import app
 from main.logger_helper import Log
@@ -46,7 +47,7 @@ def get_weather_data(date='20140415', state='IA', city='Ames'):
     return render_template('chart-temp.html',title=title,bar_chart=bar_chart)
 
 
-def __config_graph(title, x_serie):
+def __config_graph(title):
     config = pygal.Config()
     # config.human_readable = True
     config.style = pygal.style.DefaultStyle
@@ -58,27 +59,26 @@ def __config_graph(title, x_serie):
 
 @app.route('/chart-temp/')
 def graph_temperature():
-    bar_chart_list = []
+    chart_list = []
     temp_recs = []
     sensor_name_list = request.args.get('sensor_name')
-    for sensor_name in sensor_name_list.split(';'):
-        # count_rec = models.SensorHistory().query_count(models.SensorHistory.sensor_name.in_([sensor_name]))
-        temp_recs = models.SensorHistory().query_filter_all(models.SensorHistory.sensor_name == sensor_name,
-                                                            models.SensorHistory.updated_on >= '2016-07-01')
-        values = [i.temperature for i in temp_recs]
-        times = [i.updated_on for i in temp_recs]
-        # create a bar chart
-        config = __config_graph(sensor_name, times)
-        bar_chart = pygal.Line(config)
-        bar_chart.x_labels = times
-        bar_chart.add('Temp oC', values)
-        bar_chart_list.append(bar_chart)
-
-    if temp_recs:
-        title = sensor_name
-    else:
-        title = "No records for {}".format(sensor_name)
-    return render_template('chart/chart-temp.html', title=title, bar_chart_list=bar_chart_list)
+    config = __config_graph('Temperature')
+    datetimeline = pygal.DateTimeLine(x_label_rotation=35, truncate_label=-1,
+                                      x_value_formatter=lambda dt: dt.strftime('%d-%b-%Y %H:%M:%S'),
+                                      config=config)
+    try:
+        for sensor_name in sensor_name_list.split(';'):
+            temp_recs = models.SensorHistory().query_filter_all(models.SensorHistory.sensor_name == sensor_name,
+                                                                models.SensorHistory.updated_on >= '2016-07-01')
+            serie = []
+            for i in temp_recs:
+                serie.append((i.updated_on, i.temperature))
+            datetimeline.add(sensor_name, serie)
+        chart_list.append(datetimeline)
+        result = render_template('chart/chart-temp.html', chart_list=chart_list)
+    except Exception, ex:
+        pass
+    return result
 
 
 @app.route('/chart-ups/key_name=<key_name>')

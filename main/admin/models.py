@@ -689,7 +689,7 @@ class NodeHistory(db.Model, DbBase):
     name = db.Column(db.String(50))
     master_overall_cycles = db.Column(db.Integer)  # count of update cycles while node was master
     run_overall_cycles = db.Column(db.Integer)  # count of total update cycles
-    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow, index=True)
     record_uuid = db.Column(db.String(36))
     source_host_ = db.Column(db.String(50))
 
@@ -701,7 +701,7 @@ class SensorHistory(db.Model, DbBase):
     __bind_key__ = 'reporting'
     __tablename__ = 'sensor_history'
     id = db.Column(db.Integer, primary_key=True)
-    sensor_name = db.Column(db.String(50))
+    sensor_name = db.Column(db.String(50), index=True)
     address = db.Column(db.String(50))
     temperature = db.Column(db.Float)
     humidity = db.Column(db.Float)
@@ -714,7 +714,7 @@ class SensorHistory(db.Model, DbBase):
     pio_b = db.Column(db.Integer)
     sensed_a = db.Column(db.Integer)
     sensed_b = db.Column(db.Integer)
-    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow, index=True)
     record_uuid = db.Column(db.String(36))
     source_host_ = db.Column(db.String(50))
 
@@ -726,12 +726,12 @@ class SystemMonitorHistory(db.Model, DbBase):
     __bind_key__ = 'reporting'
     __tablename__ = 'systemmonitor_history'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50))
+    name = db.Column(db.String(50), index=True)
     cpu_usage_percent = db.Column(db.Float)
     cpu_temperature = db.Column(db.Float)
     memory_available_percent = db.Column(db.Float)
     uptime_days = db.Column(db.Integer)
-    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow, index=True)
     record_uuid = db.Column(db.String(36))
     source_host_ = db.Column(db.String(50))
 
@@ -757,7 +757,7 @@ class UpsHistory(db.Model, DbBase):
     beeper_on = db.Column(db.Boolean(), default=False)
     test_in_progress = db.Column(db.Boolean(), default=False)
     other_status = db.Column(db.String(50))
-    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow, index=True)
     record_uuid = db.Column(db.String(36))
     source_host_ = db.Column(db.String(50))
 
@@ -786,7 +786,7 @@ class SystemDiskHistory(db.Model, DbBase):
     last_writes_datetime = db.Column(db.DateTime())
     last_reads_elapsed = db.Column(db.Float)
     last_writes_elapsed = db.Column(db.Float)
-    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow, index=True)
     record_uuid = db.Column(db.String(36))
     source_host_ = db.Column(db.String(50))
 
