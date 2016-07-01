@@ -77,7 +77,7 @@ def graph_temperature():
     if temp_recs:
         title = sensor_name
     else:
-        title = "Too many records for {}: {} but max={}".format(sensor_name, count_rec, Constant.MAX_REPORT_LINES)
+        title = "No records for {}".format(sensor_name)
     return render_template('chart/chart-temp.html', title=title, bar_chart_list=bar_chart_list)
 
 
