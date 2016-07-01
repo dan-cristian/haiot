@@ -1,5 +1,3 @@
-# project/__init__.py
-
 import signal
 import sys
 import time
@@ -10,21 +8,21 @@ from wakeonlan import wol
 from main.logger_helper import Log
 
 try:
-    import mysql
-except ImportError:
-    pass
+    import pymysql
+except ImportError, ex:
+    Log.logger.warning("Unable to import pymysql, err={}".format(ex))
 
 # location for main db - sqlite db
-DB_LOCATION=None
+DB_LOCATION = None
 # location for storing historical reporting data
-DB_REPORTING_LOCATION=None
+DB_REPORTING_LOCATION = None
 
 app = None
 db = None
 initialised = False
-shutting_down=False
+shutting_down = False
 exit_code = 0
-MODEL_AUTO_UPDATE=False
+MODEL_AUTO_UPDATE = False
 BIND_IP = None
 BIND_PORT = None
 
@@ -38,7 +36,7 @@ def my_import(name):
             mod = getattr(mod, comp)
         return mod
     except Exception, ex:
-        Log.logger.warning("Unabel to import module {}, err={}".format(name, ex))
+        Log.logger.warning("Unable to import module {}, err={}".format(name, ex))
         return None
 
 

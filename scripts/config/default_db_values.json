@@ -31,7 +31,7 @@
     {"name": "P_MOTION_VIDEO_PATH", "value": "/media/temp/motion"},
     {"name": "P_YOUTUBE_CREDENTIAL_FILE", "value": ".youtube.credentials"},
     {"name": "DB_REPORTING_LOCATION_ENABLED", "value": "1", "description":"1 for recording data, 0 disabled"},
-    {"name": "DB_REPORTING_LOCATION", "value": "mysql+mysqlconnector://<user>:<passwd>@192.168.0.9/haiot-reporting"},
+    {"name": "DB_REPORTING_LOCATION", "value": "mysql+pymysql://<user>:<passwd>@192.168.0.9/haiot-reporting"},
     {"name": "DB_REPORTING_USER", "value": "haiot"},
     {"name": "DB_REPORTING_PASS", "value": "haiot"},
     {"name": "P_TEMPERATURE_THRESHOLD", "value": "0.2", "description":"gap in degrees before turning on / off heat, to avoid rapid on/off cycles"},
