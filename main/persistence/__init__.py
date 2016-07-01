@@ -5,7 +5,6 @@ from main import Log
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
 
-
 # saves record to local database
 def save_to_history(obj, save_to_local_db=False, upload_to_cloud=False):
     try:

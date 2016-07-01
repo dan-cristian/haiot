@@ -39,7 +39,11 @@ class DbBase:
         return self.__get_result(function)
 
     def query_all_count(self):
-        function = self.query.all.count
+        function = self.query.count
+        return self.__get_result(function)
+
+    def query_all_limit(self, limit):
+        function = self.query.limit(limit).all
         return self.__get_result(function)
 
     # example with one filter
@@ -52,6 +56,10 @@ class DbBase:
 
     def query_filter_all(self, *query_filter):
         function = self.query.filter(*query_filter).all
+        return self.__get_result(function)
+
+    def query_filter_limit(self, limit, *query_filter):
+        function = self.query.filter(*query_filter).limit(limit).all
         return self.__get_result(function)
 
     # example with multiple filters
