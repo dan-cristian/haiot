@@ -5,6 +5,8 @@
     <script type="text/javascript" src="http://kozea.github.com/pygal.js/javascripts/pygal-tooltips.js"></script>
     </head>
     <body>
-            {{ bar_chart.render()|safe }}
+    {% for bar_chart in bar_chart_list %}
+        {{ bar_chart.render()|safe }}
+    {% endfor %}
     </body>
 </html>
