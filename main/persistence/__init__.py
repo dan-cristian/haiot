@@ -8,7 +8,7 @@ __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 # saves record to local database
 def save_to_history(obj, save_to_local_db=False, upload_to_cloud=False):
     try:
-        Log.logger.debug('Trying to save historical record {}'.format(obj))
+        Log.logger.info('Trying to save historical record {}'.format(obj))
         if Constant.JSON_PUBLISH_GRAPH_X in obj:
             # name of x field
             axis_x_field = obj[Constant.JSON_PUBLISH_GRAPH_X]
@@ -21,10 +21,10 @@ def save_to_history(obj, save_to_local_db=False, upload_to_cloud=False):
             # intersect lists and get only graphable fields that had values changed
             list_axis_y = list(set(graph_y_fields) & set(changed_fields))
             if len(list_axis_y) == 0:
-                Log.logger.debug('Ignoring record save graph={} changed fields={} obj={}'.format(graph_y_fields,
-                                                                                                 changed_fields, obj))
+                Log.logger.info('Ignoring record save graph={} changed fields={} obj={}'.format(graph_y_fields,
+                                                                                                changed_fields, obj))
             else:
-                Log.logger.debug('Trying to save y axis {}'.format(list_axis_y))
+                Log.logger.info('Trying to save y axis {}'.format(list_axis_y))
                 if axis_x_field in obj and graph_id_field in obj:
                     table = obj[Constant.JSON_PUBLISH_TABLE]
                     trace_unique_id = obj[graph_id_field]  # unique record/trace identifier
@@ -59,6 +59,7 @@ def save_to_history(obj, save_to_local_db=False, upload_to_cloud=False):
                     if save_to_local_db:
                         # save to local history DB, append history to source table name
                         dest_table = str(table) + 'History'
+                        Log.logger.info('Saving to local db table {}'.format(dest_table))
                         from main.admin import models
                         # http://stackoverflow.com/questions/4030982/initialise-class-object-by-name
                         try:
@@ -74,6 +75,8 @@ def save_to_history(obj, save_to_local_db=False, upload_to_cloud=False):
                             new_record.add_commit_record_to_db()
                         except Exception, ex:
                             Log.logger.critical("Cannot save history db err={} record={}".format(ex, obj))
+                    else:
+                        Log.logger.info('Skip saving to local db')
                 else:
                     Log.logger.critical('Missing history axis_x [{}], graph_id [{}], in obj {}'.format(axis_x_field,
                                                                                                        graph_id_field,
