@@ -152,7 +152,7 @@ def mqtt_thread_run():
 
                         # if record is marked to be uploaded to a graph
                         if obj[Constant.JSON_PUBLISH_SAVE_TO_GRAPH]:
-                            persistence.save_to_history(obj, upload_to_cloud=True)
+                            # persistence.save_to_history(obj, upload_to_cloud=True)
                             # lazy init as plotly is an optional module
                             from cloud import graph_plotly
                             if graph_plotly.initialised:

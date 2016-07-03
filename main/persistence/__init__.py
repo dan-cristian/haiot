@@ -8,7 +8,8 @@ __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 # saves record to local database
 def save_to_history(obj, save_to_local_db=False, upload_to_cloud=False):
     try:
-        Log.logger.info('Trying to save historical record {}'.format(obj))
+        Log.logger.info('Trying to save historical record to_db={} to_cloud={}, {}'.format(save_to_local_db,
+                                                                                           upload_to_cloud, obj))
         if Constant.JSON_PUBLISH_GRAPH_X in obj:
             # name of x field
             axis_x_field = obj[Constant.JSON_PUBLISH_GRAPH_X]
@@ -47,6 +48,7 @@ def save_to_history(obj, save_to_local_db=False, upload_to_cloud=False):
                                 from cloud import graph_plotly
                                 if graph_plotly.initialised:
                                     from cloud.graph_plotly import graph_plotly_run
+                                    Log.logger.info('Uploading to cloud field {}'.format(graph_legend_field))
                                     # shape visual type for this trace
                                     # shape = graph_shape_fields[index]
                                     # unique name used for grid on upload
@@ -55,6 +57,9 @@ def save_to_history(obj, save_to_local_db=False, upload_to_cloud=False):
                                                                    axis_x_name=axis_x_field, axis_y_name=axis_y,
                                                                    record_unique_id_name=graph_legend_field,
                                                                    record_unique_id_value=graph_legend_item_name)
+                                Log.logger.debug('Skip upload to cloud, plotly not init')
+                            else:
+                                Log.logger.debug('Skip upload to cloud due to param')
                         index += 1
                     if save_to_local_db:
                         # save to local history DB, append history to source table name
@@ -76,7 +81,7 @@ def save_to_history(obj, save_to_local_db=False, upload_to_cloud=False):
                         except Exception, ex:
                             Log.logger.critical("Cannot save history db err={} record={}".format(ex, obj))
                     else:
-                        Log.logger.info('Skip saving to local db')
+                        Log.logger.info('Skip saving to local db due to param')
                 else:
                     Log.logger.critical('Missing history axis_x [{}], graph_id [{}], in obj {}'.format(axis_x_field,
                                                                                                        graph_id_field,

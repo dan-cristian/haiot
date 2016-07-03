@@ -61,8 +61,8 @@ class NodeGraph(BaseGraph):
     def __init__(self):
         BaseGraph.__init__(self)
     graph_x_ = 'updated_on'
-    graph_y_ = ['master_overall_cycles', 'run_overall_cycles']
-    graph_shape_ = ['hv', 'hv']
+    graph_y_ = ['master_overall_cycles']
+    graph_shape_ = ['hv']
     graph_id_ = 'name'
     graph_legend_ = 'name'
 
