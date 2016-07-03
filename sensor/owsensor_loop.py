@@ -16,6 +16,7 @@ owproxy = None
 
 def do_device():
     global owproxy
+    sensortype = 'n/a'
     sensors = owproxy.dir('/', slash=True, bus=False)
     for sensor in sensors:
         try:
@@ -54,25 +55,43 @@ def save_to_db(dev):
         record = models.Sensor(address=address)
         assert isinstance(record, models.Sensor)
         zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=address).first()
+        current_record = models.Sensor.query.filter_by(address=address).first()
         if zone_sensor:
             record.sensor_name = zone_sensor.sensor_name
         else:
             record.sensor_name = '(not defined) {}'.format(address)
         record.type = dev['type']
         record.updated_on = utils.get_base_location_now_date()
-        if dev.has_key('counters_a'): record.counters_a = dev['counters_a']
-        if dev.has_key('counters_b'): record.counters_b = dev['counters_b']
-        if dev.has_key('temperature'): record.temperature = dev['temperature']
-        if dev.has_key('humidity'): record.humidity = dev['humidity']
-        if dev.has_key('iad'): record.iad = dev['iad']
-        if dev.has_key('vad'): record.vad = dev['vad']
-        if dev.has_key('vdd'): record.vdd = dev['vdd']
-        if dev.has_key('pio_a'): record.pio_a = dev['pio_a']
-        if dev.has_key('pio_b'): record.pio_b = dev['pio_b']
-        if dev.has_key('sensed_a'): record.sensed_a = dev['sensed_a']
-        if dev.has_key('sensed_b'): record.sensed_b = dev['sensed_b']
-
-        current_record = models.Sensor.query.filter_by(address=address).first()
+        if dev.has_key('counters_a'):
+            record.counters_a = dev['counters_a']
+            if current_record:
+                record.delta_counters_a = record.counters_a - current_record.counters_a
+            else:
+                record.delta_counters_a = 0  # don't know prev. count, assume no consumption (ticks could be lost)
+        if dev.has_key('counters_b'):
+            record.counters_b = dev['counters_b']
+            if current_record:
+                record.delta_counters_b = record.counters_b - current_record.counters_b
+            else:
+                record.delta_counters_b = 0  # don't know prev. count, assume no consumption (ticks could be lost)
+        if dev.has_key('temperature'):
+            record.temperature = dev['temperature']
+        if dev.has_key('humidity'):
+            record.humidity = dev['humidity']
+        if dev.has_key('iad'):
+            record.iad = dev['iad']
+        if dev.has_key('vad'):
+            record.vad = dev['vad']
+        if dev.has_key('vdd'):
+            record.vdd = dev['vdd']
+        if dev.has_key('pio_a'):
+            record.pio_a = dev['pio_a']
+        if dev.has_key('pio_b'):
+            record.pio_b = dev['pio_b']
+        if dev.has_key('sensed_a'):
+            record.sensed_a = dev['sensed_a']
+        if dev.has_key('sensed_b'):
+            record.sensed_b = dev['sensed_b']
         record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
                                    save_to_graph=True)
     except Exception, ex:
