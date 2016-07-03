@@ -221,7 +221,11 @@
     {"zone_id":4 , "sensor_address": "B5000004F3285F28", "sensor_name": "dormitor"},
     {"zone_id":47 , "sensor_address": "EF000003BDE17928", "sensor_name": "birou"},
     {"zone_id":23 , "sensor_address": "f3:01", "sensor_name": "fridge"},
-    {"zone_id":26 , "sensor_address": "f9:01", "sensor_name": "congelator"}
+    {"zone_id":26 , "sensor_address": "f9:01", "sensor_name": "congelator"},
+    {"zone_id":8 , "sensor_address": "A80000000F86B81D", "sensor_name": "power main"},
+    {"zone_id":10 , "sensor_address": "1C0000000F99851D", "sensor_name": "power rack"},
+    {"zone_id":7 , "sensor_address": "BE0000000F870C1D", "sensor_name": "water main"},
+    {"zone_id":29 , "sensor_address": "F90000000FFEAB1D", "sensor_name": "water hot"}
   ],
 
   "ZoneAlarm": [
