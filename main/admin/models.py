@@ -296,7 +296,7 @@ class Presence(db.Model, DbBase):
     event_camera_date = db.Column(db.DateTime(), default=None)
     event_alarm_date = db.Column(db.DateTime(), default=None)
     event_io_date = db.Column(db.DateTime(), default=None)
-    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow, index=True)
+    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
 
     def __init__(self, id=''):
         super(Presence, self).__init__()
@@ -383,8 +383,8 @@ class Sensor(db.Model, graphs.SensorGraph, DbEvent, DbBase):
     sensed_b = db.Column(db.Integer)
     battery_level = db.Column(db.Integer)  # RFXCOM specific, sensor battery
     rssi = db.Column(db.Integer)  # RFXCOM specific, rssi - distance
-    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
-    added_on = db.Column(db.DateTime(), default=datetime.utcnow)
+    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
+    added_on = db.Column(db.DateTime(), default=datetime.now)
     # FIXME: now filled manually, try relations
     # zone_name = db.Column(db.String(50))
     sensor_name = db.Column(db.String(50))
@@ -450,7 +450,7 @@ class Node(db.Model, DbEvent, graphs.NodeGraph, DbBase):
     master_overall_cycles = db.Column(db.Integer)  # count of update cycles while node was master
     run_overall_cycles = db.Column(db.Integer)  # count of total update cycles
     execute_command = db.Column(db.String(50))
-    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
 
     def __init__(self, id=None, name=None, ip=None, priority=None, mac=None, is_master_logging=False):
         super(Node, self).__init__()
@@ -475,7 +475,7 @@ class SystemMonitor(db.Model, graphs.SystemMonitorGraph, DbEvent, DbBase):
     cpu_temperature = db.Column(db.Float)
     memory_available_percent = db.Column(db.Float)
     uptime_days = db.Column(db.Integer)
-    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
 
     def __repr__(self):
         return '{} {} {}'.format(self.id, self.name, self.updated_on)
@@ -497,7 +497,7 @@ class Ups(db.Model, graphs.UpsGraph, DbEvent, DbBase):
     beeper_on = db.Column(db.Boolean(), default=False)
     test_in_progress = db.Column(db.Boolean(), default=False)
     other_status = db.Column(db.String(50))
-    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
 
     def __repr__(self):
         return '{} {} {}'.format(self.id, self.name, self.updated_on)
@@ -522,7 +522,7 @@ class SystemDisk(db.Model, graphs.SystemDiskGraph, DbEvent, DbBase):
     last_writes_datetime = db.Column(db.DateTime())
     last_reads_elapsed = db.Column(db.Float)
     last_writes_elapsed = db.Column(db.Float)
-    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
 
     def __init__(self):
         super(SystemDisk, self).__init__()
@@ -563,7 +563,7 @@ class ZoneAlarm(db.Model, DbEvent, DbBase):
     gpio_host_name = db.Column(db.String(50))
     # gpio_pin = db.relationship('GpioPin', backref=db.backref('ZoneAlarm(gpiopincode)', lazy='dynamic'))
     alarm_status = db.Column(db.Integer)
-    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
 
     def __init__(self, zone_id='', gpio_pin_code='', host_name=''):
         super(ZoneAlarm, self).__init__()
@@ -584,7 +584,7 @@ class ZoneHeatRelay(db.Model, DbEvent, DbBase):
     gpio_host_name = db.Column(db.String(50))
     heat_is_on = db.Column(db.Boolean)
     is_main_heat_source = db.Column(db.Boolean)
-    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
 
     def __init__(self, zone_id=None, gpio_pin_code='', host_name='', is_main_heat_source=False):
         super(ZoneHeatRelay, self).__init__()
@@ -605,7 +605,7 @@ class ZoneCustomRelay(db.Model, DbEvent, DbBase):
     gpio_pin_code = db.Column(db.String(50))  # user friendly format, e.g. P8_11
     gpio_host_name = db.Column(db.String(50))
     relay_is_on = db.Column(db.Boolean)
-    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
 
     def __init__(self, id=None, zone_id='', gpio_pin_code='', host_name='', relay_pin_name=''):
         super(ZoneCustomRelay, self).__init__()
@@ -626,9 +626,9 @@ class CommandOverrideBase(db.Model, DbEvent, DbBase):
     host_name = db.Column(db.String(50))
     is_gui_source = db.Column(db.Boolean, default=False)  # gui has priority over rule
     is_rule_source = db.Column(db.Boolean, default=False)
-    start_date = db.Column(db.DateTime(), default=datetime.utcnow)
-    end_date = db.Column(db.DateTime(), default=datetime.utcnow)
-    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+    start_date = db.Column(db.DateTime(), default=datetime.now)
+    end_date = db.Column(db.DateTime(), default=datetime.now)
+    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
 
 
 class CommandOverrideRelay(CommandOverrideBase):
@@ -696,7 +696,7 @@ class NodeHistory(db.Model, DbBase):
     name = db.Column(db.String(50))
     master_overall_cycles = db.Column(db.Integer)  # count of update cycles while node was master
     run_overall_cycles = db.Column(db.Integer)  # count of total update cycles
-    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow, index=True)
+    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
     record_uuid = db.Column(db.String(36))
     source_host_ = db.Column(db.String(50))
 
@@ -721,8 +721,8 @@ class SensorHistory(db.Model, DbBase):
     pio_b = db.Column(db.Integer)
     sensed_a = db.Column(db.Integer)
     sensed_b = db.Column(db.Integer)
-    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow, index=True)
-    added_on = db.Column(db.DateTime(), default=datetime.utcnow)
+    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
+    added_on = db.Column(db.DateTime(), default=datetime.now)
     record_uuid = db.Column(db.String(36))
     source_host_ = db.Column(db.String(50))
 
@@ -739,7 +739,7 @@ class SystemMonitorHistory(db.Model, DbBase):
     cpu_temperature = db.Column(db.Float)
     memory_available_percent = db.Column(db.Float)
     uptime_days = db.Column(db.Integer)
-    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow, index=True)
+    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
     record_uuid = db.Column(db.String(36))
     source_host_ = db.Column(db.String(50))
 
@@ -765,7 +765,7 @@ class UpsHistory(db.Model, DbBase):
     beeper_on = db.Column(db.Boolean(), default=False)
     test_in_progress = db.Column(db.Boolean(), default=False)
     other_status = db.Column(db.String(50))
-    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow, index=True)
+    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
     record_uuid = db.Column(db.String(36))
     source_host_ = db.Column(db.String(50))
 
@@ -794,7 +794,7 @@ class SystemDiskHistory(db.Model, DbBase):
     last_writes_datetime = db.Column(db.DateTime())
     last_reads_elapsed = db.Column(db.Float)
     last_writes_elapsed = db.Column(db.Float)
-    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow, index=True)
+    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
     record_uuid = db.Column(db.String(36))
     source_host_ = db.Column(db.String(50))
 
@@ -814,6 +814,6 @@ class PresenceHistory(db.Model, DbBase):
     event_camera_date = db.Column(db.DateTime(), default=None)
     event_alarm_date = db.Column(db.DateTime(), default=None)
     event_io_date = db.Column(db.DateTime(), default=None)
-    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow, index=True)
+    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
     record_uuid = db.Column(db.String(36))
     source_host_ = db.Column(db.String(50))
