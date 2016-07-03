@@ -218,6 +218,11 @@ class DbEvent:
             #    Log.logger.warning('Incorrect parameters received on save changed fields to db')
 
 
+class DbHistory():
+    record_uuid = db.Column(db.String(36))
+    source_host_ = db.Column(db.String(50))
+
+
 class Module(db.Model, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     host_name = db.Column(db.String(50))
@@ -288,9 +293,10 @@ class ZoneArea(db.Model, DbBase):
 class Presence(db.Model, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'), nullable=False)
-    last_event_camera_date = db.Column(db.DateTime(), default=None)
-    last_event_alarm_date = db.Column(db.DateTime(), default=None)
-    last_event_io_date = db.Column(db.DateTime(), default=None)
+    event_camera_date = db.Column(db.DateTime(), default=None)
+    event_alarm_date = db.Column(db.DateTime(), default=None)
+    event_io_date = db.Column(db.DateTime(), default=None)
+    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow, index=True)
 
     def __init__(self, id=''):
         super(Presence, self).__init__()
@@ -378,6 +384,7 @@ class Sensor(db.Model, graphs.SensorGraph, DbEvent, DbBase):
     battery_level = db.Column(db.Integer)  # RFXCOM specific, sensor battery
     rssi = db.Column(db.Integer)  # RFXCOM specific, rssi - distance
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+    added_on = db.Column(db.DateTime(), default=datetime.utcnow)
     # FIXME: now filled manually, try relations
     # zone_name = db.Column(db.String(50))
     sensor_name = db.Column(db.String(50))
@@ -715,6 +722,7 @@ class SensorHistory(db.Model, DbBase):
     sensed_a = db.Column(db.Integer)
     sensed_b = db.Column(db.Integer)
     updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow, index=True)
+    added_on = db.Column(db.DateTime(), default=datetime.utcnow)
     record_uuid = db.Column(db.String(36))
     source_host_ = db.Column(db.String(50))
 
@@ -767,7 +775,7 @@ class UpsHistory(db.Model, DbBase):
 
 class SystemDiskHistory(db.Model, DbBase):
     __bind_key__ = 'reporting'
-    __tablename__ = 'systemdisk_history'
+    __tablename__ = 'systemdisk_history'  # convention: append '_history' -> 'History' to source table name
     id = db.Column(db.Integer, primary_key=True)
     serial = db.Column(db.String(50))
     system_name = db.Column(db.String(50))
@@ -796,3 +804,16 @@ class SystemDiskHistory(db.Model, DbBase):
 
     def __repr__(self):
         return '{} {} {} {} {}'.format(self.id, self.serial, self.system_name, self.hdd_name, self.hdd_disk_dev)
+
+
+class PresenceHistory(db.Model, DbBase):
+    __bind_key__ = 'reporting'
+    __tablename__ = 'presence_history'  # convention: append '_history' -> 'History' to source table name
+    id = db.Column(db.Integer, primary_key=True)
+    zone_id = db.Column(db.Integer, nullable=False)
+    event_camera_date = db.Column(db.DateTime(), default=None)
+    event_alarm_date = db.Column(db.DateTime(), default=None)
+    event_io_date = db.Column(db.DateTime(), default=None)
+    updated_on = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow, index=True)
+    record_uuid = db.Column(db.String(36))
+    source_host_ = db.Column(db.String(50))

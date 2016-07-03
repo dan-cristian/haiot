@@ -123,15 +123,17 @@ def read_drop_table(table, original_exception, drop_without_user_ask=False):
 
 
 def check_history_tables():
+    """Add below all history tables you want to be initialised"""
     table_collection_list = [
         models.NodeHistory, models.SensorHistory, models.SystemDiskHistory, models.SystemMonitorHistory,
-        models.UpsHistory]
+        models.UpsHistory, models.PresenceHistory]
     for table in table_collection_list:
         table_str = utils.get_table_name(table)
         check_table_schema(table, model_auto_update=False)
 
 
 def populate_tables(model_auto_update=False):
+    """Add below all tables you want to be initialised"""
     global table_collection
     table_collection = [models.Node, models.Parameter, models.Module,
                         models.Area, models.Zone, models.ZoneArea, models.ZoneCustomRelay,
