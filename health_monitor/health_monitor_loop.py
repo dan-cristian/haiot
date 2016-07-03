@@ -1,4 +1,3 @@
-__author__ = 'dcristian'
 import subprocess
 import os
 import cStringIO
@@ -12,9 +11,10 @@ from common import Constant, utils
 from main.admin import model_helper, models
 from main import logger_helper
 
+__author__ = 'dcristian'
+
 try:
     import psutil
-
     import_module_psutil_exist = True
 except Exception, ex:
     Log.logger.info('PSUtil module not available')
@@ -23,7 +23,6 @@ except Exception, ex:
 try:
     import wmi
     import pythoncom
-
     import_module_wmi_ok = True
 except Exception, ex:
     Log.logger.info('pywin / wmi module not available')

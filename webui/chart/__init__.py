@@ -50,10 +50,11 @@ def get_weather_data(date='20140415', state='IA', city='Ames'):
 def __config_graph(title):
     config = pygal.Config()
     # config.human_readable = True
-    config.style = pygal.style.DefaultStyle
+    #config.style = pygal.style.DefaultStyle
     config.disable_xml_declaration = True
     config.title = title
-    config.show_x_labels = True
+    #config.show_x_labels = True
+    config.legend_at_bottom = True
     return config
 
 
@@ -63,7 +64,7 @@ def graph_temperature():
     temp_recs = []
     sensor_name_list = request.args.get('sensor_name')
     config = __config_graph('Temperature')
-    datetimeline = pygal.DateTimeLine(x_label_rotation=35, truncate_label=-1,
+    datetimeline = pygal.DateTimeLine(x_label_rotation=45, truncate_label=-1,
                                       x_value_formatter=lambda dt: dt.strftime('%d-%b-%Y %H:%M:%S'),
                                       config=config)
     try:

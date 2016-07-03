@@ -74,3 +74,8 @@ class UpsGraph(BaseGraph):
     graph_shape_ = ['hv', 'hv', 'hv']
     graph_id_ = 'name'
     graph_legend_ = 'name'
+
+
+class PresenceGraph(BaseGraph):
+    def __init__(self):
+        BaseGraph.__init__(self)
