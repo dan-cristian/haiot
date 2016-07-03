@@ -197,7 +197,7 @@ def init():
             Constant.HAS_LOCAL_DB_REPORTING_CAPABILITY = True
             admin.model_helper.check_history_tables()
         except Exception, ex:
-            Log.logger.warning("Local DB reporting capability is not available, err={}".format(ex))
+            Log.logger.critical("Local DB reporting capability is not available, err={}".format(ex))
             app.config['SQLALCHEMY_BINDS'] = None
     import transport
     transport.init()
