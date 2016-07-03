@@ -68,19 +68,19 @@ def update_master_state():
                         node.is_master_overall = False
                         node.notify_enabled_ = True
                         commit()
-            #applying node master status locally, if changed in db
+            # applying node master status locally, if changed in db
             if node.name == Constant.HOST_NAME:
-                variable.NODE_THIS_IS_MASTER_LOGGING =  node.is_master_logging
+                variable.NODE_THIS_IS_MASTER_LOGGING = node.is_master_logging
 
                 if variable.NODE_THIS_IS_MASTER_OVERALL != node.is_master_overall:
                     if not node.is_master_overall:
-                        #disabling local mastership immediately
+                        # disabling local mastership immediately
                         variable.NODE_THIS_IS_MASTER_OVERALL = node.is_master_overall
                         Log.logger.info('Immediate change in node mastership, local node is master={}'.format(
                             variable.NODE_THIS_IS_MASTER_OVERALL))
                     else:
                         global since_when_i_should_be_master
-                        #check seconds lapsed since cluster agreed I must be or lose master
+                        # check seconds lapsed since cluster agreed I must be or lose master
                         seconds_elapsed = (utils.get_base_location_now_date() - since_when_i_should_be_master).total_seconds()
                         if check_if_no_masters_overall() or seconds_elapsed > 10:
                             variable.NODE_THIS_IS_MASTER_OVERALL = node.is_master_overall
@@ -90,11 +90,12 @@ def update_master_state():
                         else:
                             Log.logger.info('Waiting to set master status, sec. lapsed={}'.format(seconds_elapsed))
                         if not variable.NODE_THIS_IS_MASTER_OVERALL:
-                            #record date when cluster agreed I must be master
+                            # record date when cluster agreed I must be master
                             if since_when_i_should_be_master == datetime.datetime.max:
                                 since_when_i_should_be_master = utils.get_base_location_now_date()
     except Exception, ex:
         Log.logger.warning('Error try_become_master, err {}'.format(ex))
+
 
 def announce_node_state():
     try:
@@ -131,10 +132,14 @@ def announce_node_state():
     except Exception, ex:
         Log.logger.error('Unable to announce my state, err={}'.format(ex))
 
+
 progress_status = None
+
+
 def get_progress():
     global progress_status
     return progress_status
+
 
 def thread_run():
     Log.logger.debug('Processing node_run')
