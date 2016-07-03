@@ -27,7 +27,8 @@ class SensorGraph(BaseGraph):
         BaseGraph.__init__(self)
 
     graph_x_ = 'updated_on'
-    graph_y_ = ['temperature', 'humidity', 'counters_a', 'counters_b', 'iad', 'vdd', 'vad']
+    graph_y_ = ['temperature', 'humidity', 'counters_a', 'counters_b', 'delta_counters_a', 'delta_counters_b',
+                'iad', 'vdd', 'vad']
     graph_shape_ = ['spline','spline']
     graph_id_ = 'address'
     graph_legend_ = 'sensor_name'
