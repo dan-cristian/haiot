@@ -2,12 +2,12 @@
   "Node": [
     {"id":1,  "priority":"10", "name":"netbook", "machine_type":"raspberry"},
     {"id":2,  "priority":"2", "name":"nas"},
-    {"id":3,  "priority":"3", "name":"server"},
+    {"id":3,  "priority":"9", "name":"server"},
     {"id":4,  "priority":"4", "name":"ex-std-node466.prod.rhcloud.com"},
     {"id":5,  "priority":"5", "name":"beaglebone", "machine_type":"beaglebone"},
     {"id":6,  "priority":"6", "name":"pi-power", "machine_type":"raspberry"},
     {"id":7,  "priority":"7", "name":"pi-bell", "machine_type":"raspberry"},
-    {"id":8,  "priority":"8", "name":"pi-face", "machine_type":"raspberry"}
+    {"id":8,  "priority":"3", "name":"pi-face", "machine_type":"raspberry"}
 
   ],
 
