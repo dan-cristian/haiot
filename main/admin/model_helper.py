@@ -90,7 +90,7 @@ def check_table_schema(table, model_auto_update=False):
     except InvalidRequestError:
         Log.logger.warning('Error on check table schema {}, ignoring'.format(table))
     except Exception, ex:
-        if "ProgrammingError" in str(ex):
+        if "ProgrammingError" in str(ex) or "pymysql.err.InternalError" in str(ex):
             recreate_table = True
             ex_msg = str(ex)
         else:
@@ -98,11 +98,12 @@ def check_table_schema(table, model_auto_update=False):
     if recreate_table:
         Log.logger.critical('Table {} schema in DB seems outdated, err {}, DROP it and recreate (y/n)?'.format(ex_msg,
                                                                                                                table))
-        read_drop_table(table, ex_msg, model_auto_update)
+        read_drop_table(table, ex_msg, drop_without_user_ask=model_auto_update)
 
 
 def read_drop_table(table, original_exception, drop_without_user_ask=False):
     if not drop_without_user_ask:
+        raise Exception("Database model for table {} is not matching app tables definition".format(table))
         x = sys.stdin.readline(1)
     else:
         x = 'y'
@@ -129,6 +130,9 @@ def check_history_tables():
         models.UpsHistory, models.PresenceHistory]
     for table in table_collection_list:
         table_str = utils.get_table_name(table)
+        #if table is models.PresenceHistory:
+        #    check_table_schema(table, model_auto_update=True)
+        #else:
         check_table_schema(table, model_auto_update=False)
 
 
