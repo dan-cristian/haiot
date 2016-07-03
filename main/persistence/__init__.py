@@ -8,7 +8,7 @@ __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 # saves record to local database
 def save_to_history(obj, save_to_local_db=False, upload_to_cloud=False):
     try:
-        Log.logger.info('Trying to save historical record to_db={} to_cloud={}, {}'.format(save_to_local_db,
+        Log.logger.debug('Trying to save historical record to_db={} to_cloud={}, {}'.format(save_to_local_db,
                                                                                            upload_to_cloud, obj))
         if Constant.JSON_PUBLISH_GRAPH_X in obj:
             # name of x field
@@ -22,8 +22,8 @@ def save_to_history(obj, save_to_local_db=False, upload_to_cloud=False):
             # intersect lists and get only graphable fields that had values changed
             list_axis_y = list(set(graph_y_fields) & set(changed_fields))
             if len(list_axis_y) == 0:
-                Log.logger.info('Ignoring record save graph={} changed fields={} obj={}'.format(graph_y_fields,
-                                                                                                changed_fields, obj))
+                Log.logger.debug('Ignoring record save graph={} changed fields={} obj={}'.format(graph_y_fields,
+                                                                                                 changed_fields, obj))
             else:
                 Log.logger.info('Trying to save y axis {}'.format(list_axis_y))
                 if axis_x_field in obj and graph_id_field in obj:
@@ -64,7 +64,7 @@ def save_to_history(obj, save_to_local_db=False, upload_to_cloud=False):
                     if save_to_local_db:
                         # save to local history DB, append history to source table name
                         dest_table = str(table) + 'History'
-                        Log.logger.info('Saving to local db table {}'.format(dest_table))
+                        Log.logger.info('Saving to local db table {} obj={}'.format(dest_table, obj))
                         from main.admin import models
                         # http://stackoverflow.com/questions/4030982/initialise-class-object-by-name
                         try:
