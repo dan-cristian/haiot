@@ -67,13 +67,13 @@ def save_to_db(dev):
             if current_record:
                 record.delta_counters_a = record.counters_a - current_record.counters_a
             else:
-                record.delta_counters_a = 0  # don't know prev. count, assume no consumption (ticks could be lost)
+                record.delta_counters_a = 1  # don't know prev. count, assume no consumption (ticks could be lost)
         if dev.has_key('counters_b'):
             record.counters_b = dev['counters_b']
             if current_record:
                 record.delta_counters_b = record.counters_b - current_record.counters_b
             else:
-                record.delta_counters_b = 0  # don't know prev. count, assume no consumption (ticks could be lost)
+                record.delta_counters_b = 1  # don't know prev. count, assume no consumption (ticks could be lost)
         if dev.has_key('temperature'):
             record.temperature = dev['temperature']
         if dev.has_key('humidity'):

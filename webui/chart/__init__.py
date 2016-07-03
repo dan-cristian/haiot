@@ -44,17 +44,20 @@ def get_weather_data(date='20140415', state='IA', city='Ames'):
     bar_chart.x_labels = times
     bar_chart.add('Temps in F', imp_temps)
 
-    return render_template('chart-temp.html',title=title,bar_chart=bar_chart)
+    return render_template('chart-generic.html',title=title,bar_chart=bar_chart)
 
 
 def __config_graph(title):
     config = pygal.Config()
     # config.human_readable = True
-    #config.style = pygal.style.DefaultStyle
+    # config.style = pygal.style.DefaultStyle
     config.disable_xml_declaration = True
     config.title = title
-    #config.show_x_labels = True
+    config.show_x_labels = True
     config.legend_at_bottom = True
+    config.x_label_rotation = 90
+    config.truncate_label = -1
+    # config.x_value_formatter = lambda dt: dt.strftime('%d-%b-%Y %H:%M:%S')
     return config
 
 
@@ -76,9 +79,34 @@ def graph_temperature():
                 serie.append((i.updated_on, i.temperature))
             datetimeline.add(sensor_name, serie)
         chart_list.append(datetimeline)
-        result = render_template('chart/chart-temp.html', chart_list=chart_list)
+        result = render_template('chart/chart-generic.html', chart_list=chart_list)
     except Exception, ex:
         pass
+    return result
+
+
+@app.route('/chart-water/')
+def graph_water():
+    chart_list = []
+    sensor_name_list = request.args.get('sensor_name')
+    config = __config_graph('Water')
+    datetimeline = pygal.DateTimeLine(config=config)
+    try:
+        for sensor_name in sensor_name_list.split(';'):
+            total = 0
+            sensor_recs = models.SensorHistory().query_filter_all(models.SensorHistory.sensor_name == sensor_name,
+                                                                  models.SensorHistory.updated_on >= '2016-07-01')
+            serie = []
+            for i in sensor_recs:
+                serie.append((i.updated_on, i.delta_counters_a))
+                if i.delta_counters_a:
+                    total = total + i.delta_counters_a
+            datetimeline.add("{}, total={}".format(sensor_name, total), serie)
+            # datetimeline.x_title = "Total = {}".format(total)
+        chart_list.append(datetimeline)
+        result = render_template('chart/chart-generic.html', chart_list=chart_list)
+    except Exception, ex:
+        result = render_template('chart/chart-generic.html', chart_list=[], title=ex)
     return result
 
 
