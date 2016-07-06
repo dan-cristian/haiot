@@ -13,6 +13,11 @@ __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 initialised = False
 
 
+@app.route('/dashboard')
+def render_dashboard():
+    render_template('dashboard/main.html')
+
+
 @app.route('/chart-test')
 def get_weather_data(date='20140415', state='IA', city='Ames'):
     """
@@ -51,7 +56,7 @@ def __config_graph(title):
     config = pygal.Config()
     # config.human_readable = True
     # config.style = pygal.style.DefaultStyle
-    config.disable_xml_declaration = True
+    # config.disable_xml_declaration = True
     config.title = title
     config.show_x_labels = True
     config.legend_at_bottom = True
@@ -78,7 +83,8 @@ def graph_temperature():
             for i in temp_recs:
                 serie.append((i.updated_on, i.temperature))
             datetimeline.add(sensor_name, serie)
-        chart_list.append(datetimeline)
+            graph_data = datetimeline.render_data_uri()
+        chart_list.append(graph_data)
         result = render_template('chart/chart-generic.html', chart_list=chart_list)
     except Exception, ex:
         pass

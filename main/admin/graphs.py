@@ -77,6 +77,16 @@ class UpsGraph(BaseGraph):
     graph_legend_ = 'name'
 
 
+class UtilityGraph(BaseGraph):
+    def __init__(self):
+        BaseGraph.__init__(self)
+    graph_x_ = 'updated_on'
+    graph_y_ = ['units_delta']
+    graph_shape_ = ['hv']
+    graph_id_ = 'sensor_name'
+    graph_legend_ = 'sensor_name'
+
+
 class PresenceGraph(BaseGraph):
     def __init__(self):
         BaseGraph.__init__(self)

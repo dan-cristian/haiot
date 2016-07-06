@@ -7,7 +7,9 @@
     <body>
     <h1>{{ title }}</h1>
     {% for chart in chart_list %}
-        {{ chart.render()|safe }}
+        <div class="container" align="left">
+            <embed type="image/svg+xml" src={{ chart|safe }} style='max-width:1000px'/>
+        </div>
     {% endfor %}
     </body>
 </html>

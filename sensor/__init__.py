@@ -6,6 +6,7 @@ import owsensor_loop
 import rfxcom_run
 import ups_legrand_run
 from main.admin import models
+from pydispatch import dispatcher
 from main.admin.model_helper import commit
 
 __author__ = 'dcristian'
@@ -33,6 +34,10 @@ def sensor_update(obj):
             record.updated_on = utils.get_base_location_now_date()
             if obj.has_key('counters_a'): record.counters_a = utils.get_object_field_value(obj, 'counters_a')
             if obj.has_key('counters_b'): record.counters_b = utils.get_object_field_value(obj, 'counters_b')
+            if obj.has_key('delta_counters_a'):
+                record.delta_counters_a = utils.get_object_field_value(obj, 'delta_counters_a')
+            if obj.has_key('delta_counters_b'):
+                record.delta_counters_b = utils.get_object_field_value(obj, 'delta_counters_b')
             if obj.has_key('temperature'): record.temperature = utils.get_object_field_value(obj, 'temperature')
             if obj.has_key('humidity'): record.humidity = utils.get_object_field_value(obj, 'humidity')
             if obj.has_key('iad'): record.iad = utils.get_object_field_value(obj, 'iad')
@@ -44,9 +49,18 @@ def sensor_update(obj):
             if obj.has_key('sensed_b'): record.sensed_b = utils.get_object_field_value(obj, 'sensed_b')
 
             current_record = models.Sensor.query.filter_by(address=address).first()
+            # force field changed detection for delta_counters
+            current_record.delta_counters_a = 0
+            current_record.delta_counters_b = 0
             record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=False,
                                        save_to_graph=False)
-            commit()
+            # commit() # not needed?
+            # enable below only for testing on netbook
+            #if record.delta_counters_a or record.delta_counters_b:
+            #    dispatcher.send(Constant.SIGNAL_UTILITY, sensor_name=record.sensor_name,
+            #                    units_delta_a=record.delta_counters_a,
+            #                    units_delta_b=record.delta_counters_b, total_units_a=record.counters_a,
+            #                    total_units_b=record.counters_b)
     except Exception, ex:
         Log.logger.warning('Error on sensor update, err {}'.format(ex))
         db.session.rollback()

@@ -1,14 +1,16 @@
+import traceback
+import pyownet.protocol
+from pydispatch import dispatcher
+from main.logger_helper import Log
+from common import Constant, utils
+from main.admin import model_helper, models
+
 '''
 Created on Mar 9, 2015
 
 @author: dcristian
 '''
 
-import traceback
-import pyownet.protocol
-from main.logger_helper import Log
-from common import Constant, utils
-from main.admin import model_helper, models
 
 initialised = False
 owproxy = None
@@ -92,8 +94,15 @@ def save_to_db(dev):
             record.sensed_a = dev['sensed_a']
         if dev.has_key('sensed_b'):
             record.sensed_b = dev['sensed_b']
+        # force field changed detection for delta_counters
+        current_record.delta_counters_a = 0
+        current_record.delta_counters_b = 0
         record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
                                    save_to_graph=True)
+        if record.delta_counters_a or record.delta_counters_b:
+            dispatcher.send(Constant.SIGNAL_UTILITY, sensor_name=record.sensor_name,
+                            units_delta_a=record.delta_counters_a, units_delta_b=record.delta_counters_b,
+                            total_units_a=record.counters_a, total_units_b=record.counters_b)
     except Exception, ex:
         Log.logger.warning('Error saving sensor to DB, err {}'.format(ex))
         # finally:

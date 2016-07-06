@@ -1,8 +1,8 @@
-__author__ = 'Dan Cristian<dan.cristian@gmail.com>'
-
 from main.logger_helper import Log
 from main import thread_pool
 import template_run
+
+__author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 initialised = False
 
