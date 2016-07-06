@@ -50,8 +50,9 @@ def sensor_update(obj):
 
             current_record = models.Sensor.query.filter_by(address=address).first()
             # force field changed detection for delta_counters
-            current_record.delta_counters_a = 0
-            current_record.delta_counters_b = 0
+            if current_record:
+                current_record.delta_counters_a = 0
+                current_record.delta_counters_b = 0
             record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=False,
                                        save_to_graph=False)
             # commit() # not needed?
