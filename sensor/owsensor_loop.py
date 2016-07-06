@@ -95,8 +95,9 @@ def save_to_db(dev):
         if dev.has_key('sensed_b'):
             record.sensed_b = dev['sensed_b']
         # force field changed detection for delta_counters
-        current_record.delta_counters_a = 0
-        current_record.delta_counters_b = 0
+        if current_record:
+            current_record.delta_counters_a = 0
+            current_record.delta_counters_b = 0
         record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
                                    save_to_graph=True)
         if record.delta_counters_a or record.delta_counters_b:
