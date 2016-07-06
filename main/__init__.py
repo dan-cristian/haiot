@@ -178,6 +178,7 @@ def init():
     import admin.model_helper
     global MODEL_AUTO_UPDATE
 
+    admin.model_helper.populate_tables(MODEL_AUTO_UPDATE)
     reporting_enabled = admin.model_helper.get_param(Constant.DB_REPORTING_LOCATION_ENABLED)
     if reporting_enabled == "1":
         Log.logger.info('Checking history db tables')
@@ -198,7 +199,7 @@ def init():
         except Exception, ex:
             Log.logger.critical("Local DB reporting capability is not available, err={}".format(ex))
             app.config['SQLALCHEMY_BINDS'] = None
-    admin.model_helper.populate_tables(MODEL_AUTO_UPDATE)
+
     import transport
     transport.init()
 
