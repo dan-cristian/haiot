@@ -144,7 +144,7 @@ def populate_tables(model_auto_update=False):
                         models.TemperatureTarget, models.SchedulePattern, models.HeatSchedule, models.ZoneHeatRelay,
                         models.ZoneSensor, models.ZoneAlarm,
                         models.SystemMonitor, models.SystemDisk, models.Sensor, models.Ups, models.Rule,
-                        models.CommandOverrideRelay, models.PlotlyCache]
+                        models.CommandOverrideRelay, models.PlotlyCache, models.Utility]
 
     for table in table_collection:
         table_str = utils.get_table_name(table)
