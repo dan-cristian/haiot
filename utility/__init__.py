@@ -15,10 +15,12 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
     for delta in [units_delta_a, units_delta_b]:
         if delta:
             record = models.Utility(sensor_name=sensor_name)
-            current_record = models.Utility.query.filter_by(sensor_name=sensor_name).first()
+            current_record = models.Utility.query.filter_by(sensor_name=sensor_name, sensor_index=index).first()
             if current_record:
                 record.sensor_index = index
                 record.units_delta = delta / (current_record.ticks_per_unit * 1.0)  # force float operation
+                if not current_record.units_total:
+                    current_record.units_total = 0
                 record.units_total = current_record.units_total + record.units_delta
                 # force save
                 current_record.units_total = 0
