@@ -839,3 +839,19 @@ class PresenceHistory(db.Model, DbBase):
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
     record_uuid = db.Column(db.String(36))
     source_host_ = db.Column(db.String(50))
+
+
+class UtilityHistory(db.Model, DbBase):
+    __bind_key__ = 'reporting'
+    __tablename__ = 'utility_history'  # convention: append '_history' -> 'History' to source table name
+    id = db.Column(db.Integer, primary_key=True)
+    sensor_name = db.Column(db.String(50), index=True)
+    sensor_index = db.Column(db.Integer)  # 0 for counter_a, 1 for counter_b
+    units_total = db.Column(db.Float, default=0)  # total number of units measured
+    units_delta = db.Column(db.Float)  # total number of units measured since last measurement
+    ticks_per_unit = db.Column(db.Float, default=1)  # number of counter ticks in a unit (e.g. 10 for a watt)
+    unit_name = db.Column(db.String(50))  # watt, liter etc.
+    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
+
+    def __repr__(self):
+        return '{} {} {}'.format(self.id, self.sensor_name, self.updated_on)
