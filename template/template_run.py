@@ -1,6 +1,6 @@
-__author__ = 'Dan Cristian<dan.cristian@gmail.com>'
-
 from main.logger_helper import Log
+
+__author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 
 def thread_run():

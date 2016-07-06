@@ -55,6 +55,7 @@
     {"id":27, "active":"1", "start_order":"27", "name":"node"},
     {"id":29, "active":"1", "start_order":"29", "name":"webui.chart"},
     {"id":31, "active":"1", "start_order":"31", "name":"webui.api"},
+    {"id":33, "active":"1", "start_order":"33", "name":"utility"},
 
     {"id":113, "active":"0", "start_order":"13", "name":"cloud.graph_plotly", "host_name":"nas"},
     {"id":121, "active":"0", "start_order":"21", "name":"cloud.youtube", "host_name":"nas"},
@@ -226,6 +227,11 @@
     {"zone_id":10 , "sensor_address": "1C0000000F99851D", "sensor_name": "power rack"},
     {"zone_id":7 , "sensor_address": "BE0000000F870C1D", "sensor_name": "water main"},
     {"zone_id":29 , "sensor_address": "F90000000FFEAB1D", "sensor_name": "water hot"}
+  ],
+
+  "Utility": [
+    {"sensor_name":"power rack", "sensor_index":1, "ticks_per_unit":100 , "unit_name":"watt"},
+    {"sensor_name":"water hot", "sensor_index":0, "ticks_per_unit":1 , "unit_name":"liter"}
   ],
 
   "ZoneAlarm": [

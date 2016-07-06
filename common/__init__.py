@@ -5,12 +5,12 @@ from uuid import getnode as get_mac
 import json
 import utils
 
+
 class Constant:
     db_values_json = None
 
     def __init__(self):
         pass
-
     
     SIGNAL_SENSOR = 'signal-from-sensor'
     SIGNAL_UI_DB_POST = 'signal-from-db-post'
@@ -20,6 +20,7 @@ class Constant:
     SIGNAL_GPIO_INPUT_PORT_LIST = 'signal-setup-GPIO-input'
     SIGNAL_FILE_WATCH = 'signal-from-file-watch'
     SIGNAL_DB_CHANGE_FOR_RULES = 'signal_db_change_for_rules'
+    SIGNAL_UTILITY = 'signal-utility-data'
 
     ERROR_CONNECT_MAX_RETRY_COUNT = 2
     ERROR_CONNECT_PAUSE_SECOND = 1
@@ -135,10 +136,8 @@ def load_config_json():
         Log.logger.warning('Cannot load config json, ex={}'.format(ex))
 
 
-''' 
-retrieves parameter value from json config file
-'''
 def get_json_param(name):
+    """ retrieves parameter value from json config file"""
     param_fields = Constant.db_values_json["Parameter"]
     value = None
     for config_record in param_fields:
