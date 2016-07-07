@@ -154,6 +154,7 @@
     {"relay_pin_name": "gate_relay", "zone_id": "14", "gpio_pin_code": "5", "gpio_host_name": "pi-face","relay_is_on": "0"},
     {"relay_pin_name": "dormitor_heat_relay", "zone_id": "4", "gpio_pin_code": "4", "gpio_host_name": "pi-face","relay_is_on": "0"},
     {"relay_pin_name": "test_relay", "zone_id": "1", "gpio_pin_code": "66", "gpio_host_name": "pi-face","relay_is_on": "0"},
+
     {"relay_pin_name": "test_relay_netbook", "zone_id": "1", "gpio_pin_code": "1", "gpio_host_name": "netbook","relay_is_on": "0"},
     {"relay_pin_name": "main_heat_relay", "zone_id": "19", "gpio_pin_code": "24", "gpio_host_name": "pi-power","relay_is_on": "0"},
     {"relay_pin_name": "bucatarie_music_relay", "zone_id": "1", "gpio_pin_code": "23", "gpio_host_name": "pi-power", "relay_is_on": "0"},
@@ -260,7 +261,6 @@
     {"zone_id":8 , "gpio_pin_code":"15", "gpio_host_name": "pi-face", "alarm_pin_name": "usa casa"},
     {"zone_id":7 , "gpio_pin_code":"14", "gpio_host_name": "pi-face", "alarm_pin_name": "sonerie"},
 
-    {"zone_id":8 , "gpio_pin_code":"15", "gpio_host_name": "netbook", "alarm_pin_name": "usa casa"},
     {"zone_id":29 , "gpio_pin_code":"18", "gpio_host_name": "pi-face", "alarm_pin_name": "beci test"}
 
   ]
