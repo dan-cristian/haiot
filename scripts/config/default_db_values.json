@@ -257,6 +257,10 @@
     {"zone_id":11 , "gpio_pin_code":"0:in:6", "gpio_host_name": "pi-face", "alarm_pin_name": "etaj hol"},
     {"zone_id":34 , "gpio_pin_code":"0:in:7", "gpio_host_name": "pi-face", "alarm_pin_name": ""},
 
+    {"zone_id":8 , "gpio_pin_code":"15", "gpio_host_name": "pi-face", "alarm_pin_name": "usa casa"},
+    {"zone_id":7 , "gpio_pin_code":"14", "gpio_host_name": "pi-face", "alarm_pin_name": "sonerie"},
+
+    {"zone_id":8 , "gpio_pin_code":"15", "gpio_host_name": "netbook", "alarm_pin_name": "usa casa"},
     {"zone_id":29 , "gpio_pin_code":"18", "gpio_host_name": "pi-face", "alarm_pin_name": "beci test"}
 
   ]
