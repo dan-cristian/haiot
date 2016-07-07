@@ -17,7 +17,8 @@ def model_row_to_json(obj, operation=''):
         safe_obj = {}
         obj.event_sent_datetime = str(utils.get_base_location_now_date())
         obj.operation_type = operation
-        obj.record_uuid = str(uuid.uuid4())
+        if hasattr(obj, 'record_uuid'):
+            obj.record_uuid = str(uuid.uuid4())
         table_cols = obj._sa_class_manager
         for attr in table_cols:
             safe_obj[Constant.JSON_PUBLISH_TABLE] = str(table_cols[attr]).split('.')[0]
