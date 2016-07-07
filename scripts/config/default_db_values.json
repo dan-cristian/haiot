@@ -227,7 +227,8 @@
     {"zone_id":10 , "sensor_address": "1C0000000F99851D", "sensor_name": "power rack"},
     {"zone_id":7 , "sensor_address": "BE0000000F870C1D", "sensor_name": "water main"},
     {"zone_id":29 , "sensor_address": "F90000000FFEAB1D", "sensor_name": "water hot"},
-    {"zone_id":29 , "sensor_address": "F30000000DC60E1D", "sensor_name": "power beci"}
+    {"zone_id":29 , "sensor_address": "F30000000DC60E1D", "sensor_name": "power broke"},
+    {"zone_id":29 , "sensor_address": "AB0000000F60491D", "sensor_name": "power beci"}
   ],
 
   "Utility": [
