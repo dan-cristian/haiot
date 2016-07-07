@@ -1,13 +1,13 @@
-__author__ = 'dcristian'
 from pydispatch import dispatcher
 from main.logger_helper import Log
 from main.admin import models
-#import alarm_loop
 from main import thread_pool
 from common import Constant, utils
 from main.admin.model_helper import commit
 
-initialised=False
+__author__ = 'dcristian'
+
+initialised = False
 
 
 def handle_event_alarm(gpio_pin_code='', direction='', pin_value='', pin_connected=None):
@@ -18,7 +18,7 @@ def handle_event_alarm(gpio_pin_code='', direction='', pin_value='', pin_connect
             zone.name, zonealarm.zone_id, pin_connected, pin_value))
         zonealarm.alarm_status = pin_value
         zonealarm.updated_on = utils.get_base_location_now_date()
-        zonealarm.notify_transport_enabled= False
+        zonealarm.notify_transport_enabled = False
         commit()
     else:
         Log.logger.warning('Unexpected mising zone alarm for gpio code {}'.format(gpio_pin_code))
@@ -28,7 +28,7 @@ def unload():
     Log.logger.info('Alarm module unloading')
     global initialised
     dispatcher.disconnect(dispatcher.connect(handle_event_alarm, signal=Constant.SIGNAL_GPIO, sender=dispatcher.Any))
-    #thread_pool.remove_callable(alarm_loop.thread_run)
+    # thread_pool.remove_callable(alarm_loop.thread_run)
     initialised = False
 
 

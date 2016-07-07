@@ -50,6 +50,11 @@ def rule_node(obj=models.Node(), field_changed_list=None):
     return 'rule node ok'
 
 
+def rule_alarm(obj=models.ZoneAlarm(), field_changed_list=None):
+    Log.logger.info('Rule Alarm: obj={} fields={}'.format(obj, field_changed_list))
+    return 'zone alarm ok'
+
+
 # min & max temperatures
 def rule_sensor_temp_target(obj=models.Sensor(), field_changed_list=None):
     if not field_changed_list:
