@@ -57,11 +57,12 @@ def sensor_update(obj):
                                        save_to_graph=False)
             # commit() # not needed?
             # enable below only for testing on netbook
-            #if record.delta_counters_a or record.delta_counters_b:
-            #    dispatcher.send(Constant.SIGNAL_UTILITY, sensor_name=record.sensor_name,
-            #                    units_delta_a=record.delta_counters_a,
-            #                    units_delta_b=record.delta_counters_b, total_units_a=record.counters_a,
-            #                    total_units_b=record.counters_b)
+
+            if Constant.HOST_NAME=='netbook' and (record.delta_counters_a or record.delta_counters_b):
+                dispatcher.send(Constant.SIGNAL_UTILITY, sensor_name=record.sensor_name,
+                                units_delta_a=record.delta_counters_a,
+                                units_delta_b=record.delta_counters_b, total_units_a=record.counters_a,
+                                total_units_b=record.counters_b)
     except Exception, ex:
         Log.logger.warning('Error on sensor update, err {}'.format(ex))
         db.session.rollback()
