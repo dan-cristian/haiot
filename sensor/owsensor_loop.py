@@ -94,7 +94,7 @@ def save_to_db(dev):
             record.sensed_a = dev['sensed_a']
         if dev.has_key('sensed_b'):
             record.sensed_b = dev['sensed_b']
-        # force field changed detection for delta_counters
+        # force field changed detection for delta_counters to enable save in history
         if current_record:
             current_record.delta_counters_a = 0
             current_record.delta_counters_b = 0
