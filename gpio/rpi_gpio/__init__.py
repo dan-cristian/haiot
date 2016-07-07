@@ -74,7 +74,7 @@ def setup_in_ports(gpio_pin_list):
                                                                                        gpio_pin.pin_type,
                                                                                        gpio_pin.pin_index_bcm))
             try:
-                GPIO.setup(int(gpio_pin.pin_code), GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+                GPIO.setup(int(gpio_pin.pin_code), GPIO.IN, pull_up_down=GPIO.PUD_UP)  # PUD_DOWN:no contact detection
                 GPIO.add_event_detect(int(gpio_pin.pin_code), GPIO.BOTH, callback=event_detected, bouncetime=300)
                 __pool_pin_codes.append(gpio_pin.pin_code)
                 Log.logger.info('OK callback on rpi.gpio'.format(gpio_pin.pin_code))
