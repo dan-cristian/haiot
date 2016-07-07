@@ -144,7 +144,8 @@ class DbEvent:
 
     # graph_save_frequency in seconds
     def save_changed_fields(self, current_record='', new_record='', notify_transport_enabled=False, save_to_graph=False,
-                            ignore_only_updated_on_change=True, debug=False, graph_save_frequency=0, query_filter=None):
+                            ignore_only_updated_on_change=True, debug=False, graph_save_frequency=0, query_filter=None,
+                            save_all_fields=None):
         try:
             if hasattr(self, 'save_to_graph'):  # not all models inherit graph
                 if current_record:
@@ -172,7 +173,7 @@ class DbEvent:
                     new_value = getattr(new_record, column_name)
                     old_value = getattr(current_record, column_name)
                     # todo: comparison not working for float, because str appends .0
-                    if (not new_value is None) and (str(old_value) != str(new_value)):
+                    if (not new_value is None) and (str(old_value) != str(new_value)) or save_all_fields:
                         if column_name != 'updated_on':
                             try:
                                 obj_type = str(type(self)).split('\'')[1]
