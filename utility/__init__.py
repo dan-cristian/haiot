@@ -21,9 +21,12 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
                 record.units_delta = delta / (current_record.ticks_per_unit * 1.0)  # force float operation
                 if not current_record.units_total:
                     current_record.units_total = 0
+                # force save for history recording
+                if current_record:
+                    current_record.units_delta = 0
                 record.units_total = 0.0 + current_record.units_total + record.units_delta
                 record.save_changed_fields(current_record=current_record, new_record=record,
-                                           notify_transport_enabled=True, save_to_graph=True, save_all_fields=True)
+                                           notify_transport_enabled=True, save_to_graph=True)
             else:
                 Log.logger.critical("Counter sensor [{}] is not defined in Utility table".format(sensor_name))
         index += 1
