@@ -81,8 +81,8 @@ class UtilityGraph(BaseGraph):
     def __init__(self):
         BaseGraph.__init__(self)
     graph_x_ = 'updated_on'
-    graph_y_ = ['units_delta', 'units_total']
-    graph_shape_ = ['hv', 'hv']
+    graph_y_ = ['units_delta', 'units_total', 'ticks_delta']
+    graph_shape_ = ['hv', 'hv', 'hv']
     graph_id_ = 'sensor_name'
     graph_legend_ = 'sensor_name'
 

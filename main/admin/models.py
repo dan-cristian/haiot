@@ -575,7 +575,7 @@ class ZoneAlarm(db.Model, DbEvent, DbBase):
         self.gpio_host_name = host_name
 
     def __repr__(self):
-        return 'host {} gpiopin {} {}'.format(self.gpio_host_name, self.gpio_pin_code, self.alarm_pin_name)
+        return 'host:{} pin:{} status:{}'.format(self.gpio_host_name, self.alarm_pin_name, self.alarm_status)
 
 
 class ZoneHeatRelay(db.Model, DbEvent, DbBase):
@@ -692,6 +692,7 @@ class Utility(db.Model, graphs.UtilityGraph, DbEvent, DbBase):
     sensor_index = db.Column(db.Integer)  # 0 for counter_a, 1 for counter_b
     units_total = db.Column(db.Float)  # total number of units measured
     units_delta = db.Column(db.Float)  # total number of units measured since last measurement
+    ticks_delta = db.Column(db.BigInteger)
     ticks_per_unit = db.Column(db.Float, default=1)  # number of counter ticks in a unit (e.g. 10 for a watt)
     unit_name = db.Column(db.String(50))  # watt, liter etc.
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
@@ -850,6 +851,7 @@ class UtilityHistory(db.Model, DbBase):
     # sensor_index = db.Column(db.Integer)  # 0 for counter_a, 1 for counter_b
     units_total = db.Column(db.Float)  # total number of units measured
     units_delta = db.Column(db.Float)  # total number of units measured since last measurement
+    ticks_delta = db.Column(db.BigInteger)
     # ticks_per_unit = db.Column(db.Float, default=1)  # number of counter ticks in a unit (e.g. 10 for a watt)
     # unit_name = db.Column(db.String(50))  # watt, liter etc.
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
