@@ -16,7 +16,7 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
         if delta is not None:
             record = models.Utility(sensor_name=sensor_name)
             current_record = models.Utility.query.filter_by(sensor_name=sensor_name, sensor_index=index).first()
-            if current_record:
+            if current_record is not None:
                 record.sensor_index = index
                 record.units_delta = delta / (current_record.ticks_per_unit * 1.0)  # force float operation
                 record.ticks_delta = delta
