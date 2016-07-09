@@ -37,7 +37,8 @@
     {"name": "P_TEMPERATURE_THRESHOLD", "value": "0.2", "description":"gap in degrees before turning on / off heat, to avoid rapid on/off cycles"},
     {"name": "P_PRESENCE_MOVE_GAP", "value": "60", "description":"minutes with no move to pass before considering presence status as away"},
     {"name": "P_HEAT_ON_AUTO_INTERVAL", "value": "30", "description":"minutes of move to trigger auto heat on action"},
-    {"name": "P_HEAT_OFF_AUTO_INTERVAL", "value": "1440", "description":"minutes of inactivity to trigger auto heat off action"}
+    {"name": "P_HEAT_OFF_AUTO_INTERVAL", "value": "1440", "description":"minutes of inactivity to trigger auto heat off action"},
+    {"name": "P_MPD_SERVER", "value": "192.168.0.9", "description":"IP of mpd music server"}
   ],
   "Module": [
     {"id":1,  "active":"1", "start_order":"1", "name":"main"},

@@ -3,7 +3,8 @@ from main.logger_helper import Log
 from main import app
 from main.admin import models
 from common import Constant
-
+# import mpd
+from main.admin.model_helper import get_param
 
 
 def update_custom_relay(relay_pin_name, power_is_on):
@@ -23,3 +24,9 @@ def update_command_override_relay(relay_pin_name, is_rule, is_gui):
 
     m = models.CommandOverrideRelay
     override_row = m().query_filter_first(m.host_name.in_([Constant.HOST_NAME]), m.relay_pin_name.in_([relay_pin_name]))
+
+
+def play_bell():
+    # client = mpd.MPDClient(use_unicode=True)
+    # client.connect(get_param(Constant.P_MPD_SERVER), 6600)
+    pass

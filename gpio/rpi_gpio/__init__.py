@@ -58,7 +58,7 @@ def event_detected(channel):
         global import_module_exist
         if import_module_exist:
             state = GPIO.input(channel)
-            Log.logger.info('Event rpi.gpio input detected channel {} status {}'.format(channel, state))
+            Log.logger.info('Event rpi.gpio input detected channel={} state={}'.format(channel, state))
             dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=channel, direction='in',
                             pin_value=state, pin_connected=(state == 0))
     except Exception, ex:
@@ -75,7 +75,8 @@ def setup_in_ports(gpio_pin_list):
                                                                                        gpio_pin.pin_index_bcm))
             try:
                 GPIO.setup(int(gpio_pin.pin_code), GPIO.IN, pull_up_down=GPIO.PUD_UP)  # PUD_DOWN:no contact detection
-                GPIO.add_event_detect(int(gpio_pin.pin_code), GPIO.BOTH, callback=event_detected, bouncetime=500)
+                GPIO.add_event_detect(int(gpio_pin.pin_code), GPIO.RISING, callback=event_detected, bouncetime=500)
+                GPIO.add_event_detect(int(gpio_pin.pin_code), GPIO.FALLING, callback=event_detected, bouncetime=500)
                 __pool_pin_codes.append(gpio_pin.pin_code)
                 Log.logger.info('OK callback on rpi.gpio'.format(gpio_pin.pin_code))
             except Exception, ex:
