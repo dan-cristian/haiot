@@ -19,7 +19,7 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
             if current_record is not None:
                 record.sensor_index = index
                 if current_record.utility_type == 'electricity':
-                    # 1000 times count divided by 60 seconds time 60 minutes (kvh -> watt)
+                    # 1000 times count divided by 60 seconds time 60 minutes (kwh -> watt)
                     record.units_delta = 1000 * delta / ((current_record.ticks_per_unit * 1.0) /
                                                          (sampling_period_seconds/(60.0*60)))
                 else:
