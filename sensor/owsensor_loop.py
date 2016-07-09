@@ -69,13 +69,13 @@ def save_to_db(dev):
             if current_record:
                 record.delta_counters_a = record.counters_a - current_record.counters_a
             else:
-                record.delta_counters_a = 1  # don't know prev. count, assume no consumption (ticks could be lost)
+                record.delta_counters_a = 0  # don't know prev. count, assume no consumption (ticks could be lost)
         if dev.has_key('counters_b'):
             record.counters_b = dev['counters_b']
             if current_record:
                 record.delta_counters_b = record.counters_b - current_record.counters_b
             else:
-                record.delta_counters_b = 1  # don't know prev. count, assume no consumption (ticks could be lost)
+                record.delta_counters_b = 0  # don't know prev. count, assume no consumption (ticks could be lost)
         if dev.has_key('temperature'):
             record.temperature = dev['temperature']
         if dev.has_key('humidity'):
@@ -95,12 +95,15 @@ def save_to_db(dev):
         if dev.has_key('sensed_b'):
             record.sensed_b = dev['sensed_b']
         # force field changed detection for delta_counters to enable save in history
-        if current_record:
-            current_record.delta_counters_a = 0
-            current_record.delta_counters_b = 0
+        # but allow one 0 record to be saved for nicer graphics
+        if current_record is not None:
+            if record.delta_counters_a != 0:
+                current_record.delta_counters_a = 0
+            if record.delta_counters_b != 0:
+                current_record.delta_counters_b = 0
         record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
                                    save_to_graph=True)
-        if record.delta_counters_a or record.delta_counters_b:
+        if record.delta_counters_a is not None or record.delta_counters_b is not None:
             dispatcher.send(Constant.SIGNAL_UTILITY, sensor_name=record.sensor_name,
                             units_delta_a=record.delta_counters_a, units_delta_b=record.delta_counters_b,
                             total_units_a=record.counters_a, total_units_b=record.counters_b)

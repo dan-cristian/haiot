@@ -15,7 +15,7 @@ initialised = False
 
 @app.route('/dashboard')
 def render_dashboard():
-    render_template('dashboard/main.html')
+    return render_template('dashboard/main.html')
 
 
 @app.route('/chart-test')
@@ -69,50 +69,52 @@ def __config_graph(title):
 @app.route('/chart-temp/')
 def graph_temperature():
     chart_list = []
-    temp_recs = []
+    graph_data = None
     sensor_name_list = request.args.get('sensor_name')
     config = __config_graph('Temperature')
-    datetimeline = pygal.DateTimeLine(x_label_rotation=45, truncate_label=-1,
-                                      x_value_formatter=lambda dt: dt.strftime('%d-%b-%Y %H:%M:%S'),
-                                      config=config)
-    try:
-        for sensor_name in sensor_name_list.split(';'):
-            temp_recs = models.SensorHistory().query_filter_all(models.SensorHistory.sensor_name == sensor_name,
-                                                                models.SensorHistory.updated_on >= '2016-07-01')
-            serie = []
-            for i in temp_recs:
-                serie.append((i.updated_on, i.temperature))
-            datetimeline.add(sensor_name, serie)
-            graph_data = datetimeline.render_data_uri()
-        chart_list.append(graph_data)
-        result = render_template('chart/chart-generic.html', chart_list=chart_list)
-    except Exception, ex:
-        pass
+    datetimeline = pygal.DateTimeLine(config=config)
+    # try:
+    for sensor_name in sensor_name_list.split(';'):
+        temp_recs = models.SensorHistory().query_filter_all(models.SensorHistory.sensor_name == sensor_name,
+                                                            models.SensorHistory.updated_on >= '2016-07-08')
+        serie = []
+        for i in temp_recs:
+            serie.append((i.updated_on, i.temperature))
+        datetimeline.add(sensor_name, serie)
+        graph_data = datetimeline.render_data_uri()
+    chart_list.append(graph_data)
+    result = render_template('chart/chart-generic.html', chart_list=chart_list)
+    # except Exception, ex:
+    #     pass
     return result
 
 
-@app.route('/chart-water/')
+@app.route('/chart-utility/')
 def graph_water():
     chart_list = []
+    graph_data = None
     sensor_name_list = request.args.get('sensor_name')
-    config = __config_graph('Water')
-    datetimeline = pygal.DateTimeLine(config=config)
-    try:
-        for sensor_name in sensor_name_list.split(';'):
-            total = 0
-            sensor_recs = models.SensorHistory().query_filter_all(models.SensorHistory.sensor_name == sensor_name,
-                                                                  models.SensorHistory.updated_on >= '2016-07-01')
-            serie = []
-            for i in sensor_recs:
-                serie.append((i.updated_on, i.delta_counters_a))
-                if i.delta_counters_a:
-                    total = total + i.delta_counters_a
-            datetimeline.add("{}, total={}".format(sensor_name, total), serie)
-            # datetimeline.x_title = "Total = {}".format(total)
-        chart_list.append(datetimeline)
-        result = render_template('chart/chart-generic.html', chart_list=chart_list)
-    except Exception, ex:
-        result = render_template('chart/chart-generic.html', chart_list=[], title=ex)
+    config = __config_graph('Utility Counters')
+    graph = pygal.Bar(config=config)
+    # try:
+    for sensor_name in sensor_name_list.split(';'):
+        total = 0
+        x_labels = []
+        y_values = []
+        sensor_recs = models.UtilityHistory().query_filter_all(models.UtilityHistory.sensor_name == sensor_name,
+                                                               models.UtilityHistory.updated_on >= '2016-07-07')
+        for i in sensor_recs:
+            x_labels.append(i.updated_on)
+            y_values.append(i.units_delta)
+            if i.units_delta:
+                total = total + i.units_delta
+        graph.x_labels = x_labels
+        graph.add("{}, total={}".format(sensor_name, total), y_values)
+        graph_data = graph.render_data_uri()
+        chart_list.append(graph_data)
+    result = render_template('chart/chart-generic.html', chart_list=chart_list)
+    # except Exception, ex:
+    #    result = render_template('chart/chart-generic.html', chart_list=[], title=ex)
     return result
 
 
