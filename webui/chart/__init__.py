@@ -3,7 +3,8 @@ from urllib2 import urlopen  # python 2 syntax
 import pygal
 from datetime import datetime
 from flask import render_template, request
-from main import app
+from sqlalchemy import func
+from main import app, db
 from main.logger_helper import Log
 from main.admin import models
 from common import Constant
@@ -18,40 +19,6 @@ def render_dashboard():
     return render_template('dashboard/main.html')
 
 
-@app.route('/chart-test')
-def get_weather_data(date='20140415', state='IA', city='Ames'):
-    """
-    Date must be in YYYYMMDD
-    :param city:
-    :param state:
-    :param date:
-    """
-    api_key = 'f0126014c2b9ba66'
-    url = 'http://api.wunderground.com/api/{key}/history_{date}/q/{state}/{city}.json'
-    new_url = url.format(key=api_key,
-                         date=date,
-                         state=state,
-                         city=city)
-    result = urlopen(new_url)
-    js_string = result.read()
-    parsed = json.loads(js_string)
-    history = parsed['history']['observations']
-
-    imp_temps = [float(i['tempi']) for i in history]
-    times = ['%s:%s' % (i['utcdate']['hour'], i['utcdate']['min']) for i in history]
-
-    # create a bar chart
-    title = 'Temps for %s, %s on %s' % (city, state, date)
-    bar_chart = pygal.Bar(width=1200, height=600,
-                          explicit_size=True, title=title,
-                          style=pygal.style.DefaultStyle,
-                          disable_xml_declaration=True)
-    bar_chart.x_labels = times
-    bar_chart.add('Temps in F', imp_temps)
-
-    return render_template('chart-generic.html',title=title,bar_chart=bar_chart)
-
-
 def __config_graph(title):
     config = pygal.Config()
     # config.human_readable = True
@@ -59,6 +26,7 @@ def __config_graph(title):
     # config.disable_xml_declaration = True
     config.title = title
     config.show_x_labels = True
+    config.show_minor_x_labels = False
     config.legend_at_bottom = True
     config.x_label_rotation = 90
     config.truncate_label = -1
@@ -76,7 +44,7 @@ def graph_temperature():
     # try:
     for sensor_name in sensor_name_list.split(';'):
         temp_recs = models.SensorHistory().query_filter_all(models.SensorHistory.sensor_name == sensor_name,
-                                                            models.SensorHistory.updated_on >= '2016-07-08')
+                                                            models.SensorHistory.updated_on >= '2016-07-09')
         serie = []
         for i in temp_recs:
             serie.append((i.updated_on, i.temperature))
@@ -101,14 +69,21 @@ def graph_water():
         total = 0
         x_labels = []
         y_values = []
-        sensor_recs = models.UtilityHistory().query_filter_all(models.UtilityHistory.sensor_name == sensor_name,
-                                                               models.UtilityHistory.updated_on >= '2016-07-07')
-        for i in sensor_recs:
+        today = datetime(year=datetime.now().year, month=datetime.now().month, day=datetime.now().day - 1)
+        #records = models.UtilityHistory().query_filter_all(models.UtilityHistory.sensor_name == sensor_name,
+        #                                                   models.UtilityHistory.updated_on >= today)
+        records = db.session.query(func.hour(models.UtilityHistory.updated_on).label('updated_on'),
+                                   func.sum(models.UtilityHistory.units_delta).label('units_delta')
+                                   ).group_by(func.hour(models.UtilityHistory.updated_on)
+                                              ).filter(models.UtilityHistory.sensor_name == sensor_name,
+                                                       models.UtilityHistory.updated_on >= today).all()
+        for i in records:
             x_labels.append(i.updated_on)
             y_values.append(i.units_delta)
             if i.units_delta is not None:
                 total = total + i.units_delta
         graph.x_labels = x_labels
+        graph.x_labels_major_every = abs(len(x_labels) / 24)
         graph.add("{}, total={}".format(sensor_name, total), y_values)
         graph_data = graph.render_data_uri()
         chart_list.append(graph_data)

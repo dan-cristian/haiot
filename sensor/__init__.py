@@ -58,13 +58,14 @@ def sensor_update(obj):
             # commit() # not needed?
             # enable below only for testing on netbook
 
-            if Constant.HOST_NAME=='netbook' and (record.delta_counters_a or record.delta_counters_b):
+            if Constant.HOST_NAME == 'netbook' and (record.delta_counters_a or record.delta_counters_b):
                 dispatcher.send(Constant.SIGNAL_UTILITY, sensor_name=record.sensor_name,
                                 units_delta_a=record.delta_counters_a,
                                 units_delta_b=record.delta_counters_b, total_units_a=record.counters_a,
-                                total_units_b=record.counters_b)
+                                total_units_b=record.counters_b,
+                                sampling_period_seconds=owsensor_loop.sampling_period_seconds)
     except Exception, ex:
-        Log.logger.warning('Error on sensor update, err {}'.format(ex))
+        Log.logger.error('Error on sensor update, err {}'.format(ex), exc_info=True)
         db.session.rollback()
 
 
@@ -80,7 +81,8 @@ def unload():
 def init():
     Log.logger.info('Sensor module initialising')
     if owsensor_loop.init():
-        thread_pool.add_interval_callable(owsensor_loop.thread_run, run_interval_second=60)
+        thread_pool.add_interval_callable(owsensor_loop.thread_run,
+                                          run_interval_second=owsensor_loop.sampling_period_seconds)
     if rfxcom_run.init():
         thread_pool.add_interval_callable(rfxcom_run.thread_run, run_interval_second=60)
     if ups_legrand_run.init():

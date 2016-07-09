@@ -10,7 +10,7 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 initialised = False
 
 
-def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, total_units_b):
+def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, total_units_b, sampling_period_seconds):
     index = 0
     for delta in [units_delta_a, units_delta_b]:
         if delta is not None:
@@ -18,14 +18,23 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
             current_record = models.Utility.query.filter_by(sensor_name=sensor_name, sensor_index=index).first()
             if current_record is not None:
                 record.sensor_index = index
-                record.units_delta = delta / (current_record.ticks_per_unit * 1.0)  # force float operation
+                if current_record.utility_type == 'electricity':
+                    # 1000 times count divided by 60 seconds time 60 minutes (kvh -> watt)
+                    record.units_delta = 1000 * delta / ((current_record.ticks_per_unit * 1.0) /
+                                                         (sampling_period_seconds/(60.0*60)))
+                else:
+                    record.units_delta = delta / (current_record.ticks_per_unit * 1.0)  # force float operation
                 record.ticks_delta = delta
+                if current_record.unit_cost is None:
+                    current_record.unit_cost = 0.0
+                record.cost = 1.0 * record.units_delta * current_record.unit_cost
                 if current_record.units_total is None:
                     current_record.units_total = 0.0
                 # force save for history recording, use negative values to enable recording 0
                 if current_record is not None:
-                    current_record.units_delta = -0.1
+                    current_record.units_delta = -1
                     current_record.ticks_delta = -1
+                    current_record.cost = -1
                 record.units_total = 0.0 + current_record.units_total + record.units_delta
                 record.save_changed_fields(current_record=current_record, new_record=record,
                                            notify_transport_enabled=True, save_to_graph=True)
