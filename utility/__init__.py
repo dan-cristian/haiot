@@ -13,19 +13,19 @@ initialised = False
 def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, total_units_b):
     index = 0
     for delta in [units_delta_a, units_delta_b]:
-        if delta:
+        if delta is not None:
             record = models.Utility(sensor_name=sensor_name)
             current_record = models.Utility.query.filter_by(sensor_name=sensor_name, sensor_index=index).first()
             if current_record:
                 record.sensor_index = index
                 record.units_delta = delta / (current_record.ticks_per_unit * 1.0)  # force float operation
                 record.ticks_delta = delta
-                if not current_record.units_total:
+                if current_record.units_total is None:
                     current_record.units_total = 0.0
-                # force save for history recording
-                if current_record:
-                    current_record.units_delta = 0.0
-                    current_record.ticks_delta = 0
+                # force save for history recording, use negative values to enable recording 0
+                if current_record is not None:
+                    current_record.units_delta = -0.1
+                    current_record.ticks_delta = -1
                 record.units_total = 0.0 + current_record.units_total + record.units_delta
                 record.save_changed_fields(current_record=current_record, new_record=record,
                                            notify_transport_enabled=True, save_to_graph=True)

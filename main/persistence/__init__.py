@@ -25,7 +25,7 @@ def save_to_history(obj, save_to_local_db=False, upload_to_cloud=False):
                 Log.logger.debug('Ignoring record save graph={} changed fields={} obj={}'.format(graph_y_fields,
                                                                                                  changed_fields, obj))
             else:
-                Log.logger.info('Trying to save y axis {}'.format(list_axis_y))
+                Log.logger.debug('Trying to save y axis {}'.format(list_axis_y))
                 if axis_x_field in obj and graph_id_field in obj:
                     table = obj[Constant.JSON_PUBLISH_TABLE]
                     trace_unique_id = obj[graph_id_field]  # unique record/trace identifier
@@ -64,7 +64,7 @@ def save_to_history(obj, save_to_local_db=False, upload_to_cloud=False):
                     if save_to_local_db:
                         # save to local history DB, append history to source table name
                         dest_table = str(table) + 'History'
-                        Log.logger.info('Saving to local db table {} obj={}'.format(dest_table, obj))
+                        Log.logger.debug('Saving to local db table {} obj={}'.format(dest_table, obj))
                         from main.admin import models
                         # http://stackoverflow.com/questions/4030982/initialise-class-object-by-name
                         try:
@@ -81,7 +81,7 @@ def save_to_history(obj, save_to_local_db=False, upload_to_cloud=False):
                         except Exception, ex:
                             Log.logger.critical("Cannot save history db err={} record={}".format(ex, obj))
                     else:
-                        Log.logger.info('Skip saving to local db due to param')
+                        Log.logger.debug('Skip saving to local db due to param')
                 else:
                     Log.logger.critical('Missing history axis_x [{}], graph_id [{}], in obj {}'.format(axis_x_field,
                                                                                                        graph_id_field,
