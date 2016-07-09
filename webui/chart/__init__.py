@@ -106,7 +106,7 @@ def graph_water():
         for i in sensor_recs:
             x_labels.append(i.updated_on)
             y_values.append(i.units_delta)
-            if i.units_delta:
+            if i.units_delta is not None:
                 total = total + i.units_delta
         graph.x_labels = x_labels
         graph.add("{}, total={}".format(sensor_name, total), y_values)
