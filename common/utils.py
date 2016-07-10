@@ -1,13 +1,15 @@
-__author__ = 'dcristian'
 import os
 import json
 import re
 import datetime
+import calendar
 import math
 import importlib
 from collections import namedtuple
 import pytz
 from main.logger_helper import Log
+
+__author__ = 'dcristian'
 
 
 #http://stackoverflow.com/questions/6578986/how-to-convert-json-data-into-a-python-object
@@ -105,3 +107,11 @@ def class_for_name(module_name, class_name):
     # get the class, will raise AttributeError if class cannot be found
     c = getattr(m, class_name)
     return c
+
+
+def add_months(sourcedate,months):
+    month = sourcedate.month - 1 + months
+    year = int(sourcedate.year + month / 12 )
+    month = month % 12 + 1
+    day = min(sourcedate.day,calendar.monthrange(year,month)[1])
+    return datetime.date(year,month,day)
