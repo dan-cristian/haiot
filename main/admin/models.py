@@ -294,9 +294,11 @@ class ZoneArea(db.Model, DbBase):
 class Presence(db.Model, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'), nullable=False)
+    sensor_name = db.Column(db.String(50))
     event_camera_date = db.Column(db.DateTime(), default=None)
     event_alarm_date = db.Column(db.DateTime(), default=None)
     event_io_date = db.Column(db.DateTime(), default=None)
+    is_connected = db.Column(db.Boolean)  # pin connected? true on unarmed sensors, false on alarm/move
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
 
     def __init__(self, id=''):
