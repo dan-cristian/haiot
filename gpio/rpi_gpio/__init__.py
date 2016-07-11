@@ -98,10 +98,10 @@ def setup_in_ports(gpio_pin_list):
                                       bouncetime=500)
                 GPIO.add_event_detect(int(gpio_pin.pin_code), GPIO.FALLING, callback=_event_detected_falling,
                                       bouncetime=500)
-                __pool_pin_codes.append(gpio_pin.pin_code)
                 Log.logger.info('OK callback on rpi.gpio'.format(gpio_pin.pin_code))
             except Exception, ex:
                 Log.logger.warning('Unable to setup rpi.gpio callback pin={} err={}'.format(gpio_pin.pin_code, ex))
+            __pool_pin_codes.append(gpio_pin.pin_code)
 
 
 def thread_run():
@@ -111,6 +111,7 @@ def thread_run():
 def unload():
     for gpio_pin in __pool_pin_codes:
         GPIO.remove_event_detect(gpio_pin)
+    time.sleep(1)
     GPIO.cleanup()
     thread_pool.remove_callable(thread_run)
     global initialised
