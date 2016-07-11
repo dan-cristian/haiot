@@ -66,7 +66,7 @@ def _do_event(channel, state):
 
 
 def _check_event(channel, target_state):
-    time.sleep(0.01)
+    time.sleep(0.1)
     state = GPIO.input(channel)
     if state != target_state:
         Log.logger.info("False positive, channel {}, state {}".format(channel, state))
