@@ -2,6 +2,7 @@ from pydispatch import dispatcher
 from main import thread_pool
 from main.logger_helper import Log
 from common import Constant
+import time
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
@@ -52,8 +53,7 @@ def get_pin_bcm(bcm_id):
     return res
 
 
-#  https://sourceforge.net/p/raspberry-gpio-python/wiki/Inputs/,  LOW=0, HIGH=1
-def event_detected(channel):
+def _do_event(channel, state):
     try:
         global import_module_exist
         if import_module_exist:
@@ -63,6 +63,24 @@ def event_detected(channel):
                             pin_value=state, pin_connected=(state == 0))
     except Exception, ex:
         Log.logger.warning('Error rpi.gpio event detected, err {}'.format(ex))
+
+
+def _check_event(channel, target_state):
+    time.sleep(0.01)
+    state = GPIO.input(channel)
+    if state != target_state:
+        Log.logger.info("False positive, channel {}, state {}".format(channel, state))
+    else:
+        _do_event(channel, state)
+
+
+#  https://sourceforge.net/p/raspberry-gpio-python/wiki/Inputs/,  LOW=0, HIGH=1
+def _event_detected_rising(channel):
+    _check_event(channel, GPIO.HIGH)
+
+
+def _event_detected_falling(channel):
+    _check_event(channel, GPIO.LOW)
 
 
 #  define all ports that are used as read/input, BCM format
@@ -75,8 +93,10 @@ def setup_in_ports(gpio_pin_list):
                                                                                        gpio_pin.pin_index_bcm))
             try:
                 GPIO.setup(int(gpio_pin.pin_code), GPIO.IN, pull_up_down=GPIO.PUD_UP)  # PUD_DOWN:no contact detection
-                GPIO.add_event_detect(int(gpio_pin.pin_code), GPIO.RISING, callback=event_detected, bouncetime=500)
-                GPIO.add_event_detect(int(gpio_pin.pin_code), GPIO.FALLING, callback=event_detected, bouncetime=500)
+                GPIO.add_event_detect(int(gpio_pin.pin_code), GPIO.RISING, callback=_event_detected_rising,
+                                      bouncetime=500)
+                GPIO.add_event_detect(int(gpio_pin.pin_code), GPIO.FALLING, callback=_event_detected_falling,
+                                      bouncetime=500)
                 __pool_pin_codes.append(gpio_pin.pin_code)
                 Log.logger.info('OK callback on rpi.gpio'.format(gpio_pin.pin_code))
             except Exception, ex:
@@ -84,16 +104,7 @@ def setup_in_ports(gpio_pin_list):
 
 
 def thread_run():
-    global initialised
-    if initialised:
-        Log.logger.debug('Processing RPI.GPIO')
-        global import_module_exist
-        if not import_module_exist:
-            Log.logger.info('Simulating motion detection for test purposes')
-            event_detected('P8_11')
-        # else:
-        #    __check_for_events()
-        return 'Processed rpi.gpio'
+    pass
 
 
 def unload():
