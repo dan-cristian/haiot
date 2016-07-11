@@ -12,7 +12,7 @@ from common import Constant, utils
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
 initialised = False
-
+_period_list = ['year', 'month', 'day', 'hour']
 
 @app.route('/dashboard')
 def render_dashboard():
@@ -51,7 +51,7 @@ def _get_utility_records(group_by, function, sensor_name, start, end):
     return records
 
 
-def _get_sensor_records(group_by, function, sensor_name, start, end, sensor_type):
+def _get_sensor_records(group_by, function, sensor_name, start, end, sensor_type, group_by_prefix):
     if sensor_type == 'temperature':
         field = models.SensorHistory.temperature
     elif sensor_type == 'humidity':
@@ -62,11 +62,13 @@ def _get_sensor_records(group_by, function, sensor_name, start, end, sensor_type
         Log.logger.warning("Unknown sensor type {}".format(sensor_type))
         field = models.SensorHistory.temperature
 
-    records = db.session.query(extract(group_by, models.SensorHistory.updated_on).label('date'),
-                               function(field).label('value')
-                               ).group_by('date').filter(models.SensorHistory.sensor_name == sensor_name,
-                                                         models.SensorHistory.updated_on >= start,
-                                                         models.SensorHistory.updated_on <= end).all()
+    records = db.session.query(
+        extract(group_by_prefix, models.SensorHistory.updated_on).label('prefix'),
+        extract(group_by, models.SensorHistory.updated_on).label('date'),
+        function(field).label('value')).group_by('prefix', 'date').filter(
+        models.SensorHistory.sensor_name == sensor_name,
+        models.SensorHistory.updated_on >= start,
+        models.SensorHistory.updated_on <= end).all()
     '''
     records = db.session.query(func.hour(models.UtilityHistory.updated_on).label('updated_on'),
                                func.sum(models.UtilityHistory.units_delta).label('units_delta')
@@ -95,12 +97,34 @@ def _get_interval(args):
         Log.logger.warning("Unspecified sensor type, defaulting to temperature")
         sensor_type = 'temperature'
 
+    '''
+    year = args.get('year')
+    month = args.get('month')
+    day = args.get('day')
+    hour = args.get('hour')
+    if year is not None or month is not None or day is not None or hour is not None:
+        if year is None:
+            year = datetime.now().year
+        else:
+
+            month = int(month) if month is not None else datetime.now().month
+            day = int(day) if day is not None else datetime.now().day
+            hour = int(hour) if hour is not None else datetime.now().hour
+
+        start = datetime(year=year, month=month, day=day, hour=hour)
+        end = start
+    else:
+    '''
     if args.get('today') is not None:
         start = datetime(year=datetime.now().year, month=datetime.now().month, day=datetime.now().day)
         end = datetime.now()
     elif args.get('yesterday') is not None:
         start = datetime(year=datetime.now().year, month=datetime.now().month, day=datetime.now().day - 1)
         end = start + timedelta(days=1)
+    elif args.get('this_hour') is not None:
+        start = datetime(year=datetime.now().year, month=datetime.now().month, day=datetime.now().day,
+                         hour=datetime.now().hour)
+        end = datetime.now()
     elif args.get('this_month') is not None:
         start = datetime(year=datetime.now().year, month=datetime.now().month, day=1)
         end = datetime.now()
@@ -112,12 +136,20 @@ def _get_interval(args):
         end = datetime.now()
     else:
         start = datetime(year=datetime.now().year, month=datetime.now().month, day=datetime.now().day)
-        end = start + timedelta(days=1)
+        end = datetime.now()
 
     if args.get('group_by') is not None:
         group_by = args.get('group_by')
     else:
         group_by = 'hour'
+
+    # get previous period for grouping
+    global _period_list
+    group_by_prefix = group_by  # default value
+    for i in range(0, len(_period_list)):
+        if _period_list[i] == group_by:
+            if i > 0:
+                group_by_prefix = _period_list[i-1]
 
     function_name_list = args.get('function')
     function_list = []
@@ -138,27 +170,26 @@ def _get_interval(args):
                 Log.logger.warning("Unknown function {}, set default as sum".format(args.get('function')))
     else:
         function_list.append(func.sum)
-
-    return sensor_name_list, start, end, group_by, function_list, sensor_type
+    return sensor_name_list, start, end, group_by, function_list, sensor_type, group_by_prefix
 
 
 @app.route('/chart-sensor/')
 def graph_temperature():
     chart_list = []
     graph_data = None
-    sensor_name_list, start, end, group_by, function_list, sensor_type = _get_interval(request.args)
+    sensor_name_list, start, end, group_by, function_list, sensor_type, group_by_prefix = _get_interval(request.args)
     config = __config_graph("{} by {}".format(sensor_type, group_by), start, end)
     config.x_value_formatter = lambda dt: dt.strftime('%S')
     datetimeline = pygal.DateTimeLine(config=config)
     for sensor_name in sensor_name_list.split(';'):
         for function in function_list:
-            records = _get_sensor_records(group_by, function, sensor_name, start, end, sensor_type)
-            #if len(records) > 20:
+            records = _get_sensor_records(group_by, function, sensor_name, start, end, sensor_type, group_by_prefix)
+            # if len(records) > 20:
             #    datetimeline.show_minor_x_labels = False
             #    datetimeline.x_labels_major_every = abs(len(records)/20)
             serie = []
             for i in records:
-                serie.append((i.date, i.value))
+                serie.append((100 * i.prefix + i.date, i.value))
             datetimeline.add("{} [{}]".format(sensor_name, function._FunctionGenerator__names[0]), serie)
     graph_data = datetimeline.render_data_uri()
     chart_list.append(graph_data)
@@ -169,7 +200,7 @@ def graph_temperature():
 @app.route('/chart-utility/')
 def graph_water():
     chart_list = []
-    sensor_name_list, start, end, group_by, function_list, sensor_type = _get_interval(request.args)
+    sensor_name_list, start, end, group_by, function_list, sensor_type, group_by_prefix = _get_interval(request.args)
     config = __config_graph("{} by {}".format(sensor_type, group_by), start, end)
     graph = pygal.Bar(config=config)
     for sensor_name in sensor_name_list.split(';'):
