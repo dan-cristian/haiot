@@ -8,10 +8,11 @@ from main.admin.model_helper import get_param
 
 
 def update_custom_relay(relay_pin_name, power_is_on):
-    """carefull with API fields order to match app.route definition """
-    # with app.test_client() as c:
     msg = api_v1.generic_db_update(model_name="ZoneCustomRelay", filter_name="relay_pin_name",
                                    field_name="relay_is_on", filter_value=relay_pin_name, field_value=power_is_on)
+    """carefull with API fields order to match app.route definition """
+    # with app.test_client() as c:
+
     #    msg = c.get('/apiv1/db_update/model_name=ZoneCustomRelay&'
     #                'filter_name=relay_pin_name&field_name=relay_is_on&filter_value={}&field_value={}'.
     #                format(relay_pin_name, power_is_on)).data
