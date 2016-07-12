@@ -202,7 +202,7 @@ def init():
     Log.logger.info('Rules module initialising')
     if scheduler:
         __add_rules_into_db()
-        #__load_rules_from_db()
+        # __load_rules_from_db()
         scheduler.start()
         Log.logger.info('Scheduler started')
     else:

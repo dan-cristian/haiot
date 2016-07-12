@@ -100,12 +100,14 @@ def morning_alarm_dormitor():
 
 def water_all_3_minute():
     """is_async=1"""
-    water_front_on()
-    time.sleep(60 * 3)
-    water_front_off()
-    water_back_on()
-    time.sleep(60 * 3)
-    water_back_off()
+    water_front_3_minute()
+    water_back_3_minute()
+
+
+def water_main_all_3_minute():
+    """is_async=1"""
+    water_front_main_3_minute()
+    water_back_main_3_minute()
 
 
 def water_front_3_minute():
@@ -113,7 +115,6 @@ def water_front_3_minute():
     water_front_on()
     time.sleep(60*3)
     water_front_off()
-    back_pump_off()
 
 
 def water_back_3_minute():
@@ -121,7 +122,20 @@ def water_back_3_minute():
     water_back_on()
     time.sleep(60*3)
     water_back_off()
-    back_pump_off()
+
+
+def water_front_main_3_minute():
+    """is_async=1"""
+    water_front_main_on()
+    time.sleep(60*3)
+    water_front_main_off()
+
+
+def water_back_main_3_minute():
+    """is_async=1"""
+    water_back_main_on()
+    time.sleep(60*3)
+    water_back_main_off()
 
 
 def back_pump_on():
@@ -157,21 +171,49 @@ def water_front_off():
     back_pump_off()
 
 
+def water_front_main_on():
+    """month=05-09;hour=07;minute=50;is_active=0"""
+    Log.logger.info('water front main on')
+    rule_common.update_custom_relay('front_main_valve_relay', True)
+    rule_common.update_custom_relay('front_valve_relay', True)
+
+
+def water_front_main_off():
+    """month=05-09;hour=07;minute=52;is_active=0"""
+    Log.logger.info('water front main off')
+    rule_common.update_custom_relay('front_main_valve_relay', False)
+    rule_common.update_custom_relay('front_valve_relay', True)
+
+
 def water_back_on():
-    """month=05-09;hour=07;minute=53;is_active=0"""
+    """month=05-09;hour=07;minute=54;is_active=0"""
     Log.logger.info('water back on')
     back_pump_on()
     rule_common.update_custom_relay('back_valve_relay', True)
 
 
 def water_back_off():
-    """month=05-09;hour=07;minute=55;is_active=0"""
+    """month=05-09;hour=07;minute=57;is_active=0"""
     Log.logger.info('water back off')
     rule_common.update_custom_relay('back_valve_relay', False)
     # let the pump build some pressure
     time.sleep(5)
     # pump off if no other zone is on?
     back_pump_off()
+
+
+def water_back_main_on():
+    """month=05-09;hour=07;minute=54;is_active=0"""
+    Log.logger.info('water back main on')
+    rule_common.update_custom_relay('front_main_valve_relay', True)
+    rule_common.update_custom_relay('back_valve_relay', True)
+
+
+def water_back_main_off():
+    """month=05-09;hour=07;minute=57;is_active=0"""
+    Log.logger.info('water back main off')
+    rule_common.update_custom_relay('front_main_valve_relay', False)
+    rule_common.update_custom_relay('back_valve_relay', False)
 
 
 def main_heat_on():
