@@ -55,13 +55,15 @@ def rule_alarm(obj=models.ZoneAlarm(), field_changed_list=None):
     if obj.alarm_status == 1:
         Log.logger.info('Rule Alarm ON:  pin={} status={}'.format(obj.alarm_pin_name, obj.alarm_status))
         if obj.alarm_pin_name == 'sonerie':
-            thread.start_new_thread(rule_common.play_bell_local, 'british')
-        if obj.alarm_pin_name == 'usa intrare':
-            thread.start_new_thread(rule_common.play_bell_local, 'warning')
-        if obj.alarm_pin_name == 'poarta':
-            thread.start_new_thread(rule_common.play_bell_local, 'weatherwarning.wav')
-        if obj.alarm_pin_name == 'portita':
-            thread.start_new_thread(rule_common.play_bell_local, 'boat_hor.wav')
+            thread.start_new_thread(rule_common.play_bell_local, ('british', ))
+        elif obj.alarm_pin_name == 'usa intrare':
+            thread.start_new_thread(rule_common.play_bell_local, ('warning',))
+        elif obj.alarm_pin_name == 'poarta':
+            thread.start_new_thread(rule_common.play_bell_local, ('weatherwarning.wav',))
+        elif obj.alarm_pin_name == 'portita':
+            thread.start_new_thread(rule_common.play_bell_local, ('boat_hor.wav',))
+        elif obj.alarm_pin_name == 'birou':
+            thread.start_new_thread(rule_common.play_bell_local, ('boat_hor.wav',))
     else:
         Log.logger.info('Rule Alarm OFF: pin={} status={}'.format(obj.alarm_pin_name, obj.alarm_status))
     return 'zone alarm ok'
