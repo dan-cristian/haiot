@@ -291,6 +291,21 @@ class ZoneArea(db.Model, DbBase):
         return 'ZoneArea id {} zone={} area={}'.format(self.id, self.zone_id, self.area_id)
 
 
+class ZoneMusic(db.Model, DbBase):
+    id = db.Column(db.Integer, primary_key=True)
+    zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'), nullable=False)
+    server_ip = db.Column(db.String(15))
+    server_port = db.Column(db.Integer)
+
+    def __init__(self, id=''):
+        super(ZoneMusic, self).__init__()
+        if id:
+            self.id = id
+
+    def __repr__(self):
+        return 'ZoneMusic id {} zone={} port={}'.format(self.id, self.zone_id, self.area_id)
+
+
 class Presence(db.Model, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'), nullable=False)
