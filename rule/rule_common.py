@@ -1,3 +1,4 @@
+import subprocess
 from webui.api import api_v1
 from main.logger_helper import Log
 from main import app
@@ -27,7 +28,11 @@ def update_command_override_relay(relay_pin_name, is_rule, is_gui):
     override_row = m().query_filter_first(m.host_name.in_([Constant.HOST_NAME]), m.relay_pin_name.in_([relay_pin_name]))
 
 
-def play_bell():
+def play_bell_local():
     # client = mpd.MPDClient(use_unicode=True)
     # client.connect(get_param(Constant.P_MPD_SERVER), 6600)
+    result = subprocess.check_output(['aplay', 'scripts/audio/british.wav'], stderr=subprocess.STDOUT)
+    Log.logger.info("Play bell returned: {}".format(result))
     pass
+
+
