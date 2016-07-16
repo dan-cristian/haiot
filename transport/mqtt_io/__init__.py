@@ -1,8 +1,5 @@
-__author__ = 'dcristian'
-
 import time
 import socket
-
 from main import thread_pool
 from main.logger_helper import Log
 from main.admin import model_helper
@@ -13,11 +10,11 @@ import sender
 mqtt_mosquitto_exists = False
 mqtt_paho_exists = False
 
-try:
-    import mosquitto as mqtt
-    mqtt_mosquitto_exists = True
-except Exception:
-    mqtt_mosquitto_exists = False
+#try:
+#    import mosquitto as mqtt
+#    mqtt_mosquitto_exists = True
+#except Exception:
+mqtt_mosquitto_exists = False
 
 try:
     if not mqtt_mosquitto_exists:
@@ -25,6 +22,9 @@ try:
         mqtt_paho_exists = True
 except Exception:
     mqtt_paho_exists = False
+
+
+__author__ = 'dcristian'
 
 
 initialised=False

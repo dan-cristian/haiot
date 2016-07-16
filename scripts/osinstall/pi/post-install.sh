@@ -3,6 +3,8 @@
 USERNAME=haiot
 USERPASS=haiot
 ENABLE_PIFACE=1
+ENABLE_DFROBOT=0
+ENABLE_PIGPIO=0
 
 echo "Setting timezone ..."
 echo "Europe/Bucharest" > /etc/timezone
@@ -13,7 +15,7 @@ apt-get -y upgrade
 apt-get -y update
 echo "Installing additional packages"
 # 1-wire support needs owfs
-apt-get -y install dialog sudo apt-utils mc nano locales python wget owfs git python-rpi.gpio inotify-tools
+apt-get -y install dialog sudo apt-utils mc nano locales python wget owfs git python-rpi.gpio inotify-tools python-dev
 # run in ram needs busybox for ramfs copy operations, see "local" script sample
 apt-get -y install busybox
 # to to able to fix boot fs
@@ -64,25 +66,27 @@ else
     HAIOT_DIR=haiot
 fi
 
-#echo "Downloading pigpio library for gpio access"
-#wget abyz.co.uk/rpi/pigpio/pigpio.zip
-#unzip pigpio.zip
-#apt-get -y install build-essential
-#echo "Compiling pigpio"
-#cd PIGPIO
-#make
-#echo "Installing pigpio"
-#make install
-#cp /home/${USERNAME}/${HAIOT_DIR}/scripts/pigpio_daemon /etc/init.d
-#chmod +x /etc/init.d/pigpio_daemon
-#update-rc.d pigpio_daemon defaults
-#rm -r /home/${USERNAME}/PIGPIO
-#rm /home/${USERNAME}/pigpio.zip
-
+if [ "$ENABLE_PIGPIO" == "1" ]; then
+echo "Downloading pigpio library for gpio access"
+wget abyz.co.uk/rpi/pigpio/pigpio.zip
+unzip pigpio.zip
+apt-get -y install build-essential
+echo "Compiling pigpio"
+cd PIGPIO
+make
+echo "Installing pigpio"
+make install
+cp /home/${USERNAME}/${HAIOT_DIR}/scripts/pigpio_daemon /etc/init.d
+chmod +x /etc/init.d/pigpio_daemon
+update-rc.d pigpio_daemon defaults
+rm -r /home/${USERNAME}/PIGPIO
+rm /home/${USERNAME}/pigpio.zip
 #python setup.py install
 #todo install pigpiod init script
+fi
 
-echo "Configuring DFRobot screen"
+if [ "$ENABLE_DFROBOT" == "1" ]; then
+    echo "Configuring DFRobot screen"
 # http://unix.stackexchange.com/questions/72320/how-can-i-hook-on-to-one-terminals-output-from-another-terminal
 # script -f /dev/tty1
 # cmdline.txt=dwc_otg.lpm_enable=0 console=ttyAMA0,115200 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4
@@ -93,7 +97,8 @@ echo "Configuring DFRobot screen"
 # https://learn.adafruit.com/adafruit-pitft-28-inch-resistive-touchscreen-display-raspberry-pi/using-the-console
 # stty rows 30 cols 40
 # setfont -f Uni2-VGA8
-apt-get -y install gpm
+    apt-get -y install gpm
+fi
 
 echo "Installing minimal webmin"
 wget http://prdownloads.sourceforge.net/webadmin/webmin-1.791-minimal.tar.gz
