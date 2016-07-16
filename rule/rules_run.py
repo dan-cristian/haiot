@@ -54,6 +54,8 @@ def rule_alarm(obj=models.ZoneAlarm(), field_changed_list=None):
     # Log.logger.info('Rule Alarm: obj={} fields={}'.format(obj, field_changed_list))
     if obj.alarm_status == 1:
         Log.logger.info('Rule Alarm ON:  pin={} status={}'.format(obj.alarm_pin_name, obj.alarm_status))
+        if obj.alarm_pin_name == 'sonerie':
+            rule_common.play_bell_local()
     else:
         Log.logger.info('Rule Alarm OFF: pin={} status={}'.format(obj.alarm_pin_name, obj.alarm_status))
     return 'zone alarm ok'
