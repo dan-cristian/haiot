@@ -76,10 +76,12 @@ def _check_event(channel, target_state):
 
 #  https://sourceforge.net/p/raspberry-gpio-python/wiki/Inputs/,  LOW=0, HIGH=1
 def _event_detected_rising(channel):
+    Log.logger.info("Rising event, channel {}, expect state {}".format(channel, GPIO.HIGH))
     _check_event(channel, GPIO.HIGH)
 
 
 def _event_detected_falling(channel):
+    Log.logger.info("Falling event, channel {},  expect state {}".format(channel, GPIO.LOW))
     _check_event(channel, GPIO.LOW)
 
 
@@ -98,7 +100,7 @@ def setup_in_ports(gpio_pin_list):
                                       bouncetime=500)
                 GPIO.add_event_detect(int(gpio_pin.pin_code), GPIO.FALLING, callback=_event_detected_falling,
                                       bouncetime=500)
-                Log.logger.info('OK callback on rpi.gpio'.format(gpio_pin.pin_code))
+                Log.logger.info('OK callback set on rpi.gpio'.format(gpio_pin.pin_code))
             except Exception, ex:
                 Log.logger.critical('Unable to setup rpi.gpio callback pin={} err={}'.format(gpio_pin.pin_code, ex))
             __pool_pin_codes.append(gpio_pin.pin_code)

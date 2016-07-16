@@ -264,7 +264,7 @@
     {"zone_id":9 , "gpio_pin_code":"0:in:4", "gpio_host_name": "pi-face", "alarm_pin_name": "beci mare"},
     {"zone_id":10 , "gpio_pin_code":"0:in:5", "gpio_host_name": "pi-face", "alarm_pin_name": "scari beci"},
     {"zone_id":11 , "gpio_pin_code":"0:in:6", "gpio_host_name": "pi-face", "alarm_pin_name": "etaj hol"},
-    {"zone_id":34 , "gpio_pin_code":"0:in:7", "gpio_host_name": "pi-face", "alarm_pin_name": ""},
+    {"zone_id":8 , "gpio_pin_code":"0:in:7", "gpio_host_name": "pi-face", "alarm_pin_name": "usa intrare"},
 
     {"zone_id":8 , "gpio_pin_code":"3", "gpio_host_name": "pi-face", "alarm_pin_name": "usa casa"},
     {"zone_id":7 , "gpio_pin_code":"15", "gpio_host_name": "pi-face", "alarm_pin_name": "poarta"},
