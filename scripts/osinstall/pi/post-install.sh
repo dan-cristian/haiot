@@ -54,7 +54,7 @@ fi
 
 echo "Getting HAIOT application from github"
 cd /home/${USERNAME}
-git clone http://192.168.0.9:888/PYC.git
+git clone git://192.168.0.9/PYC.git
 if [ "$?" == "0" ]; then
     echo "Dowloaded haiot from local repository"
     HAIOT_DIR=PYC
