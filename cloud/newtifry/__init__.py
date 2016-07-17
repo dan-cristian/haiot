@@ -64,9 +64,11 @@ def _send_queue():
         params['message'] = ''
         params['priority'] = 0
         for item in _message_queue:
-            if item.message is not None:
+            if item.title is not None:
                 params['message'] += 'Title: {} ({})\n'.format(item.title, item.date)
-                params['message'] += '{}\n\n'.format(item.message)
+            if item.message is not None:
+                params['message'] += '{}\n'.format(item.message)
+            params['message'] += '\n'
             if item.url is not None:
                 params['url'] = item.url
             if item.priority is not None:
