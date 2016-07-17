@@ -38,6 +38,7 @@
     {"name": "P_PRESENCE_MOVE_GAP", "value": "60", "description":"minutes with no move to pass before considering presence status as away"},
     {"name": "P_HEAT_ON_AUTO_INTERVAL", "value": "30", "description":"minutes of move to trigger auto heat on action"},
     {"name": "P_HEAT_OFF_AUTO_INTERVAL", "value": "1440", "description":"minutes of inactivity to trigger auto heat off action"},
+    {"name": "P_NEWTIFY_KEY", "value": "6bb91f3f03f11871f4f895eb6a13b8c8", "description":"api source key"},
     {"name": "P_MPD_SERVER", "value": "192.168.0.9", "description":"IP of mpd music server"}
   ],
   "Module": [

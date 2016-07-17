@@ -34,8 +34,8 @@ def play_bell_local(sound_file):
     # client.connect(get_param(Constant.P_MPD_SERVER), 6600)
     result = subprocess.check_output(['aplay', 'scripts/audio/{}'.format(sound_file)], stderr=subprocess.STDOUT)
     Log.logger.info("Play bell returned: {}".format(result))
-    pass
 
 
 def send_notification(title, message=None, url=None, priority=None, deviceid=None, image_url=None):
-    dispatcher.send(Constant.SIGNAL_PUSH_NOTIFICATION, title, message, url, priority, deviceid, image_url)
+    dispatcher.send(Constant.SIGNAL_PUSH_NOTIFICATION, title=title, message=message, url=url, priority=priority,
+                    deviceid=deviceid, image_url=image_url)
