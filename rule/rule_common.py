@@ -4,6 +4,7 @@ from main.logger_helper import Log
 from main import app
 from main.admin import models
 from common import Constant
+from pydispatch import dispatcher
 # import mpd
 from main.admin.model_helper import get_param
 
@@ -36,3 +37,5 @@ def play_bell_local(sound_file):
     pass
 
 
+def send_notification(title, message, url, priority, deviceid, image_url):
+    dispatcher.send(Constant.SIGNAL_PUSH_NOTIFICATION, title, message, url, priority, deviceid, image_url)

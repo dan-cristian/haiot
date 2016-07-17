@@ -102,7 +102,7 @@ def zone_custom_relay_record_update(json_object):
     # carefull not to trigger infinite recursion updates
     try:
         host_name = utils.get_object_field_value(json_object, 'gpio_host_name')
-        Log.logger.info('Received custom relay state update from {}'.format(host_name))
+        Log.logger.debug('Received custom relay state update from {}'.format(host_name))
         if host_name == Constant.HOST_NAME:
             # execute local pin change related actions like turn on/off a relay
             global initialised
