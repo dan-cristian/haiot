@@ -37,7 +37,7 @@ BACKEND = 'https://newtifry.appspot.com/newtifry'
 initialised = False
 
 
-def send_message(source_key=None, title='Default', message=None,
+def send_message(source_key=None, title='', message=None,
                  url=None, priority=None, deviceid=None, image_url=None):
     """
     https://newtifry.appspot.com/page/api
