@@ -57,6 +57,7 @@
     {"id":29, "active":"1", "start_order":"29", "name":"webui.chart"},
     {"id":31, "active":"1", "start_order":"31", "name":"webui.api"},
     {"id":33, "active":"1", "start_order":"33", "name":"utility"},
+    {"id":35, "active":"1", "start_order":"35", "name":"cloud.newtifry"},
 
     {"id":113, "active":"0", "start_order":"13", "name":"cloud.graph_plotly", "host_name":"nas"},
     {"id":121, "active":"0", "start_order":"21", "name":"cloud.youtube", "host_name":"nas"},

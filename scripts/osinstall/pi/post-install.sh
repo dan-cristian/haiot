@@ -33,6 +33,7 @@ echo "Creating user $USERNAME with password=$USERPASS"
 useradd ${USERNAME} -m
 echo "$USERNAME:$USERPASS" | chpasswd
 adduser ${USERNAME} sudo
+adduser ${USERNAME} audio
 chsh -s /bin/bash ${USERNAME}
 
 if [ "$ENABLE_PIFACE" == "1" ]; then
@@ -144,6 +145,13 @@ ln -s /home/${USERNAME}/${HAIOT_DIR}/start_daemon_userspaces.sh /home/${USERNAME
 ln -s /home/${USERNAME}/${HAIOT_DIR}/start_daemon_userspaces.sh /home/${USERNAME}/.shutDown/
 #set proper owner on all user homedir files (as they were created by root)
 chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/
+
+echo "Create tmpfs"
+# http://www.zdnet.com/article/raspberry-pi-extending-the-life-of-the-sd-card/
+sudo mkdir /var/ram
+
+echo "Enable sound test via console"
+sudo chmod 777 /dev/snd/*
 
 echo "Starting haiot via userspaceServices"
 /etc/init.d/userspaceServices restart

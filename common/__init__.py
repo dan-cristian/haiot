@@ -21,6 +21,7 @@ class Constant:
     SIGNAL_FILE_WATCH = 'signal-from-file-watch'
     SIGNAL_DB_CHANGE_FOR_RULES = 'signal_db_change_for_rules'
     SIGNAL_UTILITY = 'signal-utility-data'
+    SIGNAL_PUSH_NOTIFICATION = 'signal-push-notification'
 
     ERROR_CONNECT_MAX_RETRY_COUNT = 2
     ERROR_CONNECT_PAUSE_SECOND = 1
