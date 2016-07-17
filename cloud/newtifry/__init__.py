@@ -32,6 +32,7 @@ from main.admin import model_helper
 from pydispatch import dispatcher
 from main import thread_pool
 import threading
+import datetime
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
@@ -41,7 +42,7 @@ initialised = False
 _message_queue = []
 __queue_lock = threading.Lock()
 _source_key = ''
-_last_send_date = utils.get_base_location_now_date()
+_last_send_date = datetime.datetime.min
 
 
 def _send_queue():
@@ -54,9 +55,9 @@ def _send_queue():
     params['format'] = 'json'
     params['source'] = _source_key
     if len(_message_queue) > 1:
-        params['title'] = 'Multiple notifs: %s' % _message_queue[0].title
+        params['title'] = 'Multiple notifs: %s [%s]' % (_message_queue[0].title, Constant.HOST_NAME)
     else:
-        params['title'] = _message_queue[0].title
+        params['title'] = '%s [%s]' % (_message_queue[0].title, Constant.HOST_NAME)
     global __queue_lock
     try:
         __queue_lock.acquire()
@@ -64,7 +65,7 @@ def _send_queue():
         params['priority'] = 0
         for item in _message_queue:
             if item.message is not None:
-                params['message'] += 'Title: {}\n'.format(item.title)
+                params['message'] += 'Title: {} ({})\n'.format(item.title, item.date)
                 params['message'] += '{}\n\n'.format(item.message)
             if item.url is not None:
                 params['url'] = item.url
@@ -125,7 +126,8 @@ def send_message(title, message=None, url=None, priority=None, deviceid=None, im
     """
     global _last_send_date, _message_queue
     obj = type('obj', (object,), {'title': title, 'message': message, 'url': url, 'priority': priority,
-                                  'deviceid': deviceid, 'image_url': image_url})
+                                  'deviceid': deviceid, 'image_url': image_url,
+                                  'date': utils.get_base_location_now_date()})
     _message_queue.append(obj)
     # avoid sending notifications too often
     if (utils.get_base_location_now_date() - _last_send_date).seconds < 30:

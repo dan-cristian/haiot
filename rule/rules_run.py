@@ -89,7 +89,6 @@ def rule_sensor_temp_target(obj=models.Sensor(), field_changed_list=None):
 
 def test_code():
     """second=18;is_active=0"""
-    rule_common.send_notification(title='Alarm ON {}'.format('living test'))
     Log.logger.info("Test rule code 3")
     rule_common.update_custom_relay('test_relay', True)
     time.sleep(0.5)
