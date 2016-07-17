@@ -37,7 +37,8 @@ BACKEND = 'https://newtifry.appspot.com/newtifry'
 initialised = False
 
 
-def send_message(source_key, title, message, url, priority, deviceid, image_url):
+def send_message(source_key=None, title='Default', message=None,
+                 url=None, priority=None, deviceid=None, image_url=None):
     """
     https://newtifry.appspot.com/page/api
 
@@ -93,7 +94,7 @@ def send_message(source_key, title, message, url, priority, deviceid, image_url)
         if contents.has_key('error'):
             Log.logger.warning("Newtifry server did not accept our message: %s" % contents['error'])
         else:
-            Log.logger.debug("Newtifry message sent OK. Size: %d." % contents['size'])
+            Log.logger.info("Newtifry message sent OK. Size: %d." % contents['size'])
     except urllib2.URLError, ex:
         Log.logger.warning("Newtifry failed to make request to the server: " + str(ex))
 
