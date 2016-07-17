@@ -13,9 +13,9 @@ initialised = False
 def handle_event_alarm(gpio_pin_code='', direction='', pin_value='', pin_connected=None):
     zonealarm = models.ZoneAlarm.query.filter_by(gpio_pin_code=gpio_pin_code).first()
     if zonealarm:
-        zonearea = models.ZoneArea.query_filter_first(zone_id=zonealarm.zone_id)
+        zonearea = models.ZoneArea().query_filter_first(models.ZoneArea.zone_id == zonealarm.zone_id)
         if zonearea is not None:
-            area = models.Area.query_filter_first(id=zonearea.area_id)
+            area = models.Area().query_filter_first(models.Area.id == zonearea.area_id)
             if area is not None:
                 zonealarm.start_alarm = area.is_armed
             else:
