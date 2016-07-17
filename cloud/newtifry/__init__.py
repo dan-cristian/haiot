@@ -27,18 +27,68 @@ import urllib
 import urllib2
 import json
 from main.logger_helper import Log
-from common import Constant
+from common import Constant, utils
+from main.admin import model_helper
 from pydispatch import dispatcher
+import threading
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 # Configuration.
 BACKEND = 'https://newtifry.appspot.com/newtifry'
 initialised = False
+_message_queue = []
+__queue_lock = threading.Lock()
+_source_key = ''
+_last_send_date = utils.get_base_location_now_date()
 
 
-def send_message(source_key=None, title='', message=None,
-                 url=None, priority=None, deviceid=None, image_url=None):
+def _send_queue():
+    global _source_key, _last_send_date, _message_queue
+    params = {}
+    params['format'] = 'json'
+    params['source'] = _source_key
+    if len(_message_queue) > 1:
+        params['title'] = 'Multiple notifs: %s' % _message_queue[0].title
+    else:
+        params['title'] = _message_queue[0].title
+    global __queue_lock
+    try:
+        __queue_lock.acquire()
+        params['message'] = ''
+        params['priority'] = 0
+        for item in _message_queue:
+            if item.message is not None:
+                params['message'] += 'Title: {}\n'.format(item.title)
+                params['message'] += 'Message: {}\n\n'.format(item.message)
+            if item.url is not None:
+                params['url'] = item.url
+            if item.priority is not None:
+                params['priority'] = max(item.priority, params['priority'])
+            if item.deviceid is not None:
+                params['deviceid'] = item.deviceid
+            if item.image_url is not None:
+                params['image'] = item.image_url
+        # Prepare our request
+        try:
+            response = urllib2.urlopen(BACKEND, urllib.urlencode(params))
+            # Read the body
+            body = response.read()
+            # It's JSON - parse it
+            contents = json.loads(body)
+            if 'error' in contents.keys():
+                Log.logger.warning("Newtifry server did not accept our message: %s" % contents['error'])
+            else:
+                Log.logger.info("Newtifry message sent OK. Size: %d." % contents['size'])
+                _message_queue = []
+        except urllib2.URLError, ex:
+            Log.logger.warning("Newtifry failed to make request to the server: " + str(ex))
+    finally:
+        __queue_lock.release()
+        _last_send_date = utils.get_base_location_now_date()
+
+
+def send_message(title, message=None, url=None, priority=None, deviceid=None, image_url=None):
     """
     https://newtifry.appspot.com/page/api
 
@@ -68,35 +118,16 @@ def send_message(source_key=None, title='', message=None,
     An optional bitmap URL to pass along, that would be displayed in the message detail screen (new in version 2.4.0).
     Optional
     """
-    source_key = '6bb91f3f03f11871f4f895eb6a13b8c8'
-    params = {}
-    params['format'] = 'json'
-    params['source'] = source_key
-    params['title'] = title
-    if message is not None:
-        params['message'] = message
-    if url is not None:
-        params['url'] = url
-    if priority is not None:
-        params['priority'] = priority
-    if deviceid is not None:
-        params['deviceid'] = deviceid
-    if image_url is not None:
-        params['image'] = image_url
-
-    # Prepare our request.
-    try:
-        response = urllib2.urlopen(BACKEND, urllib.urlencode(params))
-        # Read the body.
-        body = response.read()
-        # It's JSON - parse it.
-        contents = json.loads(body)
-        if contents.has_key('error'):
-            Log.logger.warning("Newtifry server did not accept our message: %s" % contents['error'])
-        else:
-            Log.logger.info("Newtifry message sent OK. Size: %d." % contents['size'])
-    except urllib2.URLError, ex:
-        Log.logger.warning("Newtifry failed to make request to the server: " + str(ex))
+    global _last_send_date, _message_queue
+    obj = type('obj', (object,), {'title': title, 'message': message, 'url': url, 'priority': priority,
+                                  'deviceid': deviceid, 'image_url': image_url})
+    _message_queue.append(obj)
+    # avoid sending notifications too often
+    if (utils.get_base_location_now_date() - _last_send_date).seconds < 30:
+        Log.logger.info('Queuing newtifry message [%s]' % title)
+        return
+    else:
+        _send_queue()
 
 
 def unload():
@@ -109,7 +140,13 @@ def unload():
 
 def init():
     Log.logger.info('Newtifry module initialising')
+    global _source_key
+    _source_key = model_helper.get_param(Constant.P_NEWTIFY_KEY)
     dispatcher.connect(send_message, signal=Constant.SIGNAL_PUSH_NOTIFICATION, sender=dispatcher.Any)
-    send_message(title="Initialising", message="Module initialising")
+    send_message(title="Initialising 1", message="Module initialising 1")
+    send_message(title="Initialising 2", message="Module initialising 2")
+    import time
+    time.sleep(30)
+    send_message(title="Initialising 3", message="Module initialising 3")
     global initialised
     initialised = True
