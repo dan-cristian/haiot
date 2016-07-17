@@ -5,7 +5,7 @@ function run_app {
     sleep 2
     echo Starting app with parameter $1 $2 $3 $4 $5 $6 $7 $8 $9 $10
     source $DIR/venv/bin/activate
-    python $DIR/haiot.py $1 $2 $3 $4 $5 $6 $7 $8 $9 $10 2> $LOG
+    python $DIR/haiot.py $1 $2 $3 $4 $5 $6 $7 $8 $9 $10 2>&1
     exit_code=$?
     echo "Program exit with code $exit_code"
     echo "---------------------------------"
@@ -65,7 +65,6 @@ START_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 echo "Current dir on start is $START_DIR, script start parameters are: " $1 $2 $3 $4 $5
 DIR=~/PYC
 echo "Base dir is $DIR"
-LOG=/var/log/messages
 
 if [ "$1" = "stop" ]; then
         stop
