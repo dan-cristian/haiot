@@ -37,5 +37,5 @@ def play_bell_local(sound_file):
     pass
 
 
-def send_notification(title, message, url, priority, deviceid, image_url):
+def send_notification(title='Default', message=None, url=None, priority=None, deviceid=None, image_url=None):
     dispatcher.send(Constant.SIGNAL_PUSH_NOTIFICATION, title, message, url, priority, deviceid, image_url)
