@@ -391,7 +391,7 @@ def __read_system_attribs():
         record.updated_on = utils.get_base_location_now_date()
         current_record = models.SystemMonitor.query.filter_by(name=record.name).first()
         record.save_changed_fields(current_record=current_record, new_record=record,
-                                   notify_transport_enabled=True, save_to_graph=True)
+                                   notify_transport_enabled=False, save_to_graph=True)
     except Exception, ex:
         Log.logger.exception('Error saving system to DB err={}'.format(ex))
 

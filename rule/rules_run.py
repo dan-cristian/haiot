@@ -52,9 +52,10 @@ def rule_node(obj=models.Node(), field_changed_list=None):
 
 def rule_alarm(obj=models.ZoneAlarm(), field_changed_list=None):
     # Log.logger.info('Rule Alarm: obj={} fields={}'.format(obj, field_changed_list))
-    if obj.alarm_status == 1:
-        Log.logger.info('Rule Alarm ON:  pin={} status={}'.format(obj.alarm_pin_name, obj.alarm_status))
-        rule_common.send_notification(title='Alarm ON {}'.format(obj.alarm_pin_name), priority=3)
+    if obj.alarm_pin_triggered:
+        Log.logger.info('Rule Alarm ON:  pin={} triggered={}'.format(obj.alarm_pin_name, obj.alarm_pin_triggered))
+        if obj.start_alarm:
+            rule_common.send_notification(title='Alarm ON {}'.format(obj.alarm_pin_name), priority=3)
         if obj.alarm_pin_name == 'sonerie':
             thread.start_new_thread(rule_common.play_bell_local, ('british.wav', ))
         elif obj.alarm_pin_name == 'usa intrare':
@@ -66,7 +67,7 @@ def rule_alarm(obj=models.ZoneAlarm(), field_changed_list=None):
         elif obj.alarm_pin_name == 'birou':
             thread.start_new_thread(rule_common.play_bell_local, ('29621__infobandit__phone.wav',))
     else:
-        Log.logger.info('Rule Alarm OFF: pin={} status={}'.format(obj.alarm_pin_name, obj.alarm_status))
+        Log.logger.info('Rule Alarm OFF: pin={} triggered={}'.format(obj.alarm_pin_name, obj.alarm_pin_triggered))
     return 'zone alarm ok'
 
 
