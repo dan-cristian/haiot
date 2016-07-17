@@ -41,5 +41,5 @@ def send_notification(title, message=None, url=None, priority=None, deviceid=Non
                     deviceid=deviceid, image_url=image_url)
 
 
-def send_chat(message=None):
-    dispatcher.send(Constant.SIGNAL_CHAT_NOTIFICATION, message=message)
+def send_chat(message=None, notify=False):
+    dispatcher.send(Constant.SIGNAL_CHAT_NOTIFICATION, message=message, notify=notify)
