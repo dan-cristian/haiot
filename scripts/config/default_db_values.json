@@ -39,6 +39,8 @@
     {"name": "P_HEAT_ON_AUTO_INTERVAL", "value": "30", "description":"minutes of move to trigger auto heat on action"},
     {"name": "P_HEAT_OFF_AUTO_INTERVAL", "value": "1440", "description":"minutes of inactivity to trigger auto heat off action"},
     {"name": "P_NEWTIFY_KEY", "value": "6bb91f3f03f11871f4f895eb6a13b8c8", "description":"api source key"},
+    {"name": "P_HIPCHAT_TOKEN", "value": "uausxhMUYOAJ3xAUdVDBVt8rq2ksUh8RbsTJ1g4s", "description":"room token"},
+    {"name": "P_HIPCHAT_ROOM_API_ID", "value": "2941088", "description":"room api id"},
     {"name": "P_MPD_SERVER", "value": "192.168.0.9", "description":"IP of mpd music server"}
   ],
   "Module": [
@@ -59,6 +61,7 @@
     {"id":31, "active":"1", "start_order":"31", "name":"webui.api"},
     {"id":33, "active":"1", "start_order":"33", "name":"utility"},
     {"id":35, "active":"1", "start_order":"35", "name":"cloud.newtifry"},
+    {"id":37, "active":"1", "start_order":"37", "name":"cloud.hipchat"},
 
     {"id":113, "active":"0", "start_order":"13", "name":"cloud.graph_plotly", "host_name":"nas"},
     {"id":121, "active":"0", "start_order":"21", "name":"cloud.youtube", "host_name":"nas"},
