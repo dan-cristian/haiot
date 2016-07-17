@@ -30,6 +30,7 @@ from main.logger_helper import Log
 from common import Constant, utils
 from main.admin import model_helper
 from pydispatch import dispatcher
+from main import thread_pool
 import threading
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
@@ -45,6 +46,10 @@ _last_send_date = utils.get_base_location_now_date()
 
 def _send_queue():
     global _source_key, _last_send_date, _message_queue
+
+    if len(_message_queue) == 0:
+        return
+
     params = {}
     params['format'] = 'json'
     params['source'] = _source_key
@@ -60,7 +65,7 @@ def _send_queue():
         for item in _message_queue:
             if item.message is not None:
                 params['message'] += 'Title: {}\n'.format(item.title)
-                params['message'] += 'Message: {}\n\n'.format(item.message)
+                params['message'] += '{}\n\n'.format(item.message)
             if item.url is not None:
                 params['url'] = item.url
             if item.priority is not None:
@@ -81,11 +86,11 @@ def _send_queue():
             else:
                 Log.logger.info("Newtifry message sent OK. Size: %d." % contents['size'])
                 _message_queue = []
+                _last_send_date = utils.get_base_location_now_date()
         except urllib2.URLError, ex:
             Log.logger.warning("Newtifry failed to make request to the server: " + str(ex))
     finally:
         __queue_lock.release()
-        _last_send_date = utils.get_base_location_now_date()
 
 
 def send_message(title, message=None, url=None, priority=None, deviceid=None, image_url=None):
@@ -143,10 +148,7 @@ def init():
     global _source_key
     _source_key = model_helper.get_param(Constant.P_NEWTIFY_KEY)
     dispatcher.connect(send_message, signal=Constant.SIGNAL_PUSH_NOTIFICATION, sender=dispatcher.Any)
-    send_message(title="Initialising 1", message="Module initialising 1")
-    send_message(title="Initialising 2", message="Module initialising 2")
-    import time
-    time.sleep(30)
-    send_message(title="Initialising 3", message="Module initialising 3")
+    send_message(title="Initialising", message="Module initialising")
+    thread_pool.add_interval_callable(_send_queue, run_interval_second=60)
     global initialised
     initialised = True
