@@ -39,3 +39,7 @@ def play_bell_local(sound_file):
 def send_notification(title, message=None, url=None, priority=None, deviceid=None, image_url=None):
     dispatcher.send(Constant.SIGNAL_PUSH_NOTIFICATION, title=title, message=message, url=url, priority=priority,
                     deviceid=deviceid, image_url=image_url)
+
+
+def send_chat(message=None):
+    dispatcher.send(Constant.SIGNAL_CHAT_NOTIFICATION, message=message)

@@ -22,6 +22,7 @@ class Constant:
     SIGNAL_DB_CHANGE_FOR_RULES = 'signal_db_change_for_rules'
     SIGNAL_UTILITY = 'signal-utility-data'
     SIGNAL_PUSH_NOTIFICATION = 'signal-push-notification'
+    SIGNAL_CHAT_NOTIFICATION = 'signal-chat-notification'
 
     ERROR_CONNECT_MAX_RETRY_COUNT = 2
     ERROR_CONNECT_PAUSE_SECOND = 1
@@ -83,6 +84,8 @@ class Constant:
     P_TEMPERATURE_THRESHOLD = 'P_TEMPERATURE_THRESHOLD'
     P_MPD_SERVER = 'P_MPD_SERVER'
     P_NEWTIFY_KEY = 'P_NEWTIFY_KEY'
+    P_HIPCHAT_TOKEN = 'P_HIPCHAT_TOKEN'
+    P_HIPCHAT_ROOM_API_ID = 'P_HIPCHAT_ROOM_API_ID'
 
     SMARTCTL_MODEL_FAMILY = 'Model Family:'
     SMARTCTL_MODEL_DEVICE = 'Device Model:'
