@@ -93,9 +93,9 @@ def test_code():
     rule_common.update_custom_relay('test_relay', True)
     time.sleep(0.5)
     rule_common.update_custom_relay('test_relay', False)
-    rule_common.send_notification(title='Alarm ON {}'.format('test 1'), priority=3)
-    rule_common.send_notification(title='Alarm ON {}'.format('test 2'), priority=3)
-    rule_common.send_notification(title='Alarm ON {}'.format('test 3'), priority=3)
+    # rule_common.send_notification(title='Alarm ON {}'.format('test 1'), priority=3)
+    # rule_common.send_notification(title='Alarm ON {}'.format('test 2'), priority=3)
+    # rule_common.send_notification(title='Alarm ON {}'.format('test 3'), priority=3)
 
 
 def toggle_gate():
