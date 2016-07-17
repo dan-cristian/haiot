@@ -13,10 +13,19 @@ initialised = False
 def handle_event_alarm(gpio_pin_code='', direction='', pin_value='', pin_connected=None):
     zonealarm = models.ZoneAlarm.query.filter_by(gpio_pin_code=gpio_pin_code).first()
     if zonealarm:
+        zonearea = models.ZoneArea.query_filter_first(zone_id=zonealarm.zone_id)
+        if zonearea is not None:
+            area = models.Area.query_filter_first(id=zonearea.area_id)
+            if area is not None:
+                zonealarm.start_alarm = area.is_armed
+            else:
+                Log.logger.warning('Zone {} is mapped to missing area' % zonealarm.zone_id)
+        else:
+            Log.logger.warning('Zone %s not mapped to an area' % zonealarm.zone_id)
         zone = models.Zone.query.filter_by(id=zonealarm.zone_id).first()
         Log.logger.info('Got alarm event in {} zoneid={} pin_connected={} pin_value={}'.format(
             zone.name, zonealarm.zone_id, pin_connected, pin_value))
-        zonealarm.alarm_status = pin_value
+        zonealarm.alarm_pin_triggered = pin_value
         zonealarm.updated_on = utils.get_base_location_now_date()
         zonealarm.notify_transport_enabled = False
         commit()

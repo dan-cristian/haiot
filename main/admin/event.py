@@ -36,7 +36,7 @@ def handle_local_event_db_post(model, row):
     # add here tables you are sure are safe to be propagated to all nodes
     elif str(models.Node) in str(model) or str(models.GpioPin) in str(model) \
             or str(models.ZoneCustomRelay) in str(model) \
-            or str(models.Rule) in str(model):
+            or str(models.Rule) in str(model):  # or str(models.Area) in str(model):
         txt = model_helper.model_row_to_json(row, operation='update')
         # execute all events directly first, then broadcast
         handle_event_mqtt_received(None, None, 'direct-event', utils.json2obj(txt))
@@ -122,6 +122,8 @@ def mqtt_thread_run():
                         rule.rule_record_update(obj)
                     elif table == utils.get_table_name(models.PlotlyCache):
                         graph_plotly.cache_record_update(obj)
+                    else:
+                        Log.logger.warning('Table %s content from %s is not processed' % (table, source_host))
 
                 if Constant.JSON_MESSAGE_TYPE in obj:
                     if variable.NODE_THIS_IS_MASTER_LOGGING:
@@ -149,7 +151,6 @@ def mqtt_thread_run():
                         # if record must be saved to local db
                         if obj[Constant.JSON_PUBLISH_SAVE_TO_HISTORY] and Constant.HAS_LOCAL_DB_REPORTING_CAPABILITY:
                             persistence.save_to_history(obj, save_to_local_db=True)
-
                         # if record is marked to be uploaded to a graph
                         if obj[Constant.JSON_PUBLISH_SAVE_TO_GRAPH]:
                             # persistence.save_to_history(obj, upload_to_cloud=True)
@@ -180,4 +181,3 @@ def init():
     dispatcher.connect(handle_local_event_db_post, signal=Constant.SIGNAL_UI_DB_POST, sender=dispatcher.Any)
     dispatcher.connect(handle_event_mqtt_received, signal=Constant.SIGNAL_MQTT_RECEIVED, sender=dispatcher.Any)
     thread_pool.add_interval_callable(mqtt_thread_run, run_interval_second=1)
-
