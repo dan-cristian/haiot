@@ -55,7 +55,9 @@ def rule_alarm(obj=models.ZoneAlarm(), field_changed_list=None):
     if obj.alarm_pin_triggered:
         Log.logger.info('Rule Alarm ON:  pin={} triggered={}'.format(obj.alarm_pin_name, obj.alarm_pin_triggered))
         if obj.start_alarm:
-            rule_common.send_notification(title='Alarm ON {}'.format(obj.alarm_pin_name), priority=3)
+            msg = 'Alarm ON {}'.format(obj.alarm_pin_name)
+            rule_common.send_notification(title=msg, priority=3)
+            rule_common.send_chat(message=msg)
         if obj.alarm_pin_name == 'sonerie':
             thread.start_new_thread(rule_common.play_bell_local, ('british.wav', ))
         elif obj.alarm_pin_name == 'usa intrare':
