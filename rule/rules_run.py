@@ -54,7 +54,7 @@ def rule_alarm(obj=models.ZoneAlarm(), field_changed_list=None):
     # Log.logger.info('Rule Alarm: obj={} fields={}'.format(obj, field_changed_list))
     if obj.alarm_status == 1:
         Log.logger.info('Rule Alarm ON:  pin={} status={}'.format(obj.alarm_pin_name, obj.alarm_status))
-        # rule_common.send_notification(title='Alarm ON {}'.format(obj.alarm_pin_name))
+        rule_common.send_notification(title='Alarm ON {}'.format(obj.alarm_pin_name))
         if obj.alarm_pin_name == 'sonerie':
             thread.start_new_thread(rule_common.play_bell_local, ('british.wav', ))
         elif obj.alarm_pin_name == 'usa intrare':
@@ -89,6 +89,7 @@ def rule_sensor_temp_target(obj=models.Sensor(), field_changed_list=None):
 
 def test_code():
     """second=18;is_active=0"""
+    rule_common.send_notification(title='Alarm ON {}'.format('living test'))
     Log.logger.info("Test rule code 3")
     rule_common.update_custom_relay('test_relay', True)
     time.sleep(0.5)
