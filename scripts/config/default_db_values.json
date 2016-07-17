@@ -39,7 +39,7 @@
     {"name": "P_HEAT_ON_AUTO_INTERVAL", "value": "30", "description":"minutes of move to trigger auto heat on action"},
     {"name": "P_HEAT_OFF_AUTO_INTERVAL", "value": "1440", "description":"minutes of inactivity to trigger auto heat off action"},
     {"name": "P_NEWTIFY_KEY", "value": "6bb91f3f03f11871f4f895eb6a13b8c8", "description":"api source key"},
-    {"name": "P_HIPCHAT_TOKEN", "value": "uausxhMUYOAJ3xAUdVDBVt8rq2ksUh8RbsTJ1g4s", "description":"room token"},
+    {"name": "P_HIPCHAT_TOKEN", "value": "fqlWeMHD2KxcSBYOt9nxu3t97CcFgljmUJZoBc3d", "description":"room token"},
     {"name": "P_HIPCHAT_ROOM_API_ID", "value": "2941088", "description":"room api id"},
     {"name": "P_MPD_SERVER", "value": "192.168.0.9", "description":"IP of mpd music server"}
   ],
