@@ -266,6 +266,7 @@ class Zone(db.Model, DbBase):
 class Area(db.Model, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
+    is_armed = db.Column(db.Boolean)
 
     def __init__(self, id='', name=''):
         super(Area, self).__init__()
@@ -274,7 +275,7 @@ class Area(db.Model, DbBase):
         self.name = name
 
     def __repr__(self):
-        return 'Area id {} {}'.format(self.id, self.name[:20])
+        return 'Area id {} {} armed={}'.format(self.id, self.name[:20], self.is_armed)
 
 
 class ZoneArea(db.Model, DbBase):
@@ -582,7 +583,8 @@ class ZoneAlarm(db.Model, DbEvent, DbBase):
     gpio_pin_code = db.Column(db.String(50))
     gpio_host_name = db.Column(db.String(50))
     # gpio_pin = db.relationship('GpioPin', backref=db.backref('ZoneAlarm(gpiopincode)', lazy='dynamic'))
-    alarm_status = db.Column(db.Integer)
+    alarm_pin_triggered = db.Column(db.Boolean)  # True if alarm sensor is connected (move detected)
+    start_alarm = db.Column(db.Boolean)  # True if alarm must start (because area/zone is armed)
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
 
     def __init__(self, zone_id='', gpio_pin_code='', host_name=''):
@@ -592,7 +594,7 @@ class ZoneAlarm(db.Model, DbEvent, DbBase):
         self.gpio_host_name = host_name
 
     def __repr__(self):
-        return 'host:{} pin:{} status:{}'.format(self.gpio_host_name, self.alarm_pin_name, self.alarm_status)
+        return 'host:{} pin:{} triggered:{}'.format(self.gpio_host_name, self.alarm_pin_name, self.alarm_pin_triggered)
 
 
 class ZoneHeatRelay(db.Model, DbEvent, DbBase):
