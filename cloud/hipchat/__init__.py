@@ -35,6 +35,7 @@ def hipchat_notify(message, color='yellow', notify=False, format='html', host='a
         Host to connect to, defaults to api.hipchat.com
     """
     global _token, _room
+    message += ' [%s]' % Constant.HOST_NAME
     if len(message) > 10000:
         raise ValueError('Message too long')
     if format not in ['text', 'html']:
