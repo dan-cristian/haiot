@@ -86,7 +86,7 @@ def _send_queue():
                 Log.logger.warning("Newtifry server did not accept our message: %s" % contents['error'])
             else:
                 Log.logger.info("Newtifry message sent OK. Size: %d." % contents['size'])
-                _message_queue = []
+                del _message_queue[:]
                 _last_send_date = utils.get_base_location_now_date()
         except urllib2.URLError, ex:
             Log.logger.warning("Newtifry failed to make request to the server: " + str(ex))
@@ -124,14 +124,18 @@ def send_message(title, message=None, url=None, priority=None, deviceid=None, im
     An optional bitmap URL to pass along, that would be displayed in the message detail screen (new in version 2.4.0).
     Optional
     """
-    global _last_send_date, _message_queue
+    global _last_send_date, _message_queue, __queue_lock
     obj = type('obj', (object,), {'title': title, 'message': message, 'url': url, 'priority': priority,
                                   'deviceid': deviceid, 'image_url': image_url,
                                   'date': utils.get_base_location_now_date()})
-    _message_queue.append(obj)
+    try:
+        __queue_lock.acquire()
+        _message_queue.append(obj)
+    finally:
+        __queue_lock.release()
     # avoid sending notifications too often
     if (utils.get_base_location_now_date() - _last_send_date).seconds < 30:
-        Log.logger.info('Queuing newtifry message [%s]' % title)
+        Log.logger.info('Queuing newtifry message [%s] count %d' % (title, len(_message_queue)))
         return
     else:
         _send_queue()
@@ -151,6 +155,8 @@ def init():
     _source_key = model_helper.get_param(Constant.P_NEWTIFY_KEY)
     dispatcher.connect(send_message, signal=Constant.SIGNAL_PUSH_NOTIFICATION, sender=dispatcher.Any)
     send_message(title="Initialising", message="Module initialising")
+    send_message(title="Initialised", message="Module initialised")
+    send_message(title="Initialised 2", message="Module initialised 2")
     thread_pool.add_interval_callable(_send_queue, run_interval_second=60)
     global initialised
     initialised = True
