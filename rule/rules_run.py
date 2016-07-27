@@ -66,8 +66,8 @@ def rule_alarm(obj=models.ZoneAlarm(), field_changed_list=None):
             thread.start_new_thread(rule_common.play_bell_local, ('weatherwarning.wav',))
         elif obj.alarm_pin_name == 'portita':
             thread.start_new_thread(rule_common.play_bell_local, ('boat_hor.wav',))
-        elif obj.alarm_pin_name == 'birou':
-            thread.start_new_thread(rule_common.play_bell_local, ('29621__infobandit__phone.wav',))
+        # elif obj.alarm_pin_name == 'birou':
+        #    thread.start_new_thread(rule_common.play_bell_local, ('29621__infobandit__phone.wav',))
     else:
         Log.logger.info('Rule Alarm OFF: pin={} triggered={}'.format(obj.alarm_pin_name, obj.alarm_pin_triggered))
     return 'zone alarm ok'
