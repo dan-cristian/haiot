@@ -59,13 +59,13 @@ def rule_alarm(obj=models.ZoneAlarm(), field_changed_list=None):
             rule_common.send_notification(title=msg, priority=3)
             rule_common.send_chat(message=msg, notify=True)
         if obj.alarm_pin_name == 'sonerie':
-            thread.start_new_thread(rule_common.play_bell_local, ('british.wav', ))
-        elif obj.alarm_pin_name == 'usa intrare':
-            thread.start_new_thread(rule_common.play_bell_local, ('warning.wav',))
+            thread.start_new_thread(rule_common.play_bell_local, ('SonnetteBasse.wav', ))
+        # elif obj.alarm_pin_name == 'usa intrare':
+        #     thread.start_new_thread(rule_common.play_bell_local, ('warning.wav',))
         elif obj.alarm_pin_name == 'poarta':
             thread.start_new_thread(rule_common.play_bell_local, ('weatherwarning.wav',))
         elif obj.alarm_pin_name == 'portita':
-            thread.start_new_thread(rule_common.play_bell_local, ('boat_hor.wav',))
+            thread.start_new_thread(rule_common.play_bell_local, ('warning.wav',))
         # elif obj.alarm_pin_name == 'birou':
         #    thread.start_new_thread(rule_common.play_bell_local, ('29621__infobandit__phone.wav',))
     else:
