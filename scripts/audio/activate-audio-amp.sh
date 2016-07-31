@@ -1,6 +1,6 @@
 #!/bin/bash
 
-AMP_URL='http://192.168.0.113:8080/apiv1/db_update/model_name=ZoneCustomRelay&filter_name=relay_pin_name&field_name=relay_is_on'
+AMP_URL='http://192.168.0.13:8080/apiv1/db_update/model_name=ZoneCustomRelay&filter_name=relay_pin_name&field_name=relay_is_on'
 
 declare -a NAME=("living" "bucatarie" "dormitor" "baie" "beci")
 declare -a RELAY=("living_music_relay" "bucatarie_music_relay" "dormitor_music_relay" "baie_mare_music_relay" "beci_music_relay")
