@@ -19,7 +19,7 @@
     {"name": "MQTT_HOST_1", "value": "192.168.0.9"},
     {"name": "MQTT_PORT_1", "value": "1883"},
     {"name": "MQTT_TOPIC", "value": "iot/main"},
-    {"name": "MQTT_HOST_2", "value": "192.168.0.115"},
+    {"name": "MQTT_HOST_2", "value": "192.168.0.1"},
     {"name": "MQTT_PORT_2", "value": "1883"},
     {"name": "DDNS_RACKSPACE_CONFIG_FILE", "value": ".rackspace.ddnsupdate.config.json",
             "description":"conf for ddns, stored in user home. uses http://ip-api.com/docs/api:json"},
