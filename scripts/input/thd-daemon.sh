@@ -1,6 +1,7 @@
 #!/bin/bash
 #kill $(cat /var/run/thd.pid)
 #find events: thd --dump /dev/input/by-id/*
+echo "$USER" `date`
 echo Starting THD
 echo Stop existing THD
 killall -q thd
