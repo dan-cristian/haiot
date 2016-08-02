@@ -29,6 +29,7 @@ fstype=`stat --file-system --format=%T $HUBIC_FUSE_ROOT`
 echo2 "Cloud mount fstype=[$fstype]"
 if [ "$fstype" != "fuseblk" ]; then
   echo2 "Cloud destination is not fuse, but $fstype, aborting!"
+  sleep 5
   return 1
 fi
 if [ $# -ne 0 ]; then
