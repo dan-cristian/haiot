@@ -1,5 +1,5 @@
 import os
-from flask import request, render_template, send_from_directory, send_file
+from flask import request, render_template, redirect, url_for, send_from_directory, send_file
 from main.logger_helper import Log
 from main import app, BIND_IP, BIND_PORT
 from main.admin import model_helper
@@ -102,7 +102,8 @@ def init():
 
 @app.route('/')
 def home():
-    return '<a href="user/node">Node</a>'
+    # return '<a href="user/node">Node</a>'
+    return redirect(url_for('user.node'))
 
 
 @app.route('/favicon.ico')
