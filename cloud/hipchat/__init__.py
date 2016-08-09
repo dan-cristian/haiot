@@ -72,9 +72,12 @@ def init():
     global _token, _room
     _token = model_helper.get_param(Constant.P_HIPCHAT_TOKEN)
     _room = model_helper.get_param(Constant.P_HIPCHAT_ROOM_API_ID)
-    hipchat_notify(message='Module initialising', notify=True, color='red')
-    # send_message(title="Initialised", message="Module initialised")
-    # send_message(title="Initialised 2", message="Module initialised 2")
+    try:
+        hipchat_notify(message='Module initialising', notify=True, color='red')
+        # send_message(title="Initialised", message="Module initialised")
+        # send_message(title="Initialised 2", message="Module initialised 2")
+    except Exception, ex:
+        Log.logger.error("Unable tp init hipchat %s" % ex)
     # thread_pool.add_interval_callable(_send_queue, run_interval_second=60)
     global initialised
     initialised = True
