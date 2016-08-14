@@ -41,10 +41,10 @@ if [ $# -ne 0 ]; then
   dest="${source/$SRC_DIR/$HUBIC_DIR}"
   dest_parent=`dirname $dest`
   mkdir -p $dest_parent >> $LOG 2>&1
-  echo2 "Uploading to $dest"
+  #echo2 "Uploading to $dest"
   cp -f $source $dest >> $LOG 2>&1
   result=$?
-  echo2 "Copy completed result=$result, file $source"
+  #echo2 "Copy completed result=$result, file $source"
   #workaround to clean temp, hubicfuse bug
   #rm -fv mnt/tmp/hubicfuse/.cloudfuse* >> $LOG 2>&1
   if [ $result -eq 0 ]; then
@@ -58,12 +58,11 @@ else
   echo2 "No parameters to upload a file provided"
   return 3
 fi
-
 }
 
 #upload and if ok move file to storage
 function move(){
-echo2 "Starting SAVE script firstparam=$1"
+#echo2 "Starting SAVE script firstparam=$1"
 if [ $# -ne 0 ]; then
   source=$1
   upload $source
@@ -75,11 +74,11 @@ if [ $# -ne 0 ]; then
     dest="${source///tmp$replace}"
     dest_parent=`dirname $dest`
     mkdir -p $dest_parent >> $LOG 2>&1
-    echo2 "Move file to $dest"
+    #echo2 "Move file to $dest"
     chmod -v 777 $dest_parent >> $LOG 2>&1
     mv -f $1 $dest >> $LOG 2>&1
     rm -d $src_parent
-    echo2 "Change mode for $dest"
+    #echo2 "Change mode for $dest"
     chmod -v 777 $dest >> $LOG 2>&1
   else
     echo2 "Upload failed result=$result, not moving file from tmp"
@@ -89,7 +88,7 @@ else
   echo2 "No parameters to move file provided, skipping this functionality"
   return 3
 fi
-echo2 "Move completed for $source"
+echo2 "Move completed OK for $source"
 return 0
 }
 
@@ -188,5 +187,13 @@ move $1 $2
 tune
 #should be last one as it exits on success
 if [ $# -eq 0 ]; then
-  move_failed
+  	lock2=/tmp/.motion.move-history.$file.exclusivelock
+	(
+		if flock -x -w 1 200 ; then
+			move_failed
+		else
+			echo "Move history already in progress, skipping"
+		fi
+	) 200>$lock2
+	rm $lock2
 fi
