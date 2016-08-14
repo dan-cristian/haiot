@@ -15,7 +15,7 @@ apt-get -y upgrade
 apt-get -y update
 echo "Installing additional packages"
 # 1-wire support needs owfs
-apt-get -y install dialog sudo apt-utils mc nano locales python wget owfs git python-rpi.gpio inotify-tools python-dev
+apt-get -y install dialog sudo apt-utils mc nano locales python wget owfs git python-rpi.gpio inotify-tools python-dev rpi-update htop
 # run in ram needs busybox for ramfs copy operations, see "local" script sample
 apt-get -y install busybox
 # to to able to fix boot fs
@@ -49,8 +49,6 @@ if [ "$ENABLE_PIFACE" == "1" ]; then
     fi
     # access rights for piface, by default python-pifacedigitalio assumes username as being = pi
     gpasswd -a ${USERNAME} spi
-    # needed to get write access to /sys/class/gpio/
-    gpasswd -a ${USERNAME} gpio
 fi
 
 
@@ -149,9 +147,21 @@ chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/
 echo "Create tmpfs"
 # http://www.zdnet.com/article/raspberry-pi-extending-the-life-of-the-sd-card/
 sudo mkdir /var/ram
+sudo chmod 777 /var/ram/
 
 echo "Enable sound test via console"
 sudo chmod 777 /dev/snd/*
+
+echo "Enable SPI via raspi-config if you have a PI-FACE card"
+sleep 5
+sudo raspi-config
+
+echo "Add ram folder for sqlite db storage"
+sudo echo "tmpfs           /var/ram        tmpfs   defaults,noatime        0       0" >> /etc/fstab
+sudo mount -a
+
+echo "Enable gpio access"
+sudo gpasswd -a $USERNAME gpio
 
 echo "Starting haiot via userspaceServices"
 /etc/init.d/userspaceServices restart
@@ -162,3 +172,6 @@ rm /usr/share/doc -r
 rm /usr/share/man -r
 apt-get -y autoremove
 apt-get clean
+
+echo "Consider running also rpi-update"
+#sudo rpi-update
