@@ -166,10 +166,10 @@ def _get_interval(args):
             elif function == 'avg':
                 function_list.append(func.avg)
             else:
-                function_list.append(func.sum)
-                Log.logger.warning("Unknown function {}, set default as sum".format(args.get('function')))
+                function_list.append(func.avg)
+                Log.logger.warning("Unknown function {}, set default as AVG".format(args.get('function')))
     else:
-        function_list.append(func.sum)
+        function_list.append(func.avg)
     return sensor_name_list, start, end, group_by, function_list, sensor_type, group_by_prefix
 
 
@@ -194,7 +194,7 @@ def graph_temperature():
     graph_data = datetimeline.render_data_uri()
     chart_list.append(graph_data)
     result = render_template('chart/chart-generic.html', chart_list=chart_list)
-    return result
+    return result, 'buba mica buba mare'
 
 
 @app.route('/chart-utility/')
