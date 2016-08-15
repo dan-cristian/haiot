@@ -9,7 +9,7 @@ __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 def save_to_history(obj, save_to_local_db=False, upload_to_cloud=False):
     try:
         Log.logger.debug('Trying to save historical record to_db={} to_cloud={}, {}'.format(save_to_local_db,
-                                                                                           upload_to_cloud, obj))
+                                                                                            upload_to_cloud, obj))
         if Constant.JSON_PUBLISH_GRAPH_X in obj:
             # name of x field
             axis_x_field = obj[Constant.JSON_PUBLISH_GRAPH_X]
@@ -22,8 +22,8 @@ def save_to_history(obj, save_to_local_db=False, upload_to_cloud=False):
             # intersect lists and get only graphable fields that had values changed
             list_axis_y = list(set(graph_y_fields) & set(changed_fields))
             if len(list_axis_y) == 0:
-                Log.logger.debug('Ignoring record save graph={} changed fields={} obj={}'.format(graph_y_fields,
-                                                                                                 changed_fields, obj))
+                Log.logger.info('Ignoring record save graph={} changed fields={} obj={}'.format(graph_y_fields,
+                                                                                                changed_fields, obj))
             else:
                 Log.logger.debug('Trying to save y axis {}'.format(list_axis_y))
                 if axis_x_field in obj and graph_id_field in obj:
@@ -78,11 +78,11 @@ def save_to_history(obj, save_to_local_db=False, upload_to_cloud=False):
                                     Log.logger.warning('History field [{}] to save is not in DB, source={}'.format(
                                         pair[0], source_host))
                             new_record.add_commit_record_to_db()
-                            Log.logger.info('Saved OK to local db table {} obj={}'.format(dest_table, obj))
+                            Log.logger.info('Saved OK to local db table {} obj={}'.format(dest_table, new_record))
                         except Exception, ex:
                             Log.logger.critical("Cannot save history db err={} record={}".format(ex, obj))
                     else:
-                        Log.logger.debug('Skip saving to local db due to param')
+                        Log.logger.info('Skip saving to local db due to param')
                 else:
                     Log.logger.critical('Missing history axis_x [{}], graph_id [{}], in obj {}'.format(axis_x_field,
                                                                                                        graph_id_field,
