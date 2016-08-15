@@ -16,6 +16,7 @@ initialised = False
 owproxy = None
 sampling_period_seconds = 60
 
+
 def do_device():
     global owproxy
     sensortype = 'n/a'
@@ -170,6 +171,15 @@ def get_io(sensor, dev):
     return dev
 
 
+def check_inactive():
+    """check for inactive sensors not read recently but in database"""
+    record_list = models.Sensor().query_all()
+    for sensor in record_list:
+        elapsed = (utils.get_base_location_now_date() - sensor.updated_on).total_seconds()
+        if elapsed > 2 * sampling_period_seconds:
+            Log.logger.warning('Sensor {} not responding since {} sec'.format(sensor.sensor_name, elapsed))
+
+
 def get_unknown(sensor, dev):
     global owproxy
     dev = get_prefix(sensor, dev)
@@ -196,4 +206,6 @@ def thread_run():
     global initialised
     Log.logger.debug('Processing sensors')
     if initialised:
-        return do_device()
+        result = do_device()
+        check_inactive()
+        return result
