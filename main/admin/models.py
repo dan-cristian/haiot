@@ -155,6 +155,7 @@ class DbEvent:
                     save_to_graph_elapsed = (utils.get_base_location_now_date() -
                                              current_record.last_save_to_graph).total_seconds()
                     if save_to_graph_elapsed > graph_save_frequency:
+                        Log.logger.info('Saving to graph record {}'.format(new_record))
                         current_record.save_to_graph = save_to_graph
                         current_record.save_to_history = save_to_graph
                     else:
@@ -201,10 +202,11 @@ class DbEvent:
                     if new_value:
                         new_record.last_commit_field_changed_list.append(column_name)
                 db.session.add(new_record)
-            commit()
             # fixme: remove hardcoded field name
             if hasattr(new_record, 'last_save_to_graph'):
+                current_record.last_save_to_graph = utils.get_base_location_now_date()
                 new_record.last_save_to_graph = utils.get_base_location_now_date()
+            commit()
         except Exception, ex:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             ex_trace = traceback.format_exception(exc_type, exc_value, exc_traceback)
