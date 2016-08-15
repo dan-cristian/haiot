@@ -456,7 +456,7 @@ class ZoneSensor(db.Model, DbBase):
         return 'ZoneSensor zone {} sensor {}'.format(self.zone_id, self.sensor_name)
 
 
-class Node(db.Model, DbEvent, graphs.NodeGraph, DbBase):
+class Node(db.Model, DbEvent, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
     ip = db.Column(db.String(15))
@@ -775,7 +775,8 @@ class SensorHistory(db.Model, DbBase):
     source_host_ = db.Column(db.String(50))
 
     def __repr__(self):
-        return '{} {}'.format(self.id, self.sensor_name)
+        return '{} {} adr={} t={} ca={} cb={}'.format(self.id, self.sensor_name, self.address, self.temperature,
+                                                      self.counters_a, self.counters_b)
 
 
 class SystemMonitorHistory(db.Model, DbBase):
