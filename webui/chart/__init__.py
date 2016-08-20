@@ -170,6 +170,7 @@ def _get_interval(args):
                 Log.logger.warning("Unknown function {}, set default as AVG".format(args.get('function')))
     else:
         function_list.append(func.avg)
+        Log.logger.warning("Unspecified function, set default as AVG")
     return sensor_name_list, start, end, group_by, function_list, sensor_type, group_by_prefix
 
 

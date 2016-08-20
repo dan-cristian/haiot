@@ -155,7 +155,7 @@ class DbEvent:
                     save_to_graph_elapsed = (utils.get_base_location_now_date() -
                                              current_record.last_save_to_graph).total_seconds()
                     if save_to_graph_elapsed > graph_save_frequency:
-                        Log.logger.info('Saving to graph record {}'.format(new_record))
+                        Log.logger.debug('Saving to graph record {}'.format(new_record))
                         current_record.save_to_graph = save_to_graph
                         current_record.save_to_history = save_to_graph
                     else:

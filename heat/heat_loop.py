@@ -106,9 +106,10 @@ def loop_zones():
             if heat_schedule and zonesensor:
                 sensor = models.Sensor.query.filter_by(address=zonesensor.sensor_address).first()
                 if heat_schedule.active and sensor:
-                    sensor_last_update_seconds = (utils.get_base_location_now_date()-sensor.updated_on).total_seconds()
-                    if sensor_last_update_seconds > 120 * 60:
-                        Log.logger.warning('Sensor {} not updated in last 120 minutes, unusual'.format(sensor.sensor_name))
+                    # sensor_last_update_seconds = (utils.get_base_location_now_date() - sensor.updated_on).total_seconds()
+                    # if sensor_last_update_seconds > 120 * 60:
+                    #    Log.logger.warning('Sensor {} not updated in last 120 minutes, unusual'.format(
+                    # sensor.sensor_name))
                     if __update_zone_heat(zone, heat_schedule, sensor):
                         heat_is_on = True
         heatrelay_main_source = models.ZoneHeatRelay.query.filter_by(is_main_heat_source=True).first()
