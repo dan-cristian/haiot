@@ -175,9 +175,10 @@ def check_inactive():
     """check for inactive sensors not read recently but in database"""
     record_list = models.Sensor().query_all()
     for sensor in record_list:
-        elapsed = (utils.get_base_location_now_date() - sensor.updated_on).total_seconds()
+        elapsed = round((utils.get_base_location_now_date() - sensor.updated_on).total_seconds() / 60, 0)
         if elapsed > 2 * sampling_period_seconds:
-            Log.logger.warning('Sensor {} not responding since {} sec'.format(sensor.sensor_name, elapsed))
+            Log.logger.warning('Sensor {} type {} not responding since {} min'.format(sensor.sensor_name,
+                                                                                      sensor.type, elapsed))
 
 
 def get_unknown(sensor, dev):
