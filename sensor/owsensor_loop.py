@@ -110,7 +110,7 @@ def save_to_db(dev):
                             total_units_a=record.counters_a, total_units_b=record.counters_b,
                             sampling_period_seconds=sampling_period_seconds)
     except Exception, ex:
-        Log.logger.warning('Error saving sensor to DB, err {}'.format(ex))
+        Log.logger.error('Error saving sensor to DB, err {}'.format(ex, exc_info=True))
         # finally:
         #    db_lock.release()
 
