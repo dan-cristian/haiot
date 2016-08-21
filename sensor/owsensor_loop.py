@@ -13,18 +13,19 @@ Created on Mar 9, 2015
 
 
 initialised = False
-owproxy = None
+__owproxy = None
 sampling_period_seconds = 60
 
 
 def do_device():
-    global owproxy
+    global __owproxy
+    sensor_dict = {}
     sensortype = 'n/a'
-    sensors = owproxy.dir('/', slash=True, bus=False)
+    sensors = __owproxy.dir('/', slash=True, bus=False)
     for sensor in sensors:
         try:
             dev = {}
-            sensortype = owproxy.read(sensor + 'type')
+            sensortype = __owproxy.read(sensor + 'type')
             if sensortype == 'DS2423':
                 dev = get_counter(sensor, dev)
             elif sensortype == 'DS2413':
@@ -39,6 +40,7 @@ def do_device():
                 dev = get_bus(sensor, dev)
             else:
                 dev = get_unknown(sensor, dev)
+            sensor_dict[dev['address']] = dev
             save_to_db(dev)
         except pyownet.protocol.ConnError, er:
             Log.logger.warning('Connection error owserver: {}'.format(er))
@@ -47,7 +49,7 @@ def do_device():
         except Exception, ex:
             Log.logger.warning('Other error reading sensors: {}'.format(ex))
             traceback.print_exc()
-    return 'Read {} sensors'.format(len(sensors))
+    return sensor_dict
 
 
 def save_to_db(dev):
@@ -116,69 +118,70 @@ def save_to_db(dev):
 
 
 def get_prefix(sensor, dev):
-    global owproxy
-    dev['address'] = str(owproxy.read(sensor + 'r_address'))
-    dev['type'] = str(owproxy.read(sensor + 'type'))
+    global __owproxy
+    dev['address'] = str(__owproxy.read(sensor + 'r_address'))
+    dev['type'] = str(__owproxy.read(sensor + 'type'))
     return dev
 
 
 def get_bus(sensor, dev):
-    global owproxy
+    global __owproxy
     dev = get_prefix(sensor, dev)
     return dev
 
 
 def get_temperature(sensor, dev):
-    global owproxy
+    global __owproxy
     dev = get_prefix(sensor, dev)
     # 2 digits round
-    dev['temperature'] = utils.round_sensor_value(owproxy.read(sensor + 'temperature'))
+    dev['temperature'] = utils.round_sensor_value(__owproxy.read(sensor + 'temperature'))
     return dev
 
 
 def get_humidity(sensor, dev):
-    global owproxy
+    global __owproxy
     dev = get_prefix(sensor, dev)
-    dev['humidity'] = utils.round_sensor_value(owproxy.read(sensor + 'humidity'))
+    dev['humidity'] = utils.round_sensor_value(__owproxy.read(sensor + 'humidity'))
     return dev
 
 
 def get_voltage(sensor, dev):
-    global owproxy
+    global __owproxy
     dev = get_prefix(sensor, dev)
-    dev['iad'] = float(owproxy.read(sensor + 'IAD'))
-    dev['vad'] = float(owproxy.read(sensor + 'VAD'))
-    dev['vdd'] = float(owproxy.read(sensor + 'VDD'))
+    dev['iad'] = float(__owproxy.read(sensor + 'IAD'))
+    dev['vad'] = float(__owproxy.read(sensor + 'VAD'))
+    dev['vdd'] = float(__owproxy.read(sensor + 'VDD'))
     return dev
 
 
 def get_counter(sensor, dev):
-    global owproxy
+    global __owproxy
     dev = get_prefix(sensor, dev)
-    dev['counters_a'] = int(owproxy.read(sensor + 'counters.A'))
-    dev['counters_b'] = int(owproxy.read(sensor + 'counters.B'))
+    dev['counters_a'] = int(__owproxy.read(sensor + 'counters.A'))
+    dev['counters_b'] = int(__owproxy.read(sensor + 'counters.B'))
     return dev
 
 
 def get_io(sensor, dev):
-    global owproxy
+    global __owproxy
     # IMPORTANT: do not use . in field names as it throws error on JSON, only use "_"
     dev = get_prefix(sensor, dev)
-    dev['pio_a'] = str(owproxy.read(sensor + 'PIO.A')).strip()
-    dev['pio_b'] = str(owproxy.read(sensor + 'PIO.B')).strip()
-    dev['sensed_a'] = str(owproxy.read(sensor + 'sensed.A')).strip()
-    dev['sensed_b'] = str(owproxy.read(sensor + 'sensed.B')).strip()
+    dev['pio_a'] = str(__owproxy.read(sensor + 'PIO.A')).strip()
+    dev['pio_b'] = str(__owproxy.read(sensor + 'PIO.B')).strip()
+    dev['sensed_a'] = str(__owproxy.read(sensor + 'sensed.A')).strip()
+    dev['sensed_b'] = str(__owproxy.read(sensor + 'sensed.B')).strip()
     return dev
 
 
-def check_inactive():
+def check_inactive(sensor_dict):
     """check for inactive sensors not read recently but in database"""
     record_list = models.Sensor().query_all()
     for sensor in record_list:
-        record = models.SensorErrorHistory()
-        record.sensor_name = sensor.sensor_name
-        record.error_type = 0
-        record.save_changed_fields(current_record=None, new_record=record, save_to_graph=True, save_all_fields=True)
+        if sensor.address in sensor_dict.keys():
+            record = models.SensorErrorHistory()
+            record.sensor_name = sensor.sensor_name
+            record.error_type = 0
+            record.save_changed_fields(current_record=None, new_record=record, save_to_graph=True, save_all_fields=True)
         elapsed = round((utils.get_base_location_now_date() - sensor.updated_on).total_seconds() / 60, 0)
         if elapsed > 2 * sampling_period_seconds:
             Log.logger.warning('Sensor {} type {} not responding since {} min'.format(sensor.sensor_name,
@@ -186,20 +189,20 @@ def check_inactive():
 
 
 def get_unknown(sensor, dev):
-    global owproxy
+    global __owproxy
     dev = get_prefix(sensor, dev)
     return dev
 
 
 def init():
     Log.logger.info('Initialising owssensor')
-    global owproxy, initialised
+    global __owproxy, initialised
     host = "none"
     port = "none"
     try:
         host = model_helper.get_param(Constant.P_OWSERVER_HOST_1)
         port = str(model_helper.get_param(Constant.P_OWSERVER_PORT_1))
-        owproxy = pyownet.protocol.proxy(host=host, port=port)
+        __owproxy = pyownet.protocol.proxy(host=host, port=port)
         initialised = True
     except Exception, ex:
         Log.logger.info('Unable to connect to 1-wire owserver host {} port {}'.format(host, port))
@@ -211,6 +214,5 @@ def thread_run():
     global initialised
     Log.logger.debug('Processing sensors')
     if initialised:
-        result = do_device()
-        check_inactive()
-        return result
+        sensor_dict = do_device()
+        check_inactive(sensor_dict)
