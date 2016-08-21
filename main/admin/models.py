@@ -204,7 +204,8 @@ class DbEvent:
                 db.session.add(new_record)
             # fixme: remove hardcoded field name
             if hasattr(new_record, 'last_save_to_graph'):
-                current_record.last_save_to_graph = utils.get_base_location_now_date()
+                if current_record is not None:
+                    current_record.last_save_to_graph = utils.get_base_location_now_date()
                 new_record.last_save_to_graph = utils.get_base_location_now_date()
             commit()
         except Exception, ex:
@@ -777,6 +778,18 @@ class SensorHistory(db.Model, DbBase):
     def __repr__(self):
         return '{} {} adr={} t={} ca={} cb={}'.format(self.id, self.sensor_name, self.address, self.temperature,
                                                       self.counters_a, self.counters_b)
+
+
+class SensorErrorHistory(db.Model, DbBase):
+    __bind_key__ = 'reporting'
+    __tablename__ = 'sensor_error_history'
+    id = db.Column(db.Integer, primary_key=True)
+    sensor_name = db.Column(db.String(50), index=True)
+    error_type = db.Column(db.Integer)  # 0=not found, 1=other err
+    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
+
+    def __repr__(self):
+        return '{} {}'.format(self.id, self.sensor_name)
 
 
 class SystemMonitorHistory(db.Model, DbBase):
