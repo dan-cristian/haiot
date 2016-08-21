@@ -32,16 +32,17 @@ def __update_ddns_rackspace():
             cache['auth'] = {}
             cache['auth']['expires'] = str(utils.get_base_location_now_date())
         config = {}
+        ip_json_test = ''
         try:
             #ip_json_test = requests.get('http://ip-api.com/json').text
-            ip_json_test = requests.get('http://ipinfo.io/').text
+            ip_json_test = requests.get('http://ipinfo.io').text
             ip_json_obj = utils.json2obj(ip_json_test)
             #public_ip = ip_json_obj['query']
             #public_isp = ip_json_obj['isp']
             public_ip = ip_json_obj['ip']
             public_isp = ip_json_obj['org']
         except Exception, ex:
-            Log.logger.warning('Unable to get my ip, err={}'.format(ex))
+            Log.logger.warning('Unable to get my ip, err={} text={}'.format(ex, ip_json_test ))
             return
 
         for config in config_list.values():
