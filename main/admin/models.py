@@ -211,12 +211,13 @@ class DbEvent:
         except Exception, ex:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             ex_trace = traceback.format_exception(exc_type, exc_value, exc_traceback)
-            Log.logger.critical('Error when saving db changes [{}], err={}, trace=\n{}'.format(new_record, ex, ex_trace))
+            Log.logger.error('Error when saving db changes [{}], err={}, trace=\n{}'.format(new_record, ex, ex_trace),
+                             exc_info=True)
             if len(db.session.dirty) > 0:
                 Log.logger.info('Session dirty records={}, rolling back'.format(len(db.session.dirty)))
                 db.session.rollback()
             else:
-                Log.logger.info('No session dirty records to rollback')
+                Log.logger.info('No session dirty records to rollback for error {}'.format(ex))
             raise ex
             # else:
             #    Log.logger.warning('Incorrect parameters received on save changed fields to db')
