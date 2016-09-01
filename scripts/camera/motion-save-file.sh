@@ -85,7 +85,7 @@ if [ $# -ne 0 ]; then
     return 2
   fi
 else
-  echo2 "No parameters to move file provided, skipping this functionality"
+  # echo2 "No parameters to move file provided, skipping this functionality"
   return 3
 fi
 echo2 "Move completed OK for $source"
@@ -182,6 +182,8 @@ do
   fi
 done
 }
+
+exit
 
 move $1 $2
 tune
