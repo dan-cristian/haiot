@@ -3,7 +3,7 @@ LOG=/mnt/log/motion.log
 #HUBIC_FUSE_ROOT=/mnt/hubic
 CLOUD_DIR=remote:motion/
 SRC_DIR=/mnt/motion/tmp/
-OLD_COUNT=100
+OLD_COUNT=1000
 MOTION_URL=http://localhost:9999
 
 #1=thread, 2=param, 3=value
@@ -36,7 +36,7 @@ if [ $# -ne 0 ]; then
   dest_parent=`dirname $dest`
   #mkdir -p $dest_parent >> $LOG 2>&1
   #echo2 "Uploading $source to $dest_parent"
-  rclone --config /home/dcristian/.rclone.conf copy $source $dest_parent >> $LOG 2>&1
+  rclone -q --config /home/dcristian/.rclone.conf.motion copy $source $dest_parent >> $LOG 2>&1
   #cp -f $source $dest >> $LOG 2>&1
   result=$?
   #echo2 "Copy completed result=$result, file $source"
@@ -44,7 +44,7 @@ if [ $# -ne 0 ]; then
     echo2 "Upload OK for file $source, result=[$result]"
     return 0
   else
-    echo2 "Upload FAILED for file $source, result=[$result]"
+    echo2 "Upload FAILED for file $source, result=[$result], HOME=$HOME, user=`whoami`"
     return 2
   fi
 else
@@ -71,6 +71,10 @@ if [ $# -ne 0 ]; then
     chmod -v 777 $dest_parent >> $LOG 2>&1
     mv -f $1 $dest >> $LOG 2>&1
     rm -d $src_parent
+    if [ $? -eq 0 ]; then
+    	src_parent_parent=`dirname $src_parent`
+    	rm -d $src_parent_parent
+    fi
     #echo2 "Change mode for $dest"
     chmod -v 777 $dest >> $LOG 2>&1
   else
@@ -81,7 +85,7 @@ else
   # echo2 "No parameters to move file provided, skipping this functionality"
   return 3
 fi
-echo2 "Move completed OK for $source"
+echo2 "Move OK for $source"
 return 0
 }
 
@@ -132,7 +136,8 @@ done
 function move_failed(){
 count=0
 count_failed=0
-find $SRC_DIR -type f -mtime +1 |
+#find $SRC_DIR -type f -mtime +1 |
+find $SRC_DIR -type f  |
 while read source
 do
   if [ -f $source ]; then
@@ -147,7 +152,7 @@ do
         	echo2 "Moving older file $source"
         	move $source
 		result=$?
-		echo2 "Moved older done result=$result"
+		#echo2 "Moved older done result=$result"
 		exit $result
   	else
         	echo2 "Already processing file $source, try next"
@@ -156,10 +161,10 @@ do
   	) 200>$lock
   	result=$?
   	rm $lock
-  	echo2 "Move older file result is $result"
+  	#echo2 "Move older file result is $result"
   	if [ $result -eq 0 ];then
 		((count++))
-		#move 5 files then exit
+		#move x files then exit
 		if [ $count -eq $OLD_COUNT ];then
 	  		return 0
 		fi
