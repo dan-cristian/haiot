@@ -12,7 +12,7 @@ function clean() {
 #ls -1 -ltd -1 $PWD $DIRSRV/** | awk ' /^-/ { print $9}' | tail -10 | xargs rm -r
 #find $DIRSRV -type f -printf "%t %p\n" | sort -nr | tail -10 | xargs rm -v
 
-#remove files x days older
+#remove files x days older, then remove empty dirs
 find $DIRSRV -type f -mtime +$FILE_AGE | xargs rm -v >> $LOG 2>&1
 echo "Clean done" >> $LOG
 }
@@ -34,6 +34,8 @@ fi
 while true; do
 	result=$(checkandclean)
 	if [ "$result" == "EMPTY" ] ; then
+		#clean empty folders
+		find $DIRSRV -type d -empty | xargs rmdir -v >> $LOG 2>&1
 		break
 	else
 		((FILE_AGE--))
