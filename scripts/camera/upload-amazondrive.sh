@@ -36,7 +36,8 @@ if [ $# -ne 0 ]; then
   dest_parent=`dirname $dest`
   #mkdir -p $dest_parent >> $LOG 2>&1
   #echo2 "Uploading $source to $dest_parent"
-  rclone -q --config /home/dcristian/.rclone.conf.motion copy $source $dest_parent >> $LOG 2>&1
+  if [ -z ${HOME+x} ]; then echo2 "HOME var is unset";export HOME="/home/motion";else echo2 "var is set to '$HOME'"; fi
+  rclone copy $source $dest_parent >> $LOG 2>&1
   #cp -f $source $dest >> $LOG 2>&1
   result=$?
   #echo2 "Copy completed result=$result, file $source"
@@ -72,8 +73,12 @@ if [ $# -ne 0 ]; then
     mv -f $1 $dest >> $LOG 2>&1
     rm -d $src_parent
     if [ $? -eq 0 ]; then
-    	src_parent_parent=`dirname $src_parent`
-    	rm -d $src_parent_parent
+    	src_parent_2=`dirname $src_parent`
+    	rm -d $src_parent_2
+	if [ $? -eq 0 ]; then
+		src_parent_3=`dirname $src_parent_2`
+        	rm -d $src_parent_3
+	fi
     fi
     #echo2 "Change mode for $dest"
     chmod -v 777 $dest >> $LOG 2>&1
