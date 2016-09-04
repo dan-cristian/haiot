@@ -8,10 +8,10 @@ echo [`date +%T.%N`] $1 $2 $3 $4 $5
 
 echo2 Starting backup to amazon drive
 
-rclone -v sync /mnt/backup remote:backup
-rclone  sync /mnt/videos remote:videos
-rclone  sync /mnt/photos remote:photos
-rclone  sync /mnt/private remote:private
-rclone  sync /mnt/media/ebooks remote:ebooks
+/usr/sbin/rclone -v sync /mnt/backup remote:backup
+/usr/sbin/rclone sync /mnt/media/videos remote:videos
+/usr/sbin/rclone sync /mnt/media/photos remote:photos
+/usr/sbin/rclone sync /mnt/media/private remote:private
+/usr/sbin/rclone sync /mnt/media/ebooks remote:ebooks
 
 echo2 Completed backup to amazon drive
