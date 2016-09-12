@@ -186,7 +186,7 @@ done
 }
 
 move $1 $2
-tune
+#tune
 #should be last one as it exits on success
 if [ $# -eq 0 ]; then
   	lock2=/tmp/.motion.move-history.$file.exclusivelock
