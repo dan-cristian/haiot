@@ -1,0 +1,12 @@
+/media
+/export
+/mnt
+/dev
+/proc
+/tmp
+/sys
+/run
+/var/tmp
+/var/log
+/home/dcristian/Dropbox
+/var/cache/oracle-jdk8-installer/jdk-8u31-linux-x64.tar.gz
