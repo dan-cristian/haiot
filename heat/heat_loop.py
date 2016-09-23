@@ -75,7 +75,7 @@ def __update_zone_heat(zone, heat_schedule, sensor):
                     zone.last_heat_status_update = utils.get_base_location_now_date()
                     zone.heat_target_temperature = temperature_target.target
                     commit()
-                    if sensor.temperature:
+                    if sensor.temperature is not None:
                         heat_is_on = __decide_action(zone, sensor.temperature, temperature_target.target)
                     #else:
                     #    heat_is_on = zone.heat_is_on
