@@ -1,9 +1,10 @@
 #!/bin/bash
 LOG=/mnt/log/motion.log
-HUBIC_FUSE_ROOT=/mnt/hubic
-HUBIC_DIR=$HUBIC_FUSE_ROOT/default/motion/
+#HUBIC_FUSE_ROOT=/mnt/hubic
+CLOUD_DIR=remote:motion/
 SRC_DIR=/mnt/motion/tmp/
-OLD_COUNT=100
+OLD_COUNT=1000
+MOTION_URL=http://localhost:9999
 
 #1=thread, 2=param, 3=value
 function check_param(){
@@ -23,35 +24,28 @@ echo [`date +%T.%N`] $1 $2 $3 $4 $5 >> $LOG 2>&1
 echo [`date +%T.%N`] $1 $2 $3 $4 $5
 }
 
-#upload to hubic
+#upload to cloud
 function upload(){
-fstype=`stat --file-system --format=%T $HUBIC_FUSE_ROOT`
-echo2 "Cloud mount fstype=[$fstype]"
-if [ "$fstype" != "fuseblk" ]; then
-  echo2 "Cloud destination is not fuse, but $fstype, aborting!"
-  sleep 5
-  return 1
-fi
 if [ $# -ne 0 ]; then
   echo2 "Upload file $1"
   source=$1
   src_parent=`dirname $source`
   replace=''
   #replace root
-  dest="${source/$SRC_DIR/$HUBIC_DIR}"
+  dest="${source/$SRC_DIR/$CLOUD_DIR}"
   dest_parent=`dirname $dest`
-  mkdir -p $dest_parent >> $LOG 2>&1
-  #echo2 "Uploading to $dest"
-  cp -f $source $dest >> $LOG 2>&1
+  #mkdir -p $dest_parent >> $LOG 2>&1
+  #echo2 "Uploading $source to $dest_parent"
+  if [ -z ${HOME+x} ]; then echo2 "HOME var is unset";export HOME="/home/motion";else echo2 "var is set to '$HOME'"; fi
+  rclone copy $source $dest_parent >> $LOG 2>&1
+  #cp -f $source $dest >> $LOG 2>&1
   result=$?
   #echo2 "Copy completed result=$result, file $source"
-  #workaround to clean temp, hubicfuse bug
-  #rm -fv mnt/tmp/hubicfuse/.cloudfuse* >> $LOG 2>&1
   if [ $result -eq 0 ]; then
     echo2 "Upload OK for file $source, result=[$result]"
     return 0
   else
-    echo2 "Upload FAILED for file $source, result=[$result]"
+    echo2 "Upload FAILED for file $source, result=[$result], HOME=$HOME, user=`whoami`"
     return 2
   fi
 else
@@ -78,6 +72,14 @@ if [ $# -ne 0 ]; then
     chmod -v 777 $dest_parent >> $LOG 2>&1
     mv -f $1 $dest >> $LOG 2>&1
     rm -d $src_parent
+    if [ $? -eq 0 ]; then
+    	src_parent_2=`dirname $src_parent`
+    	rm -d $src_parent_2
+	if [ $? -eq 0 ]; then
+		src_parent_3=`dirname $src_parent_2`
+        	rm -d $src_parent_3
+	fi
+    fi
     #echo2 "Change mode for $dest"
     chmod -v 777 $dest >> $LOG 2>&1
   else
@@ -88,14 +90,13 @@ else
   # echo2 "No parameters to move file provided, skipping this functionality"
   return 3
 fi
-echo2 "Move completed OK for $source"
+echo2 "Move OK for $source"
 return 0
 }
 
 
 function tune(){
 #tune quality depending on day time
-MOTION_URL=http://localhost:9999
 h=`date +%H`
 if [ $h -lt 6 ]; then
   #echo Night
@@ -140,7 +141,8 @@ done
 function move_failed(){
 count=0
 count_failed=0
-find $SRC_DIR -type f -mtime +1 |
+#find $SRC_DIR -type f -mtime +1 |
+find $SRC_DIR -type f  |
 while read source
 do
   if [ -f $source ]; then
@@ -155,7 +157,7 @@ do
         	echo2 "Moving older file $source"
         	move $source
 		result=$?
-		echo2 "Moved older done result=$result"
+		#echo2 "Moved older done result=$result"
 		exit $result
   	else
         	echo2 "Already processing file $source, try next"
@@ -164,10 +166,10 @@ do
   	) 200>$lock
   	result=$?
   	rm $lock
-  	echo2 "Move older file result is $result"
+  	#echo2 "Move older file result is $result"
   	if [ $result -eq 0 ];then
 		((count++))
-		#move 5 files then exit
+		#move x files then exit
 		if [ $count -eq $OLD_COUNT ];then
 	  		return 0
 		fi
@@ -183,10 +185,8 @@ do
 done
 }
 
-exit
-
 move $1 $2
-tune
+#tune
 #should be last one as it exits on success
 if [ $# -eq 0 ]; then
   	lock2=/tmp/.motion.move-history.$file.exclusivelock
