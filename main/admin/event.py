@@ -38,7 +38,7 @@ def handle_local_event_db_post(model, row):
             or str(models.ZoneCustomRelay) in str(model) \
             or str(models.Rule) in str(model):  # or str(models.Area) in str(model):
         txt = model_helper.model_row_to_json(row, operation='update')
-        # execute all events directly first, then broadcast
+        # execute all events directly first, then broadcast, as local events are not handled by remote mqtt queue
         handle_event_mqtt_received(None, None, 'direct-event', utils.json2obj(txt))
         mqtt_thread_run()
         if transport.mqtt_io.client_connected:
@@ -72,6 +72,8 @@ def on_models_committed(sender, changes):
                         if not obj.notified_on_db_commit:
                             obj.notified_on_db_commit = True
                             txt = model_helper.model_row_to_json(obj, operation=change)
+                            # execute all events directly first, then broadcast, local events not handled by remote mqtt queue
+                            handle_event_mqtt_received(None, None, 'direct-event', utils.json2obj(txt))
                             transport.send_message_json(json=txt)
                 else:
                     pass
@@ -110,8 +112,8 @@ def mqtt_thread_run():
                                 server_node = models.Node.query.filter_by(name=host_name).first()
                                 main.execute_command(execute_command, node=server_node)
                     elif table == utils.get_table_name(models.ZoneHeatRelay):
-                        if heat.initialised:
-                            heat.heat_update(obj)
+                        # if heat.initialised:
+                        heat.heat_update(obj)
                     elif table == utils.get_table_name(models.Sensor):
                         sensor.sensor_update(obj)
                     elif table == utils.get_table_name(models.ZoneCustomRelay):
