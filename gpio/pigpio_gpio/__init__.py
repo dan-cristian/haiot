@@ -44,7 +44,7 @@ try:
     __import_ok = True
 except Exception, ex:
     __import_ok = False
-    Log.logger.info('Exception on importing pigpio_gpio, err={}'.format(ex))
+    Log.logger.info('Not importing pigpio_gpio, message={}'.format(ex))
 
 '''
 http://abyz.co.uk/rpi/pigpio_gpio/index.html

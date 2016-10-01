@@ -18,11 +18,9 @@ def __save_heat_state_db(zone='', heat_is_on=''):
         zone_heat_relay.updated_on = utils.get_base_location_now_date()
         Log.logger.info('Heat state changed to is-on={} in zone {}'.format(heat_is_on, zone.name))
         zone_heat_relay.notify_transport_enabled = True
-        #save latest heat state for caching purposes
+        # save latest heat state for caching purposes
         zone.heat_is_on = heat_is_on
         commit()
-        #else:
-        #    Log.logger.debug('Heat state [{}] unchanged in zone {}'.format(heat_is_on, zone.name))
     else:
         Log.logger.warning('No heat relay found in zone {}'.format(zone.name))
 
@@ -55,7 +53,7 @@ def __update_zone_heat(zone, heat_schedule, sensor):
         hour = utils.get_base_location_now_date().hour
         weekday = datetime.datetime.today().weekday()
         # todo: insert here auto heat change based on presence status
-        if weekday <= 4: #Monday=0
+        if weekday <= 4:  # Monday=0
             schedule_pattern= models.SchedulePattern.query.filter_by(id=heat_schedule.pattern_week_id).first()
         else:
             schedule_pattern= models.SchedulePattern.query.filter_by(id=heat_schedule.pattern_weekend_id).first()
@@ -75,7 +73,7 @@ def __update_zone_heat(zone, heat_schedule, sensor):
                     zone.last_heat_status_update = utils.get_base_location_now_date()
                     zone.heat_target_temperature = temperature_target.target
                     commit()
-                    if sensor.temperature:
+                    if sensor.temperature is not None:
                         heat_is_on = __decide_action(zone, sensor.temperature, temperature_target.target)
                     #else:
                     #    heat_is_on = zone.heat_is_on
@@ -105,7 +103,7 @@ def loop_zones():
             zonesensor = models.ZoneSensor.query.filter_by(zone_id=zone.id).first()
             if heat_schedule and zonesensor:
                 sensor = models.Sensor.query.filter_by(address=zonesensor.sensor_address).first()
-                if heat_schedule.active and sensor:
+                if heat_schedule.active and sensor is not None:
                     # sensor_last_update_seconds = (utils.get_base_location_now_date() - sensor.updated_on).total_seconds()
                     # if sensor_last_update_seconds > 120 * 60:
                     #    Log.logger.warning('Sensor {} not updated in last 120 minutes, unusual'.format(
