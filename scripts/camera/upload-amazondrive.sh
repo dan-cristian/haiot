@@ -1,5 +1,5 @@
 #!/bin/bash
-LOG=/mnt/log/motion.log
+LOG=/mnt/log/amazon.log
 #HUBIC_FUSE_ROOT=/mnt/hubic
 CLOUD_DIR=remote:motion/
 SRC_DIR=/mnt/motion/tmp/
@@ -37,7 +37,7 @@ if [ $# -ne 0 ]; then
   #mkdir -p $dest_parent >> $LOG 2>&1
   #echo2 "Uploading $source to $dest_parent"
   if [ -z ${HOME+x} ]; then echo2 "HOME var is unset";export HOME="/home/motion";else echo2 "var is set to '$HOME'"; fi
-  rclone copy $source $dest_parent >> $LOG 2>&1
+  /usr/sbin/rclone copy $source $dest_parent >> $LOG 2>&1
   #cp -f $source $dest >> $LOG 2>&1
   result=$?
   #echo2 "Copy completed result=$result, file $source"
