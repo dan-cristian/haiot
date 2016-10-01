@@ -15,7 +15,7 @@ apt-get -y upgrade
 apt-get -y update
 echo "Installing additional packages"
 # 1-wire support needs owfs
-apt-get -y install dialog sudo apt-utils mc nano locales python wget owfs git python-rpi.gpio inotify-tools python-dev rpi-update htop
+apt-get -y install dialog sudo apt-utils mc nano locales python wget owfs git python-rpi.gpio inotify-tools python-dev rpi-update htop wiringpi
 # run in ram needs busybox for ramfs copy operations, see "local" script sample
 apt-get -y install busybox
 # to to able to fix boot fs
