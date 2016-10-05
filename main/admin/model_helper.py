@@ -147,10 +147,15 @@ def populate_tables(model_auto_update=False):
                         models.ZoneSensor, models.ZoneAlarm,
                         models.SystemMonitor, models.SystemDisk, models.Sensor, models.Ups, models.Rule,
                         models.CommandOverrideRelay, models.PlotlyCache, models.Utility]
+    # tables that will be cleaned on every app start
+    table_force_clean = [models.ZoneHeatRelay]
 
     for table in table_collection:
         table_str = utils.get_table_name(table)
-        check_table_schema(table, model_auto_update)
+        if table in table_force_clean:
+            read_drop_table(table, "forcing table clean", drop_without_user_ask=True)
+        else:
+            check_table_schema(table, model_auto_update)
         if table_str in Constant.db_values_json:
             default_values = Constant.db_values_json[table_str]
             if len(table().query_all()) != len(default_values):
