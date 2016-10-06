@@ -72,7 +72,8 @@ def on_models_committed(sender, changes):
                         if not obj.notified_on_db_commit:
                             obj.notified_on_db_commit = True
                             txt = model_helper.model_row_to_json(obj, operation=change)
-                            # execute all events directly first, then broadcast, local events not handled by remote mqtt queue
+                            # execute all events directly first,
+                            # then broadcast, local events not handled by remote mqtt queue
                             handle_event_mqtt_received(None, None, 'direct-event', utils.json2obj(txt))
                             transport.send_message_json(json=txt)
                 else:
