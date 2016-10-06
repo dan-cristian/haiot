@@ -26,7 +26,7 @@ def thread_run():
     try:
         # FIXME: complete this, will potentially accumulate too many requests
         for json in __send_json_queue:
-            Log.logger.info("Sending mqtt {}".format(json))
+            #  Log.logger.info("Sending mqtt {}".format(json))
             if mqtt_io.sender.send_message(json):
                 __send_json_queue.remove(json)
         if len(__send_json_queue) > 20:
