@@ -114,6 +114,7 @@ def loop_zones():
         if heatrelay_main_source:
             main_source_zone = models.Zone.query.filter_by(id=heatrelay_main_source.zone_id).first()
             if main_source_zone:
+                # fixme: heat state might not be set ok if remote relay set was not succesfull
                 if main_source_zone.heat_is_on != heat_is_on:  # avoid setting relay state too often
                     __save_heat_state_db(zone=main_source_zone, heat_is_on=heat_is_on)
             else:

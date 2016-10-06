@@ -1,11 +1,14 @@
-__author__ = 'Dan Cristian<dan.cristian@gmail.com>'
-
+import threading
 from main.logger_helper import Log
 import transport_run
 from transport import mqtt_io
 
+__author__ = 'Dan Cristian<dan.cristian@gmail.com>'
+
+
 initialised = False
 __send_json_queue = []
+__mqtt_lock = threading.Lock()
 
 
 # exit fast to avoid blocking db commit request?
@@ -18,12 +21,18 @@ def send_message_obj(obj=''):
 
 
 def thread_run():
-    # FIXME: complete this, will potentially accumulate too many requests
-    for json in __send_json_queue:
-        if mqtt_io.sender.send_message(json):
-            __send_json_queue.remove(json)
-    if len(__send_json_queue) > 20:
-        Log.logger.warning("{} messages are pending in transport send queue".format(len(__send_json_queue)))
+    global __mqtt_lock
+    __mqtt_lock.acquire()
+    try:
+        # FIXME: complete this, will potentially accumulate too many requests
+        for json in __send_json_queue:
+            Log.logger.info("Sending mqtt {}".format(json))
+            if mqtt_io.sender.send_message(json):
+                __send_json_queue.remove(json)
+        if len(__send_json_queue) > 20:
+            Log.logger.warning("{} messages are pending in transport send queue".format(len(__send_json_queue)))
+    finally:
+        __mqtt_lock.release()
 
 
 def unload():

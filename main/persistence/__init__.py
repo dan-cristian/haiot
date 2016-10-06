@@ -78,7 +78,7 @@ def save_to_history(obj, save_to_local_db=False, upload_to_cloud=False):
                                     Log.logger.warning('History field [{}] to save is not in DB, source={}'.format(
                                         pair[0], source_host))
                             new_record.add_commit_record_to_db()
-                            Log.logger.info('Saved OK to local db table {} obj={}'.format(dest_table, new_record))
+                            Log.logger.debug('Saved OK to local db table {} obj={}'.format(dest_table, new_record))
                         except Exception, ex:
                             Log.logger.critical("Cannot save history db err={} record={}".format(ex, obj))
                     else:
