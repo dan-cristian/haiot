@@ -38,6 +38,8 @@ def heat_update(obj_dict=None):
             # set pin only on pins owned by this host
             if zone_heat_relay and gpio_host_name == Constant.HOST_NAME:
                 pin_state = gpio.relay_update(gpio_pin_code=zone_heat_relay.gpio_pin_code, pin_value=pin_value)
+            else:
+                pin_state = pin_value
             if pin_state == pin_value:
                 pin_state = (pin_state == 1)
                 zone_heat_relay.heat_is_on = pin_state
