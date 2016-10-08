@@ -318,6 +318,8 @@ class Presence(db.Model, DbBase):
     event_camera_date = db.Column(db.DateTime(), default=None)
     event_alarm_date = db.Column(db.DateTime(), default=None)
     event_io_date = db.Column(db.DateTime(), default=None)
+    event_wifi_date = db.Column(db.DateTime(), default=None)
+    event_bt_date = db.Column(db.DateTime(), default=None)
     is_connected = db.Column(db.Boolean)  # pin connected? true on unarmed sensors, false on alarm/move
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
 
@@ -370,19 +372,26 @@ class HeatSchedule(db.Model, DbBase):
     # zone = db.relationship('Zone', backref=db.backref('heat schedule zone', lazy='dynamic'))
     pattern_week_id = db.Column(db.Integer, db.ForeignKey('schedule_pattern.id'), nullable=False)
     pattern_weekend_id = db.Column(db.Integer, db.ForeignKey('schedule_pattern.id'), nullable=False)
+    ''' temp minimum target if there is move in a zone, to ensure there is heat if someone is at home unplanned'''
+    temp_target_code_min_presence = db.Column(db.String(1), db.ForeignKey('temperature_target.code'), nullable=False)
+    ''' temp max target if there is no move, to preserve energy'''
+    temp_target_code_max_no_presence = db.Column(db.String(1), db.ForeignKey('temperature_target.code'), nullable=False)
     # pattern_week = db.relationship('SchedulePattern', foreign_keys='[HeatSchedule.pattern_week_id]',
     #                               backref=db.backref('schedule_pattern_week', lazy='dynamic'))
     # pattern_weekend = db.relationship('SchedulePattern', foreign_keys='[HeatSchedule.pattern_weekend_id]',
     #                                backref=db.backref('schedule_pattern_weekend', lazy='dynamic'))
     active = db.Column(db.Boolean, default=True)
 
-    def __init__(self, id=None, zone_id=None, pattern_week_id=None, pattern_weekend_id=None):
+    def __init__(self, id=None, zone_id=None, pattern_week_id=None, pattern_weekend_id=None,
+                 temp_target_code_min_presence=None, temp_target_code_max_no_presence=None):
         super(HeatSchedule, self).__init__()
         if id:
             self.id = id
         self.zone_id = zone_id
         self.pattern_week_id = pattern_week_id
         self.pattern_weekend_id = pattern_weekend_id
+        self.temp_target_code_min_presence = temp_target_code_min_presence
+        self.temp_target_code_max_no_presence = temp_target_code_max_no_presence
 
     def __repr__(self):
         return 'Zone {}, Active {}, Week {}, Weekend {}'.format(self.zone_id, self.active,
@@ -578,6 +587,8 @@ class GpioPin(db.Model, DbEvent, DbBase):
 
 
 class ZoneAlarm(db.Model, DbEvent, DbBase):
+    """not all gpios are alarm events, some are contacts, some are movement sensors"""
+    # fixme: should be more generic, i.e. ZoneContact (with types = sensor, contact)
     id = db.Column(db.Integer, primary_key=True)
     # friendly display name for pin mapping
     alarm_pin_name = db.Column(db.String(50))
@@ -745,7 +756,6 @@ class NodeHistory(db.Model, DbBase):
     master_overall_cycles = db.Column(db.Integer)  # count of update cycles while node was master
     run_overall_cycles = db.Column(db.Integer)  # count of total update cycles
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
-    record_uuid = db.Column(db.String(36))
     source_host_ = db.Column(db.String(50))
 
     def __repr__(self):
@@ -773,7 +783,6 @@ class SensorHistory(db.Model, DbBase):
     sensed_b = db.Column(db.Integer)
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
     added_on = db.Column(db.DateTime(), default=datetime.now)
-    record_uuid = db.Column(db.String(36))
     source_host_ = db.Column(db.String(50))
 
     def __repr__(self):
@@ -803,7 +812,6 @@ class SystemMonitorHistory(db.Model, DbBase):
     memory_available_percent = db.Column(db.Float)
     uptime_days = db.Column(db.Integer)
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
-    record_uuid = db.Column(db.String(36))
     source_host_ = db.Column(db.String(50))
 
     def __repr__(self):
@@ -829,7 +837,6 @@ class UpsHistory(db.Model, DbBase):
     test_in_progress = db.Column(db.Boolean(), default=False)
     other_status = db.Column(db.String(50))
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
-    record_uuid = db.Column(db.String(36))
     source_host_ = db.Column(db.String(50))
 
     def __repr__(self):
@@ -858,7 +865,6 @@ class SystemDiskHistory(db.Model, DbBase):
     last_reads_elapsed = db.Column(db.Float)
     last_writes_elapsed = db.Column(db.Float)
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
-    record_uuid = db.Column(db.String(36))
     source_host_ = db.Column(db.String(50))
 
     def __init__(self):
@@ -877,8 +883,9 @@ class PresenceHistory(db.Model, DbBase):
     event_camera_date = db.Column(db.DateTime(), default=None)
     event_alarm_date = db.Column(db.DateTime(), default=None)
     event_io_date = db.Column(db.DateTime(), default=None)
+    # event_wifi_date = db.Column(db.DateTime(), default=None)
+    # event_bt_date = db.Column(db.DateTime(), default=None)
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
-    record_uuid = db.Column(db.String(36))
     source_host_ = db.Column(db.String(50))
 
 
