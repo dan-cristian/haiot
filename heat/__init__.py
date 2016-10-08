@@ -22,31 +22,31 @@ def heat_update(obj_dict=None):
         zone_id = utils.get_object_field_value(obj_dict, utils.get_model_field_name(models.ZoneHeatRelay.zone_id))
         # fixme: remove hard reference to object field
         sent_on = utils.get_object_field_value(obj_dict, "event_sent_datetime")
-        Log.logger.info('Received heat relay state update from {} for zoneid {} sent_on={}'.format(source_host_name,
-                                                                                                   zone_id, sent_on))
+        Log.logger.info('Received heat relay state update from {} for zoneid {} sent_on={}'.format(
+            source_host_name, zone_id, sent_on))
         zone_heat_relay = models.ZoneHeatRelay.query.filter_by(zone_id=zone_id).first()
         if zone_heat_relay:
             gpio_host_name = zone_heat_relay.gpio_host_name
             if zone_heat_relay and gpio_host_name == Constant.HOST_NAME:
-                cmd_heat_is_on = utils.get_object_field_value(obj_dict,
-                                                            utils.get_model_field_name(models.ZoneHeatRelay.heat_is_on))
-                Log.logger.debug('Local heat state zone_id {} must be changed to {} on pin {}'.format(zone_id,
-                                                                    cmd_heat_is_on, zone_heat_relay.gpio_pin_code))
+                cmd_heat_is_on = utils.get_object_field_value(
+                    obj_dict, utils.get_model_field_name(models.ZoneHeatRelay.heat_is_on))
+                Log.logger.debug('Local heat state zone_id {} must be changed to {} on pin {}'.format(
+                    zone_id, cmd_heat_is_on, zone_heat_relay.gpio_pin_code))
                 if cmd_heat_is_on:
                     pin_value = 1
                 else:
                     pin_value = 0
-                pin_state = gpio.relay_update(gpio_pin_code=zone_heat_relay.gpio_pin_code, pin_value=pin_value)
+                # set pin only on pins owned by this host
+                if zone_heat_relay and gpio_host_name == Constant.HOST_NAME:
+                    pin_state = gpio.relay_update(gpio_pin_code=zone_heat_relay.gpio_pin_code, pin_value=pin_value)
                 if pin_state == pin_value:
                     pin_state = (pin_state == 1)
                     zone_heat_relay.heat_is_on = pin_state
                     zone_heat_relay.notify_transport_enabled = False
                     commit()
                 else:
-                    Log.logger.warning('Heat state zone_id {} unexpected val={} after setval={}'.format(zone_id, pin_state,
-                                                                                                    pin_value))
-            else:
-                Log.logger.debug('Ignoring heat change, not owning zone relay pin {} on this host'.format(gpio_host_name))
+                    Log.logger.warning(
+                        'Heat state zone_id {} unexpected val={} after setval={}'.format(zone_id, pin_state, pin_value))
         else:
             Log.logger.warning('No heat relay defined for zone {}, db data issue?'.format(zone_id))
     except Exception, ex:
@@ -55,7 +55,6 @@ def heat_update(obj_dict=None):
 
 def handle_event_heat(zone='', heat_is_on=''):
     assert isinstance(zone, models.Zone)
-
     pass
 
 
