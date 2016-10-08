@@ -148,7 +148,7 @@ def thread_run():
     if first_run:
         progress_status='Sleep on first run'
         Log.logger.info('On first node run I will sleep some seconds to get state updates')
-        time.sleep(10)
+        time.sleep(30)
         first_run = False
         Log.logger.info('Sleep done on first node run')
     progress_status='Updating master state'
