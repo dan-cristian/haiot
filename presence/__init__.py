@@ -3,7 +3,6 @@ from pydispatch import dispatcher
 from main import thread_pool
 from main.admin import models
 from common import Constant, utils
-from main.admin.model_helper import commit
 import presence_run
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
@@ -22,6 +21,8 @@ def handle_event_alarm(gpio_pin_code='', direction='', pin_value='', pin_connect
         record.event_io_date = utils.get_base_location_now_date()
         record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
                                    save_to_graph=True)
+    else:
+        Log.logger.warning('Unable to find zone for pin {}'.format(gpio_pin_code))
 
 
 def unload():
