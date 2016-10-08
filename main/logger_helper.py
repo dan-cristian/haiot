@@ -77,8 +77,8 @@ class Log:
                 Log.logger.addHandler(file_handler)
 
         Log.logger.info('Logging level is {}'.format(Log.LOGGING_LEVEL))
-        #remove annoying info messages
-        logging.getLogger("requests").setLevel(logging.WARNING)
+        # remove annoying info messages
+        logging.getLogger("requests").setLevel(logging.ERROR)
         if Log.RUN_IN_LIVE:
             Log.logger.info('Logger is set to live mode, disabling log propagation')
             Log.logger.propagate = False
