@@ -20,6 +20,7 @@ def __save_heat_state_db(zone='', heat_is_on=''):
         zone_heat_relay.notify_transport_enabled = True
         # save latest heat state for caching purposes
         zone.heat_is_on = heat_is_on
+        zone.last_heat_status_update = utils.get_base_location_now_date()
         commit()
     else:
         Log.logger.warning('No heat relay found in zone {}'.format(zone.name))
@@ -34,10 +35,11 @@ def __decide_action(zone, current_temperature, target_temperature):
         heat_is_on = True
     if current_temperature > (target_temperature + threshold):
         heat_is_on = False
-    if zone.heat_is_on != heat_is_on:
-        Log.logger.info('Heat must change, is {} in {} temp={} target+thresh={}'.format(heat_is_on, zone.name,
-                                                                                        current_temperature,
-                                                                                        target_temperature+ threshold))
+    # trigger if state is different and every 5 minutes (in case other hosts with relays have restarted)
+    last_heat_update_age_sec = (utils.get_base_location_now_date() - zone.last_heat_status_update).total_seconds()
+    if zone.heat_is_on != heat_is_on or last_heat_update_age_sec > 300:
+        Log.logger.info('Heat must change, is {} in {} temp={} target+thresh={}'.format(
+            heat_is_on, zone.name, current_temperature, target_temperature+ threshold))
         __save_heat_state_db(zone=zone, heat_is_on=heat_is_on)
     #else:
     #    Log.logger.info('Heat should not change, is {} in {} temp={} target={}'.format(heat_is_on, zone.name,
@@ -69,8 +71,6 @@ def __update_zone_heat(zone, heat_schedule, sensor):
                         Log.logger.info('Pattern in zone {} changed to {}, target={}'.format(zone.name,
                                                                 schedule_pattern.name, temperature_target.target))
                         zone.active_heat_schedule_pattern_id = schedule_pattern.id
-
-                    zone.last_heat_status_update = utils.get_base_location_now_date()
                     zone.heat_target_temperature = temperature_target.target
                     commit()
                     if sensor.temperature is not None:
