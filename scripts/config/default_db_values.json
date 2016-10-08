@@ -201,7 +201,7 @@
     {"id":9, "name":"week-birou",         "pattern":".... .... .... .... ..22 2222"},
     {"id":10, "name":"weekend-birou",      "pattern":".... .... .222 2222 2222 2222"},
     {"id":13, "name":"week-dormitor",     "pattern":"bbbb bbbb .... .... ...b bbbb"},
-    {"id":14, "name":"weekend-dormitor",  "pattern":"bbbb bbbb .... .bbb ...b bbbb"}
+    {"id":14, "name":"weekend-dormitor",  "pattern":"2222 2222 .... .222 ...2 2222"}
   ],
 
   "HeatSchedule": [
