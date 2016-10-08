@@ -9,7 +9,8 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 initialised = False
 
 
-def handle_event_alarm(gpio_pin_code='', direction='', pin_value='', pin_connected=None):
+def handle_event_presence(gpio_pin_code='', direction='', pin_value='', pin_connected=None):
+    Log.logger.info('Presence got event pin {}'.format(gpio_pin_code))
     zonealarm = models.ZoneAlarm.query.filter_by(gpio_pin_code=gpio_pin_code).first()
     zone_id = None
     # fixme: for now zonealarm holds gpio to zone mapping, should be made more generic
@@ -36,7 +37,7 @@ def unload():
 def init():
     Log.logger.info('Presence module initialising')
     thread_pool.add_interval_callable(presence_run.thread_run, run_interval_second=60)
-    dispatcher.connect(handle_event_alarm, signal=Constant.SIGNAL_GPIO, sender=dispatcher.Any)
+    dispatcher.connect(handle_event_presence, signal=Constant.SIGNAL_GPIO, sender=dispatcher.Any)
     global initialised
     initialised = True
 
