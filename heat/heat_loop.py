@@ -36,7 +36,8 @@ def __decide_action(zone, current_temperature, target_temperature):
     if current_temperature > (target_temperature + threshold):
         heat_is_on = False
     # trigger if state is different and every 5 minutes (in case other hosts with relays have restarted)
-    last_heat_update_age_sec = (utils.get_base_location_now_date() - zone.last_heat_status_update).total_seconds()
+    if zone.last_heat_status_update is not None:
+        last_heat_update_age_sec = (utils.get_base_location_now_date() - zone.last_heat_status_update).total_seconds()
     if zone.heat_is_on != heat_is_on or last_heat_update_age_sec > 300 or zone.last_heat_status_update is None:
         Log.logger.info('Heat must change, is {} in {} temp={} target+thresh={}'.format(
             heat_is_on, zone.name, current_temperature, target_temperature+ threshold))
@@ -80,8 +81,8 @@ def __update_zone_heat(zone, heat_schedule, sensor):
                 else:
                     Log.logger.critical('Unknown temperature pattern code {}'.format(temperature_code))
             else:
-                Log.logger.warning('Incorrect temp pattern [{}] in zone {}, length is not 24'.format(pattern,
-                                                                                                     zone.name))
+                Log.logger.warning('Incorrect temp pattern [{}] in zone {}, length is not 24'.format(
+                    pattern, zone.name))
     except Exception, ex:
         Log.logger.error('Error updatezoneheat, err={}'.format(ex, exc_info=True))
     #Log.logger.info("Temp in {} has target={} and current={}, heat should be={}".format(zone.name,
