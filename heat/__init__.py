@@ -13,7 +13,7 @@ import gpio
 initialised=False
 
 
-# execute when heat status change is signaled. changes gpio pin status
+# execute when heat status change is signaled. changes gpio pin status if pin is local
 def heat_update(obj_dict=None):
     if not obj_dict:
         obj_dict = {}
