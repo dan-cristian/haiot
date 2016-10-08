@@ -323,10 +323,13 @@ class Presence(db.Model, DbBase):
     is_connected = db.Column(db.Boolean)  # pin connected? true on unarmed sensors, false on alarm/move
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
 
-    def __init__(self, id=''):
+    def __init__(self, id='', zone_id=None):
         super(Presence, self).__init__()
         if id:
             self.id = id
+        if zone_id:
+            self.zone_id = zone_id
+
 
     def __repr__(self):
         return 'Presence id {} {}'.format(self.id)
