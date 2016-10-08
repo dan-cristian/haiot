@@ -172,5 +172,5 @@ def thread_run():
     Log.logger.debug('Processing heat')
     progress_status = 'Looping zones'
     loop_zones()
-    loop_heat_relay()
+    # loop_heat_relay()
     return 'Heat ok'
