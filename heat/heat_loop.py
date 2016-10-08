@@ -126,6 +126,7 @@ def loop_zones():
 
 
 # check actual heat relay status in db in case relay pin was modified externally
+# todo: check as might introduce state change miss
 def loop_heat_relay():
     heat_relay_list = models.ZoneHeatRelay().query_filter_all(
         models.ZoneHeatRelay.gpio_host_name.in_([Constant.HOST_NAME]))
