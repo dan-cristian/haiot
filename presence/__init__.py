@@ -10,6 +10,7 @@ initialised = False
 
 
 def record_update(json=''):
+    Log.logger.info('Got presence update')
     models.Presence().json_to_record_query(json_obj=json)
 
 
