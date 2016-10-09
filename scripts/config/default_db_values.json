@@ -282,8 +282,8 @@
     {"zone_id":7 , "gpio_pin_code":"15", "gpio_host_name": "pi-face", "alarm_pin_name": "poarta"},
     {"zone_id":7 , "gpio_pin_code":"2", "gpio_host_name": "pi-face", "alarm_pin_name": "sonerie"},
     {"zone_id":7 , "gpio_pin_code":"1", "gpio_host_name": "pi-face", "alarm_pin_name": "portita"},
-    {"zone_id":29 , "gpio_pin_code":"18", "gpio_host_name": "pi-face", "alarm_pin_name": "beci test"}
-
+    {"zone_id":29 , "gpio_pin_code":"18", "gpio_host_name": "pi-face", "alarm_pin_name": "beci test"},
+    {"zone_id":2 , "gpio_pin_code":"66", "gpio_host_name": "netbook", "alarm_pin_name": "living test"}
   ]
 }
 
