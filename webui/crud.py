@@ -138,7 +138,7 @@ def init_crud():
     from main.admin.models import Area, Zone, ZoneArea, Presence, SchedulePattern, HeatSchedule, Sensor
     from main.admin.models import Module, Parameter, TemperatureTarget, ZoneSensor, Node, Ups  # , GraphPlotly
     from main.admin.models import SystemMonitor, SystemDisk, GpioPin, ZoneAlarm, ZoneHeatRelay, ZoneCustomRelay, Rule
-    from main.admin.models import CommandOverrideRelay
+    from main.admin.models import CommandOverrideRelay, SensorError
 
     register_crud(admin, '/', 'main-entry', Module, filters=simple_filters)
     register_crud(admin, '/module', 'module', Module, filters=simple_filters)
@@ -151,6 +151,7 @@ def init_crud():
     register_crud(user, '/heatschedule', 'heatschedule', HeatSchedule, filters=simple_filters)
     register_crud(user, '/temperaturetarget', 'temperaturetarget', TemperatureTarget, filters=simple_filters)
     register_crud(user, '/sensor', 'sensor', Sensor, filters=simple_filters)
+    register_crud(user, '/sensorerror', 'sensorerror', SensorError, filters=simple_filters)
     register_crud(user, '/zonesensor', 'zonesensor', ZoneSensor, filters=simple_filters)
     register_crud(user, '/ups', 'ups', Ups, filters=simple_filters)
     register_crud(user, '/node', 'node', Node, filters=simple_filters)

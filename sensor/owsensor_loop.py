@@ -178,14 +178,14 @@ def check_inactive(sensor_dict):
     record_list = models.Sensor().query_all()
     for sensor in record_list:
         if sensor.address in sensor_dict.keys():
-            record = models.SensorErrorHistory()
+            record = models.SensorError()
             record.sensor_name = sensor.sensor_name
             record.error_type = 0
             record.save_changed_fields(current_record=None, new_record=record, save_to_graph=True, save_all_fields=True)
         elapsed = round((utils.get_base_location_now_date() - sensor.updated_on).total_seconds() / 60, 0)
         if elapsed > 2 * sampling_period_seconds:
-            Log.logger.warning('Sensor {} type {} not responding since {} min'.format(sensor.sensor_name,
-                                                                                      sensor.type, elapsed))
+            Log.logger.warning('Sensor {} type {} not responding since {} min'.format(
+                sensor.sensor_name,sensor.type, elapsed))
 
 
 def get_unknown(sensor, dev):
