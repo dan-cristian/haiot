@@ -16,7 +16,7 @@ if [ $diffsec -le 30 ] ; then
 	#echo "too soon"
 	:
 else
-	echo $datenow>$savefile
+	echo $datenow > $savefile
 	logger "Motion alerting cam $1 $2"
-	wget -q --output-document=/dev/null --timeout=1 --tries=1 "http://192.168.0.10/cmd?command=cameraevent&zoneid=$1&msg=$2&alertsource=motion-dvr"
+	wget -q --output-document=/dev/null --timeout=1 --tries=1 "http://192.168.0.12:8080/apiv1/camera_alert/zone_name=$1&cam_name=$2"
 fi
