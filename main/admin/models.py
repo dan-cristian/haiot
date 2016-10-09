@@ -200,7 +200,7 @@ class DbBase:
     # save json to a new or existing record
     def json_to_record_query(self, json_obj):
         record_id = utils.get_object_field_value(json_obj, 'id')
-        current_record = self.query_filter_first(self.id == record_id)
+        current_record = self.query_filter_first(self._sa_class_manager["id"] == record_id)
         #if current_record is None:
         #    current_record = self()
         utils.json_to_record(self, json_obj)
