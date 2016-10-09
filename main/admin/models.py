@@ -96,7 +96,7 @@ class DbBase:
                                              notify_transport_enabled=False, save_to_graph=False,
                                              ignore_only_updated_on_change=True, debug=False, graph_save_frequency=0):
         try:
-            new_record = utils.json_to_record(json_object)
+            new_record = utils.json_to_record(self, json_object)
             # let flask assign an id in case unique key name is different, to avoid key integrity error
             if not unique_key_name:
                 unique_key_name = 'id'
