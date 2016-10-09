@@ -5,11 +5,10 @@ from main import Log
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
 
-# saves record to local database
-def save_to_history(obj, save_to_local_db=False, upload_to_cloud=False):
+# saves record to cloud database
+def save_to_history_cloud(obj):
     try:
-        Log.logger.debug('Trying to save historical record to_db={} to_cloud={}, {}'.format(save_to_local_db,
-                                                                                            upload_to_cloud, obj))
+        Log.logger.debug('Trying to save historical record to cloud {}'.format(obj))
         if Constant.JSON_PUBLISH_GRAPH_X in obj:
             # name of x field
             axis_x_field = obj[Constant.JSON_PUBLISH_GRAPH_X]
@@ -44,50 +43,48 @@ def save_to_history(obj, save_to_local_db=False, upload_to_cloud=False):
                             # add multiple y values for later save in db as a single record
                             field_pairs.append([axis_y, y])
                             # upload to cloud if plotly is initialised
-                            if upload_to_cloud:
-                                from cloud import graph_plotly
-                                if graph_plotly.initialised:
-                                    from cloud.graph_plotly import graph_plotly_run
-                                    Log.logger.info('Uploading to cloud field {}'.format(graph_legend_field))
-                                    # shape visual type for this trace
-                                    # shape = graph_shape_fields[index]
-                                    # unique name used for grid on upload
-                                    grid_base_name = str(table)
-                                    graph_plotly_run.add_grid_data(grid_unique_name=grid_base_name, x=x, y=y,
-                                                                   axis_x_name=axis_x_field, axis_y_name=axis_y,
-                                                                   record_unique_id_name=graph_legend_field,
-                                                                   record_unique_id_value=graph_legend_item_name)
-                                Log.logger.debug('Skip upload to cloud, plotly not init')
-                            else:
-                                Log.logger.debug('Skip upload to cloud due to param')
+                            from cloud import graph_plotly
+                            if graph_plotly.initialised:
+                                from cloud.graph_plotly import graph_plotly_run
+                                Log.logger.info('Uploading to cloud field {}'.format(graph_legend_field))
+                                # shape visual type for this trace
+                                # shape = graph_shape_fields[index]
+                                # unique name used for grid on upload
+                                grid_base_name = str(table)
+                                graph_plotly_run.add_grid_data(grid_unique_name=grid_base_name, x=x, y=y,
+                                                               axis_x_name=axis_x_field, axis_y_name=axis_y,
+                                                               record_unique_id_name=graph_legend_field,
+                                                               record_unique_id_value=graph_legend_item_name)
+                            Log.logger.debug('Skip upload to cloud, plotly not init')
                         index += 1
-                    if save_to_local_db:
-                        # save to local history DB, append history to source table name
-                        dest_table = str(table) + 'History'
-                        Log.logger.debug('Saving to local db table {} obj={}'.format(dest_table, obj))
-                        from main.admin import models
-                        # http://stackoverflow.com/questions/4030982/initialise-class-object-by-name
-                        try:
-                            class_table = getattr(models, dest_table)
-                            new_record = class_table()
-                            for pair in field_pairs:
-                                if hasattr(new_record, pair[0]):
-                                    setattr(new_record, pair[0], pair[1])
-                                else:
-                                    source_host = obj[Constant.JSON_PUBLISH_SOURCE_HOST]
-                                    Log.logger.warning('History field [{}] to save is not in DB, source={}'.format(
-                                        pair[0], source_host))
-                            new_record.add_commit_record_to_db()
-                            Log.logger.debug('Saved OK to local db table {} obj={}'.format(dest_table, new_record))
-                        except Exception, ex:
-                            Log.logger.critical("Cannot save history db err={} record={}".format(ex, obj))
-                    else:
-                        Log.logger.info('Skip saving to local db due to param')
                 else:
-                    Log.logger.critical('Missing history axis_x [{}], graph_id [{}], in obj {}'.format(axis_x_field,
-                                                                                                       graph_id_field,
-                                                                                                       obj))
+                    Log.logger.critical('Missing history axis_x [{}], graph_id [{}], in obj {}'.format(
+                        axis_x_field,graph_id_field,obj))
         else:
             Log.logger.critical('Missing history axis X field {}'.format(Constant.JSON_PUBLISH_GRAPH_X))
     except Exception, ex:
-        Log.logger.exception('General error saving historical record, err {} obj={}'.format(ex, obj))
+        Log.logger.exception('General error saving historical cloud record, err {} obj={}'.format(ex, obj))
+
+
+# saves record to cloud database
+def save_to_history_db(obj):
+    try:
+        Log.logger.debug('Trying to save historical record to db {}'.format(obj))
+        table = obj[Constant.JSON_PUBLISH_TABLE]
+        # save to local history DB, append history to source table name
+        dest_table = str(table) + 'History'
+        Log.logger.debug('Saving to local db table {} obj={}'.format(dest_table, obj))
+        from main.admin import models
+        # http://stackoverflow.com/questions/4030982/initialise-class-object-by-name
+        try:
+            class_table = getattr(models, dest_table)
+            new_record = class_table()
+            for field in obj:
+                if hasattr(new_record, field):
+                    setattr(new_record, field, obj[field])
+            new_record.add_commit_record_to_db()
+            Log.logger.debug('Saved OK to local db table {} obj={}'.format(dest_table, new_record))
+        except Exception, ex:
+            Log.logger.critical("Cannot save history db err={} record={}".format(ex, obj))
+    except Exception, ex:
+        Log.logger.exception('General error saving historical db record, err {} obj={}'.format(ex, obj))
