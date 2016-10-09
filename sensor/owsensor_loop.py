@@ -177,9 +177,15 @@ def check_inactive(sensor_dict):
     """check for inactive sensors not read recently but in database"""
     record_list = models.Sensor().query_all()
     for sensor in record_list:
-        if sensor.address in sensor_dict.keys():
+        if sensor.address not in sensor_dict.keys():
+            current_record = models.SensorError.query.filter_by(sensor_address=sensor.address).first()
             record = models.SensorError()
             record.sensor_name = sensor.sensor_name
+            if current_record is not None:
+                record.error_count = current_record.error_count
+            else:
+                record.error_count = 0
+            record.error_count += 1
             record.error_type = 0
             record.save_changed_fields(current_record=None, new_record=record, save_to_graph=True, save_all_fields=True)
         elapsed = round((utils.get_base_location_now_date() - sensor.updated_on).total_seconds() / 60, 0)
