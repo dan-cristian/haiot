@@ -311,7 +311,7 @@ class ZoneMusic(db.Model, DbBase):
         return 'ZoneMusic id {} zone={} port={}'.format(self.id, self.zone_id, self.area_id)
 
 
-class Presence(db.Model, DbBase):
+class Presence(db.Model, DbBase, DbEvent):
     id = db.Column(db.Integer, primary_key=True)
     zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'), nullable=False)
     sensor_name = db.Column(db.String(50))
@@ -330,9 +330,8 @@ class Presence(db.Model, DbBase):
         if zone_id:
             self.zone_id = zone_id
 
-
     def __repr__(self):
-        return 'Presence id {} {}'.format(self.id)
+        return 'Presence id {} zone_id {} sensor {}'.format(self.id, self.zone_id, self.sensor_name)
 
 
 class SchedulePattern(db.Model, DbBase):

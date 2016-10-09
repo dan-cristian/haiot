@@ -114,17 +114,17 @@ def mqtt_thread_run():
                                 main.execute_command(execute_command, node=server_node)
                     elif table == utils.get_table_name(models.ZoneHeatRelay):
                         # if heat.initialised:
-                        heat.heat_update(obj)
+                        heat.record_update(obj)
                     elif table == utils.get_table_name(models.Sensor):
-                        sensor.sensor_update(obj)
+                        sensor.record_update(obj)
                     elif table == utils.get_table_name(models.ZoneCustomRelay):
                         gpio.zone_custom_relay_record_update(obj)
                     elif table == utils.get_table_name(models.GpioPin):
                         gpio.gpio_record_update(obj)
                     elif table == utils.get_table_name(models.Rule):
-                        rule.rule_record_update(obj)
+                        rule.record_update(obj)
                     elif table == utils.get_table_name(models.PlotlyCache):
-                        graph_plotly.cache_record_update(obj)
+                        graph_plotly.record_update(obj)
                     else:
                         Log.logger.warning('Table %s content from %s is not processed' % (table, source_host))
 
