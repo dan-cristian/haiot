@@ -15,7 +15,7 @@ __author__ = 'dcristian'
 initialised = False
 
 
-def sensor_update(obj):
+def record_update(obj):
     # save sensor state to db, except for current node
     try:
         sensor_host_name = utils.get_object_field_value(obj, 'name')

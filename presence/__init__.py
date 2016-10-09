@@ -11,7 +11,8 @@ initialised = False
 
 def handle_event_presence(gpio_pin_code='', direction='', pin_value='', pin_connected=None):
     Log.logger.info('Presence got event pin {}'.format(gpio_pin_code))
-    zonealarm = models.ZoneAlarm.query.filter_by(gpio_pin_code=gpio_pin_code).first()
+    zonealarm = models.ZoneAlarm().query_filter_first(
+        models.ZoneAlarm.gpio_host_name.in_([Constant.HOST_NAME]), models.ZoneAlarm.gpio_pin_code.in_([gpio_pin_code]))
     zone_id = None
     # fixme: for now zonealarm holds gpio to zone mapping, should be made more generic
     if zonealarm is not None:
@@ -20,6 +21,7 @@ def handle_event_presence(gpio_pin_code='', direction='', pin_value='', pin_conn
         current_record = models.Presence().query_filter_first(models.Presence.zone_id == zone_id)
         record = models.Presence(zone_id=zone_id)
         record.event_io_date = utils.get_base_location_now_date()
+        record.sensor_name = zonealarm.alarm_pin_name
         record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
                                    save_to_graph=True)
     else:
@@ -38,6 +40,7 @@ def init():
     Log.logger.info('Presence module initialising')
     thread_pool.add_interval_callable(presence_run.thread_run, run_interval_second=60)
     dispatcher.connect(handle_event_presence, signal=Constant.SIGNAL_GPIO, sender=dispatcher.Any)
+    handle_event_presence(gpio_pin_code='66')
     global initialised
     initialised = True
 
