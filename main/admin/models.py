@@ -138,8 +138,10 @@ class DbBase:
                 else:
                     # this is a new record
                     new_record.save_to_graph = save_to_graph
-
+            # ensure is set for both new and existing records
             new_record.save_to_history = save_to_graph
+            current_record.save_to_history = save_to_graph
+
             if current_record:
                 current_record.last_commit_field_changed_list = []
                 current_record.notify_transport_enabled = notify_transport_enabled
