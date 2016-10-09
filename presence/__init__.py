@@ -22,15 +22,23 @@ def handle_event_presence(gpio_pin_code='', direction='', pin_value='', pin_conn
         # fixme: for now zonealarm holds gpio to zone mapping, should be made more generic
         if zonealarm is not None:
             zone_id = zonealarm.zone_id
-        if zone_id is not None:
-            current_record = models.Presence().query_filter_first(models.Presence.zone_id == zone_id)
-            record = models.Presence(zone_id=zone_id)
-            record.event_io_date = utils.get_base_location_now_date()
-            record.sensor_name = zonealarm.alarm_pin_name
-            record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
-                                       save_to_graph=True, save_all_fields=True)
-        else:
-            Log.logger.warning('Unable to find presence zone for pin {}'.format(gpio_pin_code))
+            if zone_id is not None:
+                zone = models.Zone().query_filter_first(models.Zone.zone_id == zone_id)
+                if zone is not None:
+                    zone_name = zone.name
+                else:
+                    Log.logger.warning("Zone not found for presence zoneid={}".format(zone_id))
+                    zone_name = "zone_name not found"
+                current_record = models.Presence().query_filter_first(models.Presence.zone_id == zone_id)
+                record = models.Presence()
+                record.zone_id = zone_id
+                record.zone_name = zone_name
+                record.event_io_date = utils.get_base_location_now_date()
+                record.sensor_name = zonealarm.alarm_pin_name
+                record.save_changed_fields(current_record=current_record, new_record=record,
+                                           notify_transport_enabled=True, save_to_graph=True, save_all_fields=True)
+            else:
+                Log.logger.warning('Unable to find presence zone for pin {}'.format(gpio_pin_code))
     except Exception, ex:
         Log.logger.error("Unable to save presence, er={}".format(ex), exc_info=True)
 
