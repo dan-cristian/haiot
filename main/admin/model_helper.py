@@ -65,8 +65,8 @@ def commit():
     try:
         db.session.commit()
     except IntegrityError, ex:
+        Log.logger.error('Unable to commit DB session={}, ignored, err={}'.format(db.session, ex), exc_info=True)
         # db.session.rollback()
-        Log.logger.warning('Unable to commit DB session={}, ignored, err={}'.format(db.session, ex))
     except InvalidRequestError, ex:
         Log.logger.error('Error on commit, session={}, ignoring, err={}'.format(db.session, ex), exc_info=1)
     except Exception, ex:

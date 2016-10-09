@@ -158,9 +158,11 @@ class DbBase:
                             if debug:
                                 Log.logger.info(
                                     '{} {}={} oldvalue={}'.format(obj_type, column_name, new_value, old_value))
-
-                        setattr(current_record, column_name, new_value)
-                        current_record.last_commit_field_changed_list.append(column_name)
+                        else:
+                            pass
+                        if column_name != "id":  # do not change primary key with None
+                            setattr(current_record, column_name, new_value)
+                            current_record.last_commit_field_changed_list.append(column_name)
                 if len(current_record.last_commit_field_changed_list) == 0:
                     current_record.notify_transport_enabled = False
                 # fixme: remove hardcoded field name
@@ -322,12 +324,10 @@ class Presence(db.Model, DbBase, DbEvent):
     event_wifi_date = db.Column(db.DateTime(), default=None)
     event_bt_date = db.Column(db.DateTime(), default=None)
     is_connected = db.Column(db.Boolean)  # pin connected? true on unarmed sensors, false on alarm/move
-    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
+    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
 
-    def __init__(self, id='', zone_id=None):
+    def __init__(self, zone_id=None):
         super(Presence, self).__init__()
-        if id:
-            self.id = id
         if zone_id:
             self.zone_id = zone_id
 
