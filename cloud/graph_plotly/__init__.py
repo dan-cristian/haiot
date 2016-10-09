@@ -14,7 +14,7 @@ initialised = False
 
 
 # updated plotly cache on all hosts to allow grid update in case mastership changes
-def cache_record_update(obj):
+def record_update(obj):
     source_host_name = utils.get_object_field_value(obj, Constant.JSON_PUBLISH_SOURCE_HOST)
     if source_host_name != Constant.HOST_NAME:
         # Log.logger.info("Received plotly cache update from {}".format(source_host_name))
