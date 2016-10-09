@@ -17,6 +17,7 @@ class Constant:
     SIGNAL_MQTT_RECEIVED = 'signal-from-mqtt-data-received'
     SIGNAL_HEAT = 'signal-from-heat'
     SIGNAL_GPIO = 'signal-from-GPIO'
+    SIGNAL_CAMERA = 'signal-from-CAMERA'
     SIGNAL_GPIO_INPUT_PORT_LIST = 'signal-setup-GPIO-input'
     SIGNAL_FILE_WATCH = 'signal-from-file-watch'
     SIGNAL_DB_CHANGE_FOR_RULES = 'signal_db_change_for_rules'
