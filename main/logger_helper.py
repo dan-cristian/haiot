@@ -1,25 +1,26 @@
+import socket
+
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
-import socket
 
 class Log:
     def __init__(self):
         pass
 
     logger = None
-    #default logging
-    LOGGING_LEVEL=None
-    LOG_FILE=None
-    #logging output will go to syslog
+    # default logging
+    LOGGING_LEVEL = None
+    LOG_FILE = None
+    # logging output will go to syslog
     LOG_TO_SYSLOG = False
-    #on systems without remote logging access like openshift use transport to perform logging by a proxy node
+    # on systems without remote logging access like openshift use transport to perform logging by a proxy node
     LOG_TO_TRANSPORT = False
-    #this logger is used to log remote logs messages using a different formatter
-    remote_logger=None
-    #this is to enable remote syslog like papertrail
+    # this logger is used to log remote logs messages using a different formatter
+    remote_logger = None
+    # this is to enable remote syslog like papertrail
     SYSLOG_ADDRESS = None
     SYSLOG_PORT = None
-    #reduce amount of logging when running in LIVE prod
+    # reduce amount of logging when running in LIVE prod
     RUN_IN_LIVE = False
 
     @staticmethod
@@ -34,9 +35,10 @@ class Log:
                 record.hostname = ContextFilter.hostname
                 return True
 
-        #global LOGGING_LEVEL, LOG_FILE, LOG_TO_SYSLOG, SYSLOG_ADDRESS, SYSLOG_PORT, RUN_IN_LIVE
-        #global logger, remote_logger
-        logging.basicConfig(format='%(asctime)s haiot %(levelname)s %(module)s:%(funcName)s %(message)s')#%(threadName)s
+        # global LOGGING_LEVEL, LOG_FILE, LOG_TO_SYSLOG, SYSLOG_ADDRESS, SYSLOG_PORT, RUN_IN_LIVE
+        # global logger, remote_logger
+        logging.basicConfig(format='%(asctime)s haiot %(levelname)s %(module)s:%(funcName)s %(message)s')
+        # %(threadName)s
         Log.logger = logging.getLogger('haiot-' + socket.gethostname())
         Log.remote_logger = logging.getLogger('haiot-remote-' + socket.gethostname())
         Log.logger.setLevel(Log.LOGGING_LEVEL)
@@ -53,7 +55,8 @@ class Log:
             syslog_papertrail.setFormatter(pap_formatter)
             Log.logger.addHandler(syslog_papertrail)
 
-            remote_syslog_papertrail = logging.handlers.SysLogHandler(address=(Log.SYSLOG_ADDRESS, int(Log.SYSLOG_PORT)))
+            remote_syslog_papertrail = logging.handlers.SysLogHandler(
+                address=(Log.SYSLOG_ADDRESS, int(Log.SYSLOG_PORT)))
             remote_pap_formatter = logging.Formatter('')
             remote_syslog_papertrail.setFormatter(remote_pap_formatter)
             Log.remote_logger.addHandler(remote_syslog_papertrail)
@@ -62,7 +65,7 @@ class Log:
 
         if Log.LOG_TO_SYSLOG:
             try:
-                handler = logging.handlers.SysLogHandler(address = '/dev/log')
+                handler = logging.handlers.SysLogHandler(address='/dev/log')
                 Log.logger.addHandler(handler)
                 Log.logger.info('Syslog program started at {}'.format(socket.gethostname()))
             except Exception, ex:
@@ -72,13 +75,13 @@ class Log:
                 except Exception, ex:
                     print 'Unable to init syslog handler err={}'.format(ex)
         else:
-            if not Log.LOG_FILE is None:
+            if Log.LOG_FILE is not None:
                 file_handler = logging.handlers.RotatingFileHandler(Log.LOG_FILE, maxBytes=1024*1024*1, backupCount=3)
                 Log.logger.addHandler(file_handler)
 
         Log.logger.info('Logging level is {}'.format(Log.LOGGING_LEVEL))
         # remove annoying info messages
-        logging.getLogger("requests").setLevel(logging.ERROR)
+        logging.getLogger("requests").setLevel(logging.INFO)
         if Log.RUN_IN_LIVE:
             Log.logger.info('Logger is set to live mode, disabling log propagation')
             Log.logger.propagate = False
