@@ -16,7 +16,7 @@ def record_update(json=''):
 
 def handle_event_presence(gpio_pin_code='', direction='', pin_value='', pin_connected=None):
     try:
-        Log.logger.info('Presence got event pin {}'.format(gpio_pin_code))
+        # Log.logger.info('Presence got event pin {}'.format(gpio_pin_code))
         zonealarm = models.ZoneAlarm().query_filter_first(
             models.ZoneAlarm.gpio_host_name.in_([Constant.HOST_NAME]), models.ZoneAlarm.gpio_pin_code.in_([gpio_pin_code]))
         # zone_id = None
@@ -36,7 +36,7 @@ def handle_event_presence(gpio_pin_code='', direction='', pin_value='', pin_conn
                 record.zone_name = zone_name
                 record.event_io_date = utils.get_base_location_now_date()
                 record.sensor_name = zonealarm.alarm_pin_name
-                Log.logger.info('Presence saving sensor {}'.format(record.sensor_name))
+                # Log.logger.info('Presence saving sensor {}'.format(record.sensor_name))
                 record.save_changed_fields(current_record=current_record, new_record=record,
                                            notify_transport_enabled=True, save_to_graph=True, save_all_fields=True)
             else:
