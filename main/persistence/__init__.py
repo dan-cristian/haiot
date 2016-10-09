@@ -80,7 +80,7 @@ def save_to_history_db(obj):
             class_table = getattr(models, dest_table)
             new_record = class_table()
             for field in obj:
-                if hasattr(new_record, field):
+                if hasattr(new_record, field) and field != "id":
                     setattr(new_record, field, obj[field])
             new_record.add_commit_record_to_db()
             Log.logger.debug('Saved OK to local db table {} obj={}'.format(dest_table, new_record))
