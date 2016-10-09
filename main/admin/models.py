@@ -439,11 +439,13 @@ class Sensor(db.Model, graphs.SensorGraph, DbEvent, DbBase):
 class SensorError(db.Model, DbBase, DbEvent):
     id = db.Column(db.Integer, primary_key=True)
     sensor_name = db.Column(db.String(50), index=True)
+    sensor_address = db.Column(db.String(50))
     error_type = db.Column(db.Integer)  # 0=not found, 1=other err
+    error_count = db.Column(db.Integer)
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
 
     def __repr__(self):
-        return '{} {}'.format(self.id, self.sensor_name)
+        return '{} {} errors={}'.format(self.id, self.sensor_name, self.error_count)
 
 
 class Parameter(db.Model, DbBase):
