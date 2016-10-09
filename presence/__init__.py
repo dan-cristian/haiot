@@ -18,12 +18,12 @@ def handle_event_presence(gpio_pin_code='', direction='', pin_value='', pin_conn
         # Log.logger.info('Presence got event pin {}'.format(gpio_pin_code))
         zonealarm = models.ZoneAlarm().query_filter_first(
             models.ZoneAlarm.gpio_host_name.in_([Constant.HOST_NAME]), models.ZoneAlarm.gpio_pin_code.in_([gpio_pin_code]))
-        zone_id = None
+        # zone_id = None
         # fixme: for now zonealarm holds gpio to zone mapping, should be made more generic
         if zonealarm is not None:
             zone_id = zonealarm.zone_id
             if zone_id is not None:
-                zone = models.Zone().query_filter_first(models.Zone.zone_id == zone_id)
+                zone = models.Zone().query_filter_first(models.Zone.id == zone_id)
                 if zone is not None:
                     zone_name = zone.name
                 else:
