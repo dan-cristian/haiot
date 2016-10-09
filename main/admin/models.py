@@ -197,14 +197,16 @@ class DbBase:
             # else:
             #    Log.logger.warning('Incorrect parameters received on save changed fields to db')
 
+    # save json to a new or existing record
     def json_to_record_query(self, json_obj):
-        current_record = self.query_filter_first(id == self.id)
-        if current_record is not None:
-            utils.json_to_record(self, json_obj)
-            commit()
-        else:
-            self.save_changed_fields(
-                current_record=current_record, new_record=self, notify_transport_enabled=False, save_to_graph=False)
+        record_id = utils.get_object_field_value(json_obj, 'id')
+        current_record = self.query_filter_first(self.id == record_id)
+        #if current_record is None:
+        #    current_record = self()
+        utils.json_to_record(self, json_obj)
+        #commit()
+        self.save_changed_fields(
+            current_record=current_record, new_record=self, notify_transport_enabled=False, save_to_graph=False)
 
 
 # inherit this to enable easy record changes save and publish
