@@ -19,6 +19,7 @@ class DbBase:
         pass
 
     record_uuid = None
+    save_to_history = False  # if true this record will be saved to master node database for reporting
 
     def __check_for_long_query(self, result, start_time, function):
         query_details = function.im_self
@@ -120,7 +121,7 @@ class DbBase:
                             ignore_only_updated_on_change=True, debug=False, graph_save_frequency=0, query_filter=None,
                             save_all_fields=False):
         try:
-            if hasattr(self, 'save_to_graph'):  # not all models inherit graph
+            if hasattr(self, 'save_to_graph'):  # not all models inherit graph, used for periodic save
                 if current_record:
                     # if a record in db already exists
                     if not current_record.last_save_to_graph:
@@ -137,8 +138,8 @@ class DbBase:
                 else:
                     # this is a new record
                     new_record.save_to_graph = save_to_graph
-                    new_record.save_to_history = save_to_graph
 
+            new_record.save_to_history = save_to_graph
             if current_record:
                 current_record.last_commit_field_changed_list = []
                 current_record.notify_transport_enabled = notify_transport_enabled
