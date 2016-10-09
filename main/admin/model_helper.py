@@ -153,7 +153,7 @@ def populate_tables(model_auto_update=False):
     for table in table_collection:
         table_str = utils.get_table_name(table)
         if table in table_force_clean:
-            read_drop_table(table, "forcing table clean", drop_without_user_ask=True)
+            read_drop_table(table, "Forcing table clean", drop_without_user_ask=True)
         else:
             check_table_schema(table, model_auto_update)
         if table_str in Constant.db_values_json:
