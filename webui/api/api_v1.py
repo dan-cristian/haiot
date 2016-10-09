@@ -49,8 +49,14 @@ def generic_db_update(model_name, filter_name, filter_value, field_name, field_v
         Log.logger.error(msg, exc_info=1)
         return '%s: %s' % (Constant.SCRIPT_RESPONSE_NOTOK, msg)
     finally:
-        #db.session.remove()
+        # db.session.remove()
         pass
+
+
+@app.route('/apiv1/camera_alert/zone_name=<zone_name>&cam_name=<cam_name>')
+def camera_alert(zone_name, cam_name):
+    dispatcher.send(Constant.SIGNAL_CAMERA, zone_name=zone_name, cam_name=cam_name)
+    return Constant.SCRIPT_RESPONSE_OK
 
 
 def return_error(message):
@@ -66,6 +72,7 @@ def api():
     return '<a href="">API TEST</a>'
 
 # @app.route('/ebooks', defaults={'req_path': ''})
+
 
 # @app.route('/<path:req_path>')
 def dir_listing(req_path):
