@@ -91,39 +91,12 @@ class DbBase:
     def commit_record_to_db(self):
         commit()
 
-
-# inherit this to enable easy record changes save and publish
-class DbEvent:
-    def __init__(self):
-        pass
-
-    notified_on_db_commit = False
-    notify_transport_enabled = False
-    event_sent_datetime = None
-
-    operation_type = None
-    last_commit_field_changed_list = []
-
-    def get_deepcopy(self):
-        return deepcopy(self)
-
-    def json_to_record(self, json_object):
-        for field in json_object:
-            if hasattr(self, field):
-                # fixme: really bad performance
-                if utils.is_date_string(str(json_object[field])):
-                    value = utils.date_deserialiser(str(json_object[field]))
-                else:
-                    value = json_object[field]
-                setattr(self, field, value)
-        return self
-
     # copies fields from a json object to an existing or new db record
     def save_changed_fields_from_json_object(self, json_object=None, unique_key_name=None,
                                              notify_transport_enabled=False, save_to_graph=False,
                                              ignore_only_updated_on_change=True, debug=False, graph_save_frequency=0):
         try:
-            new_record = self.json_to_record(json_object)
+            new_record = utils.json_to_record(json_object)
             # let flask assign an id in case unique key name is different, to avoid key integrity error
             if not unique_key_name:
                 unique_key_name = 'id'
@@ -221,6 +194,34 @@ class DbEvent:
             raise ex
             # else:
             #    Log.logger.warning('Incorrect parameters received on save changed fields to db')
+
+    def json_to_record_query(self, json_obj):
+        current_record = self.query_filter_first(id == self.id)
+        if current_record is not None:
+            utils.json_to_record(self, json_obj)
+            commit()
+        else:
+            self.save_changed_fields(
+                current_record=current_record, new_record=self, notify_transport_enabled=False, save_to_graph=False)
+
+
+# inherit this to enable easy record changes save and publish
+class DbEvent:
+    def __init__(self):
+        pass
+
+    notified_on_db_commit = False
+    notify_transport_enabled = False
+    event_sent_datetime = None
+
+    operation_type = None
+    last_commit_field_changed_list = []
+
+    def get_deepcopy(self):
+        return deepcopy(self)
+
+    # def json_to_record(self, json_object):
+    #    return utils.json_to_record(self, json_object)
 
 
 class DbHistory():
