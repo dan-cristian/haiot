@@ -10,37 +10,39 @@ initialised = False
 
 
 def record_update(json=''):
-    Log.logger.info('Got presence update')
+    # Log.logger.info('Got presence update')
     models.Presence().json_to_record_query(json_obj=json)
 
 
 def handle_event_presence(gpio_pin_code='', direction='', pin_value='', pin_connected=None):
     try:
-        # Log.logger.info('Presence got event pin {}'.format(gpio_pin_code))
-        zonealarm = models.ZoneAlarm().query_filter_first(
-            models.ZoneAlarm.gpio_host_name.in_([Constant.HOST_NAME]), models.ZoneAlarm.gpio_pin_code.in_([gpio_pin_code]))
-        # zone_id = None
-        # fixme: for now zonealarm holds gpio to zone mapping, should be made more generic
-        if zonealarm is not None:
-            zone_id = zonealarm.zone_id
-            if zone_id is not None:
-                zone = models.Zone().query_filter_first(models.Zone.id == zone_id)
-                if zone is not None:
-                    zone_name = zone.name
+        Log.logger.info('Presence got event pin {} connected={}'.format(gpio_pin_code, pin_connected))
+        # skip too many updates, only capture when contact is not connected (for PIR sensors this is alarm)
+        if not pin_connected:
+            zonealarm = models.ZoneAlarm().query_filter_first(
+                models.ZoneAlarm.gpio_host_name.in_([Constant.HOST_NAME]), models.ZoneAlarm.gpio_pin_code.in_([gpio_pin_code]))
+            # zone_id = None
+            # fixme: for now zonealarm holds gpio to zone mapping, should be made more generic
+            if zonealarm is not None:
+                zone_id = zonealarm.zone_id
+                if zone_id is not None:
+                    zone = models.Zone().query_filter_first(models.Zone.id == zone_id)
+                    if zone is not None:
+                        zone_name = zone.name
+                    else:
+                        Log.logger.warning("Zone not found for presence zoneid={}".format(zone_id))
+                        zone_name = "zone_name not found"
+                    current_record = models.Presence().query_filter_first(models.Presence.zone_id == zone_id)
+                    record = models.Presence()
+                    record.zone_id = zone_id
+                    record.zone_name = zone_name
+                    record.event_io_date = utils.get_base_location_now_date()
+                    record.sensor_name = zonealarm.alarm_pin_name
+                    # Log.logger.info('Presence saving sensor {}'.format(record.sensor_name))
+                    record.save_changed_fields(current_record=current_record, new_record=record,
+                                               notify_transport_enabled=True, save_to_graph=True, save_all_fields=True)
                 else:
-                    Log.logger.warning("Zone not found for presence zoneid={}".format(zone_id))
-                    zone_name = "zone_name not found"
-                current_record = models.Presence().query_filter_first(models.Presence.zone_id == zone_id)
-                record = models.Presence()
-                record.zone_id = zone_id
-                record.zone_name = zone_name
-                record.event_io_date = utils.get_base_location_now_date()
-                record.sensor_name = zonealarm.alarm_pin_name
-                # Log.logger.info('Presence saving sensor {}'.format(record.sensor_name))
-                record.save_changed_fields(current_record=current_record, new_record=record,
-                                           notify_transport_enabled=True, save_to_graph=True, save_all_fields=True)
-            else:
-                Log.logger.warning('Unable to find presence zone for pin {}'.format(gpio_pin_code))
+                    Log.logger.warning('Unable to find presence zone for pin {}'.format(gpio_pin_code))
     except Exception, ex:
         Log.logger.critical("Unable to save presence, er={}".format(ex), exc_info=True)
 
