@@ -86,7 +86,3 @@ class UtilityGraph(BaseGraph):
     graph_id_ = 'sensor_name'
     graph_legend_ = 'sensor_name'
 
-
-class PresenceGraph(BaseGraph):
-    def __init__(self):
-        BaseGraph.__init__(self)
