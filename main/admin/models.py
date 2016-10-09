@@ -320,6 +320,7 @@ class ZoneMusic(db.Model, DbBase):
 class Presence(db.Model, DbBase, DbEvent):
     id = db.Column(db.Integer, primary_key=True)
     zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'), nullable=False)
+    zone_name = db.Column(db.String(50))
     sensor_name = db.Column(db.String(50))
     event_camera_date = db.Column(db.DateTime(), default=None)
     event_alarm_date = db.Column(db.DateTime(), default=None)
@@ -331,8 +332,6 @@ class Presence(db.Model, DbBase, DbEvent):
 
     def __init__(self, zone_id=None):
         super(Presence, self).__init__()
-        if zone_id:
-            self.zone_id = zone_id
 
     def __repr__(self):
         return 'Presence id {} zone_id {} sensor {}'.format(self.id, self.zone_id, self.sensor_name)
@@ -897,7 +896,8 @@ class PresenceHistory(db.Model, DbBase):
     __bind_key__ = 'reporting'
     __tablename__ = 'presence_history'  # convention: append '_history' -> 'History' to source table name
     id = db.Column(db.Integer, primary_key=True)
-    zone_id = db.Column(db.Integer, nullable=False)
+    zone_name = db.Column(db.String(50))
+    sensor_name = db.Column(db.String(50))
     event_camera_date = db.Column(db.DateTime(), default=None)
     event_alarm_date = db.Column(db.DateTime(), default=None)
     event_io_date = db.Column(db.DateTime(), default=None)
