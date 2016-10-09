@@ -436,6 +436,16 @@ class Sensor(db.Model, graphs.SensorGraph, DbEvent, DbBase):
         return '{}, {}, {}, {}'.format(self.type, self.sensor_name, self.address, self.temperature)
 
 
+class SensorError(db.Model, DbBase, DbEvent):
+    id = db.Column(db.Integer, primary_key=True)
+    sensor_name = db.Column(db.String(50), index=True)
+    error_type = db.Column(db.Integer)  # 0=not found, 1=other err
+    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
+
+    def __repr__(self):
+        return '{} {}'.format(self.id, self.sensor_name)
+
+
 class Parameter(db.Model, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True)
