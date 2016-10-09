@@ -12,6 +12,7 @@ import sensor
 import heat
 import gpio
 import rule
+import presence
 import main.persistence
 
 
@@ -123,10 +124,12 @@ def mqtt_thread_run():
                         gpio.gpio_record_update(obj)
                     elif table == utils.get_table_name(models.Rule):
                         rule.record_update(obj)
+                    elif table == utils.get_table_name(models.Presence):
+                        presence.record_update(obj)
                     elif table == utils.get_table_name(models.PlotlyCache):
                         graph_plotly.record_update(obj)
                     else:
-                        Log.logger.warning('Table %s content from %s is not processed' % (table, source_host))
+                        Log.logger.warning('Table %s content from %s is not mqtt processed' % (table, source_host))
 
                 if Constant.JSON_MESSAGE_TYPE in obj:
                     if variable.NODE_THIS_IS_MASTER_LOGGING:

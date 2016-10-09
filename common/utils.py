@@ -133,3 +133,15 @@ def add_months(sourcedate, months):
     month = month % 12 + 1
     day = min(sourcedate.day, calendar.monthrange(year, month)[1])
     return datetime.date(year, month, day)
+
+
+def json_to_record(table, json_object):
+    for field in json_object:
+        if hasattr(table, field):
+            # fixme: really bad performance
+            if is_date_string(str(json_object[field])):
+                value = date_deserialiser(str(json_object[field]))
+            else:
+                value = json_object[field]
+            setattr(table, field, value)
+    return table
