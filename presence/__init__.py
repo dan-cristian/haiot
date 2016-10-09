@@ -25,8 +25,6 @@ def handle_event_presence(gpio_pin_code='', direction='', pin_value='', pin_conn
         if zone_id is not None:
             current_record = models.Presence().query_filter_first(models.Presence.zone_id == zone_id)
             record = models.Presence(zone_id=zone_id)
-            #if current_record is not None:
-            #    record.id = current_record.id
             record.event_io_date = utils.get_base_location_now_date()
             record.sensor_name = zonealarm.alarm_pin_name
             record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
