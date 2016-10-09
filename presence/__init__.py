@@ -14,13 +14,14 @@ def record_update(json=''):
     models.Presence().json_to_record_query(json_obj=json)
 
 
-def handle_event_presence(gpio_pin_code='', direction='', pin_value='', pin_connected=None):
+def handle_event_presence_io(gpio_pin_code='', direction='', pin_value='', pin_connected=None):
     try:
-        Log.logger.info('Presence got event pin {} connected={}'.format(gpio_pin_code, pin_connected))
+        # Log.logger.info('Presence got event pin {} connected={}'.format(gpio_pin_code, pin_connected))
         # skip too many updates, only capture when contact is not connected (for PIR sensors this is alarm)
         if not pin_connected:
             zonealarm = models.ZoneAlarm().query_filter_first(
-                models.ZoneAlarm.gpio_host_name.in_([Constant.HOST_NAME]), models.ZoneAlarm.gpio_pin_code.in_([gpio_pin_code]))
+                models.ZoneAlarm.gpio_host_name.in_([Constant.HOST_NAME]),
+                models.ZoneAlarm.gpio_pin_code.in_([gpio_pin_code]))
             # zone_id = None
             # fixme: for now zonealarm holds gpio to zone mapping, should be made more generic
             if zonealarm is not None:
@@ -46,6 +47,22 @@ def handle_event_presence(gpio_pin_code='', direction='', pin_value='', pin_conn
     except Exception, ex:
         Log.logger.critical("Unable to save presence, er={}".format(ex), exc_info=True)
 
+
+def handle_event_presence_cam(zone_name, cam_name):
+    zone = models.Zone().query_filter_first(models.Zone.name == zone_name)
+    if zone is not None:
+        current_record = models.Presence().query_filter_first(models.Presence.zone_id == zone.id)
+        record = models.Presence()
+        record.zone_id = zone.id
+        record.zone_name = zone_name
+        record.event_io_date = utils.get_base_location_now_date()
+        record.sensor_name = cam_name
+        record.save_changed_fields(current_record=current_record, new_record=record,
+                                   notify_transport_enabled=True, save_to_graph=True, save_all_fields=True)
+    else:
+        Log.logger.warning('Unable to find presence zone for camera zone {}'.format(zone_name))
+
+
 def unload():
     Log.logger.info('Presence module unloading')
     # ...
@@ -57,7 +74,8 @@ def unload():
 def init():
     Log.logger.info('Presence module initialising')
     thread_pool.add_interval_callable(presence_run.thread_run, run_interval_second=60)
-    dispatcher.connect(handle_event_presence, signal=Constant.SIGNAL_GPIO, sender=dispatcher.Any)
+    dispatcher.connect(handle_event_presence_io, signal=Constant.SIGNAL_GPIO, sender=dispatcher.Any)
+    dispatcher.connect(handle_event_presence_cam, signal=Constant.SIGNAL_CAMERA, sender=dispatcher.Any)
     # handle_event_presence(gpio_pin_code='66')
     global initialised
     initialised = True
