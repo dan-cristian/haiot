@@ -38,7 +38,9 @@ def __decide_action(zone, current_temperature, target_temperature):
     # trigger if state is different and every 5 minutes (in case other hosts with relays have restarted)
     if zone.last_heat_status_update is not None:
         last_heat_update_age_sec = (utils.get_base_location_now_date() - zone.last_heat_status_update).total_seconds()
-    if zone.heat_is_on != heat_is_on or last_heat_update_age_sec > 300 or zone.last_heat_status_update is None:
+    else:
+        last_heat_update_age_sec = 300
+    if zone.heat_is_on != heat_is_on or last_heat_update_age_sec >= 300 or zone.last_heat_status_update is None:
         Log.logger.info('Heat must change, is {} in {} temp={} target+thresh={}'.format(
             heat_is_on, zone.name, current_temperature, target_temperature+ threshold))
         __save_heat_state_db(zone=zone, heat_is_on=heat_is_on)

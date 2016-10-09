@@ -158,7 +158,7 @@ def mqtt_thread_run():
                         if obj[Constant.JSON_PUBLISH_SAVE_TO_HISTORY] and Constant.HAS_LOCAL_DB_REPORTING_CAPABILITY:
                             persistence.save_to_history_db(obj)
                         # if record is marked to be uploaded to a graph
-                        if obj[Constant.JSON_PUBLISH_SAVE_TO_GRAPH]:
+                        if Constant.JSON_PUBLISH_SAVE_TO_GRAPH in obj and obj[Constant.JSON_PUBLISH_SAVE_TO_GRAPH]:
                             # persistence.save_to_history(obj, upload_to_cloud=True)
                             # lazy init as plotly is an optional module
                             from cloud import graph_plotly
@@ -174,7 +174,7 @@ def mqtt_thread_run():
                 if len(__mqtt_event_list) > last_count:
                     Log.logger.debug('Not keeping up with {} mqtt events'.format(len(__mqtt_event_list)))
             except Exception, ex:
-                Log.logger.critical("Error processing err={}, mqtt={}".format(ex, obj))
+                Log.logger.critical("Error processing event err={}, mqtt={}".format(ex, obj))
     except Exception, ex:
         Log.logger.critical("General error processing mqtt: {}".format(ex))
     finally:
