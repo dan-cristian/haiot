@@ -25,11 +25,18 @@ if [ "$ENABLE_OPTIONAL" == "1" ]; then
 	apt-get -y install htop apt-utils mc inotify-tools dosfstools
 fi
 
-echo "Installing python pip and virtualenv"
-wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py
-python get-pip.py
-rm get-pip.py
-pip install --no-cache-dir virtualenv
+pip -V
+if [ "$?" != "0" ]; then
+	echo "Installing python pip"
+	wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py
+	python get-pip.py
+	rm get-pip.py
+fi
+virtualenv  --version
+if [ "$?" != "0" ]; then
+	echo "Installing virtualenv"
+	pip install --no-cache-dir virtualenv
+fi
 
 echo "Creating user $USERNAME with password=$USERPASS"
 useradd ${USERNAME} -m
@@ -161,9 +168,14 @@ echo "Enable SPI via raspi-config if you have a PI-FACE card"
 sleep 5
 sudo raspi-config
 
-echo "Add ram folder for sqlite db storage"
-sudo echo "tmpfs           /var/ram        tmpfs   defaults,noatime        0       0" >> /etc/fstab
-sudo mount -a
+cat /etc/fstab | grep "/var/ram"
+if [ "$?" == "1" ]; then
+	echo "Add ram folder for sqlite db storage"
+	sudo echo "tmpfs           /var/ram        tmpfs   defaults,noatime        0       0" >> /etc/fstab
+	sudo mount -a
+else
+	echo "Ram folder for sqlite db storage exists already"
+fi
 
 echo "Enable gpio access"
 sudo gpasswd -a $USERNAME gpio
