@@ -195,7 +195,7 @@
 
   "SchedulePattern": [
     {"id":1, "name":"week-bucatarie",     "pattern":".... ..22 .... .... ..22 2222"},
-    {"id":2, "name":"weekend-bucatarie",  "pattern":".... .... 2222 2222 2222 2222"},
+    {"id":2, "name":"weekend-bucatarie",  "pattern":".... .... cccc cccc cccc cccc"},
     {"id":5, "name":"week-living",        "pattern":".... ..22 .... .... 3333 3333"},
     {"id":6, "name":"weekend-living",     "pattern":".... .... 3333 3333 3333 3333"},
     {"id":9, "name":"week-birou",         "pattern":".... .... .... .... ..22 2222"},
