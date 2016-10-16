@@ -159,18 +159,19 @@ def mqtt_thread_run():
                             persistence.save_to_history_db(obj)
                         # if record is marked to be uploaded to a graph
                         if Constant.JSON_PUBLISH_SAVE_TO_GRAPH in obj and obj[Constant.JSON_PUBLISH_SAVE_TO_GRAPH]:
+                            pass
                             # persistence.save_to_history(obj, upload_to_cloud=True)
                             # lazy init as plotly is an optional module
-                            from cloud import graph_plotly
-                            if graph_plotly.initialised:
-                                start = utils.get_base_location_now_date()
+                            # from cloud import graph_plotly
+                            # if graph_plotly.initialised:
+                            #    start = utils.get_base_location_now_date()
                                 # initial implementation
                                 # graph_plotly.upload_data(obj)
-                                persistence.save_to_history_cloud(obj)
-                                elapsed = (utils.get_base_location_now_date() - start).total_seconds()
-                                Log.logger.debug('Plotly upload took {}s'.format(elapsed))
-                            else:
-                                Log.logger.debug('Graph not initialised on obj upload to graph')
+                            #    persistence.save_to_history_cloud(obj)
+                            #    elapsed = (utils.get_base_location_now_date() - start).total_seconds()
+                            #    Log.logger.debug('Plotly upload took {}s'.format(elapsed))
+                            #else:
+                            #    Log.logger.debug('Graph not initialised on obj upload to graph')
                 if len(__mqtt_event_list) > last_count:
                     Log.logger.debug('Not keeping up with {} mqtt events'.format(len(__mqtt_event_list)))
             except Exception, ex:

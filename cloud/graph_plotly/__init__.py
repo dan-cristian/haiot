@@ -1,14 +1,20 @@
 __author__ = 'dcristian'
 
 import os
-import plotly.plotly as py
-from plotly import graph_objs
-from plotly.exceptions import PlotlyAccountError
 from main.logger_helper import Log
 from common import Constant, utils
 from main.admin import model_helper, models
 from main import thread_pool
-import graph_plotly_run
+
+#fixme: make it work without plotly
+try:
+    import plotly.plotly as py
+    from plotly import graph_objs
+    from plotly.exceptions import PlotlyAccountError
+    import graph_plotly_run
+except Exception, ex:
+    pass
+
 
 initialised = False
 
