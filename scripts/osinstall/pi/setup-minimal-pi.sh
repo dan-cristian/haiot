@@ -5,7 +5,8 @@
 #http://www.cnx-software.com/2012/07/31/84-mb-minimal-raspbian-armhf-image-for-raspberry-pi/
 
 dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n
-apt-get -y remove oracle-java8-jdk wolfram-engine sonic-pi scratch libraspberrypi-doc nuscratch python3.2 python3 python3-minimal lightdm x11-common libopencv-* python2.7-dev libgtk2.0-common libgtk-3-common vim-runtime gnome-* desktop-base apache2 freepats libgl1-mesa-dri nodejs python2.6 midori lxde ppp manpages avahi-daemon omxplayer epiphany-browser-data libjavascriptcoregtk-3.0-0 python3.2-minimal minecraft-pi penguinspuzzle tcl8.5 tcl8.4 fonts-droid lxde-icon-theme ttf-dejavu-core poppler-data fonts-freefont-ttf libatlas3-base --purge
+
+apt-get -y remove oracle-java8-jdk wolfram-engine sonic-pi scratch libraspberrypi-doc nuscratch python3.2 python3 python3-minimal lightdm x11-common libopencv-* python2.7-dev libgtk2.0-common libgtk-3-common vim-runtime gnome-* desktop-base apache2 freepats libgl1-mesa-dri nodejs python2.6 midori lxde ppp manpages avahi-daemon omxplayer epiphany-browser-data libjavascriptcoregtk-3.0-0 python3.2-minimal minecraft-pi penguinspuzzle tcl8.5 tcl8.4 fonts-droid lxde-icon-theme ttf-dejavu-core poppler-data fonts-freefont-ttf libatlas3-base bluez winbind gdb wpasupplicant --purge
 
 rm -rf /usr/lib/chromium/
 rm /usr/share/doc -r
@@ -14,7 +15,6 @@ rm -r /usr/share/icons
 
 
 apt-get -y install localepurge  
-#virtualenv
 localepurge
 apt-get -y remove winbind --purge
 apt-get -y autoremove
