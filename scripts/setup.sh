@@ -16,9 +16,14 @@ echo Install mandatory requirements
 pip install --no-cache-dir -r requirements.txt
 
 echo Install optional requirements, you can ignore errors
-pip install --no-cache-dir -r requirements-beaglebone.txt
-pip install --no-cache-dir -r requirements-rpi.txt
-pip install --no-cache-dir -r requirements-win.txt
+res=`cat /etc/os-release | grep raspbian -q ; echo $?`
+if [ "$res" == "0" ]; then
+	pip install --no-cache-dir -r requirements-rpi.txt
+else
+	pip install --no-cache-dir -r requirements-beaglebone.txt
+	#todo: fix script for windows
+	#pip install --no-cache-dir -r requirements-win.txt
+fi
 
 echo Installing mysql connector
 wget http://dev.mysql.com/get/Downloads/Connector-Python/mysql-connector-python-2.1.3.zip
