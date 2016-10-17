@@ -30,6 +30,8 @@ def __save_heat_state_db(zone='', heat_is_on=''):
 def __decide_action(zone, current_temperature, target_temperature):
     assert isinstance(zone, models.Zone)
     threshold = float(get_param(Constant.P_TEMPERATURE_THRESHOLD))
+    Log.logger.info("Asses heat zone={} current={} target={} thresh={}".format(
+        zone, current_temperature, target_temperature, threshold))
     heat_is_on = zone.heat_is_on
     if current_temperature < target_temperature:
         heat_is_on = True
@@ -44,7 +46,7 @@ def __decide_action(zone, current_temperature, target_temperature):
         Log.logger.info('Heat must change, is {} in {} temp={} target+thresh={}'.format(
             heat_is_on, zone.name, current_temperature, target_temperature+ threshold))
         Log.logger.info('Heat change due to: is_on_next={} is_on_db={} age={} last={}'.format(
-            zone.heat_is_on, heat_is_on, last_heat_update_age_sec, zone.last_heat_status_update ))
+            heat_is_on, zone.heat_is_on, last_heat_update_age_sec, zone.last_heat_status_update ))
         __save_heat_state_db(zone=zone, heat_is_on=heat_is_on)
     #else:
     #    Log.logger.info('Heat should not change, is {} in {} temp={} target={}'.format(heat_is_on, zone.name,
