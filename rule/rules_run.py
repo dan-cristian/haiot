@@ -53,8 +53,8 @@ def rule_node(obj=models.Node(), field_changed_list=None):
 def rule_alarm(obj=models.ZoneAlarm(), field_changed_list=None):
     # Log.logger.info('Rule Alarm: obj={} fields={}'.format(obj, field_changed_list))
     if obj.alarm_pin_triggered:
-        Log.logger.info('Rule Alarm ON:  pin={} triggered={}'.format(obj.alarm_pin_name, obj.alarm_pin_triggered))
         if obj.start_alarm:
+            Log.logger.debug('Rule Alarm ON:  pin={} triggered={}'.format(obj.alarm_pin_name, obj.alarm_pin_triggered))
             msg = 'Alarm ON {}'.format(obj.alarm_pin_name)
             rule_common.send_notification(title=msg, priority=3)
             rule_common.send_chat(message=msg, notify=True)
@@ -68,8 +68,8 @@ def rule_alarm(obj=models.ZoneAlarm(), field_changed_list=None):
             thread.start_new_thread(rule_common.play_bell_local, ('warning.wav',))
         # elif obj.alarm_pin_name == 'birou':
         #    thread.start_new_thread(rule_common.play_bell_local, ('29621__infobandit__phone.wav',))
-    else:
-        Log.logger.info('Rule Alarm OFF: pin={} triggered={}'.format(obj.alarm_pin_name, obj.alarm_pin_triggered))
+    # else:
+    #    Log.logger.info('Rule Alarm OFF: pin={} triggered={}'.format(obj.alarm_pin_name, obj.alarm_pin_triggered))
     return 'zone alarm ok'
 
 

@@ -429,6 +429,7 @@ class Sensor(db.Model, graphs.SensorGraph, DbEvent, DbBase):
     # FIXME: now filled manually, try relations
     # zone_name = db.Column(db.String(50))
     sensor_name = db.Column(db.String(50))
+    alt_address = db.Column(db.String(50)) # alternate address format, use for 1-wire, better readability
 
     def __init__(self, address=''):
         super(Sensor, self).__init__()

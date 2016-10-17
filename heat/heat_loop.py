@@ -43,6 +43,8 @@ def __decide_action(zone, current_temperature, target_temperature):
     if zone.heat_is_on != heat_is_on or last_heat_update_age_sec >= 300 or zone.last_heat_status_update is None:
         Log.logger.info('Heat must change, is {} in {} temp={} target+thresh={}'.format(
             heat_is_on, zone.name, current_temperature, target_temperature+ threshold))
+        Log.logger.info('Heat change due to: is_on_next={} is_on_db={} age={} last={}'.format(
+            zone.heat_is_on, heat_is_on, last_heat_update_age_sec, zone.last_heat_status_update ))
         __save_heat_state_db(zone=zone, heat_is_on=heat_is_on)
     #else:
     #    Log.logger.info('Heat should not change, is {} in {} temp={} target={}'.format(heat_is_on, zone.name,
