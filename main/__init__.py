@@ -85,10 +85,10 @@ def init_modules():
             if mod_host_specific:
                 Log.logger.info("Initialising host specific module definition {} {}".format(
                     mod_host_specific.name, mod_host_specific.active))
-                init_module(mod_host_specific.name, mod_host_specific.active)
+                init_module(mod_host_specific.name, mod_host_specific.active == 1)
             else:
                 Log.logger.info("Initialising generic module definition name={} active={}".format(mod.name, mod.active))
-                init_module(mod.name, mod.active)
+                init_module(mod.name, mod.active == 1)
 
 
 def signal_handler(signal_name, frame):
