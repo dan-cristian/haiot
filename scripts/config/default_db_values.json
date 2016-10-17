@@ -49,7 +49,7 @@
     {"id":7,  "active":"1", "start_order":"7", "name":"gpio"},
     {"id":9,  "active":"0", "start_order":"9", "name":"heat"},
     {"id":11, "active":"0", "start_order":"11", "name":"alarm"},
-    {"id":13, "active":"0", "start_order":"13", "name":"cloud.graph_plotly"},
+    {"id":13, "active":"0", "start_order":"13", "name":"cloud.graph_plotly.disabled"},
     {"id":17, "active":"1", "start_order":"17", "name":"webui"},
     {"id":19, "active":"1", "start_order":"19", "name":"ddns"},
     {"id":21, "active":"0", "start_order":"21", "name":"cloud.youtube"},
