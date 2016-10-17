@@ -76,18 +76,18 @@ def init_modules():
     # get the unique/distinct list of all modules defined in config, generic or host specific ones
     module_list = m.query.filter(m.host_name.in_([Constant.HOST_NAME, ""])).group_by(m.start_order).all()
     for mod in module_list:
-        Log.logger.info("Processing host specific module definition {} {}".format(mod.name, mod.active))
+        # Log.logger.info("Processing host specific module definition {} {}".format(mod.name, mod.active))
         assert isinstance(mod, admin.models.Module)
         if mod.name != 'main':
             # check if there is a host specific module and use it with priority over generic one
             mod_host_specific = m().query_filter_first(m.host_name.in_([Constant.HOST_NAME]), m.name.in_([mod.name]))
             # mod_host_specific = m.query.filter(m.host_name.in_([constant.HOST_NAME]), m.name.in_([mod.name]))
             if mod_host_specific:
-                Log.logger.info("Initialising host specific module definition {} {}".format(
-                    mod_host_specific.name, mod_host_specific.active))
+                # Log.logger.info("Initialising host specific module definition {} {}".format(
+                #    mod_host_specific.name, mod_host_specific.active))
                 init_module(mod_host_specific.name, mod_host_specific.active == 1)
             else:
-                Log.logger.info("Initialising generic module definition name={} active={}".format(mod.name, mod.active))
+                # Log.logger.info("Initialising generic module definition name={} active={}".format(mod.name, mod.active))
                 init_module(mod.name, mod.active == 1)
 
 
