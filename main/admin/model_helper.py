@@ -169,7 +169,7 @@ def populate_tables(model_auto_update=False):
                     # setattr(new_record, config_record, default_values[config_record])
                     for field in config_record:
                         setattr(new_record, field, config_record[field])
-                    # Log.logger.info("Adding new DB record: {}".format(new_record))
+                    Log.logger.info("Adding conf record: {}".format(new_record))
                     db.session.add(new_record)
                 commit()
 
