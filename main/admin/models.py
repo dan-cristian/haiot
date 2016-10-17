@@ -253,7 +253,7 @@ class Module(db.Model, DbBase):
         self.start_order = start_order
 
     def __repr__(self):
-        return 'Module {} {}, {}'.format(self.id, self.host_name, self.name[:50])
+        return 'Module {} [{}] {} {}'.format(self.id, self.host_name, self.name[:50], self.active)
 
 
 class Zone(db.Model, DbBase):
