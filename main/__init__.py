@@ -89,7 +89,7 @@ def init_modules():
                 Log.logger.info("Initialising host specific module definition")
                 init_module(mod_host_specific.name, mod_host_specific.active)
             else:
-                Log.logger.info("Initialising generic module definition")
+                Log.logger.info("Initialising generic module definition name={} active={}".format(mod.name, mod.active))
                 init_module(mod.name, mod.active)
 
 
