@@ -43,19 +43,19 @@ def save_to_history_cloud(obj):
                             # add multiple y values for later save in db as a single record
                             field_pairs.append([axis_y, y])
                             # upload to cloud if plotly is initialised
-                            from cloud import graph_plotly
-                            if graph_plotly.initialised:
-                                from cloud.graph_plotly import graph_plotly_run
-                                Log.logger.info('Uploading to cloud field {}'.format(graph_legend_field))
+                            #from cloud import graph_plotly
+                            #if graph_plotly.initialised:
+                            #    from cloud.graph_plotly import graph_plotly_run
+                            #    Log.logger.info('Uploading to cloud field {}'.format(graph_legend_field))
                                 # shape visual type for this trace
                                 # shape = graph_shape_fields[index]
                                 # unique name used for grid on upload
-                                grid_base_name = str(table)
-                                graph_plotly_run.add_grid_data(grid_unique_name=grid_base_name, x=x, y=y,
-                                                               axis_x_name=axis_x_field, axis_y_name=axis_y,
-                                                               record_unique_id_name=graph_legend_field,
-                                                               record_unique_id_value=graph_legend_item_name)
-                            Log.logger.debug('Skip upload to cloud, plotly not init')
+                            #   grid_base_name = str(table)
+                            #    graph_plotly_run.add_grid_data(grid_unique_name=grid_base_name, x=x, y=y,
+                            #                                   axis_x_name=axis_x_field, axis_y_name=axis_y,
+                            #                                   record_unique_id_name=graph_legend_field,
+                            #                                   record_unique_id_value=graph_legend_item_name)
+                            #Log.logger.debug('Skip upload to cloud, plotly not init')
                         index += 1
                 else:
                     Log.logger.critical('Missing history axis_x [{}], graph_id [{}], in obj {}'.format(
