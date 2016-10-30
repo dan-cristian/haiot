@@ -45,7 +45,7 @@ def init_module(module_name, module_is_active):
         Log.logger.info("Importing module {}".format(module_name))
         dynclass = my_import(module_name)
         if dynclass:
-            Log.logger.info('Module {} is marked as active'.format(module_name))
+            # Log.logger.info('Module {} is marked as active'.format(module_name))
             if not dynclass.initialised:
                 Log.logger.info('Module {} initialising'.format(module_name))
                 dynclass.init()
