@@ -155,7 +155,7 @@ do
   	file=`basename $source`
 	# check if file is in use with lsof
 	filename=$(basename "$file")
-	lsof | grep -q $filename
+	lsof -w | grep -q $filename
 	if [ $? = 1 ]; then
 		echo2 "FILE COUNT in tmp folder is $file_count"
   		lock=/tmp/.motion.move.$file.exclusivelock
