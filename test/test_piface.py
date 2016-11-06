@@ -1,35 +1,16 @@
 from time import sleep
 import pifacedigitalio
 
-
-def door_open(event):
-    print "Hello"
-    pifacedigital.leds[0].value = 1
-
-
-def door_closed(event):
-    print "Bebop"
-    pifacedigital.leds[0].value = 0
-
-
-def switch_pressed(event):
-    print "Hello2"
-    pifacedigital.leds[1].value = 1
-
-
-def switch_unpressed(event):
-    print "Bebop2"
-    pifacedigital.leds[1].value = 0
-
+def input_event(event):
+    print ('Piface switch event={}'.format(event))
 
 pifacedigital = pifacedigitalio.PiFaceDigital()
 print 'Doorbell Server Started\r'
 
 listener = pifacedigitalio.InputEventListener(chip=pifacedigital)
-listener.register(1, pifacedigitalio.IODIR_OFF, door_open)
-listener.register(1, pifacedigitalio.IODIR_ON, door_closed)
-listener.register(4, pifacedigitalio.IODIR_ON, switch_pressed)
-listener.register(4, pifacedigitalio.IODIR_OFF, switch_unpressed)
+for i in range(8):
+    listener.register(i, pifacedigitalio.IODIR_OFF, input_event)
+    listener.register(i, pifacedigitalio.IODIR_ON, input_event)
 listener.activate()
 
 while True:
