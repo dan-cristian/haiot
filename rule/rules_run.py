@@ -76,6 +76,13 @@ def rule_alarm(obj=models.ZoneAlarm(), field_changed_list=None):
         #    thread.start_new_thread(rule_common.play_bell_local, ('29621__infobandit__phone.wav',))
     # else:
     #    Log.logger.info('Rule Alarm OFF: pin={} triggered={}'.format(obj.alarm_pin_name, obj.alarm_pin_triggered))
+    else:
+        if obj.alarm_pin_name == 'poarta':
+            rule_common.send_notification(title="Gate Closed", priority=3)
+            rule_common.send_chat(message="Gate Closed", notify=True)
+        elif obj.alarm_pin_name == 'portita':
+            rule_common.send_notification(title="Portita Closed", priority=3)
+            rule_common.send_chat(message="Portita Closed", notify=True)
     return 'zone alarm ok'
 
 
