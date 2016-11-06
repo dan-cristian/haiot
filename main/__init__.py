@@ -45,7 +45,7 @@ def init_module(module_name, module_is_active):
         Log.logger.info("Importing module {}".format(module_name))
         dynclass = my_import(module_name)
         if dynclass:
-            Log.logger.info('Module {} is marked as active'.format(module_name))
+            # Log.logger.info('Module {} is marked as active'.format(module_name))
             if not dynclass.initialised:
                 Log.logger.info('Module {} initialising'.format(module_name))
                 dynclass.init()
@@ -204,11 +204,10 @@ def init():
     class LogMessage:
         def __init__(self):
             pass
-
         message_type = 'logging'
         message = ''
         level = ''
-        source_host_ = Constant.HOST_NAME #field name must be identical with constant.JSON_PUBLISH_SOURCE_HOST
+        source_host_ = Constant.HOST_NAME  # field name must be identical with constant.JSON_PUBLISH_SOURCE_HOST
         datetime = utils.date_serialised(utils.get_base_location_now_date())
 
     import logging
@@ -224,7 +223,6 @@ def init():
     if Log.LOG_TO_TRANSPORT:
         Log.logger.addHandler(TransportLogging())
         Log.logger.info('Initialised logging via transport proxy')
-
 
     Log.logger.info('Initialising events - import')
     from admin import event
@@ -310,10 +308,3 @@ def run(arg_list):
     print 'App EXIT'
     global exit_code
     sys.exit(exit_code)
-
-
-
-#if 'main' in __name__:
-#    run(sys.argv[1:])
-#else:
-#    print 'Not executing main, name is ' + __name__
