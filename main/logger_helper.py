@@ -8,7 +8,7 @@ class Log:
         pass
 
     logger = None
-    # default logging
+    # KEY setting, this filters out message priority from being logged
     LOGGING_LEVEL = None
     LOG_FILE = None
     # logging output will go to syslog
