@@ -204,11 +204,10 @@ def init():
     class LogMessage:
         def __init__(self):
             pass
-
         message_type = 'logging'
         message = ''
         level = ''
-        source_host_ = Constant.HOST_NAME #field name must be identical with constant.JSON_PUBLISH_SOURCE_HOST
+        source_host_ = Constant.HOST_NAME  # field name must be identical with constant.JSON_PUBLISH_SOURCE_HOST
         datetime = utils.date_serialised(utils.get_base_location_now_date())
 
     import logging
@@ -224,7 +223,6 @@ def init():
     if Log.LOG_TO_TRANSPORT:
         Log.logger.addHandler(TransportLogging())
         Log.logger.info('Initialised logging via transport proxy')
-
 
     Log.logger.info('Initialising events - import')
     from admin import event
@@ -280,7 +278,7 @@ def run(arg_list):
     elif 'warning' in arg_list:
         Log.LOGGING_LEVEL = logging.WARNING
     else:
-        Log.LOGGING_LEVEL = logging.INFO
+        Log.LOGGING_LEVEL = logging.CRITICAL
 
     Log.LOG_TO_SYSLOG = 'sysloglocal' in arg_list
     Log.RUN_IN_LIVE = 'live' in arg_list
