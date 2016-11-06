@@ -81,9 +81,10 @@ class Log:
                 Log.logger.addHandler(file_handler)
 
         Log.logger.info('Logging level is {}'.format(Log.LOGGING_LEVEL))
-        # remove annoying info messages
-        logging.getLogger("requests").setLevel(logging.CRITICAL)
 
+        # remove annoying info messages
+        logging.getLogger("requests").setLevel(logging.INFO)
+        # propagate False stops log writes to standard output
         Log.logger.propagate = False
         if Log.RUN_IN_LIVE:
             Log.logger.info('Logger is set to live mode, disabling log propagation')
