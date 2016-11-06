@@ -17,7 +17,7 @@ apt-get -y update
 apt-get -y upgrade
 echo "Installing additional packages"
 # 1-wire support needs owfs
-apt-get -y install dialog sudo nano locales python wget owfs git python-rpi.gpio python-dev rpi-update wiringpi
+apt-get -y install dialog sudo nano locales python wget owfs git python-rpi.gpio python-dev rpi-update wiringpi ssmtp mailutils
 # run in ram needs busybox for ramfs copy operations, see "local" script sample
 apt-get -y install busybox
 
@@ -170,15 +170,36 @@ sudo raspi-config
 
 cat /etc/fstab | grep "/var/ram"
 if [ "$?" == "1" ]; then
-	echo "Add ram folder for sqlite db storage"
+	echo "Add ram folder for sqlite db storage and logs"
 	sudo echo "tmpfs           /var/ram        tmpfs   defaults,noatime        0       0" >> /etc/fstab
+	sudo echo "tmpfs           /var/log        tmpfs   defaults,noatime        0       0" >> /etc/fstab
+	sudo echo "tmpfs           /tmp            tmpfs   defaults,noatime        0       0" >> /etc/fstab
 	sudo mount -a
 else
 	echo "Ram folder for sqlite db storage exists already"
 fi
 
+# https://www.cyberciti.biz/tips/linux-use-gmail-as-a-smarthost.html
+# http://iqjar.com/jar/sending-emails-from-the-raspberry-pi/
+cat /etc/ssmtp/ssmtp.conf | grep "smtp.gmail.com"
+if [ "$?" == "1" ]; then
+    echo "Setting email"
+    echo "AuthUser=antonio.gaudi33@gmail.com" >> /etc/ssmtp/ssmtp.conf
+    echo "AuthPass=<your_password>" >> /etc/ssmtp/ssmtp.conf
+    echo "FromLineOverride=YES" >> /etc/ssmtp/ssmtp.conf
+    echo "mailhub=smtp.gmail.com:587" >> /etc/ssmtp/ssmtp.conf
+    echo "UseSTARTTLS=YES" >> /etc/ssmtp/ssmtp.conf
+    echo "Now enter your password in email conf and save with CTRL+x"
+    sleep 3
+    nano /etc/ssmtp/ssmtp.conf
+    echo "Sending test email"
+    echo "This is a test" | mail -s "Test" dan.cristian@gmail.com
+fi
+
 echo "Enable gpio access"
 sudo gpasswd -a $USERNAME gpio
+echo "Allow mail access"
+sudo gpasswd -a $USERNAME mail
 
 echo "Starting haiot via userspaceServices"
 /etc/init.d/userspaceServices restart
