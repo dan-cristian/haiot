@@ -81,7 +81,9 @@ def thread_run():
 def unload():
     Log.logger.info('Piface unloading')
     if __import_ok:
-        pfio.deinit()
+        global __listener
+        __listener.deactivate()
+        pfio.deinit_board()
 
 
 def init():
