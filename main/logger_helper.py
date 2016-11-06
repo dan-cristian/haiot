@@ -82,8 +82,9 @@ class Log:
 
         Log.logger.info('Logging level is {}'.format(Log.LOGGING_LEVEL))
 
-        # remove annoying info messages
+        # todo: remove annoying info messages, but only for few cases, efect unclear
         logging.getLogger("requests").setLevel(logging.INFO)
+
         # propagate False stops log writes to standard output
         Log.logger.propagate = False
         if Log.RUN_IN_LIVE:
