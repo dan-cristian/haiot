@@ -37,6 +37,7 @@ class Log:
 
         # global LOGGING_LEVEL, LOG_FILE, LOG_TO_SYSLOG, SYSLOG_ADDRESS, SYSLOG_PORT, RUN_IN_LIVE
         # global logger, remote_logger
+        # set logging general formatting
         logging.basicConfig(format='%(asctime)s haiot %(levelname)s %(module)s:%(funcName)s %(message)s')
         # %(threadName)s
         Log.logger = logging.getLogger('haiot-' + socket.gethostname())
@@ -44,6 +45,7 @@ class Log:
         Log.logger.setLevel(Log.LOGGING_LEVEL)
         Log.remote_logger.setLevel(Log.LOGGING_LEVEL)
 
+        # init logger to cloud papertrail services
         if (Log.SYSLOG_ADDRESS is not None) and (Log.SYSLOG_PORT is not None):
             filter_log = ContextFilter()
             Log.logger.addFilter(filter_log)
@@ -54,15 +56,14 @@ class Log:
                 datefmt='%Y-%m-%dT%H:%M:%S')
             syslog_papertrail.setFormatter(pap_formatter)
             Log.logger.addHandler(syslog_papertrail)
-
             remote_syslog_papertrail = logging.handlers.SysLogHandler(
                 address=(Log.SYSLOG_ADDRESS, int(Log.SYSLOG_PORT)))
             remote_pap_formatter = logging.Formatter('')
             remote_syslog_papertrail.setFormatter(remote_pap_formatter)
             Log.remote_logger.addHandler(remote_syslog_papertrail)
-
             Log.logger.info('Initialised syslog with {}:{}'.format(Log.SYSLOG_ADDRESS, Log.SYSLOG_PORT))
 
+        # log to syslog standard file
         if Log.LOG_TO_SYSLOG:
             try:
                 handler = logging.handlers.SysLogHandler(address='/dev/log')
@@ -83,7 +84,7 @@ class Log:
         # remove annoying info messages
         logging.getLogger("requests").setLevel(logging.CRITICAL)
 
-        Log.logger.propagate = True
+        Log.logger.propagate = False
         if Log.RUN_IN_LIVE:
             Log.logger.info('Logger is set to live mode, disabling log propagation')
             Log.logger.propagate = False
