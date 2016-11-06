@@ -35,7 +35,7 @@ def set_pin_value(pin_index=None, pin_value=None, board_index=0):
 
 
 def input_event(event):
-    Log.logger.info('Piface switch event={}'.format(event))
+    # Log.logger.info('Piface switch event={}'.format(event))
     pin_num = event.pin_num
     board_index = event.chip.hardware_addr
     direction = event.direction  # 0 for press/contact, 1 for release/disconnect
@@ -49,11 +49,8 @@ def input_event(event):
 #  define all ports that are used as read/input
 #  port format is x:direction:y, e.g. 0:in:3, x=board, direction=in/out, y=pin index (0 based)
 def setup_in_ports_pif(gpio_pin_list):
-    global __listener, __pool_pin_codes, __pfd
+    global __listener, __pool_pin_codes
     try:
-        pfio.init()
-        __pfd = pfio.PiFaceDigital()
-        __listener = pfio.InputEventListener(chip=__pfd)
         for gpio_pin in gpio_pin_list:
             if gpio_pin.pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
                 # Log.logger.info('Set piface code={} type={} index={}'.format(
@@ -68,7 +65,6 @@ def setup_in_ports_pif(gpio_pin_list):
                 except Exception, ex:
                     Log.logger.critical('Unable to setup piface listener pin={} err={}'.format(gpio_pin.pin_code, ex))
                 __pool_pin_codes.append(gpio_pin.pin_code)
-        __listener.activate()
     except Exception, ex:
         Log.logger.critical('Piface setup ports failed, err={}'.format(ex))
 
@@ -87,6 +83,11 @@ def init():
     Log.logger.info('Piface initialising')
     if __import_ok:
         try:
+            global __listener, __pfd
+            pfio.init()
+            __pfd = pfio.PiFaceDigital()
+            __listener = pfio.InputEventListener(chip=__pfd)
+            __listener.activate()
             dispatcher.connect(setup_in_ports_pif, signal=Constant.SIGNAL_GPIO_INPUT_PORT_LIST, sender=dispatcher.Any)
             thread_pool.add_interval_callable(thread_run, run_interval_second=10)
             global initialised
