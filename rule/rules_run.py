@@ -69,7 +69,7 @@ def rule_alarm(obj=models.ZoneAlarm(), field_changed_list=None):
             rule_common.send_notification(title="Gate Open", priority=3)
             rule_common.send_chat(message="Gate Open", notify=True)
         elif obj.alarm_pin_name == 'portita':
-            thread.start_new_thread(rule_common.play_bell_local, ('92002__jcveliz__violin-origional.wav',))
+            thread.start_new_thread(rule_common.play_bell_local, ('121798__boss-music__bird.wav',))
             rule_common.send_notification(title="Portita Open", priority=3)
             rule_common.send_chat(message="Portita Open", notify=True)
         # elif obj.alarm_pin_name == 'birou':
