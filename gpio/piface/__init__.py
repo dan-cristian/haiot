@@ -51,14 +51,14 @@ def input_event(event):
 def setup_in_ports(gpio_pin_list):
     for gpio_pin in gpio_pin_list:
         if gpio_pin.pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
-            Log.logger.info('Set piface pincode={} type={} index={} as input'.format(
+            Log.logger.info('Set piface code={} type={} index={}'.format(
                 gpio_pin.pin_code,gpio_pin.pin_type, gpio_pin.pin_index_bcm))
             try:
-                i = gpio_pin.pin_code.split(":")[2]
-                Log.logger.info("Piface registering pin {}".format(i))
-                __listener.register(i, pfio.IODIR_ON, input_event)
-                __listener.register(i, pfio.IODIR_OFF, input_event)
-                Log.logger.info('OK callback set on piface {} pin {}'.format(gpio_pin.pin_code, i))
+                # i = gpio_pin.pin_code.split(":")[2]
+                Log.logger.info("Piface registering input pin {}".format(gpio_pin.pin_index_bcm))
+                __listener.register(gpio_pin.pin_index_bcm, pfio.IODIR_ON, input_event)
+                __listener.register(gpio_pin.pin_index_bcm, pfio.IODIR_OFF, input_event)
+                Log.logger.info('OK callback set on piface {} pin {}'.format(gpio_pin.pin_code, gpio_pin.pin_index_bcm))
             except Exception, ex:
                 Log.logger.critical('Unable to setup piface listener pin={} err={}'.format(gpio_pin.pin_code, ex))
             __pool_pin_codes.append(gpio_pin.pin_code)
