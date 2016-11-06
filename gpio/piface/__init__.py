@@ -52,11 +52,11 @@ def setup_in_ports_pif(gpio_pin_list):
     global __listener, __pool_pin_codes
     for gpio_pin in gpio_pin_list:
         if gpio_pin.pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
-            Log.logger.info('Set piface code={} type={} index={}'.format(
-                gpio_pin.pin_code,gpio_pin.pin_type, gpio_pin.pin_index_bcm))
+            # Log.logger.info('Set piface code={} type={} index={}'.format(
+            #    gpio_pin.pin_code,gpio_pin.pin_type, gpio_pin.pin_index_bcm))
             try:
                 # i = gpio_pin.pin_code.split(":")[2]
-                Log.logger.info("Piface registering input pin {}".format(gpio_pin.pin_index_bcm))
+                # Log.logger.info("Piface registering input pin {}".format(gpio_pin.pin_index_bcm))
                 __listener.register(gpio_pin.pin_index_bcm, pfio.IODIR_ON, input_event)
                 __listener.register(gpio_pin.pin_index_bcm, pfio.IODIR_OFF, input_event)
                 Log.logger.info('OK callback set on piface {} pin {}'.format(gpio_pin.pin_code, gpio_pin.pin_index_bcm))
