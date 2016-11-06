@@ -26,6 +26,17 @@ kill_proc "[x]init /usr/bin/kodi"
 kill_proc "[/]usr/lib/kodi/kodi.bin"
 }
 
+function exit_if_kodi_run(){
+ps ax | grep -q [k]odi.bin
+code=$?
+if [ $code == '0' ]; then
+        echo2 "Kodi is running, exit"
+        exit
+fi
+}
+
+# http://unix.stackexchange.com/questions/118811/why-cant-i-run-gui-apps-from-root-no-protocol-specified
+
 echo2 "Kodi cmd=$1"
 if [ "$1" == "start" ]; then
 	stop_kodi
@@ -33,6 +44,10 @@ if [ "$1" == "start" ]; then
 	/usr/bin/startx /usr/bin/kodi >> $LOG 2>&1 &
 elif [ "$1" == "stop" ]; then
 	stop_kodi
+elif [ "$1" == "start_once" ]; then
+	exit_if_kodi_run
+	echo2 "Starting kodi once"
+        /usr/bin/startx /usr/bin/kodi >> $LOG 2>&1 &
 else
 	echo2 "Action not mapped for command=[$1]"
 fi
