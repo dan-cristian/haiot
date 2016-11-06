@@ -48,7 +48,8 @@ def input_event(event):
 
 #  define all ports that are used as read/input
 #  port format is x:direction:y, e.g. 0:in:3, x=board, direction=in/out, y=pin index (0 based)
-def setup_in_ports(gpio_pin_list):
+def setup_in_ports_pif(gpio_pin_list):
+    global __listener, __pool_pin_codes
     for gpio_pin in gpio_pin_list:
         if gpio_pin.pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
             Log.logger.info('Set piface code={} type={} index={}'.format(
@@ -62,8 +63,6 @@ def setup_in_ports(gpio_pin_list):
             except Exception, ex:
                 Log.logger.critical('Unable to setup piface listener pin={} err={}'.format(gpio_pin.pin_code, ex))
             __pool_pin_codes.append(gpio_pin.pin_code)
-    __listener.activate()
-    Log.logger.info("Piface input listener activated")
 
 
 def thread_run():
@@ -84,7 +83,8 @@ def init():
             global __pfd, __listener
             __pfd = pfio.PiFaceDigital()
             __listener = pfio.InputEventListener(chip=__pfd)
-            dispatcher.connect(setup_in_ports, signal=Constant.SIGNAL_GPIO_INPUT_PORT_LIST, sender=dispatcher.Any)
+            __listener.activate()
+            dispatcher.connect(setup_in_ports_pif, signal=Constant.SIGNAL_GPIO_INPUT_PORT_LIST, sender=dispatcher.Any)
             thread_pool.add_interval_callable(thread_run, run_interval_second=10)
             global initialised
             initialised = True
