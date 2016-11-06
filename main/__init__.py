@@ -278,7 +278,8 @@ def run(arg_list):
     elif 'warning' in arg_list:
         Log.LOGGING_LEVEL = logging.WARNING
     else:
-        Log.LOGGING_LEVEL = logging.WARNING
+        # this filters out message priority from being logged
+        Log.LOGGING_LEVEL = logging.INFO
 
     Log.LOG_TO_SYSLOG = 'sysloglocal' in arg_list
     Log.RUN_IN_LIVE = 'live' in arg_list
