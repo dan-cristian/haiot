@@ -90,9 +90,8 @@ def _event_detected_falling(channel):
 def setup_in_ports(gpio_pin_list):
     for gpio_pin in gpio_pin_list:
         if gpio_pin.pin_type == Constant.GPIO_PIN_TYPE_PI_STDGPIO:
-            Log.logger.info('Set rpi.gpio pincode={} type={} index={} as input'.format(gpio_pin.pin_code,
-                                                                                       gpio_pin.pin_type,
-                                                                                       gpio_pin.pin_index_bcm))
+            Log.logger.info('Set rpi.gpio pincode={} type={} index={} as input'.format(
+                gpio_pin.pin_code, gpio_pin.pin_type, gpio_pin.pin_index_bcm))
             try:
                 GPIO.setup(int(gpio_pin.pin_code), GPIO.IN, pull_up_down=GPIO.PUD_UP)  # PUD_DOWN:no contact detection
                 GPIO.remove_event_detect(int(gpio_pin.pin_code))
@@ -123,6 +122,7 @@ def unload():
 def init():
     Log.logger.info('RPI.GPIO module initialising')
     try:
+        GPIO.cleanup()
         GPIO.setmode(GPIO.BCM)
         dispatcher.connect(setup_in_ports, signal=Constant.SIGNAL_GPIO_INPUT_PORT_LIST, sender=dispatcher.Any)
         thread_pool.add_interval_callable(thread_run, run_interval_second=10)

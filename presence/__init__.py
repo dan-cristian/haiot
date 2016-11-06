@@ -43,7 +43,7 @@ def handle_event_presence_io(gpio_pin_code='', direction='', pin_value='', pin_c
                     record.save_changed_fields(current_record=current_record, new_record=record,
                                                notify_transport_enabled=True, save_to_graph=True, save_all_fields=True)
                 else:
-                    Log.logger.warning('Unable to find presence zone for pin {}'.format(gpio_pin_code))
+                    Log.logger.warning('Unable to find presence zone for pin {} in Alarm table'.format(gpio_pin_code))
     except Exception, ex:
         Log.logger.critical("Unable to save presence, er={}".format(ex), exc_info=True)
 
