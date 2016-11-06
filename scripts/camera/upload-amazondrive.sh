@@ -21,7 +21,9 @@ return 1
 
 function echo2(){
 echo [`date +%T.%N`] $1 $2 $3 $4 $5 >> $LOG 2>&1
-echo [`date +%T.%N`] $1 $2 $3 $4 $5
+if [ $be_quiet == "0" ]; then
+	echo [`date +%T.%N`] $1 $2 $3 $4 $5
+fi
 }
 
 #upload to cloud
@@ -36,7 +38,7 @@ if [ $# -ne 0 ]; then
   dest_parent=`dirname $dest`
   #mkdir -p $dest_parent >> $LOG 2>&1
   #echo2 "Uploading $source to $dest_parent"
-  if [ -z ${HOME+x} ]; then echo2 "HOME var is unset";export HOME="/home/motion";else echo2 "var is set to '$HOME'"; fi
+  if [ -z ${HOME+x} ]; then export HOME="/home/motion"; fi
   /usr/sbin/rclone copy $source $dest_parent >> $LOG 2>&1
   #cp -f $source $dest >> $LOG 2>&1
   result=$?
@@ -147,36 +149,44 @@ while read source
 do
   if [ -f $source ]; then
 	file_count=`find /mnt/motion/tmp -type f | wc -l`
-	echo2 "FILE COUNT in tmp folder is $file_count"
+	#if [ $file_count -le "15" ]; then
+	#	be_quiet=1
+	#fi
   	file=`basename $source`
-  	lock=/tmp/.motion.move.$file.exclusivelock
-  	echo2 "Picking older file tryok #$count tryfail #$count_failed $source"
-  	(
-  	# Wait for lock on /var/lock/..exclusivelock (fd 200) for 1 seconds
-  	if flock -x -w 1 200 ; then
-        	echo2 "Moving older file $source"
-        	move $source
-		result=$?
-		#echo2 "Moved older done result=$result"
-		exit $result
-  	else
-        	echo2 "Already processing file $source, try next"
-		exit 6
-  	fi
-  	) 200>$lock
-  	result=$?
-  	rm $lock
-  	#echo2 "Move older file result is $result"
-  	if [ $result -eq 0 ];then
-		((count++))
-		#move x files then exit
-		if [ $count -eq $OLD_COUNT ];then
-	  		return 0
-		fi
-  	else
-		((count_failed++))
-		if [ $count_failed -eq 50 ]; then
-			return 1
+	# check if file is in use with lsof
+	filename=$(basename "$file")
+	lsof | grep -q $filename
+	if [ $? = 1 ]; then
+		echo2 "FILE COUNT in tmp folder is $file_count"
+  		lock=/tmp/.motion.move.$file.exclusivelock
+  		echo2 "Picking older file tryok #$count tryfail #$count_failed $source"
+  		(
+  		# Wait for lock on /var/lock/..exclusivelock (fd 200) for 1 seconds
+  		if flock -x -w 1 200 ; then
+        		echo2 "Moving older file $source"
+        		move $source
+			result=$?
+			#echo2 "Moved older done result=$result"
+			exit $result
+  		else
+        		echo2 "Already processing file $source, try next"
+			exit 6
+  		fi
+  		) 200>$lock
+  		result=$?
+  		rm $lock
+  		#echo2 "Move older file result is $result"
+		if [ $result -eq 0 ];then
+			((count++))
+			#move x files then exit
+			if [ $count -eq $OLD_COUNT ];then
+	  			return 0
+			fi
+  		else
+			((count_failed++))
+			if [ $count_failed -eq 50 ]; then
+				return 1
+			fi
 		fi
 	fi
   else
@@ -185,6 +195,7 @@ do
 done
 }
 
+be_quiet=0
 move $1 $2
 #tune
 #should be last one as it exits on success
@@ -194,7 +205,7 @@ if [ $# -eq 0 ]; then
 		if flock -x -w 1 200 ; then
 			move_failed
 		else
-			echo "Move history already in progress, skipping"
+			echo2 "Move history already in progress, skipping"
 		fi
 	) 200>$lock2
 	rm $lock2
