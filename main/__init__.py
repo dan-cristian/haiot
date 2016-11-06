@@ -278,7 +278,7 @@ def run(arg_list):
     elif 'warning' in arg_list:
         Log.LOGGING_LEVEL = logging.WARNING
     else:
-        Log.LOGGING_LEVEL = logging.CRITICAL
+        Log.LOGGING_LEVEL = logging.INFO
 
     Log.LOG_TO_SYSLOG = 'sysloglocal' in arg_list
     Log.RUN_IN_LIVE = 'live' in arg_list
@@ -308,10 +308,3 @@ def run(arg_list):
     print 'App EXIT'
     global exit_code
     sys.exit(exit_code)
-
-
-
-#if 'main' in __name__:
-#    run(sys.argv[1:])
-#else:
-#    print 'Not executing main, name is ' + __name__
