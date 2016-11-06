@@ -111,7 +111,8 @@ def thread_run():
 
 def unload():
     for gpio_pin in __pool_pin_codes:
-        GPIO.remove_event_detect(gpio_pin)
+        if isinstance(gpio_pin, int):
+            GPIO.remove_event_detect(gpio_pin)
     time.sleep(1)
     GPIO.cleanup()
     thread_pool.remove_callable(thread_run)
