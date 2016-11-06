@@ -10,6 +10,7 @@ __import_ok = False
 __pfd = None
 __listener = None
 initialised = False
+__pool_pin_codes = []
 
 try:
     import pifacedigitalio as pfio
@@ -40,9 +41,34 @@ def input_event(event):
     direction = event.direction  # 0 for press/contact, 1 for release/disconnect
     gpio_pin_code = format_pin_code(board_index=board_index, pin_direction=Constant.GPIO_PIN_DIRECTION_IN,
                                     pin_index=pin_num)
-    Log.logger.debug('Event piface gpio={} direction={}'.format(gpio_pin_code, direction))
+    Log.logger.info('Event piface gpio={} direction={}'.format(gpio_pin_code, direction))
     dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio_pin_code, direction=Constant.GPIO_PIN_DIRECTION_IN,
                     pin_value=direction, pin_connected=(direction == 0))
+
+
+#  define all ports that are used as read/input
+#  port format is x:direction:y, e.g. 0:in:3, x=board, direction=in/out, y=pin index (0 based)
+def setup_in_ports_pif(gpio_pin_list):
+    global __listener, __pool_pin_codes
+
+    global __pfd #, __listener
+    __pfd = pfio.PiFaceDigital()
+    __listener = pfio.InputEventListener(chip=__pfd)
+
+    for gpio_pin in gpio_pin_list:
+        if gpio_pin.pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
+            # Log.logger.info('Set piface code={} type={} index={}'.format(
+            #    gpio_pin.pin_code,gpio_pin.pin_type, gpio_pin.pin_index_bcm))
+            try:
+                # i = gpio_pin.pin_code.split(":")[2]
+                # Log.logger.info("Piface registering input pin {}".format(gpio_pin.pin_index_bcm))
+                __listener.register(gpio_pin.pin_index_bcm, pfio.IODIR_ON, input_event)
+                __listener.register(gpio_pin.pin_index_bcm, pfio.IODIR_OFF, input_event)
+                Log.logger.info('OK callback set on piface {} pin {}'.format(gpio_pin.pin_code, gpio_pin.pin_index_bcm))
+            except Exception, ex:
+                Log.logger.critical('Unable to setup piface listener pin={} err={}'.format(gpio_pin.pin_code, ex))
+            __pool_pin_codes.append(gpio_pin.pin_code)
+    __listener.activate()
 
 
 def thread_run():
@@ -60,15 +86,8 @@ def init():
     if __import_ok:
         try:
             pfio.init()
-            global __pfd, __listener
-            __pfd = pfio.PiFaceDigital()
-            __listener = pfio.InputEventListener(chip=__pfd)
-            for i in range(8):
-                Log.logger.info("Piface registering pin {}".format(i))
-                __listener.register(i, pfio.IODIR_ON, input_event)
-                __listener.register(i, pfio.IODIR_OFF, input_event)
-            __listener.activate()
-            Log.logger.info("Piface input listener activated")
+
+            dispatcher.connect(setup_in_ports_pif, signal=Constant.SIGNAL_GPIO_INPUT_PORT_LIST, sender=dispatcher.Any)
             thread_pool.add_interval_callable(thread_run, run_interval_second=10)
             global initialised
             initialised = True
