@@ -61,8 +61,8 @@ def setup_in_ports_pif(gpio_pin_list):
                 try:
                     # i = gpio_pin.pin_code.split(":")[2]
                     # Log.logger.info("Piface registering input pin {}".format(gpio_pin.pin_index_bcm))
-                    __listener.register(gpio_pin.pin_index_bcm, pfio.IODIR_ON, input_event)
-                    __listener.register(gpio_pin.pin_index_bcm, pfio.IODIR_OFF, input_event)
+                    __listener.register(int(gpio_pin.pin_index_bcm), pfio.IODIR_ON, input_event)
+                    __listener.register(int(gpio_pin.pin_index_bcm), pfio.IODIR_OFF, input_event)
                     Log.logger.info('OK callback set on piface {} pin {}'.format(
                         gpio_pin.pin_code, gpio_pin.pin_index_bcm))
                 except Exception, ex:
