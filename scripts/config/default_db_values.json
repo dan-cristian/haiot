@@ -77,7 +77,7 @@
     {"id":599, "active":"0", "start_order":"99", "name":"test", "host_name":"netbook"},
     {"id":511, "active":"1", "start_order":"11", "name":"alarm", "host_name":"netbook"},
 
-    {"id":611, "active":"0", "start_order":"11", "name":"alarm", "host_name":"pi-face"}
+    {"id":611, "active":"1", "start_order":"11", "name":"alarm", "host_name":"pi-face"}
   ],
 
   "Zone": [
