@@ -85,6 +85,15 @@ def _event_detected_falling(channel):
     _check_event(channel, GPIO.LOW)
 
 
+def _event_detected_both(channel):
+    now_state = GPIO.input(channel)
+    Log.logger.info("Both event, channel {}, now_state={}".format(channel, now_state))
+    time.sleep(0.1)
+    new_state = GPIO.input(channel)
+    Log.logger.info("Both event, channel {}, NEW_state={}".format(channel, new_state))
+    _do_event(channel, new_state)
+
+
 #  define all ports that are used as read/input, BCM format
 #  https://sourceforge.net/p/raspberry-gpio-python/wiki/Inputs/
 def setup_in_ports(gpio_pin_list):
@@ -101,8 +110,7 @@ def setup_in_ports(gpio_pin_list):
                 # GPIO.add_event_detect(int(gpio_pin.pin_code), GPIO.FALLING, callback=_event_detected_falling,
                 #                      bouncetime=500)
                 # Log.logger.info('Added falling on rpi.gpio'.format(gpio_pin.pin_code))
-                GPIO.add_event_detect(int(gpio_pin.pin_code), GPIO.BOTH, callback=_do_event,
-                                      bouncetime=500)
+                GPIO.add_event_detect(int(gpio_pin.pin_code), GPIO.BOTH, callback=_event_detected_both, bouncetime=500)
                 Log.logger.info('OK callback set on rpi.gpio'.format(gpio_pin.pin_code))
             except Exception, ex:
                 Log.logger.critical('Unable to setup rpi.gpio callback pin={} err={}'.format(gpio_pin.pin_code, ex))
