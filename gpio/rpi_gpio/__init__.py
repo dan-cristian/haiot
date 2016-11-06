@@ -97,8 +97,10 @@ def setup_in_ports(gpio_pin_list):
                 GPIO.remove_event_detect(int(gpio_pin.pin_code))
                 GPIO.add_event_detect(int(gpio_pin.pin_code), GPIO.RISING, callback=_event_detected_rising,
                                       bouncetime=500)
+                Log.logger.info('Added rising on rpi.gpio'.format(gpio_pin.pin_code))
                 GPIO.add_event_detect(int(gpio_pin.pin_code), GPIO.FALLING, callback=_event_detected_falling,
                                       bouncetime=500)
+                Log.logger.info('Added falling on rpi.gpio'.format(gpio_pin.pin_code))
                 Log.logger.info('OK callback set on rpi.gpio'.format(gpio_pin.pin_code))
             except Exception, ex:
                 Log.logger.critical('Unable to setup rpi.gpio callback pin={} err={}'.format(gpio_pin.pin_code, ex))
@@ -123,7 +125,6 @@ def unload():
 def init():
     Log.logger.info('RPI.GPIO module initialising')
     try:
-        GPIO.cleanup()
         GPIO.setmode(GPIO.BCM)
         dispatcher.connect(setup_in_ports, signal=Constant.SIGNAL_GPIO_INPUT_PORT_LIST, sender=dispatcher.Any)
         thread_pool.add_interval_callable(thread_run, run_interval_second=10)
