@@ -25,6 +25,7 @@ mkdir -p "$parent_dest"
 mv -f "$file_path" "$dest"
 }
 
+# https://www.musicpd.org/doc/protocol/command_reference.html
 function add_fav(){
 id="Id: "
 prefix="file: "
@@ -35,6 +36,27 @@ song_id="${song/$id/''}"
 echo2 "Marking favorite song $song_id $file_path"
 add_status=`echo playlistadd 9 \"$file_path\" | nc localhost $1`
 echo2 "Marking returned $add_status"
+}
+
+function un_fav(){
+id="Id: "
+prefix="file: "
+file=`echo "currentsong" | nc localhost $1 | grep "$prefix"`
+file_path="${file/$prefix/''}" #$MPD_MUSIC/}"
+song=`echo "currentsong" | nc localhost $1 | grep "$id"`
+song_id="${song/$id/''}"
+echo2 "Removing favorite song $song_id $file_path from playlist"
+status=`echo deleteid \"$song_id\" | nc localhost $1`
+echo2 "Marking returned $status"
+}
+
+function exit_if_kodi_run(){
+ps ax | grep -q [k]odi.bin
+code=$?
+if [ $code == '0' ]; then
+	echo2 "Kodi is running, exit"
+	exit
+fi
 }
 
 echo2 "Using MPC port=$1 type=$2 extra=$3"
@@ -85,6 +107,7 @@ for i in ${!PORT[*]}; do
 		elif [ "$2" == "prev" ]; then
 			mpc -vp $1 prev >> $LOG 2>&1
 		elif [ "$2" == "toggle" ]; then
+			exit_if_kodi_run
 			mpc -vp $1 toggle >> $LOG 2>&1
 		elif [ "$2" == "stop" ]; then
 			mpc -vp $1 stop >> $LOG 2>&1
@@ -101,6 +124,12 @@ for i in ${!PORT[*]}; do
 			mpc -vp $1 toggle >> $LOG 2>&1
 			sleep 1
 			mpc -vp $1 toggle >> $LOG 2>&1
+		elif [ "$2" == "unfav" ]; then
+                        un_fav $1
+                        #introduce a pause to indicate add to fav happened
+                        mpc -vp $1 toggle >> $LOG 2>&1
+                        sleep 1
+                        mpc -vp $1 toggle >> $LOG 2>&1
 		else
 			echo2 "Action not mapped for command=[$2]"
 		fi
