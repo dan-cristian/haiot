@@ -23,7 +23,7 @@ def handle_event_alarm(gpio_pin_code='', direction='', pin_value='', pin_connect
         else:
             Log.logger.warning('Zone %s not mapped to an area' % zonealarm.zone_id)
         zone = models.Zone.query.filter_by(id=zonealarm.zone_id).first()
-        Log.logger.debug('Got alarm event in {} zoneid={} pin_connected={} pin_value={}'.format(
+        Log.logger.info('Got alarm event in {} zoneid={} pin_connected={} pin_value={}'.format(
             zone.name, zonealarm.zone_id, pin_connected, pin_value))
         zonealarm.alarm_pin_triggered = pin_value
         zonealarm.updated_on = utils.get_base_location_now_date()
@@ -53,10 +53,10 @@ def init():
         gpio_pin = models.GpioPin().query_filter_first(models.GpioPin.pin_code.in_([alarm.gpio_pin_code]),
                                                        models.GpioPin.host_name.in_([Constant.HOST_NAME]))
         if gpio_pin:
-            Log.logger.info('Schedule setup alarm port pin={} type={}'.format(gpio_pin.pin_code, gpio_pin.pin_type))
+            # Log.logger.info('Schedule setup alarm port pin={} type={}'.format(gpio_pin.pin_code, gpio_pin.pin_type))
             port_list.append(gpio_pin)
         else:
-            Log.logger.warning('Unexpected empty gpio pin response for alarm setup')
+            Log.logger.warning('Unexpected empty gpio pin response for alarm setup {}'.format(alarm))
     dispatcher.send(signal=Constant.SIGNAL_GPIO_INPUT_PORT_LIST, gpio_pin_list=port_list)
     # just for test on netbook
     # import gpio.rpi_gpio
