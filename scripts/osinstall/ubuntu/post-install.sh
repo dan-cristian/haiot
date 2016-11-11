@@ -7,6 +7,7 @@ ENABLE_OPTIONAL=0
 ENABLE_HAIOT=0
 ENABLE_RAMRUN=0
 ENABLE_MEDIA=1
+MUSIC_ROOT=/mnt/data/hdd-wdr-evhk/music
 ENABLE_SNAPRAID=1
 DATA_DISK1=/mnt/data/hdd-wdg-6297
 DATA_DISK2=/mnt/data/hdd-wdr-evhk
@@ -14,7 +15,10 @@ PARITY_DISK=/mnt/parity/hdd-wdg-2130
 ENABLE_GIT=1
 GIT_ROOT=/mnt/data/hdd-wdg-6297/git
 ENABLE_CAMERA=1
+MOTION_ROOT=/mnt/data/hdd-wdr-evhk/motion
 LOG_ROOT=/mnt/data/hdd-wdr-evhk/log
+ENABLE_TORRENT=1
+ENABLE_SAMBA=1
 
 echo "Setting timezone ..."
 echo "Europe/Bucharest" > /etc/timezone
@@ -24,7 +28,7 @@ echo "Updating apt-get"
 apt-get -y update
 apt-get -y upgrade
 echo "Installing additional packages"
-apt-get -y install dialog sudo nano wget runit git ssmtp mailutils psmisc smartmontools localepurge mosquitto
+apt-get -y install ssh dialog sudo nano wget runit git ssmtp mailutils psmisc smartmontools localepurge mosquitto
 if [ "$ENABLE_RAMRUN" == "1" ]; then
     # run in ram needs busybox for ramfs copy operations, see "local" script sample
     apt-get -y install busybox
@@ -166,17 +170,62 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     e.g. pactl set-default-sink bluez_sink.00_ 18_6B_4e_A4_B8
     mplayer <audio file>
     '
-
+    echo 'Installing music tools'
     apt-get install mpd mpc triggerhappy
     cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/triggerhappy/triggers.conf /etc/triggerhappy/
-    ln -s $LOG_ROOT /mnt/log
 
-    apt-get install i3 xinit xterm
+    ln -s $LOG_ROOT /mnt/log
+    ln -s $MUSIC_ROOT /mnt/music
+    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/mpd.conf /etc/
+    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/sockets.target.wants/mpd*.socket /lib/systemd/system/
+    ln -s /lib/systemd/system/mpd2.socket /etc/systemd/system/sockets.target.wants/mpd2.socket
+    ln -s /lib/systemd/system/mpd3.socket /etc/systemd/system/sockets.target.wants/mpd3.socket
+    ln -s /lib/systemd/system/mpd4.socket /etc/systemd/system/sockets.target.wants/mpd4.socket
+    ln -s /lib/systemd/system/mpd5.socket /etc/systemd/system/sockets.target.wants/mpd5.socket
+    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/multi-user.target.wants/mpd*.service /lib/systemd/system/
+    ln -s /lib/systemd/system/mpd2.service /etc/systemd/system/multi-user.target.wants/mpd2.service
+    ln -s /lib/systemd/system/mpd3.service /etc/systemd/system/multi-user.target.wants/mpd3.service
+    ln -s /lib/systemd/system/mpd4.service /etc/systemd/system/multi-user.target.wants/mpd4.service
+    ln -s /lib/systemd/system/mpd5.service /etc/systemd/system/multi-user.target.wants/mpd5.service
+    systemctl enable mpd.socket
+    systemctl enable mpd2.socket
+    systemctl enable mpd3.socket
+    systemctl enable mpd4.socket
+    systemctl enable mpd5.socket
+
+    # http://www.lesbonscomptes.com/upmpdcli/upmpdcli.html
+    # https://www.lesbonscomptes.com/upmpdcli/downloads.html#ubuntu
+    add-apt-repository ppa:jean-francois-dockes/upnpp1
+    apt-get update
+    apt-get install upmpdcli
+    # will start manually with cron
+    systemctl stop upmpdcli
+    systemctl disable upmpdcli
+    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/upmpdcli*.conf /etc
+
+    echo 'Installing video tools'
+    apt-get install i3 xinit xterm kodi
 
 fi
 
 if [ "$ENABLE_CAMERA" == "1" ]; then
+    echo 'Installing motion'
     apt-get install motion
+    /etc/init.d/motion stop
+    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/motion/*.conf /etc/motion/
+    echo 'start_motion_daemon=yes' > /etc/default/motion
+    ln -s $MOTION_ROOT /mnt/motion
+    chown motion:users /mnt/log/motion.log
+    adduser motion users
+    chmod -R g+w /mnt/motion/
+    /etc/init.d/motion restart
+fi
+
+if [ "$ENABLE_TORRENT" == "1" ]; then
+    apt-get install transmission-daemon
+    /etc/init.d/transmission-daemon stop
+    cp -R $HAIOT_DIR/scripts/osinstall/ubuntu/etc/transmission-daemon /etc
+    /etc/init.d/transmission-daemon start
 fi
 
 if [ "$ENABLE_HAIOT" == "1" ]; then
@@ -191,55 +240,6 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
     if [ "$?" != "0" ]; then
         echo "Installing virtualenv"
         pip install --no-cache-dir virtualenv
-    fi
-
-    if [ "$ENABLE_PIFACE" == "1" ]; then
-        # needed for piface
-        apt-get -y install raspi-config python-pifacedigitalio
-        #enable spi
-        # safest method is to use raspi-config manuallt, and enable SPI in advanced option menu
-        cat /boot/config.txt | grep spi=
-        if [ "$?" == "0" ]; then
-            sed -i 's/spi=off/spi=on/g' /boot/config.txt
-        else
-            echo "dtparam=spi=on" >> /boot/config.txt
-        fi
-        # access rights for piface, by default python-pifacedigitalio assumes username as being = pi
-        gpasswd -a ${USERNAME} spi
-    fi
-
-    if [ "$ENABLE_PIGPIO" == "1" ]; then
-        echo "Downloading pigpio library for gpio access"
-        wget abyz.co.uk/rpi/pigpio/pigpio.zip
-        unzip pigpio.zip
-        apt-get -y install build-essential
-        echo "Compiling pigpio"
-        cd PIGPIO
-        make
-        echo "Installing pigpio"
-        make install
-        cp /home/${USERNAME}/${HAIOT_DIR}/scripts/pigpio_daemon /etc/init.d
-        chmod +x /etc/init.d/pigpio_daemon
-        update-rc.d pigpio_daemon defaults
-        rm -r /home/${USERNAME}/PIGPIO
-        rm /home/${USERNAME}/pigpio.zip
-        #python setup.py install
-        #todo install pigpiod init script
-    fi
-
-    if [ "$ENABLE_DFROBOT" == "1" ]; then
-        echo "Configuring DFRobot screen"
-        # http://unix.stackexchange.com/questions/72320/how-can-i-hook-on-to-one-terminals-output-from-another-terminal
-        # script -f /dev/tty1
-        # cmdline.txt=dwc_otg.lpm_enable=0 console=ttyAMA0,115200 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4
-        #   cgroup_enable=memory elevator=deadline rootwait fbcon=font:ProFont6x11 fbcon=map:1 consoleblank=0
-        # http://docs.robopeak.net/doku.php?id=rpusbdisp_faq#q12
-        # https://www.kernel.org/doc/Documentation/fb/fbcon.txt
-        # page 19: http://www.robopeak.com/data/doc/rpusbdisp/RPUD02-rpusbdisp_usermanual-enUS.1.1.pdf
-        # https://learn.adafruit.com/adafruit-pitft-28-inch-resistive-touchscreen-display-raspberry-pi/using-the-console
-        # stty rows 30 cols 40
-        # setfont -f Uni2-VGA8
-        apt-get -y install gpm
     fi
 
     echo "Configuring HAIOT application"
