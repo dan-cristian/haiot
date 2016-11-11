@@ -1,0 +1,7 @@
+
+netcam_url http://192.168.0.26/cgi-bin/CGIProxy.fcgi?cmd=snapPicture2&usr=v&pwd=a
+text_left back %t
+text_event back
+stream_port 10004
+; on_motion_detected /home/dcristian/OMV/scripts/recordalert.sh 12 back
+timelapse_filename tmp/timelapse/cam-back/%Y-%m/%Y-%m-%d/back-%Y-%m-%d_%H-%M-%S_lapse
