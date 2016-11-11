@@ -8,7 +8,13 @@ ENABLE_HAIOT=0
 ENABLE_RAMRUN=0
 ENABLE_MEDIA=1
 ENABLE_SNAPRAID=1
+DATA_DISK1=/mnt/data/hdd-wdg-6297
+DATA_DISK2=/mnt/data/hdd-wdr-evhk
+PARITY_DISK=/mnt/parity/hdd-wdg-2130
 ENABLE_GIT=1
+GIT_ROOT=/mnt/data/hdd-wdg-6297/git
+ENABLE_CAMERA=1
+LOG_ROOT=/mnt/data/hdd-wdr-evhk/log
 
 echo "Setting timezone ..."
 echo "Europe/Bucharest" > /etc/timezone
@@ -18,7 +24,7 @@ echo "Updating apt-get"
 apt-get -y update
 apt-get -y upgrade
 echo "Installing additional packages"
-apt-get -y install dialog sudo nano locales wget runit git ssmtp mailutils psmisc smartmontools
+apt-get -y install dialog sudo nano wget runit git ssmtp mailutils psmisc smartmontools localepurge mosquitto
 if [ "$ENABLE_RAMRUN" == "1" ]; then
     # run in ram needs busybox for ramfs copy operations, see "local" script sample
     apt-get -y install busybox
@@ -50,22 +56,23 @@ chsh -s /bin/bash ${USERNAME}
 cat /etc/fstab | grep "/mnt/data"
 if [ "$?" == "1" ]; then
     echo "Setting up hard drives in fstab. This is custom setup for each install."
-    mkdir -p /mnt/data/hdd-wdg-6297
-    mkdir -p /mnt/parity/hdd-wdg-2130
-    mkdir -p /mnt/data/hdd-wdr-evhk
+    mkdir -p $DATA_DISK1
+    mkdir -p $DATA_DISK2
+    mkdir -p $PARITY_DISK
     echo "# Added by postinstall script" >> /etc/fstab
-    echo "UUID=f6283955-9310-4ff2-8525-a48dbcdf61e3       /mnt/data/hdd-wdg-6297          ext4    nofail,noatime,journal_async_commit,data=writeback,barrier=0,errors=remount-ro    1       1" >> /etc/fstab
-    echo "UUID=1bc8e1b1-da57-4e66-9b4a-4b35fa555f15       /mnt/parity/hdd-wdg-2130        ext4    nofail,noatime,journal_async_commit,data=writeback,barrier=0,errors=remount-ro    1       1" >> /etc/fstab
-    echo "UUID=615e4b68-905a-43e0-81f2-5c0a66d632ba       /mnt/data/hdd-wdr-evhk          ext4    nofail,noatime,journal_async_commit,data=writeback,barrier=0,errors=remount-ro    1       1" >> /etc/fstab
+    echo "UUID=f6283955-9310-4ff2-8525-a48dbcdf61e3       $DATA_DISK1          ext4    nofail,noatime,journal_async_commit,data=writeback,barrier=0,errors=remount-ro    1       1" >> /etc/fstab
+    echo "UUID=1bc8e1b1-da57-4e66-9b4a-4b35fa555f15       $PARITY_DISK        ext4    nofail,noatime,journal_async_commit,data=writeback,barrier=0,errors=remount-ro    1       1" >> /etc/fstab
+    echo "UUID=615e4b68-905a-43e0-81f2-5c0a66d632ba       $DATA_DISK2          ext4    nofail,noatime,journal_async_commit,data=writeback,barrier=0,errors=remount-ro    1       1" >> /etc/fstab
     echo "#/mnt/data/*                                     /mnt/media      fuse.mergerfs   defaults,allow_other,big_writes,direct_io,fsname=mergerfs,minfreespace=50G         0       0" >> /etc/fstab
     mount -a
 fi
 
 if [ "$ENABLE_GIT" == "1" ]; then
     echo "Setting up git"
-    ln -s /mnt/data/hdd-wdg-6297/git /mnt/git
+    ln -s $GIT_ROOT /mnt/git
     git config --global user.name "Dan Cristian"
     git config --global user.email "dan.cristian@gmail.com"
+    git config --global push.default simple
     useradd gitdaemon -m
     mkdir -p /etc/sv/git-daemon
     echo '#!/bin/sh' >> /etc/sv/git-daemon/run
@@ -80,15 +87,18 @@ fi
 echo "Getting HAIOT application from git"
 cd /home/${USERNAME}
 rm -r PYC
+rm -r haiot
 git clone git://192.168.0.9/PYC.git
 if [ "$?" == "0" ]; then
     echo "Dowloaded haiot from local repository"
-    HAIOT_DIR=PYC
+    export HAIOT_DIR=/home/$USERNAME/PYC
 else
     echo "Downloading haiot from github"
     git clone https://github.com/dan-cristian/haiot.git
-    HAIOT_DIR=haiot
+    export HAIOT_DIR=/home/$USERNAME/haiot
 fi
+echo 'HAIOT_DIR=$HAIOT_DIR' > /etc/profile.d/haiot.sh
+chmod +x /etc/profile.d/haiot.sh
 
 if [ "$ENABLE_SNAPRAID" == "1" ]; then
     echo "Setup snapraid"
@@ -99,18 +109,18 @@ if [ "$ENABLE_SNAPRAID" == "1" ]; then
     cd snapraid-10.0/
     ./configure
     make
-    make check
+    # make check
     make install
     cd ..
-    cp ~/snapraid-10.0/snapraid.conf.example /etc/snapraid.conf
-    cd ..
+    #cp ~/snapraid-10.0/snapraid.conf.example /etc/snapraid.conf
+    #cd ..
     rm -rf snapraid*
-    cp /home/${USERNAME}/$HAIOT_DIR/scripts/
+    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/snapraid.conf /etc/snapraid.conf
 fi
 
 
 if [ "$ENABLE_MEDIA" == "1" ]; then
-    echo "Installing media"
+    echo "Installing media - sound + mpd + kodi"
     apt-get install alsa-utils bluez pulseaudio-module-bluetooth python-gobject python-gobject-2
     # https://www.raspberrypi.org/forums/viewtopic.php?t=68779
     # https://jimshaver.net/2015/03/31/going-a2dp-only-on-linux/
@@ -157,7 +167,16 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     mplayer <audio file>
     '
 
+    apt-get install mpd triggerhappy
+    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/triggerhappy/triggers.conf /etc/triggerhappy/
+    ln -s $LOG_ROOT /mnt/log
 
+    apt-get install i3 xinit xterm
+
+fi
+
+if [ "$ENABLE_CAMERA" == "1" ]; then
+    apt-get install motion
 fi
 
 if [ "$ENABLE_HAIOT" == "1" ]; then
