@@ -1,0 +1,7 @@
+#FI9805E
+netcam_url http://192.168.0.25/cgi-bin/CGIProxy.fcgi?cmd=snapPicture2&usr=v&pwd=a
+text_left front %t
+text_event front
+stream_port 10003
+; on_motion_detected /home/dcristian/OMV/scripts/recordalert.sh 7 front
+timelapse_filename tmp/timelapse/cam-front/%Y-%m/%Y-%m-%d/front-%Y-%m-%d_%H-%M-%S_lapse
