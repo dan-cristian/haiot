@@ -29,12 +29,12 @@ echo Adding THD hol touch
 }
 
 function init_output() {
-echo Initialise all outputs
-/home/dcristian/PYC/scripts/audio/mpc-play.sh 6600 init
-/home/dcristian/PYC/scripts/audio/mpc-play.sh 6601 init
-/home/dcristian/PYC/scripts/audio/mpc-play.sh 6602 init
-/home/dcristian/PYC/scripts/audio/mpc-play.sh 6603 init
-/home/dcristian/PYC/scripts/audio/mpc-play.sh 6604 init
+echo 'Initialise all outputs using script in [$HAIOT_DIR]'
+$HAIOT_DIR/scripts/audio/mpc-play.sh 6600 init
+$HAIOT_DIR/scripts/audio/mpc-play.sh 6601 init
+$HAIOT_DIR/scripts/audio/mpc-play.sh 6602 init
+$HAIOT_DIR/scripts/audio/mpc-play.sh 6603 init
+$HAIOT_DIR/scripts/audio/mpc-play.sh 6604 init
 }
 
 killall udevadm
