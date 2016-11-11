@@ -619,6 +619,7 @@ class ZoneAlarm(db.Model, DbEvent, DbBase):
     gpio_host_name = db.Column(db.String(50))
     # gpio_pin = db.relationship('GpioPin', backref=db.backref('ZoneAlarm(gpiopincode)', lazy='dynamic'))
     alarm_pin_triggered = db.Column(db.Boolean)  # True if alarm sensor is connected (move detected)
+    is_false_alarm_prone = db.Column(db.Boolean)  # True if sensor can easily trigger false alarms (gate move by wind)
     start_alarm = db.Column(db.Boolean)  # True if alarm must start (because area/zone is armed)
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
 
