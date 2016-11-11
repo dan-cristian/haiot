@@ -29,7 +29,9 @@ echo Adding THD hol touch
 }
 
 function init_output() {
-echo 'Initialise all outputs using script in [$HAIOT_DIR]'
+echo Initialise all outputs using script in [$HAIOT_DIR]
+echo Current dir is:
+pwd
 $HAIOT_DIR/scripts/audio/mpc-play.sh 6600 init
 $HAIOT_DIR/scripts/audio/mpc-play.sh 6601 init
 $HAIOT_DIR/scripts/audio/mpc-play.sh 6602 init
