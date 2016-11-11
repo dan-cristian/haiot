@@ -167,7 +167,7 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     mplayer <audio file>
     '
 
-    apt-get install mpd triggerhappy
+    apt-get install mpd mpc triggerhappy
     cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/triggerhappy/triggers.conf /etc/triggerhappy/
     ln -s $LOG_ROOT /mnt/log
 
