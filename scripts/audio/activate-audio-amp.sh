@@ -19,7 +19,9 @@ echo [`date +%T.%N`] $1 $2 $3 $4 $5
 tail /proc/asound/[[:upper:]]*/pcm*p/sub0/hw_params
 
 #25 times x 2 secons
-for times in {1..25}; do
+while [ True ]
+do
+
 echo === Try $times ===
   for i in ${!RELAY[*]}; do
 	cat /proc/asound/${CARD[$i]}/${DEV[$i]}/sub0/hw_params | grep -q closed
@@ -49,4 +51,10 @@ echo === Try $times ===
 	break
   fi
   sleep 2
+
+if [ $1 -ne "loop" ]; then
+    exit
+fi
+
 done
+
