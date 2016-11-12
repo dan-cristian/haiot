@@ -18,7 +18,8 @@ ENABLE_CAMERA=1
 MOTION_ROOT=/mnt/data/hdd-wdr-evhk/motion
 LOG_ROOT=/mnt/data/hdd-wdr-evhk/log
 ENABLE_TORRENT=1
-ENABLE_SAMBA=1
+#ENABLE_SAMBA=1
+ENABLE_CLOUD_AMAZON=1
 
 echo "Setting timezone ..."
 echo "Europe/Bucharest" > /etc/timezone
@@ -218,8 +219,29 @@ if [ "$ENABLE_CAMERA" == "1" ]; then
     chown motion:users /mnt/log/motion.log
     adduser motion users
     chmod -R g+w /mnt/motion/
+    mkdir -p /home/motion
+    chown motion:users /home/motion
     /etc/init.d/motion restart
 fi
+
+
+# CLOUD must be after CAMERA due to user creation
+if [ "$ENABLE_CLOUD_AMAZON" == "1" ]; then
+    # http://rclone.org/install/
+    curl -O http://downloads.rclone.org/rclone-current-linux-amd64.zip
+    unzip rclone-current-linux-amd64.zip
+    cd rclone-*-linux-amd64
+    cp rclone /usr/sbin/
+    chown root:root /usr/sbin/rclone
+    chmod 755 /usr/sbin/rclone
+    cd ..
+    rm -r rclone*
+    echo "Set your cloud account"
+    rclone config TODO TODO
+    cp /home/$USERNAME/.rclone.conf /home/motion
+    chown motion:users /home/motion/.rclone.conf
+fi
+
 
 if [ "$ENABLE_TORRENT" == "1" ]; then
     apt-get install transmission-daemon
