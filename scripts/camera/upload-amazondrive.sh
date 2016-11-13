@@ -70,6 +70,10 @@ if [ $# -ne 0 ]; then
     dest="${source///tmp$replace}"
     dest_parent=`dirname $dest`
     mkdir -p $dest_parent >> $LOG 2>&1
+    if [ $? -eq 1 ]; then
+	echo2 "Create parent folder failed"
+	return 2
+    fi
     #echo2 "Move file to $dest"
     chmod -v 777 $dest_parent >> $LOG 2>&1
     mv -f $1 $dest >> $LOG 2>&1
