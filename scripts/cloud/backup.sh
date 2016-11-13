@@ -8,6 +8,6 @@ FILE_BACKUP=$BACKUP_DIR/$HOST-Backup$DATE.tar.gz
 echo backing up $FILE_BACKUP
 sleep 5
 
-tar -pczf $FILE_BACKUP /  --exclude-from=/home/dcristian/PYC/scripts/cloud/backup-exclude.txt -v
+tar -pczf $FILE_BACKUP /  --exclude-from=/home/haiot/PYC/scripts/cloud/backup-exclude.txt -v
 chmod 666 $FILE_BACKUP
 
