@@ -7,5 +7,5 @@ FILE_BACKUP_GIT=$BACKUP_DIR/$HOST-GIT-Backup$DATE.tar.gz
 
 echo backing up $FILE_BACKUP_GIT
 
-tar -pczf $FILE_BACKUP_GIT /mnt/data/hdd-wdg-6297/git -v
+tar -pczf $FILE_BACKUP_GIT /mnt/git -v
 chmod 666 $FILE_BACKUP_GIT
