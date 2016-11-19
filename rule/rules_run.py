@@ -65,9 +65,10 @@ def rule_alarm(obj=models.ZoneAlarm(), field_changed_list=None):
         # elif obj.alarm_pin_name == 'usa intrare':
         #     thread.start_new_thread(rule_common.play_bell_local, ('warning.wav',))
         elif obj.alarm_pin_name == 'poarta':
+            pass
             # thread.start_new_thread(rule_common.play_bell_local, ('121798__boss-music__bird.wav',))
-            rule_common.send_notification(title="Gate Open", priority=2)
-            rule_common.send_chat(message="Gate Open", notify=True)
+            # rule_common.send_notification(title="Gate Open", priority=2)
+            # rule_common.send_chat(message="Gate Open", notify=True)
         elif obj.alarm_pin_name == 'portita':
             thread.start_new_thread(rule_common.play_bell_local, ('121798__boss-music__bird.wav',))
             rule_common.send_notification(title="Portita Open", priority=2)
@@ -78,8 +79,9 @@ def rule_alarm(obj=models.ZoneAlarm(), field_changed_list=None):
     #    Log.logger.info('Rule Alarm OFF: pin={} triggered={}'.format(obj.alarm_pin_name, obj.alarm_pin_triggered))
     else:
         if obj.alarm_pin_name == 'poarta':
-            rule_common.send_notification(title="Gate Closed", priority=2)
-            rule_common.send_chat(message="Gate Closed", notify=True)
+            pass
+            # rule_common.send_notification(title="Gate Closed", priority=2)
+            # rule_common.send_chat(message="Gate Closed", notify=True)
         elif obj.alarm_pin_name == 'portita':
             rule_common.send_notification(title="Portita Closed", priority=2)
             rule_common.send_chat(message="Portita Closed", notify=True)
