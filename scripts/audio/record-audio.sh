@@ -16,7 +16,7 @@ RECORD_PATH=/mnt/music/_recorded
 #current song
 song_name=""
 #previous recording song
-rec_song_name=""
+rec_song_name="none"
 
 function echo2(){
 echo [`date +%T.%N`] $1 $2 $3 $4 $5 >> $LOG 2>&1
@@ -174,7 +174,7 @@ lock=/tmp/.record-audio.exclusivelock
 					loop_out_is_open=$?
 					if [ "$loop_out_is_open" == "1" ]; then
 						record_song
-						rec_sound_name="$song_name"
+						rec_song_name="$song_name"
 						rec_song_tmp_path="$song_tmp_path"
 						rec_song_path="$song_path"
 						echo2 "Started recording $rec_sound_name[$song_name] to file $rec_song_tmp_path"
