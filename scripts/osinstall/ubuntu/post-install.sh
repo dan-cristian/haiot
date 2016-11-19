@@ -20,6 +20,8 @@ LOG_ROOT=/mnt/data/hdd-wdr-evhk/log
 ENABLE_TORRENT=1
 #ENABLE_SAMBA=1
 ENABLE_CLOUD_AMAZON=1
+ENABLE_MYSQL=1
+MYSQL_DATA_ROOT=/mnt/data/hdd-wdr-evhk/mysql
 
 echo "Setting timezone ..."
 echo "Europe/Bucharest" > /etc/timezone
@@ -173,8 +175,13 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     '
     echo 'Installing music tools'
     apt-get install mpd mpc triggerhappy
+    git clone https://github.com/wertarbyte/triggerhappy.git
+    cd triggerhappy/
+    make
+    make install
     cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/triggerhappy/triggers.conf /etc/triggerhappy/
-
+    cd ..
+    rm -r triggerhappy
     ln -s $LOG_ROOT /mnt/log
     ln -s $MUSIC_ROOT /mnt/music
     cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/mpd.conf /etc/
@@ -204,6 +211,10 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     systemctl disable upmpdcli
     cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/upmpdcli*.conf /etc
 
+    # https://trac.ffmpeg.org/wiki/Capture/ALSA#Recordaudiofromanapplicationwhilealsoroutingtheaudiotoanoutputdevice
+    echo "snd_aloop" >> /etc/modules
+    echo "options snd_aloop pcm_substreams=1" >> /etc/modprobe.d/alsa-base.conf
+
     echo 'Installing video tools'
     apt-get install i3 xinit xterm kodi
 
@@ -211,16 +222,19 @@ fi
 
 if [ "$ENABLE_CAMERA" == "1" ]; then
     echo 'Installing motion'
-    apt-get install motion
+    apt-get install motion lsof
     /etc/init.d/motion stop
     cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/motion/*.conf /etc/motion/
     echo 'start_motion_daemon=yes' > /etc/default/motion
     ln -s $MOTION_ROOT /mnt/motion
     chown motion:users /mnt/log/motion.log
+    # change default motion user attribs to set right perms
     adduser motion users
     chmod -R g+w /mnt/motion/
     mkdir -p /home/motion
     chown motion:users /home/motion
+    chsh -s /bin/bash motion
+    usermod -m -d /home/motion motion
     /etc/init.d/motion restart
 fi
 
@@ -237,9 +251,9 @@ if [ "$ENABLE_CLOUD_AMAZON" == "1" ]; then
     cd ..
     rm -r rclone*
     echo "Set your cloud account"
-    rclone config TODO TODO
+    runuser -l $USERNAME -c '/usr/sbin/rclone config'
     cp /home/$USERNAME/.rclone.conf /home/motion
-    chown motion:users /home/motion/.rclone.conf
+    chown motion:motion /home/motion/.rclone.conf
 fi
 
 
@@ -248,6 +262,19 @@ if [ "$ENABLE_TORRENT" == "1" ]; then
     /etc/init.d/transmission-daemon stop
     cp -R $HAIOT_DIR/scripts/osinstall/ubuntu/etc/transmission-daemon /etc
     /etc/init.d/transmission-daemon start
+fi
+
+if [ "$ENABLE_MYSQL" == "1" ]; then
+    echo 'Installing mysql'
+    apt-get install mysql-server
+    /etc/init.d/mysql stop
+    # http://tecadmin.net/change-default-mysql-data-directory-in-linux/
+    # change data dir and comment listen on local interface only
+    nano /etc/mysql/mysql.conf.d/mysqld.cnf
+    #add mysql data dir in app armor to allow write
+    nano /etc/apparmor.d/usr.sbin.mysqld
+    chown mysql:mysql -R $MYSQL_DATA_ROOT
+    /etc/init.d/mysql restart
 fi
 
 if [ "$ENABLE_HAIOT" == "1" ]; then
