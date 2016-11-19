@@ -73,6 +73,8 @@ for i in ${!PORT[*]}; do
 			echo2 "Init output in zone ${NAME[$i]}, output=[${OUTPUT[$i]}]"
 			mpc -vp $1 enable only "${OUTPUT[$i]}" >> $LOG 2>&1
 			mpc -vp $1 volume 25 >> $LOG 2>&1
+			mpc -vp $1 status >> $LOG 2>&1
+			mpc -vp $1 outputs >> $LOG 2>&1
 		elif [ "$2" == "music" ]; then
 			echo2 "Starting MUSIC play in zone ${NAME[$i]}, output=[${OUTPUT[$i]}]"
 			mpc -vp $1 enable only "${OUTPUT[$i]}" >> $LOG 2>&1
