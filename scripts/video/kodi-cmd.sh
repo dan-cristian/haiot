@@ -35,19 +35,38 @@ if [ $code == '0' ]; then
 fi
 }
 
+# does not work when launched from thd
+function increase_prio(){
+while :
+do
+	ps -ef | grep -q "kodi.bin"
+	if [ $? -eq 0 ]; then
+		sleep 5
+		ps -ef | grep "kodi.bin" | grep -v grep | awk '{print $2}' | xargs renice -12 -p 
+		echo "Reniced!"
+		return 0
+	fi
+echo "Looping"
+sleep 1
+done
+}
+
 # http://unix.stackexchange.com/questions/118811/why-cant-i-run-gui-apps-from-root-no-protocol-specified
+# http://kodi.wiki/view/HOW-TO:Autostart_Kodi_for_Linux
 
 echo2 "Kodi cmd=$1"
 if [ "$1" == "start" ]; then
 	stop_kodi
 	echo2 "Starting kodi"
 	/usr/bin/startx /usr/bin/kodi >> $LOG 2>&1 &
+	#increase_prio
 elif [ "$1" == "stop" ]; then
 	stop_kodi
 elif [ "$1" == "start_once" ]; then
 	exit_if_kodi_run
 	echo2 "Starting kodi once"
-        /usr/bin/startx /usr/bin/kodi >> $LOG 2>&1 &
+	/usr/bin/startx /usr/bin/kodi >> $LOG 2>&1 &
+	#increase_prio
 else
 	echo2 "Action not mapped for command=[$1]"
 fi
