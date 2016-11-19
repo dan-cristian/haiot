@@ -12,6 +12,10 @@ ENABLE_SNAPRAID=1
 DATA_DISK1=/mnt/data/hdd-wdg-6297
 DATA_DISK2=/mnt/data/hdd-wdr-evhk
 PARITY_DISK=/mnt/parity/hdd-wdg-2130
+VIDEOS_ROOT=/mnt/data/hdd-wdr-evhk/videos
+PHOTOS_ROOT=/mnt/data/hdd-wdg-6297/photos
+PRIVATE_ROOT=/mnt/data/hdd-wdg-6297/private
+EBOOKS_ROOT=/mnt/data/hdd-wdg-6297/ebooks
 ENABLE_GIT=1
 GIT_ROOT=/mnt/data/hdd-wdg-6297/git
 ENABLE_CAMERA=1
@@ -72,6 +76,10 @@ if [ "$?" == "1" ]; then
     echo "UUID=615e4b68-905a-43e0-81f2-5c0a66d632ba       $DATA_DISK2          ext4    nofail,noatime,journal_async_commit,data=writeback,barrier=0,errors=remount-ro    1       1" >> /etc/fstab
     echo "#/mnt/data/*                                     /mnt/media      fuse.mergerfs   defaults,allow_other,big_writes,direct_io,fsname=mergerfs,minfreespace=50G         0       0" >> /etc/fstab
     mount -a
+    ln -s $VIDEOS_ROOT /mnt/videos
+    ln -s $PHOTOS_ROOT /mnt/photos
+    ln -s $PRIVATE_ROOT /mnt/private
+    ln -s $EBOOKS_ROOT /mnt/ebooks
 fi
 
 if [ "$ENABLE_GIT" == "1" ]; then
@@ -127,8 +135,8 @@ fi
 
 
 if [ "$ENABLE_MEDIA" == "1" ]; then
-    echo "Installing media - sound + mpd + kodi"
-    apt-get install alsa-utils bluez pulseaudio-module-bluetooth python-gobject python-gobject-2
+    echo "Installing media - sound + mpd + kodi + mp3 tagger"
+    apt-get install alsa-utils bluez pulseaudio-module-bluetooth python-gobject python-gobject-2 id3v2 flac
     # https://www.raspberrypi.org/forums/viewtopic.php?t=68779
     # https://jimshaver.net/2015/03/31/going-a2dp-only-on-linux/
     usermod -a -G lp $USERNAME
@@ -213,11 +221,16 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
 
     # https://trac.ffmpeg.org/wiki/Capture/ALSA#Recordaudiofromanapplicationwhilealsoroutingtheaudiotoanoutputdevice
     echo "snd_aloop" >> /etc/modules
+    # this is loaded with index 0
     echo "options snd_aloop pcm_substreams=1" >> /etc/modprobe.d/alsa-base.conf
+    echo "Setting sound card order - useful for kodi if default is busy with audio chose the next one"
+    # set here the next one (in a safe zone, kodi picks this one if others are busy)
+    # http://superuser.com/questions/626606/how-to-make-alsa-pick-a-preferred-sound-device-automatically
+    echo "options snd_oxygen index=1" >> /etc/modprobe.d/alsa-base.conf
 
     echo 'Installing video tools'
+    #http://blog.endpoint.com/2012/11/using-cec-client-to-control-hdmi-devices.html
     apt-get install i3 xinit xterm kodi
-
 fi
 
 if [ "$ENABLE_CAMERA" == "1" ]; then
@@ -235,6 +248,19 @@ if [ "$ENABLE_CAMERA" == "1" ]; then
     chown motion:users /home/motion
     chsh -s /bin/bash motion
     usermod -m -d /home/motion motion
+
+    echo 'Installing latest version from alternate git as default package is very old'
+    git clone https://github.com/Motion-Project/motion.git
+    cd motion/
+    apt-get install autoconf libjpeg-dev pkgconf libavutil-dev libavformat-dev libavcodec-dev libswscale-dev
+    autoreconf
+    ./configure
+    make
+    make install
+    ln -s /etc/motion/motion.conf /usr/local/etc/motion/motion.conf
+    echo "Update motion daemon path and paths, usually in /local/bin rather than /bin"
+    sleep 5
+    nano /etc/init.d/motion
     /etc/init.d/motion restart
 fi
 
