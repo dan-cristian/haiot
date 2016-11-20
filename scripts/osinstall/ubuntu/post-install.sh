@@ -35,7 +35,7 @@ echo "Updating apt-get"
 apt-get -y update
 apt-get -y upgrade
 echo "Installing additional packages"
-apt-get -y install ssh dialog sudo nano wget runit git ssmtp mailutils psmisc smartmontools localepurge mosquitto
+apt-get -y install ssh dialog sudo nano wget runit git ssmtp mailutils psmisc smartmontools localepurge mosquitto gpm
 if [ "$ENABLE_RAMRUN" == "1" ]; then
     # run in ram needs busybox for ramfs copy operations, see "local" script sample
     apt-get -y install busybox
@@ -61,6 +61,7 @@ useradd ${USERNAME} -m
 echo "$USERNAME:$USERPASS" | chpasswd
 adduser ${USERNAME} sudo
 adduser ${USERNAME} audio
+adduser ${USERNAME} video
 chsh -s /bin/bash ${USERNAME}
 
 
@@ -112,8 +113,12 @@ else
     git clone https://github.com/dan-cristian/haiot.git
     export HAIOT_DIR=/home/$USERNAME/haiot
 fi
-echo 'HAIOT_DIR=$HAIOT_DIR' > /etc/profile.d/haiot.sh
+echo "export HAIOT_DIR=$HAIOT_DIR" > /etc/profile.d/haiot.sh
+echo "export DISPLAY=:0.0" >> /etc/profile.d/haiot.sh
+echo "export HAIOT_USER=haiot" >> /etc/profile.d/haiot.sh
 chmod +x /etc/profile.d/haiot.sh
+cp /etc/profile.d/haiot.sh /etc/profile.d/root.sh
+
 
 if [ "$ENABLE_SNAPRAID" == "1" ]; then
     echo "Setup snapraid"
@@ -136,7 +141,7 @@ fi
 
 if [ "$ENABLE_MEDIA" == "1" ]; then
     echo "Installing media - sound + mpd + kodi + mp3 tagger"
-    apt-get install alsa-utils bluez pulseaudio-module-bluetooth python-gobject python-gobject-2 id3v2 flac
+    apt-get install alsa-utils bluez pulseaudio-module-bluetooth python-gobject python-gobject-2 id3v2 flac mediainfo
     # https://www.raspberrypi.org/forums/viewtopic.php?t=68779
     # https://jimshaver.net/2015/03/31/going-a2dp-only-on-linux/
     usermod -a -G lp $USERNAME
@@ -230,7 +235,11 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
 
     echo 'Installing video tools'
     #http://blog.endpoint.com/2012/11/using-cec-client-to-control-hdmi-devices.html
-    apt-get install i3 xinit xterm kodi
+    # http://www.semicomplete.com/projects/xdotool/#idp2912
+    apt-get install i3 xinit xterm kodi xdotool
+
+    #dependencies for chrome
+    apt-get install gconf-service
 fi
 
 if [ "$ENABLE_CAMERA" == "1" ]; then
@@ -295,9 +304,11 @@ if [ "$ENABLE_MYSQL" == "1" ]; then
     apt-get install mysql-server
     /etc/init.d/mysql stop
     # http://tecadmin.net/change-default-mysql-data-directory-in-linux/
-    # change data dir and comment listen on local interface only
+    echo "change data dir and comment listen on local interface only"
+    sleep 5
     nano /etc/mysql/mysql.conf.d/mysqld.cnf
-    #add mysql data dir in app armor to allow write
+    echo "add mysql data dir in app armor to allow write"
+    sleep 5
     nano /etc/apparmor.d/usr.sbin.mysqld
     chown mysql:mysql -R $MYSQL_DATA_ROOT
     /etc/init.d/mysql restart
