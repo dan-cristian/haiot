@@ -17,7 +17,7 @@ apt-get -y update
 apt-get -y upgrade
 echo "Installing additional packages"
 # 1-wire support needs owfs
-apt-get -y install dialog sudo nano locales python wget owfs git python-rpi.gpio python-dev rpi-update wiringpi ssmtp mailutils
+apt-get -y install dialog sudo nano locales python wget owfs git python-rpi.gpio python-dev rpi-update wiringpi ssmtp mailutils mosquitto
 # run in ram needs busybox for ramfs copy operations, see "local" script sample
 apt-get -y install busybox
 
