@@ -62,6 +62,7 @@ echo "$USERNAME:$USERPASS" | chpasswd
 adduser ${USERNAME} sudo
 adduser ${USERNAME} audio
 adduser ${USERNAME} video
+adduser ${USERNAME} tty
 chsh -s /bin/bash ${USERNAME}
 
 
@@ -237,9 +238,21 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     #http://blog.endpoint.com/2012/11/using-cec-client-to-control-hdmi-devices.html
     # http://www.semicomplete.com/projects/xdotool/#idp2912
     apt-get install i3 xinit xterm kodi xdotool
-
     #dependencies for chrome
     apt-get install gconf-service
+
+    echo "Set default card for X"
+    echo '
+    pcm.!default {
+    type hw
+    card DAC
+    }
+
+    ctl.!default {
+    type hw
+    card DAC
+    }' > /root/.asoundrc
+
 fi
 
 if [ "$ENABLE_CAMERA" == "1" ]; then
