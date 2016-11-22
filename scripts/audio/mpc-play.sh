@@ -71,10 +71,10 @@ for i in ${!PORT[*]}; do
 		PORT_MATCH=$1
 		if [ "$2" == "init" ]; then
 			echo2 "Init output in zone ${NAME[$i]}, output=[${OUTPUT[$i]}]"
-			mpc -vp $1 enable only "${OUTPUT[$i]}" >> $LOG 2>&1
-			mpc -vp $1 volume 25 >> $LOG 2>&1
-			mpc -vp $1 status >> $LOG 2>&1
-			mpc -vp $1 outputs >> $LOG 2>&1
+			mpc -vp $1 enable only "${OUTPUT[$i]}"
+			mpc -vp $1 volume 25
+			mpc -vp $1 status
+			mpc -vp $1 outputs
 		elif [ "$2" == "music" ]; then
 			echo2 "Starting MUSIC play in zone ${NAME[$i]}, output=[${OUTPUT[$i]}]"
 			mpc -vp $1 enable only "${OUTPUT[$i]}" >> $LOG 2>&1
