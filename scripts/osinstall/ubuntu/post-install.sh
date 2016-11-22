@@ -188,7 +188,8 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     mplayer <audio file>
     '
     echo 'Installing music tools'
-    apt-get install mpd mpc triggerhappy
+
+    apt-get install mpd mpc triggerhappy avahi-daemon shairport-sync
     git clone https://github.com/wertarbyte/triggerhappy.git
     cd triggerhappy/
     make
@@ -253,6 +254,10 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     card DAC
     }' > /root/.asoundrc
 
+    # https://github.com/mikebrady/shairport-sync
+    echo "Configure AirPlay default sound card"
+    sleep 5
+    nano /etc/default/shairport-sync
 fi
 
 if [ "$ENABLE_CAMERA" == "1" ]; then
