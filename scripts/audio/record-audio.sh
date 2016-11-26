@@ -261,7 +261,7 @@ lock=/tmp/.record-audio.exclusivelock
 				fi
 			fi
 		else
-			sleep 3
+			sleep 5
 			((timeout+=1))
 			if [ $timeout -gt 30 ]; then
 				timeout=1
