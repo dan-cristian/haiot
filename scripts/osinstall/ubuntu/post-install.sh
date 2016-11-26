@@ -225,6 +225,13 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     systemctl stop upmpdcli
     systemctl disable upmpdcli
     cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/upmpdcli*.conf /etc
+    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/upmpdcli@.service /lib/systemd/system/
+    systemctl enable upmpdcli@living
+    systemctl start upmpdcli@living
+    systemctl enable upmpdcli@beci
+    systemctl start upmpdcli@beci
+    systemctl enable upmpdcli@dormitor
+    systemctl start upmpdcli@dormitor
 
     # https://trac.ffmpeg.org/wiki/Capture/ALSA#Recordaudiofromanapplicationwhilealsoroutingtheaudiotoanoutputdevice
     echo "snd_aloop" >> /etc/modules
@@ -258,6 +265,14 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     echo "Configure AirPlay default sound card"
     sleep 5
     nano /etc/default/shairport-sync
+    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/shairport-sync*.conf /etc/
+    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/shairport-sync@.service /lib/systemd/system/
+    # disable default instance
+    systemctl disable shairport-sync
+    systemctl stop shairport-sync
+    systemctl enable shairport-sync@living
+    systemctl enable shairport-sync@beci
+    systemctl enable shairport-sync@dormitor
 fi
 
 if [ "$ENABLE_CAMERA" == "1" ]; then
