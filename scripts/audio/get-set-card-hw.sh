@@ -41,13 +41,19 @@ return -1
 function update_shairport(){
 local zone_name=$1
 local card=$2
+local conf_file="/etc/shairport-sync_"$zone_name".conf"
+
 echo2 "Updating shairport config file zone=$zone_name card=$card"
-/bin/systemctl stop shairport-sync@$zone_name
+if [ -f $conf_file ]; then
+	/bin/systemctl stop shairport-sync@$zone_name
 
-#http://www.grymoire.com/Unix/Sed.html#uh-29
-sed 's/output_device = .*; /output_device = '$card'; /' "/etc/shairport-sync_"$zone_name".conf"
+	#http://www.grymoire.com/Unix/Sed.html#uh-29
+	/bin/sed -i 's/output_device = .*; /output_device = "'$card'"; /' "$conf_file"
 
-/bin/systemctl start shairport-sync@$zone_name
+	/bin/systemctl start shairport-sync@$zone_name
+else
+	echo2 "Config file $conf_file not found"
+fi
 }
 
 
