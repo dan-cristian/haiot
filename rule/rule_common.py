@@ -32,7 +32,8 @@ def update_command_override_relay(relay_pin_name, is_rule, is_gui):
 def play_bell_local(sound_file):
     # client = mpd.MPDClient(use_unicode=True)
     # client.connect(get_param(Constant.P_MPD_SERVER), 6600)
-    result = subprocess.check_output(['aplay', 'scripts/audio/{}'.format(sound_file)], stderr=subprocess.STDOUT)
+    #result = subprocess.check_output(['aplay', 'scripts/audio/{}'.format(sound_file)], stderr=subprocess.STDOUT)
+    result = subprocess.check_output(['aplay', 'scripts/static/sounds/{}'.format(sound_file)], stderr=subprocess.STDOUT)
     Log.logger.info("Play bell returned: {}".format(result))
 
 
