@@ -189,7 +189,7 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     '
     echo 'Installing music tools'
 
-    apt-get install mpd mpc triggerhappy avahi-daemon shairport-sync
+    apt-get install mpd mpc triggerhappy avahi-daemon shairport-sync sox lame
     git clone https://github.com/wertarbyte/triggerhappy.git
     cd triggerhappy/
     make
@@ -285,6 +285,7 @@ if [ "$ENABLE_CAMERA" == "1" ]; then
     chown motion:users /mnt/log/motion.log
     # change default motion user attribs to set right perms
     adduser motion users
+    adduser motion audio
     chmod -R g+w /mnt/motion/
     mkdir -p /home/motion
     chown motion:users /home/motion
