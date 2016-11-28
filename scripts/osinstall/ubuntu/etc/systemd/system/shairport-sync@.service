@@ -1,6 +1,6 @@
 [Unit]
 Description=Zone %I
-After=sound.target
+After=sound.target network.target
 Requires=avahi-daemon.service
 After=avahi-daemon.service
 
@@ -9,6 +9,7 @@ ExecStart=/usr/bin/shairport-sync -c /etc/shairport-sync_%I.conf
 User=shairport-sync
 Group=shairport-sync
 SyslogIdentifier=shairport-sync-%I
+Nice=-10
 
 [Install]
 WantedBy=multi-user.target
