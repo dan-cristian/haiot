@@ -1,6 +1,6 @@
 [Unit]
 Description=Upmpdcli %I
-After=sound.target
+After=sound.target network.target
 
 [Service]
 Type=simple
@@ -14,6 +14,7 @@ RestartSec=1min
 #User=
 #Group=
 SyslogIdentifier=upmpdcli-%I
+Nice=-10
 
 [Install]
 WantedBy=multi-user.target

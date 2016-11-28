@@ -1,22 +1,26 @@
 #!/bin/bash
 
-declare -a NAME=("living" "bucatarie" "dormitor" "baie" "beci")
-declare -a PORT_LIST=(6600 6601 6603 6604 6602)
+#declare -a NAME=("living" "bucatarie" "dormitor" "baie" "beci")
+#declare -a PORT_LIST=(6600 6601 6603 6604 6602)
 declare -a STATUS_OPEN=(0 0 0 0 0)
-declare -a CARD_OUT=("DAC" "PCH" "DGX" "Device" "DGX")
-declare -a CARD_CAPT=("Loopback" "PCH" "DGX" "Device" "DGX")
+#declare -a CARD_OUT=("DAC" "PCH" "DGX" "Device" "DGX")
+#declare -a CARD_CAPT=("Loopback" "PCH" "DGX" "Device" "DGX")
 RECORD_DEVICE="Loopback,1,0"
 # 1 is usualy digital, 0 is analog
-declare -a DEV_CAPT=("pcm0c" "pcm0c" "pcm1c" "pcm0c" "pcm0c")
-declare -a DEV_OUT=("pcm0p" "pcm0p" "pcm1p" "pcm0p" "pcm0p")
+#declare -a DEV_CAPT=("pcm0c" "pcm0c" "pcm1c" "pcm0c" "pcm0c")
+#declare -a DEV_OUT=("pcm0p" "pcm0p" "pcm1p" "pcm0p" "pcm0p")
 MPD_LOOP_OUTPUT_NAME="Record"
 LOG=/mnt/log/record-audio.log
 RECORD_PATH=/mnt/music/_recorded
 
-function echo2(){
-echo [`date +%T.%N`] $1 $2 $3 $4 $5 >> $LOG 2>&1
-echo [`date +%T.%N`] $1 $2 $3 $4 $5
-}
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source "$DIR/include_cards.sh"
+
+#function echo2(){
+#echo [`date +%T.%N`] $1 $2 $3 $4 $5 >> $LOG 2>&1
+#echo [`date +%T.%N`] $1 $2 $3 $4 $5
+#}
 
 function compress_set_tag(){
 local src_file=$rec_song_tmp_path
