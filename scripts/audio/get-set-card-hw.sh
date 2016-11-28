@@ -2,16 +2,18 @@
 
 LOG=/mnt/log/mpd.log
 
-declare -a NAME=("living" 	"bucatarie" 	"dormitor" 	"baie" 		"beci" 	"pod" 	"headset")
-declare -a CARD=("DAC" 		"PCH" 		"DGX" 		"Device" 	"DGX"	)
-declare -a DEV=("pcm0p" 	"pcm0p" 	"pcm1p" 	"pcm0p" 	"pcm0p")
+#declare -a NAME=("living" 	"pod"	 	"dormitor" 	"baie" 		"beci" 	"pod" 	"headset")
+#declare -a CARD=("DAC" 		"PCH" 		"DGX" 		"Device" 	"DGX"	)
+#declare -a DEV=("pcm0p" 	"pcm0p" 	"pcm1p" 	"pcm0p" 	"pcm0p")
 
 
-function echo2(){
-echo [`date +%T.%N`] $1 $2 $3 $4 $5 >> $LOG 2>&1
-echo [`date +%T.%N`] $1 $2 $3 $4 $5
-}
+#function echo2(){
+#echo [`date +%T.%N`] $1 $2 $3 $4 $5 >> $LOG 2>&1
+#echo [`date +%T.%N`] $1 $2 $3 $4 $5
+#}
 
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source "$DIR/include_cards.sh"
 
 # 0 [Loopback       ]: Loopback - Loopback
 # 1 [PCH            ]: HDA-Intel - HDA Intel PCH
@@ -63,6 +65,7 @@ local i
 for i in ${!NAME[*]}; do
 	if [ "${NAME[$i]}" == "$zone_name" ]; then
 		CARD_NAME=${CARD[$i]}
+		CARD_INDEX=${DEV[$i]}
 		echo2 "Found card $CARD_NAME in zone $zone_name"
 		return 0
 	fi
@@ -77,7 +80,8 @@ get_card_name $zone_name
 get_hw $CARD_NAME
 hw=$?
 if [ $hw -ne -1 ]; then
-	hw_full="hw:$hw,0"
+	dev_index="${CARD_INDEX//[!0-9]/}"
+	hw_full="hw:$hw,$dev_index"
 	update_shairport "$zone_name" "$hw_full"
 else
 	echo2 "Unable to find hw card zone $zone_name"
