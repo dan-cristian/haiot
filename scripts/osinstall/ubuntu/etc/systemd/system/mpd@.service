@@ -1,11 +1,14 @@
 [Unit]
-Description=Music Player Daemon
+Description=Music Player Daemon %I
 After=network.target sound.target
 
 [Service]
 EnvironmentFile=/etc/default/mpd
-ExecStart=/usr/bin/mpd --no-daemon $MPDCONF
-
+ExecStart=/usr/bin/mpd --no-daemon /etc/mpd.conf
+Restart=always
+RestartSec=1min
+SyslogIdentifier=mpd-%I
+Nice=-10
 # allow MPD to use real-time priority 50
 LimitRTPRIO=50
 LimitRTTIME=infinity
@@ -14,6 +17,4 @@ LimitRTTIME=infinity
 ProtectSystem=yes
 
 [Install]
-WantedBy=multi-user.target
-Also=mpd3.socket
-
+WantedBy=multi-user.target mpd@%i.socket
