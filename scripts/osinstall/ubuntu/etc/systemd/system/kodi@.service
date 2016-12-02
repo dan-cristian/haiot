@@ -1,0 +1,12 @@
+[Unit]
+Description=Launch Kodi on main display
+
+[Service]
+Type=oneshot
+Environment=DISPLAY=:0.0
+Nice=-1
+ExecStart=/usr/bin/su %i /usr/bin/kodi
+ExecStartPost=/usr/bin/bash -c "sleep 15 && systemctl start kodi@%i.socket"
+
+[Install]
+WantedBy=multi-user.target
