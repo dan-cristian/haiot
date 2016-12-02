@@ -200,21 +200,43 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     ln -s $LOG_ROOT /mnt/log
     ln -s $MUSIC_ROOT /mnt/music
     cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/mpd.conf /etc/
-    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/sockets.target.wants/mpd*.socket /lib/systemd/system/
-    ln -s /lib/systemd/system/mpd2.socket /etc/systemd/system/sockets.target.wants/mpd2.socket
-    ln -s /lib/systemd/system/mpd3.socket /etc/systemd/system/sockets.target.wants/mpd3.socket
-    ln -s /lib/systemd/system/mpd4.socket /etc/systemd/system/sockets.target.wants/mpd4.socket
-    ln -s /lib/systemd/system/mpd5.socket /etc/systemd/system/sockets.target.wants/mpd5.socket
-    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/multi-user.target.wants/mpd*.service /lib/systemd/system/
-    ln -s /lib/systemd/system/mpd2.service /etc/systemd/system/multi-user.target.wants/mpd2.service
-    ln -s /lib/systemd/system/mpd3.service /etc/systemd/system/multi-user.target.wants/mpd3.service
-    ln -s /lib/systemd/system/mpd4.service /etc/systemd/system/multi-user.target.wants/mpd4.service
-    ln -s /lib/systemd/system/mpd5.service /etc/systemd/system/multi-user.target.wants/mpd5.service
-    systemctl enable mpd.socket
-    systemctl enable mpd2.socket
-    systemctl enable mpd3.socket
-    systemctl enable mpd4.socket
-    systemctl enable mpd5.socket
+    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/mpd@.service /lib/systemd/system/
+    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/mpd@*.socket /lib/systemd/system/
+    systemctl enable mpd@living.service
+    systemctl enable mpd@pod.service
+    systemctl enable mpd@beci.service
+    systemctl enable mpd@dormitor.service
+    systemctl enable mpd@baie.service
+
+    systemctl enable mpd@living.socket
+    systemctl enable mpd@pod.socket
+    systemctl enable mpd@beci.socket
+    systemctl enable mpd@dormitor.socket
+    systemctl enable mpd@baie.socket
+
+    systemctl start mpd@living.socket
+    systemctl start mpd@pod.socket
+    systemctl start mpd@beci.socket
+    systemctl start mpd@dormitor.socket
+    systemctl start mpd@baie.socket
+
+    #cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/sockets.target.wants/mpd*.socket /lib/systemd/system/
+    #cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/sockets.target.wants/mpd*.socket /lib/systemd/system/
+
+    #ln -s /lib/systemd/system/mpd2.socket /etc/systemd/system/sockets.target.wants/mpd2.socket
+    #ln -s /lib/systemd/system/mpd3.socket /etc/systemd/system/sockets.target.wants/mpd3.socket
+    #ln -s /lib/systemd/system/mpd4.socket /etc/systemd/system/sockets.target.wants/mpd4.socket
+    #ln -s /lib/systemd/system/mpd5.socket /etc/systemd/system/sockets.target.wants/mpd5.socket
+    #cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/multi-user.target.wants/mpd*.service /lib/systemd/system/
+    #ln -s /lib/systemd/system/mpd2.service /etc/systemd/system/multi-user.target.wants/mpd2.service
+    #ln -s /lib/systemd/system/mpd3.service /etc/systemd/system/multi-user.target.wants/mpd3.service
+    #ln -s /lib/systemd/system/mpd4.service /etc/systemd/system/multi-user.target.wants/mpd4.service
+    #ln -s /lib/systemd/system/mpd5.service /etc/systemd/system/multi-user.target.wants/mpd5.service
+    #systemctl enable mpd.socket
+    #systemctl enable mpd2.socket
+    #systemctl enable mpd3.socket
+    #systemctl enable mpd4.socket
+    #systemctl enable mpd5.socket
 
     # http://www.lesbonscomptes.com/upmpdcli/upmpdcli.html
     # https://www.lesbonscomptes.com/upmpdcli/downloads.html#ubuntu
@@ -273,6 +295,9 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     systemctl enable shairport-sync@living
     systemctl enable shairport-sync@beci
     systemctl enable shairport-sync@dormitor
+    systemctl start shairport-sync@living
+    systemctl start shairport-sync@beci
+    systemctl start shairport-sync@dormitor
 fi
 
 if [ "$ENABLE_CAMERA" == "1" ]; then
