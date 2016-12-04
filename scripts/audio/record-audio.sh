@@ -1,26 +1,12 @@
 #!/bin/bash
-
-#declare -a NAME=("living" "bucatarie" "dormitor" "baie" "beci")
-#declare -a PORT_LIST=(6600 6601 6603 6604 6602)
 declare -a STATUS_OPEN=(0 0 0 0 0)
-#declare -a CARD_OUT=("DAC" "PCH" "DGX" "Device" "DGX")
-#declare -a CARD_CAPT=("Loopback" "PCH" "DGX" "Device" "DGX")
 RECORD_DEVICE="Loopback,1,0"
-# 1 is usualy digital, 0 is analog
-#declare -a DEV_CAPT=("pcm0c" "pcm0c" "pcm1c" "pcm0c" "pcm0c")
-#declare -a DEV_OUT=("pcm0p" "pcm0p" "pcm1p" "pcm0p" "pcm0p")
 MPD_LOOP_OUTPUT_NAME="Record"
 LOG=/mnt/log/record-audio.log
 RECORD_PATH=/mnt/music/_recorded
 
-
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source "$DIR/include_cards.sh"
-
-#function echo2(){
-#echo [`date +%T.%N`] $1 $2 $3 $4 $5 >> $LOG 2>&1
-#echo [`date +%T.%N`] $1 $2 $3 $4 $5
-#}
+source "$DIR/../common/include_cards.sh"
 
 function compress_set_tag(){
 local src_file=$rec_song_tmp_path
@@ -60,8 +46,7 @@ fi
 function record_song(){
 #local song_tmp_path=$1
 echo2 "Recording $song_tmp_path"
-arecord -c $sound_channels -f $sound_format -r $sound_rate -t wav -D hw:$RECORD_DEVICE "$song_tmp_path" &
-# >> $LOG 2>&1 &
+arecord -c $sound_channels -f $sound_format -r $sound_rate -t wav -D hw:$RECORD_DEVICE "$song_tmp_path" & >> $LOG 2>&1
 #arecord -q -c 2 -f S16_LE -r 44100 -t wav -D hw:$RECORD_DEVICE | flac -0 -o "$_song_tmp_path" >> $LOG 2>&1 &
 }
 
@@ -110,13 +95,13 @@ sound_channels=${format##*: }
 format=${sound_array[4]}
 format=${format##*: }
 sound_rate=${format% (*}
-echo2 "Sound meta format=$sound_format channels=$sound_channels rate=$sound_rate"
+echo2 "Loopback sound meta i=$i format=$sound_format channels=$sound_channels rate=$sound_rate"
 }
 
 function set_loopback_mpd_port(){
 # find card/mpd instance running with loopback
+local i
 for i in ${!CARD_OUT[*]}; do
-	# echo "Iterate $i"
 	#cat /proc/asound/${CARD_OUT[$i]}/${DEV_OUT[$i]}/sub0/hw_params
 	cat /proc/asound/${CARD_OUT[$i]}/${DEV_OUT[$i]}/sub0/hw_params | grep -q closed
 	local loop_in_is_closed=$?
@@ -186,7 +171,7 @@ timeout=1
 song_tmp_ext=".wav"
 song_ext=".flac"
 
-echo2 Started with parameter [$1] [$2]
+echo2 "Started with parameter [$1] [$2] in dir=$DIR"
 lock=/tmp/.record-audio.exclusivelock
 (
 	# Wait for lock on /var/lock/..exclusivelock (fd 200) for 1 seconds
@@ -196,7 +181,7 @@ lock=/tmp/.record-audio.exclusivelock
 		date_now=`date`
 		seconds_lapsed=`printf "%s\n" $(( $(date -d "$date_now" "+%s") - $(date -d "$date_last_on" "+%s") ))`
 		if [ $seconds_lapsed -le 300 ]; then
-			echo "Reusing cached MPD port, lapsed=$seconds_lapsed"
+			echo2 "Reusing cached MPD port, lapsed=$seconds_lapsed"
 			ok_to_record=0
 		else
 			set_loopback_mpd_port
@@ -204,7 +189,7 @@ lock=/tmp/.record-audio.exclusivelock
 		fi
 		if [ $ok_to_record -eq 0 ]; then
 			echo2 "MPD port with loopback enabled = $MPD_PORT in zone $ZONE_NAME"
-			if [ $MPD_PORT == "" ]; then
+			if [ "$MPD_PORT" == "" ]; then
 				echo2 "MPD port is empty?"
 			fi
 			date_last_on=`date`
@@ -213,6 +198,7 @@ lock=/tmp/.record-audio.exclusivelock
 				get_song_meta
 				if [ "$player_status" == "playing" ]; then
 					i=0
+          echo2 "Checking ${CARD_CAPT[$i]}-${DEV_CAPT[$i]}"
 					cat /proc/asound/${CARD_CAPT[$i]}/${DEV_CAPT[$i]}/sub0/hw_params | grep -q closed
 					loop_in_is_closed=$?
 					if [ -f "$song_tmp_path" ]; then
@@ -232,14 +218,17 @@ lock=/tmp/.record-audio.exclusivelock
 					cat /proc/asound/${CARD_CAPT[$i]}/${DEV_OUT[$i]}/sub0/hw_params | grep -q closed
 					loop_out_is_open=$?
 					if [ "$loop_out_is_open" == "1" ]; then
-						get_loopback_meta
+						get_loopback_meta 
 						record_song
 						rec_song_name="$song_name"
 						rec_song_tmp_path="$song_tmp_path"
 						rec_song_path="$song_path"
 						rec_song_duration="$song_duration"
 						echo2 "Started recording $rec_sound_name to file $rec_song_tmp_path"
-					fi
+					else
+            echo2 "Not recording $song_name as out=$loop_out_is_open"
+          fi
+            
 				else
 					if [ "$player_status" == "" ] || [ "$player_status" == "paused" ]; then
 						echo2 "Playback stopped. Terminating recording and deleting incomplete song."
@@ -269,7 +258,7 @@ lock=/tmp/.record-audio.exclusivelock
 			((timeout+=1))
 			if [ $timeout -gt 30 ]; then
 				timeout=1
-				echo2 "No loop instance active, sleep $timeout"
+				echo2 "No loop instance active, sleep $timeout, dir=$DIR"
 			fi
 		#loop port
 		fi
