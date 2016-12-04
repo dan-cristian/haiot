@@ -16,7 +16,8 @@ _period_list = ['year', 'month', 'day', 'hour']
 
 @app.route('/dashboard')
 def render_dashboard():
-    return render_template('dashboard/main.html')
+    sensors=models.Sensor().query_all()
+    return render_template('dashboard/main.html', sensor_list=sensors)
 
 
 def __config_graph(title, start, end):

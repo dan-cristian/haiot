@@ -5,7 +5,12 @@
     <title>Dashboards</title>
 </head>
 <body>
-    Hot Water
+    Hot Water Temp {{ hot_water_temp }}
     <p><a href="/chart-utility?sensor_name=water hot">today</a></p>
+{% for sensor in sensor_list%}
+    <p>{{ sensor.sensor_name }}={{ sensor.temperature }}</p>
+  {% else %}
+    <p>Unbelievable.  No entries here so far</p>
+  {% endfor %}
 </body>
 </html>
