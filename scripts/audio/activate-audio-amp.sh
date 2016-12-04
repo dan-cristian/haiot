@@ -1,13 +1,6 @@
 #!/bin/bash
 
 AMP_URL='http://192.168.0.13:8080/apiv1/db_update/model_name=ZoneCustomRelay&filter_name=relay_pin_name&field_name=relay_is_on'
-
-#declare -a NAME=("living" "pod" "dormitor" "baie" "beci")
-#declare -a RELAY=("living_music_relay" "pod_music_relay" "dormitor_music_relay" "baie_mare_music_relay" "beci_music_relay")
-#declare -a STATUS_OPEN=(0 0 0 0 0)
-#declare -a CARD=("DAC" "PCH" "DGX" "Device" "DGX")
-# 1 is usualy digital, 0 is analog
-#declare -a DEV=("pcm0p" "pcm0p" "pcm1p" "pcm0p" "pcm0p")
 CLOSED_DONE=0
 CLOSED_DONE_LOOP=0
 LOG=/mnt/log/mpd.log
@@ -16,13 +9,8 @@ REMOTE_STATUS=()
 LOCAL_STATUS=()
 REFRESHED=0
 
-#function echo2(){
-#echo [`date +%T.%N`] $1 $2 $3 $4 $5 >> $LOG 2>&1
-#echo [`date +%T.%N`] $1 $2 $3 $4 $5
-#}
-
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source "$DIR/include_cards.sh"
+source "$DIR/../common/include_cards.sh"
 
 #show current status, assume card names start with uppercase to avoid duplicates
 tail /proc/asound/[[:upper:]]*/pcm*p/sub0/hw_params
