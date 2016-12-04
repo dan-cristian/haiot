@@ -11,3 +11,6 @@ cp -vi /etc/upmpdcli*.conf $CONF/
 
 cp -vi /lib/systemd/system/mpd@.service $CONF/systemd/system/
 cp -vi /lib/systemd/system/mpd@*.socket $CONF/systemd/system/
+
+cp -vi /etc/i3blocks.conf $CONF/
+cp -vi /etc/i3/config $CONF/i3/

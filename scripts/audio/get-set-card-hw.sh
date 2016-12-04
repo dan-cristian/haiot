@@ -1,19 +1,8 @@
 #!/bin/bash
 
 LOG=/mnt/log/mpd.log
-
-#declare -a NAME=("living" 	"pod"	 	"dormitor" 	"baie" 		"beci" 	"pod" 	"headset")
-#declare -a CARD=("DAC" 		"PCH" 		"DGX" 		"Device" 	"DGX"	)
-#declare -a DEV=("pcm0p" 	"pcm0p" 	"pcm1p" 	"pcm0p" 	"pcm0p")
-
-
-#function echo2(){
-#echo [`date +%T.%N`] $1 $2 $3 $4 $5 >> $LOG 2>&1
-#echo [`date +%T.%N`] $1 $2 $3 $4 $5
-#}
-
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source "$DIR/include_cards.sh"
+source "$DIR/../common/include_cards.sh"
 
 # 0 [Loopback       ]: Loopback - Loopback
 # 1 [PCH            ]: HDA-Intel - HDA Intel PCH

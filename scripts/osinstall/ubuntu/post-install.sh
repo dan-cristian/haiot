@@ -141,6 +141,10 @@ fi
 
 
 if [ "$ENABLE_MEDIA" == "1" ]; then
+    echo "Installing bluetooth BLE for polar7"
+   #http://installfights.blogspot.ro/2016/08/fix-set-scan-parameters-failed.html
+
+
     echo "Installing media - sound + mpd + kodi + mp3 tagger"
     apt-get install alsa-utils bluez pulseaudio-module-bluetooth python-gobject python-gobject-2 id3v2 flac mediainfo
     # https://www.raspberrypi.org/forums/viewtopic.php?t=68779
@@ -267,7 +271,8 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     echo 'Installing video tools'
     #http://blog.endpoint.com/2012/11/using-cec-client-to-control-hdmi-devices.html
     # http://www.semicomplete.com/projects/xdotool/#idp2912
-    apt-get install i3 xinit xterm kodi xdotool
+    apt-get install i3 xinit xterm kodi xdotool i3blocks
+    
     #dependencies for chrome
     apt-get install gconf-service
 
@@ -298,6 +303,12 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     systemctl start shairport-sync@living
     systemctl start shairport-sync@beci
     systemctl start shairport-sync@dormitor
+
+    echo "Installing screenshow"
+    apt install feh
+
+   echo "Installing gesture"
+   apt install easystroke
 fi
 
 if [ "$ENABLE_CAMERA" == "1" ]; then

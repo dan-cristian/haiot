@@ -4,12 +4,7 @@ MPD_MUSIC=/mnt/music
 MPD_DELETED=/mnt/music_deleted
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source "$DIR/include_cards.sh"
-
-#function echo2(){
-#echo [`date +%T.%N`] $1 $2 $3 $4 $5 >> $LOG 2>&1
-#echo [`date +%T.%N`] $1 $2 $3 $4 $5
-#}
+source "$DIR/../common/include_cards.sh"
 
 function delete(){
 prefix="file: "
@@ -63,10 +58,6 @@ fi
 }
 
 echo2 "Using MPC port=$1 type=$2 extra=$3"
-
-#declare -a NAME=("living" "pod" "beci" "dormitor" "baie")
-#declare -a PORT=(6600 6601 6602 6603 6604)
-#declare -a OUTPUT=("Digital Small USB (living2)" "Analog Onboard (bucatarie)" "Analog DGX PCIe (beci)" "Digital DGX PCIe (dormitor)" "Digital Box USB (baie)")
 PORT_MATCH=0
 
 for i in ${!PORT[*]}; do
