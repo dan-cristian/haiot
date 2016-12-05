@@ -4,11 +4,10 @@
     <meta charset="UTF-8">
     <title>Dashboards</title>
 </head>
-<body>
-    Hot Water Temp {{ hot_water_temp }}
-    <p><a href="/chart-utility?sensor_name=water hot">today</a></p>
+<body style="background-color:black;" text="white">
+    <p><a href="/chart-sensor-now">today</a></p>
 {% for sensor in sensor_list%}
-    <p>{{ sensor.sensor_name }}={{ sensor.temperature }}</p>
+    {{ sensor.sensor_name }} {{ sensor.temperature }}
   {% else %}
     <p>Unbelievable.  No entries here so far</p>
   {% endfor %}
