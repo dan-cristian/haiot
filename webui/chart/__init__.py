@@ -2,23 +2,18 @@ import json
 from urllib2 import urlopen  # python 2 syntax
 import pygal
 from datetime import datetime, timedelta
-from flask import render_template, request
+from flask import render_template, request, send_file
 from sqlalchemy import func, extract
 from main import app, db
 from main.logger_helper import Log
 from main.admin import models
 from common import Constant, utils
+import dashboard
 
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
 initialised = False
 _period_list = ['year', 'month', 'day', 'hour']
-
-@app.route('/dashboard')
-def render_dashboard():
-    sensors=models.Sensor().query_filter_all(models.Sensor.temperature.isnot(None))
-    return render_template('dashboard/main.html', sensor_list=sensors)
-
 
 def __config_graph(title, start, end):
     config = pygal.Config()
@@ -231,18 +226,6 @@ def graph_ups(key_name):
     values = [i.input_voltage for i in ups_recs]
     times = [i.updated_on for i in ups_recs]
     pass
-
-
-@app.route('/chart-sensor-now/')
-def graph_sensor_now():
-    line_chart = pygal.Bar()
-    line_chart.title = 'Browser usage evolution (in %)'
-    line_chart.x_labels = map(str, range(2002, 2013))
-    line_chart.add('Firefox', [None, None, 0, 16.6, 25, 31, 36.4, 45.5, 46.3, 42.8, 37.1])
-    line_chart.add('Chrome', [None, None, None, None, None, None, 0, 3.9, 10.8, 23.8, 35.3])
-    line_chart.add('IE', [85.8, 84.6, 84.7, 74.5, 66, 58.6, 54.7, 44.8, 36.2, 26.6, 20.1])
-    line_chart.add('Others', [14.2, 15.4, 15.3, 8.9, 9, 10.4, 8.9, 5.8, 6.7, 6.8, 7.5])
-    return line_chart.render()
 
 
 def unload():
