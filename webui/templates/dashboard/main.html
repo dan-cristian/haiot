@@ -2,14 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <META HTTP-EQUIV="refresh" CONTENT="15">
     <title>Dashboards</title>
 </head>
-<body style="background-color:black;" text="white">
-    <p><a href="/chart-sensor-now">today</a></p>
-{% for sensor in sensor_list%}
-    {{ sensor.sensor_name }} {{ sensor.temperature }}
-  {% else %}
-    <p>Unbelievable.  No entries here so far</p>
-  {% endfor %}
+<body style="background-color: blue; position: absolute; width: 100%; margin-top:-160px; margin-left:-0px;" text="white">
+<embed type="image/svg+xml" src={{graph|safe}}
 </body>
 </html>
