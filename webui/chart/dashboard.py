@@ -2,7 +2,8 @@ import pygal
 from pygal import style
 from flask import render_template, request
 from main.admin import models
-from main import app, db
+from main import app
+from common import utils
 
 
 def __config_graph():
@@ -21,7 +22,7 @@ def render_dashboard():
     config = __config_graph()
     config.print_values = True
     config.print_labels = True
-    config.show_legend = False
+    config.show_legend = True
     config.style = style.DarkStyle
     config.style.value_colors = '#53A0E8'
     # ??
@@ -29,9 +30,11 @@ def render_dashboard():
 
     chart = pygal.Bar(config=config)
     chart.title = 'Temperature'
+    now_date = utils.get_base_location_now_date()
     for sensor in sensors:
-        chart.add(sensor.sensor_name, [{'value': sensor.temperature, 'label': sensor.sensor_name,
-                                        'style:': 'text-align: left, color: white'}])
+        age = (now_date - sensor.updated_on).total_seconds()
+        chart.add("{}s".format(int(age)),
+                  [{'value': sensor.temperature, 'label': sensor.sensor_name}])
     graph = chart.render(is_unicode=True)
     return render_template('dashboard/main.html', graph=graph, sensors=sensors)
 
