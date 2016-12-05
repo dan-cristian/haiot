@@ -33,8 +33,13 @@ def render_dashboard():
     now_date = utils.get_base_location_now_date()
     for sensor in sensors:
         age = (now_date - sensor.updated_on).total_seconds()
+        if age <= 300:
+            stroke_width = 3 * (300 - age) / 100
+        else:
+            stroke_width = 0
         chart.add("{}s".format(int(age)),
-                  [{'value': sensor.temperature, 'label': sensor.sensor_name}])
+                  [{'value': sensor.temperature, 'label': sensor.sensor_name,
+                    'style': 'stroke: red; stroke-width: {}'.format(int(stroke_width))}])
     graph = chart.render(is_unicode=True)
     return render_template('dashboard/main.html', graph=graph, sensors=sensors)
 
