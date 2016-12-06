@@ -4,10 +4,11 @@ from flask import render_template, request
 from main.admin import models
 from main import app
 from common import utils
-
+import time
 
 def __config_graph():
     config = pygal.Config()
+    config.style = style.DarkStyle
     # config.human_readable = True
     # config.show_x_labels = True
     # config.legend_at_bottom = True
@@ -23,7 +24,6 @@ def render_dashboard():
     config.print_values = True
     config.print_labels = True
     config.show_legend = True
-    config.style = style.DarkStyle
     config.style.value_colors = '#53A0E8'
     # ??
     # config.margin_left = 0
@@ -33,15 +33,37 @@ def render_dashboard():
     now_date = utils.get_base_location_now_date()
     for sensor in sensors:
         age = (now_date - sensor.updated_on).total_seconds()
+        age_nice = time.strftime('%H:%M:%S', time.gmtime(age))
         if age <= 300:
             stroke_width = 3 * (300 - age) / 100
         else:
             stroke_width = 0
-        chart.add("{}s".format(int(age)),
+        chart.add("{}".format(age_nice),
                   [{'value': sensor.temperature, 'label': sensor.sensor_name,
                     'style': 'stroke: red; stroke-width: {}'.format(int(stroke_width))}])
-    graph = chart.render(is_unicode=True)
-    return render_template('dashboard/main.html', graph=graph, sensors=sensors)
+    graph_temperature = chart.render(is_unicode=True)
+
+    relays = models.ZoneHeatRelay.query.order_by(models.ZoneHeatRelay.heat_pin_name).all()
+    config = __config_graph()
+    config.print_values = True
+    config.print_labels = True
+    config.show_legend = False
+    config.print_zeroes = False
+    config.show_y_labels = False
+    config.show_y_guides = False
+    dot_chart = pygal.Dot(x_label_rotation=30, config=config)
+    data = []
+    for relay in relays:
+        age_mins = int(min((now_date - relay.updated_on).total_seconds() / 60, 60))
+        if relay.heat_is_on is None:
+            dot_size = 0
+        else:
+            sign = relay.heat_is_on - 1 + 1 * relay.heat_is_on
+            dot_size = sign * age_mins
+        dot_chart.add(relay.heat_pin_name, [{'value': dot_size, 'label': relay.heat_pin_name}])
+    graph_heat = dot_chart.render(is_unicode=True)
+
+    return render_template('dashboard/main.html', graph_temperature=graph_temperature, graph_heat=graph_heat)
 
 
 @app.route('/chart-sensor-now/')
