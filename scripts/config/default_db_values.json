@@ -216,9 +216,7 @@
     {"zone_id":2,"heat_pin_name":"living","gpio_pin_code":"23","gpio_host_name":"pi-face", "is_main_heat_source":"0"},
     {"zone_id":47,"heat_pin_name":"birou","gpio_pin_code": "24","gpio_host_name":"pi-face", "is_main_heat_source":"0"},
     {"zone_id":4,"heat_pin_name":"dormitor","gpio_pin_code":"4","gpio_host_name":"pi-face","is_main_heat_source":"0"},
-    {"zone_id":19,"heat_pin_name":"heat main","gpio_pin_code":"24","gpio_host_name":"pi-power","is_main_heat_source":"1"},
-
-    {"zone_id":4,"heat_pin_name":"dormitor-test","gpio_pin_code":"1","gpio_host_name":"netbook","is_main_heat_source":"0"}
+    {"zone_id":19,"heat_pin_name":"heat main","gpio_pin_code":"24","gpio_host_name":"pi-power","is_main_heat_source":"1"}
   ],
 
   "ZoneSensor": [

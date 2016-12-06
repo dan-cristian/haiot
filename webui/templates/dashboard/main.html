@@ -5,8 +5,12 @@
     <META HTTP-EQUIV="refresh" CONTENT="15">
     <title>Dashboards</title>
 </head>
-<body style="background-color: gray; position: absolute; width: 100%; margin-top:-160px; margin-left:-0px;" text="white">
-<embed type="image/svg+xml" src={{graph_temperature|safe}}/>
-<embed type="image/svg+xml" src={{graph_heat|safe}}/>
+<body style="background-color: gray; position: absolute; width: 100%; margin-top:-160px; margin-left:-0px; margin-bottom:-100px" text="white">
+<div>
+<embed type="image/svg+xml" src={{graph_temperature|safe}}
+</div>
+<div style="margin-top:-160px">
+<embed type="image/svg+xml" src={{graph_heat|safe}}
+</div>
 </body>
 </html>
