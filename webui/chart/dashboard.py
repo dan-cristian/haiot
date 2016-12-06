@@ -22,6 +22,7 @@ def render_dashboard():
     sensors = models.Sensor.query.order_by(models.Sensor.sensor_name).filter(models.Sensor.temperature.isnot(None)).all()
     config = __config_graph()
     config.height = 400
+    config.explicit_size = True
     config.print_values = True
     config.print_labels = True
     config.show_legend = True
