@@ -47,6 +47,8 @@ def render_dashboard():
     relays = models.ZoneHeatRelay.query.order_by(models.ZoneHeatRelay.heat_pin_name).all()
     config = __config_graph()
     config.height = 150
+    config.explicit_size = True
+    #config.style = style.DefaultStyle
     config.print_values = True
     config.print_labels = False
     config.show_legend = True
