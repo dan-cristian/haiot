@@ -21,6 +21,7 @@ def render_dashboard():
     #sensors = models.Sensor().query_filter_all(models.Sensor.temperature.isnot(None))
     sensors = models.Sensor.query.order_by(models.Sensor.sensor_name).filter(models.Sensor.temperature.isnot(None)).all()
     config = __config_graph()
+    config.height = 400
     config.print_values = True
     config.print_labels = True
     config.show_legend = True
@@ -45,14 +46,19 @@ def render_dashboard():
 
     relays = models.ZoneHeatRelay.query.order_by(models.ZoneHeatRelay.heat_pin_name).all()
     config = __config_graph()
+    config.height = 150
     config.print_values = True
-    config.print_labels = True
-    config.show_legend = False
+    config.print_labels = False
+    config.show_legend = True
     config.print_zeroes = False
     config.show_y_labels = False
+    config.show_x_guides = False
     config.show_y_guides = False
+    config.x_label_rotation = 1
+    config.show_x_labels = True
     dot_chart = pygal.Dot(x_label_rotation=30, config=config)
-    data = []
+    y_values = []
+    x_values = []
     for relay in relays:
         age_mins = int(min((now_date - relay.updated_on).total_seconds() / 60, 60))
         if relay.heat_is_on is None:
@@ -60,7 +66,11 @@ def render_dashboard():
         else:
             sign = relay.heat_is_on - 1 + 1 * relay.heat_is_on
             dot_size = sign * age_mins
-        dot_chart.add(relay.heat_pin_name, [{'value': dot_size, 'label': relay.heat_pin_name}])
+        y_values.append(dot_size)
+        x_values.append(relay.heat_pin_name)
+        # dot_chart.add(relay.heat_pin_name, [{'value': dot_size, 'label': relay.heat_pin_name}])
+    dot_chart.x_labels = x_values
+    dot_chart.add('Heat', y_values)
     graph_heat = dot_chart.render(is_unicode=True)
 
     return render_template('dashboard/main.html', graph_temperature=graph_temperature, graph_heat=graph_heat)
