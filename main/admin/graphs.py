@@ -10,16 +10,25 @@ class BaseGraph:
 
 
     @property
-    def graph_x_(self): raise NotImplementedError
+    def graph_x_(self):
+        pass
+        # raise NotImplementedError
 
     @property
-    def graph_y_(self): raise NotImplementedError
+    def graph_y_(self):
+        pass
+        # raise NotImplementedError
 
     @property
-    def graph_id_(self): raise NotImplementedError
+    def graph_id_(self):
+        pass
+        # not raising error as some classes can implement basegraph (for simple save to DB history)
+        # raise NotImplementedError
 
     @property
-    def graph_legend_(self): raise NotImplementedError
+    def graph_legend_(self):
+        pass
+        # raise NotImplementedError
 
 
 class SensorGraph(BaseGraph):
