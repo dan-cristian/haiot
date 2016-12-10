@@ -69,7 +69,7 @@ def save_to_history_cloud(obj):
 # saves record to cloud database
 def save_to_history_db(obj):
     try:
-        Log.logger.debug('Trying to save historical record to db {}'.format(obj))
+        Log.logger.info('Trying to save historical record to db {}'.format(obj))
         table = obj[Constant.JSON_PUBLISH_TABLE]
         # save to local history DB, append history to source table name
         dest_table = str(table) + 'History'
