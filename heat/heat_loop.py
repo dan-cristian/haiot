@@ -18,6 +18,8 @@ def __save_heat_state_db(zone='', heat_is_on=''):
         zone_heat_relay.updated_on = utils.get_base_location_now_date()
         Log.logger.info('Heat state changed to is-on={} in zone {}'.format(heat_is_on, zone.name))
         zone_heat_relay.notify_transport_enabled = True
+        zone_heat_relay.save_to_graph = True
+        zone_heat_relay.save_to_history = True
         # save latest heat state for caching purposes
         zone.heat_is_on = heat_is_on
         zone.last_heat_status_update = utils.get_base_location_now_date()
@@ -126,8 +128,8 @@ def loop_zones():
             if main_source_zone:
                 global __last_main_heat_update
                 update_age_mins = (utils.get_base_location_now_date() - __last_main_heat_update).total_seconds() / 60
-                # # avoid setting relay state too often but do periodic refreshes
-                if main_source_zone.heat_is_on != heat_is_on or update_age_mins > 10:
+                # # avoid setting relay state too often but do periodic refreshes every x minutes
+                if main_source_zone.heat_is_on != heat_is_on or update_age_mins >= 5:
                     __save_heat_state_db(zone=main_source_zone, heat_is_on=heat_is_on)
                     __last_main_heat_update = utils.get_base_location_now_date()
             else:
