@@ -121,6 +121,7 @@ class DbBase:
                             ignore_only_updated_on_change=True, debug=False, graph_save_frequency=0, query_filter=None,
                             save_all_fields=False):
         try:
+            # inherit BaseGraph to enable persistence
             if hasattr(self, 'save_to_graph'):  # not all models inherit graph, used for periodic save
                 if current_record:
                     # if a record in db already exists
@@ -633,7 +634,7 @@ class ZoneAlarm(db.Model, DbEvent, DbBase):
         return 'host:{} pin:{} triggered:{}'.format(self.gpio_host_name, self.alarm_pin_name, self.alarm_pin_triggered)
 
 
-class ZoneHeatRelay(db.Model, DbEvent, DbBase):
+class ZoneHeatRelay(db.Model, DbEvent, DbBase, graphs.BaseGraph):
     id = db.Column(db.Integer, primary_key=True)
     # friendly display name for pin mapping
     heat_pin_name = db.Column(db.String(50))
@@ -925,3 +926,13 @@ class UtilityHistory(db.Model, DbBase):
 
     def __repr__(self):
         return '{} {} {}'.format(self.id, self.sensor_name, self.updated_on)
+
+
+class ZoneHeatRelayHistory(db.Model, DbBase):
+    __bind_key__ = 'reporting'
+    __tablename__ = 'zoneheatrelay_history'  # convention: append '_history' -> 'History' to source table name
+    id = db.Column(db.Integer, primary_key=True)
+    heat_pin_name = db.Column(db.String(50))
+    gpio_host_name = db.Column(db.String(50))
+    heat_is_on = db.Column(db.Boolean)
+    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
