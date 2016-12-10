@@ -129,7 +129,7 @@ def loop_zones():
                 global __last_main_heat_update
                 update_age_mins = (utils.get_base_location_now_date() - __last_main_heat_update).total_seconds() / 60
                 # # avoid setting relay state too often but do periodic refreshes every x minutes
-                if main_source_zone.heat_is_on != heat_is_on or update_age_mins >= 5:
+                if main_source_zone.heat_is_on != heat_is_on or update_age_mins >= 10:
                     __save_heat_state_db(zone=main_source_zone, heat_is_on=heat_is_on)
                     __last_main_heat_update = utils.get_base_location_now_date()
             else:
