@@ -40,6 +40,7 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
                     current_record.ticks_delta = -1
                     current_record.cost = -1
                 record.units_total = 0.0 + current_record.units_total + record.units_delta
+                Log.logger.info("Saving utility record {}".format(current_record))
                 record.save_changed_fields(current_record=current_record, new_record=record,
                                            notify_transport_enabled=True, save_to_graph=True)
             else:

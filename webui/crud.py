@@ -2,6 +2,7 @@ from flask import Blueprint, request, redirect, url_for, render_template
 from flask.views import MethodView
 from wtforms.ext.sqlalchemy.orm import model_form
 from main import db
+from main.admin import models
 from main.logger_helper import Log
 from common import Constant
 from pydispatch import dispatcher
@@ -163,3 +164,4 @@ def init_crud():
     register_crud(user, '/zonecustomrelay', 'zonecustomrelay', ZoneCustomRelay, filters=simple_filters)
     register_crud(user, '/rule', 'rule', Rule, filters=simple_filters)
     register_crud(user, '/commandoverriderelay', 'commandoverriderelay', CommandOverrideRelay, filters=simple_filters)
+    register_crud(user, '/utility', 'utility', models.Utility, filters=simple_filters)
