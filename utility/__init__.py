@@ -22,8 +22,13 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
                     # 1000 times count divided by 60 seconds time 60 minutes (kwh -> watt)
                     record.units_delta = 1000 * delta / ((current_record.ticks_per_unit * 1.0) /
                                                          (sampling_period_seconds/(60.0*60)))
+                    record.unit_name = 'kwh'
                 else:
-                    record.units_delta = delta / (current_record.ticks_per_unit * 1.0)  # force float operation
+                    if current_record.utility_type == 'water':
+                        record.unit_name = 'l'
+                        record.units_delta = delta / (current_record.ticks_per_unit * 1.0)
+                    else:
+                        record.units_delta = delta / (current_record.ticks_per_unit * 1.0)  # force float operation
                 record.ticks_delta = delta
                 if current_record.unit_cost is None:
                     current_record.unit_cost = 0.0
@@ -37,7 +42,7 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
                     current_record.cost = -1
                 record.units_total = 0.0 + current_record.units_total + record.units_delta
                 record.save_changed_fields(current_record=current_record, new_record=record,
-                                           notify_transport_enabled=False, save_to_graph=True)
+                                           notify_transport_enabled=True, save_to_graph=True)
             else:
                 Log.logger.critical("Counter sensor [{}] index {} is not defined in Utility table".format(sensor_name,
                                                                                                           index))
