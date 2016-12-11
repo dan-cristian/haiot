@@ -254,12 +254,7 @@
     {"sensor_name":"water hot", "sensor_index":0, "ticks_per_unit":1, "unit_name":"liter", "utility_type":"water", "unit_cost":1},
     {"sensor_name":"power main", "sensor_index":0, "ticks_per_unit":1000, "unit_name":"watt", "utility_type":"electricity", "unit_cost":1},
     {"sensor_name":"water main", "sensor_index":0, "ticks_per_unit":0.1, "unit_name":"liter", "utility_type":"water", "unit_cost":1},
-    {"sensor_name":"power beci", "sensor_index":0, "ticks_per_unit":2000, "unit_name":"watt", "utility_type":"electricity", "unit_cost":1},
-
-    {"sensor_name":"power beci", "sensor_index":1, "ticks_per_unit":1, "unit_name":"not used"},
-    {"sensor_name":"power main", "sensor_index":1, "ticks_per_unit":1, "unit_name":"not used"},
-    {"sensor_name":"power rack", "sensor_index":0, "ticks_per_unit":1, "unit_name":"not used"},
-    {"sensor_name":"water hot", "sensor_index":1, "ticks_per_unit":1, "unit_name":"not used"}
+    {"sensor_name":"power beci", "sensor_index":0, "ticks_per_unit":2000, "unit_name":"watt", "utility_type":"electricity", "unit_cost":1}
   ],
 
   "ZoneAlarm": [
