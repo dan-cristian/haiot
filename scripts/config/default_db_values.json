@@ -69,7 +69,7 @@
     {"id":121, "active":"0", "start_order":"21", "name":"cloud.youtube", "host_name":"nas"},
     {"id":123, "active":"0", "start_order":"23", "name":"sysutils.filewatch", "host_name":"nas"},
 
-    {"id":209, "active":"0", "start_order":"9", "name":"heat", "host_name":"pi-power"},
+    {"id":209, "active":"1", "start_order":"9", "name":"heat", "host_name":"pi-power"},
 
     {"id":309, "active":"1", "start_order":"19", "name":"heat", "host_name":"beaglebone"},
     {"id":311, "active":"1", "start_order":"11", "name":"alarm", "host_name":"beaglebone"},
