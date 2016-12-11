@@ -742,7 +742,7 @@ class PlotlyCache(db.Model, DbEvent, DbBase):
         self.grid_name = grid_name
 
 
-class Utility(db.Model, graphs.UtilityGraph, DbEvent, DbBase):
+class Utility(db.Model, graphs.BaseGraph, DbEvent, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     sensor_name = db.Column(db.String(50), db.ForeignKey('sensor.sensor_name'))
     sensor_index = db.Column(db.Integer)  # 0 for counter_a, 1 for counter_b
@@ -921,11 +921,9 @@ class UtilityHistory(db.Model, DbBase):
     units_delta = db.Column(db.Float)  # total number of units measured since last measurement
     ticks_delta = db.Column(db.BigInteger)
     cost = db.Column(db.Float)
+    unit_name = db.Column(db.String(50))  # watt, liter etc.
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
     source_host_ = db.Column(db.String(50))
-
-    def __repr__(self):
-        return '{} {} {}'.format(self.id, self.sensor_name, self.updated_on)
 
 
 class ZoneHeatRelayHistory(db.Model, DbBase):
