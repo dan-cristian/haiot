@@ -23,12 +23,11 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
                     record.units_delta = 1000 * delta / ((current_record.ticks_per_unit * 1.0) /
                                                          (sampling_period_seconds/(60.0*60)))
                     record.unit_name = 'kwh'
-                else:
-                    if current_record.utility_type == 'water':
+                elif current_record.utility_type == 'water':
                         record.unit_name = 'l'
                         record.units_delta = delta / (current_record.ticks_per_unit * 1.0)
-                    else:
-                        record.units_delta = delta / (current_record.ticks_per_unit * 1.0)  # force float operation
+                else:
+                    record.units_delta = delta / (current_record.ticks_per_unit * 1.0)  # force float operation
                 record.ticks_delta = delta
                 if current_record.unit_cost is None:
                     current_record.unit_cost = 0.0
