@@ -69,8 +69,8 @@ def save_to_history_cloud(obj):
 # saves record to cloud database
 def save_to_history_db(obj):
     try:
-        Log.logger.debug('Trying to save historical record to db {}'.format(obj))
         table = obj[Constant.JSON_PUBLISH_TABLE]
+        Log.logger.info('Trying to save historical record to db={}'.format(table))
         # save to local history DB, append history to source table name
         dest_table = str(table) + 'History'
         Log.logger.debug('Saving to local db table {} obj={}'.format(dest_table, obj))
@@ -83,7 +83,7 @@ def save_to_history_db(obj):
                 if hasattr(new_record, field) and field != "id":
                     setattr(new_record, field, obj[field])
             new_record.add_commit_record_to_db()
-            Log.logger.debug('Saved OK to local db table {} obj={}'.format(dest_table, new_record))
+            Log.logger.info('Saved OK to local db table {} obj={}'.format(dest_table, new_record))
         except Exception, ex:
             Log.logger.critical("Cannot save history db err={} record={}".format(ex, obj))
     except Exception, ex:
