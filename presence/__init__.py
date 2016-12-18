@@ -39,6 +39,7 @@ def handle_event_presence_io(gpio_pin_code='', direction='', pin_value='', pin_c
                     record.zone_name = zone_name
                     record.event_io_date = utils.get_base_location_now_date()
                     record.sensor_name = zonealarm.alarm_pin_name
+                    record.is_connected = pin_connected
                     # Log.logger.info('Presence saving sensor {}'.format(record.sensor_name))
                     record.save_changed_fields(current_record=current_record, new_record=record,
                                                notify_transport_enabled=True, save_to_graph=True, save_all_fields=True)
@@ -48,7 +49,7 @@ def handle_event_presence_io(gpio_pin_code='', direction='', pin_value='', pin_c
         Log.logger.critical("Unable to save presence, er={}".format(ex), exc_info=True)
 
 
-def handle_event_presence_cam(zone_name, cam_name):
+def handle_event_presence_cam(zone_name, cam_name, has_move):
     zone = models.Zone().query_filter_first(models.Zone.name == zone_name)
     if zone is not None:
         current_record = models.Presence().query_filter_first(models.Presence.zone_id == zone.id)
@@ -57,6 +58,7 @@ def handle_event_presence_cam(zone_name, cam_name):
         record.zone_name = zone_name
         record.event_camera_date = utils.get_base_location_now_date()
         record.sensor_name = cam_name
+        record.is_connected = has_move
         record.save_changed_fields(current_record=current_record, new_record=record,
                                    notify_transport_enabled=True, save_to_graph=True, save_all_fields=True)
     else:
