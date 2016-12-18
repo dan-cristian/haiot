@@ -26,6 +26,7 @@ ENABLE_TORRENT=1
 ENABLE_CLOUD_AMAZON=1
 ENABLE_MYSQL=1
 MYSQL_DATA_ROOT=/mnt/data/hdd-wdr-evhk/mysql
+ENABLE_DASHBOARD=1
 
 echo "Setting timezone ..."
 echo "Europe/Bucharest" > /etc/timezone
@@ -309,6 +310,16 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
 
    echo "Installing gesture"
    apt install easystroke
+fi
+
+if [ "$ENABLE_DASHBOARD" == "1" ]; then
+    echo "Installing smashing dashboard"
+    # https://github.com/SmashingDashboard/smashing
+    apt-get install ruby nodejs
+    apt-get install ruby-dev g++ libmysqlclient-dev
+    gem install bundler
+    gem install smashing
+
 fi
 
 if [ "$ENABLE_CAMERA" == "1" ]; then
