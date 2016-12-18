@@ -53,9 +53,9 @@ def generic_db_update(model_name, filter_name, filter_value, field_name, field_v
         pass
 
 
-@app.route('/apiv1/camera_alert/zone_name=<zone_name>&cam_name=<cam_name>')
-def camera_alert(zone_name, cam_name):
-    dispatcher.send(Constant.SIGNAL_CAMERA, zone_name=zone_name, cam_name=cam_name)
+@app.route('/apiv1/camera_alert/zone_name=<zone_name>&cam_name=<cam_name>&has_move=<has_move>')
+def camera_alert(zone_name, cam_name, has_move):
+    dispatcher.send(Constant.SIGNAL_CAMERA, zone_name=zone_name, cam_name=cam_name, has_move=has_move)
     return Constant.SCRIPT_RESPONSE_OK
 
 
