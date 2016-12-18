@@ -45,8 +45,8 @@ fi
 
 function record_song(){
 #local song_tmp_path=$1
-echo2 "Recording $song_tmp_path"
-arecord -c $sound_channels -f $sound_format -r $sound_rate -t wav -D hw:$RECORD_DEVICE "$song_tmp_path" & >> $LOG 2>&1
+echo2 "Recording $song_tmp_path, safety max 1200 seconds"
+arecord -d 1200 -c $sound_channels -f $sound_format -r $sound_rate -t wav -D hw:$RECORD_DEVICE "$song_tmp_path" & >> $LOG 2>&1
 #arecord -q -c 2 -f S16_LE -r 44100 -t wav -D hw:$RECORD_DEVICE | flac -0 -o "$_song_tmp_path" >> $LOG 2>&1 &
 }
 
@@ -161,6 +161,10 @@ fi
 echo2 "Song=$song_name status=$player_status duration=$song_duration"
 }
 
+function finish(){
+rm -f /tmp/.record-audio.exclusivelock
+}
+
 #show current status, assume card names start with uppercase to avoid duplicates
 #echo "List outputs"
 #tail /proc/asound/[[:upper:]]*/pcm*p/sub0/hw_params
@@ -171,6 +175,7 @@ timeout=1
 song_tmp_ext=".wav"
 song_ext=".flac"
 
+trap finish EXIT
 echo2 "Started with parameter [$1] [$2] in dir=$DIR"
 lock=/tmp/.record-audio.exclusivelock
 (
@@ -180,14 +185,14 @@ lock=/tmp/.record-audio.exclusivelock
 	do
 		date_now=`date`
 		seconds_lapsed=`printf "%s\n" $(( $(date -d "$date_now" "+%s") - $(date -d "$date_last_on" "+%s") ))`
-		if [ $seconds_lapsed -le 300 ]; then
-			echo2 "Reusing cached MPD port, lapsed=$seconds_lapsed"
+		if [ $seconds_lapsed -le 300 ] && [ "$MPD_PORT" != "" ]; then
+			echo2 "Reusing cached MPD port=$MPD_PORT, lapsed=$seconds_lapsed"
 			ok_to_record=0
 		else
 			set_loopback_mpd_port
 			ok_to_record=$?
 		fi
-		if [ $ok_to_record -eq 0 ]; then
+		if [ $ok_to_record -eq 0 ] && [ "$MPD_PORT" != "" ]; then
 			echo2 "MPD port with loopback enabled = $MPD_PORT in zone $ZONE_NAME"
 			if [ "$MPD_PORT" == "" ]; then
 				echo2 "MPD port is empty?"
@@ -228,7 +233,6 @@ lock=/tmp/.record-audio.exclusivelock
 					else
             echo2 "Not recording $song_name as out=$loop_out_is_open"
           fi
-            
 				else
 					if [ "$player_status" == "" ] || [ "$player_status" == "paused" ]; then
 						echo2 "Playback stopped. Terminating recording and deleting incomplete song."
@@ -270,3 +274,4 @@ else
 fi #lock
 ) 200>$lock
 rm $lock
+

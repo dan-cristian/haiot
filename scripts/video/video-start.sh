@@ -58,13 +58,19 @@ else
 	echo2 "Started X"
 	while :
 	do
-		ps ax | grep -q [i]3status
+		ps ax | grep -q [i]3blocks
 		res=$?
 		if [ $res -eq 1 ]; then
 			#echo2 "Waiting for startx process $res"
 			sleep 0.1
 		else
+			#default actions after x is started
+			xrandr --output HDMI1 --primary
 			xset +dpms
+			#duplicate screens
+			xrandr --output HDMI3 --auto --output HDMI1 --auto --same-as HDMI3
+			#set individual screens
+			#xrandr --output HDMI1 --auto --left-of HDMI3
 			/usr/bin/easystroke &
 			return
 		fi
@@ -94,6 +100,7 @@ echo2 "Starting kodi display $DISPLAY"
 /usr/bin/xdotool key --clearmodifiers alt+3  >> $LOG 2>&1
 exit_if_kodi_run
 #/sbin/runuser -l $HAIOT_USER -c "/usr/bin/kodi" >> $LOG 2>&1 &
+$DIR/../audio/mpc-play.sh living stop
 /usr/bin/kodi & >> $LOG 2>&1
 }
 
@@ -101,6 +108,7 @@ function start_kodi(){
 echo2 "Starting kodi display $DISPLAY"
 /usr/bin/xdotool key --clearmodifiers alt+3  >> $LOG 2>&1
 #/sbin/runuser -l $HAIOT_USER -c "/usr/bin/kodi" >> $LOG 2>&1 &
+$DIR/../audio/mpc-play.sh living stop
 /usr/bin/kodi & >> $LOG 2>&1
 }
 
