@@ -1,0 +1,8 @@
+[Unit]
+After=mpd@.service
+
+[Service]
+ExecStart=/home/scripts/audio/activate-audio-amp.sh loop
+
+[Install]
+WantedBy=default.target

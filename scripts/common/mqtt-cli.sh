@@ -14,7 +14,7 @@ screen_on(){
 listen(){
 rm -f $p
 ([ ! -p "$p" ]) && mkfifo $p
-(mosquitto_sub -h $host -t $topic >$p 2>/dev/null) &
+(mosquitto_sub -h $host -t $topic >$p 2>>$LOG) &
 #echo "$!" > pidfile
 while read line <$p
 do

@@ -12,10 +12,10 @@ search=$1
 echo2 "Stopping processes containing [$1]"
 while :
 do
-ps ax | grep -q '$search' | grep -v grep
+ps ax | grep "$search" | grep -vq grep
 if [ $? -eq 0 ]; then
 	#echo2 Stopping process `ps -ef | grep "$1" | grep -v grep | awk '{print $2}'`
-	ps -ef | grep "$1" | grep -v grep | awk '{print $2}' | xargs kill -9
+	ps -ef | grep "$1" | grep -v grep | awk '{print $2}' | xargs kill -9 
     	sleep 0.1
 else
 	return
