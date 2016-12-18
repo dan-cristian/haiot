@@ -908,6 +908,7 @@ class PresenceHistory(db.Model, DbBase):
     event_io_date = db.Column(db.DateTime(), default=None)
     # event_wifi_date = db.Column(db.DateTime(), default=None)
     # event_bt_date = db.Column(db.DateTime(), default=None)
+    is_connected = db.Column(db.Boolean)  # pin connected? true on unarmed sensors, false on alarm/move
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
     source_host_ = db.Column(db.String(50))
 
