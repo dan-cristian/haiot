@@ -305,6 +305,17 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     systemctl start shairport-sync@beci
     systemctl start shairport-sync@dormitor
 
+    echo "Configuring additional music scripts"
+    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/activate-audio-amp.service /lib/systemd/system/
+    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/record-audio.service /lib/systemd/system/
+    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/thd.service /lib/systemd/system/
+    systemctl enable activate-audio-amp
+    systemctl enable record-audio
+    systemctl start activate-audio-amp
+    systemctl start record-audio
+    systemctl enable thd
+    systemctl start thd
+
     echo "Installing screenshow"
     apt install feh
 
@@ -314,12 +325,18 @@ fi
 
 if [ "$ENABLE_DASHBOARD" == "1" ]; then
     echo "Installing smashing dashboard"
+    # http://labrat.it/2014/01/11/dashing-dashboard/
     # https://github.com/SmashingDashboard/smashing
     apt-get install ruby nodejs
     apt-get install ruby-dev g++ libmysqlclient-dev
     gem install bundler
     gem install smashing
+    git clone https://github.com/dan-cristian/dashiot.git
+    cd dashiot
+    bundle
+    echo "Installing dashboard service"
 
+    # https://gist.github.com/gregology/5313326
 fi
 
 if [ "$ENABLE_CAMERA" == "1" ]; then
