@@ -25,6 +25,9 @@ class Constant:
     SIGNAL_PUSH_NOTIFICATION = 'signal-push-notification'
     SIGNAL_CHAT_NOTIFICATION = 'signal-chat-notification'
 
+    PRESENCE_TYPE_CAM = 'cam'
+    
+
     ERROR_CONNECT_MAX_RETRY_COUNT = 2
     ERROR_CONNECT_PAUSE_SECOND = 1
     OS = 'not initialised'
