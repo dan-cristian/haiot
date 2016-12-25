@@ -56,9 +56,9 @@ def record_update(obj):
             record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=False,
                                        save_to_graph=False)
             # commit() # not needed?
-            # enable below only for testing on netbook
 
-            if Constant.HOST_NAME == 'netbook' and (record.delta_counters_a or record.delta_counters_b):
+            # enable below only for testing on netbook
+            if Constant.HOST_NAME == 'EN62395' and (record.delta_counters_a or record.delta_counters_b):
                 dispatcher.send(Constant.SIGNAL_UTILITY, sensor_name=record.sensor_name,
                                 units_delta_a=record.delta_counters_a,
                                 units_delta_b=record.delta_counters_b, total_units_a=record.counters_a,

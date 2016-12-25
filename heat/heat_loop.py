@@ -1,13 +1,13 @@
 __author__ = 'dcristian'
 
 import datetime
-
 from main.logger_helper import Log
 from main.admin import models
 from main.admin.model_helper import commit, get_param
 from common import utils, Constant
 import gpio
 
+__last_main_heat_update = datetime.datetime.min
 
 # save heat status and announce to all nodes
 def __save_heat_state_db(zone='', heat_is_on=''):
@@ -18,6 +18,8 @@ def __save_heat_state_db(zone='', heat_is_on=''):
         zone_heat_relay.updated_on = utils.get_base_location_now_date()
         Log.logger.info('Heat state changed to is-on={} in zone {}'.format(heat_is_on, zone.name))
         zone_heat_relay.notify_transport_enabled = True
+        zone_heat_relay.save_to_graph = True
+        zone_heat_relay.save_to_history = True
         # save latest heat state for caching purposes
         zone.heat_is_on = heat_is_on
         zone.last_heat_status_update = utils.get_base_location_now_date()
@@ -119,13 +121,17 @@ def loop_zones():
                     # sensor.sensor_name))
                     if __update_zone_heat(zone, heat_schedule, sensor):
                         heat_is_on = True
+        # turn on/off the main heating system based on zone heat needs
         heatrelay_main_source = models.ZoneHeatRelay.query.filter_by(is_main_heat_source=True).first()
         if heatrelay_main_source:
             main_source_zone = models.Zone.query.filter_by(id=heatrelay_main_source.zone_id).first()
             if main_source_zone:
-                # fixme: heat state might not be set ok if remote relay set was not succesfull
-                if main_source_zone.heat_is_on != heat_is_on:  # avoid setting relay state too often
+                global __last_main_heat_update
+                update_age_mins = (utils.get_base_location_now_date() - __last_main_heat_update).total_seconds() / 60
+                # # avoid setting relay state too often but do periodic refreshes every x minutes
+                if main_source_zone.heat_is_on != heat_is_on or update_age_mins >= 10:
                     __save_heat_state_db(zone=main_source_zone, heat_is_on=heat_is_on)
+                    __last_main_heat_update = utils.get_base_location_now_date()
             else:
                 Log.logger.critical('No heat main_src found using zone id {}'.format(heatrelay_main_source.zone_id))
         else:

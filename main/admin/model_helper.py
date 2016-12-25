@@ -128,7 +128,7 @@ def check_history_tables():
     """Add below all history tables you want to be initialised"""
     table_collection_list = [
         models.NodeHistory, models.SensorHistory, models.SystemDiskHistory, models.SystemMonitorHistory,
-        models.UpsHistory, models.PresenceHistory, models.SensorErrorHistory]
+        models.UpsHistory, models.PresenceHistory, models.SensorErrorHistory, models.ZoneHeatRelayHistory]
     for table in table_collection_list:
         table_str = utils.get_table_name(table)
         # do not drop and recreate historic ones
@@ -149,7 +149,7 @@ def populate_tables(model_auto_update=False):
                         models.CommandOverrideRelay, models.PlotlyCache, models.Utility, models.Presence,
                         models.SensorError]
     # tables that will be cleaned on every app start
-    table_force_clean = [models.ZoneHeatRelay, models.Zone, models.Sensor, models.Presence]
+    table_force_clean = [models.Zone, models.Presence, models.Module, models.Node]# models.ZoneHeatRelay , models.Sensor]
 
     for table in table_collection:
         table_str = utils.get_table_name(table)
