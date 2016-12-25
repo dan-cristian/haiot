@@ -1,17 +1,10 @@
 #!/bin/bash
 
 LOG=/mnt/log/motion.log
-#declare -a RECORD_SOURCE_LIST=("hol" "cast")
-#declare -a RECORD_DEVICE_LIST=("C525,0,0" "Device,0,0")
 RECORD_PATH=/mnt/motion/tmp/sound
 
-#function echo2(){
-#echo [`date +%T.%N`] $1 $2 $3 $4 $5 >> $LOG 2>&1
-#echo [`date +%T.%N`] $1 $2 $3 $4 $5
-#}
-
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source "$DIR/include_cards.sh"
+source "$DIR/../common/include_cards.sh"
 
 function record_if_noise(){
 mkdir -p $RECORD_PATH/$SOURCE

@@ -3,29 +3,12 @@ LOG=/mnt/log/video.log
 export HAIOT_USER=haiot
 export DISPLAY=":0.0"
 
-function echo2(){
-echo [`date +%T.%N`] $1 $2 $3 $4 $5 >> $LOG 2>&1
-echo [`date +%T.%N`] $1 $2 $3 $4 $5
-}
-
-function kill_proc(){
-pid_str=`ps ax | grep "$1"`
-echo2 "Looking for proc [$1] pid returned: [$pid_str]"
-if [[ -n "$pid_str" ]]; then
-	pid_array=($pid_str)
-	pid=${pid_array[0]}
-	echo2 "Kill existing instance $pid"
-	kill $pid
-	sleep 2
-	kill -9 $pid
-	sleep 1
-fi
-}
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source "$DIR/../common/functions.sh"
 
 function stop_kodi(){
 echo2 "Stopping kodi"
-kill_proc "[x]init /usr/bin/kodi"
-kill_proc "[/]usr/lib/kodi/kodi.bin"
+kill_proc "[k]odi/kodi.bin"
 }
 
 function stop_browser(){
@@ -34,24 +17,40 @@ kill_proc "[c]hrome"
 }
 
 
-function exit_if_video_run(){
+function exit_if_kodi_run(){
 ps ax | grep -q [k]odi.bin
 kodi_code=$?
-ps ax | grep -q [c]hrome
+if [ $kodi_code -eq 0 ]; then
+        echo2 "Kodi is running, exit"
+        exit
+fi
+}
+
+function exit_if_browser_run(){
+ps ax | grep -q [/]opt/google/chrome/chrome
 browser_code=$?
-if [ $kodi_code -eq 0 ] || [ $browser_code -eq 0 ]; then
-        echo2 "Kodi or Browser is running, exit"
+if [ $browser_code -eq 0 ]; then
+        echo2 "Browser is running, exit"
         exit
 fi
 }
 
 function startx_once(){
-ps ax | grep -q [s]tartx
-if [ $? == '0' ]; then
-	echo2 "startx running, not starting again"
+local result=`ps ax | grep [/]usr/bin/startx`
+#local result=$?
+#echo2 "got ps result [$result]"
+if [ "$result" != "" ]; then
+	tty=`cat /sys/class/tty/tty0/active`
+	# echo2 "startx running, not starting again, res=[$result], console=$tty"
+	con=`ps ax|grep [X]org | awk '{print $2}'`
+	if [ "$con" != "$tty" ]; then
+		con=${con##*tty}
+		/bin/chvt $con
+		echo2 "Switching to startx console $con"
+	fi
 	return
 else
-	echo2 "Starting startx with user $HAIOT_USER"
+	echo2 "Starting startx with user $HAIOT_USER, res=$result"
 	# https://bugs.launchpad.net/ubuntu/+source/xinit/+bug/1562219
 	#chmod 0660 /dev/tty*
 	#/sbin/runuser -l $HAIOT_USER -c
@@ -59,12 +58,20 @@ else
 	echo2 "Started X"
 	while :
 	do
-		ps ax | grep -q [i]3status
+		ps ax | grep -q [i]3blocks
 		res=$?
 		if [ $res -eq 1 ]; then
-			echo2 "Waiting for startx process $res"
+			#echo2 "Waiting for startx process $res"
 			sleep 0.1
 		else
+			#default actions after x is started
+			xrandr --output HDMI1 --primary
+			xset +dpms
+			#duplicate screens
+			xrandr --output HDMI3 --auto --output HDMI1 --auto --same-as HDMI3
+			#set individual screens
+			#xrandr --output HDMI1 --auto --left-of HDMI3
+			/usr/bin/easystroke &
 			return
 		fi
 	done
@@ -88,10 +95,20 @@ sleep 1
 done
 }
 
+function start_kodi_once(){
+echo2 "Starting kodi display $DISPLAY"
+/usr/bin/xdotool key --clearmodifiers alt+3  >> $LOG 2>&1
+exit_if_kodi_run
+#/sbin/runuser -l $HAIOT_USER -c "/usr/bin/kodi" >> $LOG 2>&1 &
+$DIR/../audio/mpc-play.sh living stop
+/usr/bin/kodi & >> $LOG 2>&1
+}
+
 function start_kodi(){
 echo2 "Starting kodi display $DISPLAY"
-/usr/bin/xdotool key --clearmodifiers alt+1  >> $LOG 2>&1
+/usr/bin/xdotool key --clearmodifiers alt+3  >> $LOG 2>&1
 #/sbin/runuser -l $HAIOT_USER -c "/usr/bin/kodi" >> $LOG 2>&1 &
+$DIR/../audio/mpc-play.sh living stop
 /usr/bin/kodi & >> $LOG 2>&1
 }
 
@@ -99,14 +116,26 @@ function start_browser(){
 echo2 "Starting browser display $DISPLAY"
 /usr/bin/xdotool key --clearmodifiers alt+2  >> $LOG 2>&1
 #/sbin/runuser -l $HAIOT_USER -c "/usr/bin/kodi" >> $LOG 2>&1 &
+exit_if_browser_run
 /usr/bin/google-chrome --user-data-dir="/home/$HAIOT_USER/.chrome" >> $LOG 2>&1
+}
+
+function presence(){
+echo2 "Detected presence"
+startx_once
+exit_if_kodi_run
+is_monitor_on
+if [ $? -ne 0 ]; then
+	xset dpms force on
+	$DIR/slideshow.sh
+fi
 }
 
 
 # http://unix.stackexchange.com/questions/118811/why-cant-i-run-gui-apps-from-root-no-protocol-specified
 # http://kodi.wiki/view/HOW-TO:Autostart_Kodi_for_Linux
 
-echo2 "Kodi cmd=$1 target_user=$HAIOT_USER whoami=`whoami`"
+#echo2 "Kodi cmd=$1 target_user=$HAIOT_USER whoami=`whoami`"
 if [ "$1" == "start-kodi" ]; then
 	stop_kodi
 	startx_once
@@ -115,15 +144,20 @@ if [ "$1" == "start-kodi" ]; then
 elif [ "$1" == "stop" ]; then
 	stop_kodi
 elif [ "$1" == "start-kodi-once" ]; then
-	exit_if_video_run
 	startx_once
-	start_kodi
+	start_kodi_once
 	#increase_prio
 elif [ "$1" == "start-browser" ]; then
         startx_once
         stop_browser
 	start_browser
         #increase_prio
+elif [ "$1" == "startx" ]; then
+        startx_once
+elif [ "$1" == "presence" ]; then
+        presence
+elif [ "$1" == "touch" ]; then
+        presence
 else
 	echo2 "Action not mapped for command=[$1]"
 fi
