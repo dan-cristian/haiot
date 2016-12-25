@@ -85,8 +85,9 @@ class Log:
         # todo: remove annoying info messages, but only for few cases, efect unclear
         logging.getLogger("requests").setLevel(logging.INFO)
 
-        # propagate False stops log writes to standard output
-        Log.logger.propagate = False
+        # propagate False stops log writes to standard output. Set to True to show log in Pycharm
         if Log.RUN_IN_LIVE:
             Log.logger.info('Logger is set to live mode, disabling log propagation')
-            Log.logger.propagate = False
+        Log.logger.propagate = not Log.RUN_IN_LIVE
+
+

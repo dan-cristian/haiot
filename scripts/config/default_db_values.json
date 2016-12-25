@@ -1,13 +1,16 @@
 {
   "Node": [
     {"id":1,  "priority":"0", "name":"netbook", "machine_type":"raspberry"},
+
     {"id":2,  "priority":"2", "name":"nas"},
     {"id":3,  "priority":"9", "name":"server"},
     {"id":4,  "priority":"4", "name":"ex-std-node466.prod.rhcloud.com"},
     {"id":5,  "priority":"5", "name":"beaglebone", "machine_type":"beaglebone"},
     {"id":6,  "priority":"6", "name":"pi-power", "machine_type":"raspberry"},
     {"id":7,  "priority":"7", "name":"pi-bell", "machine_type":"raspberry"},
-    {"id":8,  "priority":"3", "name":"pi-face", "machine_type":"raspberry"}
+    {"id":8,  "priority":"3", "name":"pi-face", "machine_type":"raspberry"},
+
+    {"id":10,  "priority":"1", "name":"EN62395", "machine_type":"raspberry"}
   ],
 
   "Parameter": [
@@ -49,19 +52,19 @@
     {"id":7,  "active":"1", "start_order":"7", "name":"gpio"},
     {"id":9,  "active":"0", "start_order":"9", "name":"heat"},
     {"id":11, "active":"0", "start_order":"11", "name":"alarm"},
-    {"id":17, "active":"1", "start_order":"17", "name":"webui"},
     {"id":13, "active":"0", "start_order":"13", "name":"cloud.graph_plotly"},
     {"id":19, "active":"1", "start_order":"19", "name":"ddns"},
     {"id":21, "active":"0", "start_order":"21", "name":"cloud.youtube"},
     {"id":23, "active":"0", "start_order":"23", "name":"sysutils.filewatch"},
     {"id":25, "active":"1", "start_order":"25", "name":"rule"},
     {"id":27, "active":"1", "start_order":"27", "name":"node"},
-    {"id":29, "active":"1", "start_order":"29", "name":"webui.chart"},
-    {"id":31, "active":"1", "start_order":"31", "name":"webui.api"},
     {"id":33, "active":"1", "start_order":"33", "name":"utility"},
     {"id":35, "active":"1", "start_order":"35", "name":"cloud.newtifry"},
     {"id":37, "active":"1", "start_order":"37", "name":"cloud.hipchat"},
     {"id":39, "active":"1", "start_order":"39", "name":"presence"},
+    {"id":101, "active":"1", "start_order":"101", "name":"webui.chart"},
+    {"id":102, "active":"1", "start_order":"102", "name":"webui.api"},
+    {"id":103, "active":"1", "start_order":"103", "name":"webui"},
 
     {"id":121, "active":"0", "start_order":"21", "name":"cloud.youtube", "host_name":"nas"},
     {"id":123, "active":"0", "start_order":"23", "name":"sysutils.filewatch", "host_name":"nas"},
@@ -72,6 +75,7 @@
     {"id":311, "active":"1", "start_order":"11", "name":"alarm", "host_name":"beaglebone"},
 
     {"id":403, "active":"1", "start_order":"3", "name":"health_monitor", "host_name":"EN62395"},
+    {"id":409, "active":"0", "start_order":"9", "name":"heat", "host_name":"EN62395"},
 
     {"id":509, "active":"1", "start_order":"9", "name":"heat", "host_name":"netbook"},
     {"id":599, "active":"0", "start_order":"99", "name":"test", "host_name":"netbook"},
@@ -99,7 +103,7 @@
     {"id":16, "name":"usa portita"},
     {"id":17, "name":"usa garaj mare"},
     {"id":18, "name":"buton usa"},
-    {"id":19, "name":"heat main"},
+    {"id":19, "name":"gas heater"},
     {"id":20, "name":"heat living"},
     {"id":21, "name":"heat birou"},
     {"id":22, "name":"heat bucatarie"},
@@ -216,9 +220,7 @@
     {"zone_id":2,"heat_pin_name":"living","gpio_pin_code":"23","gpio_host_name":"pi-face", "is_main_heat_source":"0"},
     {"zone_id":47,"heat_pin_name":"birou","gpio_pin_code": "24","gpio_host_name":"pi-face", "is_main_heat_source":"0"},
     {"zone_id":4,"heat_pin_name":"dormitor","gpio_pin_code":"4","gpio_host_name":"pi-face","is_main_heat_source":"0"},
-    {"zone_id":19,"heat_pin_name":"heat main","gpio_pin_code":"24","gpio_host_name":"pi-power","is_main_heat_source":"1"},
-
-    {"zone_id":4,"heat_pin_name":"dormitor-test","gpio_pin_code":"1","gpio_host_name":"netbook","is_main_heat_source":"0"}
+    {"zone_id":19,"heat_pin_name":"gas heater","gpio_pin_code":"24","gpio_host_name":"pi-power","is_main_heat_source":"1"}
   ],
 
   "ZoneSensor": [
@@ -252,12 +254,7 @@
     {"sensor_name":"water hot", "sensor_index":0, "ticks_per_unit":1, "unit_name":"liter", "utility_type":"water", "unit_cost":1},
     {"sensor_name":"power main", "sensor_index":0, "ticks_per_unit":1000, "unit_name":"watt", "utility_type":"electricity", "unit_cost":1},
     {"sensor_name":"water main", "sensor_index":0, "ticks_per_unit":0.1, "unit_name":"liter", "utility_type":"water", "unit_cost":1},
-    {"sensor_name":"power beci", "sensor_index":0, "ticks_per_unit":2000, "unit_name":"watt", "utility_type":"electricity", "unit_cost":1},
-
-    {"sensor_name":"power beci", "sensor_index":1, "ticks_per_unit":1, "unit_name":"not used"},
-    {"sensor_name":"power main", "sensor_index":1, "ticks_per_unit":1, "unit_name":"not used"},
-    {"sensor_name":"power rack", "sensor_index":0, "ticks_per_unit":1, "unit_name":"not used"},
-    {"sensor_name":"water hot", "sensor_index":1, "ticks_per_unit":1, "unit_name":"not used"}
+    {"sensor_name":"power beci", "sensor_index":0, "ticks_per_unit":2000, "unit_name":"watt", "utility_type":"electricity", "unit_cost":1}
   ],
 
   "ZoneAlarm": [

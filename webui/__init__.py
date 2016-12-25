@@ -119,5 +119,5 @@ def log_request():
 
 @app.errorhandler(404)
 def page_not_found(e):
-    Log.logger.error('Page not found:{}'.format(e))
+    Log.logger.error('Error {} [{}]'.format(e, request.path))
     return render_template('404.html'), 404

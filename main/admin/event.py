@@ -73,6 +73,9 @@ def on_models_committed(sender, changes):
                         if not obj.notified_on_db_commit:
                             obj.notified_on_db_commit = True
                             txt = model_helper.model_row_to_json(obj, operation=change)
+                            if txt is None:
+                                txt = model_helper.model_row_to_json(obj, operation=change)
+                                pass
                             # execute all events directly first,
                             # then broadcast, local events not handled by remote mqtt queue
                             handle_event_mqtt_received(None, None, 'direct-event', utils.json2obj(txt))
@@ -128,6 +131,9 @@ def mqtt_thread_run():
                         presence.record_update(obj)
                     elif table == utils.get_table_name(models.PlotlyCache):
                         graph_plotly.record_update(obj)
+                    elif table == utils.get_table_name(models.Utility):
+                        # no additional processing
+                        pass
                     else:
                         Log.logger.warning('Table %s content from %s is not mqtt processed' % (table, source_host))
 
