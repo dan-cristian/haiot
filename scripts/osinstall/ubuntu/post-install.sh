@@ -189,7 +189,7 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     '
     echo 'Installing music tools'
 
-    apt-get install mpd mpc triggerhappy avahi-daemon shairport-sync sox lame
+    apt-get install mpd mpc triggerhappy avahi-daemon shairport-sync sox lame mpdscribble
     git clone https://github.com/wertarbyte/triggerhappy.git
     cd triggerhappy/
     make
@@ -283,6 +283,11 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     card DAC
     }' > /root/.asoundrc
 
+    echo "Configure kodi socket activation"
+    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/kodi* /lib/systemd/system/
+    systemctl enable kodi@root.socket
+    systemctl start kodi@root.socket
+
     # https://github.com/mikebrady/shairport-sync
     echo "Configure AirPlay default sound card"
     sleep 5
@@ -298,6 +303,11 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     systemctl start shairport-sync@living
     systemctl start shairport-sync@beci
     systemctl start shairport-sync@dormitor
+
+    #https://wiki.archlinux.org/index.php/Music_Player_Daemon/Tips_and_tricks#Last.fm.2FLibre.fm_scrobbling
+    echo "Configure mpdscribble to Last.fm"
+    nano /etc/mpdscribble.conf
+
 fi
 
 if [ "$ENABLE_CAMERA" == "1" ]; then
