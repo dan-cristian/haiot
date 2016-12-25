@@ -1,0 +1,6 @@
+#http://192.168.0.9:10005
+http://admin:Abcd!234@192.168.0.28/Streaming/channels/1/picture
+http://v:vabcd1234@192.168.0.23/Streaming/channels/1/picture
+http://v:vabcd1234@192.168.0.22/Streaming/channels/1/picture
+http://192.168.0.26/cgi-bin/CGIProxy.fcgi?cmd=snapPicture2&usr=v&pwd=a
+http://admin:Abcd!234@192.168.0.21/Streaming/channels/1/picture

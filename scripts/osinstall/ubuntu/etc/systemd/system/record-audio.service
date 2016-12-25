@@ -1,0 +1,8 @@
+[Unit]
+After=mpd@.service
+
+[Service]
+ExecStart=/home/scripts/audio/record-audio.sh
+
+[Install]
+WantedBy=default.target

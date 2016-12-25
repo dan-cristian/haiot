@@ -26,6 +26,7 @@ ENABLE_TORRENT=1
 ENABLE_CLOUD_AMAZON=1
 ENABLE_MYSQL=1
 MYSQL_DATA_ROOT=/mnt/data/hdd-wdr-evhk/mysql
+ENABLE_DASHBOARD=1
 
 echo "Setting timezone ..."
 echo "Europe/Bucharest" > /etc/timezone
@@ -141,6 +142,10 @@ fi
 
 
 if [ "$ENABLE_MEDIA" == "1" ]; then
+    echo "Installing bluetooth BLE for polar7"
+   #http://installfights.blogspot.ro/2016/08/fix-set-scan-parameters-failed.html
+
+
     echo "Installing media - sound + mpd + kodi + mp3 tagger"
     apt-get install alsa-utils bluez pulseaudio-module-bluetooth python-gobject python-gobject-2 id3v2 flac mediainfo
     # https://www.raspberrypi.org/forums/viewtopic.php?t=68779
@@ -267,7 +272,8 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     echo 'Installing video tools'
     #http://blog.endpoint.com/2012/11/using-cec-client-to-control-hdmi-devices.html
     # http://www.semicomplete.com/projects/xdotool/#idp2912
-    apt-get install i3 xinit xterm kodi xdotool
+    apt-get install i3 xinit xterm kodi xdotool i3blocks
+    
     #dependencies for chrome
     apt-get install gconf-service
 
@@ -304,10 +310,42 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     systemctl start shairport-sync@beci
     systemctl start shairport-sync@dormitor
 
+
     #https://wiki.archlinux.org/index.php/Music_Player_Daemon/Tips_and_tricks#Last.fm.2FLibre.fm_scrobbling
     echo "Configure mpdscribble to Last.fm"
     nano /etc/mpdscribble.conf
 
+    echo "Configuring additional music scripts"
+    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/activate-audio-amp.service /lib/systemd/system/
+    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/record-audio.service /lib/systemd/system/
+    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/thd.service /lib/systemd/system/
+    systemctl enable activate-audio-amp
+    systemctl enable record-audio
+    systemctl start activate-audio-amp
+    systemctl start record-audio
+    systemctl enable thd
+    systemctl start thd
+
+    echo "Installing screenshow"
+    apt install feh
+
+   echo "Installing gesture"
+   apt install easystroke
+fi
+
+if [ "$ENABLE_DASHBOARD" == "1" ]; then
+    echo "Installing smashing dashboard"
+    # http://labrat.it/2014/01/11/dashing-dashboard/
+    # https://github.com/SmashingDashboard/smashing
+    apt-get install ruby nodejs
+    apt-get install ruby-dev g++ libmysqlclient-dev
+    gem install bundler
+    gem install smashing
+    git clone https://github.com/dan-cristian/dashiot.git
+    cd dashiot
+    bundle
+    echo "Installing dashboard service"
+    # https://gist.github.com/gregology/5313326
 fi
 
 if [ "$ENABLE_CAMERA" == "1" ]; then
