@@ -4,12 +4,7 @@ MPD_MUSIC=/mnt/music
 MPD_DELETED=/mnt/music_deleted
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source "$DIR/include_cards.sh"
-
-#function echo2(){
-#echo [`date +%T.%N`] $1 $2 $3 $4 $5 >> $LOG 2>&1
-#echo [`date +%T.%N`] $1 $2 $3 $4 $5
-#}
+source "$DIR/../common/include_cards.sh"
 
 function delete(){
 prefix="file: "
@@ -62,85 +57,80 @@ if [ $code == '0' ]; then
 fi
 }
 
-echo2 "Using MPC port=$1 type=$2 extra=$3"
-
-#declare -a NAME=("living" "pod" "beci" "dormitor" "baie")
-#declare -a PORT=(6600 6601 6602 6603 6604)
-#declare -a OUTPUT=("Digital Small USB (living2)" "Analog Onboard (bucatarie)" "Analog DGX PCIe (beci)" "Digital DGX PCIe (dormitor)" "Digital Box USB (baie)")
-PORT_MATCH=0
-
-for i in ${!PORT[*]}; do
-	if [ "${PORT[$i]}" == "$1" ]; then
-		PORT_MATCH=$1
+PORT=0
+echo2 "Using MPC zone=$1 type=$2 extra=$3"
+for i in ${!CARD_NAME[*]}; do  
+	if [ "${CARD_NAME[$i]}" == "$1" ]; then
+		PORT=${MPD_PORT_LIST[$i]}
 		if [ "$2" == "init" ]; then
-			echo2 "Init output in zone ${NAME[$i]}, output=[${OUTPUT[$i]}]"
-			mpc -vp $1 enable only "${OUTPUT[$i]}"
-			mpc -vp $1 volume 25
-			mpc -vp $1 status
-			mpc -vp $1 outputs
+			echo2 "Init output in zone ${CARD_NAME[$i]}, output=[${MPD_OUTPUT[$i]}]"
+			mpc -vp $PORT enable only "${MPD_OUTPUT[$i]}"
+			mpc -vp $PORT volume 25
+			mpc -vp $PORT status
+			mpc -vp $PORT outputs
 		elif [ "$2" == "music" ]; then
-			echo2 "Starting MUSIC play in zone ${NAME[$i]}, output=[${OUTPUT[$i]}]"
-			mpc -vp $1 enable only "${OUTPUT[$i]}" >> $LOG 2>&1
-			mpc -vp $1 clear >> $LOG 2>&1
-			mpc -vp $1 ls | mpc -p $1 add >> $LOG 2>&1
-			mpc -vp $1 random on >> $LOG 2>&1
-			mpc -vp $1 repeat on >> $LOG 2>&1
-			mpc -vp $1 volume 25 >> $LOG 2>&1
-			mpc -vp $1 play >> $LOG 2>&1
+			echo2 "Starting MUSIC play in zone ${CARD_NAME[$i]}, output=[${MPD_OUTPUT[$i]}]"
+			mpc -vp $PORT enable only "${MPD_OUTPUT[$i]}" >> $LOG 2>&1
+			mpc -vp $PORT clear >> $LOG 2>&1
+			mpc -vp $PORT ls | mpc -p $PORT add >> $LOG 2>&1
+			mpc -vp $PORT random on >> $LOG 2>&1
+			mpc -vp $PORT repeat on >> $LOG 2>&1
+			mpc -vp $PORT volume 25 >> $LOG 2>&1
+			mpc -vp $PORT play >> $LOG 2>&1
 			#start amp if needed
 			`dirname $0`/activate-audio-amp.sh
 			break
 		elif [ "$2" == "radio" ]; then
-			echo2 "Starting RADIO play in zone ${NAME[$i]}, output=[${OUTPUT[$i]}]"
-			mpc -vp $1 clear >> $LOG 2>&1
-			mpc -vp $1 load radios >> $LOG 2>&1
-			mpc -vp $1 volume 25 >> $LOG 2>&1
-			mpc -vp $1 play >> $LOG 2>&1
+			echo2 "Starting RADIO play in zone ${CARD_NAME[$i]}, output=[${MPD_OUTPUT[$i]}]"
+			mpc -vp $PORT clear >> $LOG 2>&1
+			mpc -vp $PORT load radios >> $LOG 2>&1
+			mpc -vp $PORT volume 25 >> $LOG 2>&1
+			mpc -vp $PORT play >> $LOG 2>&1
 			#start amp if needed
-                        `dirname $0`/activate-audio-amp.sh
+      `dirname $0`/activate-audio-amp.sh
 		elif [ "$2" == "list" ]; then
-			echo2 "Starting PLAYLIST=$3 in zone ${NAME[$i]}, output=[${OUTPUT[$i]}]"
-			mpc -vp $1 clear >> $LOG 2>&1
-			mpc -vp $1 load $3 >> $LOG 2>&1
-			mpc -vp $1 random on >> $LOG 2>&1
-			mpc -vp $1 repeat on >> $LOG 2>&1
-			mpc -vp $1 volume 25 >> $LOG 2>&1
-			mpc -vp $1 play >> $LOG 2>&1
+			echo2 "Starting PLAYLIST=$3 in zone ${CARD_NAME[$i]}, output=[${MPD_OUTPUT[$i]}]"
+			mpc -vp $PORT clear >> $LOG 2>&1
+			mpc -vp $PORT load $3 >> $LOG 2>&1
+			mpc -vp $PORT random on >> $LOG 2>&1
+			mpc -vp $PORT repeat on >> $LOG 2>&1
+			mpc -vp $PORT volume 25 >> $LOG 2>&1
+			mpc -vp $PORT play >> $LOG 2>&1
 			#start amp if needed
-                        `dirname $0`/activate-audio-amp.sh
+		  `dirname $0`/activate-audio-amp.sh
 		elif [ "$2" == "next" ]; then
-			mpc -vp $1 next >> $LOG 2>&1
+			mpc -vp $PORT next >> $LOG 2>&1
 		elif [ "$2" == "prev" ]; then
-			mpc -vp $1 prev >> $LOG 2>&1
+			mpc -vp $PORT prev >> $LOG 2>&1
 		elif [ "$2" == "toggle" ]; then
 			exit_if_kodi_run
-			mpc -vp $1 toggle >> $LOG 2>&1
+			mpc -vp $PORT toggle >> $LOG 2>&1
 		elif [ "$2" == "stop" ]; then
-			mpc -vp $1 stop >> $LOG 2>&1
+			mpc -vp $PORT stop >> $LOG 2>&1
 		elif [ "$2" == "volumeup" ]; then
-			mpc -vp $1 volume +1 >> $LOG 2>&1
+			mpc -vp $PORT volume +1 >> $LOG 2>&1
 		elif [ "$2" == "volumedown" ]; then
-			mpc -vp $1 volume -2 >> $LOG 2>&1
+			mpc -vp $PORT volume -2 >> $LOG 2>&1
 		elif [ "$2" == "delete" ]; then
-			delete $1
-			mpc -vp $1 next >> $LOG 2>&1
+			delete $PORT
+			mpc -vp $PORT next >> $LOG 2>&1
 		elif [ "$2" == "fav" ]; then
-			add_fav $1
+			add_fav $PORT
 			#introduce a pause to indicate add to fav happened
-			mpc -vp $1 toggle >> $LOG 2>&1
+			mpc -vp $PORT toggle >> $LOG 2>&1
 			sleep 1
-			mpc -vp $1 toggle >> $LOG 2>&1
+			mpc -vp $PORT toggle >> $LOG 2>&1
 		elif [ "$2" == "unfav" ]; then
-                        un_fav $1
-                        #introduce a pause to indicate add to fav happened
-                        mpc -vp $1 toggle >> $LOG 2>&1
-                        sleep 1
-                        mpc -vp $1 toggle >> $LOG 2>&1
+      un_fav $PORT
+      #introduce a pause to indicate add to fav happened
+      mpc -vp $PORT toggle >> $LOG 2>&1
+      sleep 1
+      mpc -vp $PORT toggle >> $LOG 2>&1
 		else
 			echo2 "Action not mapped for command=[$2]"
 		fi
 	fi
 done
-if [ "$PORT_MATCH" -eq "0" ]; then
-	echo2 "Warning, port=[$1] not found in config list, no action executed"
+if [ "$PORT" -eq "0" ]; then
+	echo2 "Warning, zone=[$1] not found in config list, no action executed"
 fi

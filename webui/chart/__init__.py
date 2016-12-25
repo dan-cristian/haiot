@@ -2,22 +2,18 @@ import json
 from urllib2 import urlopen  # python 2 syntax
 import pygal
 from datetime import datetime, timedelta
-from flask import render_template, request
+from flask import render_template, request, send_file
 from sqlalchemy import func, extract
 from main import app, db
 from main.logger_helper import Log
 from main.admin import models
 from common import Constant, utils
+import dashboard
 
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
 initialised = False
 _period_list = ['year', 'month', 'day', 'hour']
-
-@app.route('/dashboard')
-def render_dashboard():
-    return render_template('dashboard/main.html')
-
 
 def __config_graph(title, start, end):
     config = pygal.Config()
