@@ -325,6 +325,7 @@ class Presence(db.Model, DbBase, DbEvent):
     zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'), nullable=False)
     zone_name = db.Column(db.String(50))
     sensor_name = db.Column(db.String(50))
+    event_type = db.Column(db.String(25)) # cam, pir, contact, wifi, bt
     event_camera_date = db.Column(db.DateTime(), default=None)
     event_alarm_date = db.Column(db.DateTime(), default=None)
     event_io_date = db.Column(db.DateTime(), default=None)
@@ -618,6 +619,7 @@ class ZoneAlarm(db.Model, DbEvent, DbBase):
     # gpio_pin_code = db.Column(db.String(50), db.ForeignKey('gpio_pin.pin_code'))
     gpio_pin_code = db.Column(db.String(50))
     gpio_host_name = db.Column(db.String(50))
+    sensor_type = db.Column(db.String(25))
     # gpio_pin = db.relationship('GpioPin', backref=db.backref('ZoneAlarm(gpiopincode)', lazy='dynamic'))
     alarm_pin_triggered = db.Column(db.Boolean)  # True if alarm sensor is connected (move detected)
     is_false_alarm_prone = db.Column(db.Boolean)  # True if sensor can easily trigger false alarms (gate move by wind)
@@ -903,6 +905,7 @@ class PresenceHistory(db.Model, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     zone_name = db.Column(db.String(50))
     sensor_name = db.Column(db.String(50))
+    event_type = db.Column(db.String(25)) # cam, pir, contact, wifi, bt
     event_camera_date = db.Column(db.DateTime(), default=None)
     event_alarm_date = db.Column(db.DateTime(), default=None)
     event_io_date = db.Column(db.DateTime(), default=None)
