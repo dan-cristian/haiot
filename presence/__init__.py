@@ -36,14 +36,16 @@ def handle_event_presence_io(gpio_pin_code='', direction='', pin_value='', pin_c
                     zone_name = "zone_name not found"
                 current_record = models.Presence().query_filter_first(models.Presence.zone_id == zone_id)
                 record = models.Presence()
+                record.event_type = zonealarm.sensor_type
                 record.zone_id = zone_id
                 record.zone_name = zone_name
-                record.event_io_date = utils.get_base_location_now_date()
+                # record.event_io_date = utils.get_base_location_now_date()
                 record.sensor_name = zonealarm.alarm_pin_name
                 record.is_connected = pin_connected
                 # Log.logger.info('Presence saving sensor {}'.format(record.sensor_name))
                 record.save_changed_fields(current_record=current_record, new_record=record,
-                                           notify_transport_enabled=True, save_to_graph=True, save_all_fields=True)
+                                           notify_transport_enabled=True, save_to_graph=True,
+                                           save_all_fields=True)
             else:
                 Log.logger.warning('Unable to find presence zone for pin {} in Alarm table'.format(gpio_pin_code))
     except Exception, ex:
@@ -55,13 +57,15 @@ def handle_event_presence_cam(zone_name, cam_name, has_move):
     if zone is not None:
         current_record = models.Presence().query_filter_first(models.Presence.zone_id == zone.id)
         record = models.Presence()
+        record.event_type = Constant.PRESENCE_TYPE_CAM
         record.zone_id = zone.id
         record.zone_name = zone_name
-        record.event_camera_date = utils.get_base_location_now_date()
+        # record.event_camera_date = utils.get_base_location_now_date()
         record.sensor_name = cam_name
         record.is_connected = has_move
         record.save_changed_fields(current_record=current_record, new_record=record,
-                                   notify_transport_enabled=True, save_to_graph=True, save_all_fields=True)
+                                   notify_transport_enabled=True, save_to_graph=True,
+                                   save_all_fields=True)
     else:
         Log.logger.warning('Unable to find presence zone for camera zone {}'.format(zone_name))
 
