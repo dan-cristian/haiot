@@ -1,0 +1,15 @@
+[Unit]
+Description=Mpdscribble %I
+After=sound.target network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/mpdscribble -D --port %I
+Restart=always
+RestartSec=1min
+#User=
+#Group=
+SyslogIdentifier=mpdscribble-%I
+
+[Install]
+WantedBy=multi-user.target
