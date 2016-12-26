@@ -13,7 +13,7 @@ kill_proc "[k]odi/kodi.bin"
 
 function stop_browser(){
 echo2 "Stopping browser"
-kill_proc "[c]hrome"
+kill_proc "[m]idori"
 }
 
 
@@ -27,7 +27,7 @@ fi
 }
 
 function exit_if_browser_run(){
-ps ax | grep -q [/]opt/google/chrome/chrome
+ps ax | grep -q [/]usr/bin/midori
 browser_code=$?
 if [ $browser_code -eq 0 ]; then
         echo2 "Browser is running, exit"
@@ -71,7 +71,7 @@ else
 			xrandr --output HDMI3 --auto --output HDMI1 --auto --same-as HDMI3
 			#set individual screens
 			#xrandr --output HDMI1 --auto --left-of HDMI3
-			/usr/bin/easystroke &
+			/usr/bin/easystroke hide &
 			return
 		fi
 	done
@@ -114,10 +114,12 @@ $DIR/../audio/mpc-play.sh living stop
 
 function start_browser(){
 echo2 "Starting browser display $DISPLAY"
-/usr/bin/xdotool key --clearmodifiers alt+2  >> $LOG 2>&1
+i3-msg workspace 2
+#/usr/bin/xdotool key --clearmodifiers alt+2  >> $LOG 2>&1
 #/sbin/runuser -l $HAIOT_USER -c "/usr/bin/kodi" >> $LOG 2>&1 &
 exit_if_browser_run
-/usr/bin/google-chrome --user-data-dir="/home/$HAIOT_USER/.chrome" >> $LOG 2>&1
+#/usr/bin/google-chrome --user-data-dir="/home/$HAIOT_USER/.chrome" >> $LOG 2>&1
+midori -e Statusbar http://localhost:8080 >> $LOG 2>&1 &
 }
 
 function presence(){
