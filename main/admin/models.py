@@ -338,7 +338,7 @@ class Presence(db.Model, DbBase, DbEvent):
         super(Presence, self).__init__()
 
     def __repr__(self):
-        return 'Presence id {} zone_id {} sensor {}'.format(self.id, self.zone_id, self.sensor_name)
+        return 'Presence id {} zone_id {} sensor {} connected {}'.format(self.id, self.zone_id, self.sensor_name, self.is_connected)
 
 
 class SchedulePattern(db.Model, DbBase):
