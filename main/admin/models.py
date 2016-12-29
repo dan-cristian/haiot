@@ -915,6 +915,9 @@ class PresenceHistory(db.Model, DbBase):
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
     source_host_ = db.Column(db.String(50))
 
+    def __repr__(self):
+        return 'PresenceHistory zone {} sensor {} connected {} type {}'.format(self.zone_name, self.sensor_name, self.is_connected, self.event_type)
+
 
 class UtilityHistory(db.Model, DbBase):
     __bind_key__ = 'reporting'
