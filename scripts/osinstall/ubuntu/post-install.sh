@@ -313,7 +313,15 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
 
     #https://wiki.archlinux.org/index.php/Music_Player_Daemon/Tips_and_tricks#Last.fm.2FLibre.fm_scrobbling
     echo "Configure mpdscribble to Last.fm"
+    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/mpdscribble@.service /lib/systemd/system/
+    systemctl disable mpdscribble
+    echo "Comment port setting in conf file"
+    sleep 5
     nano /etc/mpdscribble.conf
+    systemctl enable mpdscribble@6600
+    systemctl enable mpdscribble@6601
+    systemctl start mpdscribble@6600
+    systemctl start mpdscribble@6601
 
     echo "Configuring additional music scripts"
     cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/activate-audio-amp.service /lib/systemd/system/
