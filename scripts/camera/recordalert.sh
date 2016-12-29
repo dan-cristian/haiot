@@ -17,6 +17,6 @@ if [ $diffsec -le 30 ] ; then
 	:
 else
 	echo $datenow > $savefile
-	logger "Motion alerting cam $1 $2"
-	wget -q --output-document=/dev/null --timeout=1 --tries=1 "http://192.168.0.12:8080/apiv1/camera_alert/zone_name=$1&cam_name=$2"
+	logger "Motion alerting cam $1 $2 $3"
+	wget -q --output-document=/dev/null --timeout=1 --tries=1 "http://192.168.0.12:8080/apiv1/camera_alert/zone_name=$1&cam_name=$2&has_move=$3"
 fi
