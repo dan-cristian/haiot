@@ -40,4 +40,4 @@ echo2 Adding THD hol touch
 killall udevadm
 restart_thd
 echo2 'Listening for USB add events'
-udevadm monitor --udev | grep --line-buffered 'add' | while read ; do restart_thd ; done &
+udevadm monitor --udev | grep --line-buffered 'add' | while read ; do restart_thd ; done
