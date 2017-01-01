@@ -12,6 +12,7 @@ Nice=-10
 # allow MPD to use real-time priority 50
 LimitRTPRIO=50
 LimitRTTIME=infinity
+PIDFile=%t/mpd-%I.pid
 
 # disallow writing to /usr, /bin, /sbin, ...
 ProtectSystem=yes
