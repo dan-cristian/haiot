@@ -35,6 +35,16 @@ if [ $browser_code -eq 0 ]; then
 fi
 }
 
+function start_gesture_once(){
+ps ax | grep -q [/]usr/bin/easystroke
+if [ $? -eq 0 ]; then
+        echo2 "Easystroke is running, exit"
+        return
+fi
+echo2 "Starting easystroke"
+/usr/bin/easystroke hide &
+}
+
 function startx_once(){
 local result=`ps ax | grep [/]usr/bin/startx`
 #local result=$?
@@ -69,9 +79,12 @@ else
 			xset +dpms
 			#duplicate screens
 			xrandr --output HDMI3 --auto --output HDMI1 --auto --same-as HDMI3
+			xrandr --output HDMI3 --auto --output HDMI2 --auto --same-as HDMI3
 			#set individual screens
 			#xrandr --output HDMI1 --auto --left-of HDMI3
-			/usr/bin/easystroke hide &
+			start_gesture_once
+			# SONY BD mode change
+			xrandr --output HDMI3 --mode 1920x1080
 			return
 		fi
 	done
@@ -125,6 +138,7 @@ midori -e Statusbar http://localhost:8080 >> $LOG 2>&1 &
 function presence(){
 echo2 "Detected presence"
 startx_once
+start_gesture_once
 exit_if_kodi_run
 is_monitor_on
 if [ $? -ne 0 ]; then
@@ -138,6 +152,11 @@ fi
 # http://kodi.wiki/view/HOW-TO:Autostart_Kodi_for_Linux
 
 #echo2 "Kodi cmd=$1 target_user=$HAIOT_USER whoami=`whoami`"
+lock=/tmp/.video-start.exclusivelock
+(
+	# Wait for lock on /var/lock/..exclusivelock (fd 200) for 1 seconds
+	if flock -x -w 1 200 ; then
+
 if [ "$1" == "start-kodi" ]; then
 	stop_kodi
 	startx_once
@@ -163,3 +182,7 @@ elif [ "$1" == "touch" ]; then
 else
 	echo2 "Action not mapped for command=[$1]"
 fi
+
+fi #lock
+) 200>$lock
+rm $lock
