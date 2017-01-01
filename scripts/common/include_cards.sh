@@ -32,8 +32,8 @@ echo [`date +%T.%N`] $1 $2 $3 $4 $5
 function get_card_index_by_name(){
 local zone_name=$1
 local i
-for i in ${!NAME[*]}; do
-	if [ "${NAME[$i]}" == "$zone_name" ]; then
+for i in ${!CARD_NAME[*]}; do
+	if [ "${CARD_NAME[$i]}" == "$zone_name" ]; then
 		return $i
 	fi
 done
