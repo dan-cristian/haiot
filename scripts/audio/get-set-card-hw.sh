@@ -53,8 +53,8 @@ local zone_name=$1
 local i
 for i in ${!NAME[*]}; do
 	if [ "${NAME[$i]}" == "$zone_name" ]; then
-		CARD_NAME=${CARD[$i]}
-		CARD_INDEX=${DEV[$i]}
+		CARD_NAME=${CARD_OUT[$i]}
+		CARD_INDEX=${DEV_OUT[$i]}
 		echo2 "Found card $CARD_NAME in zone $zone_name"
 		return 0
 	fi
@@ -79,9 +79,9 @@ fi
 
 
 if [ "$1" == "shairport" ]; then
-	for i in ${!NAME[*]}; do
+	for i in ${!CARD_NAME[*]}; do
 		echo2 "Updating zone ${NAME[$i]}"
-		do_shairport ${NAME[$i]}
+		do_shairport ${CARD_NAME[$i]}
 	done
 else
 	get_card_name $1
