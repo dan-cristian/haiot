@@ -212,18 +212,21 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     systemctl enable mpd@beci.service
     systemctl enable mpd@dormitor.service
     systemctl enable mpd@baie.service
+    systemctl enable mpd@headset.service
 
     systemctl enable mpd@living.socket
     systemctl enable mpd@pod.socket
     systemctl enable mpd@beci.socket
     systemctl enable mpd@dormitor.socket
     systemctl enable mpd@baie.socket
+    systemctl enable mpd@headset.socket
 
     systemctl start mpd@living.socket
     systemctl start mpd@pod.socket
     systemctl start mpd@beci.socket
     systemctl start mpd@dormitor.socket
     systemctl start mpd@baie.socket
+    systemctl start mpd@headset.socket
 
     #cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/sockets.target.wants/mpd*.socket /lib/systemd/system/
     #cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/sockets.target.wants/mpd*.socket /lib/systemd/system/

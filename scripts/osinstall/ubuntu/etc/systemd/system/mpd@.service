@@ -5,8 +5,8 @@ After=network.target sound.target
 [Service]
 EnvironmentFile=/etc/default/mpd
 ExecStart=/usr/bin/mpd --no-daemon /etc/mpd.conf
-Restart=always
-RestartSec=1min
+#Restart=always
+#RestartSec=1min
 SyslogIdentifier=mpd-%I
 Nice=-10
 # allow MPD to use real-time priority 50
