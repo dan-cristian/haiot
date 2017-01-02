@@ -17,3 +17,5 @@ $DIR/mpc-play.sh bucatarie init
 }
 
 init_output
+#show open MPD ports
+#lsof -Pnl +M -i6 -i4 | grep LISTEN | grep systemd
