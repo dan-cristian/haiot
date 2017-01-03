@@ -228,24 +228,6 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     systemctl start mpd@baie.socket
     systemctl start mpd@headset.socket
 
-    #cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/sockets.target.wants/mpd*.socket /lib/systemd/system/
-    #cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/sockets.target.wants/mpd*.socket /lib/systemd/system/
-
-    #ln -s /lib/systemd/system/mpd2.socket /etc/systemd/system/sockets.target.wants/mpd2.socket
-    #ln -s /lib/systemd/system/mpd3.socket /etc/systemd/system/sockets.target.wants/mpd3.socket
-    #ln -s /lib/systemd/system/mpd4.socket /etc/systemd/system/sockets.target.wants/mpd4.socket
-    #ln -s /lib/systemd/system/mpd5.socket /etc/systemd/system/sockets.target.wants/mpd5.socket
-    #cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/multi-user.target.wants/mpd*.service /lib/systemd/system/
-    #ln -s /lib/systemd/system/mpd2.service /etc/systemd/system/multi-user.target.wants/mpd2.service
-    #ln -s /lib/systemd/system/mpd3.service /etc/systemd/system/multi-user.target.wants/mpd3.service
-    #ln -s /lib/systemd/system/mpd4.service /etc/systemd/system/multi-user.target.wants/mpd4.service
-    #ln -s /lib/systemd/system/mpd5.service /etc/systemd/system/multi-user.target.wants/mpd5.service
-    #systemctl enable mpd.socket
-    #systemctl enable mpd2.socket
-    #systemctl enable mpd3.socket
-    #systemctl enable mpd4.socket
-    #systemctl enable mpd5.socket
-
     # http://www.lesbonscomptes.com/upmpdcli/upmpdcli.html
     # https://www.lesbonscomptes.com/upmpdcli/downloads.html#ubuntu
     add-apt-repository ppa:jean-francois-dockes/upnpp1
@@ -275,10 +257,11 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     echo 'Installing video tools'
     #http://blog.endpoint.com/2012/11/using-cec-client-to-control-hdmi-devices.html
     # http://www.semicomplete.com/projects/xdotool/#idp2912
-    apt-get install i3 xinit xterm kodi xdotool i3blocks
+    # http://askubuntu.com/questions/371261/display-monitor-info-via-command-line
+    apt-get install i3 xinit xterm kodi xdotool i3blocks jq read-edid
     
     #dependencies for chrome
-    apt-get install gconf-service
+    #apt-get install gconf-service
 
     echo "Set default card for X"
     echo '
@@ -292,10 +275,10 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     card DAC
     }' > /root/.asoundrc
 
-    echo "Configure kodi socket activation"
-    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/kodi* /lib/systemd/system/
-    systemctl enable kodi@root.socket
-    systemctl start kodi@root.socket
+    #echo "Configure kodi socket activation"
+    #cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/kodi* /lib/systemd/system/
+    #systemctl enable kodi@root.socket
+    #systemctl start kodi@root.socket
 
     # https://github.com/mikebrady/shairport-sync
     echo "Configure AirPlay default sound card"
@@ -338,7 +321,7 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     systemctl start thd
 
     echo "Installing screenshow"
-    apt install feh
+    apt install feh exiv2
 
    echo "Installing gesture"
    apt install easystroke
