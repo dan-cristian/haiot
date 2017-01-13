@@ -99,11 +99,11 @@ else
 			xrandr --output HDMI1 --primary
 			# https://wiki.archlinux.org/index.php/Display_Power_Management_Signaling
 			# http://ptspts.blogspot.ro/2009/10/screen-blanking-dpms-screen-saver.html
-			xset +dpms
-			xset dpms 600 600 600
+			enable_dpms
+			set_power_save
 			#duplicate screens
-			xrandr --output HDMI3 --auto --output HDMI1 --auto --same-as HDMI3
-			xrandr --output HDMI3 --auto --output HDMI2 --auto --same-as HDMI3
+			#xrandr --output HDMI3 --auto --output HDMI1 --auto --same-as HDMI3
+			#xrandr --output HDMI3 --auto --output HDMI2 --auto --same-as HDMI3
 			#set individual screens
 			#xrandr --output HDMI1 --auto --left-of HDMI3
 			start_gesture_once
@@ -155,23 +155,26 @@ set_workspace $I3_WORKSPACE_BROWSER
 echo2 "Workspace set for browser"
 exit_if_browser_run
 echo2 "Launch midori"
-midori -e Statusbar http://localhost:8080 >> $LOG 2>&1 &
+rm -R ~/.config/midori/
+midori -e Fullscreen http://localhost:8080 >> $LOG 2>&1 &
 }
 
 function presence(){
 echo2 "Detected presence"
 startx_once
 start_gesture_once
-#xdotool key Shift
+#xdotool key Shift 
 # awake receiver HDMI sound if screen was off
 #xrandr --output HDMI2 --auto
 #xrandr --output HDMI3 --auto
 #force resolution on sony amp
 #xrandr --output HDMI3 --mode 1920x1080
 exit_if_kodi_run
+enable_dpms
 is_monitor_on
 if [ $? -ne 0 ]; then
-	xset dpms force on
+	#xdotool key Shift
+	#xset dpms force on
 	$DIR/slideshow.sh
 fi
 }
@@ -179,23 +182,25 @@ fi
 
 function get_picture_path(){
 tmp_current_file=`cat $FEH_CURRENT_FILE`
-tmp_file_parent="$(dirname "$current_file")"
+tmp_file_parent=$(dirname "$tmp_current_file")
+echo2 "Parent is $tmp_file_parent"
 }
 
 function gesture-picture-delete(){
 get_picture_path
 echo2 "Deleting file $tmp_current_file"
 echo2 "Creating parent $PICTURE_DELETE_PATH/$tmp_file_parent"
-mkdir -p "$PICTURE_DELETE_PATH/$tmp_file_parent"
-mv "$tmp_current_file" "$PICTURE_DELETE_PATH/$tmp_file_parent"
+mkdir -pv "$PICTURE_DELETE_PATH/$tmp_file_parent"
+mv -v "$tmp_current_file" "$PICTURE_DELETE_PATH/$tmp_file_parent"
 kill -SIGUSR1 $(cat $FEH_SLIDESHOW_PID)
 }
 
 function gesture-picture-exclude(){
 get_picture_path
 echo2 "Excluding file $tmp_current_file"
-mkdir -p "$PICTURE_EXCLUDE_PATH/$tmp_file_parent"
-mv "$tmp_current_file" "$PICTURE_EXCLUDE_PATH/$tmp_file_parent"
+echo2 "Creating parent $PICTURE_DELETE_PATH/$tmp_file_parent"
+mkdir -pv "$PICTURE_EXCLUDE_PATH/$tmp_file_parent"
+mv -v "$tmp_current_file" "$PICTURE_EXCLUDE_PATH/$tmp_file_parent"
 kill -SIGUSR1 $(cat $FEH_SLIDESHOW_PID)
 }
 
