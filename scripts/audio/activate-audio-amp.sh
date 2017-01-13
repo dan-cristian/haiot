@@ -24,8 +24,8 @@ do
   for i in ${!RELAY_NAME[*]}; do
 	cat /proc/asound/${CARD_OUT[$i]}/${DEV_OUT[$i]}/sub0/hw_params | grep -q closed
 	LOCAL_STATUS[$i]=$? #0 for closed, 1 for open
-	if [ "${LOCAL_STATUS[$i]}" != "${REMOTE_STATUS[$i]}" ] || [ $MOD -eq 0 ] && [ "$REFRESHED" == "0" ]; then
-		echo2 "Set amp relay to ${LOCAL_STATUS[$i]} for ${CARD_NAME[$i]}, remote=${REMOTE_STATUS[$i]} refresh=$REFRESHED"
+	if [[ ("${LOCAL_STATUS[$i]}" != "${REMOTE_STATUS[$i]}" && "${LOCAL_STATUS[$i]}" != "0" ) || ( $MOD -eq 0 ) && ( "$REFRESHED" == "0" ) ]]; then
+		echo2 "Set amp relay to ${LOCAL_STATUS[$i]} for ${CARD_NAME[$i]}, remote=${REMOTE_STATUS[$i]} refresh=$REFRESHED mod=$MOD"
 		wget --timeout=10 --tries=1 -S -O - $AMP_URL'&filter_value='${RELAY_NAME[$i]}'&field_value='${LOCAL_STATUS[$i]}
 		REMOTE_STATUS[$i]=${LOCAL_STATUS[$i]}
 	fi
