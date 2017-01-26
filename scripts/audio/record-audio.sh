@@ -107,7 +107,7 @@ for i in ${!CARD_OUT[*]}; do
 	local loop_in_is_closed=$?
 	if [ "$loop_in_is_closed" == "1" ]; then
 		#device is open
-		local mpd_port=${PORT_LIST[$i]}
+		local mpd_port=${MPD_PORT_LIST[$i]}
 		#echo "Found sound on card ${NAME[$i]} port=$mpd_port"
 		mpc_output=`mpc -p $mpd_port status`
 		readarray -t mpc_array <<<"$mpc_output"
@@ -120,7 +120,7 @@ for i in ${!CARD_OUT[*]}; do
 			if [ $? -eq 1 ]; then
 				# echo "MPD port with loopback enabled is $mpd_port"
 				MPD_PORT=$mpd_port
-				ZONE_NAME=${NAME[$i]}
+				ZONE_NAME=${CARD_NAME[$i]}
 				return 0
 			fi
 		fi
