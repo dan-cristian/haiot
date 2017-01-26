@@ -115,11 +115,9 @@ def zone_custom_relay_record_update(json_object):
                     relay_set(gpio_pin=gpio_record, value=value, from_web=False)
                 else:
                     Log.logger.warning('Could not find gpio record for custom relay pin code={}'.format(gpio_pin_code))
-
-        else:
-            models.ZoneCustomRelay().save_changed_fields_from_json_object(json_object=json_object,
-                                                                          notify_transport_enabled=False,
-                                                                          save_to_graph=False)
+        #else:
+        models.ZoneCustomRelay().save_changed_fields_from_json_object(
+            json_object=json_object, notify_transport_enabled=False, save_to_graph=False)
     except Exception, ex:
         Log.logger.warning('Error on zone custom relay update, err {}'.format(ex))
 
