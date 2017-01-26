@@ -30,6 +30,16 @@ function pause(){
 read -n1 -r -p "Press any key to continue..." key
 }
 
+function set_power_save(){
+xset dpms 600 600 600
+}
+
+function enable_dpms(){
+if xset -q | grep "DPMS is Disabled"; then
+	xset +dpms
+fi
+}
+
 function is_monitor_on(){
 xset -q | grep "Monitor is On"
 return $?
