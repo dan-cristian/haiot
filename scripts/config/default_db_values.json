@@ -170,6 +170,7 @@
     {"relay_pin_name": "front_main_valve_relay", "zone_id": "36", "gpio_pin_code": "21", "gpio_host_name": "pi-face", "relay_is_on": "0"},
     {"relay_pin_name": "gate_relay", "zone_id": "14", "gpio_pin_code": "5", "gpio_host_name": "pi-face","relay_is_on": "0"},
     {"relay_pin_name": "dormitor_heat_relay", "zone_id": "4", "gpio_pin_code": "4", "gpio_host_name": "pi-face","relay_is_on": "0"},
+    {"relay_pin_name": "living_sub_relay", "zone_id": "2", "gpio_pin_code": "17", "gpio_host_name": "pi-face","relay_is_on": "0"},
     {"relay_pin_name": "test_relay", "zone_id": "1", "gpio_pin_code": "66", "gpio_host_name": "pi-face","relay_is_on": "0"},
 
     {"relay_pin_name": "test_relay_netbook", "zone_id": "1", "gpio_pin_code": "1", "gpio_host_name": "netbook","relay_is_on": "0"},
