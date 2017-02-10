@@ -101,7 +101,8 @@ else
 			# http://ptspts.blogspot.ro/2009/10/screen-blanking-dpms-screen-saver.html
 			enable_dpms
 			set_power_save
-			#duplicate screens
+			#duplicate screens, needed for pointer calibration
+			xrandr --output HDMI2 --auto --output HDMI1 --auto --same-as HDMI2
 			#xrandr --output HDMI3 --auto --output HDMI1 --auto --same-as HDMI3
 			#xrandr --output HDMI3 --auto --output HDMI2 --auto --same-as HDMI3
 			#set individual screens
