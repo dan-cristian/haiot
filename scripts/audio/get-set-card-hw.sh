@@ -26,6 +26,7 @@ do
 		return $dev
 	fi
 done < <(cat /proc/asound/cards | grep "]:")
+echo2 "Could not find card name $card_name"
 return -1
 }
 
@@ -51,8 +52,8 @@ fi
 function get_card_name(){
 local zone_name=$1
 local i
-for i in ${!NAME[*]}; do
-	if [ "${NAME[$i]}" == "$zone_name" ]; then
+for i in ${!CARD_NAME[*]}; do
+	if [ "${CARD_NAME[$i]}" == "$zone_name" ]; then
 		CARD_NAME=${CARD_OUT[$i]}
 		CARD_INDEX=${DEV_OUT[$i]}
 		echo2 "Found card $CARD_NAME in zone $zone_name"
