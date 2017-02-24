@@ -27,6 +27,7 @@ ENABLE_CLOUD_AMAZON=1
 ENABLE_MYSQL=1
 MYSQL_DATA_ROOT=/mnt/data/hdd-wdr-evhk/mysql
 ENABLE_DASHBOARD=1
+ENABLE_ALEXA=1
 
 echo "Setting timezone ..."
 echo "Europe/Bucharest" > /etc/timezone
@@ -340,6 +341,12 @@ if [ "$ENABLE_DASHBOARD" == "1" ]; then
     bundle
     echo "Installing dashboard service"
     # https://gist.github.com/gregology/5313326
+fi
+
+if [ "$ENABLE_ALEXA" == "1" ]; then
+    echo "Installing alexa control"
+    apt-get install npm
+
 fi
 
 if [ "$ENABLE_CAMERA" == "1" ]; then
