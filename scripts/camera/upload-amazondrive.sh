@@ -153,9 +153,9 @@ while read source
 do
   if [ -f $source ]; then
 	file_count=`find /mnt/motion/tmp -type f | wc -l`
-	#if [ $file_count -le "15" ]; then
-	#	be_quiet=1
-	#fi
+	if [ $file_count -le "100" ]; then
+		be_quiet=1
+	fi
   	file=`basename $source`
 	# check if file is in use with lsof
 	filename=$(basename "$file")
