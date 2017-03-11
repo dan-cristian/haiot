@@ -1,6 +1,6 @@
 import os
 from pydispatch import dispatcher
-from flask import abort, send_file, render_template
+from flask import abort, send_file, render_template, request
 from main import app, db
 from main.logger_helper import Log
 from main.admin.model_helper import commit
@@ -74,7 +74,7 @@ def api():
 
 @app.route('/alexa', methods=['GET', 'POST'])
 def alexa():
-    Log.logger.info('ALEXA request')
+    Log.logger.info('ALEXA request request={}'.format(request.form))
     return '<a href="">ALEXA TEST</a>'
 
 # @app.route('/ebooks', defaults={'req_path': ''})
