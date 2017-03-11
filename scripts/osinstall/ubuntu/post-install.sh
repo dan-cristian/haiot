@@ -330,6 +330,7 @@ fi
 
 if [ "$ENABLE_DASHBOARD" == "1" ]; then
     echo "Installing smashing dashboard"
+    adduser ${USERNAME} dialout
     # http://labrat.it/2014/01/11/dashing-dashboard/
     # https://github.com/SmashingDashboard/smashing
     apt-get install ruby nodejs
