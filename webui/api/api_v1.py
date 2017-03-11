@@ -71,6 +71,11 @@ def return_ok():
 def api():
     return '<a href="">API TEST</a>'
 
+
+@app.route('/alexa')
+def api():
+    return '<a href="">ALEXA TEST</a>'
+
 # @app.route('/ebooks', defaults={'req_path': ''})
 
 
