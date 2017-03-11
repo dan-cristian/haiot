@@ -114,7 +114,7 @@ def favicon():
 @app.before_request
 def log_request():
     # if app.config.get('LOG_REQUESTS'):
-    Log.logger.debug('HTTP Request: {}'.format(request.url))
+    Log.logger.info('HTTP Request: {}'.format(request.url))
 
 
 @app.errorhandler(404)
