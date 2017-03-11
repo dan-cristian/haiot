@@ -72,7 +72,7 @@ def api():
     return '<a href="">API TEST</a>'
 
 
-@app.route('/alexa')
+@app.route('/alexa', methods=['GET', 'POST'])
 def alexa():
     Log.logger.info('ALEXA request')
     return '<a href="">ALEXA TEST</a>'
