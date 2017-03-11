@@ -74,7 +74,7 @@ def api():
 
 @app.route('/alexa', methods=['GET', 'POST'])
 def alexa():
-    Log.logger.info('ALEXA request request={}'.format(request.form))
+    Log.logger.info('ALEXA request request={}'.format(request.form['request']))
     return '<a href="">ALEXA TEST</a>'
 
 # @app.route('/ebooks', defaults={'req_path': ''})
