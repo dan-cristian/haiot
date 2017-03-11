@@ -3,8 +3,9 @@ from pydispatch import dispatcher
 from flask import abort, send_file, render_template, request
 from main import app, db
 from main.logger_helper import Log
-from main.admin.model_helper import commit
+from main.admin.model_helper import commit, get_param
 from common import Constant, utils
+from mpd import MPDClient
 
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
@@ -72,10 +73,54 @@ def api():
     return '<a href="">API TEST</a>'
 
 
-@app.route('/alexa', methods=['GET', 'POST'])
+@app.route('/alexa/mpd', methods=['GET', 'POST'])
 def alexa():
-    Log.logger.info('ALEXA request request={}'.format(request.form['request']))
-    return '<a href="">ALEXA TEST</a>'
+    if request.json is not None:
+        Log.logger.info('ALEXA request request={}'.format(request.json['request']))
+        if request.json['request']['intent'] is not None:
+            slots = request.json['request']['intent']['slots']
+            cmd = None
+            zone = None
+            for name, value in slots.iteritems():
+                if name == 'Action':
+                    cmd = value['value']
+                elif name == 'Zone':
+                    zone = value['value']
+            if cmd is not None and zone is not None:
+                Log.logger.info('ALEXA executes {} in {}'.format(cmd, zone))
+                client = MPDClient()
+                client.timeout = 5
+                port = None
+                port_list = get_param(Constant.P_MPD_PORT_ZONE).split(',')
+                for pair in port_list:
+                    if zone in pair:
+                        port = int(pair.split('=')[1])
+                        break
+                if port is not None:
+                    client.connect(get_param(Constant.P_MPD_SERVER), port)
+                    if cmd == 'next':
+                        client.next()
+                    elif cmd == 'previous':
+                        client.previous()
+                    elif cmd == 'pause':
+                        client.pause(1)
+                    elif cmd == 'resume':
+                        client.pause(0)
+                    client.close()
+                    client.disconnect()
+                    response = 'Action done, ' + cmd + ' in zone ' + zone
+                else:
+                    response = 'Could not connect to MPD server, port not found'
+            else:
+                response = 'Warning, action not done, was ' + cmd + ' in zone ' + zone
+        else:
+            response = 'Warning, incomplete action'
+    else:
+        response = 'Invalid command'
+    return '{ "version": "1.0", "sessionAttributes": {}, ' \
+           '"response": { "outputSpeech": {"type": "PlainText", "text": " ' + response + ' "}, ' \
+           '"shouldEndSession": true }}'
+
 
 # @app.route('/ebooks', defaults={'req_path': ''})
 
