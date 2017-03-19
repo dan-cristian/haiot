@@ -43,7 +43,8 @@
     {"name": "P_NEWTIFY_KEY", "value": "6bb91f3f03f11871f4f895eb6a13b8c8", "description":"api source key"},
     {"name": "P_HIPCHAT_TOKEN", "value": "fqlWeMHD2KxcSBYOt9nxu3t97CcFgljmUJZoBc3d", "description":"room token"},
     {"name": "P_HIPCHAT_ROOM_API_ID", "value": "2941088", "description":"room api id"},
-    {"name": "P_MPD_SERVER", "value": "192.168.0.9", "description":"IP of mpd music server"}
+    {"name": "P_MPD_SERVER", "value": "192.168.0.9", "description":"IP of mpd music server"},
+    {"name": "P_MPD_PORT_ZONE","value": "living room=6600,headset=6601,basement=6602,bedroom=6603,bathroom=6604,attic=6605", "description":"mpd port for each music zone"}
   ],
   "Module": [
     {"id":1,  "active":"1", "start_order":"1", "name":"main"},
@@ -284,4 +285,3 @@
     {"zone_id":2 , "gpio_pin_code":"66", "gpio_host_name": "netbook", "alarm_pin_name": "living test"}
   ]
 }
-
