@@ -30,10 +30,10 @@ def love(request):
                                    username=USERNAME, password_hash=password_hash)
     track = network.get_user(USERNAME).get_now_playing()
     if track is None:
-        return "No play"
+        return '{"result": "NoPlay"}'
     else:
         track.love()
         if track.get_userloved():
-            return "Loved {}".format(track.title)
+            return '{"result": "Loved ' + track.title + '"}'
         else:
-            return "Error love {}".format(track.title)
+            return '{"result": "Failed ' + track.title + '"}'
