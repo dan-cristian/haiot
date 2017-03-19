@@ -64,7 +64,7 @@ def handle_event_presence_cam(zone_name, cam_name, has_move):
         # record.event_camera_date = utils.get_base_location_now_date()
         record.sensor_name = cam_name
         record.is_connected = bool(int(has_move))
-        Log.logger.info("Saving cam event zone {} sensor {} is_conn={} record={}".format(
+        Log.logger.debug("Saving cam event zone {} sensor {} is_conn={} record={}".format(
             record.zone_name, record.sensor_name, record.is_connected, record))
         record.save_changed_fields(current_record=current_record, new_record=record,
                                    notify_transport_enabled=True, save_to_graph=True,
