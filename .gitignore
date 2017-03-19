@@ -4,3 +4,4 @@ venv/
 .idea/*
 nohup.out
 database.db
+.credentials/
