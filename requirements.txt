@@ -24,3 +24,4 @@ apscheduler
 pygal
 #fusepy
 pymysql
+python-mpd2
