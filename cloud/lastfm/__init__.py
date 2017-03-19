@@ -34,6 +34,6 @@ def love(request):
     else:
         track.love()
         if track.get_userloved():
-            print("Loved {}".format(track.title))
+            return "Loved {}".format(track.title)
         else:
-            print("Error love {}".format(track.title))
+            return "Error love {}".format(track.title)
