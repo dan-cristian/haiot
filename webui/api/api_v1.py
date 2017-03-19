@@ -79,6 +79,11 @@ def alexa_mpd():
     return alexa.mpd(request)
 
 
+@app.route('/test/lastfm/love', methods=['GET', 'POST'])
+def test_lastfm_love():
+    return lastfm.love(request)
+
+
 @app.route('/lastfm/love', methods=['GET', 'POST'])
 def lastfm_love():
     return lastfm.love(request)
