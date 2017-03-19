@@ -88,3 +88,4 @@ def save_to_history_db(obj):
             Log.logger.critical("Cannot save history db err={} record={}".format(ex, obj))
     except Exception, ex:
         Log.logger.exception('General error saving historical db record, err {} obj={}'.format(ex, obj))
+
