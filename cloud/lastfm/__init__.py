@@ -20,7 +20,15 @@ def init():
     PASSWORD = config_list['lastfm_pass']
 
 
-def love(request):
+def _multify(text):
+    every = 22
+    lines = []
+    for i in xrange(0, len(text), every):
+        lines.append(text[i:i + every])
+    return '\n'.join(lines)
+
+
+def _get_current():
     global API_KEY, API_SECRET, USERNAME, PASSWORD
     if API_KEY is None:
         init()
@@ -29,11 +37,30 @@ def love(request):
     network = pylast.LastFMNetwork(api_key=API_KEY, api_secret=API_SECRET,
                                    username=USERNAME, password_hash=password_hash)
     track = network.get_user(USERNAME).get_now_playing()
+    return track
+
+
+def love(request):
+    track = _get_current()
     if track is None:
-        return '{"result": "Not Playing!"}'
+        result = "Not Playing!"
     else:
         track.love()
         if track.get_userloved():
-            return '{"result": "Loved ' + track.title + '"}'
+            result = 'LOVED ' + track.title
         else:
-            return '{"result": "Failed!"}'
+            result = 'Failed!'
+    return '{"result": "' + _multify(result) + '"}'
+
+
+def current():
+    track = _get_current()
+    if track is None:
+        return '{"result": "None Playing!"}'
+    else:
+        if track.get_userloved():
+            prefix = '! '
+        else:
+            prefix = ''
+        return '{"result": "' + _multify(prefix + track.title) + '"}'
+
