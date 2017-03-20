@@ -89,6 +89,16 @@ def lastfm_love():
     return lastfm.love(request)
 
 
+@app.route('/test/lastfm/current', methods=['GET'])
+def test_lastfm_current():
+    return lastfm.current()
+
+
+@app.route('/lastfm/current', methods=['GET'])
+def lastfm_current():
+    return lastfm.current()
+
+
 # @app.route('/ebooks', defaults={'req_path': ''})
 
 
