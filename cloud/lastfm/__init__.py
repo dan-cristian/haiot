@@ -21,7 +21,7 @@ def init():
 
 
 def _multify(text):
-    every = 22
+    every = 20
     lines = []
     for i in xrange(0, len(text), every):
         lines.append(text[i:i + every])
