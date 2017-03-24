@@ -25,3 +25,4 @@ pygal
 #fusepy
 pymysql
 python-mpd2
+pylast

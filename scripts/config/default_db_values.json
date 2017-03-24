@@ -25,6 +25,7 @@
     {"name": "MQTT_PORT_2", "value": "1883"},
     {"name": "DDNS_RACKSPACE_CONFIG_FILE", "value": ".credentials/.rackspace.ddnsupdate.config.json",
             "description":"conf for ddns, stored in user home. uses http://ip-api.com/docs/api:json"},
+    {"name": "LASTFM_CONFIG_FILE", "value": ".credentials/.lastfm.credentials", "description":"conf for lastfm & libre"},
     {"name": "P_USESUDO_DISKTOOLS", "value": "False"},
     {"name": "MQTT_HOST_3", "value": "iot.eclipse.org"},
     {"name": "MQTT_PORT_3", "value": "1883"},

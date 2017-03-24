@@ -83,8 +83,9 @@ def save_to_history_db(obj):
                 if hasattr(new_record, field) and field != "id":
                     setattr(new_record, field, obj[field])
             new_record.add_commit_record_to_db()
-            Log.logger.info('Saved OK to local db table {} obj={}'.format(dest_table, new_record))
+            Log.logger.debug('Saved OK to local db table {} obj={}'.format(dest_table, new_record))
         except Exception, ex:
             Log.logger.critical("Cannot save history db err={} record={}".format(ex, obj))
     except Exception, ex:
         Log.logger.exception('General error saving historical db record, err {} obj={}'.format(ex, obj))
+
