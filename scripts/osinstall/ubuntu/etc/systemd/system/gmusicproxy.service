@@ -10,7 +10,7 @@ After=network.service
 Type=simple
 User=haiot
 KillMode=process
-ExecStart=/home/haiot/gmusicproxy/GMusicProxy  --daemon --extended-m3u
+ExecStart=/home/haiot/gmusicproxy/GMusicProxy  --daemon --extended-m3u --config /home/haiot/.config/gmusicproxy.cfg
 
 [Install]
 WantedBy=default.target
