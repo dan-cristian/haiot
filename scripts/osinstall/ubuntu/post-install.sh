@@ -298,7 +298,7 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     systemctl start shairport-sync@dormitor
 
 
-    #https://wiki.archlinux.org/index.php/Music_Player_Daemon/Tips_and_tricks#Last.fm.2FLibre.fm_scrobbling
+    # https://wiki.archlinux.org/index.php/Music_Player_Daemon/Tips_and_tricks#Last.fm.2FLibre.fm_scrobbling
     echo "Configure mpdscribble to Last.fm"
     cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/mpdscribble@.service /lib/systemd/system/
     systemctl disable mpdscribble
@@ -326,6 +326,24 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
 
    echo "Installing gesture"
    apt install easystroke
+
+   echo "Installing GoogleMusicProxy"
+   # http://gmusicproxy.net/
+   apt-get install python-virtualenv virtualenvwrapper
+   cd /home/${USERNAME}
+   su ${USERNAME} <<'EOF'
+   mkvirtualenv -p /usr/bin/python2 gmusicproxy
+   git clone https://github.com/diraimondo/gmusicproxy.git
+   cd gmusicproxy
+   pip install -r requirements.txt
+   workon gmusicproxy
+EOF
+   cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/gmusicproxy.service /lib/systemd/system/
+   cp $HAIOT_DIR/scripts/config/gmusicproxy.cfg /home/${USERNAME}/.config/
+   systemctl enable gmusicproxy
+   echo "Open gmusicproxy config file to set user, pass and port"
+   # systemctl start gmusicproxy
+   # chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}
 fi
 
 if [ "$ENABLE_DASHBOARD" == "1" ]; then
@@ -342,6 +360,7 @@ if [ "$ENABLE_DASHBOARD" == "1" ]; then
     bundle
     echo "Installing dashboard service"
     # https://gist.github.com/gregology/5313326
+
 fi
 
 if [ "$ENABLE_ALEXA" == "1" ]; then

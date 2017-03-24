@@ -1,0 +1,16 @@
+# Adapt the USER and paths to your configuration and
+# copy this files in /etc/systemd/system/ and do :
+#    sudo systemctl gmusicproxy enable
+#    sudo systemctl gmusicproxy start
+[Unit]
+Description=Google music proxy service
+After=network.service
+
+[Service]
+Type=simple
+User=haiot
+KillMode=process
+ExecStart=/home/haiot/gmusicproxy/GMusicProxy  --daemon --extended-m3u
+
+[Install]
+WantedBy=default.target
