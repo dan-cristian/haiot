@@ -99,6 +99,16 @@ def lastfm_current():
     return lastfm.current()
 
 
+@app.route('/lastfm/play_loved', methods=['GET'])
+def lastfm_play_loved():
+    return lastfm.get_loved_tracks_to_mpd()
+
+
+@app.route('/test/lastfm/play_loved', methods=['GET'])
+def test_lastfm_play_loved():
+    return lastfm.get_loved_tracks_to_mpd()
+
+
 # @app.route('/ebooks', defaults={'req_path': ''})
 
 
