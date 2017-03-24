@@ -4,6 +4,14 @@ from main.admin.model_helper import get_param
 from common import Constant
 
 
+def _multify(text):
+    every = 18
+    lines = []
+    for i in xrange(0, len(text), every):
+        lines.append(text[i:i + every])
+    return '\n'.join(lines)
+
+
 def get_first_active_mpd():
     port_config = get_param(Constant.P_MPD_PORT_ZONE).split(',')
 
@@ -37,6 +45,8 @@ def next():
     client = get_first_active_mpd()
     if client is not None:
         client.next()
+    result = client.currentsong()['title']
+    return '{"result": "' + _multify(result) + '"}'
 
 
 def toggle():
@@ -46,3 +56,5 @@ def toggle():
             client.pause(1)
         else:
             client.pause(0)
+    result = client.status()['state']
+    return '{"result": "' + _multify(result) + '"}'
