@@ -7,6 +7,7 @@ from main.admin.model_helper import commit
 from common import Constant, utils
 from cloud import alexa
 from cloud import lastfm
+from music import mpd
 
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
@@ -107,6 +108,16 @@ def lastfm_play_loved():
 @app.route('/test/lastfm/play_loved', methods=['GET'])
 def test_lastfm_play_loved():
     return lastfm.get_loved_tracks_to_mpd()
+
+
+@app.route('/mpd/next', methods=['GET'])
+def mpd_next():
+    return mpd.next()
+
+
+@app.route('/mpd/toggle', methods=['GET'])
+def mpd_toggle():
+    return mpd.toggle()
 
 
 # @app.route('/ebooks', defaults={'req_path': ''})
