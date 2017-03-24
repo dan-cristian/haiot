@@ -31,3 +31,18 @@ def get_first_active_mpd():
         return client
     else:
         return None
+
+
+def next():
+    client = get_first_active_mpd()
+    if client is not None:
+        client.next()
+
+
+def toggle():
+    client = get_first_active_mpd()
+    if client is not None:
+        if client.status()['state'] == 'play':
+            client.pause(1)
+        else:
+            client.pause(0)
