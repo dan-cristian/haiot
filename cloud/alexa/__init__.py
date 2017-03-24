@@ -30,7 +30,6 @@ def mpd(request):
                             if 'value' in value.keys():
                                 zone = value['value']
                 port_config = get_param(Constant.P_MPD_PORT_ZONE).split(',')
-                port_list = []
                 alt_port = None
                 client = MPDClient()
                 client.timeout = 5
