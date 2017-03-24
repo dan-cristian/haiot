@@ -89,6 +89,7 @@ def get_loved_tracks_to_mpd():
             else:
                 mpd_client.add(res[0]['file'])
                 added += 1
+        mpd_client.play(0)
         mpd_client.close()
         mpd_client.disconnect()
     else:
