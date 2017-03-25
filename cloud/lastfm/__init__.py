@@ -93,7 +93,8 @@ def get_loved_tracks_to_mpd():
                 mpd_client.play(0)
         mpd_client.close()
         mpd_client.disconnect()
+        result = 'Added {} songs'.format(added)
     else:
-        Log.logger.warning('No active mpd instance found')
-    result = 'Added {} songs'.format(added)
+        result = 'Lastfm: No active mpd instance found'
+        Log.logger.warning(result)
     return '{"result": "' + _multify(result) + '"}'
