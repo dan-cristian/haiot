@@ -12,7 +12,7 @@ def get_song_id(artist, title):
     title = urllib.quote(title.encode('utf-8'), safe='')
     artist = urllib.quote(artist.encode('utf-8'), safe='')
     param = '/search_id?type=song&title={}&artist={}&exact=no'.format(title, artist)
-    result = requests.get('{}{}'.format(url, param)).text
+    result = requests.get('{}{}'.format(url, param), timeout=7).text
     if result == '':
         return None
     else:

@@ -77,12 +77,15 @@ def get_loved_tracks_to_mpd():
             artist = track[0].artist.name
             title = track[0].title
             # print track[0].artist.name, track[0].title
-            res = mpd_client.find("any", title)
+            res = mpd_client.search("any", title)
+            if len(res) == 0:
+                res = mpd_client.search("file", title)
             if len(res) == 0:
                 Log.logger.info("Searching in Google Music for {}".format(title.encode('utf-8')))
                 gsong_id = gmusicproxy.get_song_id(artist=artist, title=title)
                 if gsong_id is not None:
-                    mpd_client.add(gmusicproxy.get_song_url(gsong_id))
+                    # adding stream songs first to encourage first play (these are newer I guess)
+                    mpd_client.addid(gmusicproxy.get_song_url(gsong_id), 0)
                     added += 1
                 else:
                     Log.logger.warning("Could not find song {} in Google Music".format(title.encode('utf-8')))
