@@ -14,7 +14,7 @@ def _multify(text):
 
 def get_first_active_mpd():
     port_config = get_param(Constant.P_MPD_PORT_ZONE).split(',')
-
+    first_port = None
     alt_port = None
     alt_zone = None
 
@@ -24,6 +24,8 @@ def get_first_active_mpd():
     port_list_play = []
     for pair in port_config:
         port_val = int(pair.split('=')[1])
+        if first_port is None:
+            first_port = port_val
         zone_val = pair.split('=')[0]
         client.connect(get_param(Constant.P_MPD_SERVER), port_val)
         if client.status()['state'] == 'play':
@@ -38,7 +40,7 @@ def get_first_active_mpd():
         client.connect(get_param(Constant.P_MPD_SERVER), alt_port)
         return client
     else:
-        return None
+        return client.connect(get_param(Constant.P_MPD_SERVER), first_port)
 
 
 def next():
