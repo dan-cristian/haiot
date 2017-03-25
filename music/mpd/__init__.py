@@ -40,7 +40,8 @@ def get_first_active_mpd():
         client.connect(get_param(Constant.P_MPD_SERVER), alt_port)
         return client
     else:
-        return client.connect(get_param(Constant.P_MPD_SERVER), first_port)
+        client.connect(get_param(Constant.P_MPD_SERVER), first_port)
+        return client
 
 
 def next():
