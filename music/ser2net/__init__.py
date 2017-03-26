@@ -44,13 +44,19 @@ def amp_bi_set_yamaha(on):
     return data
 
 
-def amp_zone3_power(on):
+def amp_zone_power(on, zone_index):
     global _AMP_ZONE3_POWER_OFF, _AMP_ZONE3_POWER_ON
     sock = connect_socket()
     if on:
-        sock.send(_AMP_ZONE3_POWER_ON)
+        if zone_index == 3:
+            sock.send(_AMP_ZONE3_POWER_ON)
+        elif zone_index == 2:
+            sock.send(_AMP_ZONE2_POWER_ON)
     else:
-        sock.send(_AMP_ZONE3_POWER_OFF)
+        if zone_index == 3:
+            sock.send(_AMP_ZONE3_POWER_OFF)
+        elif zone_index == 2:
+            sock.send(_AMP_ZONE2_POWER_OFF)
     data = sock.recv(1024)
     result = binascii.b2a_hex(data)
     sock.close()
