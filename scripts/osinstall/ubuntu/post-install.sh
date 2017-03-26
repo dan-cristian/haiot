@@ -148,7 +148,7 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
 
 
     echo "Installing media - sound + mpd + kodi + mp3 tagger"
-    apt-get install alsa-utils bluez pulseaudio-module-bluetooth python-gobject python-gobject-2 id3v2 flac mediainfo
+    apt-get install alsa-utils bluez pulseaudio-module-bluetooth python-gobject python-gobject-2
     # https://www.raspberrypi.org/forums/viewtopic.php?t=68779
     # https://jimshaver.net/2015/03/31/going-a2dp-only-on-linux/
     usermod -a -G lp $USERNAME
@@ -195,7 +195,7 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     '
     echo 'Installing music tools'
 
-    apt-get install mpd mpc triggerhappy avahi-daemon shairport-sync sox lame mpdscribble
+    apt-get install mpd mpc triggerhappy avahi-daemon shairport-sync sox lame metaflac mpdscribble id3v2 flac mediainfo
     git clone https://github.com/wertarbyte/triggerhappy.git
     cd triggerhappy/
     make

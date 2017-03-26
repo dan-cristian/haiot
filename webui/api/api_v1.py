@@ -7,7 +7,7 @@ from main.admin.model_helper import commit
 from common import Constant, utils
 from cloud import alexa
 from cloud import lastfm
-from music import mpd
+from music import mpd, amp
 
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
@@ -118,6 +118,16 @@ def mpd_next():
 @app.route('/mpd/toggle', methods=['GET'])
 def mpd_toggle():
     return mpd.toggle()
+
+
+@app.route('/amp/zone_on/<zone_name>', methods=['GET'])
+def amp_zone_on(zone_name):
+    return amp.zone_set(on=True, zone_name=zone_name)
+
+
+@app.route('/amp/zone_off/<zone_name>', methods=['GET'])
+def amp_zone_off(zone_name):
+    return amp.zone_set(on=False, zone_name=zone_name)
 
 
 # @app.route('/ebooks', defaults={'req_path': ''})
