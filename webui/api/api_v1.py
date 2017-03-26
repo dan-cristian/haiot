@@ -120,14 +120,14 @@ def mpd_toggle():
     return mpd.toggle()
 
 
-@app.route('/amp/zone_on/<zone_name>', methods=['GET'])
-def amp_zone_on(zone_name):
-    return amp.zone_set(on=True, zone_name=zone_name)
+@app.route('/amp/zone_on/<zone_index>', methods=['GET'])
+def amp_zone_on(zone_index):
+    return amp.zone_set(on=True, zone_index=zone_index)
 
 
-@app.route('/amp/zone_off/<zone_name>', methods=['GET'])
-def amp_zone_off(zone_name):
-    return amp.zone_set(on=False, zone_name=zone_name)
+@app.route('/amp/zone_off/<zone_index>', methods=['GET'])
+def amp_zone_off(zone_index):
+    return amp.zone_set(on=False, zone_index=zone_index)
 
 
 # @app.route('/ebooks', defaults={'req_path': ''})

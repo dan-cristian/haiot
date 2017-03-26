@@ -4,6 +4,6 @@ from main.logger_helper import Log
 from music import ser2net
 
 
-def zone_set(on, zone_name=None):
-    return ser2net.amp_zone3_power(on)
+def zone_set(on, zone_index):
+    return ser2net.amp_zone_power(on, int(zone_index))
 
