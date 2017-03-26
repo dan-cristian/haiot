@@ -344,6 +344,13 @@ EOF
    echo "Open gmusicproxy config file to set user, pass and port"
    # systemctl start gmusicproxy
    # chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}
+
+   echo "serial control via net for AMP setup"
+   # http://techtinkering.com/2013/04/02/connecting-to-a-remote-serial-port-over-tcpip/
+   apt install ser2net
+   echo "update /etc/ser2net.conf, use port 2000"
+   systemctl restart ser2net
+
 fi
 
 if [ "$ENABLE_DASHBOARD" == "1" ]; then
