@@ -77,13 +77,13 @@ if [ $# -ne 0 ]; then
     #echo2 "Move file to $dest"
     chmod -v 777 $dest_parent >> $LOG 2>&1
     mv -f $1 $dest >> $LOG 2>&1
-    rm -d $src_parent
+    rm -d $src_parent >> $LOG 2>&1
     if [ $? -eq 0 ]; then
     	src_parent_2=`dirname $src_parent`
-    	rm -d $src_parent_2
+    	rm -d $src_parent_2 >> $LOG 2>&1
 	if [ $? -eq 0 ]; then
 		src_parent_3=`dirname $src_parent_2`
-        	rm -d $src_parent_3
+        	rm -d $src_parent_3 >> $LOG 2>&1
 	fi
     fi
     #echo2 "Change mode for $dest"
