@@ -1,3 +1,5 @@
+from urllib import addinfo
+
 import pylast
 from main.admin.model_helper import get_param
 from common import Constant
@@ -85,14 +87,18 @@ def get_loved_tracks_to_mpd():
                 gsong_id = gmusicproxy.get_song_id(artist=artist, title=title)
                 if gsong_id is not None:
                     # adding stream songs first to encourage first play (these are newer I guess)
-                    mpd_client.addid(gmusicproxy.get_song_url(gsong_id), 0)
+                    if added > 1:
+                        addindex = 1  # keep first song first
+                    else:
+                        addindex = 0
+                    mpd_client.addid(gmusicproxy.get_song_url(gsong_id), addindex)
                     added += 1
                 else:
                     Log.logger.warning("Could not find song {} in Google Music".format(title.encode('utf-8')))
             else:
                 mpd_client.add(res[0]['file'])
                 added += 1
-            if added == 1:  # fixme: might play repeatedly
+            if added == 1:  # fixme: might re-play several times
                 mpd_client.play(0)
         mpd_client.close()
         mpd_client.disconnect()
