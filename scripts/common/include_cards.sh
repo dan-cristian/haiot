@@ -3,7 +3,7 @@
 #sound output
 declare -a CARD_NAME=("living" "living_sub" "headset" "dormitor" "baie" "beci" "pod")
 # living zone is mentioned twice to power on both amp and sub relays
-declare -a RELAY_NAME=("living_music_relay" "living_sub_relay" "none" "dormitor_music_relay" "baie_mare_music_relay" "beci_music_relay" "pod_music_relay")
+declare -a RELAY_NAME=("living_music_relay" "living_sub_relay" "none" "dormitor_music_relay" "living_music_relay" "living_music_relay" "pod_music_relay")
 declare -a CARD_OUT=("PCH" "PCH" "PCH" "DGX" "Device" "DGX" "DAC")
 	# 1 is usualy digital, 0 is analog
 declare -a DEV_OUT=("pcm8p" "pcm8p" "pcm0p" "pcm1p" "pcm0p" "pcm0p" "pcm0p")
@@ -16,7 +16,7 @@ declare -a CARD_CAPT=("Loopback" "" "PCH" "DGX" "Device" "DGX" "")
 
 #MPD settings
 declare -a MPD_PORT_LIST=(6600 6600 6601 6603 6604 6602 6605)
-declare -a MPD_OUTPUT=("Onboard-PCH HDMI2 (living)" "Onboard-PCH HDMI2 (living)" "Onboard-PCH Optical (headset)" "PCI-DGX Optical (dormitor)" "MediumUsb-Device Optical (baie)" "PCI-DGX Analog (beci)" "SmallUsb-DAC Optical (pod)")
+declare -a MPD_OUTPUT=("Onboard-PCH HDMI2 (living)" "Onboard-PCH HDMI2 (living)" "Onboard-PCH Optical (headset)" "PCI-DGX Optical (dormitor)" "Onboard-PCH Analog (baie)" "PCI-DGX Analog (beci)" "SmallUsb-DAC Optical (pod)")
 
 function echo2(){
 echo [`date +%T.%N`] $1 $2 $3 $4 $5 >> $LOG 2>&1
