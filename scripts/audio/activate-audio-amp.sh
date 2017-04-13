@@ -17,7 +17,7 @@ while :
 do
   #execute close command only every 5 minutes
   MIN=`date +"%M"`
-  MOD=`expr $MIN % 2`
+  MOD=`expr $MIN % 5`
   LOCAL_STATUS=()
 
   for i in ${!RELAY_NAME[*]}; do
