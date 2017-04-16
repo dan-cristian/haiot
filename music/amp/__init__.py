@@ -71,18 +71,21 @@ def set_amp_power(power_state, relay_name, amp_zone_index):
     relay = models.ZoneCustomRelay.query.filter_by(relay_pin_name=relay_name).first()
     if relay is not None:
         initial_relay_state = relay.relay_is_on
-        relay.relay_is_on = power_state
-        commit()
-        # dispatch as UI action otherwise change actions are not triggered
-        dispatcher.send(signal=Constant.SIGNAL_UI_DB_POST, model=models.ZoneCustomRelay, row=relay)
-        Log.logger.info("Set relay {} to state {}".format(relay_name, power_state))
+        # power on main relay for amp or on/off if there is no zone
+        if power_state or amp_zone_index == "0":
+            relay.relay_is_on = power_state
+            commit()
+            # dispatch as UI action otherwise change actions are not triggered
+            dispatcher.send(signal=Constant.SIGNAL_UI_DB_POST, model=models.ZoneCustomRelay, row=relay)
+            Log.logger.info("Set relay {} to state {}".format(relay_name, power_state))
     else:
         msg = "Could not find relay name {}\n".format(relay_name)
         Log.logger.warning(msg)
         return msg
 
+    # change amp zone power
     if amp_zone_index is None or amp_zone_index == "0":
-        # only relay change is needed
+        # only main relay change is needed
         return "Power in {} set to {}\n".format(relay_name, relay.relay_is_on)
     else:
         # potentially amp settings change is required to switch amp zones
