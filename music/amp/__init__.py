@@ -5,6 +5,7 @@ import time
 import binascii
 from main.admin import models
 from main.logger_helper import Log
+from pydispatch import dispatcher
 
 _AMP_ON = "\x0207A1D\x03"
 _AMP_OFF = "\x0207A1E\x03"
@@ -72,6 +73,8 @@ def set_amp_power(power_state, relay_name, amp_zone_index):
         initial_relay_state = relay.relay_is_on
         relay.relay_is_on = power_state
         commit()
+        # dispatch as UI action otherwise change actions are not triggered
+        dispatcher.send(signal=Constant.SIGNAL_UI_DB_POST, model=models.ZoneCustomRelay, row=relay)
         Log.logger.info("Set relay {} to state {}".format(relay_name, power_state))
     else:
         msg = "Could not find relay name {}\n".format(relay_name)
