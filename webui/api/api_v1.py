@@ -37,6 +37,7 @@ def generic_db_update(model_name, filter_name, filter_value, field_name, field_v
                 setattr(record, field_name, field_value)
                 db.session.add(record)
                 commit()
+                # dispatch as UI action otherwise change actions are not triggered
                 dispatcher.send(signal=Constant.SIGNAL_UI_DB_POST, model=table, row=record)
                 return '%s: %s' % (Constant.SCRIPT_RESPONSE_OK, record)
             else:
