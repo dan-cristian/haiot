@@ -62,6 +62,7 @@ def amp_zone_power(on, zone_index):
     data = sock.recv(1024)
     result = binascii.b2a_hex(data)
     sock.close()
+    Log.logger.info("Set amp zone {} to state {}".format(zone_index, on))
     return 'power on={} zone_index={} result={}\n'.format(on, zone_index, result)
 
 
@@ -71,6 +72,7 @@ def set_amp_power(power_state, relay_name, amp_zone_index):
         initial_relay_state = relay.relay_is_on
         relay.relay_is_on = power_state
         commit()
+        Log.logger.info("Set relay {} to state {}".format(relay_name, power_state))
     else:
         msg = "Could not find relay name {}\n".format(relay_name)
         Log.logger.warning(msg)
