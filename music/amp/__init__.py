@@ -55,11 +55,15 @@ def amp_zone_power(on, zone_index):
             sock.send(_AMP_ZONE3_POWER_ON)
         elif zone_index == 2:
             sock.send(_AMP_ZONE2_POWER_ON)
+        elif zone_index == 1:
+            amp_bi_set_yamaha(on)
     else:
         if zone_index == 3:
             sock.send(_AMP_ZONE3_POWER_OFF)
         elif zone_index == 2:
             sock.send(_AMP_ZONE2_POWER_OFF)
+        elif zone_index == 1:
+            amp_bi_set_yamaha(on)
     data = sock.recv(1024)
     result = binascii.b2a_hex(data)
     sock.close()
@@ -77,7 +81,10 @@ def set_amp_power(power_state, relay_name, amp_zone_index):
             commit()
             # dispatch as UI action otherwise change actions are not triggered
             dispatcher.send(signal=Constant.SIGNAL_UI_DB_POST, model=models.ZoneCustomRelay, row=relay)
-            Log.logger.info("Set relay {} to state {}".format(relay_name, power_state))
+            msg = "Set relay {} to state {}\n".format(relay_name, power_state)
+            Log.logger.info(msg)
+        else:
+            msg = "Not changed relay state for {}\n".format(relay_name)
     else:
         msg = "Could not find relay name {}\n".format(relay_name)
         Log.logger.warning(msg)
@@ -86,10 +93,10 @@ def set_amp_power(power_state, relay_name, amp_zone_index):
     # change amp zone power
     if amp_zone_index is None or amp_zone_index == "0":
         # only main relay change is needed
-        return "Power in {} set to {}\n".format(relay_name, relay.relay_is_on)
+        return msg + "Power in {} set to {}\n".format(relay_name, relay.relay_is_on)
     else:
         # potentially amp settings change is required to switch amp zones
         if initial_relay_state is not power_state:
                 # delay to wait for amp to fully start
                 time.sleep(5)
-        return amp_zone_power(power_state, int(amp_zone_index))
+        return msg + amp_zone_power(power_state, int(amp_zone_index))
