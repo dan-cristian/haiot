@@ -27,15 +27,18 @@ if [ -f "$src_file" ]; then
 	#check if play was stopped earlier or skipped. add 2 seconds loss
 	local duration_ondisk=$(mediainfo --Inform="Audio;%Duration%" "$src_file")
 	duration_ondisk=$(( 2 + $duration_ondisk / 1000))
-	if [ $duration_ondisk -lt $rec_song_duration ]; then
-		echo2 "Song not completely played, target=$rec_song_duration actual=$duration_ondisk, ingnoring"
-		#rm -v "$src_file"
+	echo2 "Song actual duration=$duration_ondisk, forecasted duration=$rec_song_duration"
+  if [ $duration_ondisk -lt $rec_song_duration ]; then
+		echo2 "Song not completely played, target=$rec_song_duration actual=$duration_ondisk, ignoring"
+		#rm -vf "$src_file"
 		return
 	fi
-
+ 
+  
 	local artist=${rec_song_name% - *}  # retain the part before the " - "
 	local title=${rec_song_name##* - }  # retain the part after the " - "
-	flac -f -0 "$src_file" -o "$dst_file"
+	#flac -f -0 "$src_file" -o "$dst_file"
+  sox "$src_file" -b16 "$dst_file"
 	echo2 "Setting ID3 TAGS, artist=$artist title=$title"
 	id3v2 -a "$artist" -t "$title" "$dst_file"
 else
@@ -45,7 +48,7 @@ fi
 
 function record_song(){
 #local song_tmp_path=$1
-echo2 "Recording $song_tmp_path, safety max 1200 seconds"
+echo2 "Recording channels=$sound_channels format=$sound_format rate=$sound_rate $song_tmp_path, safety max 1200 seconds"
 arecord -d 1200 -c $sound_channels -f $sound_format -r $sound_rate -t wav -D hw:$RECORD_DEVICE "$song_tmp_path" & >> $LOG 2>&1
 #arecord -q -c 2 -f S16_LE -r 44100 -t wav -D hw:$RECORD_DEVICE | flac -0 -o "$_song_tmp_path" >> $LOG 2>&1 &
 }
@@ -69,8 +72,10 @@ local port=$1
 #echo check output port $port
 local mpc_output_list=`mpc -p $port outputs`
 local output_status=${mpc_output_list##*$MPD_LOOP_OUTPUT_NAME) is }
-#echo Loopback output status is [$output_status]
-if [ "$output_status" == "enabled" ]; then
+#echo "Loopback output status for $port:$MPD_LOOP_OUTPUT_NAME is [$output_status]"
+#http://stackoverflow.com/questions/229551/string-contains-in-bash
+if [[ "$output_status" == "enabled"* ]]; then
+	echo2 "Output enabled"
 	return 1
 else
 	return 0
@@ -86,7 +91,8 @@ fi
 #buffer_size: 22052
 
 get_loopback_meta(){
-local output=`cat /proc/asound/${CARD_OUT[$i]}/${DEV_OUT[$i]}/sub0/hw_params`
+echo2 "Get loopback for card $CARD_INDEX"
+local output=`cat /proc/asound/${CARD_OUT[$CARD_INDEX]}/${DEV_OUT[$CARD_INDEX]}/sub0/hw_params`
 readarray -t sound_array <<<"$output"
 local format=${sound_array[1]}
 sound_format=${format##*: }  # retain the part after the last :
@@ -121,6 +127,7 @@ for i in ${!CARD_OUT[*]}; do
 				# echo "MPD port with loopback enabled is $mpd_port"
 				MPD_PORT=$mpd_port
 				ZONE_NAME=${CARD_NAME[$i]}
+        CARD_INDEX=$i
 				return 0
 			fi
 		fi
@@ -151,10 +158,13 @@ duration_line=${duration_line% (*}
 if [ "$duration_line" != "" ]; then
 	local min=${duration_line%:*}
 	local sec=${duration_line##*:}
+	echo2 "Duration [$min] [$sec] [$duration_line]" 
 	#trim leading 0
 	sec=$(echo $sec | sed 's/^0*//')
-	echo2 "Duration [$min] [$sec] [$duration_line]"
-	song_duration=$(($min * 60 + $sec))
+  if [ "$sec" == "" ]; then
+    sec="0"
+  fi
+  song_duration=$(($min * 60 + $sec))
 else
 	song_duration=0
 fi
@@ -208,7 +218,7 @@ lock=/tmp/.record-audio.exclusivelock
 					loop_in_is_closed=$?
 					if [ -f "$song_tmp_path" ]; then
 						echo2 "$song_tmp_path found. deleting"
-						rm -v "$song_tmp_path"
+						rm -vf "$song_tmp_path"
 						#song_tmp_path="$RECORD_PATH/tmp/$song_name(`date +%s`)$song_tmp_ext"
 					fi
 					# echo "Check if input is busy"
@@ -223,7 +233,7 @@ lock=/tmp/.record-audio.exclusivelock
 					cat /proc/asound/${CARD_CAPT[$i]}/${DEV_OUT[$i]}/sub0/hw_params | grep -q closed
 					loop_out_is_open=$?
 					if [ "$loop_out_is_open" == "1" ]; then
-						get_loopback_meta 
+						get_loopback_meta
 						record_song
 						rec_song_name="$song_name"
 						rec_song_tmp_path="$song_tmp_path"
