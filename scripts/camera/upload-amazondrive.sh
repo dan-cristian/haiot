@@ -77,13 +77,13 @@ if [ $# -ne 0 ]; then
     #echo2 "Move file to $dest"
     chmod -v 777 $dest_parent >> $LOG 2>&1
     mv -f $1 $dest >> $LOG 2>&1
-    rm -d $src_parent
+    rm -d $src_parent >> $LOG 2>&1
     if [ $? -eq 0 ]; then
     	src_parent_2=`dirname $src_parent`
-    	rm -d $src_parent_2
+    	rm -d $src_parent_2 >> $LOG 2>&1
 	if [ $? -eq 0 ]; then
 		src_parent_3=`dirname $src_parent_2`
-        	rm -d $src_parent_3
+        	rm -d $src_parent_3 >> $LOG 2>&1
 	fi
     fi
     #echo2 "Change mode for $dest"
@@ -153,9 +153,9 @@ while read source
 do
   if [ -f $source ]; then
 	file_count=`find /mnt/motion/tmp -type f | wc -l`
-	#if [ $file_count -le "15" ]; then
-	#	be_quiet=1
-	#fi
+	if [ $file_count -le "100" ]; then
+		be_quiet=1
+	fi
   	file=`basename $source`
 	# check if file is in use with lsof
 	filename=$(basename "$file")
