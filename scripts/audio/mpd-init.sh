@@ -13,7 +13,7 @@ $DIR/mpc-play.sh beci init
 $DIR/mpc-play.sh dormitor init
 $DIR/mpc-play.sh baie init
 $DIR/mpc-play.sh headset init
-$DIR/mpc-play.sh bucatarie init
+#$DIR/mpc-play.sh bucatarie init
 }
 
 init_output
