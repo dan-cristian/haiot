@@ -175,7 +175,10 @@ enable_dpms
 is_monitor_on
 if [ $? -ne 0 ]; then
 	#xdotool key Shift
-	#xset dpms force on
+	xset dpms force on
+	#extending screen close timeout?
+	unset_power_save
+	set_power_save
 	$DIR/slideshow.sh
 fi
 }

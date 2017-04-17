@@ -34,6 +34,10 @@ function set_power_save(){
 xset dpms 600 600 600
 }
 
+function unset_power_save(){
+xset dpms 0 0 0
+}
+
 function enable_dpms(){
 if xset -q | grep "DPMS is Disabled"; then
 	xset +dpms
