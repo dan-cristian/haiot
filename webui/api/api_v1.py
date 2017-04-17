@@ -65,7 +65,7 @@ def camera_alert(zone_name, cam_name, has_move):
 
 @app.route('/apiv1/amp_power/state=<power_state>&relay_name=<relay_name>&amp_zone_index=<amp_zone_index>')
 def amp_power(power_state, relay_name, amp_zone_index=None):
-    return amp.set_amp_power(power_state, relay_name, amp_zone_index)
+    return amp.set_amp_power(int(power_state), relay_name, int(amp_zone_index))
 
 
 def return_error(message):
