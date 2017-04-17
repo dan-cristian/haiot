@@ -80,6 +80,7 @@ class DbBase:
 
     def delete(self):
         function = self.query.delete
+        commit()
         return self.__get_result(function)
 
     def add_commit_record_to_db(self):
