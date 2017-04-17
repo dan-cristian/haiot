@@ -76,12 +76,12 @@ def set_amp_power(power_state, relay_name, amp_zone_index):
     if relay is not None:
         initial_relay_state = relay.relay_is_on
         # power on main relay for amp or on/off if there is no zone
-        if power_state or amp_zone_index == "0":
-            relay.relay_is_on = power_state
+        if power_state == 1 or amp_zone_index == 0:
+            relay.relay_is_on = bool(power_state)
             commit()
             # dispatch as UI action otherwise change actions are not triggered
             dispatcher.send(signal=Constant.SIGNAL_UI_DB_POST, model=models.ZoneCustomRelay, row=relay)
-            msg = "Set relay {} to state {}\n".format(relay_name, power_state)
+            msg = "Set relay {} to state {} zone_index={}\n".format(relay_name, power_state, amp_zone_index)
             Log.logger.info(msg)
         else:
             msg = "Not changed relay state for {}\n".format(relay_name)
@@ -91,7 +91,7 @@ def set_amp_power(power_state, relay_name, amp_zone_index):
         return msg
 
     # change amp zone power
-    if amp_zone_index is None or amp_zone_index == "0":
+    if amp_zone_index is None or amp_zone_index == 0:
         # only main relay change is needed
         return msg + "Power in {} set to {}\n".format(relay_name, relay.relay_is_on)
     else:
@@ -99,4 +99,4 @@ def set_amp_power(power_state, relay_name, amp_zone_index):
         if initial_relay_state is not power_state:
                 # delay to wait for amp to fully start
                 time.sleep(5)
-        return msg + amp_zone_power(power_state, int(amp_zone_index))
+        return msg + amp_zone_power(power_state, amp_zone_index)
