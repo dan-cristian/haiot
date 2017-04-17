@@ -39,8 +39,10 @@ def amp_bi_set_yamaha(on):
         sock.send(_AMP_BI_OFF)
     data = sock.recv(1024)
     if "already in use" in data:
+        msg = "Error, {}\n".format(data)
         sock.close()
-        return "Error, {}\n".format(data)
+        Log.logger.warning(msg)
+        return msg
     else:
         time.sleep(1)
         sock.send(_AMP_OFF)
@@ -104,7 +106,7 @@ def set_amp_power(power_state, relay_name, amp_zone_index):
         return msg + "Power in {} set to {}\n".format(relay_name, relay.relay_is_on)
     else:
         # potentially amp settings change is required to switch amp zones
-        if initial_relay_state is not True:
+        if initial_relay_state is not True and power_state is True:
             # delay to wait for amp to fully start
             time.sleep(5)
         return msg + amp_zone_power(power_state, amp_zone_index)
