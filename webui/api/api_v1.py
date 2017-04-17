@@ -37,6 +37,7 @@ def generic_db_update(model_name, filter_name, filter_value, field_name, field_v
                 setattr(record, field_name, field_value)
                 db.session.add(record)
                 commit()
+                # dispatch as UI action otherwise change actions are not triggered
                 dispatcher.send(signal=Constant.SIGNAL_UI_DB_POST, model=table, row=record)
                 return '%s: %s' % (Constant.SCRIPT_RESPONSE_OK, record)
             else:
@@ -60,6 +61,11 @@ def generic_db_update(model_name, filter_name, filter_value, field_name, field_v
 def camera_alert(zone_name, cam_name, has_move):
     dispatcher.send(Constant.SIGNAL_CAMERA, zone_name=zone_name, cam_name=cam_name, has_move=has_move)
     return Constant.SCRIPT_RESPONSE_OK
+
+
+@app.route('/apiv1/amp_power/state=<power_state>&relay_name=<relay_name>&amp_zone_index=<amp_zone_index>')
+def amp_power(power_state, relay_name, amp_zone_index=None):
+    return amp.set_amp_power(int(power_state), relay_name, int(amp_zone_index))
 
 
 def return_error(message):
