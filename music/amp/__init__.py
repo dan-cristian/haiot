@@ -21,6 +21,11 @@ _AMP_ZONE2_POWER_OFF = "\x0207EBB\x03"
 _AMP_ZONE3_POWER_ON = "\x0207AED\x03"
 _AMP_ZONE3_POWER_OFF = "\x0207AEE\x03"
 
+class AMP_YMH:
+    BI_AMP_ON = None
+    ZONE2_ON = None
+    ZONE3_ON = None
+
 
 def connect_socket():
     host = get_param(Constant.P_AMP_SERIAL_HOST)
@@ -31,6 +36,10 @@ def connect_socket():
 
 
 def _amp_bi_set_yamaha(on, sock):
+    # avoid periodic amp restarts
+    if AMP_YMH.BI_AMP_ON is on:
+        return
+
     global _AMP_BI_ON
     if on:
         sock.send(_AMP_BI_ON)
@@ -42,11 +51,13 @@ def _amp_bi_set_yamaha(on, sock):
         Log.logger.warning(msg)
         return msg
     else:
+        AMP_YMH.BI_AMP_ON = on
         time.sleep(1)
         sock.send(_AMP_OFF)
         data = sock.recv(1024)
         time.sleep(1)
         sock.send(_AMP_ON)
+        time.sleep(5)
         return data
 
 
@@ -57,20 +68,24 @@ def amp_zone_power(on, zone_index):
     if on:
         if zone_index == 3:
             sock.send(_AMP_ZONE3_POWER_ON)
+            AMP_YMH.ZONE3_ON = on
         elif zone_index == 2:
             sock.send(_AMP_ZONE2_POWER_ON)
+            AMP_YMH.ZONE2_ON = on
         elif zone_index == 1:
             msg = _amp_bi_set_yamaha(on, sock)
     else:
         if zone_index == 3:
             sock.send(_AMP_ZONE3_POWER_OFF)
+            AMP_YMH.ZONE3_ON = on
         elif zone_index == 2:
             sock.send(_AMP_ZONE2_POWER_OFF)
+            AMP_YMH.ZONE2_ON = on
         elif zone_index == 1:
             msg = _amp_bi_set_yamaha(on, sock)
     data = sock.recv(1024)
     result = binascii.b2a_hex(data)
-    msg = msg + result
+    msg = "{} {}".format(msg, result)
     sock.close()
     result = "Set done amp zone {} to state {}, result={}\n".format(zone_index, on, msg)
     Log.logger.info(result)
