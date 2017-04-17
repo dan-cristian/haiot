@@ -30,9 +30,8 @@ def connect_socket():
     return s
 
 
-def amp_bi_set_yamaha(on):
+def _amp_bi_set_yamaha(on, sock):
     global _AMP_BI_ON
-    sock = connect_socket()
     if on:
         sock.send(_AMP_BI_ON)
     else:
@@ -40,7 +39,6 @@ def amp_bi_set_yamaha(on):
     data = sock.recv(1024)
     if "already in use" in data:
         msg = "Error, {}\n".format(data)
-        sock.close()
         Log.logger.warning(msg)
         return msg
     else:
@@ -49,7 +47,6 @@ def amp_bi_set_yamaha(on):
         data = sock.recv(1024)
         time.sleep(1)
         sock.send(_AMP_ON)
-        sock.close()
         return data
 
 
@@ -63,14 +60,14 @@ def amp_zone_power(on, zone_index):
         elif zone_index == 2:
             sock.send(_AMP_ZONE2_POWER_ON)
         elif zone_index == 1:
-            msg = amp_bi_set_yamaha(on)
+            msg = _amp_bi_set_yamaha(on, sock)
     else:
         if zone_index == 3:
             sock.send(_AMP_ZONE3_POWER_OFF)
         elif zone_index == 2:
             sock.send(_AMP_ZONE2_POWER_OFF)
         elif zone_index == 1:
-            msg = amp_bi_set_yamaha(on)
+            msg = _amp_bi_set_yamaha(on, sock)
     data = sock.recv(1024)
     result = binascii.b2a_hex(data)
     msg = msg + result
