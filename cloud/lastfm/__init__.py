@@ -67,18 +67,18 @@ def current():
         return '{"result": "' + _multify(prefix + track.title) + '"}'
 
 
-def get_loved_tracks_to_mpd():
-    global _network, USERNAME
-    if _network is None:
-        init()
-    loved_tracks = _network.get_user(USERNAME).get_loved_tracks(limit=None)
+def _add_to_playlist(tracks):
     mpd_client = mpd.get_first_active_mpd()
     added = 0
     if mpd_client is not None:
         mpd_client.clear()
-        for track in loved_tracks:
-            artist = track[0].artist.name
-            title = track[0].title
+        for track in tracks:
+            if type(track) == pylast.Track:
+                artist = track.artist.name
+                title = track.title
+            else:
+                artist = track[0].artist.name
+                title = track[0].title
             # print track[0].artist.name, track[0].title
             Log.logger.info("Searching for {} - {}".format(artist.encode('utf-8'), title.encode('utf-8')))
             res = mpd_client.search("any", title)
@@ -111,4 +111,22 @@ def get_loved_tracks_to_mpd():
     else:
         result = 'Lastfm: No active mpd instance found'
         Log.logger.warning(result)
+    return result
+
+
+def get_by_tag(tag):
+    global _network, USERNAME
+    if _network is None:
+        init()
+    tracks = _network.get_user(USERNAME).get_tagged_tracks(tag)
+    result = _add_to_playlist(tracks)
+    return '{"result": "' + _multify(result) + '"}'
+
+
+def get_loved_tracks_to_mpd():
+    global _network, USERNAME
+    if _network is None:
+        init()
+    loved_tracks = _network.get_user(USERNAME).get_loved_tracks(limit=None)
+    result = _add_to_playlist(loved_tracks)
     return '{"result": "' + _multify(result) + '"}'

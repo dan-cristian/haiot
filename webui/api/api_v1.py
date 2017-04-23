@@ -111,6 +111,11 @@ def lastfm_play_loved():
     return lastfm.get_loved_tracks_to_mpd()
 
 
+@app.route('/lastfm/get_by_tag/<tag_name>', methods=['GET'])
+def lastfm_get_by_tag(tag_name):
+    return lastfm.get_by_tag(tag_name)
+
+
 @app.route('/test/lastfm/play_loved', methods=['GET'])
 def test_lastfm_play_loved():
     return lastfm.get_loved_tracks_to_mpd()
