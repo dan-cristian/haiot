@@ -1,0 +1,5 @@
+https://www.linode.com/docs/websites/nginx/install-nginx-and-a-startssl-certificate-on-debian-8-jessie/
+
+printf "john:$(openssl passwd -crypt s3cr3t)" >> passwords
+
+https://www.elastic.co/blog/playing-http-tricks-nginx
