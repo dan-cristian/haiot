@@ -19,6 +19,7 @@ EBOOKS_ROOT=/mnt/data/hdd-wdg-6297/ebooks
 ENABLE_GIT=1
 GIT_ROOT=/mnt/data/hdd-wdg-6297/git
 ENABLE_CAMERA=1
+ENABLE_CAMERA_SHINOBI=1
 MOTION_ROOT=/mnt/data/hdd-wdr-evhk/motion
 LOG_ROOT=/mnt/data/hdd-wdr-evhk/log
 ENABLE_TORRENT=1
@@ -408,6 +409,16 @@ if [ "$ENABLE_CAMERA" == "1" ]; then
     /etc/init.d/motion restart
 fi
 
+if [ "$ENABLE_CAMERA_SHINOBI" == "1" ]; then
+    echo 'Installing shinobi'
+    # https://shinobi.video/docs/start
+    apt-get install nodejs npm
+    npm cache clean -f
+    npm install -g n
+    n stable
+
+    npm install pm2 -g
+fi
 
 # CLOUD must be after CAMERA due to user creation
 if [ "$ENABLE_CLOUD_AMAZON" == "1" ]; then
