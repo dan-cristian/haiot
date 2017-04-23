@@ -10,6 +10,7 @@ import json
 USERNAME = None
 _network = None
 
+
 def init():
     config_file = get_param(Constant.P_LASTFM_CONFIG_FILE)
     with open(config_file, 'r') as f:
@@ -79,11 +80,13 @@ def get_loved_tracks_to_mpd():
             artist = track[0].artist.name
             title = track[0].title
             # print track[0].artist.name, track[0].title
+            Log.logger.info("Searching for {} - {}".format(artist.encode('utf-8'), title.encode('utf-8')))
             res = mpd_client.search("any", title)
             if len(res) == 0:
+                Log.logger.info("Search again in mpd")
                 res = mpd_client.search("file", title)
             if len(res) == 0:
-                Log.logger.info("Searching in Google Music for {}".format(title.encode('utf-8')))
+                Log.logger.info("Searching in Google Music as song not found in mpd")
                 gsong_id = gmusicproxy.get_song_id(artist=artist, title=title)
                 if gsong_id is not None:
                     # adding stream songs first to encourage first play (these are newer I guess)
@@ -91,12 +94,14 @@ def get_loved_tracks_to_mpd():
                         addindex = 1  # keep first song first
                     else:
                         addindex = 0
+                    Log.logger.info("Added file {}".format(gmusicproxy.get_song_url(gsong_id)))
                     mpd_client.addid(gmusicproxy.get_song_url(gsong_id), addindex)
                     added += 1
                 else:
-                    Log.logger.warning("Could not find song {} in Google Music".format(title.encode('utf-8')))
+                    Log.logger.warning("Could not find the song in Google Music")
             else:
                 mpd_client.add(res[0]['file'])
+                Log.logger.info("Added file {}".format(res[0]['file']))
                 added += 1
             if added == 1:  # fixme: might re-play several times
                 mpd_client.play(0)
