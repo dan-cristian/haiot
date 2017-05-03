@@ -93,17 +93,29 @@ def test_lastfm_love():
 
 @app.route('/lastfm/love', methods=['GET', 'POST'])
 def lastfm_love():
-    return lastfm.love(request)
+    try:
+        result = lastfm.love(request)
+    except Exception, e:
+        result = "{}".format(e)
+    return result
 
 
 @app.route('/test/lastfm/current', methods=['GET'])
 def test_lastfm_current():
-    return lastfm.current()
+    try:
+        result = lastfm.current()
+    except Exception, e:
+        result = "{}".format(e)
+    return result
 
 
 @app.route('/lastfm/current', methods=['GET'])
 def lastfm_current():
-    return lastfm.current()
+    try:
+        result = lastfm.current()
+    except Exception, e:
+        result = "{}".format(e)
+    return result
 
 
 @app.route('/lastfm/play_loved', methods=['GET'])
