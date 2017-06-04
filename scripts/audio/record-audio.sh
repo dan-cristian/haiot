@@ -28,19 +28,23 @@ if [ -f "$src_file" ]; then
 	local duration_ondisk=$(mediainfo --Inform="Audio;%Duration%" "$src_file")
 	duration_ondisk=$(( 2 + $duration_ondisk / 1000))
 	echo2 "Song actual duration=$duration_ondisk, forecasted duration=$rec_song_duration"
-  if [ $duration_ondisk -lt $rec_song_duration ]; then
+	if [ $duration_ondisk -lt $rec_song_duration ]; then
 		echo2 "Song not completely played, target=$rec_song_duration actual=$duration_ondisk, ignoring"
-		#rm -vf "$src_file"
+		rm -vf "$src_file"
 		return
 	fi
- 
-  
 	local artist=${rec_song_name% - *}  # retain the part before the " - "
 	local title=${rec_song_name##* - }  # retain the part after the " - "
 	#flac -f -0 "$src_file" -o "$dst_file"
-  sox "$src_file" -b16 "$dst_file"
+	sox "$src_file" -b16 "$dst_file"
 	echo2 "Setting ID3 TAGS, artist=$artist title=$title"
 	id3v2 -a "$artist" -t "$title" "$dst_file"
+	if [ $? -eq 0 ]; then
+		echo2 "Compress OK, removing source wav $src_file"
+		rm -vf "$src_file"
+	else
+		echo2 "Error, file not compressed and tagged"
+	fi
 else
 	echo2 "Source file [$src_file] not on disk, skip compressing"
 fi
@@ -48,9 +52,19 @@ fi
 
 function record_song(){
 #local song_tmp_path=$1
-echo2 "Recording channels=$sound_channels format=$sound_format rate=$sound_rate $song_tmp_path, safety max 1200 seconds"
-arecord -d 1200 -c $sound_channels -f $sound_format -r $sound_rate -t wav -D hw:$RECORD_DEVICE "$song_tmp_path" & >> $LOG 2>&1
-#arecord -q -c 2 -f S16_LE -r 44100 -t wav -D hw:$RECORD_DEVICE | flac -0 -o "$_song_tmp_path" >> $LOG 2>&1 &
+local mpc_search=`mpc -p $MPD_PORT search artist "$song_artist" title "$song_title"`
+if [ -z "$mpc_search" ]; then
+	echo2 "Recording channels=$sound_channels format=$sound_format rate=$sound_rate $song_tmp_path, safety max 1200 seconds"
+	arecord -d 1200 -c $sound_channels -f $sound_format -r $sound_rate -t wav -D hw:$RECORD_DEVICE "$song_tmp_path" & >> $LOG 2>&1
+	rec_song_name="$song_name"
+	rec_song_tmp_path="$song_tmp_path"
+	rec_song_path="$song_path"
+	rec_song_duration="$song_duration"
+	echo2 "Started recording $rec_sound_name to file $rec_song_tmp_path"
+	#arecord -q -c 2 -f S16_LE -r 44100 -t wav -D hw:$RECORD_DEVICE | flac -0 -o "$_song_tmp_path" >> $LOG 2>&1 &
+else
+	echo2 "Song already in library at [$mpc_search], not recording"
+fi
 }
 
 function stop_arecord(){
@@ -147,8 +161,11 @@ function get_song_meta(){
 local mpc_output=`mpc -p $MPD_PORT status`
 readarray -t mpc_array <<<"$mpc_output"
 song_name=${mpc_array[0]}
-song_path=$RECORD_PATH/$song_name$song_ext
-song_tmp_path=$RECORD_PATH/tmp/$song_name$song_tmp_ext
+song_artist=${song_name% -*}
+song_title=${song_name##*- }
+sanitized_song_name=${song_name////_}
+song_path=$RECORD_PATH/$sanitized_song_name$song_ext
+song_tmp_path=$RECORD_PATH/tmp/$sanitized_song_name$song_tmp_ext
 local status_line=${mpc_array[1]}
 local status=${status_line%]*}  # retain the part before the]
 player_status=${status##*[}  # retain the part after the last[
@@ -168,7 +185,7 @@ if [ "$duration_line" != "" ]; then
 else
 	song_duration=0
 fi
-echo2 "Song=$song_name status=$player_status duration=$song_duration"
+echo2 "Song=$song_name Artist=$song_artist Title=$song_title status=$player_status duration=$song_duration"
 }
 
 function finish(){
@@ -235,11 +252,6 @@ lock=/tmp/.record-audio.exclusivelock
 					if [ "$loop_out_is_open" == "1" ]; then
 						get_loopback_meta
 						record_song
-						rec_song_name="$song_name"
-						rec_song_tmp_path="$song_tmp_path"
-						rec_song_path="$song_path"
-						rec_song_duration="$song_duration"
-						echo2 "Started recording $rec_sound_name to file $rec_song_tmp_path"
 					else
             echo2 "Not recording $song_name as out=$loop_out_is_open"
           fi
