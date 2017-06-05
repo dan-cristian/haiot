@@ -84,7 +84,7 @@ do
 		else
 			state=${LOCAL_ZONE_STATUS[$relay_name$zone_index]}
 		fi
-        	if [[ ("$state" == "1") && ("$state" != "${REMOTE_STATUS[$relay_name$zone_index]}") ]]; then
+        	if [[ (("$state" == "1") || ("$zone_index" != "0"))  && ("$state" != "${REMOTE_STATUS[$relay_name$zone_index]}") ]]; then
 			# $1=action $2=relay_name $3=card_name $4=state $5=zone_index
 			do_url "Set" "$relay_name" "${CARD_NAME[$i]}" "$state" "$zone_index"
         	fi
