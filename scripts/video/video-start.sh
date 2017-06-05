@@ -177,8 +177,9 @@ if [ $? -ne 0 ]; then
 	#xdotool key Shift
 	xset dpms force on
 	#extending screen close timeout?
-	unset_power_save
-	set_power_save
+	xset s reset
+	#unset_power_save
+	#set_power_save
 	$DIR/slideshow.sh
 fi
 }
@@ -239,7 +240,8 @@ elif [ "$1" == "stop" ]; then
 	stop_kodi
 elif [ "$1" == "start-kodi-once" ]; then
 	startx_once
-	start_kodi_once
+	#start_kodi_once
+	start_kodi
 	#increase_prio
 elif [ "$1" == "start-browser" ]; then
         #startx_once

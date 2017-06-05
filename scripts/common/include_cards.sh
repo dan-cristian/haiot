@@ -17,8 +17,8 @@ declare -a DEV_CAPT=("pcm0c" "" "" "pcm0c" "pcm1c" "pcm0c" "pcm0c" "")
 declare -a CARD_CAPT=("Loopback" "" "" "PCH" "DGX" "Device" "DGX" "")
 
 #MPD settings
-declare -a MPD_PORT_LIST=(6600 6600 6601 6603 6604 6602 6605 6600)
-declare -a MPD_OUTPUT=("Onboard-PCH HDMI2 (living)" "Onboard-PCH HDMI2 (living)" "Bucatarie" "Onboard-PCH Optical (headset)" "PCI-DGX Optical (dormitor)" "Onboard-PCH Analog (baie)" "PCI-DGX Analog (beci)" "SmallUsb-DAC Optical (pod)")
+declare -a MPD_PORT_LIST=(6600 6600 6600 6601 6603 6604 6602 6605)
+declare -a MPD_OUTPUT=("Onboard-PCH HDMI2 (living)" "Onboard-PCH HDMI2 (living)" "Loop (bucatarie)" "Onboard-PCH Optical (headset)" "PCI-DGX Optical (dormitor)" "Onboard-PCH Analog (baie)" "PCI-DGX Analog (beci)" "SmallUsb-DAC Optical (pod)")
 
 function echo2(){
 echo [`date +%T.%N`] $1 $2 $3 $4 $5 >> $LOG 2>&1
