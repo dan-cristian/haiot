@@ -137,7 +137,8 @@
     {"id":45, "name":"powerserver"},
     {"id":46, "name":"ups main"},
     {"id":47, "name":"birou"},
-    {"id":48, "name":"solar jos"}
+    {"id":48, "name":"solar jos"},
+    {"id":49, "name":"soba beci"}
   ],
 
   "Area": [
@@ -260,7 +261,8 @@
     {"zone_id":29 , "sensor_address": "F90000000FFEAB1D", "sensor_name": "water hot"},
     {"zone_id":7 , "sensor_address": "BE0000000F870C1D", "sensor_name": "water main"},
     {"zone_id":29 , "sensor_address": "F30000000DC60E1D", "sensor_name": "power broken"},
-    {"zone_id":29 , "sensor_address": "AB0000000F60491D", "sensor_name": "power beci"}
+    {"zone_id":29 , "sensor_address": "AB0000000F60491D", "sensor_name": "power beci"},
+    {"zone_id":49 , "sensor_address": "AC000003BE024F28", "sensor_name": "soba beci"}
   ],
 
   "Utility": [
