@@ -12,12 +12,15 @@ def get_song_id(artist, title):
     title = urllib.quote(title.encode('utf-8'), safe='')
     artist = urllib.quote(artist.encode('utf-8'), safe='')
     param = '/search_id?type=song&title={}&artist={}&exact=yes'.format(title, artist)
-    result = requests.get('{}{}'.format(url, param), timeout=7).text
-    if result == '':
+    try:
+        result = requests.get('{}{}'.format(url, param), timeout=7).text
+        if result == '':
+            return None
+        else:
+            return result
+    except Exception, ex:
+        Log.logger.critical("Error on get song from google proxy: {}", ex)
         return None
-    else:
-        return result
-
 
 def get_song_url(song_id):
     url = get_param(Constant.P_GMUSICPROXY_URL)
