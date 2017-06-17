@@ -19,7 +19,7 @@ def get_song_id(artist, title):
         else:
             return result
     except Exception, ex:
-        Log.logger.critical("Error on get song from google proxy: {}", ex)
+        Log.logger.critical("Error on get song from google proxy: {}".format(ex))
         return None
 
 def get_song_url(song_id):
