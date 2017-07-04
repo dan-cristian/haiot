@@ -18,13 +18,14 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
             current_record = models.Utility.query.filter_by(sensor_name=sensor_name, sensor_index=index).first()
             if current_record is not None:
                 record.sensor_index = index
-                if current_record.utility_type == 'electricity':
+                if current_record.utility_type == Constant.UTILITY_TYPE_ELECTRICITY:
                     # 1000 times count divided by 60 seconds time 60 minutes (kwh -> watt)
-                    record.units_delta = 1000 * delta / ((current_record.ticks_per_unit * 1.0) /
-                                                         (sampling_period_seconds/(60.0*60)))
-                    record.unit_name = 'kwh'
-                elif current_record.utility_type == 'water':
-                        record.unit_name = 'l'
+                    #record.units_delta = 1000 * delta / ((current_record.ticks_per_unit * 1.0) /
+                    #                                     (sampling_period_seconds/(60.0*60)))
+                    record.units_delta = delta / (current_record.ticks_per_unit * 1.0)
+                    record.unit_name = Constant.UTILITY_TYPE_ELECTRICITY_MEASURE
+                elif current_record.utility_type == Constant.UTILITY_TYPE_WATER:
+                        record.unit_name = Constant.UTILITY_TYPE_WATER_MEASURE
                         record.units_delta = delta / (current_record.ticks_per_unit * 1.0)
                 else:
                     record.units_delta = delta / (current_record.ticks_per_unit * 1.0)  # force float operation
