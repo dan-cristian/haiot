@@ -139,6 +139,11 @@ class Constant:
     GPIO_PIN_DIRECTION_IN = 'in'
     GPIO_PIN_DIRECTION_OUT = 'out'
 
+    UTILITY_TYPE_ELECTRICITY='electricity'
+    UTILITY_TYPE_ELECTRICITY_MEASURE = 'kWh'
+    UTILITY_TYPE_WATER = 'water'
+    UTILITY_TYPE_WATER_MEASURE = 'l'
+
 
 def load_config_json():
     from main.logger_helper import Log
