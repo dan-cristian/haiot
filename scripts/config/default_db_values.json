@@ -245,7 +245,7 @@
     {"zone_id":38 , "sensor_address": "AE000003BDFFB928", "sensor_name": "puffer sus", "alt_address": ""},
     {"zone_id":38 , "sensor_address": "04000004F3DE2128", "sensor_name": "puffer mijloc", "alt_address": "28.21DEF3040000"},
     {"zone_id":38 , "sensor_address": "12000004F3428528", "sensor_name": "puffer jos", "alt_address": ""},
-    {"zone_id":29 , "sensor_address": "01000001CEF4B326", "sensor_name": "hol beci", "alt_address": ""},
+    {"zone_id":7 , "sensor_address": "01000001CEF4B326", "sensor_name": "curte fata", "alt_address": ""},
     {"zone_id":31 , "sensor_address": "4C000003BDD49D28", "sensor_name": "gas heater", "alt_address": ""},
     {"zone_id":25 , "sensor_address": "96000003BDFE5D28", "sensor_name": "boiler sus", "alt_address": ""},
     {"zone_id":25 , "sensor_address": "53000004F296DD28", "sensor_name": "boiler mijloc", "alt_address": ""},
