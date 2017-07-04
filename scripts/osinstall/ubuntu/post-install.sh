@@ -335,12 +335,12 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
    apt-get install python-virtualenv virtualenvwrapper
    cd /home/${USERNAME}
    su ${USERNAME} <<'EOF'
+'EOF'
    mkvirtualenv -p /usr/bin/python2 gmusicproxy
    git clone https://github.com/diraimondo/gmusicproxy.git
    cd gmusicproxy
    pip install -r requirements.txt
    workon gmusicproxy
-EOF
    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/gmusicproxy.service /lib/systemd/system/
    cp $HAIOT_DIR/scripts/config/gmusicproxy.cfg /home/${USERNAME}/.config/
    systemctl enable gmusicproxy
