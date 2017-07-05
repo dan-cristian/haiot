@@ -5,6 +5,7 @@ from main import app, BIND_IP, BIND_PORT
 from main.admin import model_helper
 from common import Constant
 import helpers
+import traceback
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
@@ -118,9 +119,18 @@ def log_before_request():
 
 
 @app.after_request
-def log_after_request(argument):
+def log_after_request(response):
     # if app.config.get('LOG_REQUESTS'):
-    Log.logger.info('HTTP Request END: {} ARG={}'.format(request, argument))
+    Log.logger.info('HTTP Request END: {} ARG={}'.format(request, response))
+    return response
+
+
+@app.errorhandler(Exception)
+def exceptions(e):
+    tb = traceback.format_exc()
+    Log.logger.error('%s %s %s %s 5xx INTERNAL SERVER ERROR\n%s',
+        request.remote_addr, request.method, request.scheme, request.full_path, tb)
+    return e.status_code
 
 
 @app.errorhandler(404)
