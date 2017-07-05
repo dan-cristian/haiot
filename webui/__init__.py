@@ -112,9 +112,9 @@ def favicon():
 
 
 @app.before_request
-def log_before_request():
+def log_before_request(argument):
     # if app.config.get('LOG_REQUESTS'):
-    Log.logger.info('HTTP Request START: {}'.format(request))
+    Log.logger.info('HTTP Request START: {} ARG={}'.format(request, argument))
 
 
 @app.after_request
