@@ -69,6 +69,7 @@ def amp_zone_power(on, zone_index):
     global _AMP_ZONE3_POWER_OFF, _AMP_ZONE3_POWER_ON
     sock = connect_socket()
     msg = "socket cmd ok, "
+    sock.settimeout(5)
     if on:
         if zone_index == 3:
             sock.send(_AMP_ZONE3_POWER_ON)
