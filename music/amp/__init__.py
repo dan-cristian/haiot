@@ -112,19 +112,25 @@ def set_amp_power(power_state, relay_name, amp_zone_index):
             msg = "Set relay {} to state {} zone_index={}\n".format(relay_name, power_state, amp_zone_index)
             Log.logger.info(msg)
         else:
+            Log.logger.info("step 5")
             msg = "Not changed relay state for {}\n".format(relay_name)
     else:
         msg = "Could not find relay name {}\n".format(relay_name)
         Log.logger.warning(msg)
         return msg
 
+    Log.logger.info("step 5")
     # change amp zone power
     if amp_zone_index is None or amp_zone_index == 0:
         # only main relay change is needed
+        Log.logger.info("step 6")
         return msg + "Power in {} set to {}\n".format(relay_name, relay.relay_is_on)
     else:
+        Log.logger.info("step 7")
         # potentially amp settings change is required to switch amp zones
         if initial_relay_state is not True and power_state is True:
             # delay to wait for amp to fully start
+            Log.logger.info("step 8")
             time.sleep(5)
+        Log.logger.info("step 9")
         return msg + amp_zone_power(power_state, amp_zone_index)
