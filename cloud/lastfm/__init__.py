@@ -60,10 +60,13 @@ def current():
     if track is None:
         return '{"result": "None Playing!"}'
     else:
-        if track.get_userloved():
-            prefix = '! '
-        else:
-            prefix = ''
+        try:
+            if track.get_userloved():
+                prefix = '! '
+            else:
+                prefix = ''
+        except Exception, ex:
+            prefix = "? "
         return '{"result": "' + _multify(prefix + track.title) + '"}'
 
 
