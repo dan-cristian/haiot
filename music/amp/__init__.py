@@ -97,9 +97,11 @@ def set_amp_power(power_state, relay_name, amp_zone_index):
     relay = models.ZoneCustomRelay.query.filter_by(relay_pin_name=relay_name).first()
     Log.logger.info("step 2")
     power_state = bool(power_state)
+    Log.logger.info("step 2.1")
     if relay is not None:
         initial_relay_state = relay.relay_is_on
         # power on main relay for amp or on/off if there is no zone
+        Log.logger.info("step 2.2")
         if power_state is True or amp_zone_index == 0:
             Log.logger.info("step 3")
             relay.relay_is_on = power_state
