@@ -31,7 +31,11 @@ def connect_socket():
     host = get_param(Constant.P_AMP_SERIAL_HOST)
     port = int(get_param(Constant.P_AMP_SERIAL_PORT))
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    Log.logger.info("Connecting socket")
+    s.settimeout(2)
     s.connect((host, port))
+    s.settimeout(None)
+    Log.logger.info("Connected socket")
     return s
 
 
