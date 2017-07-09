@@ -152,7 +152,7 @@ class DbBase:
                     new_value = getattr(new_record, column_name)
                     old_value = getattr(current_record, column_name)
                     # todo: comparison not working for float, because str appends .0
-                    if ((not new_value is None) and (str(old_value) != str(new_value))) or save_all_fields:
+                    if ((new_value is not None) and (str(old_value) != str(new_value))) or save_all_fields:
                         if column_name != 'updated_on':
                             try:
                                 obj_type = str(type(self)).split('\'')[1]
