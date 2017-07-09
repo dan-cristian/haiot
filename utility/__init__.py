@@ -18,6 +18,7 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
             current_record = models.Utility.query.filter_by(sensor_name=sensor_name, sensor_index=index).first()
             if current_record is not None:
                 record.sensor_index = index
+                record.utility_name = current_record.utility_name
                 if current_record.utility_type == Constant.UTILITY_TYPE_ELECTRICITY:
                     # 1000 times count divided by 60 seconds time 60 minutes (kwh -> watt)
                     #record.units_delta = 1000 * delta / ((current_record.ticks_per_unit * 1.0) /
@@ -47,8 +48,8 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
                 record.save_changed_fields(current_record=current_record, new_record=record,
                                            notify_transport_enabled=True, save_to_graph=True)
             else:
-                Log.logger.critical("Counter sensor [{}] index {} is not defined in Utility table".format(sensor_name,
-                                                                                                          index))
+                Log.logger.critical("Counter sensor [{}] index {} is not defined in Utility table".format(
+                    sensor_name, index))
         index += 1
 
 
