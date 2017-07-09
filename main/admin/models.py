@@ -747,6 +747,7 @@ class PlotlyCache(db.Model, DbEvent, DbBase):
 
 class Utility(db.Model, graphs.BaseGraph, DbEvent, DbBase):
     id = db.Column(db.Integer, primary_key=True)
+    utility_name = db.Column(db.String(50))  # unique name, can be different than sensor name for dual counter
     sensor_name = db.Column(db.String(50), db.ForeignKey('sensor.sensor_name'))
     sensor_index = db.Column(db.Integer)  # 0 for counter_a, 1 for counter_b
     units_total = db.Column(db.Float)  # total number of units measured
@@ -924,6 +925,7 @@ class UtilityHistory(db.Model, DbBase):
     __bind_key__ = 'reporting'
     __tablename__ = 'utility_history'  # convention: append '_history' -> 'History' to source table name
     id = db.Column(db.Integer, primary_key=True)
+    utility_name = db.Column(db.String(50), index=True)
     sensor_name = db.Column(db.String(50), index=True)
     units_total = db.Column(db.Float)  # total number of units measured
     units_delta = db.Column(db.Float)  # total number of units measured since last measurement
