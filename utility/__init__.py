@@ -48,7 +48,7 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
                 record.units_total = 0.0 + current_record.units_total + record.units_delta
                 Log.logger.info("Saving utility record {} name={}".format(current_record, record.utility_name))
                 record.save_changed_fields(current_record=current_record, new_record=record,
-                                           notify_transport_enabled=True, save_all_fields=True, save_to_graph=True)
+                                           notify_transport_enabled=True, save_to_graph=True)
             else:
                 Log.logger.critical("Counter sensor [{}] index {} is not defined in Utility table".format(
                     sensor_name, index))
