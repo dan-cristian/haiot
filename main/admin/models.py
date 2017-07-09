@@ -142,7 +142,7 @@ class DbBase:
                     new_record.save_to_graph = save_to_graph
             # ensure is set for both new and existing records
             new_record.save_to_history = save_to_graph
-            if current_record:
+            if current_record is not None:
                 # ensure is set for both new and existing records
                 current_record.save_to_history = save_to_graph
                 current_record.last_commit_field_changed_list = []
