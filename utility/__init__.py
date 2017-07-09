@@ -27,8 +27,10 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
                 elif current_record.utility_type == Constant.UTILITY_TYPE_WATER:
                         record.unit_name = Constant.UTILITY_TYPE_WATER_MEASURE
                         record.units_delta = delta / (current_record.ticks_per_unit * 1.0)
+                        Log.logger.info("Saving utility water delta={}".format(record.units_delta))
                 else:
                     record.units_delta = delta / (current_record.ticks_per_unit * 1.0)  # force float operation
+                    Log.logger.info("Saving unknown utility type={}".format(current_record.utility_type))
                 record.ticks_delta = delta
                 if current_record.unit_cost is None:
                     current_record.unit_cost = 0.0
