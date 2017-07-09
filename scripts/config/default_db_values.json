@@ -262,6 +262,7 @@
     {"zone_id":10 , "sensor_address": "1C0000000F99851D", "sensor_name": "power rack"},
     {"zone_id":29 , "sensor_address": "F90000000FFEAB1D", "sensor_name": "water hot"},
     {"zone_id":7 , "sensor_address": "BE0000000F870C1D", "sensor_name": "water main"},
+    {"zone_id":29 , "sensor_address": "AB0000000F60491D", "sensor_name": "water house"},
     {"zone_id":29 , "sensor_address": "F30000000DC60E1D", "sensor_name": "power broken"},
     {"zone_id":29 , "sensor_address": "AB0000000F60491D", "sensor_name": "power beci"},
     {"zone_id":49 , "sensor_address": "AC000003BE024F28", "sensor_name": "soba beci"}
@@ -272,6 +273,7 @@
     {"sensor_name":"water hot", "sensor_index":0, "ticks_per_unit":1, "unit_name":"liter", "utility_type":"water", "unit_cost":1},
     {"sensor_name":"power main", "sensor_index":0, "ticks_per_unit":100, "unit_name":"watt", "utility_type":"electricity", "unit_cost":1},
     {"sensor_name":"water main", "sensor_index":0, "ticks_per_unit":0.1, "unit_name":"liter", "utility_type":"water", "unit_cost":1},
+    {"sensor_name":"water house", "sensor_index":1, "ticks_per_unit":1, "unit_name":"liter", "utility_type":"water", "unit_cost":1},
     {"sensor_name":"power beci", "sensor_index":0, "ticks_per_unit":2000, "unit_name":"watt", "utility_type":"electricity", "unit_cost":1}
   ],
 
