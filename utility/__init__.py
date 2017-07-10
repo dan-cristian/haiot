@@ -30,8 +30,11 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
                         record.units_delta = delta / (current_record.ticks_per_unit * 1.0)
                         Log.logger.info("Saving utility water delta={}".format(record.units_delta))
                 else:
-                    record.units_delta = delta / (current_record.ticks_per_unit * 1.0)  # force float operation
                     Log.logger.info("Saving unknown utility type={}".format(current_record.utility_type))
+                    if current_record.ticks_per_unit is not None:
+                        record.units_delta = delta / (current_record.ticks_per_unit * 1.0)  # force float operation
+                    else:
+                        Log.logger.warning("Null ticks per unit")
                 record.ticks_delta = delta
                 if current_record.unit_cost is None:
                     current_record.unit_cost = 0.0
@@ -44,10 +47,10 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
                     current_record.ticks_delta = -1
                     current_record.cost = -1
                     #current_record.utility_name = ""
-                    #current_record.sensor_index = -1
+                    current_record.sensor_index = -1
                 record.units_total = 0.0 + current_record.units_total + record.units_delta
                 Log.logger.info("Saving utility record {} name={}".format(current_record, record.utility_name))
-                record.save_changed_fields(current_record=current_record, new_record=record, debug=True,
+                record.save_changed_fields(current_record=current_record, new_record=record, debug=False,
                                            notify_transport_enabled=True, save_to_graph=True, save_all_fields=True)
             else:
                 Log.logger.critical("Counter sensor [{}] index {} is not defined in Utility table".format(
