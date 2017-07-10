@@ -155,7 +155,8 @@ class DbBase:
                         Log.logger.info('DEBUG process Col={} New={} Old={} Saveall={}'.format(
                             column_name, new_value, old_value, save_all_fields))
                     # todo: comparison not working for float, because str appends .0
-                    if ((new_value is not None) and (str(old_value) != str(new_value))) or save_all_fields:
+                    if ((new_value is not None) and (str(old_value) != str(new_value))) \
+                            or (save_all_fields and (new_value is not None)):
                         if column_name != 'updated_on':
                             try:
                                 obj_type = str(type(self)).split('\'')[1]
@@ -187,7 +188,7 @@ class DbBase:
                     if new_value:
                         new_record.last_commit_field_changed_list.append(column_name)
                 if debug:
-                    Log.logger.info('DEBUG new record ={}').format(new_record)
+                    Log.logger.info('DEBUG new record={}'.format(new_record))
                 db.session.add(new_record)
             # fixme: remove hardcoded field name
             if hasattr(new_record, 'last_save_to_graph'):
