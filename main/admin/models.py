@@ -151,6 +151,9 @@ class DbBase:
                     column_name = str(column)
                     new_value = getattr(new_record, column_name)
                     old_value = getattr(current_record, column_name)
+                    if debug:
+                        Log.logger.info('DEBUG process Col={} New={} Old={} Saveall={}'.format(
+                            column_name, new_value, old_value, save_all_fields))
                     # todo: comparison not working for float, because str appends .0
                     if ((new_value is not None) and (str(old_value) != str(new_value))) or save_all_fields:
                         if column_name != 'updated_on':
@@ -160,14 +163,16 @@ class DbBase:
                                 obj_type = obj_type_words[len(obj_type_words) - 1]
                             except Exception, ex:
                                 obj_type = str(type(self))
-                            if debug:
-                                Log.logger.info(
-                                    '{} {}={} oldvalue={}'.format(obj_type, column_name, new_value, old_value))
                         else:
                             pass
                         if column_name != "id":  # do not change primary key with None
                             setattr(current_record, column_name, new_value)
                             current_record.last_commit_field_changed_list.append(column_name)
+                            if debug:
+                                Log.logger.info('DEBUG change COL={} to VAL={}'.format(column_name, new_value))
+                    else:
+                        if debug:
+                            Log.logger.info('DEBUG not changing current column={}'.format(column_name))
                 if len(current_record.last_commit_field_changed_list) == 0:
                     current_record.notify_transport_enabled = False
                 # fixme: remove hardcoded field name
@@ -181,6 +186,8 @@ class DbBase:
                     new_value = getattr(new_record, column_name)
                     if new_value:
                         new_record.last_commit_field_changed_list.append(column_name)
+                if debug:
+                    Log.logger.info('DEBUG new record ={}').format(new_record)
                 db.session.add(new_record)
             # fixme: remove hardcoded field name
             if hasattr(new_record, 'last_save_to_graph'):
