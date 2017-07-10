@@ -105,14 +105,14 @@ def save_to_db(dev):
             if record.delta_counters_b != 0:
                 current_record.delta_counters_b = 0
         record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
-                                   save_to_graph=True)
+                                   save_to_graph=True, debug=False)
         if record.delta_counters_a is not None or record.delta_counters_b is not None:
             dispatcher.send(Constant.SIGNAL_UTILITY, sensor_name=record.sensor_name,
                             units_delta_a=record.delta_counters_a, units_delta_b=record.delta_counters_b,
                             total_units_a=record.counters_a, total_units_b=record.counters_b,
                             sampling_period_seconds=sampling_period_seconds)
     except Exception, ex:
-        Log.logger.error('Error saving sensor to DB, err {}'.format(ex, exc_info=True))
+        Log.logger.error('Error saving sensor to DB, err {}'.format(ex), exc_info=True)
         # finally:
         #    db_lock.release()
 
