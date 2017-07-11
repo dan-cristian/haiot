@@ -29,6 +29,10 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
                         record.unit_name = Constant.UTILITY_TYPE_WATER_MEASURE
                         record.units_delta = delta / (current_record.ticks_per_unit * 1.0)
                         Log.logger.info("Saving utility water delta={}".format(record.units_delta))
+                elif current_record.utility_type == Constant.UTILITY_TYPE_GAS:
+                    record.unit_name = Constant.UTILITY_TYPE_GAS_MEASURE
+                    record.units_delta = delta / (current_record.ticks_per_unit * 1.0)
+                    Log.logger.info("Saving utility gas delta={}".format(record.units_delta))
                 else:
                     Log.logger.info("Saving unknown utility type={}".format(current_record.utility_type))
                     if current_record.ticks_per_unit is not None:
