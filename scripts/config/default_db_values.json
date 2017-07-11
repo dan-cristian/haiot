@@ -1,7 +1,6 @@
 {
   "Node": [
     {"id":1,  "priority":"0", "name":"netbook", "machine_type":"raspberry"},
-
     {"id":2,  "priority":"2", "name":"nas"},
     {"id":3,  "priority":"9", "name":"server"},
     {"id":4,  "priority":"4", "name":"ex-std-node466.prod.rhcloud.com"},
