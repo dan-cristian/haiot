@@ -143,6 +143,8 @@ class Constant:
     UTILITY_TYPE_ELECTRICITY_MEASURE = 'kWh'
     UTILITY_TYPE_WATER = 'water'
     UTILITY_TYPE_WATER_MEASURE = 'l'
+    UTILITY_TYPE_GAS = 'gas'
+    UTILITY_TYPE_GAS_MEASURE = 'dm3'
 
 
 def load_config_json():
