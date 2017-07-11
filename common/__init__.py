@@ -144,7 +144,7 @@ class Constant:
     UTILITY_TYPE_WATER = 'water'
     UTILITY_TYPE_WATER_MEASURE = 'l'
     UTILITY_TYPE_GAS = 'gas'
-    UTILITY_TYPE_GAS_MEASURE = 'dm3'
+    UTILITY_TYPE_GAS_MEASURE = 'l'
 
 
 def load_config_json():
