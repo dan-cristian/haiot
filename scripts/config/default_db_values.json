@@ -264,18 +264,18 @@
     {"zone_id":29 , "sensor_address": "AB0000000F60491D", "sensor_name": "water-power beci"},
     {"zone_id":29 , "sensor_address": "F30000000DC60E1D", "sensor_name": "power broken"},
     {"zone_id":49 , "sensor_address": "AC000003BE024F28", "sensor_name": "soba beci"},
-    {"zone_id":29 , "sensor_address": "EF0000000F97CA1D", "sensor_name": "gas"}
+    {"zone_id":29 , "sensor_address": "EF0000000F97CA1D", "sensor_name": "gas-water"}
   ],
 
   "Utility": [
     {"utility_name":"power rack", "sensor_name":"power rack", "sensor_index":1, "ticks_per_unit":2000, "unit_name":"kWh", "utility_type":"electricity", "unit_cost":1},
     {"utility_name":"water hot", "sensor_name":"water hot", "sensor_index":0, "ticks_per_unit":1, "unit_name":"l", "utility_type":"water", "unit_cost":1},
     {"utility_name":"power main", "sensor_name":"power main", "sensor_index":0, "ticks_per_unit":100, "unit_name":"kWh", "utility_type":"electricity", "unit_cost":1},
-    {"utility_name":"water main", "sensor_name":"water main", "sensor_index":0, "ticks_per_unit":0.1, "unit_name":"l", "utility_type":"water", "unit_cost":1},
+    {"utility_name":"unused", "sensor_name":"water main", "sensor_index":0, "ticks_per_unit":0.1, "unit_name":"l", "utility_type":"water", "unit_cost":1},
     {"utility_name":"water house", "sensor_name":"water-power beci", "sensor_index":1, "ticks_per_unit":1, "unit_name":"l", "utility_type":"water", "unit_cost":1},
     {"utility_name":"power beci", "sensor_name":"water-power beci", "sensor_index":0, "ticks_per_unit":2000, "unit_name":"kWh", "utility_type":"electricity", "unit_cost":1},
-    {"utility_name":"gas", "sensor_name":"gas", "sensor_index":0, "ticks_per_unit":100, "unit_name":"mc", "utility_type":"gas", "unit_cost":1},
-    {"utility_name":"gas 2", "sensor_name":"gas", "sensor_index":1, "ticks_per_unit":100, "unit_name":"mc", "utility_type":"gas", "unit_cost":1}
+    {"utility_name":"gas", "sensor_name":"gas-water", "sensor_index":0, "ticks_per_unit":100, "unit_name":"mc", "utility_type":"gas", "unit_cost":1},
+    {"utility_name":"water main", "sensor_name":"gas-water", "sensor_index":1, "ticks_per_unit":0.1, "unit_name":"l", "utility_type":"water", "unit_cost":1}
   ],
 
   "ZoneAlarm": [
