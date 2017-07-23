@@ -266,7 +266,7 @@
     {"zone_id":29 , "sensor_address": "F30000000DC60E1D", "sensor_name": "power broken"},
     {"zone_id":49 , "sensor_address": "AC000003BE024F28", "sensor_name": "soba beci"},
     {"zone_id":29 , "sensor_address": "EF0000000F97CA1D", "sensor_name": "gas-water"},
-    {"zone_id":12 , "sensor_address": "2679F0CE0100004E", "sensor_name": "voltage-water"}
+    {"zone_id":12 , "sensor_address": "4E000001CEF07926", "sensor_name": "voltage-water"}
   ],
 
   "Utility": [
