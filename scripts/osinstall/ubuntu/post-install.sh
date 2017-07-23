@@ -43,7 +43,7 @@ echo "Setting timezone ..."
 echo "Europe/Bucharest" > /etc/timezone
 dpkg-reconfigure -f noninteractive tzdata
 
-echo "Updating apt-get"
+echo "Updating apt-get and upgrade"
 if [ ! -f /tmp/updated ]; then
     apt-get -y update
     apt-get -y upgrade
