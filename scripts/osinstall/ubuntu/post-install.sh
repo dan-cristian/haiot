@@ -427,8 +427,8 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
    # http://gmusicproxy.net/
    apt-get install python-virtualenv virtualenvwrapper
    cd /home/${USERNAME}
-   su ${USERNAME} <<'EOF'
-'EOF'
+   su ${USERNAME} #<<'EOF'
+
    mkvirtualenv -p /usr/bin/python2 gmusicproxy
    git clone https://github.com/diraimondo/gmusicproxy.git
    cd gmusicproxy
