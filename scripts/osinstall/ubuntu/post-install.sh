@@ -4,31 +4,38 @@ USERNAME=haiot
 USERPASS=haiot
 ENABLE_WEBMIN=0
 ENABLE_OPTIONAL=0
-ENABLE_HAIOT=0
+ENABLE_HAIOT=1
 ENABLE_RAMRUN=0
-ENABLE_MEDIA=1
+ENABLE_MEDIA=0
 MUSIC_ROOT=/mnt/data/hdd-wdr-evhk/music
+
 ENABLE_SNAPRAID=1
 DATA_DISK1=/mnt/data/hdd-wdg-6297
 DATA_DISK2=/mnt/data/hdd-wdr-evhk
 PARITY_DISK=/mnt/parity/hdd-wdg-2130
+
 VIDEOS_ROOT=/mnt/data/hdd-wdr-evhk/videos
 PHOTOS_ROOT=/mnt/data/hdd-wdg-6297/photos
 PRIVATE_ROOT=/mnt/data/hdd-wdg-6297/private
 EBOOKS_ROOT=/mnt/data/hdd-wdg-6297/ebooks
-ENABLE_GIT=1
+
+ENABLE_GIT=0
 GIT_ROOT=/mnt/data/hdd-wdg-6297/git
-ENABLE_CAMERA=1
-ENABLE_CAMERA_SHINOBI=1
+
+ENABLE_CAMERA=0
+ENABLE_CAMERA_SHINOBI=0
 MOTION_ROOT=/mnt/data/hdd-wdr-evhk/motion
 LOG_ROOT=/mnt/data/hdd-wdr-evhk/log
-ENABLE_TORRENT=1
+
+ENABLE_TORRENT=0
 #ENABLE_SAMBA=1
-ENABLE_CLOUD_AMAZON=1
-ENABLE_MYSQL=1
+ENABLE_CLOUD_AMAZON=0
+
+ENABLE_MYSQL_SERVER=0
 MYSQL_DATA_ROOT=/mnt/data/hdd-wdr-evhk/mysql
-ENABLE_DASHBOARD=1
-ENABLE_ALEXA=1
+
+ENABLE_DASHBOARD=0
+ENABLE_ALEXA=0
 
 echo "Setting timezone ..."
 echo "Europe/Bucharest" > /etc/timezone
@@ -38,7 +45,7 @@ echo "Updating apt-get"
 apt-get -y update
 apt-get -y upgrade
 echo "Installing additional packages"
-apt-get -y install ssh dialog sudo nano wget runit git ssmtp mailutils psmisc smartmontools localepurge mosquitto gpm
+apt-get -y install ssh dialog sudo nano wget runit git ssmtp mailutils psmisc smartmontools localepurge  gpm
 if [ "$ENABLE_RAMRUN" == "1" ]; then
     # run in ram needs busybox for ramfs copy operations, see "local" script sample
     apt-get -y install busybox
@@ -447,7 +454,7 @@ if [ "$ENABLE_TORRENT" == "1" ]; then
     /etc/init.d/transmission-daemon start
 fi
 
-if [ "$ENABLE_MYSQL" == "1" ]; then
+if [ "$ENABLE_MYSQL_SERVER" == "1" ]; then
     echo 'Installing mysql'
     apt-get install mysql-server
     /etc/init.d/mysql stop
@@ -463,6 +470,7 @@ if [ "$ENABLE_MYSQL" == "1" ]; then
 fi
 
 if [ "$ENABLE_HAIOT" == "1" ]; then
+    apt-get install mosquitto owfs
     pip -V
     if [ "$?" != "0" ]; then
         echo "Installing python pip"
