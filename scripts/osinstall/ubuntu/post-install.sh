@@ -171,7 +171,48 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
     cd ${HAIOT_DIR}
     chmod +x scripts/*sh*
     chmod +x *.sh
-    source scripts/setup.sh
+
+    source venv/bin/activate
+    if [ "$?" != "0" ]; then
+        #sudo pip install --upgrade pip
+        sudo pip install virtualenv
+        virtualenv venv
+        source venv/bin/activate
+    fi
+
+    echo "Installing mysql connector"
+    wget http://dev.mysql.com/get/Downloads/Connector-Python/mysql-connector-python-2.1.3.zip
+    unzip mysql-connector-python-2.1.3.zip
+    cd mysql-connector-python-2.1.3/
+    python setup.py install
+    echo "Installing done for mysql connector"
+    cd ..
+    rm mysql-connector-python-2.1.3.zip
+    rm -r mysql-connector-python-2.1.3
+
+    #setuptools latest needed for apscheduler
+    echo "Updating pip etc."
+    if [ ! -f /tmp/updated_pip ]; then
+        pip install --no-cache-dir --upgrade pip
+        pip install --no-cache-dir --upgrade setuptools
+        touch /tmp/updated_pip
+    fi
+
+    echo Install mandatory requirements
+    pip install --no-cache-dir -r requirements.txt
+
+    echo Install optional requirements, you can ignore errors
+    res=`cat /etc/os-release | grep raspbian -q ; echo $?`
+    if [ "$res" == "0" ]; then
+        pip install --no-cache-dir -r requirements-rpi.txt
+    else
+        pip install --no-cache-dir -r requirements-beaglebone.txt
+    fi
+
+    echo "Setup python done"
+
+    #source scripts/setup.sh
+
     chown -R ${USERNAME}:${USERNAME} .
 fi
 
