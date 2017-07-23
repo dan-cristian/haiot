@@ -118,25 +118,47 @@ if [ "$ENABLE_GIT" == "1" ]; then
     sv start git-daemon
 fi
 
+if [ "$ENABLE_HAIOT" == "1" ]; then
+    echo "Getting HAIOT application from git"
+    cd /home/${USERNAME}
+    rm -r PYC
+    rm -r haiot
+    git clone git://192.168.0.9/PYC.git
+    if [ "$?" == "0" ]; then
+        echo "Downloaded haiot from local repository"
+        export HAIOT_DIR=/home/$USERNAME/PYC
+    else
+        echo "Downloading haiot from github"
+        git clone https://github.com/dan-cristian/haiot.git
+        export HAIOT_DIR=/home/$USERNAME/haiot
+    fi
+    echo "export HAIOT_DIR=$HAIOT_DIR" > /etc/profile.d/haiot.sh
+    echo "export DISPLAY=:0.0" >> /etc/profile.d/haiot.sh
+    echo "export HAIOT_USER=haiot" >> /etc/profile.d/haiot.sh
+    chmod +x /etc/profile.d/haiot.sh
+    cp /etc/profile.d/haiot.sh /etc/profile.d/root.sh
 
-echo "Getting HAIOT application from git"
-cd /home/${USERNAME}
-rm -r PYC
-rm -r haiot
-git clone git://192.168.0.9/PYC.git
-if [ "$?" == "0" ]; then
-    echo "Dowloaded haiot from local repository"
-    export HAIOT_DIR=/home/$USERNAME/PYC
-else
-    echo "Downloading haiot from github"
-    git clone https://github.com/dan-cristian/haiot.git
-    export HAIOT_DIR=/home/$USERNAME/haiot
+    apt-get install mosquitto owfs
+    pip -V
+    if [ "$?" != "0" ]; then
+        echo "Installing python pip"
+        wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py
+        python get-pip.py
+        rm get-pip.py
+    fi
+    virtualenv  --version
+    if [ "$?" != "0" ]; then
+        echo "Installing virtualenv"
+        pip install --no-cache-dir virtualenv
+    fi
+
+    echo "Configuring HAIOT application"
+    cd /home/${USERNAME}/${HAIOT_DIR}
+    chmod +x scripts/*sh*
+    chmod +x *.sh
+    scripts/setup.sh
+    chown -R ${USERNAME}:${USERNAME} .
 fi
-echo "export HAIOT_DIR=$HAIOT_DIR" > /etc/profile.d/haiot.sh
-echo "export DISPLAY=:0.0" >> /etc/profile.d/haiot.sh
-echo "export HAIOT_USER=haiot" >> /etc/profile.d/haiot.sh
-chmod +x /etc/profile.d/haiot.sh
-cp /etc/profile.d/haiot.sh /etc/profile.d/root.sh
 
 
 if [ "$ENABLE_SNAPRAID" == "1" ]; then
@@ -477,28 +499,6 @@ if [ "$ENABLE_MYSQL_SERVER" == "1" ]; then
     /etc/init.d/mysql restart
 fi
 
-if [ "$ENABLE_HAIOT" == "1" ]; then
-    apt-get install mosquitto owfs
-    pip -V
-    if [ "$?" != "0" ]; then
-        echo "Installing python pip"
-        wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py
-        python get-pip.py
-        rm get-pip.py
-    fi
-    virtualenv  --version
-    if [ "$?" != "0" ]; then
-        echo "Installing virtualenv"
-        pip install --no-cache-dir virtualenv
-    fi
-
-    echo "Configuring HAIOT application"
-    cd /home/${USERNAME}/${HAIOT_DIR}
-    chmod +x scripts/*sh*
-    chmod +x *.sh
-    scripts/setup.sh
-    chown -R ${USERNAME}:${USERNAME} .
-fi
 
 
 
@@ -541,4 +541,3 @@ rm /usr/share/doc -r
 rm /usr/share/man -r
 apt-get -y autoremove
 apt-get clean
-
