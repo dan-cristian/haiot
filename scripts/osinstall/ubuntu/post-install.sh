@@ -125,7 +125,7 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
     cd /home/${USERNAME}
     if [ -d PYC ]; then
         echo "PYC exists, remove? y/[n]"
-        read remove
+        read -t 30 remove
         if [ "$remove" == "y" ]; then
             rm -r PYC
         fi
