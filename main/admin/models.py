@@ -17,7 +17,7 @@ from main.admin.model_helper import commit
 class DbBase:
     def __init__(self):
         pass
-
+    # to fix a bug, https://stackoverflow.com/questions/27812250/sqlalchemy-inheritance-not-working
     __table_args__ = {'extend_existing': True}
 
     record_uuid = None
