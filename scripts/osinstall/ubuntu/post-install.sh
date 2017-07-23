@@ -171,7 +171,7 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
     cd ${HAIOT_DIR}
     chmod +x scripts/*sh*
     chmod +x *.sh
-    scripts/setup.sh
+    source scripts/setup.sh
     chown -R ${USERNAME}:${USERNAME} .
 fi
 
