@@ -20,12 +20,13 @@ cd ..
 rm mysql-connector-python-2.1.3.zip
 rm -r mysql-connector-python-2.1.3
 
-#echo Ensure pip latest version
-#pip install --no-cache-dir --upgrade pip
-
-#latest needed for apscheduler
-#pip install --no-cache-dir --upgrade setuptools
-pip install --no-cache-dir setuptools
+#setuptools latest needed for apscheduler
+echo "Updating pip etc."
+if [ ! -f /tmp/updated_pip ]; then
+    pip install --no-cache-dir --upgrade pip
+    pip install --no-cache-dir --upgrade setuptools
+    touch /tmp/updated_pip
+fi
 
 echo Install mandatory requirements
 pip install --no-cache-dir -r requirements.txt
@@ -50,3 +51,5 @@ fi
 # http://kivy.org/docs/installation/installation-linux.html
 #pip install Cython==0.21.2
 #pip install kivy
+
+echo "Setup python done"
