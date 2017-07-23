@@ -49,6 +49,7 @@ if [ ! -f /tmp/updated ]; then
     apt-get -y upgrade
     touch /tmp/updated
 else
+
     echo "Skipping update & upgrade, already done"
 fi
 
