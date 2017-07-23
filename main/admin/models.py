@@ -18,6 +18,8 @@ class DbBase:
     def __init__(self):
         pass
 
+    __table_args__ = {'extend_existing': True}
+
     record_uuid = None
     save_to_history = False  # if true this record will be saved to master node database for reporting
 
