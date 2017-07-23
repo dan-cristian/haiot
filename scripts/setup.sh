@@ -4,8 +4,8 @@
 #chmod +x scripts/stopserver.sh
 source venv/bin/activate
 if [ "$?" != "0" ]; then
-    sudo pip install --upgrade pip
-    sudo pip install --upgrade virtualenv
+    #sudo pip install --upgrade pip
+    #sudo pip install --upgrade virtualenv
     virtualenv venv
     source venv/bin/activate
 fi
