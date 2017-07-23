@@ -10,6 +10,29 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 initialised = False
 
 
+def __utility_update_ex(sensor_name, value):
+    if value is not None:
+        record = models.Utility(sensor_name=sensor_name)
+        current_record = models.Utility.query.filter_by(sensor_name=sensor_name).first()
+        if current_record is not None:
+            record.utility_name = current_record.utility_name
+            if current_record.utility_type == Constant.UTILITY_TYPE_WATER_LEVEL:
+                record.units_total = value / (current_record.ticks_per_unit * 1.0)
+                Log.logger.info("Saving utility water level value={} depth={}".format(value, record.units_total))
+            if current_record.units_total is None:
+                current_record.units_total = 0.0
+            else:
+                # force save
+                if current_record is not None:
+                    current_record.units_total = -1
+
+            Log.logger.info("Saving utility ex record {} name={}".format(current_record, record.utility_name))
+            record.save_changed_fields(current_record=current_record, new_record=record, debug=False,
+                                       notify_transport_enabled=True, save_to_graph=True, save_all_fields=True)
+        else:
+            Log.logger.critical("Utility ex sensor [{}] is not defined in Utility table".format(sensor_name))
+
+
 def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, total_units_b, sampling_period_seconds):
     index = 0
     for delta in [units_delta_a, units_delta_b]:
@@ -73,6 +96,7 @@ def unload():
 def init():
     Log.logger.info('Utility module initialising')
     dispatcher.connect(__utility_update, signal=Constant.SIGNAL_UTILITY, sender=dispatcher.Any)
+    dispatcher.connect(__utility_update_ex, signal=Constant.SIGNAL_UTILITY_EX, sender=dispatcher.Any)
     # thread_pool.add_interval_callable(template_run.thread_run, run_interval_second=60)
     global initialised
     initialised = True

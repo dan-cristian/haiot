@@ -101,7 +101,7 @@
     {"id":9, "name":"beci mare"},
     {"id":10, "name":"scari beci"},
     {"id":11, "name":"etaj hol"},
-    {"id":12, "name":"curte fata"},
+    {"id":12, "name":"curte spate"},
     {"id":13, "name":"living tv"},
     {"id":14, "name":"usa poarta"},
     {"id":15, "name":"usa casa"},
@@ -265,7 +265,8 @@
     {"zone_id":29 , "sensor_address": "AB0000000F60491D", "sensor_name": "water-power beci"},
     {"zone_id":29 , "sensor_address": "F30000000DC60E1D", "sensor_name": "power broken"},
     {"zone_id":49 , "sensor_address": "AC000003BE024F28", "sensor_name": "soba beci"},
-    {"zone_id":29 , "sensor_address": "EF0000000F97CA1D", "sensor_name": "gas-water"}
+    {"zone_id":29 , "sensor_address": "EF0000000F97CA1D", "sensor_name": "gas-water"},
+    {"zone_id":12 , "sensor_address": "2679F0CE0100004E", "sensor_name": "voltage-water"}
   ],
 
   "Utility": [
@@ -276,7 +277,8 @@
     {"utility_name":"water house", "sensor_name":"water-power beci", "sensor_index":1, "ticks_per_unit":1, "unit_name":"l", "utility_type":"water", "unit_cost":2.9388},
     {"utility_name":"power beci", "sensor_name":"water-power beci", "sensor_index":0, "ticks_per_unit":2000, "unit_name":"kWh", "utility_type":"electricity", "unit_cost":0.5259},
     {"utility_name":"gas", "sensor_name":"gas-water", "sensor_index":0, "ticks_per_unit":100, "unit_name":"mc", "utility_type":"gas", "unit_cost":1.5675},
-    {"utility_name":"water main", "sensor_name":"gas-water", "sensor_index":1, "ticks_per_unit":0.1, "unit_name":"l", "utility_type":"water", "unit_cost":2.9388}
+    {"utility_name":"water main", "sensor_name":"gas-water", "sensor_index":1, "ticks_per_unit":0.1, "unit_name":"l", "utility_type":"water", "unit_cost":2.9388},
+    {"utility_name":"dirty water", "sensor_name":"voltage-water", "sensor_index":0, "ticks_per_unit":0.6666, "unit_name":"meter", "utility_type":"water level", "unit_cost":0}
   ],
 
   "ZoneAlarm": [
