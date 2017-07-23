@@ -123,14 +123,27 @@ fi
 if [ "$ENABLE_HAIOT" == "1" ]; then
     echo "Getting HAIOT application from git"
     cd /home/${USERNAME}
-    rm -r PYC
-    rm -r haiot
-    git clone git://192.168.0.9/PYC.git
+    if [ -d PYC ]; then
+        echo "PYC exists, remove? y/[n]"
+        read remove
+        if [ "$remove" == "y" ]; then
+            rm -r PYC
+        fi
+    fi
+
+    if [ -d PYC ]; then
+        cd PYC
+        git pull
+        cd ..
+    else
+        git clone git://192.168.0.9/PYC.git
+    fi
     if [ "$?" == "0" ]; then
         echo "Downloaded haiot from local repository"
         export HAIOT_DIR=/home/$USERNAME/PYC
     else
         echo "Downloading haiot from github"
+        rm -r haiot
         git clone https://github.com/dan-cristian/haiot.git
         export HAIOT_DIR=/home/$USERNAME/haiot
     fi
