@@ -9,7 +9,7 @@ ENABLE_RAMRUN=0
 ENABLE_MEDIA=0
 MUSIC_ROOT=/mnt/data/hdd-wdr-evhk/music
 
-ENABLE_SNAPRAID=1
+ENABLE_SNAPRAID=0
 DATA_DISK1=/mnt/data/hdd-wdg-6297
 DATA_DISK2=/mnt/data/hdd-wdr-evhk
 PARITY_DISK=/mnt/parity/hdd-wdg-2130
@@ -42,8 +42,14 @@ echo "Europe/Bucharest" > /etc/timezone
 dpkg-reconfigure -f noninteractive tzdata
 
 echo "Updating apt-get"
-apt-get -y update
-apt-get -y upgrade
+if [ ! -f /tmp/updated ]; then
+    apt-get -y update
+    apt-get -y upgrade
+    touch /tmp/updated
+else
+    echo "Skipping update & upgrade, already done"
+fi
+
 echo "Installing additional packages"
 apt-get -y install ssh dialog sudo nano wget runit git ssmtp mailutils psmisc smartmontools localepurge  gpm
 if [ "$ENABLE_RAMRUN" == "1" ]; then
@@ -56,14 +62,16 @@ if [ "$ENABLE_OPTIONAL" == "1" ]; then
 	# inotify-tools dosfstools apt-utils
 fi
 
-cat /etc/apt/sources.list | grep "webmin"
-if [ "$?" == "1" ]; then
-    echo "Installing webmin"
-    echo "deb http://download.webmin.com/download/repository sarge contrib" >> /etc/apt/sources.list
-    wget http://www.webmin.com/jcameron-key.asc
-    apt-key add jcameron-key.asc
-    apt-get update
-    apt-get install webmin
+if [ "$ENABLE_WEBMIN" == "1" ]; then
+    cat /etc/apt/sources.list | grep "webmin"
+    if [ "$?" == "1" ]; then
+        echo "Installing webmin"
+        echo "deb http://download.webmin.com/download/repository sarge contrib" >> /etc/apt/sources.list
+        wget http://www.webmin.com/jcameron-key.asc
+        apt-key add jcameron-key.asc
+        apt-get update
+        apt-get install webmin
+    fi
 fi
 
 echo "Creating user $USERNAME with password=$USERPASS"
