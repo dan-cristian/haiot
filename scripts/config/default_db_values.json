@@ -7,7 +7,8 @@
     {"id":5,  "priority":"5", "name":"beaglebone", "machine_type":"beaglebone"},
     {"id":6,  "priority":"6", "name":"pi-power", "machine_type":"raspberry"},
     {"id":7,  "priority":"7", "name":"pi-bell", "machine_type":"raspberry"},
-    {"id":8,  "priority":"3", "name":"pi-face", "machine_type":"raspberry"},
+    {"id":8,  "priority":"3", "name":"pi-sense", "machine_type":"raspberry"},
+    {"id":9,  "priority":"3", "name":"pi-face", "machine_type":"raspberry"},
 
     {"id":10,  "priority":"1", "name":"EN62395", "machine_type":"raspberry"}
   ],
