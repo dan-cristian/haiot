@@ -20,11 +20,12 @@ cd ..
 rm mysql-connector-python-2.1.3.zip
 rm -r mysql-connector-python-2.1.3
 
+#echo Ensure pip latest version
+#pip install --no-cache-dir --upgrade pip
 
-echo Ensure pip latest version
-pip install --no-cache-dir --upgrade pip
 #latest needed for apscheduler
-pip install --no-cache-dir --upgrade setuptools
+#pip install --no-cache-dir --upgrade setuptools
+pip install --no-cache-dir setuptools
 
 echo Install mandatory requirements
 pip install --no-cache-dir -r requirements.txt
