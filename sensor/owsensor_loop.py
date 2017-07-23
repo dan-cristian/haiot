@@ -111,6 +111,8 @@ def save_to_db(dev):
                             units_delta_a=record.delta_counters_a, units_delta_b=record.delta_counters_b,
                             total_units_a=record.counters_a, total_units_b=record.counters_b,
                             sampling_period_seconds=sampling_period_seconds)
+        if record.vad is not None:
+            dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=record.sensor_name, value=record.vad)
     except Exception, ex:
         Log.logger.error('Error saving sensor to DB, err {}'.format(ex), exc_info=True)
         # finally:
