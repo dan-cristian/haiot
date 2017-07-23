@@ -37,19 +37,7 @@ if [ "$res" == "0" ]; then
 	pip install --no-cache-dir -r requirements-rpi.txt
 else
 	pip install --no-cache-dir -r requirements-beaglebone.txt
-	#todo: fix script for windows
-	#pip install --no-cache-dir -r requirements-win.txt
 fi
 
-
-#echo "Installing pigpio python module, assuming is installed in user home folder"
-#cd ../PIGPIO
-#python setup.py install
-#cd ../PYC
-
-#echo "Installing kivy"
-# http://kivy.org/docs/installation/installation-linux.html
-#pip install Cython==0.21.2
-#pip install kivy
-
 echo "Setup python done"
+<<EOF
