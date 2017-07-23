@@ -40,4 +40,3 @@ else
 fi
 
 echo "Setup python done"
-<<EOF
