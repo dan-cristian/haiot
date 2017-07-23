@@ -597,3 +597,5 @@ rm /usr/share/doc -r
 rm /usr/share/man -r
 apt-get -y autoremove
 apt-get clean
+
+echo "Install completed"
