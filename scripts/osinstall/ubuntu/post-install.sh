@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "Run this script with root account"
+
 USERNAME=haiot
 USERPASS=haiot
 ENABLE_WEBMIN=0
@@ -152,8 +154,8 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
         pip install --no-cache-dir virtualenv
     fi
 
-    echo "Configuring HAIOT application"
-    cd /home/${USERNAME}/${HAIOT_DIR}
+    echo "Configuring HAIOT application in dir ${HAIOT_DIR}"
+    cd ${HAIOT_DIR}
     chmod +x scripts/*sh*
     chmod +x *.sh
     scripts/setup.sh
