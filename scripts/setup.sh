@@ -2,10 +2,13 @@
 
 #chmod +x startserver*.sh
 #chmod +x scripts/stopserver.sh
-sudo pip install --upgrade pip
-sudo pip install --upgrade virtualenv
-virtualenv venv
 source venv/bin/activate
+if [ "$?" != "0" ]; then
+    sudo pip install --upgrade pip
+    sudo pip install --upgrade virtualenv
+    virtualenv venv
+    source venv/bin/activate
+fi
 
 echo "Installing mysql connector"
 wget http://dev.mysql.com/get/Downloads/Connector-Python/mysql-connector-python-2.1.3.zip
