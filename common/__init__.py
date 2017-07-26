@@ -22,6 +22,7 @@ class Constant:
     SIGNAL_FILE_WATCH = 'signal-from-file-watch'
     SIGNAL_DB_CHANGE_FOR_RULES = 'signal_db_change_for_rules'
     SIGNAL_UTILITY = 'signal-utility-data'
+    SIGNAL_UTILITY_EX = 'signal-utility-extra-data'
     SIGNAL_PUSH_NOTIFICATION = 'signal-push-notification'
     SIGNAL_CHAT_NOTIFICATION = 'signal-chat-notification'
 
@@ -139,6 +140,13 @@ class Constant:
     GPIO_PIN_DIRECTION_IN = 'in'
     GPIO_PIN_DIRECTION_OUT = 'out'
 
+    UTILITY_TYPE_ELECTRICITY='electricity'
+    #UTILITY_TYPE_ELECTRICITY_MEASURE = 'kWh'
+    UTILITY_TYPE_WATER = 'water'
+    #UTILITY_TYPE_WATER_MEASURE = 'l'
+    UTILITY_TYPE_GAS = 'gas'
+    #UTILITY_TYPE_GAS_MEASURE = 'l'
+    UTILITY_TYPE_WATER_LEVEL = 'water level'
 
 def load_config_json():
     from main.logger_helper import Log
