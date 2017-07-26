@@ -31,7 +31,11 @@ def connect_socket():
     host = get_param(Constant.P_AMP_SERIAL_HOST)
     port = int(get_param(Constant.P_AMP_SERIAL_PORT))
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    Log.logger.info("Connecting socket")
+    s.settimeout(2)
     s.connect((host, port))
+    s.settimeout(None)
+    Log.logger.info("Connected socket")
     return s
 
 
@@ -62,9 +66,11 @@ def _amp_bi_set_yamaha(on, sock):
 
 
 def amp_zone_power(on, zone_index):
+    Log.logger.info("Setting amp power for zone {}".format(zone_index))
     global _AMP_ZONE3_POWER_OFF, _AMP_ZONE3_POWER_ON
     sock = connect_socket()
     msg = "socket cmd ok, "
+    sock.settimeout(5)
     if on:
         if zone_index == 3:
             sock.send(_AMP_ZONE3_POWER_ON)
@@ -121,4 +127,5 @@ def set_amp_power(power_state, relay_name, amp_zone_index):
         if initial_relay_state is not True and power_state is True:
             # delay to wait for amp to fully start
             time.sleep(5)
-        return msg + amp_zone_power(power_state, amp_zone_index)
+        result_amp = amp_zone_power(power_state, amp_zone_index)
+        return msg + result_amp
