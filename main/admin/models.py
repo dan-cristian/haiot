@@ -17,6 +17,8 @@ from main.admin.model_helper import commit
 class DbBase:
     def __init__(self):
         pass
+    # to fix a bug, https://stackoverflow.com/questions/27812250/sqlalchemy-inheritance-not-working
+    __table_args__ = {'extend_existing': True}
 
     record_uuid = None
     save_to_history = False  # if true this record will be saved to master node database for reporting
@@ -142,7 +144,7 @@ class DbBase:
                     new_record.save_to_graph = save_to_graph
             # ensure is set for both new and existing records
             new_record.save_to_history = save_to_graph
-            if current_record:
+            if current_record is not None:
                 # ensure is set for both new and existing records
                 current_record.save_to_history = save_to_graph
                 current_record.last_commit_field_changed_list = []
@@ -151,8 +153,12 @@ class DbBase:
                     column_name = str(column)
                     new_value = getattr(new_record, column_name)
                     old_value = getattr(current_record, column_name)
+                    if debug:
+                        Log.logger.info('DEBUG process Col={} New={} Old={} Saveall={}'.format(
+                            column_name, new_value, old_value, save_all_fields))
                     # todo: comparison not working for float, because str appends .0
-                    if ((not new_value is None) and (str(old_value) != str(new_value))) or save_all_fields:
+                    if ((new_value is not None) and (str(old_value) != str(new_value))) \
+                            or (save_all_fields and (new_value is not None)):
                         if column_name != 'updated_on':
                             try:
                                 obj_type = str(type(self)).split('\'')[1]
@@ -160,14 +166,16 @@ class DbBase:
                                 obj_type = obj_type_words[len(obj_type_words) - 1]
                             except Exception, ex:
                                 obj_type = str(type(self))
-                            if debug:
-                                Log.logger.info(
-                                    '{} {}={} oldvalue={}'.format(obj_type, column_name, new_value, old_value))
                         else:
                             pass
                         if column_name != "id":  # do not change primary key with None
                             setattr(current_record, column_name, new_value)
                             current_record.last_commit_field_changed_list.append(column_name)
+                            if debug:
+                                Log.logger.info('DEBUG change COL={} to VAL={}'.format(column_name, new_value))
+                    else:
+                        if debug:
+                            Log.logger.info('DEBUG not changing current column={}'.format(column_name))
                 if len(current_record.last_commit_field_changed_list) == 0:
                     current_record.notify_transport_enabled = False
                 # fixme: remove hardcoded field name
@@ -181,6 +189,8 @@ class DbBase:
                     new_value = getattr(new_record, column_name)
                     if new_value:
                         new_record.last_commit_field_changed_list.append(column_name)
+                if debug:
+                    Log.logger.info('DEBUG new record={}'.format(new_record))
                 db.session.add(new_record)
             # fixme: remove hardcoded field name
             if hasattr(new_record, 'last_save_to_graph'):
@@ -747,6 +757,7 @@ class PlotlyCache(db.Model, DbEvent, DbBase):
 
 class Utility(db.Model, graphs.BaseGraph, DbEvent, DbBase):
     id = db.Column(db.Integer, primary_key=True)
+    utility_name = db.Column(db.String(50))  # unique name, can be different than sensor name for dual counter
     sensor_name = db.Column(db.String(50), db.ForeignKey('sensor.sensor_name'))
     sensor_index = db.Column(db.Integer)  # 0 for counter_a, 1 for counter_b
     units_total = db.Column(db.Float)  # total number of units measured
@@ -924,6 +935,7 @@ class UtilityHistory(db.Model, DbBase):
     __bind_key__ = 'reporting'
     __tablename__ = 'utility_history'  # convention: append '_history' -> 'History' to source table name
     id = db.Column(db.Integer, primary_key=True)
+    utility_name = db.Column(db.String(50), index=True)
     sensor_name = db.Column(db.String(50), index=True)
     units_total = db.Column(db.Float)  # total number of units measured
     units_delta = db.Column(db.Float)  # total number of units measured since last measurement
