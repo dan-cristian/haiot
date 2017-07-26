@@ -1,44 +1,59 @@
 #!/bin/bash
 
+echo "Run this script with root account"
+
 USERNAME=haiot
 USERPASS=haiot
 ENABLE_WEBMIN=0
 ENABLE_OPTIONAL=0
-ENABLE_HAIOT=0
+ENABLE_HAIOT=1
 ENABLE_RAMRUN=0
-ENABLE_MEDIA=1
+ENABLE_MEDIA=0
 MUSIC_ROOT=/mnt/data/hdd-wdr-evhk/music
-ENABLE_SNAPRAID=1
+
+ENABLE_SNAPRAID=0
 DATA_DISK1=/mnt/data/hdd-wdg-6297
 DATA_DISK2=/mnt/data/hdd-wdr-evhk
 PARITY_DISK=/mnt/parity/hdd-wdg-2130
+
 VIDEOS_ROOT=/mnt/data/hdd-wdr-evhk/videos
 PHOTOS_ROOT=/mnt/data/hdd-wdg-6297/photos
 PRIVATE_ROOT=/mnt/data/hdd-wdg-6297/private
 EBOOKS_ROOT=/mnt/data/hdd-wdg-6297/ebooks
-ENABLE_GIT=1
+
+ENABLE_GIT=0
 GIT_ROOT=/mnt/data/hdd-wdg-6297/git
-ENABLE_CAMERA=1
-ENABLE_CAMERA_SHINOBI=1
+
+ENABLE_CAMERA=0
+ENABLE_CAMERA_SHINOBI=0
 MOTION_ROOT=/mnt/data/hdd-wdr-evhk/motion
 LOG_ROOT=/mnt/data/hdd-wdr-evhk/log
-ENABLE_TORRENT=1
+
+ENABLE_TORRENT=0
 #ENABLE_SAMBA=1
-ENABLE_CLOUD_AMAZON=1
-ENABLE_MYSQL=1
+ENABLE_CLOUD_AMAZON=0
+
+ENABLE_MYSQL_SERVER=0
 MYSQL_DATA_ROOT=/mnt/data/hdd-wdr-evhk/mysql
-ENABLE_DASHBOARD=1
-ENABLE_ALEXA=1
+
+ENABLE_DASHBOARD=0
+ENABLE_ALEXA=0
 
 echo "Setting timezone ..."
 echo "Europe/Bucharest" > /etc/timezone
 dpkg-reconfigure -f noninteractive tzdata
 
-echo "Updating apt-get"
-apt-get -y update
-apt-get -y upgrade
+echo "Updating apt-get and upgrade"
+if [ ! -f /tmp/updated ]; then
+    apt-get -y update
+    apt-get -y upgrade
+    touch /tmp/updated
+else
+    echo "Skipping update & upgrade, already done!"
+fi
+
 echo "Installing additional packages"
-apt-get -y install ssh dialog sudo nano wget runit git ssmtp mailutils psmisc smartmontools localepurge mosquitto gpm
+apt-get -y install ssh dialog sudo nano wget runit git ssmtp mailutils psmisc smartmontools localepurge  gpm
 if [ "$ENABLE_RAMRUN" == "1" ]; then
     # run in ram needs busybox for ramfs copy operations, see "local" script sample
     apt-get -y install busybox
@@ -49,14 +64,16 @@ if [ "$ENABLE_OPTIONAL" == "1" ]; then
 	# inotify-tools dosfstools apt-utils
 fi
 
-cat /etc/apt/sources.list | grep "webmin"
-if [ "$?" == "1" ]; then
-    echo "Installing webmin"
-    echo "deb http://download.webmin.com/download/repository sarge contrib" >> /etc/apt/sources.list
-    wget http://www.webmin.com/jcameron-key.asc
-    apt-key add jcameron-key.asc
-    apt-get update
-    apt-get install webmin
+if [ "$ENABLE_WEBMIN" == "1" ]; then
+    cat /etc/apt/sources.list | grep "webmin"
+    if [ "$?" == "1" ]; then
+        echo "Installing webmin"
+        echo "deb http://download.webmin.com/download/repository sarge contrib" >> /etc/apt/sources.list
+        wget http://www.webmin.com/jcameron-key.asc
+        apt-key add jcameron-key.asc
+        apt-get update
+        apt-get install webmin
+    fi
 fi
 
 echo "Creating user $USERNAME with password=$USERPASS"
@@ -103,25 +120,101 @@ if [ "$ENABLE_GIT" == "1" ]; then
     sv start git-daemon
 fi
 
+if [ "$ENABLE_HAIOT" == "1" ]; then
+    echo "Getting HAIOT application from git"
+    cd /home/${USERNAME}
+    if [ -d PYC ]; then
+        echo "PYC exists, remove? y/[n]"
+        read -t 30 remove
+        if [ "$remove" == "y" ]; then
+            rm -r PYC
+        fi
+    fi
 
-echo "Getting HAIOT application from git"
-cd /home/${USERNAME}
-rm -r PYC
-rm -r haiot
-git clone git://192.168.0.9/PYC.git
-if [ "$?" == "0" ]; then
-    echo "Dowloaded haiot from local repository"
-    export HAIOT_DIR=/home/$USERNAME/PYC
-else
-    echo "Downloading haiot from github"
-    git clone https://github.com/dan-cristian/haiot.git
-    export HAIOT_DIR=/home/$USERNAME/haiot
+    if [ -d PYC ]; then
+        cd PYC
+        git pull
+        cd ..
+    else
+        git clone git://192.168.0.9/PYC.git
+    fi
+    if [ "$?" == "0" ]; then
+        echo "Downloaded haiot from local repository"
+        export HAIOT_DIR=/home/$USERNAME/PYC
+    else
+        echo "Downloading haiot from github"
+        rm -r haiot
+        git clone https://github.com/dan-cristian/haiot.git
+        export HAIOT_DIR=/home/$USERNAME/haiot
+    fi
+    echo "export HAIOT_DIR=$HAIOT_DIR" > /etc/profile.d/haiot.sh
+    echo "export DISPLAY=:0.0" >> /etc/profile.d/haiot.sh
+    echo "export HAIOT_USER=haiot" >> /etc/profile.d/haiot.sh
+    chmod +x /etc/profile.d/haiot.sh
+    cp /etc/profile.d/haiot.sh /etc/profile.d/root.sh
+
+    apt-get install mosquitto owfs
+    pip -V
+    if [ "$?" != "0" ]; then
+        echo "Installing python pip"
+        wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py
+        python get-pip.py
+        rm get-pip.py
+    fi
+    virtualenv  --version
+    if [ "$?" != "0" ]; then
+        echo "Installing virtualenv"
+        pip install --no-cache-dir virtualenv
+    fi
+
+    echo "Configuring HAIOT application in dir ${HAIOT_DIR}"
+    cd ${HAIOT_DIR}
+    chmod +x scripts/*sh*
+    chmod +x *.sh
+
+    source venv/bin/activate
+    if [ "$?" != "0" ]; then
+        #sudo pip install --upgrade pip
+        sudo pip install virtualenv
+        virtualenv venv
+        source venv/bin/activate
+    fi
+
+    echo "Installing mysql connector"
+    wget http://dev.mysql.com/get/Downloads/Connector-Python/mysql-connector-python-2.1.3.zip
+    unzip mysql-connector-python-2.1.3.zip
+    cd mysql-connector-python-2.1.3/
+    python setup.py install
+    echo "Installing done for mysql connector"
+    cd ..
+    rm mysql-connector-python-2.1.3.zip
+    rm -r mysql-connector-python-2.1.3
+
+    #setuptools latest needed for apscheduler
+    echo "Updating pip etc."
+    if [ ! -f /tmp/updated_pip ]; then
+        pip install --no-cache-dir --upgrade pip
+        pip install --no-cache-dir --upgrade setuptools
+        touch /tmp/updated_pip
+    fi
+
+    echo Install mandatory requirements
+    pip install --no-cache-dir -r requirements.txt
+
+    echo Install optional requirements, you can ignore errors
+    res=`cat /etc/os-release | grep raspbian -q ; echo $?`
+    if [ "$res" == "0" ]; then
+        pip install --no-cache-dir -r requirements-rpi.txt
+    else
+        pip install --no-cache-dir -r requirements-beaglebone.txt
+    fi
+
+    echo "Setup python done"
+
+    #source scripts/setup.sh
+
+    chown -R ${USERNAME}:${USERNAME} .
 fi
-echo "export HAIOT_DIR=$HAIOT_DIR" > /etc/profile.d/haiot.sh
-echo "export DISPLAY=:0.0" >> /etc/profile.d/haiot.sh
-echo "export HAIOT_USER=haiot" >> /etc/profile.d/haiot.sh
-chmod +x /etc/profile.d/haiot.sh
-cp /etc/profile.d/haiot.sh /etc/profile.d/root.sh
 
 
 if [ "$ENABLE_SNAPRAID" == "1" ]; then
@@ -334,13 +427,13 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
    # http://gmusicproxy.net/
    apt-get install python-virtualenv virtualenvwrapper
    cd /home/${USERNAME}
-   su ${USERNAME} <<'EOF'
+   su ${USERNAME} #<<'EOF'
+
    mkvirtualenv -p /usr/bin/python2 gmusicproxy
    git clone https://github.com/diraimondo/gmusicproxy.git
    cd gmusicproxy
    pip install -r requirements.txt
    workon gmusicproxy
-EOF
    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/gmusicproxy.service /lib/systemd/system/
    cp $HAIOT_DIR/scripts/config/gmusicproxy.cfg /home/${USERNAME}/.config/
    systemctl enable gmusicproxy
@@ -447,7 +540,7 @@ if [ "$ENABLE_TORRENT" == "1" ]; then
     /etc/init.d/transmission-daemon start
 fi
 
-if [ "$ENABLE_MYSQL" == "1" ]; then
+if [ "$ENABLE_MYSQL_SERVER" == "1" ]; then
     echo 'Installing mysql'
     apt-get install mysql-server
     /etc/init.d/mysql stop
@@ -462,27 +555,6 @@ if [ "$ENABLE_MYSQL" == "1" ]; then
     /etc/init.d/mysql restart
 fi
 
-if [ "$ENABLE_HAIOT" == "1" ]; then
-    pip -V
-    if [ "$?" != "0" ]; then
-        echo "Installing python pip"
-        wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py
-        python get-pip.py
-        rm get-pip.py
-    fi
-    virtualenv  --version
-    if [ "$?" != "0" ]; then
-        echo "Installing virtualenv"
-        pip install --no-cache-dir virtualenv
-    fi
-
-    echo "Configuring HAIOT application"
-    cd /home/${USERNAME}/${HAIOT_DIR}
-    chmod +x scripts/*sh*
-    chmod +x *.sh
-    scripts/setup.sh
-    chown -R ${USERNAME}:${USERNAME} .
-fi
 
 
 
@@ -526,3 +598,4 @@ rm /usr/share/man -r
 apt-get -y autoremove
 apt-get clean
 
+echo "Install completed"
