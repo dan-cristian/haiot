@@ -54,8 +54,10 @@ function record_song(){
 #local song_tmp_path=$1
 local mpc_search=`mpc -p $MPD_PORT search artist "$song_artist" title "$song_title"`
 if [ -z "$mpc_search" ]; then
-	echo2 "Recording channels=$sound_channels format=$sound_format rate=$sound_rate $song_tmp_path, safety max 1200 seconds"
-	arecord -d 1200 -c $sound_channels -f $sound_format -r $sound_rate -t wav -D hw:$RECORD_DEVICE "$song_tmp_path" & >> $LOG 2>&1
+	record_duration=$(($song_duration + 5))
+	record_duration=$(($record_duration<=7200?$record_duration:7200))
+	echo2 "Recording channels=$sound_channels format=$sound_format rate=$sound_rate $song_tmp_path, safe duration=$record_duration sec"
+	arecord -d $record_duration -c $sound_channels -f $sound_format -r $sound_rate -t wav -D hw:$RECORD_DEVICE "$song_tmp_path" & >> $LOG 2>&1
 	rec_song_name="$song_name"
 	rec_song_tmp_path="$song_tmp_path"
 	rec_song_path="$song_path"
