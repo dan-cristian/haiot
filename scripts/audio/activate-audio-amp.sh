@@ -1,7 +1,7 @@
 #!/bin/bash
 
-AMP_URL='http://192.168.0.13:8080/apiv1/db_update/model_name=ZoneCustomRelay&filter_name=relay_pin_name&field_name=relay_is_on'
-AMP_URL_V2='http://192.168.0.13:8080/apiv1/amp_power/state=<power_state>&relay_name=<relay_name>&amp_zone_index=<amp_zone_index>'
+AMP_URL='http://192.168.0.12:8080/apiv1/db_update/model_name=ZoneCustomRelay&filter_name=relay_pin_name&field_name=relay_is_on'
+AMP_URL_V2='http://192.168.0.12:8080/apiv1/amp_power/state=<power_state>&relay_name=<relay_name>&amp_zone_index=<amp_zone_index>'
 LOG=/mnt/log/activate-amp.log
 
 declare -A REMOTE_STATUS
