@@ -161,8 +161,19 @@ function get_song_meta(){
 local mpc_output=`mpc -p $MPD_PORT status`
 readarray -t mpc_array <<<"$mpc_output"
 song_name=${mpc_array[0]}
-song_artist=${song_name% -*}
 song_title=${song_name##*- }
+song_artist=${song_name% -*}
+#fix for (AlbumArtist) issue
+#Estiva, Estiva (AlbumArtist) - Foreverland (Original Mix)
+echo $song_artist | grep -q ' (AlbumArtist)'
+if [ $? -eq 0 ]; then
+	echo2 "Found bad artist title, fixing=[$song_artist]"
+	song_artist=${song_artist%,*}
+	echo2 "Fixed bad artist title, fixed=[$song_artist]"
+	song_name="$song_artist - $song_title"
+	echo2 "Fixed song name=[$song_name]"
+fi
+#end fix
 sanitized_song_name=${song_name////_}
 song_path=$RECORD_PATH/$sanitized_song_name$song_ext
 song_tmp_path=$RECORD_PATH/tmp/$sanitized_song_name$song_tmp_ext

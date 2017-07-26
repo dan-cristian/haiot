@@ -24,5 +24,5 @@ echo [`date +%T.%N`] $1 $2 $3 $4 $5
 
 path=$1
 event=$2
-echo2 "Event: Starting record movie=$1 event=$2 path=["`pwd`"] root=$DIR"
-$DIR/../audio/detect-record-sound.sh start "$event" "$path" & >> $LOG 2>&1
+# echo2 "Event: Starting record movie=$1 event=$2 path=["`pwd`"] root=$DIR"
+# $DIR/../audio/detect-record-sound.sh start "$event" "$path" & >> $LOG 2>&1
