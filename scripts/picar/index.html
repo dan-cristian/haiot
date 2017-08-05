@@ -1,0 +1,164 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>WebIO Picar Project by CodeRewind</title>
+<meta name="viewport" content = "height = device-height, width = 480, initial-scale=1.0, minimum-scale=1.0, user-scalable = no" />
+<script type="text/javascript" src="/jquery.js"></script>
+<script type="text/javascript" src="/webiopi.js"></script>
+<script type="text/javascript">
+	function init() {
+	}
+	function Stop() {
+	webiopi().callMacro("ButtonStop");
+	}
+	function Forward() {
+	webiopi().callMacro("ButtonForward");
+	}
+	function Reverse() {
+	webiopi().callMacro("ButtonReverse");
+	}
+	function TurnLeft() {
+	webiopi().callMacro("ButtonTurnLeft");
+	}
+	function TurnRight() {
+	webiopi().callMacro("ButtonTurnRight");
+	}
+        function StepForward() {
+        webiopi().callMacro("ButtonStepForward");
+        }
+        function StepBack() {
+        webiopi().callMacro("ButtonStepBack");
+        }
+	function FlashAll() {
+	webiopi().callMacro("ButtonFlashAll");
+	}	
+	webiopi().ready(init);
+  </script>
+<style>
+html, body {
+	height:100%;
+	margin:0;
+}
+
+.main {
+	height:100%;
+	width:100%;
+}
+
+.container {
+	display:table;
+	height:100%;
+	margin:0 auto;
+	width: 480px;
+}
+
+.center {
+	display:table-cell;
+	height:480px;
+	width: 480px;
+	vertical-align:middle;
+}
+
+.arrow-top, .arrow-down {
+	clear:both;
+	text-align:center;
+	width:100%;
+}
+
+.middle-row {
+	float: left;
+	margin:20px 0;
+	width:480px;
+}
+
+.arrow-left {
+	float: left;
+	margin-right:20px;
+}
+
+.stop {
+	float: left;
+}
+
+.arrow-right {
+	float: left;
+	margin-left:20px;
+}
+
+a {
+ opacity:0.80;
+}
+
+a:hover {
+ opacity:1;
+}
+
+.credits {
+	margin-top:40px;
+	text-align:center;
+}
+
+.turnDeviceNotification {
+  position:fixed;
+  top: 0;
+  left:0;
+  height:100%;
+  width:100%;
+  display: none;	
+  background-image:url('picar/turn-device.png');
+  background-size:cover;
+}
+</style>
+</head>
+
+<body>
+<div class="turnDeviceNotification"></div>
+<div class="main">
+	<div class="container">
+    	<div class="center">
+            <div class="arrow-top" onmousedown="Forward()"><a href="#"><img src="picar/arrow-top.png" alt="Up"></a></div>
+	            <div class="arrow-top" onmousedown="StepForward()"><a href="#"><img src="picar/arrow-top.png" alt="Up"></a></div>
+            <div class="middle-row">
+                <div class="arrow-left" onmousedown="TurnLeft()"><a href="#"><img src="picar/arrow-left.png" alt="Up"></a></div>
+		<div class="stop" onmousedown="Stop()"><a href="#"><img src="picar/btn-stop.png" alt="Up"></a></div>
+		<div class="arrow-right" onmousedown="TurnRight()"><a href="#"><img src="picar/arrow-right.png" alt="Up"></a></div>
+            </div>
+            <div class="arrow-down" onmousedown="StepBack()"><a href="#"><img src="picar/arrow-down.png" alt="Back"></a></div>
+
+            <div class="arrow-down" onmousedown="Reverse()"><a href="#"><img src="picar/arrow-down.png" alt="Up"></a></div>
+            <div class="credits" onmousedown="FlashAll()"><a href="#"><img src="picar/pricar-project.png" alt="Up"></a></div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+	jQuery(window).bind('orientationchange', function(e) {
+	 switch ( window.orientation ) {
+	  case 0:
+	    $('.turnDeviceNotification').css('display', 'none');
+	    $('.main').css('display', 'block');
+	    // The device is in portrait mode now
+	  break;
+
+	  case 180:
+	    $('.turnDeviceNotification').css('display', 'none');
+	    $('.main').css('display', 'block');
+	    // The device is in portrait mode now
+	  break;
+
+	  case 90:
+	    // The device is in landscape now
+	    $('.turnDeviceNotification').css('display', 'block');
+	    $('.main').css('display', 'none');	    
+	  break;
+
+	  case -90:
+	    // The device is in landscape now
+	    $('.turnDeviceNotification').css('display', 'block');
+	    $('.main').css('display', 'none');	    
+	  break;
+	 }
+	});
+</script>
+</body>
+</html>
