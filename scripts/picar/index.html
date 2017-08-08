@@ -34,6 +34,20 @@
 	webiopi().callMacro("ButtonFlashAll");
 	}	
 	webiopi().ready(init);
+
+// Check if key press is a number
+function validate(e) 
+{ 
+	var charCode = e.which || e.keyCode;
+
+	if (charCode == 38) { StepForward(); }
+	if (charCode == 40) { StepBack(); }
+	if (charCode == 37) { TurnLeft(); }
+	if (charCode == 39) { TurnRight(); }
+	
+	return true;
+}
+
   </script>
 <style>
 html, body {
@@ -112,7 +126,7 @@ a:hover {
 </style>
 </head>
 
-<body>
+<body onkeydown="return validate(event);">
 <div class="turnDeviceNotification"></div>
 <div class="main">
 	<div class="container">
@@ -125,7 +139,6 @@ a:hover {
 		<div class="arrow-right" onmousedown="TurnRight()"><a href="#"><img src="picar/arrow-right.png" alt="Up"></a></div>
             </div>
             <div class="arrow-down" onmousedown="StepBack()"><a href="#"><img src="picar/arrow-down.png" alt="Back"></a></div>
-
             <div class="arrow-down" onmousedown="Reverse()"><a href="#"><img src="picar/arrow-down.png" alt="Up"></a></div>
             <div class="credits" onmousedown="FlashAll()"><a href="#"><img src="picar/pricar-project.png" alt="Up"></a></div>
         </div>
