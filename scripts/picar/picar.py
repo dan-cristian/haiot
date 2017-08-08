@@ -5,6 +5,8 @@
 import webiopi
 from time import sleep
 from time import time
+import os
+
 # Enable debug output
 # webiopi.setDebug()
 GPIO = webiopi.GPIO
@@ -38,6 +40,17 @@ GPIO_TRIGGER = 18
 GPIO_ECHO = 23
 SAFE_DISTANCE = 20 #cm
 
+# IR line sensor
+irLPin = 24
+irCPin = 25
+irRPin = 12
+
+# alarm
+alarmPin = 26
+
+# power pin
+powerPin = 13
+
 
 #setup function is called automatically at WebIoPi startup
 def setup():
@@ -54,8 +67,15 @@ def setup():
 	#set GPIO sound sensor direction (IN / OUT)
 	GPIO.setFunction(GPIO_TRIGGER, GPIO.OUT)
 	GPIO.setFunction(GPIO_ECHO, GPIO.IN)
+	#set ir input
+	GPIO.setFunction(irLPin, GPIO.IN)
+	GPIO.setFunction(irCPin, GPIO.IN)
+	GPIO.setFunction(irRPin, GPIO.IN)
+	
+	GPIO.setFunction(alarmPin, GPIO.IN, GPIO.PUD_UP)
 
-
+	GPIO.setFunction(powerPin, GPIO.IN)
+	
 def initiate():
 	global acceleration
 	global turnacceleration
@@ -75,6 +95,16 @@ def initiate():
 	maxspeed = 100
 	maxsteerspeed = 50
 	minspeed = 0
+	
+	webiopi.utils.thread.runLoop(func=loopThread, async=True)
+
+
+def loopThread():
+	power = GPIO.input(powerPin)
+	alarm = GPIO.input(alarmPin)
+	print 'power=', power, ' alarm=', alarm, ' distance=', distance()
+	sleep(1)
+
 
 def reverse():
     GPIO.digitalWrite(motorDriveForwardPin, GPIO.LOW)
@@ -293,6 +323,8 @@ def ButtonStepForward():
 			forward()
         		sleep(0.2)
         		stopMotor()
+		irL, irC, irR = irstatus()
+		print ("IR=", irL, irC, irR)
 	except Exception, ex:
 		print ("Exception ", ex)
 
@@ -396,5 +428,18 @@ def distance():
     return distance
 
 
+def irstatus():
+	irL = GPIO.input(irLPin)
+	irC = GPIO.input(irCPin)
+	irR = GPIO.input(irRPin)
+	
+	return irL, irC, irR
 
+def shutdown():
+	os.system('sudo halt')	
+
+
+def detectMove():
+	os.system('flite -voice awb -t "I see you"')
+	
 initiate()
