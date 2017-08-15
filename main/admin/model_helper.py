@@ -60,10 +60,12 @@ def get_param(name):
 
 
 def commit():
-    time_start = utils.get_base_location_now_date()
-    query_details = "COMMIT " + str(db.session.identity_map)
     try:
+        time_start = utils.get_base_location_now_date()
+        query_details = "COMMIT " + str(db.session.identity_map)
         db.session.commit()
+        performance.add_query(time_start, query_details=query_details)
+        return True
     except IntegrityError, ex:
         Log.logger.error('Unable to commit DB session={}, ignored, err={}'.format(db.session, ex), exc_info=True)
         db.session.rollback()
@@ -72,7 +74,7 @@ def commit():
     except Exception, ex:
         Log.logger.warning('Exception on commit, session={} err={}'.format(db.session, ex))
         db.session.remove()
-    performance.add_query(time_start, query_details=query_details)
+    return False
 
 
 def get_mod_name(module):
