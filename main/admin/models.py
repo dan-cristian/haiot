@@ -87,13 +87,13 @@ class DbBase:
 
     def add_commit_record_to_db(self):
         db.session.add(self)
-        commit()
+        return commit()
 
     def add_record_to_session(self):
         db.session.add(self)
 
     def commit_record_to_db(self):
-        commit()
+        return commit()
 
     # copies fields from a json object to an existing or new db record
     def save_changed_fields_from_json_object(self, json_object=None, unique_key_name=None,
