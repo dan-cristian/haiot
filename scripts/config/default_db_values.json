@@ -174,13 +174,16 @@
     {"relay_pin_name": "back_valve_relay", "zone_id": "37", "gpio_pin_code": "16", "gpio_host_name": "pi-face","relay_is_on": "0"},
     {"relay_pin_name": "back_lights_relay", "zone_id": "40", "gpio_pin_code": "12", "gpio_host_name": "pi-face","relay_is_on": "0"},
     {"relay_pin_name": "front_main_valve_relay", "zone_id": "36", "gpio_pin_code": "21", "gpio_host_name": "pi-face", "relay_is_on": "0"},
-    {"relay_pin_name": "gate_relay", "zone_id": "14", "gpio_pin_code": "5", "gpio_host_name": "pi-face","relay_is_on": "0"},
     {"relay_pin_name": "dormitor_heat_relay", "zone_id": "4", "gpio_pin_code": "4", "gpio_host_name": "pi-face","relay_is_on": "0"},
     {"relay_pin_name": "living_sub_relay", "zone_id": "2", "gpio_pin_code": "17", "gpio_host_name": "pi-face","relay_is_on": "0"},
     {"relay_pin_name": "test_relay", "zone_id": "1", "gpio_pin_code": "66", "gpio_host_name": "pi-face","relay_is_on": "0"},
+    {"relay_pin_name": "puffer_pump_heat_relay", "zone_id": "14", "gpio_pin_code": "5", "gpio_host_name": "pi-face","relay_is_on": "0"},
+    {"relay_pin_name": "puffer_pump_water_relay", "zone_id": "19", "gpio_pin_code": "22", "gpio_host_name": "pi-face","relay_is_on": "0"},
+    {"relay_pin_name": "main_heat_relay", "zone_id": "19", "gpio_pin_code": "27", "gpio_host_name": "pi-face","relay_is_on": "0"},
+
 
     {"relay_pin_name": "test_relay_netbook", "zone_id": "1", "gpio_pin_code": "1", "gpio_host_name": "netbook","relay_is_on": "0"},
-    {"relay_pin_name": "main_heat_relay", "zone_id": "19", "gpio_pin_code": "24", "gpio_host_name": "pi-power","relay_is_on": "0"},
+    {"relay_pin_name": "unused-formerheat", "zone_id": "19", "gpio_pin_code": "24", "gpio_host_name": "pi-power","relay_is_on": "0"},
     {"relay_pin_name": "pod_music_relay", "zone_id": "1", "gpio_pin_code": "23", "gpio_host_name": "pi-power", "relay_is_on": "0"},
     {"relay_pin_name": "dormitor_music_relay", "zone_id": "4", "gpio_pin_code": "18", "gpio_host_name": "pi-power", "relay_is_on": "0"},
     {"relay_pin_name": "living_music_relay", "zone_id": "2", "gpio_pin_code": "17", "gpio_host_name": "pi-power", "relay_is_on": "0"},
