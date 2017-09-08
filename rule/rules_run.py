@@ -251,5 +251,31 @@ def water_back_main_off():
 def main_heat_on():
     rule_common.update_command_override_relay('main_heat_relay')
 
+
+def front_lights_on():
+    rule_common.update_custom_relay('front_lights_relay', True)
+
+
+# special format needed: alexawemo_<wemo device name, substitute space with _>_<operation: on or off>
+def alexawemo_front_lights_on():
+    rule_common.update_custom_relay('front_lights_relay', True)
+    return True
+
+
+def alexawemo_front_lights_off():
+    rule_common.update_custom_relay('front_lights_relay', False)
+    return True
+
+
+def alexawemo_watering_on():
+    water_all_3_minute()
+    return True
+
+
+def alexawemo_watering_off():
+    water_front_off()
+    water_back_off()
+    return True
+
 # ##### MACROS END ##############
 
