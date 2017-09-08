@@ -5,7 +5,7 @@ from main import app, db
 from main.logger_helper import Log
 from main.admin.model_helper import commit
 from common import Constant, utils
-from cloud import alexa
+import cloud.alexa.mpd_run
 from cloud import lastfm
 from music import mpd, amp
 
@@ -86,7 +86,7 @@ def api():
 
 @app.route('/alexa/mpd', methods=['GET', 'POST'])
 def alexa_mpd():
-    return alexa.mpd(request)
+    return cloud.alexa.mpd_run.mpd(request)
 
 
 @app.route('/test/lastfm/love', methods=['GET', 'POST'])

@@ -115,6 +115,33 @@ def __load_rules_from_db():
         Log.logger.error("Unable to load rules from db, err={}".format(ex1, exc_info=True))
 
 
+def get_alexawemo_rules():
+    ALEXA_RULE_PREFIX = 'alexawemo_'
+    alexa_rules = {}
+    # parse rules to find alexawemo specific ones
+    __func_list = getmembers(rules_run, isfunction)
+    if __func_list:
+        for func in __func_list:
+            if not func[1].func_defaults and not func[1].func_name.startswith('_'):
+                # add this to DB
+                if func[0].startswith(ALEXA_RULE_PREFIX):
+                    name_list = func[0].split('_on')
+                    if len(name_list) == 2:
+                        dev_name = name_list[0].split(ALEXA_RULE_PREFIX)[1]
+                        if dev_name in alexa_rules.keys():
+                            alexa_rules[dev_name][0] = func[1]
+                        else:
+                            alexa_rules[dev_name] = [func[1], 0]
+                    else:
+                        name_list = func[0].split('_off')
+                        if len(name_list) == 2:
+                            dev_name = name_list[0].split(ALEXA_RULE_PREFIX)[1]
+                            if dev_name in alexa_rules.keys():
+                                alexa_rules[dev_name][1] = func[1]
+                            else:
+                                alexa_rules[dev_name] = [0, func[1]]
+    return alexa_rules
+
 # add dynamic rules into db and sceduler to allow execution via web interface or API
 def __add_rules_into_db():
     try:
