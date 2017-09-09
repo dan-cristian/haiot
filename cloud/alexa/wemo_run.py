@@ -38,6 +38,8 @@ import uuid
 from inspect import getmembers, isfunction
 from main.logger_helper import Log
 from main import thread_pool
+from main.admin.model_helper import get_param
+from common import Constant
 import rule
 
 
@@ -143,7 +145,7 @@ class upnp_device(object):
 
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         if self.port == 0:
-            self.port = 50000 + index
+            self.port = (int)(get_param(Constant.P_ALEXA_WEMO_LISTEN_PORT)) + index
             #self.port = self.socket.getsockname()[1]
         self.socket.bind((self.ip_address, self.port))
         self.socket.listen(5)
@@ -395,4 +397,4 @@ def init():
                         action_handler_on=alexa_list[rule_entry][0], action_handler_off=alexa_list[rule_entry][1])
         index += 1
 
-    thread_pool.add_interval_callable(_pooler.poll, run_interval_second=1)
+    thread_pool.add_interval_callable(_pooler.poll, run_interval_second=0.5)
