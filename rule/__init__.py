@@ -124,23 +124,39 @@ def get_alexawemo_rules():
         for func in __func_list:
             if not func[1].func_defaults and not func[1].func_name.startswith('_'):
                 # add this to DB
-                if func[0].startswith(ALEXA_RULE_PREFIX):
-                    name_list = func[0].split('_on')
+                func_name = func[0]
+                if func_name.startswith(ALEXA_RULE_PREFIX):
+                    # cmd = func_name.split(ALEXA_RULE_PREFIX)[1]
+                    name_list = func_name.split('_on')
                     if len(name_list) == 2:
                         dev_name = name_list[0].split(ALEXA_RULE_PREFIX)[1]
                         if dev_name in alexa_rules.keys():
-                            alexa_rules[dev_name][0] = func[1]
+                            # alexa_rules[dev_name][0] = func[1]
+                            alexa_rules[dev_name][0] = func_name
                         else:
-                            alexa_rules[dev_name] = [func[1], 0]
+                            # alexa_rules[dev_name] = [func[1], 0]
+                            alexa_rules[dev_name] = [func_name, None]
                     else:
-                        name_list = func[0].split('_off')
+                        name_list = func_name.split('_off')
                         if len(name_list) == 2:
                             dev_name = name_list[0].split(ALEXA_RULE_PREFIX)[1]
                             if dev_name in alexa_rules.keys():
-                                alexa_rules[dev_name][1] = func[1]
+                                # alexa_rules[dev_name][1] = func[1]
+                                alexa_rules[dev_name][1] = func_name
                             else:
-                                alexa_rules[dev_name] = [0, func[1]]
+                                # alexa_rules[dev_name] = [None, func[1]]
+                                alexa_rules[dev_name] = [None, func_name]
     return alexa_rules
+
+
+def execute_rule(rule_name):
+    rule = models.Rule().query_filter_first(models.Rule.command.in_([rule_name]))
+    if rule is not None:
+        return rules_run.execute_macro(rule, force_exec=True)
+    else:
+        Log.logger.warning("No rule found in db with name {}".format(rule_name))
+        return False
+
 
 # add dynamic rules into db and sceduler to allow execution via web interface or API
 def __add_rules_into_db():

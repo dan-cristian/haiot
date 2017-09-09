@@ -5,6 +5,7 @@ import datetime
 from main.logger_helper import Log
 from main.admin import models
 import rule_common
+from music import mpd
 
 try:
     # sometimes I get "ImportError: cannot import name scheduler" so trying two import methods
@@ -27,17 +28,17 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 # first parameter must have an object type equal to the object for which you get events in case there are DB changes
 # 2nd parameter will contain list of fields changed
 
-def execute_macro(obj=models.Rule(), field_changed_list=None):
-    if obj.execute_now:
+def execute_macro(obj=models.Rule(), field_changed_list=None, force_exec=False):
+    if obj.execute_now or force_exec:
         Log.logger.info('Execute macro {} as execute_now is True'.format(obj.command))
         # obj.execute_now = False
         # obj.commit_record_to_db()
-        function = getattr(sys.modules[__name__], obj.command)
+        func = getattr(sys.modules[__name__], obj.command)
         if obj.is_async:
-            thread.start_new_thread(function, ())
+            thread.start_new_thread(func, ())
             result = "rule started async"
         else:
-            result = function()
+            result = func()
     else:
         Log.logger.info('Ignoring execute macro as execute_now is False')
         result = "Rule not executed as execute_now is False"
@@ -268,14 +269,34 @@ def alexawemo_front_lights_off():
 
 
 def alexawemo_watering_on():
+    """is_async=1"""
     water_all_3_minute()
     return True
 
 
 def alexawemo_watering_off():
+    """is_async=1"""
     water_front_off()
     water_back_off()
     return True
+
+
+def alexawemo_music_living_on():
+    return mpd.play('living')
+
+
+def alexawemo_music_living_off():
+    return mpd.pause('living')
+
+
+def alexawemo_music_bedroom_on():
+    return mpd.play('bedroom')
+
+
+def alexawemo_music_bedroom_off():
+    return mpd.pause('bedroom')
+
+
 
 # ##### MACROS END ##############
 
