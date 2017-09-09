@@ -88,18 +88,21 @@ class poller:
         del (self.targets[fileno])
 
     def poll(self):
-        timeout = 100
-        if self.use_poll:
-            ready = self.poller.poll(timeout)
-        else:
-            ready = []
-            if len(self.targets) > 0:
-                (rlist, wlist, xlist) = select.select(self.targets.keys(), [], [], timeout)
-                ready = [(x, None) for x in rlist]
-        for one_ready in ready:
-            target = self.targets.get(one_ready[0], None)
-            if target:
-                target.do_read(one_ready[0])
+        try:
+            timeout = 100
+            if self.use_poll:
+                ready = self.poller.poll(timeout)
+            else:
+                ready = []
+                if len(self.targets) > 0:
+                    (rlist, wlist, xlist) = select.select(self.targets.keys(), [], [], timeout)
+                    ready = [(x, None) for x in rlist]
+            for one_ready in ready:
+                target = self.targets.get(one_ready[0], None)
+                if target:
+                    target.do_read(one_ready[0])
+        except Exception, ex:
+            Log.logger.error("Error in wemo poll: {}".format(ex))
 
 
 # Base class for a generic UPnP device. This is far from complete
@@ -243,11 +246,13 @@ class fauxmo(upnp_device):
             if data.find('<BinaryState>1</BinaryState>') != -1:
                 # on
                 Log.logger.info("Responding to ON for %s" % self.name)
-                success = self.action_handler_on()
+                success = rule.execute_rule(self.action_handler_on)
+                # success = self.action_handler_on()
             elif data.find('<BinaryState>0</BinaryState>') != -1:
                 # off
                 Log.logger.info("Responding to OFF for %s" % self.name)
-                success = self.action_handler_off()
+                success = rule.execute_rule(self.action_handler_off)
+                # success = self.action_handler_off()
             else:
                 Log.logger.info("Unknown Binary State request:")
                 Log.logger.info(data)
@@ -378,18 +383,6 @@ def init():
     # when a broadcast is received.
     _pooler.add(u)
 
-    #rule.rule_common.update_custom_relay('front_lights_relay', True)
-
-    # Create our FauxMo virtual switch devices
-    #global _FAUXMOS
-    #_FAUXMOS = [
-    #    ['office lights',
-    #     rest_api_handler('http://192.168.5.4/ha-api?cmd=on&a=office', 'http://192.168.5.4/ha-api?cmd=off&a=office')],
-    #    ['kitchen lights',
-    #     rest_api_handler('http://192.168.5.4/ha-api?cmd=on&a=kitchen', 'http://192.168.5.4/ha-api?cmd=off&a=kitchen')]
-    #]
-
-
     # NOTE: As of 2015-08-17, the Echo appears to have a hard-coded limit of
     # 16 switches it can control. Only the first 16 elements of the FAUXMOS
     # list will be used.
@@ -397,14 +390,9 @@ def init():
     index = 0
     for rule_entry in alexa_list.keys():
         # a fixed port wasn't specified, use a dynamic one
-        switch = fauxmo(dev_name=rule_entry, listener=u, pooller=_pooler, ip_address=None, port=0, index = index,
+        dev_name = rule_entry.replace('_', ' ')
+        switch = fauxmo(dev_name=dev_name, listener=u, pooller=_pooler, ip_address=None, port=0, index=index,
                         action_handler_on=alexa_list[rule_entry][0], action_handler_off=alexa_list[rule_entry][1])
         index += 1
-
-    #for one_faux in _FAUXMOS:
-    #    if len(one_faux) == 2:
-    #        # a fixed port wasn't specified, use a dynamic one
-    #        one_faux.append(0)
-    #    switch = fauxmo(one_faux[0], u, _pooler, None, one_faux[2], action_handler=one_faux[1])
 
     thread_pool.add_interval_callable(_pooler.poll, run_interval_second=1)
