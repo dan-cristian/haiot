@@ -12,14 +12,35 @@ def _multify(text):
     return '\n'.join(lines)
 
 
+def _get_port(zone_name):
+    port_config = get_param(Constant.P_MPD_PORT_ZONE).split(',')
+    for pair in port_config:
+        split = pair.split('=')
+        if split[0] == zone_name:
+            return int(split[1])
+    return None
+
+
+def _get_client(port=None):
+    client = MPDClient()
+    client.timeout = 5
+    if port is not None:
+        client.connect(get_param(Constant.P_MPD_SERVER), port)
+    return client
+
+
+def _close_client(client):
+    client.close()
+    client.disconnect()
+
+
 def get_first_active_mpd():
     port_config = get_param(Constant.P_MPD_PORT_ZONE).split(',')
     first_port = None
     alt_port = None
     alt_zone = None
 
-    client = MPDClient()
-    client.timeout = 5
+    client = _get_client()
     # get the zone playing, only if one is active
     port_list_play = []
     for pair in port_config:
@@ -61,3 +82,21 @@ def toggle():
             client.pause(0)
     result = client.status()['state']
     return '{"result": "' + _multify(result) + '"}'
+
+
+def play(zone_name):
+    client = _get_client(_get_port(zone_name))
+    if client is not None:
+        client.play()
+        return client.status()['state'] == 'play'
+    else:
+        return False
+
+
+def pause(zone_name):
+    client = _get_client(port=_get_port(zone_name))
+    if client is not None:
+        client.pause(1)
+        return client.status()['state'] == 'stop'
+    else:
+        return False
