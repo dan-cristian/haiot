@@ -7,6 +7,9 @@ ENABLE_DFROBOT=0
 ENABLE_PIGPIO=0
 ENABLE_WEBMIN=0
 ENABLE_OPTIONAL=0
+ENABLE_BACKUP=1
+ENABLE_HAIOT=1
+ENABLE_RUN_IN_RAM=0
 
 echo "Setting timezone ..."
 echo "Europe/Bucharest" > /etc/timezone
@@ -15,11 +18,19 @@ dpkg-reconfigure -f noninteractive tzdata
 echo "Updating apt-get"
 apt-get -y update
 apt-get -y upgrade
+
 echo "Installing additional packages"
 # 1-wire support needs owfs
 apt-get -y install dialog sudo nano locales python wget owfs git python-rpi.gpio python-dev rpi-update wiringpi ssmtp mailutils mosquitto
-# run in ram needs busybox for ramfs copy operations, see "local" script sample
-apt-get -y install busybox
+
+if [ "$ENABLE_HAIOT" == "1" ]; then
+    apt-get -y install dialog sudo nano locales python wget git python-rpi.gpio python-dev rpi-update ssmtp mailutils
+fi
+
+if [ "$ENABLE_RUN_IN_RAM" == "1" ]; then
+    # run in ram needs busybox for ramfs copy operations, see "local" script sample
+    apt-get -y install busybox
+fi
 
 if [ "$ENABLE_OPTIONAL" == "1" ]; then
 	apt-get -y install htop apt-utils mc inotify-tools dosfstools
@@ -73,25 +84,6 @@ else
     echo "Downloading haiot from github"
     git clone https://github.com/dan-cristian/haiot.git
     HAIOT_DIR=haiot
-fi
-
-if [ "$ENABLE_PIGPIO" == "1" ]; then
-	echo "Downloading pigpio library for gpio access"
-	wget abyz.co.uk/rpi/pigpio/pigpio.zip
-	unzip pigpio.zip
-	apt-get -y install build-essential
-	echo "Compiling pigpio"
-	cd PIGPIO
-	make
-	echo "Installing pigpio"
-	make install
-	cp /home/${USERNAME}/${HAIOT_DIR}/scripts/pigpio_daemon /etc/init.d
-	chmod +x /etc/init.d/pigpio_daemon
-	update-rc.d pigpio_daemon defaults
-	rm -r /home/${USERNAME}/PIGPIO
-	rm /home/${USERNAME}/pigpio.zip
-	#python setup.py install
-	#todo install pigpiod init script
 fi
 
 if [ "$ENABLE_DFROBOT" == "1" ]; then
