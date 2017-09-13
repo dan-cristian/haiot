@@ -6,7 +6,7 @@ USERNAME=haiot
 USERPASS=haiot
 ENABLE_WEBMIN=0
 ENABLE_OPTIONAL=0
-ENABLE_HAIOT=1
+ENABLE_HAIOT=0
 ENABLE_RAMRUN=0
 ENABLE_MEDIA=0
 MUSIC_ROOT=/mnt/data/hdd-wdr-evhk/music
@@ -39,6 +39,9 @@ MYSQL_DATA_ROOT=/mnt/data/hdd-wdr-evhk/mysql
 ENABLE_DASHBOARD=0
 ENABLE_ALEXA=0
 
+ENABLE_BACKUP=0
+ENABLE_VPN_SERVER=0
+
 echo "Setting timezone ..."
 echo "Europe/Bucharest" > /etc/timezone
 dpkg-reconfigure -f noninteractive tzdata
@@ -52,8 +55,20 @@ else
     echo "Skipping update & upgrade, already done!"
 fi
 
-echo "Installing additional packages"
-apt-get -y install ssh dialog sudo nano wget runit git ssmtp mailutils psmisc smartmontools localepurge  gpm
+echo "Installing additional generic packages"
+apt-get -y install ssh dialog sudo nano wget runit git ssmtp mailutils psmisc smartmontools localepurge gpm davfs2
+
+
+echo "Creating user $USERNAME with password=$USERPASS"
+useradd ${USERNAME} -m
+echo "$USERNAME:$USERPASS" | chpasswd
+adduser ${USERNAME} sudo
+adduser ${USERNAME} audio
+adduser ${USERNAME} video
+adduser ${USERNAME} tty
+chsh -s /bin/bash ${USERNAME}
+
+
 if [ "$ENABLE_RAMRUN" == "1" ]; then
     # run in ram needs busybox for ramfs copy operations, see "local" script sample
     apt-get -y install busybox
@@ -76,32 +91,28 @@ if [ "$ENABLE_WEBMIN" == "1" ]; then
     fi
 fi
 
-echo "Creating user $USERNAME with password=$USERPASS"
-useradd ${USERNAME} -m
-echo "$USERNAME:$USERPASS" | chpasswd
-adduser ${USERNAME} sudo
-adduser ${USERNAME} audio
-adduser ${USERNAME} video
-adduser ${USERNAME} tty
-chsh -s /bin/bash ${USERNAME}
 
+if [ "$ENABLE_SNAPRAID" == "1" ]; then
+    echo "Installing backup clients"
+    apt install -y openvpn
 
-cat /etc/fstab | grep "/mnt/data"
-if [ "$?" == "1" ]; then
-    echo "Setting up hard drives in fstab. This is custom setup for each install."
-    mkdir -p $DATA_DISK1
-    mkdir -p $DATA_DISK2
-    mkdir -p $PARITY_DISK
-    echo "# Added by postinstall script" >> /etc/fstab
-    echo "UUID=f6283955-9310-4ff2-8525-a48dbcdf61e3       $DATA_DISK1          ext4    nofail,noatime,journal_async_commit,data=writeback,barrier=0,errors=remount-ro    1       1" >> /etc/fstab
-    echo "UUID=1bc8e1b1-da57-4e66-9b4a-4b35fa555f15       $PARITY_DISK        ext4    nofail,noatime,journal_async_commit,data=writeback,barrier=0,errors=remount-ro    1       1" >> /etc/fstab
-    echo "UUID=615e4b68-905a-43e0-81f2-5c0a66d632ba       $DATA_DISK2          ext4    nofail,noatime,journal_async_commit,data=writeback,barrier=0,errors=remount-ro    1       1" >> /etc/fstab
-    echo "#/mnt/data/*                                     /mnt/media      fuse.mergerfs   defaults,allow_other,big_writes,direct_io,fsname=mergerfs,minfreespace=50G         0       0" >> /etc/fstab
-    mount -a
-    ln -s $VIDEOS_ROOT /mnt/videos
-    ln -s $PHOTOS_ROOT /mnt/photos
-    ln -s $PRIVATE_ROOT /mnt/private
-    ln -s $EBOOKS_ROOT /mnt/ebooks
+    cat /etc/fstab | grep "/mnt/data"
+    if [ "$?" == "1" ]; then
+        echo "Setting up hard drives in fstab. This is custom setup for each install."
+        mkdir -p $DATA_DISK1
+        mkdir -p $DATA_DISK2
+        mkdir -p $PARITY_DISK
+        echo "# Added by postinstall script" >> /etc/fstab
+        echo "UUID=f6283955-9310-4ff2-8525-a48dbcdf61e3       $DATA_DISK1          ext4    nofail,noatime,journal_async_commit,data=writeback,barrier=0,errors=remount-ro    1       1" >> /etc/fstab
+        echo "UUID=1bc8e1b1-da57-4e66-9b4a-4b35fa555f15       $PARITY_DISK        ext4    nofail,noatime,journal_async_commit,data=writeback,barrier=0,errors=remount-ro    1       1" >> /etc/fstab
+        echo "UUID=615e4b68-905a-43e0-81f2-5c0a66d632ba       $DATA_DISK2          ext4    nofail,noatime,journal_async_commit,data=writeback,barrier=0,errors=remount-ro    1       1" >> /etc/fstab
+        echo "#/mnt/data/*                                     /mnt/media      fuse.mergerfs   defaults,allow_other,big_writes,direct_io,fsname=mergerfs,minfreespace=50G         0       0" >> /etc/fstab
+        mount -a
+        ln -s $VIDEOS_ROOT /mnt/videos
+        ln -s $PHOTOS_ROOT /mnt/photos
+        ln -s $PRIVATE_ROOT /mnt/private
+        ln -s $EBOOKS_ROOT /mnt/ebooks
+    fi
 fi
 
 if [ "$ENABLE_GIT" == "1" ]; then
@@ -469,7 +480,6 @@ fi
 if [ "$ENABLE_ALEXA" == "1" ]; then
     echo "Installing alexa control"
     apt-get install npm
-
 fi
 
 if [ "$ENABLE_CAMERA" == "1" ]; then
@@ -555,8 +565,122 @@ if [ "$ENABLE_MYSQL_SERVER" == "1" ]; then
     /etc/init.d/mysql restart
 fi
 
+if [ "$ENABLE_BACKUP" == "1" ]; then
+    echo "Installing cloud backup tools"
+    apt-get install -y fuse ntfs-3g
+
+    # not working
+    #https://www.howtoforge.com/tutorial/owncloud-install-debian-8-jessie/
+    #echo 'deb http://download.opensuse.org/repositories/isv:/ownCloud:/community/Debian_8.0/ /' >> /etc/apt/sources.list.d/owncloud.list
+    #https://tecadmin.net/install-owncloud-on-ubuntu/#
+    #http://manjaro.site/install-owncloud-10-debian-8-jessie/
+
+    #apt-get install -y apache2 mysql-server php5-common libapache2-mod-php5 php5-cli php5-mysql php5-curl
+    #owncloud
+    #cd /tmp
+    #wget https://download.owncloud.org/community/owncloud-10.0.2.tar.bz2
+    #cd /var/www/html
+    #tar xjf /tmp/owncloud-10.0.2.tar.bz2
+    #chown -R www-data:www-data owncloud
+    #chmod -R 755 owncloud
+    #rm -f /tmp/owncloud-10.0.2.tar.bz2
+
+    #mysql -u root -p
+    #mysql> CREATE DATABASE owncloud;
+    #mysql> GRANT ALL ON owncloud.* to 'owncloud'@'localhost' IDENTIFIED BY '_password_';
+    #mysql> FLUSH PRIVILEGES;
+    #mysql> quit
+    #https://doc.owncloud.org/server/8.2/user_manual/files/access_webdav.html
 
 
+    #enable high power consumption
+    #https://www.reddit.com/r/raspberry_pi/comments/2x4bo4/external_hard_drive_for_rasppi_2/
+
+    cd /tmp
+    wget https://download.nextcloud.com/server/releases/nextcloud-12.0.2.tar.bz2
+    apt install apache2 mariadb-server libapache2-mod-php5 php5-cli php5-mysql php5-curl php5-mysql php5-gd php5-json php5-intl php5-mcrypt php5-imagick
+    cd /var/www/
+    tar -xjf /tmp/nextcloud-12.0.2.tar.bz2
+    #https://docs.nextcloud.com/server/12/admin_manual/installation/source_installation.html#prerequisites-for-manual-installation
+    nano /etc/apache2/sites-available/nextcloud.conf
+    ln -s /etc/apache2/sites-available/nextcloud.conf /etc/apache2/sites-enabled/nextcloud.conf
+    a2enmod rewrite
+    a2enmod headers
+    a2enmod env
+    a2enmod dir
+    a2enmod mime
+    a2enmod ssl
+    a2ensite default-ssl
+    chown www-data:www-data -R nextcloud
+
+    mysql -u root -p
+    #CREATE DATABASE nextcloud;
+    #GRANT ALL ON nextcloud.* to 'nextcloud'@'localhost' IDENTIFIED BY 'cba';
+    #FLUSH PRIVILEGES;
+
+    service apache2 restart
+fi
+
+if [ "$ENABLE_VPN_SERVER" == "1" ]; then
+    #https://www.digitalocean.com/community/tutorials/how-to-set-up-an-openvpn-server-on-debian-8
+    apt install -y openvpn easy-rsa ufw
+    gunzip -c /usr/share/doc/openvpn/examples/sample-config-files/server.conf.gz > /etc/openvpn/server.conf
+    nano /etc/openvpn/server.conf
+    #dh2048.pem
+    #push "redirect-gateway def1 bypass-dhcp"
+    #open dns
+    #user nobody
+    #group nogroup
+    echo 1 > /proc/sys/net/ipv4/ip_forward
+    nano /etc/sysctl.conf
+    #net.ipv4.ip_forward=1
+    ufw allow ssh
+    ufw allow 1194/udp
+    nano /etc/default/ufw
+    #DEFAULT_FORWARD_POLICY="ACCEPT"
+    nano /etc/ufw/before.rules
+    #
+    cp -r /usr/share/easy-rsa/ /etc/openvpn
+    mkdir /etc/openvpn/easy-rsa/keys
+    nano /etc/openvpn/easy-rsa/vars
+    #
+    echo "This will take a lot of time"
+    openssl dhparam -out /etc/openvpn/dh2048.pem 2048
+    cd /etc/openvpn/easy-rsa
+    . ./vars
+    ./clean-all
+    ./build-ca
+    ./build-key-server server
+    cp /etc/openvpn/easy-rsa/keys/{server.crt,server.key,ca.crt} /etc/openvpn
+    ls /etc/openvpn
+    service openvpn start
+    service openvpn status
+    echo "Build client keys"
+    ./build-key client1
+    cp /usr/share/doc/openvpn/examples/sample-config-files/client.conf /etc/openvpn/easy-rsa/keys/client.ovpn
+    nano /etc/openvpn/easy-rsa/keys/client.ovpn
+    #remote your_server_ip 1194
+    #user nobody
+    #group nogroup
+
+    nano /etc/openvpn/easy-rsa/keys/client.ovpn
+    #;ca ca.crt
+    #;cert client.crt
+    #;key client.key
+    echo '<ca>' >> /etc/openvpn/easy-rsa/keys/client.ovpn
+    cat /etc/openvpn/ca.crt >> /etc/openvpn/easy-rsa/keys/client.ovpn
+    echo '</ca>' >> /etc/openvpn/easy-rsa/keys/client.ovpn
+
+    echo '<cert>' >> /etc/openvpn/easy-rsa/keys/client.ovpn
+    cat /etc/openvpn/easy-rsa/keys/client1.crt >> /etc/openvpn/easy-rsa/keys/client.ovpn
+    echo '</cert>' >> /etc/openvpn/easy-rsa/keys/client.ovpn
+
+    echo '<key>' >> /etc/openvpn/easy-rsa/keys/client.ovpn
+    cat /etc/openvpn/easy-rsa/keys/client1.key >> /etc/openvpn/easy-rsa/keys/client.ovpn
+    echo '</key>' >> /etc/openvpn/easy-rsa/keys/client.ovpn
+fi
+
+echo "Optimise for flash and ssd usage"
 
 echo "Create tmpfs"
 # http://www.zdnet.com/article/raspberry-pi-extending-the-life-of-the-sd-card/
@@ -588,7 +712,7 @@ if [ "$?" == "1" ]; then
     sleep 3
     nano /etc/ssmtp/ssmtp.conf
     echo "Sending test email"
-    echo "This is a test" | mail -s "Test" dan.cristian@gmail.com
+    dmesg | mail -s "Test" dan.cristian@gmail.com
 fi
 
 echo "Removing not needed files and cleaning apt files"
