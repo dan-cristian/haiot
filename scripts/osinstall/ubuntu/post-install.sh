@@ -41,6 +41,9 @@ ENABLE_ALEXA=0
 
 ENABLE_BACKUP=0
 ENABLE_VPN_SERVER=0
+ENABLE_SECURE_SSH=0
+
+ENABLE_ROUTER=0
 
 echo "Setting timezone ..."
 echo "Europe/Bucharest" > /etc/timezone
@@ -350,6 +353,8 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     systemctl start upmpdcli@beci
     systemctl enable upmpdcli@dormitor
     systemctl start upmpdcli@dormitor
+    systemctl enable upmpdcli@headset
+    systemctl start upmpdcli@headset
 
     # https://trac.ffmpeg.org/wiki/Capture/ALSA#Recordaudiofromanapplicationwhilealsoroutingtheaudiotoanoutputdevice
     echo "snd_aloop" >> /etc/modules
@@ -619,6 +624,29 @@ if [ "$ENABLE_BACKUP" == "1" ]; then
     #FLUSH PRIVILEGES;
 
     service apache2 restart
+
+    #https://www.htpcguides.com/spin-down-and-manage-hard-drive-power-on-raspberry-pi/
+    apt install -y build-essential fakeroot debhelper
+    cd ~
+    wget http://sourceforge.net/projects/hd-idle/files/hd-idle-1.05.tgz
+    tar -xvf hd-idle-1.05.tgz && cd hd-idle
+    dpkg-buildpackage -rfakeroot
+    dpkg -i ../hd-idle_*.deb
+
+    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/hd-idle.service /etc/systemd/system/
+    systemctl enable hd-idle
+    systemctl start hd-idle
+fi
+
+if [ "$ENABLE_ROUTER" == "1" ]; then
+   #https://www.ostechnix.com/sslh-share-port-https-ssh/
+   apt install -y nginx sslh
+
+fi
+
+if [ "$ENABLE_SECURE_SSH" == "1" ]; then
+    apt install -y fail2ban
+
 fi
 
 if [ "$ENABLE_VPN_SERVER" == "1" ]; then
