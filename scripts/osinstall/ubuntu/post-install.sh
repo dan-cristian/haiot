@@ -636,6 +636,8 @@ if [ "$ENABLE_BACKUP" == "1" ]; then
     cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/hd-idle.service /etc/systemd/system/
     systemctl enable hd-idle
     systemctl start hd-idle
+
+
 fi
 
 if [ "$ENABLE_ROUTER" == "1" ]; then
@@ -646,6 +648,21 @@ fi
 
 if [ "$ENABLE_SECURE_SSH" == "1" ]; then
     apt install -y fail2ban
+
+    #Beaglebone black optimisation
+    #https://datko.net/2013/10/03/howto_crypto_beaglebone_black/
+    #https://superuser.com/questions/881404/beaglebone-black-openssl-crypto-acceleration
+    cd ~
+    apt install -y linux-headers-4.4.54-ti-r93
+    wget http://nwl.cc/pub/cryptodev-linux/cryptodev-linux-1.9.tar.gz
+    tar zxf cryptodev-linux-1.7.tar.gz
+    cd cryptodev-linux-1.9
+    make
+    make install
+    depmod -a
+    modprobe cryptodev
+    echo cryptodev >> /etc/modules
+
 
 fi
 
