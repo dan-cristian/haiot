@@ -122,14 +122,18 @@ def loop_zones():
                     if __update_zone_heat(zone, heat_schedule, sensor):
                         heat_is_on = True
         # turn on/off the main heating system based on zone heat needs
-        heatrelay_main_source = models.ZoneHeatRelay.query.filter_by(is_main_heat_source=True).first()
+        # check first to find alternate valid heat sources
+        heatrelay_main_source = models.ZoneHeatRelay.query.filter_by(is_alternate_heat_source=True).first()
+        if heatrelay_main_source is None:
+            heatrelay_main_source = models.ZoneHeatRelay.query.filter_by(is_main_heat_source=True).first()
         if heatrelay_main_source:
             main_source_zone = models.Zone.query.filter_by(id=heatrelay_main_source.zone_id).first()
             if main_source_zone:
                 global __last_main_heat_update
                 update_age_mins = (utils.get_base_location_now_date() - __last_main_heat_update).total_seconds() / 60
                 # # avoid setting relay state too often but do periodic refreshes every x minutes
-                if main_source_zone.heat_is_on != heat_is_on or update_age_mins >= 10:
+                if main_source_zone.heat_is_on != heat_is_on or update_age_mins >= int(get_param(
+                        Constant.P_HEAT_STATE_REFRESH_PERIOD)):
                     __save_heat_state_db(zone=main_source_zone, heat_is_on=heat_is_on)
                     __last_main_heat_update = utils.get_base_location_now_date()
             else:
@@ -175,6 +179,21 @@ def loop_heat_relay():
             Log.logger.exception('Error processing heat relay=[{}] pin=[{}] err={}'.format(heat_relay, gpio_pin, ex))
 
 
+''' set which is the main heat source relay that must be set on '''
+def set_main_heat_source():
+    heat_source_relay_list = models.ZoneHeatRelay.query.filter(models.ZoneHeatRelay.temp_sensor_name is not None).all()
+    temp_limit = float(get_param(Constant.P_HEAT_SOURCE_MIN_TEMP))
+    for heat_source_relay in heat_source_relay_list:
+        temperature = models.Sensor().query_filter_first(
+            models.Sensor.sensor_name.in_([heat_source_relay.temp_sensor_name]))
+        if temperature >= temp_limit:
+            heat_source_relay.is_alternate_heat_source = True
+            commit()
+        else:
+            heat_source_relay.is_alternate_heat_source = False
+            commit()
+
+
 progress_status = None
 
 
@@ -187,6 +206,7 @@ def thread_run():
     global progress_status
     Log.logger.debug('Processing heat')
     progress_status = 'Looping zones'
+    set_main_heat_source()
     loop_zones()
     # loop_heat_relay()
     return 'Heat ok'
