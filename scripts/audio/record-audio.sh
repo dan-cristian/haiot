@@ -125,31 +125,34 @@ function set_loopback_mpd_port(){
 local i
 for i in ${!CARD_OUT[*]}; do
 	#cat /proc/asound/${CARD_OUT[$i]}/${DEV_OUT[$i]}/sub0/hw_params
+	#echo2 "Checking "/proc/asound/${CARD_OUT[$i]}/${DEV_OUT[$i]}/sub0/hw_params
 	cat /proc/asound/${CARD_OUT[$i]}/${DEV_OUT[$i]}/sub0/hw_params | grep -q closed
 	local loop_in_is_closed=$?
 	if [ "$loop_in_is_closed" == "1" ]; then
 		#device is open
 		local mpd_port=${MPD_PORT_LIST[$i]}
-		#echo "Found sound on card ${NAME[$i]} port=$mpd_port"
+		#echo2 "Found sound on card ${NAME[$i]} port=$mpd_port"
 		mpc_output=`mpc -p $mpd_port status`
 		readarray -t mpc_array <<<"$mpc_output"
 		local status_line=${mpc_array[1]}
 		local status=${status_line%]*}  # retain the part before the]
 		status=${status##*[}  # retain the part after the last[
-		#echo "Status=[$status]"
+		#echo2 "Status=[$status]"
 		if [ "$status" == "playing" ]; then
 			is_output_enabled $mpd_port
 			if [ $? -eq 1 ]; then
-				# echo "MPD port with loopback enabled is $mpd_port"
+				echo2 "MPD port with loopback enabled is $mpd_port"
 				MPD_PORT=$mpd_port
 				ZONE_NAME=${CARD_NAME[$i]}
-        CARD_INDEX=$i
+        			CARD_INDEX=$i
 				return 0
 			fi
 		fi
+		#echo2 "Loop is not playing"
 	fi
+	#echo2 "Loop is closed"
 done
-# echo2 "Could not find running MPD instance with loopback enabled"
+#echo2 "Could not find running MPD instance with loopback enabled"
 export MPD_PORT=""
 return 1
 }
