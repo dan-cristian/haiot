@@ -8,7 +8,7 @@ declare -a RELAY_NAME=("living_music_relay" "living_sub_relay" "living_music_rel
 declare -a RELAY_AMP_ZONE=("0" "0" "1" "0" "0" "3" "2" "0")
 declare -a CARD_OUT=("PCH" "PCH" "Loopback" "PCH" "DGX" "Device" "DGX" "DAC")
 	# 1 is usualy digital, 0 is analog
-declare -a DEV_OUT=("pcm8p" "pcm8p" "pcm1p" "pcm0p" "pcm1p" "pcm0p" "pcm0p" "pcm0p")
+declare -a DEV_OUT=("pcm8p" "pcm8p" "pcm1p" "pcm1p" "pcm1p" "pcm0p" "pcm0p" "pcm0p")
 
 #sound capture
 declare -a RECORD_SOURCE_LIST=("hol" "cast")
