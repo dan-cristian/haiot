@@ -39,7 +39,8 @@ MYSQL_DATA_ROOT=/mnt/data/hdd-wdr-evhk/mysql
 ENABLE_DASHBOARD=0
 ENABLE_ALEXA=0
 
-ENABLE_BACKUP=0
+ENABLE_BACKUP_SERVER=0
+ENABLE_BACKUP_CLIENT=0
 ENABLE_VPN_SERVER=0
 ENABLE_SECURE_SSH=0
 
@@ -59,7 +60,7 @@ else
 fi
 
 echo "Installing additional generic packages"
-apt-get -y install ssh dialog sudo nano wget runit git ssmtp mailutils psmisc smartmontools localepurge gpm davfs2
+apt-get -y install ssh dialog sudo nano wget runit git ssmtp mailutils psmisc smartmontools localepurge gpm davfs2 sshpass
 
 
 echo "Creating user $USERNAME with password=$USERPASS"
@@ -570,7 +571,7 @@ if [ "$ENABLE_MYSQL_SERVER" == "1" ]; then
     /etc/init.d/mysql restart
 fi
 
-if [ "$ENABLE_BACKUP" == "1" ]; then
+if [ "$ENABLE_BACKUP_SERVER" == "1" ]; then
     echo "Installing cloud backup tools"
     apt-get install -y fuse ntfs-3g
 
@@ -637,6 +638,12 @@ if [ "$ENABLE_BACKUP" == "1" ]; then
     systemctl enable hd-idle
     systemctl start hd-idle
 
+
+fi
+
+if [ "$ENABLE_BACKUP_CLIENT" == "1" ]; then
+    echo "Installing backup client tools"
+    # https://www.digitalocean.com/community/tutorials/how-to-configure-ssh-key-based-authentication-on-a-linux-server
 
 fi
 
