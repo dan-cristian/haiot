@@ -28,9 +28,9 @@ fi
 path=$1
 event=$2
 echo2 "Event: Ending record movie=$1 event=$2 path="`pwd`
-$DIR/../audio/detect-record-sound.sh end "$event" "$path" >> $LOG 2>&1
+#$DIR/../audio/detect-record-sound.sh end "$event" "$path" >> $LOG 2>&1
 # http://stackoverflow.com/questions/11779490/how-to-add-a-new-audio-not-mixing-into-a-video-using-ffmpeg
-echo2 Mixing sound with video
+#echo2 Mixing sound with video
 #todo
 $DIR/upload-amazondrive.sh $1 $2 >> $LOG 2>&1
-
+$DIR/upload-private-cloud.sh $1 $2 >> $LOG 2>&1
