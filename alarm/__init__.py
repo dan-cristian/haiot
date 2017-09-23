@@ -50,6 +50,7 @@ def init():
     port_list = []
     local_alarms = models.ZoneAlarm().query_filter_all(models.ZoneAlarm.gpio_host_name.in_([Constant.HOST_NAME]))
     for alarm in local_alarms:
+        Log.logger.info("Processing zone alarm {}".format(alarm))
         gpio_pin = models.GpioPin().query_filter_first(models.GpioPin.pin_code.in_([alarm.gpio_pin_code]),
                                                        models.GpioPin.host_name.in_([Constant.HOST_NAME]))
         if gpio_pin is not None:
