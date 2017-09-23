@@ -115,13 +115,13 @@ def favicon():
 @app.before_request
 def log_before_request():
     # if app.config.get('LOG_REQUESTS'):
-    Log.logger.info('HTTP Request START: {}'.format(request))
+    Log.logger.debug('HTTP Request START: {}'.format(request))
 
 
 @app.after_request
 def log_after_request(response):
     # if app.config.get('LOG_REQUESTS'):
-    Log.logger.info('HTTP Request END: {} ARG={}'.format(request, response))
+    Log.logger.debug('HTTP Request END: {} ARG={}'.format(request, response))
     return response
 
 
