@@ -27,7 +27,7 @@ def handle_event_alarm(gpio_pin_code='', direction='', pin_value='', pin_connect
             zone.name, zonealarm.zone_id, pin_connected, pin_value))
         zonealarm.alarm_pin_triggered = pin_value
         zonealarm.updated_on = utils.get_base_location_now_date()
-        zonealarm.notify_transport_enabled = False
+        zonealarm.notify_transport_enabled = True
         commit()
     else:
         Log.logger.warning('Unexpected mising zone alarm for gpio code {}'.format(gpio_pin_code))
