@@ -26,7 +26,7 @@ def __utility_update_ex(sensor_name, value):
                 if current_record is not None:
                     current_record.units_total = -1
 
-            Log.logger.info("Saving utility ex record {} name={}".format(current_record, record.utility_name))
+            Log.logger.debug("Saving utility ex record {} name={}".format(current_record, record.utility_name))
             record.save_changed_fields(current_record=current_record, new_record=record, debug=False,
                                        notify_transport_enabled=True, save_to_graph=True, save_all_fields=True)
         else:
@@ -51,13 +51,14 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
                 elif current_record.utility_type == Constant.UTILITY_TYPE_WATER:
                         record.unit_name = current_record.unit_name  # Constant.UTILITY_TYPE_WATER_MEASURE
                         record.units_delta = delta / (current_record.ticks_per_unit * 1.0)
-                        Log.logger.info("Saving utility water delta={}".format(record.units_delta))
+                        Log.logger.debug("Saving utility water delta={}".format(record.units_delta))
                 elif current_record.utility_type == Constant.UTILITY_TYPE_GAS:
                     record.unit_name = current_record.unit_name  # Constant.UTILITY_TYPE_GAS_MEASURE
                     record.units_delta = delta / (current_record.ticks_per_unit * 1.0)
-                    Log.logger.info("Saving utility gas delta={}".format(record.units_delta))
+                    Log.logger.debug("Saving utility gas delta={}".format(record.units_delta))
                 else:
-                    Log.logger.info("Saving unknown utility type={}".format(current_record.utility_type))
+                    Log.logger.info("Saving unknown utility type={} sensor={}".format(
+                        current_record.utility_type, sensor_name))
                     if current_record.ticks_per_unit is not None:
                         record.units_delta = delta / (current_record.ticks_per_unit * 1.0)  # force float operation
                     else:
@@ -76,7 +77,7 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
                     #current_record.utility_name = ""
                     current_record.sensor_index = -1
                 record.units_total = 0.0 + current_record.units_total + record.units_delta
-                Log.logger.info("Saving utility record {} name={}".format(current_record, record.utility_name))
+                Log.logger.debug("Saving utility record {} name={}".format(current_record, record.utility_name))
                 record.save_changed_fields(current_record=current_record, new_record=record, debug=False,
                                            notify_transport_enabled=True, save_to_graph=True, save_all_fields=True)
             else:
