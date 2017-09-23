@@ -186,6 +186,7 @@ def populate_tables(model_auto_update=False):
         node_obj.add_record_to_session()
     # let this commented for test purposes (make netbook Windows look like PI)
     if Constant.HOST_NAME != 'netbook':
+        Log.logger.info("Setting current machine type to {}".format(Constant.HOST_MACHINE_TYPE))
         node_obj.machine_type = Constant.HOST_MACHINE_TYPE
     Constant.HOST_PRIORITY = node_obj.priority
     commit()
@@ -220,7 +221,6 @@ def populate_tables(model_auto_update=False):
                             gpio.pin_index_bcm = ''
                         db.session.add(gpio)
                 commit()
-
         # fixme: check for other PI revisions
         elif node.machine_type == Constant.MACHINE_TYPE_RASPBERRY:
             if len(models.GpioPin.query.filter_by(
