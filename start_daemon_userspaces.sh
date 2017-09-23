@@ -26,7 +26,7 @@ if [ $exit_code == 128 ]; then
     fi
 
 while $must_run; do
-    run_app db_mem model_auto_update sysloglocal $1 $2 $3 $4 $5
+    run_app db_mem model_auto_update sysloglocal $1 $2 $3 $4 $5 $6
     if [ $exit_code == 131 ]; then
         echo "Restarting app"
     fi
