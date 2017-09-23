@@ -53,7 +53,7 @@ def handle_event_presence_io(gpio_pin_code='', direction='', pin_value='', pin_c
 
 
 def handle_event_presence_cam(zone_name, cam_name, has_move):
-    Log.logger.info("Got cam event zone {} cam {} move={}".format(zone_name, cam_name, has_move))
+    Log.logger.debug("Got cam event zone {} cam {} move={}".format(zone_name, cam_name, has_move))
     zone = models.Zone().query_filter_first(models.Zone.name == zone_name)
     if zone is not None:
         current_record = models.Presence().query_filter_first(models.Presence.zone_id == zone.id)
