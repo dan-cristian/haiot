@@ -13,6 +13,7 @@ import heat
 import gpio
 import rule
 import presence
+import alarm
 import main.persistence
 
 
@@ -133,6 +134,9 @@ def mqtt_thread_run():
                         presence.record_update(obj)
                     elif table == utils.get_table_name(models.PlotlyCache):
                         graph_plotly.record_update(obj)
+                    elif table == utils.get_table_name(models.ZoneAlarm):
+                        # no processing (no local save)
+                        pass
                     elif table == utils.get_table_name(models.Utility):
                         # no additional processing
                         pass
