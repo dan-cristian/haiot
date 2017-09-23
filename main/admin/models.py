@@ -271,9 +271,8 @@ class Module(db.Model, DbBase):
 class Zone(db.Model, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
-
     active_heat_schedule_pattern_id = db.Column(db.Integer)
-    heat_is_on = db.Column(db.Boolean)
+    heat_is_on = db.Column(db.Boolean, default=False)
     last_heat_status_update = db.Column(db.DateTime(), default=None)
     heat_target_temperature = db.Column(db.Integer)
 
@@ -290,7 +289,7 @@ class Zone(db.Model, DbBase):
 class Area(db.Model, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
-    is_armed = db.Column(db.Boolean)
+    is_armed = db.Column(db.Boolean, default=False)
 
     def __init__(self, id='', name=''):
         super(Area, self).__init__()
@@ -342,7 +341,7 @@ class Presence(db.Model, DbBase, DbEvent):
     event_io_date = db.Column(db.DateTime(), default=None)
     event_wifi_date = db.Column(db.DateTime(), default=None)
     event_bt_date = db.Column(db.DateTime(), default=None)
-    is_connected = db.Column(db.Boolean)  # pin connected? true on unarmed sensors, false on alarm/move
+    is_connected = db.Column(db.Boolean, default=False)  # pin connected? true on unarmed sensors, false on alarm/move
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
 
     def __init__(self, zone_id=None):
@@ -609,7 +608,7 @@ class GpioPin(db.Model, DbEvent, DbBase):
     pin_direction = db.Column(db.String(4))  # in, out, None
     board_index = db.Column(db.Integer)  # 0 to n (max 3 for piface)
     description = db.Column(db.String(50))
-    is_active = db.Column(db.Boolean)  # if pin was setup(exported) through this app. will be unexported when app exit
+    is_active = db.Column(db.Boolean, default=False)  # if pin was setup(exported) through this app. will be unexported when app exit
 
     def __init__(self):
         super(GpioPin, self).__init__()
@@ -632,9 +631,9 @@ class ZoneAlarm(db.Model, DbEvent, DbBase):
     gpio_host_name = db.Column(db.String(50))
     sensor_type = db.Column(db.String(25))
     # gpio_pin = db.relationship('GpioPin', backref=db.backref('ZoneAlarm(gpiopincode)', lazy='dynamic'))
-    alarm_pin_triggered = db.Column(db.Boolean)  # True if alarm sensor is connected (move detected)
-    is_false_alarm_prone = db.Column(db.Boolean)  # True if sensor can easily trigger false alarms (gate move by wind)
-    start_alarm = db.Column(db.Boolean)  # True if alarm must start (because area/zone is armed)
+    alarm_pin_triggered = db.Column(db.Boolean, default=False)  # True if alarm sensor is connected (move detected)
+    is_false_alarm_prone = db.Column(db.Boolean, default=False)  # True if sensor can easily trigger false alarms (gate move by wind)
+    start_alarm = db.Column(db.Boolean, default=False)  # True if alarm must start (because area/zone is armed)
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
 
     def __init__(self, zone_id='', gpio_pin_code='', host_name=''):
@@ -926,12 +925,13 @@ class PresenceHistory(db.Model, DbBase):
     event_io_date = db.Column(db.DateTime(), default=None)
     # event_wifi_date = db.Column(db.DateTime(), default=None)
     # event_bt_date = db.Column(db.DateTime(), default=None)
-    is_connected = db.Column(db.Boolean)  # pin connected? true on unarmed sensors, false on alarm/move
+    is_connected = db.Column(db.Boolean, default=False)  # pin connected? true on unarmed sensors, false on alarm/move
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
     source_host_ = db.Column(db.String(50))
 
     def __repr__(self):
-        return 'PresenceHistory zone {} sensor {} connected {} type {}'.format(self.zone_name, self.sensor_name, self.is_connected, self.event_type)
+        return 'PresenceHistory zone {} sensor {} connected {} type {}'.format(
+            self.zone_name, self.sensor_name, self.is_connected, self.event_type)
 
 
 class UtilityHistory(db.Model, DbBase):
@@ -955,5 +955,5 @@ class ZoneHeatRelayHistory(db.Model, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     heat_pin_name = db.Column(db.String(50))
     gpio_host_name = db.Column(db.String(50))
-    heat_is_on = db.Column(db.Boolean)
+    heat_is_on = db.Column(db.Boolean, default=False)
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
