@@ -299,7 +299,7 @@
   ],
 
   "ZoneAlarm": [
-    {"zone_id":47 , "gpio_pin_code":"P8_11", "gpio_host_name": "beaglebone", "alarm_pin_name": "birou"},
+    {"zone_id":47 , "gpio_pin_code":"0:in:0", "gpio_host_name": "netbook", "alarm_pin_name": "birou test"},
     {"zone_id":1 , "gpio_pin_code":"P8_08", "gpio_host_name": "beaglebone", "alarm_pin_name": "bucatarie"},
     {"zone_id":2 , "gpio_pin_code":"P8_16", "gpio_host_name": "beaglebone", "alarm_pin_name": "living"},
     {"zone_id":3 , "gpio_pin_code":"P8_12", "gpio_host_name": "beaglebone", "alarm_pin_name": "beci mic"},
