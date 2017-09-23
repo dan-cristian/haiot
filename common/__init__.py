@@ -39,10 +39,11 @@ class Constant:
     MACHINE_TYPE_OPENWRT = 'openwrt'
     MACHINE_TYPE_INTEL_LINUX = 'intel-linux'
 
-    HOST_NAME = 'not initialised'
-    HOST_MAIN_IP = 'not initialised'
-    HOST_MAC = 'not initialised'
-    HOST_MACHINE_TYPE = 'not initialised'
+    NOT_INIT = 'not initialised'
+    HOST_NAME = NOT_INIT
+    HOST_MAIN_IP = NOT_INIT
+    HOST_MAC = NOT_INIT
+    HOST_MACHINE_TYPE = NOT_INIT
     HOST_PRIORITY = -1
 
     IS_MACHINE_BEAGLEBONE = False
