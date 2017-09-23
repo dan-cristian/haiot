@@ -9,7 +9,6 @@
     {"id":7,  "priority":"7", "name":"pi-bell", "machine_type":"raspberry"},
     {"id":8,  "priority":"4", "name":"pi-sense", "machine_type":"raspberry"},
     {"id":9,  "priority":"3", "name":"pi-face", "machine_type":"raspberry"},
-
     {"id":10,  "priority":"1", "name":"EN62395", "machine_type":"raspberry"}
   ],
 
