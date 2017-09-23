@@ -55,10 +55,7 @@ def init():
             if description_hardware and 'AM33XX' in description_hardware:
                 Constant.HOST_MACHINE_TYPE = Constant.MACHINE_TYPE_BEAGLEBONE
                 Constant.IS_MACHINE_BEAGLEBONE = True
-            if description_hardware and 'BCM2708' in description_hardware:
-                Constant.HOST_MACHINE_TYPE = Constant.MACHINE_TYPE_RASPBERRY
-                Constant.IS_MACHINE_RASPBERRYPI = True
-            if description_hardware and 'BCM2709' in description_hardware:
+            elif description_hardware and 'BCM2' in description_hardware:
                 Constant.HOST_MACHINE_TYPE = Constant.MACHINE_TYPE_RASPBERRY
                 Constant.IS_MACHINE_RASPBERRYPI = True
             if description_system_type and 'Atheros' in description_system_type:
@@ -67,6 +64,11 @@ def init():
             if description_model_name and 'Intel' in description_model_name:
                 Constant.HOST_MACHINE_TYPE = Constant.MACHINE_TYPE_INTEL_LINUX
                 Constant.IS_MACHINE_INTEL = True
+        if Constant.HOST_MACHINE_TYPE == Constant.NOT_INIT:
+            Log.logger.error("Unknown machine type")
     elif Constant.IS_OS_WINDOWS():
         import platform
         Constant.HOST_MACHINE_TYPE = platform.machine()
+    else:
+        Log.logger.warning("Unknown OS on system init")
+
