@@ -123,9 +123,9 @@ def loop_zones():
                         heat_is_on = True
         # turn on/off the main heating system based on zone heat needs
         # check first to find alternate valid heat sources
-        heatrelay_main_source = models.ZoneHeatRelay.query.filter_by(is_alternate_heat_source=True).first()
+        heatrelay_main_source = models.ZoneHeatRelay.query.filter_by(is_alternate_heat_source=1).first()
         if heatrelay_main_source is None:
-            heatrelay_main_source = models.ZoneHeatRelay.query.filter_by(is_main_heat_source=True).first()
+            heatrelay_main_source = models.ZoneHeatRelay.query.filter_by(is_main_heat_source=1).first()
         if heatrelay_main_source is not None:
             Log.logger.info("Main heat relay={}".format(heatrelay_main_source))
             main_source_zone = models.Zone.query.filter_by(id=heatrelay_main_source.zone_id).first()
