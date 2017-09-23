@@ -270,7 +270,7 @@ def run(arg_list):
             print 'Enabled remote debugging, waiting 5 seconds for client to attach'
             ptvsd.wait_for_attach(timeout=5)
         except Exception, ex:
-            Log.logger.warning("Error in remote debug: {}".format(ex))
+            print "Error in remote debug: {}".format(ex)
     import logging
     from main import logger_helper
     if 'debug' in arg_list:
