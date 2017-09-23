@@ -267,8 +267,8 @@ def run(arg_list):
         try:
             import ptvsd
             ptvsd.enable_attach(secret='secret', address=('0.0.0.0', 5678))
-            print 'Enabled remote debugging, waiting 5 seconds for client to attach'
-            ptvsd.wait_for_attach(timeout=5)
+            print 'Enabled remote debugging, waiting 15 seconds for client to attach'
+            ptvsd.wait_for_attach(timeout=15)
         except Exception, ex:
             print "Error in remote debug: {}".format(ex)
     import logging
