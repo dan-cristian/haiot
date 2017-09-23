@@ -222,7 +222,7 @@ def populate_tables(model_auto_update=False):
                 commit()
 
         # fixme: check for other PI revisions
-        if node.machine_type == Constant.MACHINE_TYPE_RASPBERRY:
+        elif node.machine_type == Constant.MACHINE_TYPE_RASPBERRY:
             if len(models.GpioPin.query.filter_by(
                     pin_type=Constant.GPIO_PIN_TYPE_PI_STDGPIO, host_name=node.name).all()) != 40:
                 models.GpioPin.query.filter_by(pin_type=Constant.GPIO_PIN_TYPE_PI_STDGPIO, host_name=node.name).delete()
@@ -253,3 +253,5 @@ def populate_tables(model_auto_update=False):
                         gpio.board_index = board
                         db.session.add(gpio)
             commit()
+        else:
+            Log.logger.warning("Unknown machine type {} for node {}".format(node.machine_type, node))
