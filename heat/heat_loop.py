@@ -126,7 +126,7 @@ def loop_zones():
         heatrelay_main_source = models.ZoneHeatRelay.query.filter_by(is_alternate_heat_source=True).first()
         if heatrelay_main_source is None:
             heatrelay_main_source = models.ZoneHeatRelay.query.filter_by(is_main_heat_source=True).first()
-        if heatrelay_main_source:
+        if heatrelay_main_source is not None:
             main_source_zone = models.Zone.query.filter_by(id=heatrelay_main_source.zone_id).first()
             if main_source_zone:
                 global __last_main_heat_update
@@ -134,6 +134,7 @@ def loop_zones():
                 # # avoid setting relay state too often but do periodic refreshes every x minutes
                 if main_source_zone.heat_is_on != heat_is_on or update_age_mins >= int(get_param(
                         Constant.P_HEAT_STATE_REFRESH_PERIOD)):
+                    Log.logger.info("Setting main heat on={}, zone={}".format(heat_is_on, main_source_zone))
                     __save_heat_state_db(zone=main_source_zone, heat_is_on=heat_is_on)
                     __last_main_heat_update = utils.get_base_location_now_date()
             else:
