@@ -138,7 +138,8 @@
     {"id":46, "name":"ups main"},
     {"id":47, "name":"birou"},
     {"id":48, "name":"solar jos"},
-    {"id":49, "name":"soba beci"}
+    {"id":49, "name":"soba beci"},
+    {"id":50, "name":"puffer heater"}
   ],
 
   "Area": [
@@ -241,7 +242,7 @@
     {"zone_id":47,"heat_pin_name":"birou","gpio_pin_code": "24","gpio_host_name":"pi-face", "is_main_heat_source":"0"},
     {"zone_id":4,"heat_pin_name":"dormitor","gpio_pin_code":"4","gpio_host_name":"pi-face","is_main_heat_source":"0"},
     {"zone_id":19,"heat_pin_name":"gas heat","gpio_pin_code":"27","gpio_host_name":"pi-face","is_main_heat_source":"1"},
-    {"zone_id":19,"heat_pin_name":"puffer heat","gpio_pin_code":"22","gpio_host_name":"pi-face","is_main_heat_source":"0","temp_sensor_name":"puffer sus"}
+    {"zone_id":50,"heat_pin_name":"puffer heat","gpio_pin_code":"22","gpio_host_name":"pi-face","is_main_heat_source":"0","temp_sensor_name":"puffer sus"}
   ],
 
   "ZoneSensor": [
