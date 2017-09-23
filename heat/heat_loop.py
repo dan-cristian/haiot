@@ -210,15 +210,19 @@ def set_main_heat_source():
                 # if alternate source is no longer valid
                 if heat_source_relay.is_alternate_source_switch:
                     # stop alternate heat source
-                    heatrelay_alt_source = models.ZoneHeatRelay.query.filter_by(is_alternate_heat_source=1).first()
-                    if heatrelay_alt_source is not None:
-                        alt_source_zone = models.Zone.query.filter_by(id=heatrelay_alt_source.zone_id).first()
-                        __save_heat_state_db(zone=alt_source_zone, heat_is_on=False)
+                    #heatrelay_alt_source = models.ZoneHeatRelay.query.filter_by(is_alternate_heat_source=1).first()
+                    #if heatrelay_alt_source is not None:
+                    #    alt_source_zone = models.Zone.query.filter_by(id=heatrelay_alt_source.zone_id).first()
+                    #    __save_heat_state_db(zone=alt_source_zone, heat_is_on=False)
                     # turn valve back to main position
                     switch_source_zone = models.Zone.query.filter_by(id=heat_source_relay.zone_id).first()
                     __save_heat_state_db(zone=switch_source_zone, heat_is_on=False)
                 else:
                     # mark this source as inactive, let main source to start
+                    if heat_source_relay.is_alternate_heat_source:
+                        # force alt source shutdown if was on
+                        alt_source_zone = models.Zone.query.filter_by(id=heat_source_relay.zone_id).first()
+                        __save_heat_state_db(zone=alt_source_zone, heat_is_on=False)
                     heat_source_relay.is_alternate_heat_source = False
                 commit()
 
