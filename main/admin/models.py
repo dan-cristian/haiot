@@ -657,7 +657,8 @@ class ZoneHeatRelay(db.Model, DbEvent, DbBase, graphs.BaseGraph):
     gpio_host_name = db.Column(db.String(50))
     heat_is_on = db.Column(db.Boolean, default=False)
     is_main_heat_source = db.Column(db.Boolean, default=False)
-    is_alternate_heat_source = db.Column(db.Boolean, default=False)  # used for low cost/eco heat sources
+    is_alternate_source_switch = db.Column(db.Boolean, default=False)  # switch to alternate source
+    is_alternate_heat_source = db.Column(db.Boolean, default=False)  # used for low cost/eco main heat sources
     temp_sensor_name = db.Column(db.String(50))  # temperature sensor name for heat sources to check for heat limit
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
 
