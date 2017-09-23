@@ -160,9 +160,9 @@
             "request": "attach",
             "localRoot": "${workspaceRoot}",
             "remoteRoot": "${workspaceRoot}",
-            "port": 3000,
-            "secret": "my_secret",
-            "host": "localhost"
+            "port": 5678,
+            "secret": "secret",
+            "host": "192.168.0.12"
         }
     ]
 }
