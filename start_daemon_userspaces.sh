@@ -3,9 +3,9 @@
 function run_app {
     $DIR/scripts/stopserver.sh
     sleep 2
-    echo Starting app with parameter $1 $2 $3 $4 $5 $6 $7 $8 $9 $10
+    echo Starting app with parameter $1 $2 $3 $4 $5 $6 $7 $8 $9
     source $DIR/venv/bin/activate
-    python $DIR/haiot.py $1 $2 $3 $4 $5 $6 $7 $8 $9 $10 2>&1
+    python $DIR/haiot.py $1 $2 $3 $4 $5 $6 $7 $8 $9 2>&1
     exit_code=$?
     echo "Program exit with code $exit_code"
     echo "---------------------------------"
@@ -62,12 +62,12 @@ stop() {
 }
 
 START_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-echo "Current dir on start is $START_DIR, script start parameters are: " $1 $2 $3 $4 $5
+echo "Current dir on start is $START_DIR, script start parameters are: " $1 $2 $3 $4 $5 $6 $7 $8 $9
 DIR=~/PYC
 echo "Base dir is $DIR"
 
 if [ "$1" = "stop" ]; then
         stop
 else
-        start
+        start $1 $2 $3 $4 $5 $6 $7 $8 $9
 fi
