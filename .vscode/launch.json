@@ -159,7 +159,7 @@
             "type": "python",
             "request": "attach",
             "localRoot": "${workspaceRoot}",
-            "remoteRoot": "${workspaceRoot}",
+            "remoteRoot": "/home/haiot/PYC",
             "port": 5678,
             "secret": "secret",
             "host": "192.168.0.12"
