@@ -58,7 +58,7 @@ def _do_event(channel, state):
         global import_module_exist
         if import_module_exist:
             state = GPIO.input(channel)
-            Log.logger.info('Event rpi.gpio input detected channel={} state={}'.format(channel, state))
+            Log.logger.debug('Event rpi.gpio input detected channel={} state={}'.format(channel, state))
             dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=channel, direction='in',
                             pin_value=state, pin_connected=(state == 0))
     except Exception, ex:
