@@ -184,14 +184,16 @@ def set_main_heat_source():
     heat_source_relay_list = models.ZoneHeatRelay.query.filter(models.ZoneHeatRelay.temp_sensor_name is not None).all()
     temp_limit = float(get_param(Constant.P_HEAT_SOURCE_MIN_TEMP))
     for heat_source_relay in heat_source_relay_list:
-        temperature = models.Sensor().query_filter_first(
-            models.Sensor.sensor_name.in_([heat_source_relay.temp_sensor_name]))
-        if temperature >= temp_limit:
-            heat_source_relay.is_alternate_heat_source = True
-            commit()
-        else:
-            heat_source_relay.is_alternate_heat_source = False
-            commit()
+        # is there is a temp sensor defined, consider this source as possible alternate source
+        if heat_source_relay.temp_sensor_name is not None:
+            temp_rec = models.Sensor().query_filter_first(
+                models.Sensor.sensor_name.in_([heat_source_relay.temp_sensor_name]))
+            if temp_rec is not None and temp_rec.temperature >= temp_limit:
+                heat_source_relay.is_alternate_heat_source = True
+                commit()
+            else:
+                heat_source_relay.is_alternate_heat_source = False
+                commit()
 
 
 progress_status = None
