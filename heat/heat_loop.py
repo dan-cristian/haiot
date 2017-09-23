@@ -9,14 +9,16 @@ import gpio
 
 __last_main_heat_update = datetime.datetime.min
 
-# save heat status and announce to all nodes
+
+# save heat status and announce to all nodes.
 def __save_heat_state_db(zone='', heat_is_on=''):
     assert isinstance(zone, models.Zone)
     zone_heat_relay = models.ZoneHeatRelay.query.filter_by(zone_id=zone.id).first()
     if zone_heat_relay is not None:
         zone_heat_relay.heat_is_on = heat_is_on
         zone_heat_relay.updated_on = utils.get_base_location_now_date()
-        Log.logger.info('Heat state changed to is-on={} in zone {}'.format(heat_is_on, zone.name))
+        Log.logger.info('Heat state changed to is-on={} via pin={} in zone={}'.format(
+            heat_is_on, zone_heat_relay.heat_pin_name, zone.name))
         zone_heat_relay.notify_transport_enabled = True
         zone_heat_relay.save_to_graph = True
         zone_heat_relay.save_to_history = True
@@ -181,7 +183,7 @@ def loop_heat_relay():
             Log.logger.exception('Error processing heat relay=[{}] pin=[{}] err={}'.format(heat_relay, gpio_pin, ex))
 
 
-''' set which is the main heat source relay that must be set on '''
+# set which is the main heat source relay that must be set on
 def set_main_heat_source():
     heat_source_relay_list = models.ZoneHeatRelay.query.filter(models.ZoneHeatRelay.temp_sensor_name is not None).all()
     temp_limit = float(get_param(Constant.P_HEAT_SOURCE_MIN_TEMP))
@@ -190,11 +192,34 @@ def set_main_heat_source():
         if heat_source_relay.temp_sensor_name is not None:
             temp_rec = models.Sensor().query_filter_first(
                 models.Sensor.sensor_name.in_([heat_source_relay.temp_sensor_name]))
+            # if alternate source is valid
             if temp_rec is not None and temp_rec.temperature >= temp_limit:
-                heat_source_relay.is_alternate_heat_source = True
+                if heat_source_relay.is_alternate_source_switch:
+                    # stop main heat source
+                    heatrelay_main_source = models.ZoneHeatRelay.query.filter_by(is_main_heat_source=1).first()
+                    main_source_zone = models.Zone.query.filter_by(id=heatrelay_main_source.zone_id).first()
+                    __save_heat_state_db(zone=main_source_zone, heat_is_on=False)
+                    # turn switch valve on to alternate position
+                    switch_source_zone = models.Zone.query.filter_by(id=heat_source_relay.zone_id).first()
+                    __save_heat_state_db(zone=switch_source_zone, heat_is_on=True)
+                else:
+                    # mark this source as active, to be started when there is heat need
+                    heat_source_relay.is_alternate_heat_source = True
                 commit()
             else:
-                heat_source_relay.is_alternate_heat_source = False
+                # if alternate source is no longer valid
+                if heat_source_relay.is_alternate_source_switch:
+                    # stop alternate heat source
+                    heatrelay_alt_source = models.ZoneHeatRelay.query.filter_by(is_alternate_heat_source=1).first()
+                    if heatrelay_alt_source is not None:
+                        alt_source_zone = models.Zone.query.filter_by(id=heatrelay_alt_source.zone_id).first()
+                        __save_heat_state_db(zone=alt_source_zone, heat_is_on=False)
+                    # turn valve back to main position
+                    switch_source_zone = models.Zone.query.filter_by(id=heat_source_relay.zone_id).first()
+                    __save_heat_state_db(zone=switch_source_zone, heat_is_on=False)
+                else:
+                    # mark this source as inactive, let main source to start
+                    heat_source_relay.is_alternate_heat_source = False
                 commit()
 
 
