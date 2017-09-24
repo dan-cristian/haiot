@@ -223,6 +223,7 @@ def set_main_heat_source():
                         # force alt source shutdown if was on
                         alt_source_zone = models.Zone.query.filter_by(id=heat_source_relay.zone_id).first()
                         __save_heat_state_db(zone=alt_source_zone, heat_is_on=False)
+                        #todo: sleep needed to allow for valve return
                     heat_source_relay.is_alternate_heat_source = False
                 commit()
 
