@@ -54,6 +54,7 @@ class Constant:
     HAS_LOCAL_DB_REPORTING_CAPABILITY = False
 
     MAX_REPORT_LINES = 1000
+    URL_OPEN_TIMEOUT = 10
 
     @staticmethod
     def IS_OS_WINDOWS():
