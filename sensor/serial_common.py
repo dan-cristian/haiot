@@ -34,6 +34,7 @@ def get_standard_serial_device_list():
     for port_no in range(0, 5):
         ser.port = port_no
         try:
+            Log.logger.info('Trying to open serial port {}'.format(port_no))
             ser.open()
             ser.close()
             Log.logger.info('Found and opened serial port {}'.format(port_no))
