@@ -79,6 +79,6 @@ def get_standard_serial_device_list():
             s.close()
             Log.logger.info('Found and opened serial port {}'.format(port))
             result.append(port)
-        except (OSError, serial.SerialException):
+        except Exception, ex:
             Log.logger.info('Cannot open serial port {}, ex='.format(port, ex))
     return result
