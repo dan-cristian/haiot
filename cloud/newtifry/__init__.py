@@ -79,7 +79,7 @@ def _send_queue():
                 params['image'] = item.image_url
         # Prepare our request
         try:
-            response = urllib2.urlopen(BACKEND, urllib.urlencode(params))
+            response = urllib2.urlopen(BACKEND, urllib.urlencode(params), timeout=Constant.URL_OPEN_TIMEOUT)
             # Read the body
             body = response.read()
             # It's JSON - parse it
