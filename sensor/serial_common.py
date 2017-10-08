@@ -61,10 +61,11 @@ def get_standard_serial_device_list():
         # this excludes your current terminal "/dev/tty"
         ports = glob.glob('/dev/tty[A-Za-z]*')
     elif sys.platform.startswith('darwin'):
-        ports = glob.glob('/dev/tty.*')
+        ports = glob.glob('/dev/tty*')
     else:
         raise EnvironmentError('Unsupported platform {}'.format(sys.platform))
 
+    Log.logger.info("Found {} serial ports".format(len(ports)))
     result = []
     for port in ports:
         try:
