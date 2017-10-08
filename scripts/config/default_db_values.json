@@ -220,7 +220,7 @@
     {"id":7, "name":"week-living-summer",        "pattern":".... ..22 .... .... 2222 2222"},
     {"id":8, "name":"weekend-living-summer",     "pattern":".... .... 2222 2222 2222 2222"},
     {"id":9, "name":"week-birou-winter",         "pattern":".... .... .... .... ..22 2222"},
-    {"id":10, "name":"weekend-birou-winter",     "pattern":".... .... .222 2222 2222 2222"},
+    {"id":10, "name":"weekend-birou-winter",     "pattern":".... .... ..bb bbbb bbbb bbbb"},
     {"id":11, "name":"week-birou-summer",         "pattern":".... .... .... .... ..bb bbbb"},
     {"id":12, "name":"weekend-birou-summer",     "pattern":".... .... .bbb bbbb bbbb bbbb"},
     {"id":13, "name":"week-dormitor-winter",     "pattern":"2222 2222 .... .... ...2 2222"},
@@ -314,7 +314,6 @@
     {"zone_id":8 , "gpio_pin_code":"0:in:7", "gpio_host_name": "pi-face", "alarm_pin_name": "usa intrare", "sensor_type": "contact"},
 
     {"zone_id":8 , "gpio_pin_code":"3", "gpio_host_name": "pi-face", "alarm_pin_name": "not used"},
-    {"zone_id":7 , "gpio_pin_code":"15", "gpio_host_name": "pi-face", "alarm_pin_name": "poarta", "sensor_type": "contact", "is_false_alarm_prone" : "1"},
     {"zone_id":28 , "gpio_pin_code":"2", "gpio_host_name": "pi-face", "alarm_pin_name": "sonerie", "sensor_type": "contact"},
     {"zone_id":7 , "gpio_pin_code":"1", "gpio_host_name": "pi-face", "alarm_pin_name": "portita", "sensor_type": "contact"},
     {"zone_id":29 , "gpio_pin_code":"18", "gpio_host_name": "pi-face", "alarm_pin_name": "beci test"}
