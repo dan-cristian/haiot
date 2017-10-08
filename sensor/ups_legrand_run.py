@@ -16,6 +16,7 @@ class LegrandUps:
     def __init__(self):
         pass
 
+    Connected = False
     Id = None
     Name = None
     Port = None
@@ -38,8 +39,10 @@ def __open_port(ser):
     ser.bytesize = serial.EIGHTBITS
     try:
         ser.open()
+        return True
     except Exception, ex:
         Log.logger.warning('Unable to open serial port {}'.format(ser.port))
+        return False
 
 
 def __write_read_port(ser, command):
@@ -138,6 +141,7 @@ def init():
     initialised = False
     try:
         # if constant.OS in constant.OS_LINUX:
+        Log.logger.info('Looking for serial ports')
         serial_list = serial_common.get_standard_serial_device_list()
         # else:
         #    portpath = None
