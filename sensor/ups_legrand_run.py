@@ -61,24 +61,24 @@ def __write_read_port(ser, command):
     return response
 
 
-def __search_ups(port_no):
+def __search_ups(port_name):
     global __serial, __ups
     ser = serial.Serial()
-    ser.port = port_no
+    ser.port = port_name
     __open_port(ser)
     if ser.isOpen():
         for i in range(0, 4):
             response = __write_read_port(ser, 'I\r')
             if response != '':
-                Log.logger.info('Got serial response [{}] on ups init port {}'.format(response, port_no))
+                Log.logger.info('Got serial response [{}] on ups init port {}'.format(response, port_name))
                 __serial = ser
                 __ups = LegrandUps()
                 __ups.Id = str(response).replace(' ', '').replace('\r', '')
                 __ups.Name = 'Legrand Nicky ' + __ups.Id
-                __ups.Port = port_no
+                __ups.Port = port_name
                 break
             else:
-                Log.logger.info('Got empty response on ups init port {}'.format(port_no))
+                Log.logger.info('Got empty response on ups init port {}'.format(port_name))
     if __serial is None:
         ser.close()
 
