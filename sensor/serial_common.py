@@ -1,5 +1,6 @@
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
+import sys
 import glob
 import serial
 from main.logger_helper import Log
@@ -25,7 +26,8 @@ def get_portpath_linux(product_name):
     return None
 
 
-def get_standard_serial_device_list():
+# does not work anymore
+def get_standard_serial_device_list_old():
     valid_list = []
     ser = serial.Serial()
     ser.baudrate = 9600
@@ -40,5 +42,35 @@ def get_standard_serial_device_list():
             Log.logger.info('Found and opened serial port {}'.format(port_no))
             valid_list.append(port_no)
         except Exception, ex:
-            pass
+            Log.logger.info('Cannot open serial port, ex='.format(ex))
     return valid_list
+
+
+# https://stackoverflow.com/questions/12090503/listing-available-com-ports-with-python
+def get_standard_serial_device_list():
+    """ Lists serial port names
+
+        :raises EnvironmentError:
+            On unsupported or unknown platforms
+        :returns:
+            A list of the serial ports available on the system
+    """
+    if sys.platform.startswith('win'):
+        ports = ['COM%s' % (i + 1) for i in range(256)]
+    elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
+        # this excludes your current terminal "/dev/tty"
+        ports = glob.glob('/dev/tty[A-Za-z]*')
+    elif sys.platform.startswith('darwin'):
+        ports = glob.glob('/dev/tty.*')
+    else:
+        raise EnvironmentError('Unsupported platform {}'.format(sys.platform))
+
+    result = []
+    for port in ports:
+        try:
+            s = serial.Serial(port)
+            s.close()
+            result.append(port)
+        except (OSError, serial.SerialException):
+            pass
+    return result
