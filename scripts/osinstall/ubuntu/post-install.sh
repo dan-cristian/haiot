@@ -72,6 +72,7 @@ adduser ${USERNAME} sudo
 adduser ${USERNAME} audio
 adduser ${USERNAME} video
 adduser ${USERNAME} tty
+adduser ${USERNAME} dialout
 chsh -s /bin/bash ${USERNAME}
 
 
