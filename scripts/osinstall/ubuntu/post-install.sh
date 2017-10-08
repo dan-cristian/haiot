@@ -46,6 +46,8 @@ ENABLE_SECURE_SSH=0
 
 ENABLE_ROUTER=0
 
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+echo "Script directory is $SCRIPT_DIR, make sure script is placed in proper haiot GIT folder structure to find conf files"
 echo "Setting timezone ..."
 echo "Europe/Bucharest" > /etc/timezone
 dpkg-reconfigure -f noninteractive tzdata
@@ -604,17 +606,17 @@ if [ "$ENABLE_BACKUP_SERVER" == "1" ]; then
 
     cd /tmp
     wget https://download.nextcloud.com/server/releases/nextcloud-12.0.2.tar.bz2
-    apt install apache2 mariadb-server libapache2-mod-php5 php5-cli php5-mysql php5-curl php5-mysql php5-gd php5-json php5-intl php5-mcrypt php5-imagick
+    apt install -y apache2 mariadb-server
+    #apt install libapache2-mod-php5 php5-cli php5-mysql php5-curl php5-mysql php5-gd php5-json php5-intl php5-mcrypt php5-imagick
+    apt install -y libapache2-mod-php php-cli php-mysql php-curl php-mysql php-gd php-json php-intl php-mcrypt php-imagick
+    apt install -y php-zip php-xml php-mbstring php-dompdf
     cd /var/www/
     tar -xjf /tmp/nextcloud-12.0.2.tar.bz2
     #https://docs.nextcloud.com/server/12/admin_manual/installation/source_installation.html#prerequisites-for-manual-installation
-    nano /etc/apache2/sites-available/nextcloud.conf
+    #https://bayton.org/docs/nextcloud/installing-nextcloud-on-ubuntu-16-04-lts-with-redis-apcu-ssl-apache/
+    cp $SCRIPT_DIR/etc/nextcloud.conf /etc/apache2/sites-available/nextcloud.conf
     ln -s /etc/apache2/sites-available/nextcloud.conf /etc/apache2/sites-enabled/nextcloud.conf
-    a2enmod rewrite
-    a2enmod headers
-    a2enmod env
-    a2enmod dir
-    a2enmod mime
+    a2enmod rewrite headers env dir mime
     a2enmod ssl
     a2ensite default-ssl
     chown www-data:www-data -R nextcloud
@@ -623,6 +625,7 @@ if [ "$ENABLE_BACKUP_SERVER" == "1" ]; then
     #CREATE DATABASE nextcloud;
     #GRANT ALL ON nextcloud.* to 'nextcloud'@'localhost' IDENTIFIED BY 'cba';
     #FLUSH PRIVILEGES;
+    #quit;
 
     service apache2 restart
 
