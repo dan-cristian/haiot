@@ -63,15 +63,22 @@ def get_standard_serial_device_list():
     elif sys.platform.startswith('darwin'):
         ports = glob.glob('/dev/tty*')
     else:
-        raise EnvironmentError('Unsupported platform {}'.format(sys.platform))
+        Log.logger.error('Unsupported platform for serial detection, {}'.format(sys.platform))
+        return None
 
     Log.logger.info("Found {} serial ports".format(len(ports)))
     result = []
     for port in ports:
         try:
-            s = serial.Serial(port)
+            s = serial.Serial()
+            s.baudrate = 9600
+            s.timeout = 3
+            s.writeTimeout = 3
+            s.port = port
+            s.open()
             s.close()
+            Log.logger.info('Found and opened serial port {}'.format(port))
             result.append(port)
         except (OSError, serial.SerialException):
-            pass
+            Log.logger.info('Cannot open serial port {}, ex='.format(port, ex))
     return result
