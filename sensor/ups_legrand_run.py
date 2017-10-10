@@ -69,7 +69,8 @@ def __search_ups(port_name):
     if ser.isOpen():
         for i in range(0, 4):
             response = __write_read_port(ser, 'I\r')
-            if response != '':
+            # fixme: check what response string legrand provides
+            if response != '' and len(response) > 1:
                 Log.logger.info('Got serial response [{}] on ups init port {}'.format(response, port_name))
                 __serial = ser
                 __ups = LegrandUps()
@@ -78,7 +79,7 @@ def __search_ups(port_name):
                 __ups.Port = port_name
                 break
             else:
-                Log.logger.info('Got empty response on ups init port {}'.format(port_name))
+                Log.logger.info('Got unknown response {} on ups init port {}'.format(response, port_name))
     if __serial is None:
         ser.close()
 
@@ -124,7 +125,7 @@ def __read_ups_status():
 
             # Log.logger.info('UPS remaining={} load={}'.format(__ups.RemainingMinutes, __ups.LoadPercent))
         else:
-            Log.logger.warning('Unexpected number of parameters {} on ups status read'.format(len(atoms)))
+            Log.logger.warning('Unexpected number of parameters ({}) on ups status read'.format(len(atoms)))
     else:
         Log.logger.info('Read empty UPS status')
 
