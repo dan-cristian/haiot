@@ -79,7 +79,7 @@ def __search_ups(port_name):
                 __ups.Port = port_name
                 break
             else:
-                Log.logger.info('Got unknown response [{}][] on ups init port {}'.format(
+                Log.logger.info('Got unknown response [{}][{}] on ups init port {}'.format(
                     response, len(response), port_name))
     if __serial is None:
         ser.close()
