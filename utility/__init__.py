@@ -10,6 +10,7 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 initialised = False
 
 
+# water utility
 def __utility_update_ex(sensor_name, value):
     if value is not None:
         record = models.Utility(sensor_name=sensor_name)
