@@ -86,6 +86,6 @@ def init():
     if rfxcom_run.init():
         thread_pool.add_interval_callable(rfxcom_run.thread_run, run_interval_second=60)
     if ups_legrand_run.init():
-        thread_pool.add_interval_callable(ups_legrand_run.thread_run, run_interval_second=60)
+        thread_pool.add_interval_callable(ups_legrand_run.thread_run, run_interval_second=30)
     global initialised
     initialised = True
