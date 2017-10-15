@@ -124,7 +124,8 @@ def __read_ups_status():
             record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
                                        save_to_graph=True)
 
-            # Log.logger.info('UPS remaining={} load={}'.format(__ups.RemainingMinutes, __ups.LoadPercent))
+            Log.logger.info('UPS remaining={} load={} input={} output={}'.format(
+                __ups.RemainingMinutes, __ups.LoadPercent, __ups.InputVoltage, __ups.OutputVoltage))
         else:
             Log.logger.warning('Unexpected number of parameters ({}) on ups status read'.format(len(atoms)))
     else:
