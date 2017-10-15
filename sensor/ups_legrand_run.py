@@ -69,8 +69,8 @@ def __search_ups(port_name):
     if ser.isOpen():
         for i in range(0, 4):
             response = __write_read_port(ser, 'I\r')
-            # fixme: check what response string legrand provides
-            if response != '' and len(response) > 1:
+            # [#                           JP00106G  #015]
+            if "JP00106G" in response:
                 Log.logger.info('Got serial response [{}] on ups init port {}'.format(response, port_name))
                 __serial = ser
                 __ups = LegrandUps()
