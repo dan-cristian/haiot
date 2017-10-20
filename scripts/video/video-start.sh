@@ -48,7 +48,7 @@ echo2 "Starting easystroke"
 
 # http://askubuntu.com/questions/371261/display-monitor-info-via-command-line
 # http://unix.stackexchange.com/questions/13619/how-do-i-prevent-xorg-using-my-linux-laptops-display-panel
-function configure_ingnored_hdmi_amp(){
+function configure_ignored_hdmi_amp(){
 local amp_name=$1
 for dir in /sys/class/drm/*HDMI*; do
 	if cat $dir/edid | parse-edid | grep $amp_name | grep -vq grep; then
@@ -84,7 +84,7 @@ else
 	# https://bugs.launchpad.net/ubuntu/+source/xinit/+bug/1562219
 	#chmod 0660 /dev/tty*
 	#/sbin/runuser -l $HAIOT_USER -c
-	configure_ingnored_hdmi_amp "$AMP_HDMI_X11_IGNORE"
+	configure_ignored_hdmi_amp "$AMP_HDMI_X11_IGNORE"
 	"/usr/bin/startx" & >> $LOG 2>&1
 	echo2 "Started X"
 	while :
@@ -231,6 +231,7 @@ lock=/tmp/.video-start.exclusivelock
 # Wait for lock on /var/lock/..exclusivelock (fd 200) for 1 seconds
 if flock -x -w 1 200 ; then
 
+echo2 "Executing video command $1"
 if [ "$1" == "start-kodi" ]; then
 	stop_kodi
 	startx_once
@@ -241,6 +242,7 @@ elif [ "$1" == "stop" ]; then
 elif [ "$1" == "start-kodi-once" ]; then
 	startx_once
 	#start_kodi_once
+	stop_kodi
 	start_kodi
 	#increase_prio
 elif [ "$1" == "start-browser" ]; then
