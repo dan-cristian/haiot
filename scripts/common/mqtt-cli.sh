@@ -2,18 +2,20 @@
 ##########################
 # MQTT Shell Listen & Exec
 
-LOG=/mnt/log/video.log
+LOG=/mnt/log/mqtt-cli.log
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "$DIR/functions.sh"
 
 screen_on(){
+   echo2 "Detected presence, notify video"
    $DIR/../video/video-start.sh presence
 }
 
 listen(){
 rm -f $p
 ([ ! -p "$p" ]) && mkfifo $p
+killall mosquitto_sub
 (mosquitto_sub -h $host -t $topic >$p 2>>$LOG) &
 #echo "$!" > pidfile
 while read line <$p
@@ -30,6 +32,7 @@ do
     :
   fi
 done
+echo2 "Exit mosquitto read loop"
 }
 
 p="/tmp/mqtt_pipe"
