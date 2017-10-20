@@ -68,3 +68,14 @@ do
 	fi
 done
 }
+
+#check if amp is seen by linux, if not see then sound will not go through
+function is_amp_detected(){
+local amp_name=$1
+for dir in /sys/class/drm/*HDMI*; do
+        if cat $dir/edid | parse-edid | grep $amp_name | grep -vq grep; then
+                return 1
+        fi
+done
+return 0
+}
