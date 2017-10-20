@@ -11,6 +11,9 @@ REFRESHED=0
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "$DIR/../common/include_cards.sh"
+source "$DIR/../common/params.sh"
+source "$DIR/../common/functions.sh"
+
 
 # $1=action $2=relay_name $3=card_name $4=state $5=zone_index
 function do_url {
@@ -22,6 +25,17 @@ wget --timeout=10 --tries=1 -nv -O - $NEW_URL
 REMOTE_STATUS["$2$5"]=$4
 }
 
+function check_amp {
+	# hack to restart X on first music run after system restart, to force hdmi sound card enabling
+	is_amp_detected $AMP_HDMI_X11_IGNORE
+	have_amp=$?
+        if [ $have_amp -eq 0 ]; then
+        	i3-msg exit
+                echo2 "Restarted X to enable HDMI sound, result was " $have_amp
+        else
+        	echo2 "AMP $AMP_HDMI_X11_IGNORE is already seen, have sound, result was " $have_amp
+        fi
+}
 
 #show current status, assume card names start with uppercase to avoid duplicates
 tail /proc/asound/[[:upper:]]*/pcm*p/sub0/hw_params
@@ -77,7 +91,7 @@ do
   	done
   else
 	#changed state. run on power on, delayed off at refresh
-	echo2 "Checking state change"
+	#echo2 "Checking state change"
   	for i in ${!RELAY_NAME[*]}; do
 		relay_name=${RELAY_NAME[$i]}
 		zone_index=${RELAY_AMP_ZONE[$i]}
@@ -86,16 +100,12 @@ do
 		else
 			state=${LOCAL_ZONE_STATUS[$relay_name$zone_index]}
 		fi
-		echo2 "Check $relay_name$zone_index=$state with stored state=${REMOTE_STATUS[$relay_name$zone_index]}"
+		#echo2 "Check $relay_name$zone_index=$state with stored state=${REMOTE_STATUS[$relay_name$zone_index]}"
         	if [[ (("$state" == "1") || ("$zone_index" != "0"))  && ("$state" != "${REMOTE_STATUS[$relay_name$zone_index]}") ]]; then
 			# $1=action $2=relay_name $3=card_name $4=state $5=zone_index
 			do_url "Set" "$relay_name" "${CARD_NAME[$i]}" "$state" "$zone_index"
-			# hack to restart X on first music run after system restart, to force hdmi sound card enabling
-			if [[ (! -f "/tmp/music-started-once" ) && ( "$state" == "1") ]]; then
-				i3-msg exit
-				touch "/tmp/music-started-once"
-				echo2 "Restarted X to enable HDMI sound"
-			fi
+			# run check only for hdmi zones
+			check_amp
         	fi
   	done
   fi

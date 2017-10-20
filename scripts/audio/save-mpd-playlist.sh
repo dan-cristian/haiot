@@ -11,6 +11,6 @@ mkdir -p $target_dir
 mpc playlist -f $MUSIC_PATH/%file% |
 while read -r line ; do
 	file_name=$(basename "$line")
-	echo "Processing file $file_name"
+	echo2 "Processing file $file_name"
 	ln -s "$line" "$target_dir/$file_name"
 done
