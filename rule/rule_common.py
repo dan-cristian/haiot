@@ -44,3 +44,13 @@ def send_notification(title, message=None, url=None, priority=None, deviceid=Non
 
 def send_chat(message=None, notify=False):
     dispatcher.send(Constant.SIGNAL_CHAT_NOTIFICATION, message=message, notify=notify)
+
+
+def send_email(subject=None, body=None):
+    dispatcher.send(Constant.SIGNAL_EMAIL_NOTIFICATION, subject=subject, body=body)
+
+
+def notify_via_all(title=None, message=None, priority=None):
+    send_notification(title=title, message=message, priority=priority)
+    send_chat(message=message)
+    send_email(subject=title, body=message)
