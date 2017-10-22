@@ -132,6 +132,20 @@ def __read_ups_status():
         Log.logger.info('Read empty UPS status')
 
 
+def _create_dummy_entry():
+    name = "dummy UPS"
+    record = models.Ups()
+    record.name = name
+    current_record = models.Ups.query.filter_by(name=name).first()
+    if current_record is None:
+        record.save_changed_fields(current_record=current_record, new_record=record)
+    else:
+        record.name = current_record.name
+        record.power_failed = 1
+        record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
+                                   save_to_graph=True)
+
+
 def unload():
     global initialised
     if __serial is not None and __serial.isOpen():
@@ -160,6 +174,8 @@ def init():
             Log.logger.info('No standard open serial ports detected on this system')
     except Exception, ex:
         Log.logger.warning('Unable to open ups port, err {}'.format(ex))
+    if not initialised:
+        _create_dummy_entry()
     return initialised
 
 
