@@ -100,3 +100,14 @@ def pause(zone_name):
         return client.status()['state'] == 'stop'
     else:
         return False
+
+
+# http://pythonhosted.org/python-mpd2/topics/commands.html#the-music-database
+def populate(zone_name):
+    client = _get_client(port=_get_port(zone_name))
+    if client is not None:
+        # fixme: populate playlist
+        client.add('/')
+        return len(client.playlist())
+    else:
+        return False
