@@ -99,7 +99,7 @@ def rule_sensor_temp_target(obj=models.Sensor(), field_changed_list=None):
 
 # ups rule
 def rule_ups_power(obj=models.Ups(), field_changed_list=None):
-    Log.logger.info("changed list is {}".format(field_changed_list))
+    #Log.logger.info("changed list is {}".format(field_changed_list))
     if field_changed_list is not None:
         if 'power_failed' in field_changed_list:
             if obj.power_failed:
@@ -109,8 +109,11 @@ def rule_ups_power(obj=models.Ups(), field_changed_list=None):
         if 'battery_voltage' in field_changed_list:
             if obj.battery_voltage <= 50:
                 rule_common.notify_via_all("UPS battery low at {} volts".format(obj.battery_voltage), "Low voltage")
+        if 'load_percent' in field_changed_list:
+            if obj.load_percent >= 70:
+                rule_common.notify_via_all("UPS load HIGH at {}".format(obj.load_percent), "High ups load")
         if 'input_voltage' in field_changed_list:
-            if obj.input_voltage <= 223:
+            if obj.input_voltage <= 200:
                 rule_common.notify_via_all("Grid low at {} volts".format(obj.input_voltage), "Low grid voltage")
     return 'ups rule ok'
 
