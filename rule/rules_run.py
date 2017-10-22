@@ -98,15 +98,16 @@ def rule_sensor_temp_target(obj=models.Sensor(), field_changed_list=None):
 
 
 # ups rule
-def rule_sensor_temp_target(obj=models.Ups(), field_changed_list=None):
+def rule_ups_power(obj=models.Ups(), field_changed_list=None):
     if field_changed_list is not None:
         if hasattr(field_changed_list, 'power_failed'):
             if obj.power_failed:
-                rule_common.send_notification(title="UPS power failure", priority=1)
-                rule_common.send_chat(message="UPS power failure", notify=True)
+                rule_common.notify_via_all(title="UPS power LOST", message="power lost", priority=1)
             else:
-                rule_common.send_notification(title="UPS power is back on", priority=1)
-                rule_common.send_chat(message="UPS power is back on", notify=True)
+                rule_common.notify_via_all(title="UPS power OK", message="power is back", priority=1)
+        if hasattr(field_changed_list, 'battery_voltage'):
+            if obj.battery_voltage <= 50:
+                rule_common.notify_via_all("UPS battery low at {} volts".format(obj.battery_voltage), "Low voltage")
     return 'ups rule ok'
 
 # VALUE TRIGGER RULES END ###########
