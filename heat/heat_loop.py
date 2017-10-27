@@ -113,16 +113,17 @@ def loop_zones():
         for zone in zone_list:
             progress_status = 'do zone {}'.format(zone.name)
             heat_schedule = models.HeatSchedule.query.filter_by(zone_id=zone.id).first()
-            zonesensor = models.ZoneSensor.query.filter_by(zone_id=zone.id).first()
-            if heat_schedule and zonesensor:
-                sensor = models.Sensor.query.filter_by(address=zonesensor.sensor_address).first()
-                if heat_schedule.active and sensor is not None:
-                    # sensor_last_update_seconds = (utils.get_base_location_now_date() - sensor.updated_on).total_seconds()
-                    # if sensor_last_update_seconds > 120 * 60:
-                    #    Log.logger.warning('Sensor {} not updated in last 120 minutes, unusual'.format(
-                    # sensor.sensor_name))
-                    if __update_zone_heat(zone, heat_schedule, sensor):
-                        heat_is_on = True
+            zonesensor_list = models.ZoneSensor.query.filter_by(zone_id=zone.id).all()
+            for zonesensor in zonesensor_list:
+                if heat_schedule and zonesensor:
+                    sensor = models.Sensor.query.filter_by(address=zonesensor.sensor_address).first()
+                    if heat_schedule.active and sensor is not None:
+                        # sensor_last_update_seconds = (utils.get_base_location_now_date() - sensor.updated_on).total_seconds()
+                        # if sensor_last_update_seconds > 120 * 60:
+                        #    Log.logger.warning('Sensor {} not updated in last 120 minutes, unusual'.format(
+                        # sensor.sensor_name))
+                        if __update_zone_heat(zone, heat_schedule, sensor):
+                            heat_is_on = True
         # turn on/off the main heating system based on zone heat needs
         # check first to find alternate valid heat sources
         heatrelay_main_source = models.ZoneHeatRelay.query.filter_by(is_alternate_heat_source=1).first()
