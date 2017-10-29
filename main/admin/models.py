@@ -765,9 +765,11 @@ class Utility(db.Model, graphs.BaseGraph, DbEvent, DbBase):
     sensor_index = db.Column(db.Integer)  # 0 for counter_a, 1 for counter_b
     units_total = db.Column(db.Float)  # total number of units measured
     units_delta = db.Column(db.Float)  # total number of units measured since last measurement
+    units_2_delta = db.Column(db.Float)  # total number of units measured since last measurement
     ticks_delta = db.Column(db.BigInteger)
     ticks_per_unit = db.Column(db.Float, default=1)  # number of counter ticks in a unit (e.g. 10 for a watt)
-    unit_name = db.Column(db.String(50))  # watt, liter etc.
+    unit_name = db.Column(db.String(50))  # kwh, liter etc.
+    unit_2_name = db.Column(db.String(50))  # 2nd unit type, optional, i.e. watts
     unit_cost = db.Column(db.Float)
     cost = db.Column(db.Float)
     utility_type = db.Column(db.String(50))  # water, electricity, gas
@@ -943,9 +945,11 @@ class UtilityHistory(db.Model, DbBase):
     sensor_name = db.Column(db.String(50), index=True)
     units_total = db.Column(db.Float)  # total number of units measured
     units_delta = db.Column(db.Float)  # total number of units measured since last measurement
+    units_2_delta = db.Column(db.Float)  # total number of units measured since last measurement
     ticks_delta = db.Column(db.BigInteger)
     cost = db.Column(db.Float)
-    unit_name = db.Column(db.String(50))  # watt, liter etc.
+    unit_name = db.Column(db.String(50))  # kwh, liter etc.
+    unit_2_name = db.Column(db.String(50))  # watt
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
     source_host_ = db.Column(db.String(50))
 
