@@ -56,6 +56,7 @@ def save_to_db(dev):
     # global db_lock
     # db_lock.acquire()
     try:
+        delta_time_counters = None
         address = dev['address']
         record = models.Sensor(address=address)
         assert isinstance(record, models.Sensor)
@@ -71,8 +72,11 @@ def save_to_db(dev):
             record.counters_a = dev['counters_a']
             if current_record:
                 record.delta_counters_a = record.counters_a - current_record.counters_a
+                # get accurate interval (e.g. to establish power consumption in watts)
+                delta_time_counters = (utils.get_base_location_now_date() - current_record.updated_on).total_seconds()
             else:
                 record.delta_counters_a = 0  # don't know prev. count, assume no consumption (ticks could be lost)
+                delta_time_counters = sampling_period_seconds
         if dev.has_key('counters_b'):
             record.counters_b = dev['counters_b']
             if current_record:
@@ -110,7 +114,7 @@ def save_to_db(dev):
             dispatcher.send(Constant.SIGNAL_UTILITY, sensor_name=record.sensor_name,
                             units_delta_a=record.delta_counters_a, units_delta_b=record.delta_counters_b,
                             total_units_a=record.counters_a, total_units_b=record.counters_b,
-                            sampling_period_seconds=sampling_period_seconds)
+                            sampling_period_seconds=delta_time_counters)
         if record.vad is not None:
             dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=record.sensor_name, value=record.vad)
     except Exception, ex:
