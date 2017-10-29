@@ -14,7 +14,7 @@ Created on Mar 9, 2015
 
 initialised = False
 __owproxy = None
-sampling_period_seconds = 60
+sampling_period_seconds = 30
 
 
 def do_device():
