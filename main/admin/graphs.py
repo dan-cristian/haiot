@@ -91,8 +91,8 @@ class UtilityGraph(BaseGraph):
         BaseGraph.__init__(self)
     graph_x_ = 'updated_on'
     # list fields you want saved in database
-    graph_y_ = ['utility_name', 'sensor_index', 'units_delta', 'units_total', 'ticks_delta', 'cost']
+    graph_y_ = ['utility_name', 'sensor_index', 'units_delta', 'units_2_delta', 'units_total', 'ticks_delta', 'cost']
     # used for plotly
-    graph_shape_ = ['hv', 'hv', 'hv', 'hv', 'hv', 'hv']
+    graph_shape_ = ['hv', 'hv', 'hv', 'hv', 'hv', 'hv', 'hv']
     graph_id_ = 'sensor_name'
     graph_legend_ = 'sensor_name'
