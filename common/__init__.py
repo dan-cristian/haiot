@@ -65,6 +65,7 @@ class Constant:
     def IS_OS_LINUX():
         return Constant.OS in Constant.OS_LINUX
 
+    DB_FIELD_UPDATE = 'updated_on'
     SCRIPT_RESPONSE_OK = 'RESULTOK'
     SCRIPT_RESPONSE_NOTOK = 'RESULTNOTOK'
 
