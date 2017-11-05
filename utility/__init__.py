@@ -47,8 +47,10 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
                     # 1000 times count divided by 60 seconds time 60 minutes (kwh -> watt)
                     #record.units_delta = 1000 * delta / ((current_record.ticks_per_unit * 1.0) /
                     #                                     (sampling_period_seconds/(60.0*60)))
-                    record.units_delta = delta / (current_record.ticks_per_unit * 1.0)
+                    record.units_delta = delta / (current_record.ticks_per_unit * 1.0) # kwh
                     record.unit_name = current_record.unit_name  # Constant.UTILITY_TYPE_ELECTRICITY_MEASURE
+                    record.unit_2_name = current_record.unit_name_2
+                    record.units_2_delta = 1000 * record.units_delta / (sampling_period_seconds / 3600.0) # watts
                 elif current_record.utility_type == Constant.UTILITY_TYPE_WATER:
                         record.unit_name = current_record.unit_name  # Constant.UTILITY_TYPE_WATER_MEASURE
                         record.units_delta = delta / (current_record.ticks_per_unit * 1.0)

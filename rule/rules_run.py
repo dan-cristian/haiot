@@ -302,7 +302,7 @@ def alexawemo_watering_off():
 
 
 def alexawemo_music_living_on():
-    return mpd.play('living')
+    return mpd.play('living', default_dir='/_New/')
 
 
 def alexawemo_music_living_off():
@@ -310,12 +310,19 @@ def alexawemo_music_living_off():
 
 
 def alexawemo_music_bedroom_on():
-    return mpd.play('bedroom')
+    return mpd.play('bedroom', default_dir='/_New/')
 
 
 def alexawemo_music_bedroom_off():
     return mpd.pause('bedroom')
 
+
+def alexawemo_music_bathroom_on():
+    return mpd.play('bedroom', default_dir='/_New/')
+
+
+def alexawemo_music_bathroom_off():
+    return mpd.pause('bedroom')
 
 
 # ##### MACROS END ##############
