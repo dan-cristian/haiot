@@ -75,6 +75,7 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
                 # force save for history recording, use negative values to enable recording 0
                 if current_record is not None:
                     current_record.units_delta = -1
+                    current_record.units_2_delta = -1
                     current_record.ticks_delta = -1
                     current_record.cost = -1
                     #current_record.utility_name = ""
