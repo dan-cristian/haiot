@@ -49,8 +49,9 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
                     #                                     (sampling_period_seconds/(60.0*60)))
                     record.units_delta = delta / (current_record.ticks_per_unit * 1.0) # kwh
                     record.unit_name = current_record.unit_name  # Constant.UTILITY_TYPE_ELECTRICITY_MEASURE
+                    record.units_2_delta = (1000 * record.units_delta) / (sampling_period_seconds / 3600.0)  # watts
+                    Log.logger.info("Watts usage is {}".format(record.units_2_delta))
                     record.unit_2_name = current_record.unit_name_2
-                    record.units_2_delta = 1000 * record.units_delta / (sampling_period_seconds / 3600.0) # watts
                 elif current_record.utility_type == Constant.UTILITY_TYPE_WATER:
                         record.unit_name = current_record.unit_name  # Constant.UTILITY_TYPE_WATER_MEASURE
                         record.units_delta = delta / (current_record.ticks_per_unit * 1.0)
@@ -73,6 +74,7 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
                 if current_record.unit_cost is None:
                     current_record.unit_cost = 0.0
                 record.cost = 1.0 * record.units_delta * current_record.unit_cost
+                #todo: read previous value from history
                 if current_record.units_total is None:
                     current_record.units_total = 0.0
                 # force save for history recording, use negative values to enable recording 0
