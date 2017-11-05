@@ -1,3 +1,4 @@
+from sqlalchemy import desc
 from main.logger_helper import Log
 from main import thread_pool
 from common import Constant
@@ -54,7 +55,7 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
                         record.units_delta = delta / (current_record.ticks_per_unit * 1.0) # kwh
                         record.unit_name = current_record.unit_name  # Constant.UTILITY_TYPE_ELECTRICITY_MEASURE
                         record.units_2_delta = (1000 * record.units_delta) / (sampling_period_seconds / 3600.0)  # watts
-                        Log.logger.info("Watts usage in {} is {}".format(record.utility_name, record.units_2_delta))
+                        Log.logger.debug("Watts usage in {} is {}".format(record.utility_name, record.units_2_delta))
                         record.unit_2_name = current_record.unit_2_name
                     elif current_record.utility_type == Constant.UTILITY_TYPE_WATER:
                             record.unit_name = current_record.unit_name  # Constant.UTILITY_TYPE_WATER_MEASURE
@@ -80,7 +81,14 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
                     record.cost = 1.0 * record.units_delta * current_record.unit_cost
                     # todo: read previous value from history
                     if current_record.units_total is None:
-                        current_record.units_total = 0.0
+                        # get val from history db
+                        last_rec = models.UtilityHistory.query.filter_by(
+                            utility_name=record.utility_name).order_by(desc(models.UtilityHistory.id)).first()
+                        if last_rec is not None:
+                            current_record.units_total = last_rec.units_total
+                        else:
+                            Log.logger.warning("Could not find last history record for {}".format(record.utility_name))
+                            current_record.units_total = 0.0
                     # force save for history recording, use negative values to enable recording 0
                     if current_record is not None:
                         current_record.units_delta = -1
