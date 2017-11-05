@@ -5,6 +5,7 @@ from common import utils, Constant
 import owsensor_loop
 import rfxcom_run
 import ups_legrand_run
+import http_parser_run
 from main.admin import models
 from pydispatch import dispatcher
 from main.admin.model_helper import commit
@@ -87,5 +88,7 @@ def init():
         thread_pool.add_interval_callable(rfxcom_run.thread_run, run_interval_second=60)
     if ups_legrand_run.init():
         thread_pool.add_interval_callable(ups_legrand_run.thread_run, run_interval_second=30)
+    if http_parser_run.init_solar_aps():
+        thread_pool.add_interval_callable(http_parser_run.thread_solar_aps_run, run_interval_second=60)
     global initialised
     initialised = True
