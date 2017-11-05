@@ -7,6 +7,7 @@ import math
 import importlib
 from collections import namedtuple
 import pytz
+import urllib2
 from main.logger_helper import Log
 
 __author__ = 'dcristian'
@@ -145,3 +146,15 @@ def json_to_record(table, json_object):
                 value = json_object[field]
             setattr(table, field, value)
     return table
+
+
+def parse_http(url, start_key, end_key):
+    text = urllib2.urlopen(url).read()
+    start = text.find(start_key)
+    end = text.find(end_key)
+    if start != -1 and end != -1:
+        val_start = start + len(start_key)
+        value_str = text[val_start:end]
+        return value_str
+    else:
+        return None

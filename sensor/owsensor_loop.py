@@ -82,7 +82,8 @@ def save_to_db(dev):
             if current_record:
                 record.delta_counters_b = record.counters_b - current_record.counters_b
             else:
-                record.delta_counters_b = 0  # don't know prev. count, assume no consumption (ticks could be lost)
+                # fixme: don't know prev. count, assume no consumption (ticks could be lost)
+                record.delta_counters_b = 0
         if dev.has_key('temperature'):
             record.temperature = dev['temperature']
         if dev.has_key('humidity'):
