@@ -84,10 +84,13 @@ def toggle():
     return '{"result": "' + _multify(result) + '"}'
 
 
-def play(zone_name):
+def play(zone_name, default_dir=None):
     client = _get_client(_get_port(zone_name))
     if client is not None:
         client.play()
+        if client.status()['state'] != 'play':
+            populate(zone_name, default_dir)
+            client.play()
         return client.status()['state'] == 'play'
     else:
         return False
@@ -103,11 +106,16 @@ def pause(zone_name):
 
 
 # http://pythonhosted.org/python-mpd2/topics/commands.html#the-music-database
-def populate(zone_name):
+def populate(zone_name, default_dir=None):
     client = _get_client(port=_get_port(zone_name))
     if client is not None:
         # fixme: populate playlist
-        client.add('/')
+        client.clear()
+        if default_dir is None:
+            client.add('/')
+        else:
+            client.add(default_dir)
+        client.random(1)
         return len(client.playlist())
     else:
         return False
