@@ -781,7 +781,7 @@ class Utility(db.Model, graphs.BaseGraph, DbEvent, DbBase):
         self.sensor_name = sensor_name
 
     def __repr__(self):
-        return '{} {} {}'.format(self.id, self.sensor_name, self.updated_on)
+        return '{} {} {}'.format(self.id, self.utility_name, self.updated_on)
 
 
 '''
