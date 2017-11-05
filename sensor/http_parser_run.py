@@ -40,6 +40,9 @@ def thread_solar_aps_run():
                     record.units_delta = 0
                 else:
                     record.units_delta = production - current_record.units_total
+                    if record.units_delta == 0:
+                        # do not waste db space if no power generated
+                        return
                 record.units_total = production
                 record.unit_name = current_record.unit_name
 
