@@ -4,6 +4,7 @@ import sys
 from copy import deepcopy
 from main.logger_helper import Log
 from main import db
+from common import Constant
 import graphs
 from common import utils, performance
 from main.admin.model_helper import commit
@@ -159,7 +160,7 @@ class DbBase:
                     # todo: comparison not working for float, because str appends .0
                     if ((new_value is not None) and (str(old_value) != str(new_value))) \
                             or (save_all_fields and (new_value is not None)):
-                        if column_name != 'updated_on':
+                        if column_name != Constant.DB_FIELD_UPDATE:
                             try:
                                 obj_type = str(type(self)).split('\'')[1]
                                 obj_type_words = obj_type.split('.')
@@ -180,7 +181,7 @@ class DbBase:
                     current_record.notify_transport_enabled = False
                 # fixme: remove hardcoded field name
                 elif len(current_record.last_commit_field_changed_list) == 1 and ignore_only_updated_on_change and \
-                                'updated_on' in current_record.last_commit_field_changed_list:
+                                Constant.DB_FIELD_UPDATE in current_record.last_commit_field_changed_list:
                     current_record.notify_transport_enabled = False
             else:
                 new_record.notify_transport_enabled = notify_transport_enabled
