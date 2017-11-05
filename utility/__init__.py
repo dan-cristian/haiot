@@ -68,7 +68,7 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
                         record.units_2_delta = 0
                         Log.logger.debug("Saving utility gas delta={}".format(record.units_delta))
                     else:
-                        Log.logger.info("Saving unknown utility type={} sensor={}".format(
+                        Log.logger.debug("Saving unknown utility type={} sensor={}".format(
                             current_record.utility_type, sensor_name))
                         if current_record.ticks_per_unit is not None:
                             record.units_delta = delta / (current_record.ticks_per_unit * 1.0)  # force float operation
