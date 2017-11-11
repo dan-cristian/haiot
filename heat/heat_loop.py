@@ -31,26 +31,29 @@ def __save_heat_state_db(zone='', heat_is_on=''):
 
 
 # triggers heat status update if heat changed
-def __decide_action(zone, current_temperature, target_temperature):
+def __decide_action(zone, current_temperature, target_temperature, force_on=False):
     assert isinstance(zone, models.Zone)
     threshold = float(get_param(Constant.P_TEMPERATURE_THRESHOLD))
     Log.logger.debug("Asses heat zone={} current={} target={} thresh={}".format(
         zone, current_temperature, target_temperature, threshold))
-    heat_is_on = zone.heat_is_on
-    if heat_is_on is None:
-        heat_is_on = False
-    if current_temperature < target_temperature:
+    if force_on:
         heat_is_on = True
-    if current_temperature > (target_temperature + threshold):
-        heat_is_on = False
+    else:
+        heat_is_on = zone.heat_is_on
+        if heat_is_on is None:
+            heat_is_on = False
+        if current_temperature < target_temperature:
+            heat_is_on = True
+        if current_temperature > (target_temperature + threshold):
+            heat_is_on = False
     # trigger if state is different and every 5 minutes (in case other hosts with relays have restarted)
     if zone.last_heat_status_update is not None:
         last_heat_update_age_sec = (utils.get_base_location_now_date() - zone.last_heat_status_update).total_seconds()
     else:
         last_heat_update_age_sec = 300
     if zone.heat_is_on != heat_is_on or last_heat_update_age_sec >= 300 or zone.last_heat_status_update is None:
-        Log.logger.info('Heat must change, is {} in {} temp={} target+thresh={}'.format(
-            heat_is_on, zone.name, current_temperature, target_temperature+ threshold))
+        Log.logger.info('Heat must change, is {} in {} temp={} target+thresh={}, forced={}'.format(
+            heat_is_on, zone.name, current_temperature, target_temperature+ threshold, force_on))
         Log.logger.info('Heat change due to: is_on_next={} is_on_db={} age={} last={}'.format(
             heat_is_on, zone.heat_is_on, last_heat_update_age_sec, zone.last_heat_status_update ))
         __save_heat_state_db(zone=zone, heat_is_on=heat_is_on)
@@ -73,6 +76,14 @@ def __update_zone_heat(zone, heat_schedule, sensor):
         else:
             schedule_pattern= models.SchedulePattern.query.filter_by(id=heat_schedule.pattern_weekend_id).first()
         if schedule_pattern:
+            # check if we need forced heat on
+            force_on = False
+            if schedule_pattern.keep_warm:
+                if len(schedule_pattern.keep_warm_pattern) == 20:
+                    interval = int(minute / 5)
+                    force_on = (schedule_pattern.keep_warm_pattern[interval] == "1")
+                else:
+                    Log.logger.critical("Missing keep warm pattern for zone {}".format(zone.name))
             # strip formatting characters that are not used to represent target temperature
             pattern = str(schedule_pattern.pattern).replace('-', '').replace(' ','')
             # check pattern validity
@@ -87,7 +98,8 @@ def __update_zone_heat(zone, heat_schedule, sensor):
                     zone.heat_target_temperature = temperature_target.target
                     commit()
                     if sensor.temperature is not None:
-                        heat_is_on = __decide_action(zone, sensor.temperature, temperature_target.target)
+                        heat_is_on = __decide_action(
+                            zone, sensor.temperature, temperature_target.target, force_on=force_on)
                     #else:
                     #    heat_is_on = zone.heat_is_on
                 else:

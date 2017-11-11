@@ -57,8 +57,7 @@ def rule_alarm(obj=models.ZoneAlarm(), field_changed_list=None):
         if obj.start_alarm:
             Log.logger.debug('Rule Alarm ON:  pin={} triggered={}'.format(obj.alarm_pin_name, obj.alarm_pin_triggered))
             msg = 'Alarm ON {}'.format(obj.alarm_pin_name)
-            rule_common.send_notification(title=msg, priority=3)
-            rule_common.send_chat(message=msg, notify=True)
+            rule_common.notify_via_all(title=msg, message=msg, priority=3)
         if obj.alarm_pin_name == 'sonerie':
             thread.start_new_thread(rule_common.play_bell_local, ('SonnetteBasse.wav', ))
             rule_common.send_notification(title="Sonerie", priority=2)
@@ -107,10 +106,10 @@ def rule_ups_power(obj=models.Ups(), field_changed_list=None):
             else:
                 rule_common.notify_via_all(title="UPS power OK", message="power is back", priority=1)
         if 'battery_voltage' in field_changed_list:
-            if obj.battery_voltage <= 50:
+            if obj.battery_voltage <= 52:
                 rule_common.notify_via_all("UPS battery low at {} volts".format(obj.battery_voltage), "Low voltage")
         if 'load_percent' in field_changed_list:
-            if obj.load_percent >= 70:
+            if obj.load_percent >= 60:
                 rule_common.notify_via_all("UPS load HIGH at {}".format(obj.load_percent), "High ups load")
         if 'input_voltage' in field_changed_list:
             if obj.input_voltage <= 200:
