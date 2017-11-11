@@ -8,7 +8,7 @@ from common import utils, Constant
 import gpio
 
 __last_main_heat_update = datetime.datetime.min
-
+__TEMP_NO_HEAT = '.'
 
 # save heat status and announce to all nodes.
 def __save_heat_state_db(zone='', heat_is_on=''):
@@ -76,20 +76,22 @@ def __update_zone_heat(zone, heat_schedule, sensor):
         else:
             schedule_pattern= models.SchedulePattern.query.filter_by(id=heat_schedule.pattern_weekend_id).first()
         if schedule_pattern:
-            # check if we need forced heat on
-            force_on = False
-            if schedule_pattern.keep_warm:
-                if len(schedule_pattern.keep_warm_pattern) == 20:
-                    interval = int(minute / 5)
-                    force_on = (schedule_pattern.keep_warm_pattern[interval] == "1")
-                else:
-                    Log.logger.critical("Missing keep warm pattern for zone {}".format(zone.name))
+
             # strip formatting characters that are not used to represent target temperature
             pattern = str(schedule_pattern.pattern).replace('-', '').replace(' ','')
             # check pattern validity
             if len(pattern) == 24:
                 temperature_code = pattern[hour]
                 temperature_target = models.TemperatureTarget.query.filter_by(code=temperature_code).first()
+                # check if we need forced heat on, if for this hour temp has a upper target tan min
+                force_on = False
+                if schedule_pattern.keep_warm:
+                    if len(schedule_pattern.keep_warm_pattern) == 20:
+                        interval = int(minute / 5)
+                        force_on = ((schedule_pattern.keep_warm_pattern[interval] == "1") and
+                                    temperature_code is not __TEMP_NO_HEAT)
+                    else:
+                        Log.logger.critical("Missing keep warm pattern for zone {}".format(zone.name))
                 if temperature_target:
                     if zone.active_heat_schedule_pattern_id != schedule_pattern.id:
                         Log.logger.info('Pattern in zone {} changed to {}, target={}'.format(zone.name,
