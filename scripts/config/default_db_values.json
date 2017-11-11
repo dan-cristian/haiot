@@ -217,8 +217,8 @@
   ],
 
   "SchedulePattern": [
-    {"id":1, "name":"week-bucatarie-winter",      "pattern":".... ..22 .... .... ..22 2222"},
-    {"id":2, "name":"weekend-bucatarie-winter",   "pattern":".... .... 2222 2222 2222 2222"},
+    {"id":1, "name":"week-bucatarie-winter",      "pattern":".... ..22 .... .... ..22 2222", "keep_warm":"1", "keep_warm_pattern":"11000000001100000000"},
+    {"id":2, "name":"weekend-bucatarie-winter",   "pattern":".... .... 2222 2222 2222 2222", "keep_warm":"1", "keep_warm_pattern":"11000000001100000000"},
     {"id":3, "name":"week-bucatarie-summer",      "pattern":".... .... 2222 2222 2222 2222"},
     {"id":4, "name":"weekend-bucatarie-summer",   "pattern":".... .... bbbb bbbb bbbb bbbb"},
     {"id":5, "name":"week-living-winter",        "pattern":".... ..22 .... .... 3333 3333"},
