@@ -358,6 +358,9 @@ class SchedulePattern(db.Model, DbBase):
     pattern = db.Column(db.String(24))
     auto_activate_on_move = db.Column(db.Boolean, default=False)
     auto_deactivate_on_away = db.Column(db.Boolean, default=False)
+    keep_warm = db.Column(db.Boolean, default=False)  # keep the zone warm, used for cold floors
+    keep_warm_pattern = db.Column(db.String(20))  # pattern, 5 minutes increments of on/off: 10000100010000111000
+
 
     def __init__(self, id=None, name='', pattern=''):
         super(SchedulePattern, self).__init__()
@@ -660,6 +663,7 @@ class ZoneHeatRelay(db.Model, DbEvent, DbBase, graphs.BaseGraph):
     is_main_heat_source = db.Column(db.Boolean, default=False)
     is_alternate_source_switch = db.Column(db.Boolean, default=False)  # switch to alternate source
     is_alternate_heat_source = db.Column(db.Boolean, default=False)  # used for low cost/eco main heat sources
+
     temp_sensor_name = db.Column(db.String(50))  # temperature sensor name for heat sources to check for heat limit
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
 
