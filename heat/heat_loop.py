@@ -76,7 +76,6 @@ def __update_zone_heat(zone, heat_schedule, sensor):
         else:
             schedule_pattern= models.SchedulePattern.query.filter_by(id=heat_schedule.pattern_weekend_id).first()
         if schedule_pattern:
-
             # strip formatting characters that are not used to represent target temperature
             pattern = str(schedule_pattern.pattern).replace('-', '').replace(' ','')
             # check pattern validity
@@ -94,8 +93,8 @@ def __update_zone_heat(zone, heat_schedule, sensor):
                         Log.logger.critical("Missing keep warm pattern for zone {}".format(zone.name))
                 if temperature_target:
                     if zone.active_heat_schedule_pattern_id != schedule_pattern.id:
-                        Log.logger.info('Pattern in zone {} changed to {}, target={}'.format(zone.name,
-                                                                schedule_pattern.name, temperature_target.target))
+                        Log.logger.info('Pattern in zone {} changed to {}, target={}'.format(
+                            zone.name, schedule_pattern.name, temperature_target.target))
                         zone.active_heat_schedule_pattern_id = schedule_pattern.id
                     zone.heat_target_temperature = temperature_target.target
                     commit()
@@ -208,6 +207,7 @@ def set_main_heat_source():
             temp_rec = models.Sensor().query_filter_first(
                 models.Sensor.sensor_name.in_([heat_source_relay.temp_sensor_name]))
             # if alternate source is valid
+            # fixme: add temp threshold to avoid quick on/offs
             if temp_rec is not None and temp_rec.temperature >= temp_limit:
                 if heat_source_relay.is_alternate_source_switch:
                     # stop main heat source
