@@ -67,7 +67,8 @@ def __search_ups(port_name):
     ser.port = port_name
     __open_port(ser)
     if ser.isOpen():
-        for i in range(0, 3):
+        # first read returns unknown response, second works
+        for i in range(0, 2):
             response = __write_read_port(ser, 'I\r')
             # [#                           JP00106G  #015]
             if "JP00106G" in response:

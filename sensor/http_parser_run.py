@@ -11,6 +11,8 @@ from main.admin import models, model_helper
 _initialised_solar_aps = False
 __start_keyword = 'Lifetime generation</td><td align=center>'
 __end_keyword = ' kWh</td>'
+__start_keyword_now = 'Last System Power</td><td align=center>'
+__end_keyword_now = ' W</td>'
 
 
 def init_solar_aps():
@@ -29,6 +31,8 @@ def thread_solar_aps_run():
     if variable.NODE_THIS_IS_MASTER_OVERALL:
         production = utils.parse_http(model_helper.get_param(Constant.P_SOLAR_APS_LOCAL_URL),
                                       __start_keyword, __end_keyword)
+        last_power = utils.parse_http(model_helper.get_param(Constant.P_SOLAR_APS_LOCAL_URL),
+                                      __start_keyword_now, __end_keyword_now)
         if production is not None:
             production = float(production)
             utility_name = model_helper.get_param(Constant.P_SOLAR_UTILITY_NAME)
@@ -45,7 +49,8 @@ def thread_solar_aps_run():
                         return
                 record.units_total = production
                 record.unit_name = current_record.unit_name
-
+                record.units_2_delta = last_power
+                record.unit_2_name = current_record.unit_2_name
             else:
                 record.units_delta = production
                 record.units_total = production
