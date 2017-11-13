@@ -27,14 +27,20 @@ REMOTE_STATUS["$2$5"]=$4
 
 function check_amp {
 	# hack to restart X on first music run after system restart, to force hdmi sound card enabling
-	is_amp_detected $AMP_HDMI_X11_IGNORE
-	have_amp=$?
-        if [ $have_amp -eq 0 ]; then
-        	i3-msg exit
-                echo2 "Restarted X to enable HDMI sound, result was " $have_amp
-        else
-        	echo2 "AMP $AMP_HDMI_X11_IGNORE is already seen, have sound, result was " $have_amp
-        fi
+	if [ ! -f $AMP_HDMI_DETECTED_FILE ]; then
+		is_amp_detected $AMP_HDMI_X11_IGNORE
+		have_amp=$?
+        	if [ $have_amp -eq 0 ]; then
+        		i3-msg exit
+                	echo2 "Restarted X to enable HDMI sound, result was " $have_amp
+			touch $AMP_HDMI_DETECTED_FILE
+        	else
+        		echo2 "AMP $AMP_HDMI_X11_IGNORE is already seen, have sound, result was " $have_amp
+			touch $AMP_HDMI_DETECTED_FILE
+        	fi
+	else
+		echo2 "AMP already detected, touch file exists"
+	fi
 }
 
 #show current status, assume card names start with uppercase to avoid duplicates
@@ -88,6 +94,7 @@ do
 		do_url "Refresh" "$relay_name" "${CARD_NAME[$i]}" "$state" "$zone_index"
 		#wget --timeout=10 --tries=1 -O - $AMP_URL'&filter_value='${RELAY_NAME[$i]}'&field_value='$state
 		REFRESHED=1
+		check_amp
   	done
   else
 	#changed state. run on power on, delayed off at refresh
