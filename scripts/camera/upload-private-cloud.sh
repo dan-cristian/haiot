@@ -31,11 +31,11 @@ function upload(){
 if [ $# -ne 0 ]; then
   echo2 "Upload file $1"
   source=$1
-  src_parent=`dirname $source`
+  src_parent=`dirname "$source"`
   replace=''
   #replace root
   dest="${source/$SRC_DIR/$CLOUD_DIR}"
-  dest_parent=`dirname $dest`
+  dest_parent=`dirname "$dest"`
   #mkdir -p $dest_parent >> $LOG 2>&1
   echo2 "Uploading $source to $dest"
   if [ -z ${HOME+x} ]; then export HOME="/home/motion"; fi
@@ -66,34 +66,34 @@ fi
 function move(){
 #echo2 "Starting SAVE script firstparam=$1"
 if [ $# -ne 0 ]; then
-  source=$1
-  upload $source
+  source="$1"
+  upload "$source"
   result=$?
   if [ "$result" == "0" ];then
-    src_parent=`dirname $source`
+    src_parent=`dirname "$source"`
     replace=''
     #strip out "tmp" folder name
     dest="${source///tmp$replace}"
-    dest_parent=`dirname $dest`
-    mkdir -p $dest_parent >> $LOG 2>&1
+    dest_parent=`dirname "$dest"`
+    mkdir -p "$dest_parent" >> $LOG 2>&1
     if [ $? -eq 1 ]; then
 	echo2 "Create parent folder failed"
 	return 2
     fi
     #echo2 "Move file to $dest"
-    chmod -v 777 $dest_parent >> $LOG 2>&1
-    mv -f $1 $dest >> $LOG 2>&1
-    rm -d $src_parent >> $LOG 2>&1
+    chmod -v 777 "$dest_parent" >> $LOG 2>&1
+    mv -f $1 "$dest" >> $LOG 2>&1
+    rm -d "$src_parent" >> $LOG 2>&1
     if [ $? -eq 0 ]; then
     	src_parent_2=`dirname $src_parent`
-    	rm -d $src_parent_2 >> $LOG 2>&1
+    	rm -d "$src_parent_2" >> $LOG 2>&1
 	if [ $? -eq 0 ]; then
-		src_parent_3=`dirname $src_parent_2`
-        	rm -d $src_parent_3 >> $LOG 2>&1
+		src_parent_3=`dirname "$src_parent_2"`
+        	rm -d "$src_parent_3" >> $LOG 2>&1
 	fi
     fi
     #echo2 "Change mode for $dest"
-    chmod -v 777 $dest >> $LOG 2>&1
+    chmod -v 777 "$dest" >> $LOG 2>&1
   else
     echo2 "Upload failed result=$result, not moving file from tmp"
     return 2
@@ -153,19 +153,21 @@ done
 function move_failed(){
 count=0
 count_failed=0
+be_quiet=1
 #find $SRC_DIR -type f -mtime +1 |
 find $SRC_DIR -type f  |
 while read source
 do
-  if [ -f $source ]; then
+  echo2 "Processing old file ["$source"]"
+  if [ -f "$source" ]; then
 	file_count=`find /mnt/motion/tmp -type f | wc -l`
-	if [ $file_count -le "100" ]; then
+	if [ $file_count -le "154000" ]; then
 		be_quiet=1
 	fi
-  	file=`basename $source`
+  	file=`basename "$source"`
 	# check if file is in use with lsof
 	filename=$(basename "$file")
-	lsof -w | grep -q $filename
+	lsof -w | grep -q "$filename"
 	if [ $? = 1 ]; then
 		echo2 "FILE COUNT in tmp folder is $file_count"
   		lock=/tmp/.motion.move.$file.exclusivelock
@@ -174,7 +176,7 @@ do
   		# Wait for lock on /var/lock/..exclusivelock (fd 200) for 1 seconds
   		if flock -x -w 1 200 ; then
         		echo2 "Moving older file $source"
-        		move $source
+        		move "$source"
 			result=$?
 			#echo2 "Moved older done result=$result"
 			exit $result
@@ -195,7 +197,7 @@ do
 			fi
   		else
 			((count_failed++))
-			if [ $count_failed -eq 50 ]; then
+			if [ $count_failed -eq 500 ]; then
 				echo2 "Exiting as I failed to move $count_failed files"
 				return 1
 			fi
