@@ -81,6 +81,14 @@ def get_mod_name(module):
     return str(module).split("'")[1]
 
 
+def save_db_log(entry_name, entry_value):
+    record = models.Log.query.filter_by(entry_name=entry_name).first()
+    if record is None:
+        record = models.Log(entry_name = entry_name)
+    record.entry_value = entry_value
+    commit()
+
+
 def check_table_schema(table, model_auto_update=False):
     recreate_table = False
     ex_msg = None
@@ -151,7 +159,7 @@ def populate_tables(model_auto_update=False):
                         models.Sensor,
                         models.Ups, models.Rule,
                         models.CommandOverrideRelay, models.PlotlyCache, models.Utility, models.Presence,
-                        models.SensorError]
+                        models.SensorError, models.Log]
     # tables that will be cleaned on every app start
     table_force_clean = [models.Zone, models.Presence, models.Module, models.Node, models.Rule, models.ZoneHeatRelay]
     # , models.Sensor]

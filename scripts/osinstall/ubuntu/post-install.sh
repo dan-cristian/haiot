@@ -1,7 +1,11 @@
 #!/bin/bash
 
-echo "Run this script with root account"
+if [[ $EUID -ne 0 ]]; then
+   echo "This script must be run as root" 
+   exit 1
+fi
 
+COUNTRY_CODE=RO
 USERNAME=haiot
 USERPASS=haiot
 ENABLE_WEBMIN=0
@@ -46,6 +50,69 @@ ENABLE_SECURE_SSH=0
 
 ENABLE_ROUTER=0
 
+ENABLE_DASHCAM=1
+ENABLE_DASHCAM_LCD_DF=0
+ENABLE_LOG_RAM=0
+
+set_config_var() {
+  lua - "$1" "$2" "$3" <<EOF > "$3.bak"
+local key=assert(arg[1])
+local value=assert(arg[2])
+local fn=assert(arg[3])
+local file=assert(io.open(fn))
+local made_change=false
+for line in file:lines() do
+  if line:match("^#?%s*"..key.."=.*$") then
+    line=key.."="..value
+    made_change=true
+  end
+  print(line)
+end
+
+if not made_change then
+  print(key.."="..value)
+end
+EOF
+mv "$3.bak" "$3"
+}
+
+clear_config_var() {
+  lua - "$1" "$2" <<EOF > "$2.bak"
+local key=assert(arg[1])
+local fn=assert(arg[2])
+local file=assert(io.open(fn))
+for line in file:lines() do
+  if line:match("^%s*"..key.."=.*$") then
+    line="#"..line
+  end
+  print(line)
+end
+EOF
+mv "$2.bak" "$2"
+}
+
+get_config_var() {
+  lua - "$1" "$2" <<EOF
+local key=assert(arg[1])
+local fn=assert(arg[2])
+local file=assert(io.open(fn))
+local found=false
+for line in file:lines() do
+  local val = line:match("^%s*"..key.."=(.*)$")
+  if (val ~= nil) then
+    print(val)
+    found=true
+    break
+  end
+end
+if not found then
+   print(0)
+end
+EOF
+}
+
+
+
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 echo "Script directory is $SCRIPT_DIR, make sure script is placed in proper haiot GIT folder structure to find conf files"
 echo "Setting timezone ..."
@@ -62,7 +129,7 @@ else
 fi
 
 echo "Installing additional generic packages"
-apt-get -y install ssh dialog sudo nano wget runit git ssmtp mailutils psmisc smartmontools localepurge gpm davfs2 sshpass
+apt-get -y install ssh dialog sudo nano wget runit git ssmtp mailutils psmisc smartmontools localepurge sshpass
 
 
 echo "Creating user $USERNAME with password=$USERPASS"
@@ -438,10 +505,10 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     systemctl start thd
 
     echo "Installing screenshow"
-    apt install feh exiv2
+    apt install feh exiv2 
 
    echo "Installing gesture"
-   apt install easystroke
+   apt install easystroke gpm
 
    echo "Installing GoogleMusicProxy"
    # http://gmusicproxy.net/
@@ -576,7 +643,7 @@ fi
 
 if [ "$ENABLE_BACKUP_SERVER" == "1" ]; then
     echo "Installing cloud backup tools"
-    apt-get install -y fuse ntfs-3g
+    apt-get install -y fuse ntfs-3g davfs2
 
     # not working
     #https://www.howtoforge.com/tutorial/owncloud-install-debian-8-jessie/
@@ -736,6 +803,94 @@ if [ "$ENABLE_VPN_SERVER" == "1" ]; then
     echo '</key>' >> /etc/openvpn/easy-rsa/keys/client.ovpn
 fi
 
+if [ "$ENABLE_DASHCAM" == "1" ]; then
+	#http://pidashcam.blogspot.ro/2013/09/install.html#front
+	cat /etc/network/interfaces | grep "auto wlan0"
+    if [ "$?" == "1" ]; then
+		#https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md
+		iwlist wlan0 scan
+		TMP_WIFI="/etc/wpa_supplicant/wpa_supplicant.conf"
+        read -sp "Enter wifi password:" wifipass
+		echo 'network={' 	>> $TMP_WIFI
+		echo 'ssid="home2"'	>> $TMP_WIFI
+		echo 'psk="'$wifipass'"'	>> $TMP_WIFI
+		echo 'priority=1'	>> $TMP_WIFI
+		echo "}"			>> $TMP_WIFI
+		set_config_var country $COUNTRY_CODE $TMP_WIFI
+		wpa_cli -i wlan0 reconfigure
+		echo "auto wlan0" >> /etc/network/interfaces
+		echo "Change password for pi user"
+		passwd pi
+		systemctl enable ssh
+		systemctl start ssh
+		#enable camera
+		# https://raspberrypi.stackexchange.com/questions/14229/how-can-i-enable-the-camera-without-using-raspi-config
+		set_config_var start_x 1 /boot/config.txt
+		CUR_GPU_MEM=$(get_config_var gpu_mem /boot/config.txt)
+		if [ -z "$CUR_GPU_MEM" ] || [ "$CUR_GPU_MEM" -lt 128 ]; then
+		  set_config_var gpu_mem 128 /boot/config.txt
+		fi
+		sed /boot/config.txt -i -e "s/^startx/#startx/"
+		sed /boot/config.txt -i -e "s/^fixup_file/#fixup_file/"
+	fi
+	#https://github.com/waveform80/picamera/issues/288#issuecomment-222636171
+	apt install -y python-picamera
+	#http://www.richardmudhar.com/blog/2015/02/raspberry-pi-camera-and-motion-out-of-the-box-sparrowcam/
+	modprobe bcm2835-v4l2
+	if ! grep -q "^bcm2835[-_]v4l2" /etc/modules; then printf "bcm2835-v4l2\n" >> /etc/modules; fi
+	apt install -y motion
+    cam1_conf=/etc/motion/camera1.conf
+    cam2_conf=/etc/motion/camera2.conf
+    motion_conf=/etc/motion/motion.conf
+	cp /etc/motion/camera1-dist.conf $cam1_conf
+    cp /etc/motion/camera2-dist.conf $cam2_conf
+    sed -i -re '/camera1.conf/ s/^; //' $motion_conf 
+    sed -i -re '/camera2.conf/ s/^; //' $motion_conf
+echo "
+target_dir /home/${USERNAME}/motion/records
+movie_filename front-%v-%Y%m%d%H%M%S
+width 640
+height 480
+framerate 8
+output_pictures off
+ffmpeg_timelapse_mode hourly
+ffmpeg_video_codec mpeg4
+stream_localhost off
+stream_maxrate 8
+webcontrol_localhost off
+" >> $cam1_conf
+
+echo "
+target_dir /home/${USERNAME}/motion/records
+movie_filename rear-%v-%Y%m%d%H%M%S
+input -1
+width 640
+height 480
+framerate 8
+output_pictures off
+ffmpeg_timelapse_mode hourly
+ffmpeg_video_codec mpeg4
+stream_localhost off
+stream_maxrate 8
+webcontrol_localhost off
+" >> $cam2_conf
+fi
+
+if [ "$ENABLE_DASHCAM_LCD_DF" == "1" ]; then
+    echo "Installing dfrobot tft screen"
+	#https://github.com/pimoroni/rp_usbdisplay/tree/master/dkms
+	#http://docs.robopeak.net/doku.php?id=rpusbdisp_faq#q12
+	wget https://github.com/pimoroni/rp_usbdisplay/raw/master/dkms/rp-usbdisplay-dkms_1.0_all.deb
+	apt install dkms raspberrypi-kernel-headers
+	dpkg -i rp-usbdisplay-dkms_1.0_all.deb
+	modprobe rp_usbdisplay
+	if ! grep -q "^rp_[u_]sbdisplay" /etc/modules; then printf "rp_usbdisplay\n" >> /etc/modules; fi
+	if ! grep -q "fbcon[=_]map:1" /boot/cmdline.txt; then echo -n " fbcon=font:ProFont6x11 fbcon=map:1" >> /boot/cmdline.txt; fi
+	#remove new line 
+	tr -d '\n' < /boot/cmdline.txt > /boot/cmdline.new
+	mv /boot/cmdline.new /boot/cmdline.txt
+fi
+
 echo "Optimise for flash and ssd usage"
 
 echo "Create tmpfs"
@@ -747,8 +902,10 @@ cat /etc/fstab | grep "/var/ram"
 if [ "$?" == "1" ]; then
 	echo "Add ram folder for sqlite db storage and logs"
 	echo "tmpfs           /var/ram        tmpfs   defaults,noatime        0       0" >> /etc/fstab
-	echo "tmpfs           /var/log        tmpfs   defaults,noatime        0       0" >> /etc/fstab
-	echo "tmpfs           /tmp            tmpfs   defaults,noatime        0       0" >> /etc/fstab
+	if [ "$ENABLE_LOG_RAM" == "1" ]; then
+        echo "tmpfs           /var/log        tmpfs   defaults,noatime        0       0" >> /etc/fstab
+	fi
+    echo "tmpfs           /tmp            tmpfs   defaults,noatime        0       0" >> /etc/fstab
 	mount -a
 else
 	echo "Ram folder for sqlite db storage exists already"
@@ -759,14 +916,15 @@ fi
 cat /etc/ssmtp/ssmtp.conf | grep "smtp.gmail.com"
 if [ "$?" == "1" ]; then
     echo "Setting email"
+    read -sp "Enter email password:" emailpass
     echo "AuthUser=antonio.gaudi33@gmail.com" >> /etc/ssmtp/ssmtp.conf
-    echo "AuthPass=<your_password>" >> /etc/ssmtp/ssmtp.conf
+    echo "AuthPass=$emailpass" >> /etc/ssmtp/ssmtp.conf
     echo "FromLineOverride=YES" >> /etc/ssmtp/ssmtp.conf
     echo "mailhub=smtp.gmail.com:587" >> /etc/ssmtp/ssmtp.conf
     echo "UseSTARTTLS=YES" >> /etc/ssmtp/ssmtp.conf
-    echo "Now enter your password in email conf and save with CTRL+x"
-    sleep 3
-    nano /etc/ssmtp/ssmtp.conf
+    #echo "Now enter your password in email conf and save with CTRL+x"
+    #sleep 3
+    #nano /etc/ssmtp/ssmtp.conf
     echo "Sending test email"
     dmesg | mail -s "Test" dan.cristian@gmail.com
 fi
