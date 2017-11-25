@@ -165,3 +165,4 @@ def init_crud():
     register_crud(user, '/rule', 'rule', Rule, filters=simple_filters)
     register_crud(user, '/commandoverriderelay', 'commandoverriderelay', CommandOverrideRelay, filters=simple_filters)
     register_crud(user, '/utility', 'utility', models.Utility, filters=simple_filters)
+    register_crud(user, '/log', 'log', models.Log, filters=simple_filters)

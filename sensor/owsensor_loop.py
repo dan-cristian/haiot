@@ -182,6 +182,7 @@ def get_io(sensor, dev):
 
 def check_inactive(sensor_dict):
     """check for inactive sensors not read recently but in database"""
+    inactive_list = ''
     record_list = models.Sensor().query_all()
     for sensor in record_list:
         if sensor.address not in sensor_dict.keys():
