@@ -161,6 +161,9 @@ class Constant:
     #UTILITY_TYPE_GAS_MEASURE = 'l'
     UTILITY_TYPE_WATER_LEVEL = 'water level'
 
+    LOG_SENSOR_INACTIVE = ''
+
+
 def load_config_json():
     from main.logger_helper import Log
     try:
