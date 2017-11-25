@@ -788,6 +788,19 @@ class Utility(db.Model, graphs.BaseGraph, DbEvent, DbBase):
         return '{} {} {}'.format(self.id, self.utility_name, self.updated_on)
 
 
+class Log(db.Model, graphs.BaseGraph, DbEvent, DbBase):
+    id = db.Column(db.Integer, primary_key=True)
+    entry_name = db.Column(db.String(50))  # unique name
+    entry_value = db.Column(db.String(50))
+    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
+
+    def __init__(self, entry_name=''):
+        super(Log, self).__init__()
+        self.entry_name = entry_name
+
+    def __repr__(self):
+        return '{} {} {}'.format(self.id, self.entry_name, self.entry_value)
+
 '''
 tables used to store historical data
 column names must match the source model names as save is done automatically
