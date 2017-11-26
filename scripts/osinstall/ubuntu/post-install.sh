@@ -846,6 +846,17 @@ if [ "$ENABLE_DASHCAM" == "1" ]; then
     cp /etc/motion/camera2-dist.conf $cam2_conf
     sed -i -re '/camera1.conf/ s/^; //' $motion_conf 
     sed -i -re '/camera2.conf/ s/^; //' $motion_conf
+    #https://github.com/legotheboss/YouTube-files/wiki/(RPi)-Compile-FFmpeg-with-the-OpenMAX-H.264-GPU-acceleration
+    #might need more disk space, resize SSD
+    #https://askubuntu.com/questions/386420/how-to-open-gparted-terminal
+    #https://unix.stackexchange.com/questions/67095/how-can-i-expand-ext4-partition-size-on-debian
+    apt-get install libomxil-bellagio-dev libx264-dev libx265-dev  -y
+    git clone https://github.com/FFmpeg/FFmpeg.git
+    cd FFmpeg
+    ./configure --arch=armel --target-os=linux --enable-gpl --enable-omx --enable-omx-rpi --enable-nonfree --prefix=/usr --extra-version='1~deb9u1' --toolchain=hardened --libdir=/usr/lib/arm-linux-gnueabihf --incdir=/usr/include/arm-linux-gnueabihf
+    make -j4
+    
+
 echo "
 target_dir /home/${USERNAME}/motion/records
 movie_filename front-%v-%Y%m%d%H%M%S
