@@ -1,8 +1,12 @@
 import sys
 import pygame
 import os
+import io
+import glob
+import errno
 
 UI_DFROBOT_2_8 = True
+TOUCHSCREEN_EVDEV_NAME = 'RoboPeakUSBDisplayTS'
 _width = 100
 _height = 80
 _screen = None
@@ -12,8 +16,26 @@ _button_list = []
 
 #https://pythonprogramming.net/pygame-button-function-events/
 # https://www.dfrobot.com/product-1062.html
+
+
+def _get_touch_device():
+    for evdev in glob.glob("/sys/class/input/event*"):
+        try:
+            with io.open(os.path.join(evdev, 'device', 'name'), 'r') as f:
+                if f.read().strip() == TOUCHSCREEN_EVDEV_NAME:
+                    dev_name = os.path.join('/dev', 'input', os.path.basename(evdev))
+                    print "Device name is: " + dev_name
+                    return dev_name
+        except IOError as e:
+            if e.errno != errno.ENOENT:
+                raise
+    raise RuntimeError('Unable to locate touchscreen device')
+
+
 if UI_DFROBOT_2_8:
     os.environ["SDL_FBDEV"] = "/dev/fb1"
+    os.environ["SDL_MOUSEDRV"] = "TSLIB"
+    os.environ["SDL_MOUSEDEV"] = _get_touch_device()
     _width = 320
     _height = 240
 
@@ -50,7 +72,7 @@ class Button:
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
 
-        print(click)
+        #print(click)
         smalltext = pygame.font.SysFont("comicsansms", 20)
         if self.x + self.w > mouse[0] > self.x and self.y + self.h > mouse[1] > self.y:
             pygame.draw.rect(_screen, self.ac, (self.x, self.y, self.w, self.h))
@@ -86,7 +108,7 @@ def loop():
                 quit()
             for btn in _button_list:
                 btn.do_event()
-            clock.tick(15)
+            #clock.tick(15)
 
 
 def init():
