@@ -50,8 +50,9 @@ ENABLE_SECURE_SSH=0
 
 ENABLE_ROUTER=0
 
-ENABLE_DASHCAM=1
-ENABLE_DASHCAM_LCD_DF=0
+ENABLE_DASHCAM_PI=1
+ENABLE_DASHCAM_PI_LCD_DF=1
+ENABLE_DASHCAM_MOTION=0
 ENABLE_LOG_RAM=0
 
 set_config_var() {
@@ -119,10 +120,45 @@ echo "Setting timezone ..."
 echo "Europe/Bucharest" > /etc/timezone
 dpkg-reconfigure -f noninteractive tzdata
 
+
+# give internet connectivity via WIFI first
+if [ "$ENABLE_DASHCAM_PI" == "1" ]; then
+	#http://pidashcam.blogspot.ro/2013/09/install.html#front
+	cat /etc/network/interfaces | grep "auto wlan0"
+    if [ "$?" == "1" ]; then
+		#https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md
+		iwlist wlan0 scan
+		TMP_WIFI="/etc/wpa_supplicant/wpa_supplicant.conf"
+        read -sp "Enter wifi password:" wifipass
+		echo 'network={' 	>> $TMP_WIFI
+		echo 'ssid="home2"'	>> $TMP_WIFI
+		echo 'psk="'$wifipass'"'	>> $TMP_WIFI
+		echo 'priority=1'	>> $TMP_WIFI
+		echo "}"			>> $TMP_WIFI
+		set_config_var country $COUNTRY_CODE $TMP_WIFI
+		wpa_cli -i wlan0 reconfigure
+		echo "auto wlan0" >> /etc/network/interfaces
+		echo "Waiting to get WIFI connection"
+		systemctl enable ssh
+		systemctl start ssh
+	fi
+fi
+
+echo "Testing internet connectivity"
+while true;do
+    ping -c 1 www.google.com && break
+    sleep 1
+done
+
+echo "Starting update & auto install in 10 seconds"
+sleep 10
+
 echo "Updating apt-get and upgrade"
 if [ ! -f /tmp/updated ]; then
     apt-get -y update
     apt-get -y upgrade
+    #echo "Ignore following error if you are not running on a PI"
+    #rpi-update
     touch /tmp/updated
 else
     echo "Skipping update & upgrade, already done!"
@@ -803,22 +839,10 @@ if [ "$ENABLE_VPN_SERVER" == "1" ]; then
     echo '</key>' >> /etc/openvpn/easy-rsa/keys/client.ovpn
 fi
 
-if [ "$ENABLE_DASHCAM" == "1" ]; then
+if [ "$ENABLE_DASHCAM_PI" == "1" ]; then
 	#http://pidashcam.blogspot.ro/2013/09/install.html#front
 	cat /etc/network/interfaces | grep "auto wlan0"
     if [ "$?" == "1" ]; then
-		#https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md
-		iwlist wlan0 scan
-		TMP_WIFI="/etc/wpa_supplicant/wpa_supplicant.conf"
-        read -sp "Enter wifi password:" wifipass
-		echo 'network={' 	>> $TMP_WIFI
-		echo 'ssid="home2"'	>> $TMP_WIFI
-		echo 'psk="'$wifipass'"'	>> $TMP_WIFI
-		echo 'priority=1'	>> $TMP_WIFI
-		echo "}"			>> $TMP_WIFI
-		set_config_var country $COUNTRY_CODE $TMP_WIFI
-		wpa_cli -i wlan0 reconfigure
-		echo "auto wlan0" >> /etc/network/interfaces
 		echo "Change password for pi user"
 		passwd pi
 		systemctl enable ssh
@@ -838,24 +862,49 @@ if [ "$ENABLE_DASHCAM" == "1" ]; then
 	#http://www.richardmudhar.com/blog/2015/02/raspberry-pi-camera-and-motion-out-of-the-box-sparrowcam/
 	modprobe bcm2835-v4l2
 	if ! grep -q "^bcm2835[-_]v4l2" /etc/modules; then printf "bcm2835-v4l2\n" >> /etc/modules; fi
-	apt install -y motion
+    # https://unix.stackexchange.com/questions/91027/how-to-disable-usb-autosuspend-on-kernel-3-7-10-or-above
+	if ! grep -q "usbcore[._]autosuspend" /boot/cmdline.txt; then echo -n " usbcore.autosuspend=-1" >> /boot/cmdline.txt; fi
+	#remove new line
+	tr -d '\n' < /boot/cmdline.txt > /boot/cmdline.new
+	mv /boot/cmdline.new /boot/cmdline.txt
+
+	#https://github.com/legotheboss/YouTube-files/wiki/(RPi)-Compile-FFmpeg-with-the-OpenMAX-H.264-GPU-acceleration
+    #might need more disk space, resize SSD
+    #https://askubuntu.com/questions/386420/how-to-open-gparted-terminal
+    #https://unix.stackexchange.com/questions/67095/how-can-i-expand-ext4-partition-size-on-debian
+    apt install -y git libomxil-bellagio-dev libx264-dev libx265-dev libmp3lame-dev libfontconfig-dev libasound2-dev
+
+    if [ ! -f FFmpeg/ffmpeg ]; then
+        git clone https://github.com/FFmpeg/FFmpeg.git
+        cd FFmpeg
+        #./configure --arch=armel --target-os=linux --enable-libmp3lame --enable-gpl --enable-omx --enable-omx-rpi --enable-nonfree --prefix=/usr --extra-version='1~deb9u1' --toolchain=hardened --libdir=/usr/lib/arm-linux-gnueabihf --incdir=/usr/include/arm-linux-gnueabihf
+        ./configure --arch=armel --target-os=linux --enable-indev=alsa --enable-outdev=alsa --enable-libfreetype --enable-libfontconfig --enable-libmp3lame --enable-gpl --enable-omx --enable-omx-rpi --enable-nonfree --prefix=/usr --toolchain=hardened --libdir=/usr/lib/arm-linux-gnueabihf --incdir=/usr/include/arm-linux-gnueabihf
+        make -j4
+        cd ..
+    fi
+    #https://www.raspberrypi.org/documentation/raspbian/applications/camera.md
+    #http://www.bogotobogo.com/VideoStreaming/ffmpeg_AdaptiveLiveStreaming_SmoothStreaming.php
+    # https://superuser.com/questions/908280/what-is-the-correct-way-to-fix-keyframes-in-ffmpeg-for-dash
+    #pi cam v1
+    #raspivid -o -  -t 0 -ex night -br 50 -n -w 1296 -h    -fps 8 | ./ffmpeg -r 8 -i - -y -frag_duration 1000 -an -c:v h264_omx -b:v 3000k -vf "drawtext=text='%{localtime\:%c}': fontcolor=white@0.8: fontsize=32: x=10: y=10" record0.mp4
+    #usb webcam 5mp
+    #./ffmpeg -r 8 -f video4linux2 -i /dev/video1 -vf "drawtext=text='%{localtime\:%c}': fontcolor=white@0.8: fontsize=32: x=10: y=10" -s 1600x1200 -an -c:v h264_omx -b:v 3000k -y -frag_duration 1000 record1.mp4
+    #./ffmpeg -y -f alsa -thread_queue_size 512 -ac 1 -i hw:1 -ar 16000 -acodec mp3 -f video4linux2 -r 8 -i /dev/video1 -vf "drawtext=text='%{localtime\:%c}': fontcolor=white@0.8: fontsize=32: x=10: y=10" -s 1280x720 -c:v h264_omx -b:v 3000k -frag_duration 1000 record2.mp4
+    #usb web cam logitech c310
+    #./ffmpeg  -r 8 -f video4linux2 -i /dev/video1 -vf "drawtext=text='%{localtime\:%c}': fontcolor=white@0.8: fontsize=32: x=10: y=10" -s 1280x720 -an -c:v h264_omx -b:v 3000k -y -frag_duration 1000 -f segment -segment_time 3600 -segment_format mp4 -reset_timestamps 1  -force_key_frames "expr:gte(t,n_forced*2)" /mnt/tmp/record2_%03d.mp4
+    #windows
+    #https://stackoverflow.com/questions/44347991/how-to-grab-laptop-webcam-video-with-ffmpeg-in-windows
+    #ffmpeg -y -f dshow -i video="Integrated Camera" -r 8 -c:v libx264 -b:v 2000k -frag_duration 1000 record1.mp4
+
+if [ "$ENABLE_DASHCAM_MOTION" == "1" ]; then
+    apt install -y motion
     cam1_conf=/etc/motion/camera1.conf
     cam2_conf=/etc/motion/camera2.conf
     motion_conf=/etc/motion/motion.conf
 	cp /etc/motion/camera1-dist.conf $cam1_conf
     cp /etc/motion/camera2-dist.conf $cam2_conf
-    sed -i -re '/camera1.conf/ s/^; //' $motion_conf 
+    sed -i -re '/camera1.conf/ s/^; //' $motion_conf
     sed -i -re '/camera2.conf/ s/^; //' $motion_conf
-    #https://github.com/legotheboss/YouTube-files/wiki/(RPi)-Compile-FFmpeg-with-the-OpenMAX-H.264-GPU-acceleration
-    #might need more disk space, resize SSD
-    #https://askubuntu.com/questions/386420/how-to-open-gparted-terminal
-    #https://unix.stackexchange.com/questions/67095/how-can-i-expand-ext4-partition-size-on-debian
-    apt-get install libomxil-bellagio-dev libx264-dev libx265-dev  -y
-    git clone https://github.com/FFmpeg/FFmpeg.git
-    cd FFmpeg
-    ./configure --arch=armel --target-os=linux --enable-gpl --enable-omx --enable-omx-rpi --enable-nonfree --prefix=/usr --extra-version='1~deb9u1' --toolchain=hardened --libdir=/usr/lib/arm-linux-gnueabihf --incdir=/usr/include/arm-linux-gnueabihf
-    make -j4
-    
 
 echo "
 target_dir /home/${USERNAME}/motion/records
@@ -887,19 +936,31 @@ webcontrol_localhost off
 " >> $cam2_conf
 fi
 
-if [ "$ENABLE_DASHCAM_LCD_DF" == "1" ]; then
-    echo "Installing dfrobot tft screen"
-	#https://github.com/pimoroni/rp_usbdisplay/tree/master/dkms
-	#http://docs.robopeak.net/doku.php?id=rpusbdisp_faq#q12
-	wget https://github.com/pimoroni/rp_usbdisplay/raw/master/dkms/rp-usbdisplay-dkms_1.0_all.deb
-	apt install dkms raspberrypi-kernel-headers
-	dpkg -i rp-usbdisplay-dkms_1.0_all.deb
-	modprobe rp_usbdisplay
-	if ! grep -q "^rp_[u_]sbdisplay" /etc/modules; then printf "rp_usbdisplay\n" >> /etc/modules; fi
-	if ! grep -q "fbcon[=_]map:1" /boot/cmdline.txt; then echo -n " fbcon=font:ProFont6x11 fbcon=map:1" >> /boot/cmdline.txt; fi
-	#remove new line 
-	tr -d '\n' < /boot/cmdline.txt > /boot/cmdline.new
-	mv /boot/cmdline.new /boot/cmdline.txt
+fi
+
+if [ "$ENABLE_DASHCAM_PI_LCD_DF" == "1" ]; then
+    modprobe rp_usbdisplay
+    if [ "$?" == "1" ]; then
+        echo "Installing dfrobot tft screen"
+        #https://github.com/pimoroni/rp_usbdisplay/tree/master/dkms
+        #http://docs.robopeak.net/doku.php?id=rpusbdisp_faq#q12
+        wget https://github.com/pimoroni/rp_usbdisplay/raw/master/dkms/rp-usbdisplay-dkms_1.0_all.deb
+        # https://askubuntu.com/questions/714874/how-to-point-dkms-to-kernel-headers
+        #ln -s /usr/src/linux-headers-$(uname -r)  /lib/modules/$(uname -r)/build
+        apt install dkms raspberrypi-kernel-headers python-pip python-pygame
+        dpkg -i rp-usbdisplay-dkms_1.0_all.deb
+        echo "Probing module"
+        modprobe rp_usbdisplay
+        if ! grep -q "^rp_[u_]sbdisplay" /etc/modules; then printf "rp_usbdisplay\n" >> /etc/modules; fi
+        if ! grep -q "fbcon[=_]map:1" /boot/cmdline.txt; then echo -n " fbcon=font:ProFont6x11 fbcon=map:1" >> /boot/cmdline.txt; fi
+        #remove new line
+        tr -d '\n' < /boot/cmdline.txt > /boot/cmdline.new
+        mv /boot/cmdline.new /boot/cmdline.txt
+        #https://stackoverflow.com/questions/24147026/display-gui-on-raspberry-pi-without-startx
+        #https://pythonprogramming.net/pygame-button-function-events/
+        #calibrate tft pointer
+        #https://learn.adafruit.com/adafruit-pitft-28-inch-resistive-touchscreen-display-raspberry-pi/resistive-touchscreen-manual-install-calibrate
+	fi
 fi
 
 echo "Optimise for flash and ssd usage"
@@ -926,6 +987,7 @@ fi
 # http://iqjar.com/jar/sending-emails-from-the-raspberry-pi/
 cat /etc/ssmtp/ssmtp.conf | grep "smtp.gmail.com"
 if [ "$?" == "1" ]; then
+    apt install -y ssmtp mailutils
     echo "Setting email"
     read -sp "Enter email password:" emailpass
     echo "AuthUser=antonio.gaudi33@gmail.com" >> /etc/ssmtp/ssmtp.conf
