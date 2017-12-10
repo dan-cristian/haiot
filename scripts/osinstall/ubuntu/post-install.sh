@@ -947,20 +947,25 @@ if [ "$ENABLE_DASHCAM_PI_LCD_DF" == "1" ]; then
         wget https://github.com/pimoroni/rp_usbdisplay/raw/master/dkms/rp-usbdisplay-dkms_1.0_all.deb
         # https://askubuntu.com/questions/714874/how-to-point-dkms-to-kernel-headers
         #ln -s /usr/src/linux-headers-$(uname -r)  /lib/modules/$(uname -r)/build
+        #http://virtual.4my.eu/RP_USBDisplay/Ubuntu%20ARMv7hf/readme.txt
         apt install dkms raspberrypi-kernel-headers python-pip python-pygame
         dpkg -i rp-usbdisplay-dkms_1.0_all.deb
         echo "Probing module"
         modprobe rp_usbdisplay
-        if ! grep -q "^rp_[u_]sbdisplay" /etc/modules; then printf "rp_usbdisplay\n" >> /etc/modules; fi
+
         if ! grep -q "fbcon[=_]map:1" /boot/cmdline.txt; then echo -n " fbcon=font:ProFont6x11 fbcon=map:1" >> /boot/cmdline.txt; fi
         #remove new line
         tr -d '\n' < /boot/cmdline.txt > /boot/cmdline.new
         mv /boot/cmdline.new /boot/cmdline.txt
         #https://stackoverflow.com/questions/24147026/display-gui-on-raspberry-pi-without-startx
+        #https://unix.stackexchange.com/questions/58961/how-do-i-let-an-sdl-app-not-running-as-root-use-the-console/387144#387144
+
         #https://pythonprogramming.net/pygame-button-function-events/
         #calibrate tft pointer
-        #https://learn.adafruit.com/adafruit-pitft-28-inch-resistive-touchscreen-display-raspberry-pi/resistive-touchscreen-manual-install-calibrate
+        #https://stackoverflow.com/questions/26092441/pygame-mousebuttondown-coordinates-are-off-unless-im-in-xwindows
+        #not working -- https://learn.adafruit.com/adafruit-pitft-28-inch-resistive-touchscreen-display-raspberry-pi/resistive-touchscreen-manual-install-calibrate
 	fi
+	if ! grep -q "^rp_[u_]sbdisplay" /etc/modules; then printf "rp_usbdisplay\n" >> /etc/modules; fi
 fi
 
 echo "Optimise for flash and ssd usage"
