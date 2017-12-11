@@ -2,7 +2,7 @@ from main.logger_helper import Log
 from main import thread_pool
 import dashcam_run
 import dashcam_ui
-
+import rpusbdisp
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 initialised = False
