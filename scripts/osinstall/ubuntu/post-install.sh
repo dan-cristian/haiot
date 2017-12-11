@@ -2,7 +2,7 @@
 
 if [[ $EUID -ne 0 ]]; then
    echo "This script must be run as root" 
-   exit 1
+   return 1
 fi
 
 COUNTRY_CODE=RO
@@ -849,6 +849,7 @@ if [ "$ENABLE_DASHCAM_PI" == "1" ]; then
 		systemctl start ssh
 		#enable camera
 		# https://raspberrypi.stackexchange.com/questions/14229/how-can-i-enable-the-camera-without-using-raspi-config
+		set_config_var enable_uart 0
 		set_config_var start_x 1 /boot/config.txt
 		CUR_GPU_MEM=$(get_config_var gpu_mem /boot/config.txt)
 		if [ -z "$CUR_GPU_MEM" ] || [ "$CUR_GPU_MEM" -lt 128 ]; then
