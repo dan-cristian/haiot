@@ -5,7 +5,6 @@ import errno
 import struct
 from collections import namedtuple
 import threading
-import time
 import select
 import Queue
 
@@ -41,12 +40,10 @@ TS_MOVE = 2
 class Touch(object):
     def __init__(self, slot, x, y):
         self.slot = slot
-
         self._x = x
         self._y = y
         self.last_x = -1
         self.last_y = -1
-
         self._id = -1
         self.events = []
         self.on_move = None
@@ -72,6 +69,7 @@ class Touch(object):
     @id.setter
     def id(self, value):
         if value != self._id:
+            #print "Set id={}".format(value)
             if value == -1 and not TS_RELEASE in self.events:
                 self.events.append(TS_RELEASE)
             elif not TS_PRESS in self.events:
@@ -103,7 +101,9 @@ class Touch(object):
 
     def handle_events(self):
         """Run outstanding press/release/move events"""
+        #print 'Handling events {}'.format(len(self.events))
         for event in self.events:
+            #print "Handling: {}".format(event)
             if event == TS_MOVE and callable(self.on_move):
                 self.on_move(event, self)
             if event == TS_PRESS and callable(self.on_press):
@@ -135,8 +135,10 @@ class Touchscreen(object):
         self.touches = Touches([Touch(x, 0, 0) for x in range(TOUCH_MAX_COUNT)])
         self._event_queue = Queue.Queue()
         self._touch_slot = 0
+        print 'Initialised Touchscreen'
 
     def _run(self):
+        print "Starting Touchscreen thread"
         self._running = True
         while self._running:
             self.poll()
@@ -145,7 +147,6 @@ class Touchscreen(object):
     def run(self):
         if self._thread is not None:
             return
-
         self._thread = threading.Thread(target=self._run)
         self._thread.start()
 
@@ -195,38 +196,42 @@ class Touchscreen(object):
             event = self._event_queue.get()
             self._event_queue.task_done()
 
+            #print event
+
             if event.type == EV_TYPE_SYN:  # Sync
                 for touch in self.touches:
                     touch.handle_events()
                 return self.touches
 
-            if event.type == EV_TYPE_EXTRA:
-                if event.code == ABS_MT_TOUCH2:
-                    print "touch2"
-                    for touch in self.touches:
-                        touch.handle_events()
+            #if event.type == EV_TYPE_EXTRA:
+            #    if event.code == ABS_MT_TOUCH2 and event.value == TS_RELEASE:
+            #        self._current_touch.id = -1
+
 
             if event.type == EV_TYPE_ABS:  # Absolute cursor position
                 if event.code == ABS_MT_TOUCH:
-                    print "touch"
+                    if event.value == TS_RELEASE:
+                        self._current_touch.id = -1
+                    else:
+                        self._current_touch.id = event.value
 
                 if event.code == ABS_MT_SLOT:
                     self._touch_slot = event.value
 
-                if event.code == ABS_MT_TRACKING_ID:
-                    self._current_touch.id = event.value
-
-                if event.code == ABS_MT_POSITION_X:
-                    self._current_touch.x = event.value
-
-                if event.code == ABS_MT_POSITION_Y:
-                    self._current_touch.y = event.value
+                #if event.code == ABS_MT_TRACKING_ID:
+                #    self._current_touch.id = event.value
+                #if event.code == ABS_MT_POSITION_X:
+                #    self._current_touch.x = event.value
+                #if event.code == ABS_MT_POSITION_Y:
+                #    self._current_touch.y = event.value
 
                 if event.code == ABS_X:
-                    self.position.x = event.value
+                    self._current_touch.x = event.value
+                    #self.position.x = event.value
 
                 if event.code == ABS_Y:
-                    self.position.y = event.value
+                    self._current_touch.y = event.value
+                    #self.position.y = event.value
 
         return []
 
