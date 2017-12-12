@@ -27,6 +27,7 @@ bright_green = (100, 255, 0)
 #https://pythonprogramming.net/pygame-button-function-events/
 # https://www.dfrobot.com/product-1062.html
 
+#https://github.com/adafruit/adafruit-pi-cam/blob/master/cam.py
 
 def _get_touch_device():
     for evdev in glob.glob("/sys/class/input/event*"):
