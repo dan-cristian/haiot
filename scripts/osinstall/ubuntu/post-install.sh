@@ -849,7 +849,7 @@ if [ "$ENABLE_DASHCAM_PI" == "1" ]; then
 		systemctl start ssh
 		#enable camera
 		# https://raspberrypi.stackexchange.com/questions/14229/how-can-i-enable-the-camera-without-using-raspi-config
-		set_config_var enable_uart 0
+		set_config_var enable_uart 0 /boot/config.txt
 		set_config_var start_x 1 /boot/config.txt
 		CUR_GPU_MEM=$(get_config_var gpu_mem /boot/config.txt)
 		if [ -z "$CUR_GPU_MEM" ] || [ "$CUR_GPU_MEM" -lt 128 ]; then
@@ -896,6 +896,15 @@ if [ "$ENABLE_DASHCAM_PI" == "1" ]; then
     #windows
     #https://stackoverflow.com/questions/44347991/how-to-grab-laptop-webcam-video-with-ffmpeg-in-windows
     #ffmpeg -y -f dshow -i video="Integrated Camera" -r 8 -c:v libx264 -b:v 2000k -frag_duration 1000 record1.mp4
+
+    echo "Installing IO/Sensor packages"
+    apt install -y i2c-tools libi2c-dev
+    if ! grep -q "^i2c[-_]dev" /etc/modules; then printf "i2c-dev\n" >> /etc/modules; fi
+    if ! grep -q "^i2c[-_]bcm2708" /etc/modules; then printf "i2c-bcm2708\n" >> /etc/modules; fi
+
+    set_config_var dtparam i2c_arm=on /boot/config.txt
+    #dtparam=i2c_arm=on
+
 
 if [ "$ENABLE_DASHCAM_MOTION" == "1" ]; then
     apt install -y motion
