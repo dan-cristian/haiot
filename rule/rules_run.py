@@ -113,7 +113,7 @@ def rule_ups_power(obj=models.Ups(), field_changed_list=None):
             if obj.load_percent >= 60:
                 rule_common.notify_via_all("UPS load HIGH at {}".format(obj.load_percent), "High ups load")
         if 'input_voltage' in field_changed_list:
-            if obj.input_voltage <= 200:
+            if obj.input_voltage <= 195:
                 rule_common.notify_via_all("Grid low at {} volts".format(obj.input_voltage), "Low grid voltage")
     return 'ups rule ok'
 
