@@ -53,6 +53,7 @@ ENABLE_ROUTER=0
 ENABLE_DASHCAM_PI=1
 ENABLE_DASHCAM_PI_LCD_DF=1
 ENABLE_DASHCAM_MOTION=0
+ENABLE_3G_MODEM=1
 ENABLE_LOG_RAM=0
 
 set_config_var() {
@@ -980,6 +981,40 @@ if [ "$ENABLE_DASHCAM_PI_LCD_DF" == "1" ]; then
         #not working -- https://learn.adafruit.com/adafruit-pitft-28-inch-resistive-touchscreen-display-raspberry-pi/resistive-touchscreen-manual-install-calibrate
 	fi
 	if ! grep -q "^rp_[u_]sbdisplay" /etc/modules; then printf "rp_usbdisplay\n" >> /etc/modules; fi
+fi
+
+if [ "$ENABLE_3G_MODEM" == "1" ]; then
+    # https://linux-romania.com/ro/raspberry-pi-project/23-zte-mf-110-digi-net-mobile-.html
+    # http://myhowtosandprojects.blogspot.ro/2013/12/how-to-setup-usb-3g-modem-linux.html
+    if ! grep -q "digi-mobil" /etc/wvdial.conf; then
+        echo "Enabling 3G modem"
+        apt install -y ppp wvdial usb-modeswitch
+        echo "
+[Dialer digi-mobil]
+Modem Type = Analog Modem
+Phone = *99***1#
+ISDN = 0
+Baud = 7200000
+Modem = /dev/ttyUSB2
+Init1 = ATZ
+Init2 = at+cgdcont=1,"ip","internet"
+Stupid Mode = 1
+Password = { }
+Username = { }
+Abort on No Dialtone = 0
+Dial Attempts = 0
+        " > /etc/wvdial.conf
+        echo "Testing connectivity, press CTRL+C if OK"
+        wvdial digi-mobil
+        #improve this as removes wanted line
+        sed -i '/exit 0/d' /etc/rc.local
+        echo "
+echo Waiting 20s for USB modem to connect
+sleep 20
+wvdial digi-mobil &
+exit 0
+        " >> /etc/rc.local
+    fi
 fi
 
 echo "Optimise for flash and ssd usage"
