@@ -21,7 +21,8 @@ def _get_win_cams():
 
 
 def _run_ffmpeg_pi(out_filename):
-    global _ffmpeg_pi, _segment_duration
+    global _ffmpeg_pi
+    print "Recording on {}".format(out_filename)
     if _ffmpeg_pi is None:
         _ffmpeg_pi = subprocess.Popen([
             'ffmpeg', '-y', '-r', '8', '-i', '-',
@@ -29,7 +30,7 @@ def _run_ffmpeg_pi(out_filename):
             '-f', 'segment', '-segment_time', _segment_duration, '-segment_format', 'mp4', '-reset_timestamps', '1',
             '-force_key_frames', '"expr:gte(t,n_forced*10)"',
             '-frag_duration', '1000',
-            '-an', out_filename,
+            '-an', out_filename
         ], stdin=subprocess.PIPE)
 
 
@@ -89,7 +90,7 @@ def usb_record_loop():
 
 def pi_record_loop():
     global _ffmpeg_pi
-    out_filename = 'capturepi%03d.mp4'
+    out_filename = '/mnt/tmp/capturepi%03d.mp4'
     camera = picamera.PiCamera()
     camera.resolution = (1296, 972)
     camera.framerate = 8

@@ -891,8 +891,12 @@ if [ "$ENABLE_DASHCAM_PI" == "1" ]; then
     #usb webcam 5mp
     #./ffmpeg -r 8 -f video4linux2 -i /dev/video1 -vf "drawtext=text='%{localtime\:%c}': fontcolor=white@0.8: fontsize=32: x=10: y=10" -s 1600x1200 -an -c:v h264_omx -b:v 3000k -y -frag_duration 1000 record1.mp4
     #./ffmpeg -y -f alsa -thread_queue_size 512 -ac 1 -i hw:1 -ar 16000 -acodec mp3 -f video4linux2 -r 8 -i /dev/video1 -vf "drawtext=text='%{localtime\:%c}': fontcolor=white@0.8: fontsize=32: x=10: y=10" -s 1280x720 -c:v h264_omx -b:v 3000k -frag_duration 1000 record2.mp4
+
+    echo "Fix USB issue"
+    #https://github.com/raspberrypi/linux/issues/623
+
     #usb web cam logitech c310
-    #./ffmpeg  -r 8 -f video4linux2 -i /dev/video1 -vf "drawtext=text='%{localtime\:%c}': fontcolor=white@0.8: fontsize=32: x=10: y=10" -s 1280x720 -an -c:v h264_omx -b:v 3000k -y -frag_duration 1000 -f segment -segment_time 3600 -segment_format mp4 -reset_timestamps 1  -force_key_frames "expr:gte(t,n_forced*2)" /mnt/tmp/record2_%03d.mp4
+    #./ffmpeg -y -f alsa -thread_queue_size 16384 -ac 1 -i hw:1 -r 8 -f video4linux2 -thread_queue_size 8192 -i /dev/video0 -vf "drawtext=text='%{localtime\:%c}': fontcolor=white@0.8: fontsize=32: x=10: y=10" -s 1280x720 -c:v h264_omx -b:v 3000k -frag_duration 1000 -f segment -segment_time 3600 -segment_format mp4 -reset_timestamps 1  -force_key_frames "expr:gte(t,n_forced*2)" /mnt/tmp/record2_%03d.mp4
     #windows
     #https://stackoverflow.com/questions/44347991/how-to-grab-laptop-webcam-video-with-ffmpeg-in-windows
     #ffmpeg -y -f dshow -i video="Integrated Camera" -r 8 -c:v libx264 -b:v 2000k -frag_duration 1000 record1.mp4
