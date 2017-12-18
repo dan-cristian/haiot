@@ -788,7 +788,7 @@ class Utility(db.Model, graphs.BaseGraph, DbEvent, DbBase):
         return '{} {} {}'.format(self.id, self.utility_name, self.updated_on)
 
 
-class Log(db.Model, graphs.BaseGraph, DbEvent, DbBase):
+class State(db.Model, graphs.BaseGraph, DbEvent, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     entry_name = db.Column(db.String(50))  # unique name
     entry_value = db.Column(db.String(50))
