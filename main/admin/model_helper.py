@@ -156,12 +156,12 @@ def populate_tables(model_auto_update=False):
                         models.TemperatureTarget, models.SchedulePattern, models.HeatSchedule, models.ZoneHeatRelay,
                         models.ZoneSensor, models.ZoneAlarm,
                         models.SystemMonitor, models.SystemDisk,
-                        models.Sensor,
-                        models.Ups, models.Rule,
+                        models.Sensor, models.Ups, models.Rule,
                         models.CommandOverrideRelay, models.PlotlyCache, models.Utility, models.Presence,
                         models.SensorError, models.Log]
     # tables that will be cleaned on every app start
-    table_force_clean = [models.Zone, models.Presence, models.Module, models.Node, models.Rule, models.ZoneHeatRelay]
+    table_force_clean = [models.Parameter, models.Zone, models.Presence, models.Module, models.Node, models.Rule,
+                         models.ZoneHeatRelay]
     # , models.Sensor]
 
     for table in table_collection:
