@@ -27,7 +27,7 @@ def _represent():
     last = Params.lastrecord
     res = None
     try:
-        res = "[{'y': %f, 'x': %f, 'z': %f}, {'y': %f, 'x': %f, 'z': %f}, {%f}]" % \
+        res = "[{'y': %f, 'x': %f, 'z': %f}, {'y': %f, 'x': %f, 'z': %f}, %f]" % \
               (last[0]['y'], last[0]['x'], last[0]['z'],
                last[1]['y'], last[1]['x'], last[1]['z'],
                last[2])
@@ -42,7 +42,7 @@ def _to_json():
 
 class Index:
     def GET(self):
-        print "returning {}".format(_represent())
+        #print "returning {}".format(_represent())
         return _represent()
 
 

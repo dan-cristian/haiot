@@ -5,6 +5,7 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from math import radians
 from pygame.locals import *
+import json
 
 import filter
 
@@ -44,6 +45,7 @@ def read_values():
     link = "http://192.168.0.17:9000" # Change this address to your settings
     f = urllib.urlopen(link)
     myfile = f.read()
+
     return myfile
 
 
@@ -57,8 +59,7 @@ def run():
     cube = Cube((0.0, 0.0, 0.0), (.5, .5, .7))
     angle = 0
     i = 0
-    filter.filter_init(new_store[i][1]['x'], new_store[i][1]['y'], new_store[i][1]['z'],
-                       new_store[i][0]['x'], new_store[i][0]['y'], new_store[i][0]['z'])
+    filter.filter_init(read_values())
     i += 1
     while True:
         time.sleep(0.2)
