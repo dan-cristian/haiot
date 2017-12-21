@@ -45,8 +45,8 @@ def read_values():
     link = "http://192.168.0.17:9000" # Change this address to your settings
     f = urllib.urlopen(link)
     myfile = f.read()
-
-    return myfile
+    var = json.loads(myfile)
+    return var
 
 
 

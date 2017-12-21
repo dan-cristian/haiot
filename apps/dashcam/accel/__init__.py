@@ -27,10 +27,11 @@ def _represent():
     last = Params.lastrecord
     res = None
     try:
-        res = "[{'y': %f, 'x': %f, 'z': %f}, {'y': %f, 'x': %f, 'z': %f}, %f]" % \
-              (last[0]['y'], last[0]['x'], last[0]['z'],
-               last[1]['y'], last[1]['x'], last[1]['z'],
-               last[2])
+        res = json.dumps(last)
+        #res = "[{'y': %f, 'x': %f, 'z': %f}, {'y': %f, 'x': %f, 'z': %f}, %f]" % \
+        #      (last[0]['y'], last[0]['x'], last[0]['z'],
+        #       last[1]['y'], last[1]['x'], last[1]['z'],
+        #       last[2])
     except Exception, ex:
         print ex
     return res
