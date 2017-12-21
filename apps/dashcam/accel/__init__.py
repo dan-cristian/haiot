@@ -43,7 +43,7 @@ class AccelRecord:
 
 class index:
     def GET(self):
-        record = read_sensor()
+        record = _lastrecord
         print "returning {}".format(record)
         return record
 
@@ -61,6 +61,7 @@ def _run_web_server():
         web.httpserver.runsimple(_web_app.wsgifunc(), ("0.0.0.0", _WEB_PORT))
     except Exception, ex:
         print ex
+
 
 def init():
     global _sensor, _web_thread
