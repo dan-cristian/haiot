@@ -3,7 +3,8 @@
     {"id":1,  "priority":"10", "name":"netbook", "machine_type":"raspberry"},
     {"id":6,  "priority":"6", "name":"pi-power", "machine_type":"raspberry"},
     {"id":8,  "priority":"4", "name":"pi-sense", "machine_type":"raspberry"},
-    {"id":9,  "priority":"3", "name":"pi-face", "machine_type":"raspberry"}
+    {"id":9,  "priority":"3", "name":"pi-face", "machine_type":"raspberry"},
+    {"id":4,  "priority":"11", "name":"pidash", "machine_type":"raspberry"}
   ],
 
   "Parameter": [
@@ -60,7 +61,7 @@
     {"id":9,  "active":"0", "start_order":"9", "name":"heat"},
     {"id":11, "active":"0", "start_order":"11", "name":"alarm"},
     {"id":13, "active":"0", "start_order":"13", "name":"cloud.graph_plotly"},
-    {"id":19, "active":"1", "start_order":"19", "name":"ddns"},
+    {"id":19, "active":"0", "start_order":"19", "name":"ddns"},
     {"id":21, "active":"0", "start_order":"21", "name":"cloud.youtube"},
     {"id":23, "active":"0", "start_order":"23", "name":"sysutils.filewatch"},
     {"id":25, "active":"1", "start_order":"25", "name":"rule"},
@@ -73,22 +74,22 @@
     {"id":101, "active":"1", "start_order":"101", "name":"webui.chart"},
     {"id":102, "active":"1", "start_order":"102", "name":"webui.api"},
     {"id":103, "active":"1", "start_order":"103", "name":"webui"},
+    {"id":105, "active":"0", "start_order":"105", "name":"apps.dashcam"},
+
 
     {"id":121, "active":"0", "start_order":"21", "name":"cloud.youtube", "host_name":"nas"},
     {"id":123, "active":"0", "start_order":"23", "name":"sysutils.filewatch", "host_name":"nas"},
+    {"id":119, "active":"1", "start_order":"19", "name":"ddns", "host_name":"nas"},
 
     {"id":209, "active":"0", "start_order":"9", "name":"heat", "host_name":"pi-power"},
 
-    {"id":309, "active":"1", "start_order":"19", "name":"heat", "host_name":"beaglebone"},
-    {"id":311, "active":"1", "start_order":"11", "name":"alarm", "host_name":"beaglebone"},
+    {"id":401, "active":"1", "start_order":"105", "name":"apps.dashcam", "host_name":"pidash"},
 
-    {"id":403, "active":"1", "start_order":"3", "name":"health_monitor", "host_name":"EN62395"},
-    {"id":409, "active":"0", "start_order":"9", "name":"heat", "host_name":"EN62395"},
-
-    {"id":509, "active":"1", "start_order":"9", "name":"heat", "host_name":"netbook"},
+    {"id":501, "active":"1", "start_order":"105", "name":"apps.dashcam", "host_name":"netbook"},
+    {"id":509, "active":"0", "start_order":"9", "name":"heat", "host_name":"netbook"},
     {"id":599, "active":"0", "start_order":"99", "name":"test", "host_name":"netbook"},
-    {"id":511, "active":"1", "start_order":"11", "name":"alarm", "host_name":"netbook"},
-    {"id":541, "active":"1", "start_order":"41", "name":"cloud.alexa", "host_name":"netbook"},
+    {"id":511, "active":"0", "start_order":"11", "name":"alarm", "host_name":"netbook"},
+    {"id":541, "active":"0", "start_order":"41", "name":"cloud.alexa", "host_name":"netbook"},
 
     {"id":609, "active":"1", "start_order":"9", "name":"heat", "host_name":"pi-face"},
     {"id":611, "active":"1", "start_order":"11", "name":"alarm", "host_name":"pi-face"},
@@ -146,7 +147,8 @@
     {"id":48, "name":"solar jos"},
     {"id":49, "name":"soba beci"},
     {"id":50, "name":"puffer heater"},
-    {"id":51, "name":"puffer gas valve"}
+    {"id":51, "name":"puffer gas valve"},
+    {"id":200, "name":"car octavia vibrate"}
   ],
 
   "Area": [
@@ -323,6 +325,8 @@
     {"zone_id":8 , "gpio_pin_code":"3", "gpio_host_name": "pi-face", "alarm_pin_name": "not used"},
     {"zone_id":28 , "gpio_pin_code":"2", "gpio_host_name": "pi-face", "alarm_pin_name": "sonerie", "sensor_type": "contact"},
     {"zone_id":7 , "gpio_pin_code":"1", "gpio_host_name": "pi-face", "alarm_pin_name": "portita", "sensor_type": "contact"},
-    {"zone_id":29 , "gpio_pin_code":"18", "gpio_host_name": "pi-face", "alarm_pin_name": "beci test"}
+    {"zone_id":29 , "gpio_pin_code":"18", "gpio_host_name": "pi-face", "alarm_pin_name": "beci test"},
+
+    {"zone_id":200 , "gpio_pin_code":"24", "gpio_host_name": "pidash", "alarm_pin_name": "car vibrate", "sensor_type": "contact"}
   ]
 }
