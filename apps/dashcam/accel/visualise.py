@@ -1,179 +1,124 @@
-import pygame
+import pygame, sys
+from pygame.locals import *
 import time
 import urllib
-from OpenGL.GL import *
-from OpenGL.GLU import *
-from math import radians
-from pygame.locals import *
 import json
-
-import filter
-
-#  http://blog.bitify.co.uk/2013/11/3d-opengl-visualisation-of-data-from.html
-
-SCREEN_SIZE = (800, 600)
-SCALAR = .5
-SCALAR2 = 0.2
-
-
-def resize(width, height):
-    glViewport(0, 0, width, height)
-    glMatrixMode(GL_PROJECTION)
-    glLoadIdentity()
-    gluPerspective(45.0, float(width) / height, 0.001, 10.0)
-    glMatrixMode(GL_MODELVIEW)
-    glLoadIdentity()
-    gluLookAt(0.0, 1.0, -5.0,
-              0.0, 0.0, 0.0,
-              0.0, 1.0, 0.0)
-
-
-def init():
-    glEnable(GL_DEPTH_TEST)
-    glClearColor(0.0, 0.0, 0.0, 0.0)
-    glShadeModel(GL_SMOOTH)
-    glEnable(GL_BLEND)
-    glEnable(GL_POLYGON_SMOOTH)
-    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST)
-    glEnable(GL_COLOR_MATERIAL)
-    glEnable(GL_LIGHTING)
-    glEnable(GL_LIGHT0)
-    glLightfv(GL_LIGHT0, GL_AMBIENT, (0.3, 0.3, 0.3, 1.0));
+import math
 
 
 def read_values():
-    link = "http://192.168.0.17:9000" # Change this address to your settings
+    link = "http://127.0.0.1:9000"
+    #link = "http://192.168.0.17:9000"
     f = urllib.urlopen(link)
     myfile = f.read()
     var = json.loads(myfile)
     return var
 
 
+def get_y_rotation(x,y,z):
+    radians = math.atan2(x, dist(y,z))
+    return -math.degrees(radians)
 
-def run():
+
+def get_x_rotation(x,y,z):
+    radians = math.atan2(y, dist(x,z))
+    return math.degrees(radians)
+
+
+def dist(a, b):
+    return math.sqrt((a * a) + (b * b))
+
+
+def init():
     pygame.init()
-    screen = pygame.display.set_mode(SCREEN_SIZE, HWSURFACE | OPENGL | DOUBLEBUF)
-    resize(*SCREEN_SIZE)
-    init()
-    clock = pygame.time.Clock()
-    cube = Cube((0.0, 0.0, 0.0), (.5, .5, .7))
-    angle = 0
-    i = 0
-    filter.filter_init(read_values())
-    i += 1
+    # set up the graphics window
+    WINDOW = pygame.display.set_mode((400, 300), 0, 32)
+    pygame.display.set_caption('MPU_6050 Demo')
+    # set up the colors
+    BLACK = (0, 0, 0)
+    WHITE = (255, 255, 255)
+    RED = (255, 0, 0)
+    GREEN = (0, 255, 0)
+    BLUE = (0, 0, 255)
+    # draw on the surface object
+    WINDOW.fill(WHITE)
+
+    now = time.time()
+
+    K = 0.98
+    K1 = 1 - K
+    time_diff = 0.01
+
+    v = read_values()
+    last_x = get_x_rotation(v[0]['x'], v[0]['y'], v[0]['z'])
+    last_y = get_y_rotation(v[0]['x'], v[0]['y'], v[0]['z'])
+    gyro_scaled_x = v[1]['x']
+    gyro_scaled_y = v[1]['y']
+
+    gyro_offset_x = gyro_scaled_x
+    gyro_offset_y = gyro_scaled_y
+
+    gyro_total_x = last_x - gyro_offset_x
+    gyro_total_y = last_y - gyro_offset_y
+
+    # run the loop
     while True:
-        time.sleep(0.2)
-        then = pygame.time.get_ticks()
         for event in pygame.event.get():
             if event.type == QUIT:
-                return
-            if event.type == KEYUP and event.key == K_ESCAPE:
-                return
+                pygame.quit()
+                sys.exit()
 
-        #values = read_values(i)
-        values = filter.filter_clean(new_store[i][1]['x'], new_store[i][1]['y'], new_store[i][1]['z'],
-                                     new_store[i][0]['x'], new_store[i][0]['y'], new_store[i][0]['z'])
-        i += 1
-        x_angle = values[0]
-        y_angle = values[1]
+        time.sleep(time_diff - 0.005)
+        v = read_values()
+        gyro_scaled_x = v[1]['x']
+        gyro_scaled_y = v[1]['y']
+        gyro_scaled_z = v[1]['z']
+        accel_scaled_x = v[0]['x']
+        accel_scaled_y = v[0]['y']
+        accel_scaled_z = v[0]['z']
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        gyro_scaled_x -= gyro_offset_x
+        gyro_scaled_y -= gyro_offset_y
 
-        glColor((1., 1., 1.))
-        glLineWidth(1)
-        glBegin(GL_LINES)
+        gyro_x_delta = (gyro_scaled_x * time_diff)
+        gyro_y_delta = (gyro_scaled_y * time_diff)
 
-        for x in range(-20, 22, 2):
-            glVertex3f(x / 10., -1, -1)
-            glVertex3f(x / 10., -1, 1)
+        gyro_total_x += gyro_x_delta
+        gyro_total_y += gyro_y_delta
 
-        for x in range(-20, 22, 2):
-            glVertex3f(x / 10., -1, 1)
-            glVertex3f(x / 10., 1, 1)
+        rotation_x = get_x_rotation(accel_scaled_x, accel_scaled_y, accel_scaled_z)
+        rotation_y = get_y_rotation(accel_scaled_x, accel_scaled_y, accel_scaled_z)
 
-        for z in range(-10, 12, 2):
-            glVertex3f(-2, -1, z / 10.)
-            glVertex3f(2, -1, z / 10.)
+        last_x = K * (last_x + gyro_x_delta) + (K1 * rotation_x)
+        last_y = K * (last_y + gyro_y_delta) + (K1 * rotation_y)
 
-        for z in range(-10, 12, 2):
-            glVertex3f(-2, -1, z / 10.)
-            glVertex3f(-2, 1, z / 10.)
+        # print last_x,last_y on terminal window
+        print (last_x), (last_y)
 
-        for z in range(-10, 12, 2):
-            glVertex3f(2, -1, z / 10.)
-            glVertex3f(2, 1, z / 10.)
+        delta_y = math.radians(last_y)
 
-        for y in range(-10, 12, 2):
-            glVertex3f(-2, y / 10., 1)
-            glVertex3f(2, y / 10., 1)
+        # z-is thickness of the line
+        z = 2 * int(last_x)
+        if z < 0:
+            z = -z
+            COLOR = RED  # change colour if x-axis reading is negative
+        else:
+            COLOR = BLUE
+        if z == 0:
+            z = 1
 
-        for y in range(-10, 12, 2):
-            glVertex3f(-2, y / 10., 1)
-            glVertex3f(-2, y / 10., -1)
+        x1 = 200 - (100 * math.cos(delta_y))
+        y1 = 150 + (100 * math.sin(delta_y))
+        x2 = 200 + (100 * math.cos(delta_y))
+        y2 = 150 - (100 * math.sin(delta_y))
 
-        for y in range(-10, 12, 2):
-            glVertex3f(2, y / 10., 1)
-            glVertex3f(2, y / 10., -1)
+        # print (x1), (y1) ,(x2), (y2)
+        WINDOW.fill(WHITE)  # clear window before redraw
 
-        glEnd()
-        glPushMatrix()
-        glRotate(float(x_angle), 1, 0, 0)
-        glRotate(-float(y_angle), 0, 0, 1)
-        cube.render()
-        glPopMatrix()
-        pygame.display.flip()
-
-
-class Cube(object):
-
-    def __init__(self, position, color):
-        self.position = position
-        self.color = color
-
-    # Cube information
-    num_faces = 6
-
-    vertices = [(-1.0, -0.05, 0.5),
-                (1.0, -0.05, 0.5),
-                (1.0, 0.05, 0.5),
-                (-1.0, 0.05, 0.5),
-                (-1.0, -0.05, -0.5),
-                (1.0, -0.05, -0.5),
-                (1.0, 0.05, -0.5),
-                (-1.0, 0.05, -0.5)]
-
-    normals = [(0.0, 0.0, +1.0),  # front
-               (0.0, 0.0, -1.0),  # back
-               (+1.0, 0.0, 0.0),  # right
-               (-1.0, 0.0, 0.0),  # left
-               (0.0, +1.0, 0.0),  # top
-               (0.0, -1.0, 0.0)]  # bottom
-
-    vertex_indices = [(0, 1, 2, 3),  # front
-                      (4, 5, 6, 7),  # back
-                      (1, 5, 6, 2),  # right
-                      (0, 4, 7, 3),  # left
-                      (3, 2, 6, 7),  # top
-                      (0, 1, 5, 4)]  # bottom
-
-    def render(self):
-        then = pygame.time.get_ticks()
-        glColor(self.color)
-
-        vertices = self.vertices
-
-        # Draw all 6 faces of the cube
-        glBegin(GL_QUADS)
-
-        for face_no in xrange(self.num_faces):
-            glNormal3dv(self.normals[face_no])
-            v1, v2, v3, v4 = self.vertex_indices[face_no]
-            glVertex(vertices[v1])
-            glVertex(vertices[v2])
-            glVertex(vertices[v3])
-            glVertex(vertices[v4])
-        glEnd()
+        # simply draw the plane, z-is thickness: change thickness of the line to appear 3D
+        pygame.draw.line(WINDOW, COLOR, (x1, y1), (x2, y2), z)
+        pygame.display.update()
 
 
 if __name__ == "__main__":
-    run()
+    init()
