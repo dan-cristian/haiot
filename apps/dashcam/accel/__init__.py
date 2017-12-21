@@ -59,9 +59,8 @@ def _run_web_server():
 
 
 def init():
-    global _sensor, _web_thread
     try:
-        _sensor = mpu6050(0x68)
+        Params.sensor = mpu6050(0x68)
     except Exception, ex:
         print ex
 
@@ -75,7 +74,7 @@ def read_sensor():
     try:
         sensor_all = Params.sensor.get_all_data()
     except Exception, ex:
-        #print ex
+        print ex
         sensor_all = [{'y': -0.49320554199218747, 'x': -9.528922607421874, 'z': 1.0414777221679687}, {'y': -0.8625954198473282, 'x': -3.0839694656488548, 'z': 0.7938931297709924}, 28.577058823529413]
     Params.lastrecord = sensor_all
     return sensor_all
