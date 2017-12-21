@@ -139,11 +139,19 @@ if [ "$ENABLE_DASHCAM_PI" == "1" ]; then
 		set_config_var country $COUNTRY_CODE $TMP_WIFI
 		wpa_cli -i wlan0 reconfigure
 		echo "auto wlan0" >> /etc/network/interfaces
-		echo "Waiting to get WIFI connection"
-		systemctl enable ssh
+        echo "Change password for pi user as SSH will be enabled"
+		passwd pi
+        systemctl enable ssh
 		systemctl start ssh
+        
 	fi
 fi
+
+if [ `cat /etc/hostname` == "raspberrypi" ]; then
+    read -sp "Enter host name:" new_host_name
+    echo $new_host_name > /etc/hostname
+fi
+
 
 echo "Testing internet connectivity"
 while true;do
@@ -166,7 +174,7 @@ else
 fi
 
 echo "Installing additional generic packages"
-apt-get -y install ssh dialog sudo nano wget runit git ssmtp mailutils psmisc smartmontools localepurge sshpass
+apt-get -y install ssh dialog sudo nano wget runit git ssmtp mailutils psmisc smartmontools localepurge sshpass dos2unix
 
 
 echo "Creating user $USERNAME with password=$USERPASS"
@@ -275,7 +283,7 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
     chmod +x /etc/profile.d/haiot.sh
     cp /etc/profile.d/haiot.sh /etc/profile.d/root.sh
 
-    apt-get install mosquitto owfs
+    apt-get -y install mosquitto owfs
     pip -V
     if [ "$?" != "0" ]; then
         echo "Installing python pip"
@@ -842,15 +850,11 @@ fi
 
 if [ "$ENABLE_DASHCAM_PI" == "1" ]; then
 	#http://pidashcam.blogspot.ro/2013/09/install.html#front
-	cat /etc/network/interfaces | grep "auto wlan0"
-    if [ "$?" == "1" ]; then
-		echo "Change password for pi user"
-		passwd pi
-		systemctl enable ssh
-		systemctl start ssh
-		#enable camera
+    if ! grep -q "gpu_mem" /boot/config.txt; then
+        #enable camera
 		# https://raspberrypi.stackexchange.com/questions/14229/how-can-i-enable-the-camera-without-using-raspi-config
-		set_config_var enable_uart 0 /boot/config.txt
+        echo "Enabling PI camera"
+        set_config_var enable_uart 0 /boot/config.txt
 		set_config_var start_x 1 /boot/config.txt
 		CUR_GPU_MEM=$(get_config_var gpu_mem /boot/config.txt)
 		if [ -z "$CUR_GPU_MEM" ] || [ "$CUR_GPU_MEM" -lt 128 ]; then
@@ -903,12 +907,26 @@ if [ "$ENABLE_DASHCAM_PI" == "1" ]; then
     #ffmpeg -y -f dshow -i video="Integrated Camera" -r 8 -c:v libx264 -b:v 2000k -frag_duration 1000 record1.mp4
 
     echo "Installing IO/Sensor packages"
-    apt install -y i2c-tools libi2c-dev
+    apt install -y i2c-tools libi2c-dev python-smbus
     if ! grep -q "^i2c[-_]dev" /etc/modules; then printf "i2c-dev\n" >> /etc/modules; fi
     if ! grep -q "^i2c[-_]bcm2708" /etc/modules; then printf "i2c-bcm2708\n" >> /etc/modules; fi
 
     set_config_var dtparam i2c_arm=on /boot/config.txt
-    #dtparam=i2c_arm=on
+    echo "Installing accel + gyro lib"
+    pip install mpu6050-raspberrypi
+
+    echo "Disable UART console"
+    sed -i -e "s/console=serial0,115200//g" /boot/cmdline.txt
+
+    echo "Installing GPS"
+    apt install -y gpsd gpsd-clients
+    systemctl stop gpsd.socket
+    systemctl disable gpsd.socket
+
+    gpsd /dev/ttyS0 -F /var/run/gpsd.sock
+    cgps -s
+    # https://gitlab.com/eneiluj/phonetrack-oc
+    echo "gpsd /dev/ttyS0 -F /var/run/gpsd.sock" >> /etc/rc.local
 
 
 if [ "$ENABLE_DASHCAM_MOTION" == "1" ]; then
@@ -963,7 +981,7 @@ if [ "$ENABLE_DASHCAM_PI_LCD_DF" == "1" ]; then
         # https://askubuntu.com/questions/714874/how-to-point-dkms-to-kernel-headers
         #ln -s /usr/src/linux-headers-$(uname -r)  /lib/modules/$(uname -r)/build
         #http://virtual.4my.eu/RP_USBDisplay/Ubuntu%20ARMv7hf/readme.txt
-        apt install dkms raspberrypi-kernel-headers python-pip python-pygame
+        apt install -y dkms raspberrypi-kernel-headers python-pip python-pygame
         dpkg -i rp-usbdisplay-dkms_1.0_all.deb
         echo "Probing module"
         modprobe rp_usbdisplay
@@ -986,11 +1004,11 @@ fi
 if [ "$ENABLE_3G_MODEM" == "1" ]; then
     # https://linux-romania.com/ro/raspberry-pi-project/23-zte-mf-110-digi-net-mobile-.html
     # http://myhowtosandprojects.blogspot.ro/2013/12/how-to-setup-usb-3g-modem-linux.html
-    if ! grep -q "digi-mobil" /etc/wvdial.conf; then
+    if ! grep -q "ttyUSB2" /etc/wvdial.conf; then
         echo "Enabling 3G modem"
         apt install -y ppp wvdial usb-modeswitch
         echo "
-[Dialer digi-mobil]
+[Dialer Defaults]
 Modem Type = Analog Modem
 Phone = *99***1#
 ISDN = 0
@@ -1004,6 +1022,7 @@ Username = { }
 Abort on No Dialtone = 0
 Dial Attempts = 0
         " > /etc/wvdial.conf
+        dos2unix /etc/wvdial.conf
         echo "Testing connectivity, press CTRL+C if OK"
         wvdial digi-mobil
         #improve this as removes wanted line
@@ -1011,7 +1030,7 @@ Dial Attempts = 0
         echo "
 echo Waiting 20s for USB modem to connect
 sleep 20
-wvdial digi-mobil &
+wvdial &
 exit 0
         " >> /etc/rc.local
     fi
