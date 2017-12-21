@@ -6,7 +6,7 @@ import threading
 try:
     from mpu6050 import mpu6050
 except Exception, ex:
-    pass
+    print ex
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
