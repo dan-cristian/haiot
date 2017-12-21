@@ -79,6 +79,7 @@ def read_sensor():
     try:
         sensor_all = _sensor.get_all_data()
     except Exception, ex:
+        print ex
         sensor_all = [{'y': -0.49320554199218747, 'x': -9.528922607421874, 'z': 1.0414777221679687}, {'y': -0.8625954198473282, 'x': -3.0839694656488548, 'z': 0.7938931297709924}, 28.577058823529413]
     record = AccelRecord(sensor_all[0], sensor_all[1], sensor_all[2])
     _lastrecord = record
