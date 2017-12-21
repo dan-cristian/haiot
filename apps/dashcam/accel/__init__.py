@@ -46,7 +46,7 @@ def _run_web_server():
 
 def init():
     global _sensor, _web_thread
-    #_sensor = mpu6050(0x68)
+    _sensor = mpu6050(0x68)
     if _WEB_PORT != 0:
         _web_thread = threading.Thread(target=_run_web_server)
         _web_thread.start()
@@ -62,3 +62,4 @@ if __name__ == "__main__":
     init()
     while True:
         thread_run()
+
