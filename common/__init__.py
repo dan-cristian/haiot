@@ -172,7 +172,8 @@ def load_config_json():
         with open(var_path, 'r') as f:
             Constant.db_values_json = json.load(f)
     except Exception, ex:
-        Log.logger.warning('Cannot load config json, ex={}'.format(ex))
+        Log.logger.error('Cannot load config json, ex={}'.format(ex))
+        exit(2)
 
 
 def get_json_param(name):

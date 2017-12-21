@@ -26,7 +26,6 @@ MODEL_AUTO_UPDATE = False
 BIND_IP = None
 BIND_PORT = None
 
-
 def my_import(name):
     # http://stackoverflow.com/questions/547829/how-to-dynamically-load-a-python-class
     try:
@@ -302,6 +301,7 @@ def run(arg_list):
         elif 'bind_port=' in s:
             global BIND_PORT
             BIND_PORT = s.split('=')[1]
+
 
     global MODEL_AUTO_UPDATE
     MODEL_AUTO_UPDATE = 'model_auto_update' in arg_list
