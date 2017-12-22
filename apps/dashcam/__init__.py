@@ -1,7 +1,7 @@
 from main.logger_helper import Log
 from main import thread_pool
 import ui
-import rpusbdisp
+#import rpusbdisp
 import recorder
 import gps
 import accel
