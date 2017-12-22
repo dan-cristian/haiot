@@ -105,7 +105,7 @@ def check_table_schema(table, model_auto_update=False):
             recreate_table = True
             ex_msg = str(ex)
         else:
-            Log.logger.warning('Unexpected error on check table, err={}'.format(ex))
+            Log.logger.warning('Unexpected error on check table {}, err={}'.format(table, ex))
     if recreate_table:
         Log.logger.critical('Table {} schema in DB seems outdated, err {}, DROP it and recreate (y/n)?'.format(ex_msg,
                                                                                                                table))
@@ -119,7 +119,7 @@ def read_drop_table(table, original_exception, drop_without_user_ask=False):
     else:
         x = 'y'
     if x == 'y':
-        Log.logger.warning('Dropping table {}'.format(table))
+        Log.logger.info('Dropping table {}'.format(table))
         try:
             table_name = table.query._primary_entity.entity_zero._with_polymorphic_selectable.description
             # fixme: does not work with multiple db sources

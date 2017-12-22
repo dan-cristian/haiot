@@ -63,7 +63,7 @@ def unload():
 
 
 def init():
-    Log.logger.info('Email module initialising')
+    Log.logger.debug('Email module initialising')
     dispatcher.connect(send_notification, signal=Constant.SIGNAL_EMAIL_NOTIFICATION, sender=dispatcher.Any)
     global __notif_from, __notif_pass, __notif_dest
     __notif_from = model_helper.get_param(Constant.P_GMAIL_NOTIFY_FROM_EMAIL)
