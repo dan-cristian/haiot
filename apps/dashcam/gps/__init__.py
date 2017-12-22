@@ -1,5 +1,6 @@
 import gpsd
 import urllib2
+import urllib
 import time
 initialised = False
 
@@ -34,9 +35,10 @@ def _read_gps():
 def _upload_buffer():
     for url in list(State.url_buffer):
         try:
-            response = urllib2.urlopen(url, timeout=State.url_timeout)
-            # Read the body
-            body = response.read()
+            f = urllib.urlopen(url)
+            #f = urllib2.urlopen(url, timeout=State.url_timeout, cadefault=True)
+            resp = f.read()
+            print "Response was {}".format(resp)
             State.url_buffer.remove(url)
         except Exception, ex:
             print ex
