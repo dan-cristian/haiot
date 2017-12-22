@@ -50,7 +50,9 @@
     {"name": "HEAT_SOURCE_MIN_TEMP", "value": "35", "description":"minimum temperature to consider a heat source usable"},
     {"name": "HEAT_STATE_REFRESH_PERIOD", "value": "1", "description":"period in minutes to do a heath status & gpio pins refresh"},
     {"name": "SOLAR_APS_LOCAL_URL", "value": "http://192.168.0.10/cgi-bin/home", "description":"link to aps ecu page with day production"},
-    {"name": "SOLAR_UTILITY_NAME", "value": "solar_aps", "description":"utility name from utility table"}
+    {"name": "SOLAR_UTILITY_NAME", "value": "solar_aps", "description":"utility name from utility table"},
+    {"name": "UPS_ON_HOST", "value": "pi-face", "description":"host name on which the ups is connected, to enable UPS search"},
+    {"name": "SOLAR_PARSER_ON_HOST", "value": "pi-face", "description":"host name on which the aps solar parser runs"}
   ],
   "Module": [
     {"id":1,  "active":"1", "start_order":"1", "name":"main"},
@@ -84,6 +86,7 @@
     {"id":209, "active":"0", "start_order":"9", "name":"heat", "host_name":"pi-power"},
 
     {"id":401, "active":"1", "start_order":"105", "name":"apps.dashcam", "host_name":"pidash"},
+    {"id":411, "active":"1", "start_order":"11", "name":"alarm", "host_name":"pidash"},
 
     {"id":501, "active":"1", "start_order":"105", "name":"apps.dashcam", "host_name":"netbook"},
     {"id":509, "active":"0", "start_order":"9", "name":"heat", "host_name":"netbook"},
