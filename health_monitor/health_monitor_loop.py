@@ -17,7 +17,7 @@ try:
     import psutil
     import_module_psutil_exist = True
 except Exception, ex:
-    Log.logger.info('PSUtil module not available')
+    #Log.logger.info('PSUtil module not available')
     import_module_psutil_exist = False
 
 try:
@@ -25,7 +25,7 @@ try:
     import pythoncom
     import_module_wmi_ok = True
 except Exception, ex:
-    Log.logger.info('pywin / wmi module not available')
+    #Log.logger.info('pywin / wmi module not available')
     import_module_wmi_ok = False
 
 ERR_TEXT_NO_DEV = 'failed: No such device'

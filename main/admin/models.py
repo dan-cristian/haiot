@@ -784,14 +784,14 @@ class Utility(db.Model, graphs.BaseGraph, DbEvent, DbBase):
         return '{} {} {}'.format(self.id, self.utility_name, self.updated_on)
 
 
-class State(db.Model, graphs.BaseGraph, DbEvent, DbBase):
+class State(db.Model, DbEvent, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     entry_name = db.Column(db.String(50))  # unique name
     entry_value = db.Column(db.String(50))
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
 
     def __init__(self, entry_name=''):
-        super(Log, self).__init__()
+        super(State, self).__init__()
         self.entry_name = entry_name
 
     def __repr__(self):

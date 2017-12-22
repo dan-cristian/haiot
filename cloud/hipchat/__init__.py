@@ -67,7 +67,7 @@ def unload():
 
 
 def init():
-    Log.logger.info('Hipchat module initialising')
+    Log.logger.debug('Hipchat module initialising')
     dispatcher.connect(hipchat_notify, signal=Constant.SIGNAL_CHAT_NOTIFICATION, sender=dispatcher.Any)
     global _token, _room
     _token = model_helper.get_param(Constant.P_HIPCHAT_TOKEN)
