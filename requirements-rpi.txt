@@ -1,5 +1,6 @@
 pifacedigitalio
 pifacecommon
 RPi.GPIO
-smbus
 gpsd-py3
+pygame
+smbus2

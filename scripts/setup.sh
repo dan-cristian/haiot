@@ -4,9 +4,11 @@
 #chmod +x scripts/stopserver.sh
 source venv/bin/activate
 if [ "$?" != "0" ]; then
+    echo "detected that venv is not installed"
     #sudo pip install --upgrade pip
     sudo pip install virtualenv
-    virtualenv venv
+    #https://raspberrypi.stackexchange.com/questions/9246/how-to-install-smbus-to-virtualenv
+    virtualenv --system-site-packages venv
     source venv/bin/activate
 fi
 

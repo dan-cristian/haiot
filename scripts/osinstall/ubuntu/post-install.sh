@@ -985,6 +985,7 @@ if [ "$ENABLE_DASHCAM_PI_LCD_DF" == "1" ]; then
         #ln -s /usr/src/linux-headers-$(uname -r)  /lib/modules/$(uname -r)/build
         #http://virtual.4my.eu/RP_USBDisplay/Ubuntu%20ARMv7hf/readme.txt
         apt install -y dkms raspberrypi-kernel-headers python-pip 
+        #https://askubuntu.com/questions/299950/how-do-i-install-pygame-in-virtualenv/299965#299965
         apt build-dep -y python-pygame
         apt install -y libsdl-dev python-pygame
         dpkg -i rp-usbdisplay-dkms_1.0_all.deb
