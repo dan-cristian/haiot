@@ -99,15 +99,15 @@ def _usb_init():
 
 def usb_record_loop():
     if Params.is_recording_usb:
-        stdout, stderr = Params.ffmpeg_usb.communicate()
-        print "STDOUT"
-        print stdout
-        print "STDERR"
-        print stderr
         Params.ffmpeg_usb.poll()
         if Params.ffmpeg_usb.returncode is not None:
             Params.is_recording_usb = False
             print "usb record exit with code {}".format(Params.ffmpeg_usb.returncode)
+            if Params.ffmpeg_usb.returncode == 1:
+                stdout, stderr = Params.ffmpeg_usb.communicate()
+                print "Recording stopped with error"
+                print stderr
+
     #time.sleep(10)
     #Params.ffmpeg_usb.terminate()
 
