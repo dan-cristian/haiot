@@ -25,9 +25,9 @@ def _read_gps():
         else:
             alt = r.alt
         # use battery fields to report horizontal speed
-        url = State.UPLOAD_SERVER_URL.replace("<lat>", r.lat).replace("<lon>", r.lon).replace("<alt>", alt).replace(
-            "<sat>", r.sats_valid).replace("<acc>", r.position_precision()[0]).replace("<bat>", r.hspeed).replace(
-            "<time>", time.time())
+        url = State.UPLOAD_SERVER_URL.replace("<lat>", str(r.lat)).replace("<lon>", str(r.lon)).replace(
+            "<alt>", str(alt)).replace("<sat>", str(r.sats_valid)).replace(
+            "<acc>", str(r.position_precision()[0])).replace("<bat>", str(r.hspeed)).replace("<time>", str(time.time()))
         State.url_buffer.insert(0, url)
 
 
