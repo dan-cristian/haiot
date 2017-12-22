@@ -100,7 +100,7 @@ def usb_record_loop():
         Params.ffmpeg_usb.poll()
         if Params.ffmpeg_usb.returncode is not None:
             Params.is_recording_usb = False
-            print Params.ffmpeg_usb.returncode
+            print "usb record exit with code {}".format(Params.ffmpeg_usb.returncode)
     #time.sleep(10)
     #Params.ffmpeg_usb.terminate()
 

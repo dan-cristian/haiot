@@ -197,7 +197,7 @@ def populate_tables(model_auto_update=False):
         node_obj.add_record_to_session()
     # let this commented for test purposes (make netbook Windows look like PI)
     if Constant.HOST_NAME != 'netbook':
-        Log.logger.info("Setting current machine type to {}".format(Constant.HOST_MACHINE_TYPE))
+        #Log.logger.info("Setting current machine type to {}".format(Constant.HOST_MACHINE_TYPE))
         node_obj.machine_type = Constant.HOST_MACHINE_TYPE
     Constant.HOST_PRIORITY = node_obj.priority
     commit()
@@ -252,7 +252,7 @@ def populate_tables(model_auto_update=False):
                 models.GpioPin.query.filter_by(pin_type=Constant.GPIO_PIN_TYPE_PI_FACE_SPI,
                                                host_name=node.name).delete()
                 commit()
-                Log.logger.info('Populating pi-face {} pins on {} '.format(node.machine_type, node.name))
+                Log.logger.info('Populating piface {} pins on {} '.format(node.machine_type, node.name))
             for board in range(0, 4):
                 for pin_dir in (Constant.GPIO_PIN_DIRECTION_IN, Constant.GPIO_PIN_DIRECTION_OUT):
                     for pin in range(0, 8):  # -1
