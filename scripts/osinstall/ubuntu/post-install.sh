@@ -185,6 +185,9 @@ adduser ${USERNAME} audio
 adduser ${USERNAME} video
 adduser ${USERNAME} tty
 adduser ${USERNAME} dialout
+adduser ${USERNAME} i2c
+adduser ${USERNAME} spi
+adduser ${USERNAME} gpio
 chsh -s /bin/bash ${USERNAME}
 
 
