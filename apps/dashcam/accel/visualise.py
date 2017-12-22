@@ -7,8 +7,8 @@ import math
 
 
 def read_values():
-    link = "http://127.0.0.1:9000"
-    #link = "http://192.168.0.17:9000"
+    #link = "http://127.0.0.1:9000"
+    link = "http://192.168.0.17:9000"
     f = urllib.urlopen(link)
     myfile = f.read()
     var = json.loads(myfile)
@@ -98,7 +98,7 @@ def init():
         delta_y = math.radians(last_y)
 
         # z-is thickness of the line
-        z = 2 * int(last_x)
+        z = 4 * int(last_x)
         if z < 0:
             z = -z
             COLOR = RED  # change colour if x-axis reading is negative

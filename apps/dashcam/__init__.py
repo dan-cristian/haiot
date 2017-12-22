@@ -22,9 +22,11 @@ def unload():
 
 def init():
     Log.logger.info('Dashcam module initialising')
-    thread_pool.add_interval_callable(recorder.thread_run, run_interval_second=60)
-    thread_pool.add_interval_callable(gps.thread_run, run_interval_second=60)
-    thread_pool.add_interval_callable(accel.thread_run, run_interval_second=0.2)
+    recorder.init()
+    thread_pool.add_interval_callable(recorder.thread_run, run_interval_second=1)
+    #thread_pool.add_interval_callable(gps.thread_run, run_interval_second=60)
+    accel.init()
+    thread_pool.add_interval_callable(accel.thread_run, run_interval_second=0.5)
     global initialised
     initialised = True
     ui.init()
