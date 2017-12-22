@@ -2,3 +2,4 @@ pifacedigitalio
 pifacecommon
 RPi.GPIO
 smbus
+gpsd-py3
