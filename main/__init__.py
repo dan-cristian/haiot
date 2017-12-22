@@ -260,8 +260,12 @@ def init():
 
     Log.logger.info('Feeding dogs with grass until app will exit')
     # stop app from exiting
-    while not shutting_down:
-        time.sleep(1)
+    try:
+        while not shutting_down:
+            time.sleep(1)
+    except Exception, ex:
+        print ex
+        unload()
     Log.logger.critical('Looping ended, app will exit')
 
 
