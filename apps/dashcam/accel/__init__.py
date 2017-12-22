@@ -17,12 +17,10 @@ class Params:
     lastrecord = None
     #sensor = None
     calibration = None
-    sensitivity = 1 # number of decimals
     WEB_PORT = 9000 # set to 0 to disable
     urls = ('/', 'Index')
     web_thread = None
     web_app = None
-
 
 
 class Raw:

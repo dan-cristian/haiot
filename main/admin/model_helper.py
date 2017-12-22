@@ -158,7 +158,7 @@ def populate_tables(model_auto_update=False):
                         models.SystemMonitor, models.SystemDisk,
                         models.Sensor, models.Ups, models.Rule,
                         models.CommandOverrideRelay, models.PlotlyCache, models.Utility, models.Presence,
-                        models.SensorError, models.Log]
+                        models.SensorError, models.State]
     # tables that will be cleaned on every app start
     table_force_clean = [models.Parameter, models.Zone, models.Presence, models.Module, models.Node, models.Rule,
                          models.ZoneHeatRelay]
