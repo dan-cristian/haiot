@@ -6,8 +6,8 @@ from main.admin.model_helper import commit
 from main import thread_pool
 import std_gpio
 import piface
-import bbb_io
-import pigpio_gpio
+#import bbb_io
+#import pigpio_gpio
 import rpi_gpio
 
 initialised = False
@@ -123,9 +123,9 @@ def zone_custom_relay_record_update(json_object):
 
 
 def thread_run():
-    pigpio_gpio.thread_run()
+    #pigpio_gpio.thread_run()
     piface.thread_run()
-    bbb_io.thread_run()
+    #bbb_io.thread_run()
     std_gpio.thread_run()
     rpi_gpio.thread_run()
 
@@ -136,7 +136,7 @@ def unload():
         Log.logger.info('Unloading gpio pins')
         std_gpio.unload()
         piface.unload()
-        bbb_io.unload()
+        #bbb_io.unload()
         rpi_gpio.unload()
     initialised = False
 
@@ -145,10 +145,10 @@ def init():
     Log.logger.info("GPIO initialising")
     if Constant.IS_MACHINE_RASPBERRYPI:
         piface.init()
-        pigpio_gpio.init()
+        #pigpio_gpio.init()
         rpi_gpio.init()
     if Constant.IS_MACHINE_BEAGLEBONE:
-        bbb_io.init()
+        #bbb_io.init()
         std_gpio.init()
     thread_pool.add_interval_callable(thread_run, run_interval_second=1)
     global initialised
