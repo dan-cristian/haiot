@@ -1,11 +1,12 @@
 import gpsd
 import urllib2
-import urllib
+import ssl
 import time
 initialised = False
 
 
 class State:
+    context = ssl._create_unverified_context()
     url_timeout = 5
     device_name = "skoda"
     UPLOAD_SERVER_URL = "https://www.dancristian.ro/nextcloud/index.php/apps/phonetrack/log/gpslogger/" \
@@ -29,14 +30,15 @@ def _read_gps():
         url = State.UPLOAD_SERVER_URL.replace("<lat>", str(r.lat)).replace("<lon>", str(r.lon)).replace(
             "<alt>", str(alt)).replace("<sat>", str(r.sats_valid)).replace(
             "<acc>", str(r.position_precision()[0])).replace("<bat>", str(r.hspeed)).replace("<time>", str(time.time()))
-        State.url_buffer.insert(0, url)
+        State.url_buffer.insert(1, url)
 
 
 def _upload_buffer():
     for url in list(State.url_buffer):
         try:
-            f = urllib.urlopen(url)
-            #f = urllib2.urlopen(url, timeout=State.url_timeout, cadefault=True)
+            #f = urllib.urlopen(url)
+            # https://stackoverflow.com/questions/27835619/urllib-and-ssl-certificate-verify-failed-error
+            f = urllib2.urlopen(url, timeout=State.url_timeout, context=State.context)
             resp = f.read()
             print "Response was {}".format(resp)
             State.url_buffer.remove(url)
