@@ -70,8 +70,8 @@ def init():
     __notif_dest = model_helper.get_param(Constant.P_NOTIFY_EMAIL_RECIPIENT)
     __notif_pass = _get_pass(__notif_from)
 
-    if send_notification("Starting haiot", "Host is {}".format(Constant.HOST_NAME)):
-        Log.logger.info("Init email sent OK")
+    #if send_notification("Starting haiot", "Host is {}".format(Constant.HOST_NAME)):
+    #    Log.logger.info("Init email sent OK")
     global initialised
     initialised = True
 
