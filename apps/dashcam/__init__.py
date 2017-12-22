@@ -16,6 +16,7 @@ def unload():
     thread_pool.remove_callable(recorder.thread_run)
     thread_pool.remove_callable(gps.thread_run)
     thread_pool.remove_callable(accel.thread_run)
+    accel.unload()
     global initialised
     initialised = False
 

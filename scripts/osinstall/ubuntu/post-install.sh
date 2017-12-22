@@ -143,7 +143,6 @@ if [ "$ENABLE_DASHCAM_PI" == "1" ]; then
 		passwd pi
         systemctl enable ssh
 		systemctl start ssh
-        
 	fi
 fi
 
@@ -852,6 +851,7 @@ if [ "$ENABLE_VPN_SERVER" == "1" ]; then
 fi
 
 if [ "$ENABLE_DASHCAM_PI" == "1" ]; then
+    cd /home/${USERNAME}
 	#http://pidashcam.blogspot.ro/2013/09/install.html#front
     if ! grep -q "gpu_mem" /boot/config.txt; then
         #enable camera
@@ -910,13 +910,14 @@ if [ "$ENABLE_DASHCAM_PI" == "1" ]; then
     #ffmpeg -y -f dshow -i video="Integrated Camera" -r 8 -c:v libx264 -b:v 2000k -frag_duration 1000 record1.mp4
 
     echo "Installing IO/Sensor packages"
-    apt install -y i2c-tools libi2c-dev python-smbus
+    apt install -y i2c-tools libi2c-dev
+    #python-smbus
     if ! grep -q "^i2c[-_]dev" /etc/modules; then printf "i2c-dev\n" >> /etc/modules; fi
     if ! grep -q "^i2c[-_]bcm2708" /etc/modules; then printf "i2c-bcm2708\n" >> /etc/modules; fi
 
     set_config_var dtparam i2c_arm=on /boot/config.txt
-    echo "Installing accel + gyro lib"
-    pip install mpu6050-raspberrypi
+    #echo "Installing accel + gyro lib"
+    #pip install mpu6050-raspberrypi
 
     echo "Disable UART console"
     sed -i -e "s/console=serial0,115200//g" /boot/cmdline.txt
