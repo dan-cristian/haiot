@@ -5,7 +5,8 @@ import web
 import time
 import threading
 try:
-    import smbus
+    #import smbus
+    from smbus2 import smbus
     #from mpu6050 import mpu6050
 except Exception, ex:
     print ex
