@@ -152,7 +152,7 @@ def unload():
 
 
 def init():
-    Log.logger.info('Newtifry module initialising')
+    Log.logger.debug('Newtifry module initialising')
     global _source_key
     _source_key = model_helper.get_param(Constant.P_NEWTIFY_KEY)
     dispatcher.connect(send_message, signal=Constant.SIGNAL_PUSH_NOTIFICATION, sender=dispatcher.Any)

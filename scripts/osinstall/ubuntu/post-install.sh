@@ -984,7 +984,9 @@ if [ "$ENABLE_DASHCAM_PI_LCD_DF" == "1" ]; then
         # https://askubuntu.com/questions/714874/how-to-point-dkms-to-kernel-headers
         #ln -s /usr/src/linux-headers-$(uname -r)  /lib/modules/$(uname -r)/build
         #http://virtual.4my.eu/RP_USBDisplay/Ubuntu%20ARMv7hf/readme.txt
-        apt install -y dkms raspberrypi-kernel-headers python-pip python-pygame
+        apt install -y dkms raspberrypi-kernel-headers python-pip 
+        apt build-dep -y python-pygame
+        apt install -y libsdl-dev python-pygame
         dpkg -i rp-usbdisplay-dkms_1.0_all.deb
         echo "Probing module"
         modprobe rp_usbdisplay

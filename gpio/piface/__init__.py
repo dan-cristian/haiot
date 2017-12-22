@@ -86,7 +86,7 @@ def unload():
 
 
 def init():
-    Log.logger.info('Piface initialising')
+    Log.logger.debug('Piface initialising')
     if __import_ok:
         try:
             dispatcher.connect(setup_in_ports_pif, signal=Constant.SIGNAL_GPIO_INPUT_PORT_LIST, sender=dispatcher.Any)

@@ -17,7 +17,7 @@ def unload():
 
 
 def init():
-    Log.logger.info('API module initialising')
+    Log.logger.debug('API module initialising')
     # thread_pool.add_interval_callable(template_run.thread_run, run_interval_second=60)
     global initialised
     initialised = True
