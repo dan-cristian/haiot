@@ -40,8 +40,10 @@ def _upload_buffer():
             # https://stackoverflow.com/questions/27835619/urllib-and-ssl-certificate-verify-failed-error
             f = urllib2.urlopen(url, timeout=State.url_timeout, context=State.context)
             resp = f.read()
-            print "Response was {}".format(resp)
-            State.url_buffer.remove(url)
+            if resp == "null":
+                State.url_buffer.remove(url)
+            else:
+                print "Unexpected response {}".format(resp)
         except Exception, ex:
             print ex
             State.url_buffer.append(url)
