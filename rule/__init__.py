@@ -246,7 +246,7 @@ def reload_rules():
 
 def init():
     global scheduler
-    Log.logger.info('Rules module initialising')
+    Log.logger.debug('Rules module initialising')
     if scheduler:
         __add_rules_into_db()
         # __load_rules_from_db()

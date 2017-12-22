@@ -81,7 +81,7 @@ def unload():
 
 
 def init():
-    Log.logger.info('Sensor module initialising')
+    Log.logger.debug('Sensor module initialising')
     if owsensor_loop.init():
         thread_pool.add_interval_callable(owsensor_loop.thread_run,
                                           run_interval_second=owsensor_loop.sampling_period_seconds)

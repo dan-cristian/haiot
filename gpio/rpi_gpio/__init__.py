@@ -133,7 +133,7 @@ def unload():
 
 
 def init():
-    Log.logger.info('RPI.GPIO module initialising')
+    Log.logger.debug('RPI.GPIO module initialising')
     try:
         GPIO.setmode(GPIO.BCM)
         dispatcher.connect(setup_in_ports, signal=Constant.SIGNAL_GPIO_INPUT_PORT_LIST, sender=dispatcher.Any)

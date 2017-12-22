@@ -16,7 +16,7 @@ def unload():
 
 def init():
     if not IS_STANDALONE_MODE:
-        Log.logger.info('Node module initialising')
+        Log.logger.debug('Node module initialising')
         thread_pool.add_interval_callable_progress(node_run.thread_run, run_interval_second=30,
                                                    progress_func=node_run.get_progress)
         global initialised

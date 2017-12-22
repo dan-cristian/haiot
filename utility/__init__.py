@@ -115,7 +115,7 @@ def unload():
 
 
 def init():
-    Log.logger.info('Utility module initialising')
+    Log.logger.debug('Utility module initialising')
     dispatcher.connect(__utility_update, signal=Constant.SIGNAL_UTILITY, sender=dispatcher.Any)
     dispatcher.connect(__utility_update_ex, signal=Constant.SIGNAL_UTILITY_EX, sender=dispatcher.Any)
     # thread_pool.add_interval_callable(template_run.thread_run, run_interval_second=60)

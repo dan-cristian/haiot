@@ -23,7 +23,7 @@ def add_interval_callable(func, run_interval_second=60):
         __callable_list.append(func)
         __exec_last_date_list[func]=datetime.now()
         __exec_interval_list[func]=run_interval_second
-        Log.logger.info('Added for processing callable ' + print_name)
+        Log.logger.debug('Added for processing callable ' + print_name)
     else:
         Log.logger.info('Callable not added, already there')
 
