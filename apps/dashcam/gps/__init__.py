@@ -50,12 +50,18 @@ def _upload_buffer():
 
 def init():
     global initialised
-    gpsd.connect()
-    initialised = True
+    try:
+        gpsd.connect()
+        initialised = True
+    except Exception, ex:
+        print ex
 
 
 def thread_run():
-    _read_gps()
+    if initialised:
+        _read_gps()
+    else:
+        init()
     _upload_buffer()
 
 

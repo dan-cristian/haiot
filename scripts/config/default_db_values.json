@@ -2,7 +2,6 @@
   "Node": [
     {"id":1,  "priority":"10", "name":"netbook", "machine_type":"raspberry"},
     {"id":6,  "priority":"6", "name":"pi-power", "machine_type":"raspberry"},
-    {"id":8,  "priority":"4", "name":"pi-sense", "machine_type":"raspberry"},
     {"id":9,  "priority":"3", "name":"pi-face", "machine_type":"raspberry"},
     {"id":4,  "priority":"11", "name":"pidash", "machine_type":"raspberry"}
   ],
@@ -73,7 +72,7 @@
     {"id":37, "active":"1", "start_order":"37", "name":"cloud.hipchat"},
     {"id":39, "active":"1", "start_order":"39", "name":"presence"},
     {"id":41, "active":"0", "start_order":"41", "name":"cloud.alexa"},
-    {"id":101, "active":"1", "start_order":"101", "name":"webui.chart"},
+    {"id":101, "active":"0", "start_order":"101", "name":"webui.chart"},
     {"id":102, "active":"1", "start_order":"102", "name":"webui.api"},
     {"id":103, "active":"1", "start_order":"103", "name":"webui"},
     {"id":105, "active":"0", "start_order":"105", "name":"apps.dashcam"},
