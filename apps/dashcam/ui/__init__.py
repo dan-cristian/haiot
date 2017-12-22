@@ -4,7 +4,12 @@ import os
 import io
 import glob
 import errno
-from rpusbdisp import Touchscreen
+try:
+    from rpusbdisp import Touchscreen
+    _disp_initialised = True
+except Exception, ex:
+    print ex
+    _disp_initialised = False
 
 UI_DFROBOT_2_8 = True
 TOUCHSCREEN_EVDEV_NAME = 'RoboPeakUSBDisplayTS'
@@ -174,12 +179,13 @@ def init():
     _button_list.append(
         Button("Cucu", 100, 30, 100, 30, blue, green, button3))
 
-    _ts = Touchscreen()
-    for touch in _ts.touches:
-        touch.on_press = handle_press
-        touch.on_release = handle_release
-        touch.on_move = handle_move
-    _ts.run()
+    if _disp_initialised:
+        _ts = Touchscreen()
+        for touch in _ts.touches:
+            touch.on_press = handle_press
+            touch.on_release = handle_release
+            touch.on_move = handle_move
+        _ts.run()
 
     pygame.event.set_blocked(pygame.MOUSEMOTION)
     pygame.event.set_blocked(pygame.MOUSEBUTTONDOWN)

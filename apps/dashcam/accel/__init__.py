@@ -54,7 +54,7 @@ class Raw:
         raw_gyro_data = Raw.bus.read_i2c_block_data(Raw.address, 0x43, 6)
         raw_accel_data = Raw.bus.read_i2c_block_data(Raw.address, 0x3b, 6)
         raw_temp_data = Raw.bus.read_i2c_block_data(Raw.address, 0x41, 6)
-        temp = (Raw.twos_compliment((raw_gyro_data[0] << 8) + raw_gyro_data[1]) / 340.0) + 36.53
+        temp = (Raw.twos_compliment((raw_temp_data[0] << 8) + raw_temp_data[1]) / 340.0) + 36.53
 
         gyro_scaled_x = Raw.twos_compliment((raw_gyro_data[0] << 8) + raw_gyro_data[1]) / Raw.gyro_scale
         gyro_scaled_y = Raw.twos_compliment((raw_gyro_data[2] << 8) + raw_gyro_data[3]) / Raw.gyro_scale
@@ -108,7 +108,6 @@ def _run_web_server():
 
 def init():
     try:
-        #Params.sensor = mpu6050(0x68)
         Raw.init()
     except Exception, ex:
         print ex
