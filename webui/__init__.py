@@ -91,7 +91,7 @@ def init():
     else:
         # otherwise listen on all interfaces
         host = '0.0.0.0'
-        port = model_helper.get_param(Constant.P_FLASK_WEB_PORT)
+        port = int(model_helper.get_param(Constant.P_FLASK_WEB_PORT))
     app.wsgi_app = ReverseProxied(app.wsgi_app)
     app.config['STATIC_FOLDER'] = os.path.join(os.path.dirname(__file__), 'static')
     flask_thread = helpers.FlaskInThread(app, host=host, port=port, debug=True, use_reloader=False)
