@@ -6,7 +6,7 @@ import time
 import threading
 try:
     #import smbus
-    from smbus2 import smbus
+    from smbus2 import SMBus
     #from mpu6050 import mpu6050
 except Exception, ex:
     print ex
@@ -37,7 +37,7 @@ class Raw:
 
     @staticmethod
     def init():
-        Raw.bus = smbus.SMBus(1)
+        Raw.bus = SMBus(1)
         # Now wake the 6050 up as it starts in sleep mode
         Raw.bus.write_byte_data(Raw.address, Raw.power_mgmt_1, 0)
 
