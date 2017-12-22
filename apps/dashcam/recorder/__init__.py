@@ -67,7 +67,7 @@ def _run_ffmpeg_usb_win(no_sound=True):
         print Params.ffmpeg_usb.returncode
 
 
-def _run_ffmpeg_usb(resolution, no_sound=True):
+def _run_ffmpeg_usb(no_sound=True):
     if no_sound:
         sound_param = "-an"
     else:
