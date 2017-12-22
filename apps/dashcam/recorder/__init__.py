@@ -81,8 +81,7 @@ def _run_ffmpeg_usb(no_sound=True):
             '-vf', '"drawtext=text=\'%{localtime\:%c}\': fontcolor=white@0.8: fontsize=32: x=10: y=10"',
             '-s', Params.usb_max_resolution, sound_param, "-c:v", "h264_omx", "-b:v", "3000k",
             '-frag_duration', '1000', '-strftime', '1',
-            Params.usb_out_filename])
-            #, stdin=subprocess.PIPE)
+            Params.usb_out_filename], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 
 def _usb_init():
@@ -97,6 +96,11 @@ def _usb_init():
 
 def usb_record_loop():
     if Params.is_recording_usb:
+        stdout, stderr = Params.ffmpeg_usb.communicate()
+        print "STDOUT"
+        print stdout
+        print "STDERR"
+        print stderr
         Params.ffmpeg_usb.poll()
         if Params.ffmpeg_usb.returncode is not None:
             Params.is_recording_usb = False
