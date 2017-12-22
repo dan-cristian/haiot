@@ -78,7 +78,7 @@ def unload():
 
 
 def init():
-    Log.logger.info('WebUI module initialising')
+    Log.logger.debug('WebUI module initialising')
     # thread_pool.add_callable(webui.thread_run, run_interval_second=60)
     from crud import admin, user
     crud.init_crud()

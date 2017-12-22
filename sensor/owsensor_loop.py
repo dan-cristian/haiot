@@ -209,7 +209,7 @@ def get_unknown(sensor, dev):
 
 
 def init():
-    Log.logger.info('Initialising owssensor')
+    Log.logger.debug('Initialising owssensor')
     global __owproxy, initialised
     host = "none"
     port = "none"
@@ -219,7 +219,7 @@ def init():
         __owproxy = pyownet.protocol.proxy(host=host, port=port)
         initialised = True
     except Exception, ex:
-        Log.logger.info('Unable to connect to 1-wire owserver host {} port {}'.format(host, port))
+        Log.logger.info('1-wire owserver not found on host {} port {}'.format(host, port))
         initialised = False
     return initialised
 

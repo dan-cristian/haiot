@@ -142,7 +142,7 @@ def unload():
 
 
 def init():
-    Log.logger.info("GPIO initialising")
+    Log.logger.debug("GPIO initialising")
     if Constant.IS_MACHINE_RASPBERRYPI:
         piface.init()
         #pigpio_gpio.init()
