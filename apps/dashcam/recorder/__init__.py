@@ -90,8 +90,11 @@ def _usb_init():
         _run_ffmpeg_usb_win(no_sound=True)
     else:
         _run_ffmpeg_usb(no_sound=True)
+        print "Recording started"
     if Params.ffmpeg_usb._child_created:
         Params.is_recording_usb = True
+    else:
+        print "Recording process not created"
 
 
 def usb_record_loop():

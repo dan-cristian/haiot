@@ -161,39 +161,42 @@ def init():
     print 'Initialising dashcam UI'
     global _screen, initialised, _button_list, _ts
 
-    pygame.init()
-    print 'pygame initialised'
-    size = width, height = _width, _height
-    print 'pygame set mode {}'.format(size)
-    _screen = pygame.display.set_mode(size)
-    _screen.fill(black)
-    largetext = pygame.font.Font('freesansbold.ttf', 20)
-    textsurf, textrect = text_objects("A bit Racey", largetext)
-    textrect.center = ((_width/2), (_height/2))
-    _screen.blit(textsurf, textrect)
+    try:
+        pygame.init()
+        print 'pygame initialised'
+        size = width, height = _width, _height
+        print 'pygame set mode {}'.format(size)
+        _screen = pygame.display.set_mode(size)
+        _screen.fill(black)
+        largetext = pygame.font.Font('freesansbold.ttf', 20)
+        textsurf, textrect = text_objects("A bit Racey", largetext)
+        textrect.center = ((_width/2), (_height/2))
+        _screen.blit(textsurf, textrect)
 
-    _button_list.append(
-        Button("GO", 15, 150, 100, 30, green, blue, button1))
-    _button_list.append(
-        Button("Quit", 200, 150, 100, 30, red, bright_red, button2))
-    _button_list.append(
-        Button("Cucu", 100, 30, 100, 30, blue, green, button3))
+        _button_list.append(
+            Button("GO", 15, 150, 100, 30, green, blue, button1))
+        _button_list.append(
+            Button("Quit", 200, 150, 100, 30, red, bright_red, button2))
+        _button_list.append(
+            Button("Cucu", 100, 30, 100, 30, blue, green, button3))
 
-    if _disp_initialised:
-        _ts = Touchscreen()
-        for touch in _ts.touches:
-            touch.on_press = handle_press
-            touch.on_release = handle_release
-            touch.on_move = handle_move
-        _ts.run()
+        if _disp_initialised:
+            _ts = Touchscreen()
+            for touch in _ts.touches:
+                touch.on_press = handle_press
+                touch.on_release = handle_release
+                touch.on_move = handle_move
+            _ts.run()
 
-    pygame.event.set_blocked(pygame.MOUSEMOTION)
-    pygame.event.set_blocked(pygame.MOUSEBUTTONDOWN)
-    pygame.event.set_blocked(pygame.MOUSEBUTTONUP)
-    pygame.mouse.set_visible(False)
+        pygame.event.set_blocked(pygame.MOUSEMOTION)
+        pygame.event.set_blocked(pygame.MOUSEBUTTONDOWN)
+        pygame.event.set_blocked(pygame.MOUSEBUTTONUP)
+        pygame.mouse.set_visible(False)
 
-    pygame.display.update()
-    initialised = True
+        pygame.display.update()
+        initialised = True
+    except Exception, ex:
+        print ex
 
 
 if __name__ == '__main__':
