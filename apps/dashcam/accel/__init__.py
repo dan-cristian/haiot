@@ -105,6 +105,11 @@ def _run_web_server():
         print ex
 
 
+def unload():
+    Params.web_app.stop()
+    Params.web_thread.join()
+
+
 def init():
     try:
         Raw.init()
