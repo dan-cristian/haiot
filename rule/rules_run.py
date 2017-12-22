@@ -76,7 +76,7 @@ def rule_alarm(obj=models.ZoneAlarm(), field_changed_list=None):
             rule_common.send_chat(message="Portita Open", notify=True)
         elif obj.alarm_pin_name == 'car vibrate':
             msg = "Car Vibration"
-            rule_common.notify_via_all(title=msg, message=msg, priority=3)
+            #rule_common.notify_via_all(title=msg, message=msg, priority=3)
         # elif obj.alarm_pin_name == 'birou':
         #    thread.start_new_thread(rule_common.play_bell_local, ('29621__infobandit__phone.wav',))
     # else:

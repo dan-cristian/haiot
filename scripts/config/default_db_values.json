@@ -160,7 +160,8 @@
     {"id":3, "name":"parter"},
     {"id":4, "name":"etaj"},
     {"id":5, "name":"pod"},
-    {"id":6, "name":"curte"}
+    {"id":6, "name":"curte"},
+    {"id":50, "name":"car"}
   ],
 
   "ZoneArea": [
@@ -176,6 +177,7 @@
     {"id":10, "area_id":"1", "zone_id":"11"},
     {"id":11, "area_id":"1", "zone_id":"29"},
     {"id":12, "area_id":"1", "zone_id":"47"},
+    {"id":13, "area_id":"50", "zone_id":"200"},
     {"id":200, "area_id":"2", "zone_id":"3"},
     {"id":201, "area_id":"2", "zone_id":"9"},
     {"id":300, "area_id":"3", "zone_id":"1"},
