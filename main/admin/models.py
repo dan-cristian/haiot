@@ -700,22 +700,15 @@ class ZoneCustomRelay(db.Model, DbEvent, DbBase):
         return 'host {} {} {} {}'.format(self.gpio_host_name, self.gpio_pin_code, self.relay_pin_name, self.relay_is_on)
 
 
-# base class for user or rule events that might override automatic system behaviour
-class CommandOverrideBase(db.Model, DbEvent, DbBase):
+class CommandOverrideRelay(db.Model, DbEvent, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     host_name = db.Column(db.String(50))
     is_gui_source = db.Column(db.Boolean, default=False)  # gui has priority over rule
     is_rule_source = db.Column(db.Boolean, default=False)
+    relay_pin_name = db.Column(db.String(50))
     start_date = db.Column(db.DateTime(), default=datetime.now)
     end_date = db.Column(db.DateTime(), default=datetime.now)
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
-
-
-# https://stackoverflow.com/questions/43832848/cant-define-table-args-on-a-child-class-in-a-single-table-inheritance-setup
-class CommandOverrideRelay(CommandOverrideBase):
-    __tablename__ = 'command_override_relay'
-    __table_args__ = {'extend_existing': True}
-    relay_pin_name = db.Column(db.String(50))
 
 
 class Rule(db.Model, DbEvent, DbBase):
