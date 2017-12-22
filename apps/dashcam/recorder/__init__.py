@@ -7,7 +7,7 @@ except Exception, ex:
 import subprocess
 import time
 import datetime as dt
-import re
+from common import Constant
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
@@ -87,7 +87,10 @@ def _run_ffmpeg_usb(resolution, no_sound=True):
 
 def _usb_init():
     print "Recording USB"
-    _run_ffmpeg_usb_win(no_sound=True)
+    if Constant.IS_OS_WINDOWS():
+        _run_ffmpeg_usb_win(no_sound=True)
+    else:
+        _run_ffmpeg_usb(no_sound=True)
     if Params.ffmpeg_usb._child_created:
         Params.is_recording_usb = True
 
@@ -98,8 +101,8 @@ def usb_record_loop():
         if Params.ffmpeg_usb.returncode is not None:
             Params.is_recording_usb = False
             print Params.ffmpeg_usb.returncode
-    time.sleep(10)
-    Params.ffmpeg_usb.terminate()
+    #time.sleep(10)
+    #Params.ffmpeg_usb.terminate()
 
 
 def _pi_init():
