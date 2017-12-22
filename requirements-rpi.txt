@@ -1,4 +1,4 @@
 pifacedigitalio
 pifacecommon
 RPi.GPIO
-mpu6050-raspberrypi
+smbus
