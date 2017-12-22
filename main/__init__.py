@@ -25,6 +25,7 @@ exit_code = 0
 MODEL_AUTO_UPDATE = False
 BIND_IP = None
 BIND_PORT = None
+IS_STANDALONE_MODE = None  # runs standalone, no node / mqtt connection & history
 
 def my_import(name):
     # http://stackoverflow.com/questions/547829/how-to-dynamically-load-a-python-class
@@ -177,7 +178,7 @@ def init():
 
     admin.model_helper.populate_tables(MODEL_AUTO_UPDATE)
     reporting_enabled = admin.model_helper.get_param(Constant.DB_REPORTING_LOCATION_ENABLED)
-    if reporting_enabled == "1":
+    if reporting_enabled == "1" and not IS_STANDALONE_MODE:
         Log.logger.info('Checking history db tables')
         # http://docs.sqlalchemy.org/en/rel_0_9/dialects/mysql.html#module-sqlalchemy.dialects.mysql.mysqlconnector
         user = admin.model_helper.get_param(Constant.DB_REPORTING_USER)
@@ -196,9 +197,14 @@ def init():
         except Exception, ex:
             Log.logger.critical("Local DB reporting capability is not available, err={}".format(ex))
             app.config['SQLALCHEMY_BINDS'] = None
+    elif IS_STANDALONE_MODE:
+        Log.logger.info('Skipping reporting feature initialising, standalone mode')
 
     import transport
-    transport.init()
+    if not IS_STANDALONE_MODE:
+        transport.init()
+    else:
+        Log.logger.info('Skipping transport initialising, standalone mode')
 
     class LogMessage:
         def __init__(self):
@@ -303,8 +309,9 @@ def run(arg_list):
             BIND_PORT = s.split('=')[1]
 
 
-    global MODEL_AUTO_UPDATE
+    global MODEL_AUTO_UPDATE, IS_STANDALONE_MODE
     MODEL_AUTO_UPDATE = 'model_auto_update' in arg_list
+    IS_STANDALONE_MODE = 'standalone' in arg_list
     init()  # will block here until app is closed
     print 'App EXIT'
     global exit_code

@@ -225,11 +225,15 @@ def __add_rules_into_db():
         Log.logger.exception('Error adding rules into db {}'.format(ex), exc_info=1)
 
 
-def reload_rules():
-    global __rules_timestamp
+def _get_stamp():
     path = rules_run.__file__
     path = path.replace(".pyc", ".py")
-    new_stamp = os.path.getmtime(path)
+    return os.path.getmtime(path)
+
+
+def reload_rules():
+    global __rules_timestamp
+    new_stamp = _get_stamp()
     if new_stamp != __rules_timestamp:
         Log.logger.info('Reloading rules {} as timestamp changed, {} != {}'.format(path, __rules_timestamp, new_stamp))
         imp.reload(rules_run)
@@ -248,6 +252,8 @@ def init():
         # __load_rules_from_db()
         scheduler.start()
         Log.logger.info('Scheduler started')
+        global __rules_timestamp
+        __rules_timestamp = _get_stamp()
     else:
         Log.logger.warning('Rules not initialised as scheduler is not available')
     thread_pool.add_interval_callable(thread_run, run_interval_second=3)
