@@ -23,7 +23,7 @@ class Params:
     usb_out_filename = recordings_root + 'usb_%Y-%m-%d_%H-%M-%S.mp4'
     usb_camera_keywords = 'HD Webcam C525'
     usb_camera_dev_name = '/dev/video0'
-    usb_record_hw_card = 0
+    usb_record_hw_card = 1
     usb_record_hw_dev = 0
     usb_max_resolution = '1280x720'
     pi_max_resolution = (1296, 972)
