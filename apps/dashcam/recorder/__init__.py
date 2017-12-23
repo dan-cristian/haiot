@@ -116,7 +116,7 @@ def _run_ffmpeg_usb(no_sound=True):
              '-s', Params.usb_max_resolution, sound_param, "-c:v", "h264_omx", "-b:v", "3000k",
              '-frag_duration', '1000', '-strftime', '1', Params.usb_out_filename],
             stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        Params.ffmpeg_usb_out = NBSR(Params.ffmpeg_usb.stdout)
+
 
 
 def _usb_init():
@@ -128,6 +128,7 @@ def _usb_init():
         print "Recording started"
     if Params.ffmpeg_usb._child_created:
         Params.is_recording_usb = True
+        Params.ffmpeg_usb_out = NBSR(Params.ffmpeg_usb.stdout)
     else:
         print "Recording process not created"
 
@@ -195,6 +196,7 @@ if __name__ == '__main__':
     if Params.ffmpeg_usb._child_created:
         Params.is_recording_usb = True
         print "Recording started"
+        Params.ffmpeg_usb_out = NBSR(Params.ffmpeg_usb.stdout)
     else:
         print "Recording process not created"
     while True:
