@@ -98,20 +98,19 @@ def _run_ffmpeg_usb(no_sound=True):
                    '-reset_timestamps 1 -force_key_frames \"expr:gte(t,n_forced*2)\" -strftime 1 {}'.format(
             Params.usb_record_hw_card, Params.usb_camera_dev_name, overlay, Params.usb_max_resolution, sound_param,
             Params.usb_out_filename)
-        print "Executing: {}".format(cmd_line)
-        Params.ffmpeg_usb = subprocess.Popen(
-            [cmd_line], shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        #print "Executing: {}".format(cmd_line)
+        #Params.ffmpeg_usb = subprocess.Popen([cmd_line], shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+        #                                     stderr=subprocess.PIPE)
 
-        return
-        Params.ffmpeg_usb = subprocess.Popen([
-            'ffmpeg', '-y',
-            '-f', 'alsa', '-thread_queue_size', '16384', '-ac', '1', '-i', 'hw:{}'.format(Params.usb_record_hw_card),
-            '-r', str(Params.usb_framerate), '-f', 'video4linux2', '-i', Params.usb_camera_dev_name,
-            '-thread_queue_size', '16384', '-reset_timestamps', '1', '-force_key_frames', '"expr:gte(t,n_forced*10)"',
-            '-vf', '"drawtext=text=\'%{localtime\:%c}\': fontcolor=white@0.8: fontsize=32: x=10: y=10"',
-            '-s', Params.usb_max_resolution, sound_param, "-c:v", "h264_omx", "-b:v", "3000k",
-            '-frag_duration', '1000', '-strftime', '1',
-            Params.usb_out_filename], shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        Params.ffmpeg_usb = subprocess.call(
+            ['ffmpeg', '-y', '-f', 'alsa', '-thread_queue_size', '16384', '-ac', '1',
+             '-i', 'hw:{}'.format(Params.usb_record_hw_card), '-r', str(Params.usb_framerate),
+             '-f', 'video4linux2', '-thread_queue_size', '16384', '-i', Params.usb_camera_dev_name,
+             '-reset_timestamps', '1', '-force_key_frames', '"expr:gte(t,n_forced*10)"',
+             '-vf', '"drawtext=text=\'%{localtime\:%c}\': fontcolor=white@0.8: fontsize=32: x=10: y=10"',
+             '-s', Params.usb_max_resolution, sound_param, "-c:v", "h264_omx", "-b:v", "3000k",
+             '-frag_duration', '1000', '-strftime', '1', Params.usb_out_filename],
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 
 def _usb_init():
@@ -127,7 +126,7 @@ def _usb_init():
         print "Recording process not created"
 
 
-def usb_record_loop():
+def _usb_record_loop():
     if Params.is_recording_usb:
         Params.ffmpeg_usb.poll()
         if Params.ffmpeg_usb.returncode is not None:
@@ -137,6 +136,8 @@ def usb_record_loop():
                 stdout, stderr = Params.ffmpeg_usb.communicate()
                 print "Recording stopped with error"
                 print stderr
+        else:
+            print "USB recording ongoing"
 
     #time.sleep(10)
     #Params.ffmpeg_usb.terminate()
@@ -160,7 +161,7 @@ def _pi_stop():
     Params.is_recording_pi = False
 
 
-def pi_record_loop():
+def _pi_record_loop():
     if Params.is_recording_pi:
         Params.pi_camera.annotate_text = dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         #Params.pi_camera.wait_recording(0.4)
@@ -175,9 +176,11 @@ def init():
 
 
 def thread_run():
-    pi_record_loop()
-    usb_record_loop()
+    _pi_record_loop()
+    _usb_record_loop()
 
 
 if __name__ == '__main__':
-    usb_record_loop()
+    _get_usb_params()
+    _usb_init()
+    _usb_record_loop()
