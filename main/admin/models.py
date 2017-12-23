@@ -845,7 +845,7 @@ class PeopleDevice(db.Model, DbEvent, DbBase):
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
 
 
-class Position():
+class Position(db.Model, DbEvent, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     device_id = db.Column(db.Integer)
     latitude = db.Column(db.String(20))
