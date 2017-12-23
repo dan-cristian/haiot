@@ -140,7 +140,7 @@ def _usb_record_loop():
         if Params.ffmpeg_usb.returncode is not None:
             Params.is_recording_usb = False
             print "usb record exit with code {}".format(Params.ffmpeg_usb.returncode)
-            if Params.ffmpeg_usb.returncode == 1:
+            if Params.ffmpeg_usb.returncode != 0:
                 stdout, stderr = Params.ffmpeg_usb.communicate()
                 print "USB recording stopped with error"
                 print stderr
@@ -164,7 +164,7 @@ def _pi_record_loop():
         if Params.ffmpeg_pi.returncode is not None:
             Params.is_recording_pi = False
             print "PI record exit with code {}".format(Params.ffmpeg_pi.returncode)
-            if Params.ffmpeg_pi.returncode == 1:
+            if Params.ffmpeg_pi.returncode != 0:
                 stdout, stderr = Params.ffmpeg_pi.communicate()
                 print "PI recording stopped with error"
                 print stderr
