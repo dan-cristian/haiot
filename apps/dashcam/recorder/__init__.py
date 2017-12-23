@@ -18,6 +18,7 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 class Params:
     ffmpeg_pi = None
+    ffmpeg_pi_out = None
     ffmpeg_usb = None
     ffmpeg_usb_out = None
     segment_duration = 3600  # in seconds
@@ -64,7 +65,8 @@ def _run_ffmpeg_pi():
             'ffmpeg', '-y', '-r', str(Params.pi_framerate), '-i', '-', '-vcodec', 'copy',
             '-f', 'segment', '-segment_time', str(Params.segment_duration), '-segment_format', 'mp4',
             '-reset_timestamps', '1', '-force_key_frames', '"expr:gte(t,n_forced*10)"',
-            '-frag_duration', '1000', '-strftime', '1', '-an', Params.pi_out_filename], stdin=subprocess.PIPE)
+            '-frag_duration', '1000', '-strftime', '1', '-an', Params.pi_out_filename],
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 
 def _run_ffmpeg_usb_win(no_sound=True):
@@ -140,16 +142,34 @@ def _usb_record_loop():
             print "usb record exit with code {}".format(Params.ffmpeg_usb.returncode)
             if Params.ffmpeg_usb.returncode == 1:
                 stdout, stderr = Params.ffmpeg_usb.communicate()
-                print "Recording stopped with error"
+                print "USB recording stopped with error"
                 print stderr
         else:
-            print "USB recording ongoing"
-            print Params.ffmpeg_usb_out.readline(0.2)
+            print "USB recording ongoing\n"
+            print Params.ffmpeg_usb_out.readline(0.3)
     else:
         print "USB not recording"
 
     #time.sleep(10)
     #Params.ffmpeg_usb.terminate()
+
+
+def _pi_record_loop():
+    if Params.is_recording_pi:
+        Params.pi_camera.annotate_text = dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        #Params.pi_camera.wait_recording(0.4)
+        print "PI is recording\n"
+        print Params.ffmpeg_pi_out.readline(0.3)
+        Params.ffmpeg_pi.poll()
+        if Params.ffmpeg_pi.returncode is not None:
+            Params.is_recording_pi = False
+            print "PI record exit with code {}".format(Params.ffmpeg_pi.returncode)
+            if Params.ffmpeg_pi.returncode == 1:
+                stdout, stderr = Params.ffmpeg_pi.communicate()
+                print "PI recording stopped with error"
+                print stderr
+    else:
+        print "PI not recording"
 
 
 def _pi_init():
@@ -161,21 +181,15 @@ def _pi_init():
         print "Recording PI"
         _run_ffmpeg_pi()
         Params.pi_camera.start_recording(Params.ffmpeg_pi.stdin, format='h264', bitrate=Params.pi_bitrate)
-        Params.is_recording_pi = True
+        if Params.ffmpeg_pi._child_created:
+            Params.is_recording_pi = True
+            Params.ffmpeg_pi_out = NBSR(Params.ffmpeg_pi.stdout)
 
 
 def _pi_stop():
     Params.pi_camera.stop_recording()
     Params.pi_camera.close()
     Params.is_recording_pi = False
-
-
-def _pi_record_loop():
-    if Params.is_recording_pi:
-        Params.pi_camera.annotate_text = dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        #Params.pi_camera.wait_recording(0.4)
-    else:
-        print "PI is not recording"
 
 
 def init():
