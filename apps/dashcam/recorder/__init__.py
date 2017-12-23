@@ -217,4 +217,5 @@ if __name__ == '__main__':
     _pi_init()
     while True:
         _usb_record_loop()
+        _pi_record_loop()
         time.sleep(2)
