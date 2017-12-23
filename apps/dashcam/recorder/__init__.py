@@ -90,7 +90,7 @@ def _run_ffmpeg_usb(no_sound=True):
     else:
         sound_param = ""
     if Params.ffmpeg_usb is None:
-        overlay = '\'%{localtime\:%c}\''
+        overlay = '%{localtime\:%c}'
         cmd_line = 'ffmpeg -y -f alsa -thread_queue_size 16384 -ac 1 -i hw:{} -r 8 -f video4linux2 ' \
                    '-thread_queue_size 8192 -i {} ' \
                    '-vf "drawtext=text=\'{}\': fontcolor=white@0.8: fontsize=32: x=10: y=10" ' \
