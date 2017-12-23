@@ -188,6 +188,7 @@ adduser ${USERNAME} dialout
 adduser ${USERNAME} i2c
 adduser ${USERNAME} spi
 adduser ${USERNAME} gpio
+adduser ${USERNAME} netdev # for wpa_cli access as non-root
 chsh -s /bin/bash ${USERNAME}
 
 

@@ -30,8 +30,7 @@ class BluetoothRSSI(object):
 
     def prep_cmd_pkt(self):
         """Prepares the command packet for requesting RSSI"""
-        reqstr = struct.pack(
-            "6sB17s", bt.str2ba(self.addr), bt.ACL_LINK, "\0" * 17)
+        reqstr = struct.pack("6sB17s", bt.str2ba(self.addr), bt.ACL_LINK, "\0" * 17)
         request = array.array("c", reqstr)
         handle = fcntl.ioctl(self.hci_fd, bt.HCIGETCONNINFO, request, 1)
         handle = struct.unpack("8xH14x", request.tostring())[0]
@@ -54,15 +53,15 @@ class BluetoothRSSI(object):
             if self.cmd_pkt is None:
                 self.prep_cmd_pkt()
             # Send command to request RSSI
-            rssi = bt.hci_send_req(
-                self.hci_sock, bt.OGF_STATUS_PARAM,
-                bt.OCF_READ_RSSI, bt.EVT_CMD_COMPLETE, 4, self.cmd_pkt)
+            rssi = bt.hci_send_req(self.hci_sock, bt.OGF_STATUS_PARAM,
+                                   bt.OCF_READ_RSSI, bt.EVT_CMD_COMPLETE, 4, self.cmd_pkt)
             rssi = struct.unpack('b', rssi[3])[0]
             return rssi
         except IOError:
             # Happens if connection fails (e.g. device is not in range)
             self.connected = False
             return None
+
 
 def _check_presence():
     devs = models.Device().query_filter_all()
@@ -75,10 +74,11 @@ def _check_presence():
         if result is not None:
             try:
                 dev.last_bt_active = utils.get_base_location_now_date()
+                dev.last_active = utils.get_base_location_now_date()
                 dev.commit_record_to_db()
                 pd = models.PeopleDevice
                 peopledev = pd().query_filter_first(pd.device_id == dev.id)
-                if peopledev is not None:
+                if peopledev is not None and peopledev.give_presence:
                     p = models.People
                     people = p().query_filter_first(p.id == peopledev.people_id)
                     if people is not None:
