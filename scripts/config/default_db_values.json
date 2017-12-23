@@ -105,19 +105,24 @@
     {"id":1, "name":"Dan Cristian", "email":"dan.cristian@gmail.com"},
     {"id":2, "name":"Anca Cristian", "email":"ancastefanro@yahoo.com"},
     {"id":3, "name":"Tudor Cristian", "email":"tudr.cristian@gmail.com"},
-    {"id":4, "name":"Lucian Cristian", "email":"lucian.cristian@gmail.com"}
+    {"id":4, "name":"Lucian Cristian", "email":"lucian.cristian@gmail.com"},
+
+    {"id":100, "name":"Antonio Gaudi 33", "email":"dan.cristian@gmail.com"}
   ],
 
   "Device": [
-    {"id":1, "name":"Samsung Galaxy S6", "bt_address":"E0:DB:10:1E:E0:8A"},
-    {"id":2, "name":"Huawei P10 lite", "bt_address":"0C:8F:FF:33:B8:19"},
-    {"id":3, "name":"Allview P6", "bt_address":"E6:68:46:5C:36:8E"},
-    {"id":4, "name":"Lucian Cristian", "bt_address":"A4:E4:B8:7E:BB:AA"}
+    {"id":1, "name":"Samsung Galaxy S6", "type":"phone", "bt_address":"E0:DB:10:1E:E0:8A"},
+    {"id":2, "name":"Huawei P10 lite", "type":"phone", "bt_address":"0C:8F:FF:33:B8:19"},
+    {"id":3, "name":"Allview P6", "type":"phone", "bt_address":"E6:68:46:5C:36:8E"},
+    {"id":4, "name":"Lucian Cristian", "type":"phone", "bt_address":"A4:E4:B8:7E:BB:AA"},
+    {"id":100, "name":"Home Wifi", "type":"wifi", "wifi_address":"a4:2b:b0:fe:8c:2e"},
+    {"id":101, "name":"skoda", "type":"gps"}
   ],
 
   "PeopleDevice": [
     {"id":1, "people_id":"1", "device_id":"1", "give_presence":"1"},
-    {"id":2, "people_id":"2", "device_id":"2", "give_presence":"1"}
+    {"id":2, "people_id":"2", "device_id":"2", "give_presence":"1"},
+    {"id":3, "people_id":"100", "device_id":"100", "give_presence":"1"}
   ],
 
   "Zone": [
