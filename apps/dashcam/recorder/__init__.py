@@ -145,7 +145,7 @@ def _usb_record_loop():
                 print stderr
         else:
             print "USB recording ongoing"
-            print Params.ffmpeg_usb_out.readline(0.1)
+            print Params.ffmpeg_usb_out.readline(0.2)
     else:
         print "USB not recording"
 
@@ -175,6 +175,8 @@ def _pi_record_loop():
     if Params.is_recording_pi:
         Params.pi_camera.annotate_text = dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         #Params.pi_camera.wait_recording(0.4)
+    else:
+        print "PI is not recording"
 
 
 def init():
@@ -199,6 +201,7 @@ if __name__ == '__main__':
         Params.ffmpeg_usb_out = NBSR(Params.ffmpeg_usb.stdout)
     else:
         print "Recording process not created"
+    _pi_init()
     while True:
         _usb_record_loop()
         time.sleep(2)
