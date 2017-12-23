@@ -90,12 +90,13 @@ def _run_ffmpeg_usb(no_sound=True):
     else:
         sound_param = ""
     if Params.ffmpeg_usb is None:
+        overlay = '\'%{localtime\:%c}\''
         cmd_line = 'ffmpeg -y -f alsa -thread_queue_size 16384 -ac 1 -i hw:{} -r 8 -f video4linux2 ' \
                    '-thread_queue_size 8192 -i {} ' \
-                   '-vf "drawtext=text=\'%{localtime\:%c}\': fontcolor=white@0.8: fontsize=32: x=10: y=10" ' \
+                   '-vf "drawtext=text=\'{}\': fontcolor=white@0.8: fontsize=32: x=10: y=10" ' \
                    '-s {} {} -c:v h264_omx -b:v 3000k -frag_duration 1000 -f segment -segment_time 3600 ' \
                    '-reset_timestamps 1 -force_key_frames \"expr:gte(t,n_forced*2)\" -strftime 1 {}'.format(
-            Params.usb_record_hw_card, Params.usb_camera_dev_name, Params.usb_max_resolution, sound_param,
+            Params.usb_record_hw_card, overlay, Params.usb_camera_dev_name, Params.usb_max_resolution, sound_param,
             Params.usb_out_filename)
         print "Executing: {}".format(cmd_line)
         Params.ffmpeg_usb = subprocess.Popen(
