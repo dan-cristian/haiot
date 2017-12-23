@@ -66,6 +66,10 @@ class DbBase:
         function = self.query.filter(*query_filter).limit(limit).all
         return self.__get_result(function)
 
+    # simple ex
+    #pd = models.PeopleDevice
+    #peopledev = pd().query_filter_first(pd.device_id == dev.id)
+
     # example with multiple filters
     # m = models.Table
     # m().query_filter_first(m.host_name.in_([Constant.HOST_NAME]), m.name.in_([mod.name]))
@@ -796,6 +800,45 @@ class State(db.Model, DbEvent, DbBase):
 
     def __repr__(self):
         return '{} {} {}'.format(self.id, self.entry_name, self.entry_value)
+
+
+class Device(db.Model, DbEvent, DbBase):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50))  # unique name
+    bt_address = db.Column(db.String(50))
+    wifi_address = db.Column(db.String(50))
+    last_bt_active = db.Column(db.DateTime(), onupdate=datetime.now)
+    last_wifi_active = db.Column(db.DateTime(), onupdate=datetime.now)
+    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
+
+    def __init__(self, name=''):
+        super(Device, self).__init__()
+        self.name = name
+
+    def __repr__(self):
+        return '{} {}'.format(self.id, self.name)
+
+
+class People(db.Model, DbEvent, DbBase):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50))  # unique name
+    email = db.Column(db.String(50))
+    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
+
+    def __init__(self, name=''):
+        super(People, self).__init__()
+        self.name = name
+
+    def __repr__(self):
+        return '{} {}'.format(self.id, self.name)
+
+
+class PeopleDevice(db.Model, DbEvent, DbBase):
+    id = db.Column(db.Integer, primary_key=True)
+    people_id = db.Column(db.Integer)
+    device_id = db.Column(db.Integer)
+    give_presence = db.Column(db.Boolean, default=False)
+    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
 
 '''
 tables used to store historical data
