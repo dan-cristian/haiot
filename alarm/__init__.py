@@ -10,8 +10,6 @@ __author__ = 'dcristian'
 initialised = False
 
 
-
-
 def handle_event_alarm(gpio_pin_code='', direction='', pin_value='', pin_connected=None):
     zonealarm = models.ZoneAlarm.query.filter_by(gpio_pin_code=gpio_pin_code).first()
     if zonealarm is not None:
