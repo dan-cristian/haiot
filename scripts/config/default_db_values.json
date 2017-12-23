@@ -115,7 +115,7 @@
     {"id":2, "name":"Huawei P10 lite", "type":"phone", "bt_address":"0C:8F:FF:33:B8:19"},
     {"id":3, "name":"Allview P6", "type":"phone", "bt_address":"E6:68:46:5C:36:8E"},
     {"id":4, "name":"Lucian Cristian", "type":"phone", "bt_address":"A4:E4:B8:7E:BB:AA"},
-    {"id":100, "name":"Home Wifi", "type":"wifi", "wifi_address":"a4:2b:b0:fe:8c:2e"},
+    {"id":100, "name":"Home Wifi", "type":"wifi", "wifi_address":"A4:2B:B0:FE:8C:2E"},
     {"id":101, "name":"skoda", "type":"gps"}
   ],
 
