@@ -5,6 +5,7 @@ except Exception, ex:
     __has_picamera = False
 import subprocess
 import os
+import time
 import datetime as dt
 try:
     from common import Constant
@@ -186,4 +187,6 @@ if __name__ == '__main__':
     _get_usb_params()
     _run_ffmpeg_usb(no_sound=True)
     print "Recording started"
-    _usb_record_loop()
+    while True:
+        _usb_record_loop()
+        time.sleep(2)
