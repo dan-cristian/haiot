@@ -61,11 +61,10 @@ def _run_ffmpeg_pi():
     print "Recording on {}".format(Params.pi_out_filename)
     if Params.ffmpeg_pi is None:
         Params.ffmpeg_pi = subprocess.Popen([
-            'ffmpeg', '-y', '-r', Params.pi_framerate, '-i', '-', '-vcodec', 'copy',
-            '-f', 'segment', '-segment_time', Params.segment_duration, '-segment_format', 'mp4',
+            'ffmpeg', '-y', '-r', str(Params.pi_framerate), '-i', '-', '-vcodec', 'copy',
+            '-f', 'segment', '-segment_time', str(Params.segment_duration), '-segment_format', 'mp4',
             '-reset_timestamps', '1', '-force_key_frames', '"expr:gte(t,n_forced*10)"',
-            '-frag_duration', '1000', '-strftime', '1',
-            '-an', Params.pi_out_filename], stdin=subprocess.PIPE)
+            '-frag_duration', '1000', '-strftime', '1', '-an', Params.pi_out_filename], stdin=subprocess.PIPE)
 
 
 def _run_ffmpeg_usb_win(no_sound=True):
