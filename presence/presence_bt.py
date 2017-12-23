@@ -99,7 +99,7 @@ def thread_run():
     _check_presence()
     if rssi_initialised:
         btrssi = BluetoothRSSI(addr='E0:DB:10:1E:E0:8A')
-        print btrssi
+        print btrssi.get_rssi()
     return 'Processed presence_run'
 
 
