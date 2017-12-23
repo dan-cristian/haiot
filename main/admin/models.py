@@ -805,10 +805,14 @@ class State(db.Model, DbEvent, DbBase):
 class Device(db.Model, DbEvent, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))  # unique name
+    type = db.Column(db.String(50))
     bt_address = db.Column(db.String(50))
     wifi_address = db.Column(db.String(50))
-    last_bt_active = db.Column(db.DateTime(), onupdate=datetime.now)
-    last_wifi_active = db.Column(db.DateTime(), onupdate=datetime.now)
+    bt_signal = db.Column(db.Integer)
+    wifi_signal = db.Column(db.Integer)
+    last_bt_active = db.Column(db.DateTime())
+    last_wifi_active = db.Column(db.DateTime())
+    last_active = db.Column(db.DateTime())
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
 
     def __init__(self, name=''):
@@ -839,6 +843,22 @@ class PeopleDevice(db.Model, DbEvent, DbBase):
     device_id = db.Column(db.Integer)
     give_presence = db.Column(db.Boolean, default=False)
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
+
+
+class Position():
+    id = db.Column(db.Integer, primary_key=True)
+    device_id = db.Column(db.Integer)
+    latitude = db.Column(db.String(20))
+    longitude = db.Column(db.String(20))
+    altitude = db.Column(db.Float)
+    hspeed = db.Column(db.Float)
+    vspeed = db.Column(db.Float)
+    hprecision = db.Column(db.Integer)
+    vprecision = db.Column(db.Integer)
+    battery = db.Column(db.Integer)
+    satellite = db.Column(db.Integer)
+    satellite_valid = db.Column(db.Integer)
+    updated_on = db.Column(db.DateTime())
 
 '''
 tables used to store historical data
