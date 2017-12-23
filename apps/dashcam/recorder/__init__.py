@@ -141,6 +141,8 @@ def _usb_record_loop():
                 print stderr
         else:
             print "USB recording ongoing"
+    else:
+        print "USB not recording"
 
     #time.sleep(10)
     #Params.ffmpeg_usb.terminate()
@@ -186,7 +188,11 @@ def thread_run():
 if __name__ == '__main__':
     _get_usb_params()
     _run_ffmpeg_usb(no_sound=True)
-    print "Recording started"
+    if Params.ffmpeg_usb._child_created:
+        Params.is_recording_usb = True
+        print "Recording started"
+    else:
+        print "Recording process not created"
     while True:
         _usb_record_loop()
         time.sleep(2)
