@@ -3,7 +3,7 @@ from pydispatch import dispatcher
 from main import thread_pool
 from main.admin import models
 from common import Constant, utils
-import presence_run
+import presence_bt
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 initialised = False
@@ -76,14 +76,14 @@ def handle_event_presence_cam(zone_name, cam_name, has_move):
 def unload():
     Log.logger.info('Presence module unloading')
     # ...
-    thread_pool.remove_callable(presence_run.thread_run)
+    thread_pool.remove_callable(presence_bt.thread_run)
     global initialised
     initialised = False
 
 
 def init():
     Log.logger.debug('Presence module initialising')
-    thread_pool.add_interval_callable(presence_run.thread_run, run_interval_second=60)
+    thread_pool.add_interval_callable(presence_bt.thread_run, run_interval_second=30)
     dispatcher.connect(handle_event_presence_io, signal=Constant.SIGNAL_GPIO, sender=dispatcher.Any)
     dispatcher.connect(handle_event_presence_cam, signal=Constant.SIGNAL_CAMERA, sender=dispatcher.Any)
     # handle_event_presence(gpio_pin_code='66')
@@ -92,4 +92,4 @@ def init():
 
 
 if __name__ == '__main__':
-    presence_run.thread_run()
+    presence_bt.thread_run()

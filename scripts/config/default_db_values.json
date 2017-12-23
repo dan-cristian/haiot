@@ -100,6 +100,26 @@
     {"id":633, "active":"1", "start_order":"33", "name":"utility", "host_name":"pi-face"}
   ],
 
+  "People": [
+    {"id":999, "name":"Unknown", "email":"dan.cristian@gmail.com"},
+    {"id":1, "name":"Dan Cristian", "email":"dan.cristian@gmail.com"},
+    {"id":2, "name":"Anca Cristian", "email":"ancastefanro@yahoo.com"},
+    {"id":3, "name":"Tudor Cristian", "email":"tudr.cristian@gmail.com"},
+    {"id":4, "name":"Lucian Cristian", "email":"lucian.cristian@gmail.com"}
+  ],
+
+  "Device": [
+    {"id":1, "name":"Samsung Galaxy S6", "bt_address":"E0:DB:10:1E:E0:8A"},
+    {"id":2, "name":"Huawei P10 lite", "bt_address":"0C:8F:FF:33:B8:19"},
+    {"id":3, "name":"Allview P6", "bt_address":"E6:68:46:5C:36:8E"},
+    {"id":4, "name":"Lucian Cristian", "bt_address":"A4:E4:B8:7E:BB:AA"}
+  ],
+
+  "PeopleDevice": [
+    {"id":1, "people_id":"1", "device_id":"1", "give_presence":"1"},
+    {"id":2, "people_id":"2", "device_id":"2", "give_presence":"1"}
+  ],
+
   "Zone": [
     {"id":1, "name":"bucatarie"},
     {"id":2, "name":"living"},
