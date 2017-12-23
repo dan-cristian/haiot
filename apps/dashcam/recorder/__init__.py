@@ -21,7 +21,9 @@ class Params:
     recordings_root = '/home/haiot/recordings/'
     pi_out_filename = recordings_root + 'pi_%Y-%m-%d_%H-%M-%S.mp4'
     usb_out_filename = recordings_root + 'usb_%Y-%m-%d_%H-%M-%S.mp4'
+    usb_camera_keywords = 'HD Webcam C525'
     usb_camera_dev_name = '/dev/video0'
+    usb_record_hw_id = 0
     usb_max_resolution = '1280x720'
     pi_max_resolution = (1296, 972)
     win_camera_dev_name = "Integrated Camera"
@@ -35,6 +37,16 @@ class Params:
 
 def _get_win_cams():
     pass
+
+
+def _get_usb_params():
+    rec = subprocess.check_output(['arecord', '-l']).split('\n')
+    for line in rec:
+        if len(line) > 1:
+            atoms = line.split(',')
+            if len(atoms) > 1:
+                if Params.usb_camera_keywords in atoms[0]:
+                    Params.usb_record_hw_id = atoms[1].split(':')[0].split(' device ')[1]
 
 
 def _run_ffmpeg_pi():
@@ -76,7 +88,7 @@ def _run_ffmpeg_usb(no_sound=True):
     if Params.ffmpeg_usb is None:
         Params.ffmpeg_usb = subprocess.Popen([
             'ffmpeg', '-y',
-            '-f', 'alsa', '-thread_queue_size', '16384', '-ac', '1', '-i', 'hw:1'
+            '-f', 'alsa', '-thread_queue_size', '16384', '-ac', '1', '-i', 'hw:'+str(Params.usb_record_hw_id),
             '-r', Params.usb_framerate, '-f', 'video4linux2', '-i', Params.usb_camera_dev_name,
             '-thread_queue_size', '16384', '-reset_timestamps', '1', '-force_key_frames', '"expr:gte(t,n_forced*10)"',
             '-vf', '"drawtext=text=\'%{localtime\:%c}\': fontcolor=white@0.8: fontsize=32: x=10: y=10"',
@@ -140,6 +152,7 @@ def pi_record_loop():
 def init():
     if not os.path.exists(Params.recordings_root):
         os.makedirs(Params.recordings_root)
+    _get_usb_params()
     _pi_init()
     _usb_init()
 

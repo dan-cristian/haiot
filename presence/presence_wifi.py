@@ -28,13 +28,13 @@ def _check_wifi(test=False):
             line = " ".join(line.split())
             atoms = line.split(' ')
             if len(atoms) > 4 and atoms[0] != 'bssid':
-                ssid = atoms[0].upper()
+                ssid = atoms[0].lower()
                 freq = atoms[1]
                 signal = atoms[2]
                 flags = atoms[3]
                 name = atoms[4]
                 d = models.Device
-                dev = d().query_filter_first(d.wifi_address.upper() == ssid)
+                dev = d().query_filter_first(d.wifi_address == ssid)
                 if dev is not None:
                     dev.last_wifi_active = utils.get_base_location_now_date()
                     dev.last_active = utils.get_base_location_now_date()
