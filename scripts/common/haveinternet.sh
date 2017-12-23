@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# https://unix.stackexchange.com/questions/190513/shell-scripting-proper-way-to-check-for-internet-connectivity
+
 GW=`/sbin/ip route | awk '/default/ { print $3 }'`
 checkdns=`cat /etc/resolv.conf | awk '/nameserver/ {print $2}' | awk 'NR == 1 {print; exit}'`
 checkdomain=google.com
@@ -75,7 +77,11 @@ function checkgw
 }
 
 tput setaf 6; echo "Fast check for HTTPS connectivity" && echo; tput sgr0;
-if portscan; then exit 0; fi
+if portscan; then
+    echo > /tmp/haveinternet
+    exit 0;
+fi
+rm /tmp/haveinternet
 
 checkgw
 if [ $? -eq 0 ]
@@ -85,9 +91,10 @@ then
   pingnet
   portscan
   httpreq
+  echo > /tmp/haveinternet
   exit 0
 else
-  echo && echo "Something is wrong with LAN (Gateway unreachable)"
+  tput setaf 1; echo && echo "Something is wrong with LAN (Gateway unreachable)"; tput sgr0;
   pingdns
   pingnet
   portscan

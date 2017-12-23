@@ -149,6 +149,7 @@ fi
 if [ `cat /etc/hostname` == "raspberrypi" ]; then
     read -sp "Enter host name:" new_host_name
     echo $new_host_name > /etc/hostname
+    echo "127.0.0.1" $new_host_name > /etc/hosts
 fi
 
 
@@ -286,6 +287,10 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
     cp /etc/profile.d/haiot.sh /etc/profile.d/root.sh
 
     apt-get -y install mosquitto owfs
+    echo "Instaling bluetooth modules"
+    apt install -y bluez python-bluez
+    apt build-dep -y python-bluez
+
     pip -V
     if [ "$?" != "0" ]; then
         echo "Installing python pip"
@@ -1019,7 +1024,7 @@ if [ "$ENABLE_3G_MODEM" == "1" ]; then
 Modem Type = Analog Modem
 Phone = *99***1#
 ISDN = 0
-Baud = 7200000
+Baud = 9600
 Modem = /dev/ttyUSB2
 Init1 = ATZ
 Init2 = at+cgdcont=1,"ip","internet"
@@ -1047,7 +1052,7 @@ exit 0
     # https://askubuntu.com/questions/667922/udev-script-doesnt-run-in-the-background
     #echo 'ACTION=="add",SUBSYSTEMS=="usb",ATTRS{manufacturer}=="ZTE,Incorporated",RUN+="/usr/bin/wvdial & disown"' > /etc/udev/rules.d/10-3gstick.rules
 
-
+    cp ${HAIOT_DIR}/apps/dashcam/scripts/cron.d.3gdial /etc/cron.d/
 fi
 
 echo "Optimise for flash and ssd usage"
