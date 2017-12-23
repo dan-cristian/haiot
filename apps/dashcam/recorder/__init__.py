@@ -3,9 +3,9 @@ try:
     __has_picamera = True
 except Exception, ex:
     __has_picamera = False
-
 import subprocess
 import time
+import os
 import datetime as dt
 from common import Constant
 
@@ -18,8 +18,9 @@ class Params:
     segment_duration = '3600'  # in seconds
     is_recording_pi = False
     is_recording_usb = False
-    pi_out_filename = '/mnt/tmp/pi_%Y-%m-%d_%H-%M-%S.mp4'
-    usb_out_filename = '/mnt/tmp/usb_%Y-%m-%d_%H-%M-%S.mp4'
+    recordings_root = '/home/haiot/recordings/'
+    pi_out_filename = recordings_root + 'pi_%Y-%m-%d_%H-%M-%S.mp4'
+    usb_out_filename = recordings_root + 'usb_%Y-%m-%d_%H-%M-%S.mp4'
     usb_camera_dev_name = '/dev/video0'
     usb_max_resolution = '1280x720'
     pi_max_resolution = (1296, 972)
@@ -137,6 +138,8 @@ def pi_record_loop():
 
 
 def init():
+    if not os.path.exists(Params.recordings_root):
+        os.makedirs(Params.recordings_root)
     _pi_init()
     _usb_init()
 
