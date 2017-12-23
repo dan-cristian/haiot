@@ -189,6 +189,7 @@ adduser ${USERNAME} i2c
 adduser ${USERNAME} spi
 adduser ${USERNAME} gpio
 adduser ${USERNAME} netdev # for wpa_cli access as non-root
+echo "${USERNAME} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/010_pi-nopasswd
 chsh -s /bin/bash ${USERNAME}
 
 
@@ -1053,7 +1054,8 @@ exit 0
     # https://askubuntu.com/questions/667922/udev-script-doesnt-run-in-the-background
     #echo 'ACTION=="add",SUBSYSTEMS=="usb",ATTRS{manufacturer}=="ZTE,Incorporated",RUN+="/usr/bin/wvdial & disown"' > /etc/udev/rules.d/10-3gstick.rules
 
-    cp ${HAIOT_DIR}/apps/dashcam/scripts/cron.d.3gdial /etc/cron.d/
+    # https://unix.stackexchange.com/questions/296347/crontab-never-running-while-in-etc-cron-d
+    cat ${HAIOT_DIR}/apps/dashcam/scripts/cron.d.3gdial >> /etc/crontab
 fi
 
 echo "Optimise for flash and ssd usage"
