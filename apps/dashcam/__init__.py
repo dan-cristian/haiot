@@ -25,14 +25,13 @@ def init():
     Log.logger.info('Dashcam module initialising')
     recorder.init()
     thread_pool.add_interval_callable(recorder.thread_run, run_interval_second=1)
-    gps.init()
-    thread_pool.add_interval_callable(gps.thread_run, run_interval_second=10)
-    accel.init()
-    thread_pool.add_interval_callable(accel.thread_run, run_interval_second=0.5)
+    #gps.init()
+    #thread_pool.add_interval_callable(gps.thread_run, run_interval_second=10)
+    #accel.init()
+    #thread_pool.add_interval_callable(accel.thread_run, run_interval_second=0.5)
+    #ui.init()
     global initialised
     initialised = True
-    ui.init()
-
 
 if __name__ == '__main__':
     pass
