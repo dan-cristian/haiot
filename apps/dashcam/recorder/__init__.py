@@ -23,7 +23,8 @@ class Params:
     usb_out_filename = recordings_root + 'usb_%Y-%m-%d_%H-%M-%S.mp4'
     usb_camera_keywords = 'HD Webcam C525'
     usb_camera_dev_name = '/dev/video0'
-    usb_record_hw_id = 0
+    usb_record_hw_card = 0
+    usb_record_hw_dev = 0
     usb_max_resolution = '1280x720'
     pi_max_resolution = (1296, 972)
     win_camera_dev_name = "Integrated Camera"
@@ -38,7 +39,7 @@ class Params:
 def _get_win_cams():
     pass
 
-
+# card 1: C525 [HD Webcam C525], device 0: USB Audio [USB Audio]
 def _get_usb_params():
     rec = subprocess.check_output(['arecord', '-l']).split('\n')
     for line in rec:
@@ -46,7 +47,8 @@ def _get_usb_params():
             atoms = line.split(',')
             if len(atoms) > 1:
                 if Params.usb_camera_keywords in atoms[0]:
-                    Params.usb_record_hw_id = atoms[1].split(':')[0].split(' device ')[1]
+                    Params.usb_record_hw_card = atoms[0].split(':')[0].split('card ')[1]
+                    Params.usb_record_hw_dev = atoms[1].split(':')[0].split(' device ')[1]
 
 
 def _run_ffmpeg_pi():
@@ -80,6 +82,7 @@ def _run_ffmpeg_usb_win(no_sound=True):
         print Params.ffmpeg_usb.returncode
 
 
+# fmpeg -y -f alsa -thread_queue_size 16384 -ac 1 -i hw:1 -r 8 -f video4linux2 -thread_queue_size 8192 -i /dev/video0 -vf "drawtext=text='%{localtime\:%c}': fontcolor=white@0.8: fontsize=32: x=10: y=10" -s 1280x720 -c:v h264_omx -b:v 3000k -frag_duration 1000 -f segment -segment_time 3600 -reset_timestamps 1  -force_key_frames "expr:gte(t,n_forced*2)" -strftime 1 /home/haiot/recordings/usb_%Y-%m-%d_%H-%M-%S.mp4
 def _run_ffmpeg_usb(no_sound=True):
     if no_sound:
         sound_param = "-an"
@@ -88,7 +91,7 @@ def _run_ffmpeg_usb(no_sound=True):
     if Params.ffmpeg_usb is None:
         Params.ffmpeg_usb = subprocess.Popen([
             'ffmpeg', '-y',
-            '-f', 'alsa', '-thread_queue_size', '16384', '-ac', '1', '-i', 'hw:'+str(Params.usb_record_hw_id),
+            '-f', 'alsa', '-thread_queue_size', '16384', '-ac', '1', '-i', 'hw:'+str(Params.usb_record_hw_card),
             '-r', Params.usb_framerate, '-f', 'video4linux2', '-i', Params.usb_camera_dev_name,
             '-thread_queue_size', '16384', '-reset_timestamps', '1', '-force_key_frames', '"expr:gte(t,n_forced*10)"',
             '-vf', '"drawtext=text=\'%{localtime\:%c}\': fontcolor=white@0.8: fontsize=32: x=10: y=10"',
