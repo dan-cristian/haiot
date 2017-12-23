@@ -875,9 +875,11 @@ if [ "$ENABLE_DASHCAM_PI" == "1" ]; then
 	fi
 	#https://github.com/waveform80/picamera/issues/288#issuecomment-222636171
 	apt install -y python-picamera
+
 	#http://www.richardmudhar.com/blog/2015/02/raspberry-pi-camera-and-motion-out-of-the-box-sparrowcam/
-	modprobe bcm2835-v4l2
-	if ! grep -q "^bcm2835[-_]v4l2" /etc/modules; then printf "bcm2835-v4l2\n" >> /etc/modules; fi
+	#modprobe bcm2835-v4l2
+	#if ! grep -q "^bcm2835[-_]v4l2" /etc/modules; then printf "bcm2835-v4l2\n" >> /etc/modules; fi
+
     # https://unix.stackexchange.com/questions/91027/how-to-disable-usb-autosuspend-on-kernel-3-7-10-or-above
 	if ! grep -q "usbcore[._]autosuspend" /boot/cmdline.txt; then echo -n " usbcore.autosuspend=-1" >> /boot/cmdline.txt; fi
 	#remove new line
