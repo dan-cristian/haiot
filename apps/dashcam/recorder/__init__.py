@@ -49,6 +49,7 @@ def _get_usb_params():
                 if Params.usb_camera_keywords in atoms[0]:
                     Params.usb_record_hw_card = atoms[0].split(':')[0].split('card ')[1]
                     Params.usb_record_hw_dev = atoms[1].split(':')[0].split(' device ')[1]
+                    print "Found audio card {}:{}".format(Params.usb_record_hw_card, Params.usb_record_hw_dev)
 
 
 def _run_ffmpeg_pi():
