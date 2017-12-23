@@ -96,7 +96,7 @@ def _run_ffmpeg_usb(no_sound=True):
                    '-vf "drawtext=text=\'{}\': fontcolor=white@0.8: fontsize=32: x=10: y=10" ' \
                    '-s {} {} -c:v h264_omx -b:v 3000k -frag_duration 1000 -f segment -segment_time 3600 ' \
                    '-reset_timestamps 1 -force_key_frames \"expr:gte(t,n_forced*2)\" -strftime 1 {}'.format(
-            Params.usb_record_hw_card, overlay, Params.usb_camera_dev_name, Params.usb_max_resolution, sound_param,
+            Params.usb_record_hw_card, Params.usb_camera_dev_name, overlay, Params.usb_max_resolution, sound_param,
             Params.usb_out_filename)
         print "Executing: {}".format(cmd_line)
         Params.ffmpeg_usb = subprocess.Popen(
