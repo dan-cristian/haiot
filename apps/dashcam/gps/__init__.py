@@ -14,6 +14,10 @@ class State:
                         "timestamp=<time>&bat=<bat>".format(device_name)
     last = None
     url_buffer = []
+    # timestamp with moves that helps reducing gps report frequency
+    last_vibrate = None
+    last_move_inside = None
+    last_move_outside = None
 
 
 # https://github.com/MartijnBraam/gpsd-py3/blob/master/DOCS.md
