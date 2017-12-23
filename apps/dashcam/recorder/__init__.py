@@ -20,7 +20,7 @@ class Params:
     ffmpeg_pi = None
     ffmpeg_usb = None
     ffmpeg_usb_out = None
-    segment_duration = '3600'  # in seconds
+    segment_duration = 3600  # in seconds
     is_recording_pi = False
     is_recording_usb = False
     recordings_root = '/home/haiot/recordings/'
@@ -35,10 +35,10 @@ class Params:
     win_camera_dev_name = "Integrated Camera"
     pi_thread = None
     usb_thread = None
-    pi_framerate = '8'
-    usb_framerate = '8'
+    pi_framerate = 8
+    usb_framerate = 8
     pi_camera = None
-    pi_bitrate = '2000000'
+    pi_bitrate = 2000000
 
 
 def _get_win_cams():
@@ -96,13 +96,13 @@ def _run_ffmpeg_usb(no_sound=True):
         sound_param = ""
     if Params.ffmpeg_usb is None:
         overlay = '%{localtime\:%c}'
-        cmd_line = 'ffmpeg -y -f alsa -thread_queue_size 16384 -ac 1 -i hw:{} -r 8 -f video4linux2 ' \
-                   '-thread_queue_size 8192 -i {} ' \
-                   '-vf "drawtext=text=\'{}\': fontcolor=white@0.8: fontsize=32: x=10: y=10" ' \
-                   '-s {} {} -c:v h264_omx -b:v 3000k -frag_duration 1000 -f segment -segment_time 3600 ' \
-                   '-reset_timestamps 1 -force_key_frames \"expr:gte(t,n_forced*2)\" -strftime 1 {}'.format(
-            Params.usb_record_hw_card, Params.usb_camera_dev_name, overlay, Params.usb_max_resolution, sound_param,
-            Params.usb_out_filename)
+        #cmd_line = 'ffmpeg -y -f alsa -thread_queue_size 16384 -ac 1 -i hw:{} -r 8 -f video4linux2 ' \
+        #           '-thread_queue_size 8192 -i {} ' \
+        #           '-vf "drawtext=text=\'{}\': fontcolor=white@0.8: fontsize=32: x=10: y=10" ' \
+        #           '-s {} {} -c:v h264_omx -b:v 3000k -frag_duration 1000 -f segment -segment_time 3600 ' \
+        #           '-reset_timestamps 1 -force_key_frames \"expr:gte(t,n_forced*2)\" -strftime 1 {}'.format(
+        #    Params.usb_record_hw_card, Params.usb_camera_dev_name, overlay, Params.usb_max_resolution, sound_param,
+        #    Params.usb_out_filename)
         #print "Executing: {}".format(cmd_line)
         #Params.ffmpeg_usb = subprocess.Popen([cmd_line], shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
         #                                     stderr=subprocess.PIPE)
