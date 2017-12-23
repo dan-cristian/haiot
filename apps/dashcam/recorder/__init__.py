@@ -7,11 +7,7 @@ import subprocess
 import os
 import time
 import datetime as dt
-try:
-    import fcntl
-except Exception:
-    pass
-
+from nbstreamreader import NonBlockingStreamReader as NBSR
 try:
     from common import Constant
 except Exception:
@@ -23,6 +19,7 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 class Params:
     ffmpeg_pi = None
     ffmpeg_usb = None
+    ffmpeg_usb_out = None
     segment_duration = '3600'  # in seconds
     is_recording_pi = False
     is_recording_usb = False
@@ -42,16 +39,6 @@ class Params:
     usb_framerate = '8'
     pi_camera = None
     pi_bitrate = '2000000'
-
-
-def _non_block_read(output):
-    fd = output.fileno()
-    fl = fcntl.fcntl(fd, fcntl.F_GETFL)
-    fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
-    try:
-        return output.read()
-    except:
-        return ""
 
 
 def _get_win_cams():
@@ -129,6 +116,7 @@ def _run_ffmpeg_usb(no_sound=True):
              '-s', Params.usb_max_resolution, sound_param, "-c:v", "h264_omx", "-b:v", "3000k",
              '-frag_duration', '1000', '-strftime', '1', Params.usb_out_filename],
             stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        Params.ffmpeg_usb_out = NBSR(Params.ffmpeg_usb.stdout)
 
 
 def _usb_init():
@@ -156,7 +144,7 @@ def _usb_record_loop():
                 print stderr
         else:
             print "USB recording ongoing"
-            print _non_block_read(Params.ffmpeg_usb.stdout)
+            print Params.ffmpeg_usb_out.readline(0.1)
     else:
         print "USB not recording"
 
