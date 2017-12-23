@@ -10,9 +10,9 @@ pcount=2
 
 function portscan
 {
-  echo "Starting port scan of $checkdomain port 80"
+  #echo "Starting port scan of $checkdomain port 80"
   if nc -zw1 $checkdomain 80; then
-    echo "Port scan good, $checkdomain port 80 available"
+    #echo "Port scan good, $checkdomain port 80 available"
     return 0
   else
     echo "Port scan of $checkdomain port 80 failed."
@@ -76,7 +76,7 @@ function checkgw
     return $?
 }
 
-echo "Fast check for HTTPS connectivity" && echo
+#echo "Fast check for HTTPS connectivity" && echo
 if portscan; then
     echo > /tmp/haveinternet
     exit 0;
