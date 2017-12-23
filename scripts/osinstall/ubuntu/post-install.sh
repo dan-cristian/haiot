@@ -1031,7 +1031,7 @@ Dial Attempts = 0
         " > /etc/wvdial.conf
         dos2unix /etc/wvdial.conf
         echo "Testing connectivity, press CTRL+C if OK"
-        wvdial digi-mobil
+        wvdial
         #improve this as removes wanted line
         sed -i '/exit 0/d' /etc/rc.local
         echo "
@@ -1041,6 +1041,13 @@ wvdial &
 exit 0
         " >> /etc/rc.local
     fi
+
+    #https://www.raspberrypi.org/forums/viewtopic.php?t=41056
+    #https://ubuntuforums.org/showthread.php?t=1648939
+    # https://askubuntu.com/questions/667922/udev-script-doesnt-run-in-the-background
+    #echo 'ACTION=="add",SUBSYSTEMS=="usb",ATTRS{manufacturer}=="ZTE,Incorporated",RUN+="/usr/bin/wvdial & disown"' > /etc/udev/rules.d/10-3gstick.rules
+
+
 fi
 
 echo "Optimise for flash and ssd usage"
