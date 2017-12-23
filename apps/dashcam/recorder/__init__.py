@@ -4,10 +4,12 @@ try:
 except Exception, ex:
     __has_picamera = False
 import subprocess
-import time
 import os
 import datetime as dt
-from common import Constant
+try:
+    from common import Constant
+except Exception:
+    pass
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
@@ -102,7 +104,7 @@ def _run_ffmpeg_usb(no_sound=True):
         #Params.ffmpeg_usb = subprocess.Popen([cmd_line], shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
         #                                     stderr=subprocess.PIPE)
 
-        Params.ffmpeg_usb = subprocess.call(
+        Params.ffmpeg_usb = subprocess.Popen(
             ['ffmpeg', '-y', '-f', 'alsa', '-thread_queue_size', '16384', '-ac', '1',
              '-i', 'hw:{}'.format(Params.usb_record_hw_card), '-r', str(Params.usb_framerate),
              '-f', 'video4linux2', '-thread_queue_size', '16384', '-i', Params.usb_camera_dev_name,
@@ -182,5 +184,6 @@ def thread_run():
 
 if __name__ == '__main__':
     _get_usb_params()
-    _usb_init()
+    _run_ffmpeg_usb(no_sound=True)
+    print "Recording started"
     _usb_record_loop()
