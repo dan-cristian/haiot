@@ -8,6 +8,11 @@ import os
 import time
 import datetime as dt
 try:
+    import fcntl
+except Exception:
+    pass
+
+try:
     from common import Constant
 except Exception:
     pass
@@ -37,6 +42,16 @@ class Params:
     usb_framerate = '8'
     pi_camera = None
     pi_bitrate = '2000000'
+
+
+def _non_block_read(output):
+    fd = output.fileno()
+    fl = fcntl.fcntl(fd, fcntl.F_GETFL)
+    fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
+    try:
+        return output.read()
+    except:
+        return ""
 
 
 def _get_win_cams():
@@ -141,6 +156,7 @@ def _usb_record_loop():
                 print stderr
         else:
             print "USB recording ongoing"
+            print _non_block_read(Params.ffmpeg_usb.stdout)
     else:
         print "USB not recording"
 
