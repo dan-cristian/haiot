@@ -160,7 +160,7 @@ def _pi_init():
         Params.pi_camera.framerate = Params.pi_framerate
         Params.pi_camera.annotate_background = picamera.Color('black')
         print "Recording PI"
-        _run_ffmpeg_pi(Params.pi_out_filename)
+        _run_ffmpeg_pi()
         Params.pi_camera.start_recording(Params.ffmpeg_pi.stdin, format='h264', bitrate=Params.pi_bitrate)
         Params.is_recording_pi = True
 
