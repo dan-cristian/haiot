@@ -2,6 +2,8 @@ import gpsd
 import urllib2
 import ssl
 import time
+from main.admin import models
+
 initialised = False
 
 
@@ -35,6 +37,20 @@ def _read_gps():
             "<alt>", str(alt)).replace("<sat>", str(r.sats_valid)).replace(
             "<acc>", str(r.position_precision()[0])).replace("<bat>", str(r.hspeed)).replace("<time>", str(time.time()))
         State.url_buffer.insert(1, url)
+        d = models.Device
+        dev = d().query_filter_first(d.name == State.device_name)
+        if dev is not None:
+            p = models.Position
+            pos = p().query_filter_first(p.device_id == dev.id)
+            if pos is not None:
+                pos.latitude = r.lat
+                pos.longitude = r.lon
+                pos.hprecision = r.position_precision()[0]
+                pos.vprecision = r.position_precision()[1]
+                pos.hspeed = r.hspeed
+                pos.vspeed = r.vspeed
+                pos.satellite = r.sats
+                pos.satellite_valid = r.sats_valid
 
 
 def _upload_buffer():
