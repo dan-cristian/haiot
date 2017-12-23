@@ -263,8 +263,7 @@ def init():
     try:
         while not shutting_down:
             time.sleep(1)
-    except Exception, ex:
-        print ex
+    finally:
         unload()
     Log.logger.critical('Looping ended, app will exit')
 
