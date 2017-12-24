@@ -25,7 +25,7 @@ class Params:
     is_recording_pi = False
     is_recording_usb = False
     is_pi_camera_enabled = True
-    is_usb_camera_enabled = False
+    is_usb_camera_enabled = True
     recordings_root = '/home/haiot/recordings/'
     pi_out_filename = recordings_root + '%Y-%m-%d_%H-%M-%S_pi.mp4'
     usb_out_filename = recordings_root + '%Y-%m-%d_%H-%M-%S_usb.mp4'
