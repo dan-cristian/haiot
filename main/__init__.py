@@ -151,13 +151,15 @@ def unload_modules():
 
 def unload():
     Log.logger.info('Main module is unloading, application will exit')
-    import webui, main.thread_pool, gpio
-    from transport import mqtt_io
+    import main.thread_pool
 
     global shutting_down
     shutting_down = True
     main.thread_pool.__thread_pool_enabled = False
     unload_modules()
+
+    from main import cron
+    cron.unload()
 
     #if webui.initialised:
     #    webui.unload()
