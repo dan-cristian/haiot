@@ -60,8 +60,8 @@ def hipchat_notify(message, color='yellow', notify=False, format='html', host='a
 
 def unload():
     Log.logger.info('Hipchat module unloading')
-    dispatcher.disconnect(dispatcher.connect(hipchat_notify, signal=Constant.SIGNAL_PUSH_NOTIFICATION,
-                                             sender=dispatcher.Any))
+    #dispatcher.disconnect(dispatcher.connect(hipchat_notify, signal=Constant.SIGNAL_PUSH_NOTIFICATION,
+    #                                         sender=dispatcher.Any))
     global initialised
     initialised = False
 
@@ -73,7 +73,8 @@ def init():
     _token = model_helper.get_param(Constant.P_HIPCHAT_TOKEN)
     _room = model_helper.get_param(Constant.P_HIPCHAT_ROOM_API_ID)
     try:
-        hipchat_notify(message='Module initialising', notify=True, color='red')
+        pass
+        # hipchat_notify(message='Module initialising', notify=True, color='red')
         # send_message(title="Initialised", message="Module initialised")
         # send_message(title="Initialised 2", message="Module initialised 2")
     except Exception, ex:
