@@ -24,8 +24,8 @@ class Params:
     segment_duration = 3600  # in seconds
     is_recording_pi = False
     is_recording_usb = False
-    is_pi_camera_enabled = True
-    is_usb_camera_enabled = True
+    is_pi_camera_on = True
+    is_usb_camera_on = True
     recordings_root = '/home/haiot/recordings/'
     pi_out_filename = recordings_root + '%Y-%m-%d_%H-%M-%S_pi.mp4'
     usb_out_filename = recordings_root + '%Y-%m-%d_%H-%M-%S_usb.mp4'
@@ -164,14 +164,12 @@ def _usb_record_loop():
     if Params.is_recording_usb:
         Params.ffmpeg_usb.poll()
         if Params.ffmpeg_usb.returncode is not None:
-            Params.is_recording_usb = False
             print "usb record exit with code {}".format(Params.ffmpeg_usb.returncode)
             if Params.ffmpeg_usb.returncode != 0:
-                stdout, stderr = Params.ffmpeg_usb.communicate()
                 print "USB recording stopped with error"
-                print stdout
-                print stderr
-                Params.is_recording_usb = False
+            else:
+                print "USB exit, not an error?"
+            _usb_stop()
         else:
             pass
             # print "USB recording ongoing"
@@ -188,12 +186,12 @@ def _pi_record_loop():
         # Params.pi_camera.wait_recording(0.4)
         Params.ffmpeg_pi.poll()
         if Params.ffmpeg_pi.returncode is not None:
-            Params.is_recording_pi = False
             print "PI record exit with code {}".format(Params.ffmpeg_pi.returncode)
             if Params.ffmpeg_pi.returncode != 0:
-                stdout, stderr = Params.ffmpeg_pi.communicate()
                 print "PI recording stopped with error"
-                print stderr
+            else:
+                print "PI exit, not an error?"
+            _pi_stop()
         else:
             pass
             # print "PI is recording\n"
@@ -224,12 +222,13 @@ def _pi_init():
 
 
 def _pi_stop():
+    Params.is_recording_pi = False
     if Params.pi_camera is not None:
         Params.pi_camera.stop_recording()
         Params.pi_camera.close()
-        Params.is_recording_pi = False
         if Params.ffmpeg_pi is not None:
             Params.ffmpeg_pi.terminate()
+            Params.ffmpeg_pi = None
         if Params.pi_out_std is not None:
             Params.pi_out_std.close()
         if Params.pi_out_err is not None:
@@ -237,8 +236,10 @@ def _pi_stop():
 
 
 def _usb_stop():
+    Params.is_recording_usb = False
     if Params.ffmpeg_usb is not None:
         Params.ffmpeg_usb.terminate()
+        Params.ffmpeg_usb = None
         if Params.usb_out_std is not None:
             Params.usb_out_std.close()
         if Params.usb_out_err is not None:
@@ -256,19 +257,27 @@ def init():
     global initialised
     if not os.path.exists(Params.recordings_root):
         os.makedirs(Params.recordings_root)
-    if Params.is_pi_camera_enabled:
+    if Params.is_pi_camera_on:
         _pi_init()
-    if Params.is_usb_camera_enabled:
+    if Params.is_usb_camera_on:
         _get_usb_params()
         _usb_init()
     initialised = True
 
 
 def thread_run():
-    if Params.is_pi_camera_enabled and Params.is_recording_pi:
-        _pi_record_loop()
-    if Params.is_usb_camera_enabled and Params.is_recording_usb:
-        _usb_record_loop()
+    if Params.is_pi_camera_on:
+        if Params.is_recording_pi:
+            _pi_record_loop()
+        else:
+            print "Starting PI camera, should have been on"
+            _pi_init()
+    if Params.is_usb_camera_on:
+        if Params.is_recording_usb:
+            _usb_record_loop()
+        else:
+            print "Starting USB camera, should have been on"
+            _usb_init()
 
 
 if __name__ == '__main__':
