@@ -66,30 +66,31 @@ class BluetoothRSSI(object):
 def _check_presence():
     devs = models.Device().query_filter_all()
     for dev in devs:
-        result = None
-        btrssi = None
-        try:
-            result = bluetooth.lookup_name(dev.bt_address.upper(), timeout=2)
-            if rssi_initialised:
-                btrssi = BluetoothRSSI(addr=dev.bt_address.upper())
-        except Exception, ex:
-            print "BT scan error: {}".format(ex)
-        if result is not None:
+        if dev.bt_address is not None:
+            result = None
+            btrssi = None
             try:
-                dev.last_bt_active = utils.get_base_location_now_date()
-                dev.last_active = utils.get_base_location_now_date()
-                dev.commit_record_to_db()
-                pd = models.PeopleDevice
-                peopledev = pd().query_filter_first(pd.device_id == dev.id)
-                if peopledev is not None and peopledev.give_presence:
-                    p = models.People
-                    people = p().query_filter_first(p.id == peopledev.people_id)
-                    if people is not None:
-                        dispatcher.send(Constant.SIGNAL_PRESENCE, device=dev.name, people=people.name)
-                        if btrssi is not None:
-                            print "Rssi for {}={}".format(people.name, btrssi.get_rssi())
+                result = bluetooth.lookup_name(dev.bt_address.upper(), timeout=2)
             except Exception, ex:
-                pass
+                print "BT scan error: {}".format(ex)
+            if result is not None:
+                try:
+                    if rssi_initialised:
+                        btrssi = BluetoothRSSI(addr=dev.bt_address.upper())
+                    dev.last_bt_active = utils.get_base_location_now_date()
+                    dev.last_active = utils.get_base_location_now_date()
+                    dev.commit_record_to_db()
+                    pd = models.PeopleDevice
+                    peopledev = pd().query_filter_first(pd.device_id == dev.id)
+                    if peopledev is not None and peopledev.give_presence:
+                        p = models.People
+                        people = p().query_filter_first(p.id == peopledev.people_id)
+                        if people is not None:
+                            dispatcher.send(Constant.SIGNAL_PRESENCE, device=dev.name, people=people.name)
+                            if btrssi is not None:
+                                print "Rssi for {}={}".format(people.name, btrssi.get_rssi())
+                except Exception, ex:
+                    pass
 
 
 def _list_all():
