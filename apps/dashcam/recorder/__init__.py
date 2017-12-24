@@ -29,10 +29,14 @@ class Params:
     recordings_root = '/home/haiot/recordings/'
     pi_out_filename = recordings_root + '%Y-%m-%d_%H-%M-%S_pi.mp4'
     usb_out_filename = recordings_root + '%Y-%m-%d_%H-%M-%S_usb.mp4'
-    pi_out_file_std = 'pi.std'
-    pi_out_file_err = 'pi.err'
-    usb_out_file_std = 'usb.std'
-    usb_out_file_err = 'usb.err'
+    pi_out_filename_std = 'pi.std'
+    pi_out_filename_err = 'pi.err'
+    pi_out_std = None
+    pi_out_err = None
+    usb_out_filename_std = 'usb.std'
+    usb_out_filename_err = 'usb.err'
+    usb_out_std = None
+    usb_out_err = None
     usb_camera_keywords = 'HD Webcam C525'
     usb_camera_dev_name = '/dev/video0'
     usb_record_hw_card = 1
@@ -66,14 +70,15 @@ def _get_usb_params():
 
 def _run_ffmpeg_pi():
     print "Recording on {}".format(Params.pi_out_filename)
+    Params.pi_out_std = open(Params.recordings_root + Params.pi_out_filename_std, 'w')
+    Params.pi_out_err = open(Params.recordings_root + Params.pi_out_filename_err, 'w')
     if Params.ffmpeg_pi is None:
         Params.ffmpeg_pi = subprocess.Popen([
             'ffmpeg', '-y', '-r', str(Params.pi_framerate), '-i', '-', '-vcodec', 'copy',
             '-f', 'segment', '-segment_time', str(Params.segment_duration), '-segment_format', 'mp4',
             '-reset_timestamps', '1', '-force_key_frames', '"expr:gte(t,n_forced*10)"',
             '-frag_duration', '1000', '-strftime', '1', '-an', Params.pi_out_filename],
-            stdin=subprocess.PIPE, stdout=Params.recordings_root + Params.pi_out_file_std,
-            stderr=Params.recordings_root + Params.pi_out_file_err)
+            stdin=subprocess.PIPE, stdout=Params.pi_out_std, stderr=Params.pi_out_err)
 
 
 def _run_ffmpeg_usb_win(no_sound=True):
@@ -115,6 +120,9 @@ def _run_ffmpeg_usb(no_sound=True):
         #Params.ffmpeg_usb = subprocess.Popen([cmd_line], shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
         #                                     stderr=subprocess.PIPE)
 
+        Params.usb_out_std = open(Params.recordings_root + Params.usb_out_filename_std, 'w')
+        Params.usb_out_err = open(Params.recordings_root + Params.usb_out_filename_err, 'w')
+
         Params.ffmpeg_usb = subprocess.Popen(
             ['ffmpeg', '-y', '-f', 'alsa',
              '-thread_queue_size', '8192',
@@ -131,8 +139,7 @@ def _run_ffmpeg_usb(no_sound=True):
              '-force_key_frames', 'expr:gte(t,n_forced*10)',
              '-strftime', '1',
              Params.usb_out_filename],
-            stdin=subprocess.PIPE, stdout=Params.recordings_root + Params.usb_out_file_std,
-            stderr=Params.recordings_root + Params.usb_out_file_err)
+            stdin=subprocess.PIPE, stdout=Params.usb_out_std, stderr=Params.usb_out_err)
 
 
 
@@ -221,11 +228,19 @@ def _pi_stop():
         Params.is_recording_pi = False
         if Params.ffmpeg_pi is not None:
             Params.ffmpeg_pi.terminate()
+        if Params.pi_out_std is not None:
+            Params.pi_out_std.close()
+        if Params.pi_out_err is not None:
+            Params.pi_out_err.close()
 
 
 def _usb_stop():
     if Params.ffmpeg_usb is not None:
         Params.ffmpeg_usb.terminate()
+        if Params.usb_out_std is not None:
+            Params.usb_out_std.close()
+        if Params.usb_out_err is not None:
+            Params.usb_out_err.close()
 
 
 def unload():
