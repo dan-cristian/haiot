@@ -39,6 +39,7 @@ def _check_wifi(test=False):
                     dev.last_wifi_active = utils.get_base_location_now_date()
                     dev.last_active = utils.get_base_location_now_date()
                     dev.wifi_signal = signal
+                    models.commit()
                     pd = models.PeopleDevice
                     peopledev = pd().query_filter_first(pd.device_id == dev.id)
                     if peopledev is not None and peopledev.give_presence:
