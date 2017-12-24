@@ -26,6 +26,10 @@ if [ $exit_code == 128 ]; then
     fi
 
 while $must_run; do
+    if [[ "$@" == "standalone" ]]; then
+        echo "Standalone mode, deleting db"
+        rm /var/ram/database.db
+    fi
     run_app db_mem model_auto_update sysloglocal $1 $2 $3 $4 $5 $6
     if [ $exit_code == 131 ]; then
         echo "Restarting app"
