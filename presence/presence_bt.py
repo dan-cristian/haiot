@@ -75,8 +75,8 @@ def _check_presence():
                 print "BT scan error: {}".format(ex)
             if result is not None:
                 try:
-                    if rssi_initialised:
-                        btrssi = BluetoothRSSI(addr=dev.bt_address.upper())
+                    #if rssi_initialised:
+                    #    btrssi = BluetoothRSSI(addr=dev.bt_address.upper())
                     dev.last_bt_active = utils.get_base_location_now_date()
                     dev.last_active = utils.get_base_location_now_date()
                     models.commit()
@@ -87,8 +87,8 @@ def _check_presence():
                         people = p().query_filter_first(p.id == peopledev.people_id)
                         if people is not None:
                             dispatcher.send(Constant.SIGNAL_PRESENCE, device=dev.name, people=people.name)
-                            if btrssi is not None:
-                                print "Rssi for {}={}".format(people.name, btrssi.get_rssi())
+                            #if btrssi is not None:
+                            #    print "Rssi for {}={}".format(people.name, btrssi.get_rssi())
                 except Exception, ex:
                     print "Error on bt presence".format(ex)
 
