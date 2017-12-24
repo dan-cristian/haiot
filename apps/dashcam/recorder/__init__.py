@@ -145,8 +145,10 @@ def _usb_record_loop():
                 print "USB recording stopped with error"
                 print stderr
         else:
-            print "USB recording ongoing\n"
-            print Params.ffmpeg_usb_out.readline(0.3)
+            # print "USB recording ongoing"
+            line = Params.ffmpeg_usb_out.readline(0.5)
+            if line is not None:
+                print line
     else:
         print "USB not recording"
 
@@ -157,9 +159,7 @@ def _usb_record_loop():
 def _pi_record_loop():
     if Params.is_recording_pi:
         Params.pi_camera.annotate_text = dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        #Params.pi_camera.wait_recording(0.4)
-        print "PI is recording\n"
-        print Params.ffmpeg_pi_out.readline(0.3)
+        # Params.pi_camera.wait_recording(0.4)
         Params.ffmpeg_pi.poll()
         if Params.ffmpeg_pi.returncode is not None:
             Params.is_recording_pi = False
@@ -168,6 +168,11 @@ def _pi_record_loop():
                 stdout, stderr = Params.ffmpeg_pi.communicate()
                 print "PI recording stopped with error"
                 print stderr
+        else:
+            # print "PI is recording\n"
+            line = Params.ffmpeg_pi_out.readline(0.5)
+            if line is not None:
+                print line
     else:
         print "PI not recording"
 
