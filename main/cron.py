@@ -26,6 +26,10 @@ def thread_run():
     schedule.run_pending()
 
 
+def unload():
+    schedule.clear()
+
+
 def init():
     Log.logger.info('cron module initialising')
     setup_tasks()
