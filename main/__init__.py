@@ -64,6 +64,16 @@ def init_module(module_name, module_is_active):
         '''
 
 
+def unload_module(module_name):
+    dynclass = my_import(module_name)
+    if dynclass:
+        if dynclass.initialised:
+            Log.logger.info('Module {} unloading'.format(module_name))
+            dynclass.unload()
+        else:
+            Log.logger.info('Module {} is not initialised, skipping unload'.format(module_name))
+
+
 def init_modules():
     import admin.models
     import admin.model_helper
@@ -116,6 +126,26 @@ def execute_command(command, node=None):
     if exit_code != 0:
         unload()
 
+
+def unload_modules():
+    import admin.models
+    import admin.model_helper
+    from common import Constant
+    from main.logger_helper import Log
+
+    m = admin.models.Module
+    # http://docs.sqlalchemy.org/en/rel_0_9/core/sqlelement.html
+    # keep host name default to '' rather than None (which does not work on filter in)
+    # get the unique/distinct list of all modules defined in config, generic or host specific ones
+    module_list = m.query.filter(m.host_name == Constant.HOST_NAME).group_by(m.start_order.desc()).all()
+    for mod in module_list:
+        assert isinstance(mod, admin.models.Module)
+        if mod.name != 'main':
+            try:
+                unload_module(mod.name)
+            except Exception, ex:
+                print "Error unloading module: {}".format(ex)
+
 #  --------------------------------------------------------------------------  #
 
 
@@ -127,12 +157,14 @@ def unload():
     global shutting_down
     shutting_down = True
     main.thread_pool.__thread_pool_enabled = False
-    if webui.initialised:
-        webui.unload()
-    if mqtt_io.initialised:
-        mqtt_io.unload()
-    if gpio.initialised:
-        gpio.unload()
+    unload_modules()
+
+    #if webui.initialised:
+    #    webui.unload()
+    #if mqtt_io.initialised:
+    #    mqtt_io.unload()
+    #if gpio.initialised:
+    #    gpio.unload()
 
 
 def init():
