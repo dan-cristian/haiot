@@ -882,6 +882,7 @@ if [ "$ENABLE_DASHCAM_PI" == "1" ]; then
 
     # https://unix.stackexchange.com/questions/91027/how-to-disable-usb-autosuspend-on-kernel-3-7-10-or-above
 	if ! grep -q "usbcore[._]autosuspend" /boot/cmdline.txt; then echo -n " usbcore.autosuspend=-1" >> /boot/cmdline.txt; fi
+	if ! grep -q "panic[=_]" /boot/cmdline.txt; then echo -n " panic=3" >> /boot/cmdline.txt; fi
 	#remove new line
 	tr -d '\n' < /boot/cmdline.txt > /boot/cmdline.new
 	mv /boot/cmdline.new /boot/cmdline.txt
