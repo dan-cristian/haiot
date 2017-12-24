@@ -36,7 +36,7 @@ def handle_event_alarm(gpio_pin_code='', direction='', pin_value='', pin_connect
 def unload():
     Log.logger.info('Alarm module unloading')
     global initialised
-    dispatcher.disconnect(dispatcher.connect(handle_event_alarm, signal=Constant.SIGNAL_GPIO, sender=dispatcher.Any))
+    # dispatcher.disconnect(dispatcher.connect(handle_event_alarm, signal=Constant.SIGNAL_GPIO, sender=dispatcher.Any))
     # thread_pool.remove_callable(alarm_loop.thread_run)
     initialised = False
 

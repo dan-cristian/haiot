@@ -143,6 +143,9 @@ def mqtt_thread_run():
                     elif table == utils.get_table_name(models.Ups):
                         # no additional processing
                         pass
+                    elif table == utils.get_table_name(models.SystemDisk):
+                        # no additional processing
+                        pass
                     else:
                         Log.logger.warning('Table %s content from %s is not mqtt processed' % (table, source_host))
 
