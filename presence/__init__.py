@@ -84,7 +84,7 @@ def unload():
 
 def init():
     Log.logger.debug('Presence module initialising')
-    thread_pool.add_interval_callable(presence_bt.thread_run, run_interval_second=20)
+    #thread_pool.add_interval_callable(presence_bt.thread_run, run_interval_second=20)
     thread_pool.add_interval_callable(presence_wifi.thread_run, run_interval_second=20)
     dispatcher.connect(handle_event_presence_io, signal=Constant.SIGNAL_GPIO, sender=dispatcher.Any)
     dispatcher.connect(handle_event_presence_cam, signal=Constant.SIGNAL_CAMERA, sender=dispatcher.Any)
