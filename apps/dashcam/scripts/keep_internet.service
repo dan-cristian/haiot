@@ -1,0 +1,8 @@
+[Unit]
+After=network.service
+
+[Service]
+ExecStart=/home/scripts/net/keep_internet.sh
+
+[Install]
+WantedBy=default.target
