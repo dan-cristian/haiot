@@ -18,9 +18,9 @@ initialised = False
 
 class Params:
     ffmpeg_pi = None
-    ffmpeg_pi_out = None
+    #ffmpeg_pi_out = None
     ffmpeg_usb = None
-    ffmpeg_usb_out = None
+    #ffmpeg_usb_out = None
     segment_duration = 3600  # in seconds
     is_recording_pi = False
     is_recording_usb = False
@@ -153,7 +153,7 @@ def _usb_init():
             print "Recording started"
         if Params.ffmpeg_usb._child_created:
             Params.is_recording_usb = True
-            Params.ffmpeg_usb_out = NBSR(Params.ffmpeg_usb.stdout)
+            #Params.ffmpeg_usb_out = NBSR(Params.ffmpeg_usb.stdout)
         else:
             print "Recording process not created"
     except Exception, ex:
@@ -173,10 +173,11 @@ def _usb_record_loop():
                 print stderr
                 Params.is_recording_usb = False
         else:
+            pass
             # print "USB recording ongoing"
-            line = Params.ffmpeg_usb_out.readline(0.5)
-            if line is not None:
-                print line
+            #line = Params.ffmpeg_usb_out.readline(0.5)
+            #if line is not None:
+            #    print line
     else:
         print "USB not recording"
 
@@ -194,10 +195,11 @@ def _pi_record_loop():
                 print "PI recording stopped with error"
                 print stderr
         else:
+            pass
             # print "PI is recording\n"
-            line = Params.ffmpeg_pi_out.readline(0.5)
-            if line is not None:
-                print line
+            #line = Params.ffmpeg_pi_out.readline(0.5)
+            #if line is not None:
+            #    print line
     else:
         print "PI not recording"
 
@@ -214,7 +216,7 @@ def _pi_init():
             Params.pi_camera.start_recording(Params.ffmpeg_pi.stdin, format='h264', bitrate=Params.pi_bitrate)
             if Params.ffmpeg_pi._child_created:
                 Params.is_recording_pi = True
-                Params.ffmpeg_pi_out = NBSR(Params.ffmpeg_pi.stdout)
+                #Params.ffmpeg_pi_out = NBSR(Params.ffmpeg_pi.stdout)
         except Exception, ex:
             print "Unable to initialise picamera, ex={}".format(ex)
     else:
@@ -275,7 +277,7 @@ if __name__ == '__main__':
     if Params.ffmpeg_usb._child_created:
         Params.is_recording_usb = True
         print "Recording started"
-        Params.ffmpeg_usb_out = NBSR(Params.ffmpeg_usb.stdout)
+        #Params.ffmpeg_usb_out = NBSR(Params.ffmpeg_usb.stdout)
     else:
         print "Recording process not created"
     _pi_init()
