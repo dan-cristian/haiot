@@ -106,8 +106,9 @@ def _run_web_server():
 
 
 def unload():
-    Params.web_app.stop()
-    Params.web_thread.join()
+    if Params.web_app is not None:
+        Params.web_app.stop()
+        Params.web_thread.join()
 
 
 def init():
