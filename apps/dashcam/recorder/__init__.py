@@ -109,13 +109,15 @@ def _run_ffmpeg_usb(no_sound=True):
         #                                     stderr=subprocess.PIPE)
 
         Params.ffmpeg_usb = subprocess.Popen(
-            ['ffmpeg', '-y', '-f', 'alsa', '-thread_queue_size', '16384', '-ac', '1',
+            ['ffmpeg', '-y', '-f', 'alsa', '-thread_queue_size', '8192', '-ac', '1',
              '-i', 'hw:{}'.format(Params.usb_record_hw_card), '-r', str(Params.usb_framerate),
-             '-f', 'video4linux2', '-thread_queue_size', '16384', '-i', Params.usb_camera_dev_name,
+             '-f', 'video4linux2', '-thread_queue_size', '8192', '-i', Params.usb_camera_dev_name,
              '-vf', 'drawtext=text=\'%{localtime\:%c}\':fontcolor=white@0.8:fontsize=32:x=10:y=10',
              '-s', Params.usb_max_resolution, sound_param, "-c:v", "h264_omx", "-b:v", "3000k",
              '-frag_duration', '1000', '-f', 'segment', '-segment_time', str(Params.segment_duration),
-             '-reset_timestamps', '1', '-force_key_frames', 'expr:gte(t,n_forced*10)', '-strftime', '1',
+             '-reset_timestamps', '1',
+             #'-force_key_frames', 'expr:gte(t,n_forced*10)',
+             '-strftime', '1',
              Params.usb_out_filename],
             stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
