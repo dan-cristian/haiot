@@ -86,7 +86,7 @@ def _run_ffmpeg_usb_win(no_sound=True):
             '-strftime', '1',
             Params.usb_out_filename])
         #, stdin=subprocess.PIPE)
-        print Params.ffmpeg_usb.returncode
+        #print Params.ffmpeg_usb.returncode
 
 
 # fmpeg -y -f alsa -thread_queue_size 16384 -ac 1 -i hw:1 -r 8 -f video4linux2 -thread_queue_size 8192 -i /dev/video0 -vf "drawtext=text='%{localtime\:%c}': fontcolor=white@0.8: fontsize=32: x=10: y=10" -s 1280x720 -c:v h264_omx -b:v 3000k -frag_duration 1000 -f segment -segment_time 3600 -reset_timestamps 1  -force_key_frames "expr:gte(t,n_forced*2)" -strftime 1 /home/haiot/recordings/usb_%Y-%m-%d_%H-%M-%S.mp4
