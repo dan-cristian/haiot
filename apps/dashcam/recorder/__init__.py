@@ -147,6 +147,7 @@ def _usb_record_loop():
             if Params.ffmpeg_usb.returncode != 0:
                 stdout, stderr = Params.ffmpeg_usb.communicate()
                 print "USB recording stopped with error"
+                print stdout
                 print stderr
                 Params.is_recording_usb = False
         else:
