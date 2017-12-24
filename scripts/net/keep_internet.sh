@@ -11,7 +11,7 @@ pcount=2
 function portscan
 {
   #echo "Starting port scan of $checkdomain port 80"
-  if nc -zw1 $checkdomain 80; then
+  if nc -zw1 -w 5 $checkdomain 80; then
     #echo "Port scan good, $checkdomain port 80 available"
     return 0
   else
@@ -76,28 +76,61 @@ function checkgw
     return $?
 }
 
-#echo "Fast check for HTTPS connectivity" && echo
-if portscan; then
-    echo > /tmp/haveinternet
-    exit 0;
-fi
-rm /tmp/haveinternet
+function have_internet
+{
+    #echo "Fast check for HTTPS connectivity" && echo
+    if portscan; then
+        echo > /tmp/haveinternet
+        return 0;
+    fi
+    rm /tmp/haveinternet
+    return 1
+}
 
-checkgw
-if [ $? -eq 0 ]
-then
-  echo && echo "LAN Gateway pingable. Proceeding with internet connectivity check."
-  pingdns
-  pingnet
-  portscan
-  httpreq
-  echo > /tmp/haveinternet
-  exit 0
-else
-  echo && echo "Something is wrong with LAN (Gateway unreachable)"
-  pingdns
-  pingnet
-  portscan
-  httpreq
-  #  exit 1
+
+function debug {
+    checkgw
+    if [ $? -eq 0 ]
+    then
+      echo && echo "LAN Gateway pingable. Proceeding with internet connectivity check."
+      pingdns
+      pingnet
+      portscan
+      httpreq
+      echo > /tmp/haveinternet
+      return 0
+    else
+      echo && echo "Something is wrong with LAN (Gateway unreachable)"
+      pingdns
+      pingnet
+      portscan
+      httpreq
+      #  exit 1
+    fi
+
+}
+
+# test internet connectivity without making traffic (via interface status etc)
+function have_internet_no_traffic
+{
+    return 0
+}
+
+function loop
+{
+while :
+do
+    have_internet
+done
+}
+
+if [ ! -f /tmp/haveinternet ]; then
+    ifconfig | grep ppp0
+    if [ $? -eq 1 ]; then
+        wvdial &
+    else
+        echo "Restarting ppp"
+        killall pppd
+        wvdial &
+    fi
 fi

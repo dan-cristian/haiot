@@ -24,6 +24,8 @@ class Params:
     segment_duration = 3600  # in seconds
     is_recording_pi = False
     is_recording_usb = False
+    is_pi_camera_enabled = True
+    is_usb_camera_enabled = False
     recordings_root = '/home/haiot/recordings/'
     pi_out_filename = recordings_root + 'pi_%Y-%m-%d_%H-%M-%S.mp4'
     usb_out_filename = recordings_root + 'usb_%Y-%m-%d_%H-%M-%S.mp4'
@@ -89,7 +91,7 @@ def _run_ffmpeg_usb_win(no_sound=True):
         #print Params.ffmpeg_usb.returncode
 
 
-# fmpeg -y -f alsa -thread_queue_size 16384 -ac 1 -i hw:1 -r 8 -f video4linux2 -thread_queue_size 8192 -i /dev/video0 -vf "drawtext=text='%{localtime\:%c}': fontcolor=white@0.8: fontsize=32: x=10: y=10" -s 1280x720 -c:v h264_omx -b:v 3000k -frag_duration 1000 -f segment -segment_time 3600 -reset_timestamps 1  -force_key_frames "expr:gte(t,n_forced*2)" -strftime 1 /home/haiot/recordings/usb_%Y-%m-%d_%H-%M-%S.mp4
+# ffmpeg -y -f alsa -thread_queue_size 16384 -ac 1 -i hw:1 -r 8 -f video4linux2 -thread_queue_size 8192 -i /dev/video0 -vf "drawtext=text='%{localtime\:%c}': fontcolor=white@0.8: fontsize=32: x=10: y=10" -s 1280x720 -c:v h264_omx -b:v 3000k -frag_duration 1000 -f segment -segment_time 3600 -reset_timestamps 1  -force_key_frames "expr:gte(t,n_forced*2)" -strftime 1 /home/haiot/recordings/usb_%Y-%m-%d_%H-%M-%S.mp4
 def _run_ffmpeg_usb(no_sound=True):
     if no_sound:
         sound_param = "-an"
@@ -110,18 +112,18 @@ def _run_ffmpeg_usb(no_sound=True):
 
         Params.ffmpeg_usb = subprocess.Popen(
             ['ffmpeg', '-y', '-f', 'alsa',
-             #'-thread_queue_size', '8192',
+             '-thread_queue_size', '8192',
              '-ac', '1',
              '-i', 'hw:{}'.format(Params.usb_record_hw_card), '-r', str(Params.usb_framerate),
              '-f', 'video4linux2',
-             #'-thread_queue_size', '8192',
+             '-thread_queue_size', '8192',
              '-i', Params.usb_camera_dev_name,
-             #'-vf', 'drawtext=text=\'%{localtime\:%c}\':fontcolor=white@0.8:fontsize=32:x=10:y=10',
+             '-vf', 'drawtext=text=\'%{localtime\:%c}\':fontcolor=white@0.8:fontsize=32:x=10:y=10',
              '-s', Params.usb_max_resolution, sound_param, "-c:v", "h264_omx", "-b:v", "2000k",
-             #'-frag_duration', '1000',
+             '-frag_duration', '1000',
              '-f', 'segment', '-segment_time', str(Params.segment_duration),
              '-reset_timestamps', '1',
-             #'-force_key_frames', 'expr:gte(t,n_forced*10)',
+             '-force_key_frames', 'expr:gte(t,n_forced*10)',
              '-strftime', '1',
              Params.usb_out_filename],
             stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -211,11 +213,13 @@ def _pi_stop():
         Params.pi_camera.stop_recording()
         Params.pi_camera.close()
         Params.is_recording_pi = False
-        Params.ffmpeg_pi.terminate()
+        if Params.ffmpeg_pi is not None:
+            Params.ffmpeg_pi.terminate()
 
 
 def _usb_stop():
-    Params.ffmpeg_usb.terminate()
+    if Params.ffmpeg_usb is not None:
+        Params.ffmpeg_usb.terminate()
 
 
 def unload():
@@ -224,20 +228,23 @@ def unload():
     _usb_stop()
     initialised = False
 
+
 def init():
     global initialised
     if not os.path.exists(Params.recordings_root):
         os.makedirs(Params.recordings_root)
-    _get_usb_params()
-    _pi_init()
-    _usb_init()
+    if Params.is_pi_camera_enabled:
+        _pi_init()
+    if Params.is_usb_camera_enabled:
+        _get_usb_params()
+        _usb_init()
     initialised = True
 
 
 def thread_run():
-    if Params.is_recording_pi:
+    if Params.is_pi_camera_enabled and Params.is_recording_pi:
         _pi_record_loop()
-    if Params.is_recording_usb:
+    if Params.is_usb_camera_enabled and Params.is_recording_usb:
         _usb_record_loop()
 
 
