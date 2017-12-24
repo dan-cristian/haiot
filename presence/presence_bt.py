@@ -79,7 +79,7 @@ def _check_presence():
                         btrssi = BluetoothRSSI(addr=dev.bt_address.upper())
                     dev.last_bt_active = utils.get_base_location_now_date()
                     dev.last_active = utils.get_base_location_now_date()
-                    dev.commit_record_to_db()
+                    models.commit()
                     pd = models.PeopleDevice
                     peopledev = pd().query_filter_first(pd.device_id == dev.id)
                     if peopledev is not None and peopledev.give_presence:
@@ -90,7 +90,7 @@ def _check_presence():
                             if btrssi is not None:
                                 print "Rssi for {}={}".format(people.name, btrssi.get_rssi())
                 except Exception, ex:
-                    pass
+                    print "Error on bt presence".format(ex)
 
 
 def _list_all():
