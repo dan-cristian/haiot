@@ -70,6 +70,8 @@ echo "Current dir on start is $START_DIR, script start parameters are: " $1 $2 $
 DIR=~/PYC
 echo "Base dir is $DIR"
 
+
+
 if [ "$1" = "stop" ]; then
         stop
 else
