@@ -197,10 +197,11 @@ def _pi_init():
 
 
 def _pi_stop():
-    Params.pi_camera.stop_recording()
-    Params.pi_camera.close()
-    Params.is_recording_pi = False
-    Params.ffmpeg_pi.terminate()
+    if Params.pi_camera is not None:
+        Params.pi_camera.stop_recording()
+        Params.pi_camera.close()
+        Params.is_recording_pi = False
+        Params.ffmpeg_pi.terminate()
 
 
 def _usb_stop():
@@ -221,6 +222,7 @@ def init():
     _pi_init()
     _usb_init()
     initialised = True
+
 
 def thread_run():
     if Params.is_recording_pi:
