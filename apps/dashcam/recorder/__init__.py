@@ -122,16 +122,19 @@ def _run_ffmpeg_usb(no_sound=True):
 
 def _usb_init():
     print "Recording USB"
-    if Constant.IS_OS_WINDOWS():
-        _run_ffmpeg_usb_win(no_sound=True)
-    else:
-        _run_ffmpeg_usb(no_sound=True)
-        print "Recording started"
-    if Params.ffmpeg_usb._child_created:
-        Params.is_recording_usb = True
-        Params.ffmpeg_usb_out = NBSR(Params.ffmpeg_usb.stdout)
-    else:
-        print "Recording process not created"
+    try:
+        if Constant.IS_OS_WINDOWS():
+            _run_ffmpeg_usb_win(no_sound=True)
+        else:
+            _run_ffmpeg_usb(no_sound=True)
+            print "Recording started"
+        if Params.ffmpeg_usb._child_created:
+            Params.is_recording_usb = True
+            Params.ffmpeg_usb_out = NBSR(Params.ffmpeg_usb.stdout)
+        else:
+            print "Recording process not created"
+    except Exception, ex:
+        print "Unable to initialise USB camera, ex={}".format(ex)
 
 
 def _usb_record_loop():
@@ -176,16 +179,19 @@ def _pi_record_loop():
 
 def _pi_init():
     if __has_picamera:
-        Params.pi_camera = picamera.PiCamera()
-        Params.pi_camera.resolution = Params.pi_max_resolution
-        Params.pi_camera.framerate = Params.pi_framerate
-        Params.pi_camera.annotate_background = picamera.Color('black')
-        print "Recording PI"
-        _run_ffmpeg_pi()
-        Params.pi_camera.start_recording(Params.ffmpeg_pi.stdin, format='h264', bitrate=Params.pi_bitrate)
-        if Params.ffmpeg_pi._child_created:
-            Params.is_recording_pi = True
-            Params.ffmpeg_pi_out = NBSR(Params.ffmpeg_pi.stdout)
+        try:
+            Params.pi_camera = picamera.PiCamera()
+            Params.pi_camera.resolution = Params.pi_max_resolution
+            Params.pi_camera.framerate = Params.pi_framerate
+            Params.pi_camera.annotate_background = picamera.Color('black')
+            print "Recording PI"
+            _run_ffmpeg_pi()
+            Params.pi_camera.start_recording(Params.ffmpeg_pi.stdin, format='h264', bitrate=Params.pi_bitrate)
+            if Params.ffmpeg_pi._child_created:
+                Params.is_recording_pi = True
+                Params.ffmpeg_pi_out = NBSR(Params.ffmpeg_pi.stdout)
+        except Exception, ex:
+            print "Unable to initialise picamera, ex={}".format(ex)
     else:
         print "No picamera module"
 
@@ -217,8 +223,10 @@ def init():
     initialised = True
 
 def thread_run():
-    _pi_record_loop()
-    _usb_record_loop()
+    if Params.is_recording_pi:
+        _pi_record_loop()
+    if Params.is_recording_usb:
+        _usb_record_loop()
 
 
 if __name__ == '__main__':
