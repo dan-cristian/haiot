@@ -14,7 +14,7 @@ except Exception:
     pass
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
-
+initialised = False
 
 class Params:
     ffmpeg_pi = None
@@ -152,9 +152,6 @@ def _usb_record_loop():
     else:
         print "USB not recording"
 
-    #time.sleep(10)
-    #Params.ffmpeg_usb.terminate()
-
 
 def _pi_record_loop():
     if Params.is_recording_pi:
@@ -197,15 +194,27 @@ def _pi_stop():
     Params.pi_camera.stop_recording()
     Params.pi_camera.close()
     Params.is_recording_pi = False
+    Params.ffmpeg_pi.terminate()
 
+
+def _usb_stop():
+    Params.ffmpeg_usb.terminate()
+
+
+def unload():
+    global initialised
+    _pi_stop()
+    _usb_stop()
+    initialised = False
 
 def init():
+    global initialised
     if not os.path.exists(Params.recordings_root):
         os.makedirs(Params.recordings_root)
     _get_usb_params()
     _pi_init()
     _usb_init()
-
+    initialised = True
 
 def thread_run():
     _pi_record_loop()

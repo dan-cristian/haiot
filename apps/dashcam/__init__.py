@@ -14,7 +14,9 @@ def unload():
     Log.logger.info('Dashcam module unloading')
     # ...
     thread_pool.remove_callable(recorder.thread_run)
+    recorder.unload()
     thread_pool.remove_callable(gps.thread_run)
+    gps.unload()
     thread_pool.remove_callable(accel.thread_run)
     accel.unload()
     global initialised
