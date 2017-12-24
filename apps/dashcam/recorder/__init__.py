@@ -27,8 +27,12 @@ class Params:
     is_pi_camera_enabled = True
     is_usb_camera_enabled = False
     recordings_root = '/home/haiot/recordings/'
-    pi_out_filename = recordings_root + 'pi_%Y-%m-%d_%H-%M-%S.mp4'
-    usb_out_filename = recordings_root + 'usb_%Y-%m-%d_%H-%M-%S.mp4'
+    pi_out_filename = recordings_root + '%Y-%m-%d_%H-%M-%S_pi.mp4'
+    usb_out_filename = recordings_root + '%Y-%m-%d_%H-%M-%S_usb.mp4'
+    pi_out_file_std = 'pi.std'
+    pi_out_file_err = 'pi.err'
+    usb_out_file_std = 'usb.std'
+    usb_out_file_err = 'usb.err'
     usb_camera_keywords = 'HD Webcam C525'
     usb_camera_dev_name = '/dev/video0'
     usb_record_hw_card = 1
@@ -68,7 +72,8 @@ def _run_ffmpeg_pi():
             '-f', 'segment', '-segment_time', str(Params.segment_duration), '-segment_format', 'mp4',
             '-reset_timestamps', '1', '-force_key_frames', '"expr:gte(t,n_forced*10)"',
             '-frag_duration', '1000', '-strftime', '1', '-an', Params.pi_out_filename],
-            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            stdin=subprocess.PIPE, stdout=Params.recordings_root + Params.pi_out_file_std,
+            stderr=Params.recordings_root + Params.pi_out_file_err)
 
 
 def _run_ffmpeg_usb_win(no_sound=True):
@@ -126,7 +131,8 @@ def _run_ffmpeg_usb(no_sound=True):
              '-force_key_frames', 'expr:gte(t,n_forced*10)',
              '-strftime', '1',
              Params.usb_out_filename],
-            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            stdin=subprocess.PIPE, stdout=Params.recordings_root + Params.usb_out_file_std,
+            stderr=Params.recordings_root + Params.usb_out_file_err)
 
 
 
