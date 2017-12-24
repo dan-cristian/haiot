@@ -58,6 +58,7 @@ def _read_gps():
                 pos.vspeed = r.vspeed
                 pos.satellite = r.sats
                 pos.satellite_valid = r.sats_valid
+                models.commit()
 
 
 def _upload_buffer():
@@ -91,7 +92,7 @@ def init():
         gpsd.connect()
         initialised = True
     except Exception, ex:
-        print ex
+        print "Error connecting gps, ex={}".format(ex)
 
 
 def thread_run():
