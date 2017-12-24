@@ -184,6 +184,8 @@ def _pi_init():
         if Params.ffmpeg_pi._child_created:
             Params.is_recording_pi = True
             Params.ffmpeg_pi_out = NBSR(Params.ffmpeg_pi.stdout)
+    else:
+        print "No picamera module"
 
 
 def _pi_stop():
