@@ -26,7 +26,7 @@ class State:
 def _read_gps():
     r = gpsd.get_current()
     if r.mode < 2:
-        print "No gps fix, sats={} valid={}".format(r.sats, r.sats_valid)
+        print "No gps fix, sats={} valid={} mode={}".format(r.sats, r.sats_valid, r.mode)
     else:
         if r.mode == 2:
             alt = -9999
