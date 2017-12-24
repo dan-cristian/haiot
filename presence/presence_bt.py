@@ -67,10 +67,13 @@ def _check_presence():
     devs = models.Device().query_filter_all()
     for dev in devs:
         result = None
+        btrssi = None
         try:
             result = bluetooth.lookup_name(dev.bt_address.upper(), timeout=2)
+            if rssi_initialised:
+                btrssi = BluetoothRSSI(addr=dev.bt_address.upper())
         except Exception, ex:
-            pass
+            print "BT scan error: {}".format(ex)
         if result is not None:
             try:
                 dev.last_bt_active = utils.get_base_location_now_date()
@@ -83,6 +86,8 @@ def _check_presence():
                     people = p().query_filter_first(p.id == peopledev.people_id)
                     if people is not None:
                         dispatcher.send(Constant.SIGNAL_PRESENCE, device=dev.name, people=people.name)
+                        if btrssi is not None:
+                            print "Rssi for {}={}".format(people.name, btrssi.get_rssi())
             except Exception, ex:
                 pass
 
@@ -99,7 +104,7 @@ def thread_run():
     _check_presence()
     if rssi_initialised:
         btrssi = BluetoothRSSI(addr='E0:DB:10:1E:E0:8A')
-        print btrssi.get_rssi()
+        print "Rssi={}".format(btrssi.get_rssi())
     return 'Processed presence_run'
 
 

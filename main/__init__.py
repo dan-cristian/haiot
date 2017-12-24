@@ -144,7 +144,7 @@ def unload_modules():
             try:
                 unload_module(mod.name)
             except Exception, ex:
-                print "Error unloading module: {}".format(ex)
+                print "Error unloading module {}: {}".format(mod.name, ex)
 
 #  --------------------------------------------------------------------------  #
 

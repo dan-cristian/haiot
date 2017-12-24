@@ -20,14 +20,19 @@ class State:
     last_vibrate = None
     last_move_inside = None
     last_move_outside = None
+    reported_no_fix = False
 
 
 # https://github.com/MartijnBraam/gpsd-py3/blob/master/DOCS.md
 def _read_gps():
     r = gpsd.get_current()
     if r.mode < 2:
-        print "No gps fix, sats={} valid={} mode={}".format(r.sats, r.sats_valid, r.mode)
+        if not State.reported_no_fix:
+            print "No gps fix, sats={} valid={} mode={}".format(r.sats, r.sats_valid, r.mode)
+            State.reported_no_fix = True
+        pass
     else:
+        State.reported_no_fix = False
         if r.mode == 2:
             alt = -9999
         else:
