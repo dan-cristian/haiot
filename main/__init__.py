@@ -137,7 +137,7 @@ def unload_modules():
     # http://docs.sqlalchemy.org/en/rel_0_9/core/sqlelement.html
     # keep host name default to '' rather than None (which does not work on filter in)
     # get the unique/distinct list of all modules defined in config, generic or host specific ones
-    module_list = m.query.filter(m.host_name == Constant.HOST_NAME).group_by(m.start_order.desc()).all()
+    module_list = m.query.filter(m.host_name.in_([Constant.HOST_NAME, ""])).group_by(m.start_order.desc()).all()
     for mod in module_list:
         assert isinstance(mod, admin.models.Module)
         if mod.name != 'main':

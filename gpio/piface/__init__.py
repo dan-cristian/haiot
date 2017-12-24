@@ -14,11 +14,10 @@ __pool_pin_codes = []
 
 try:
     import pifacedigitalio as pfio
-
     __import_ok = True
 except Exception, ex:
     __import_ok = False
-    Log.logger.info('Exception on importing pifacedigitalio, err={}'.format(ex))
+    Log.logger.info('Pifacedigitalio module not available')
 
 
 def format_pin_code(board_index, pin_direction, pin_index):
