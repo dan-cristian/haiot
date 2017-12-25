@@ -49,7 +49,7 @@ def get_usb_audio(dev_name):
                 if dev_name in atoms[0]:
                     hw_card = atoms[0].split(':')[0].split('card ')[1]
                     hw_dev = atoms[1].split(':')[0].split(' device ')[1]
-                    res = '{}:{}'.format(hw_card, hw_dev)
+                    res = '{},{}'.format(hw_card, hw_dev)
                     print "Found audio card {}".format(res)
                     break
     return res
