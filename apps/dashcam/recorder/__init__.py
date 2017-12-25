@@ -110,7 +110,7 @@ def _recover_usb():
     src = Params.recordings_root + Params.usb_out_filename_err
     # make a copy for debug
     print('Copy usb output file for debug')
-    shutil.copy(src, src + '.' + time.time())
+    shutil.copy(src, src + '.' + str(time.time()))
     ferr = open(src)
     contents = ferr.read()
     ferr.close()
