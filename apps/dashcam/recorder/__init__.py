@@ -229,7 +229,10 @@ def _pi_stop():
         Params.is_recording_pi = False
         if Params.pi_camera is not None:
             if Params.ffmpeg_pi is not None:
-                Params.ffmpeg_pi.terminate()
+                try:
+                    Params.ffmpeg_pi.terminate()
+                except Exception:
+                    pass
                 Params.ffmpeg_pi = None
             Params.pi_camera.stop_recording()
             Params.pi_camera.close()
@@ -246,7 +249,10 @@ def _usb_stop():
     print "Stopping USB"
     Params.is_recording_usb = False
     if Params.ffmpeg_usb is not None:
-        Params.ffmpeg_usb.terminate()
+        try:
+            Params.ffmpeg_usb.terminate()
+        except Exception:
+            pass
         Params.ffmpeg_usb = None
         if Params.usb_out_std is not None:
             Params.usb_out_std.close()
