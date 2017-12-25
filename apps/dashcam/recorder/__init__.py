@@ -236,6 +236,7 @@ def _pi_stop():
                 Params.pi_camera.close()
             except Exception, ex:
                 print "Exception on pi camera close, ex={}".format(ex)
+            print "Camera closed={} recording={}".format(Params.pi_camera.closed, Params.pi_camera.recording)
             if Params.pi_out_std is not None:
                 Params.pi_out_std.close()
             if Params.pi_out_err is not None:
