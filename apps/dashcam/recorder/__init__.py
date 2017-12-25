@@ -227,7 +227,7 @@ def _pi_stop():
                     pass
                 Params.ffmpeg_pi = None
             try:
-                print "Camera closed={} recording={}".format(Params.pi_camera.closed(), Params.pi_camera.recording())
+                print "Camera closed={} recording={}".format(Params.pi_camera.closed, Params.pi_camera.recording)
                 Params.pi_camera.stop_recording()
                 Params.pi_camera.close()
             except Exception, ex:
