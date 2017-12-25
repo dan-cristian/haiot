@@ -21,11 +21,12 @@ class Params:
     #ffmpeg_pi_out = None
     ffmpeg_usb = None
     #ffmpeg_usb_out = None
-    segment_duration = 3600  # in seconds
+    segment_duration = 900  # in seconds
     is_recording_pi = False
     is_recording_usb = False
     is_pi_camera_on = True
     is_usb_camera_on = True
+    usb_sound_enabled = True
     recordings_root = '/home/haiot/recordings/'
     pi_out_filename = recordings_root + '%Y-%m-%d_%H-%M-%S_pi.mp4'
     usb_out_filename = recordings_root + '%Y-%m-%d_%H-%M-%S_usb.mp4'
@@ -102,11 +103,11 @@ def _run_ffmpeg_usb_win(no_sound=True):
 
 
 # ffmpeg -y -f alsa -thread_queue_size 16384 -ac 1 -i hw:1 -r 8 -f video4linux2 -thread_queue_size 8192 -i /dev/video0 -vf "drawtext=text='%{localtime\:%c}': fontcolor=white@0.8: fontsize=32: x=10: y=10" -s 1280x720 -c:v h264_omx -b:v 3000k -frag_duration 1000 -f segment -segment_time 3600 -reset_timestamps 1  -force_key_frames "expr:gte(t,n_forced*2)" -strftime 1 /home/haiot/recordings/usb_%Y-%m-%d_%H-%M-%S.mp4
-def _run_ffmpeg_usb(no_sound=True):
-    if no_sound:
-        sound_param = "-an"
-    else:
+def _run_ffmpeg_usb():
+    if Params.usb_sound_enabled:
         sound_param = ""
+    else:
+        sound_param = "-an"
     if Params.ffmpeg_usb is None:
         overlay = '%{localtime\:%c}'
         #cmd_line = 'ffmpeg -y -f alsa -thread_queue_size 16384 -ac 1 -i hw:{} -r 8 -f video4linux2 ' \
@@ -147,9 +148,9 @@ def _usb_init():
     print "Recording USB"
     try:
         if Constant.IS_OS_WINDOWS():
-            _run_ffmpeg_usb_win(no_sound=True)
+            _run_ffmpeg_usb_win()
         else:
-            _run_ffmpeg_usb(no_sound=True)
+            _run_ffmpeg_usb()
             print "Recording started"
         if Params.ffmpeg_usb._child_created:
             Params.is_recording_usb = True
