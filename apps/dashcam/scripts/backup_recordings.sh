@@ -1,7 +1,7 @@
 #!/bin/bash
 LOG=/home/haiot/log/backup-recordings.log
-HOST_DEST=192.168.0.18
-#HOST_DEST=www.dancristian.ro
+#HOST_DEST=192.168.0.18
+HOST_DEST=www.dancristian.ro
 
 function echo2(){
 echo [`date +%T.%N`] $1 $2 $3 $4 $5 >> $LOG 2>&1
