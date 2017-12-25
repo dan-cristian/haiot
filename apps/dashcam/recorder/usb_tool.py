@@ -33,6 +33,7 @@ def get_usb_dev(dev_name):
     for filename in os.listdir(root):
         if dev_name in filename:
             res = root + filename
+            print "Found usb cam at {}".format(res)
             break
     return res
 
@@ -57,6 +58,6 @@ def get_usb_audio(dev_name):
 
 if __name__ == '__main__':
     print _get_usb_dev_root('C525')
-    print _get_usb_dev('C525')
+    print get_usb_dev('C525')
 
 
