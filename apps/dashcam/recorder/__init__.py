@@ -41,7 +41,7 @@ class Params:
     usb_out_std = None
     usb_out_err = None
     usb_camera_keywords = 'HD Webcam C525'
-    usb_camera_dev_name = '/dev/video0'
+    usb_camera_dev_path = '/dev/video0'
     usb_record_hw_card = 1
     usb_record_hw_dev = 0
     usb_max_resolution = '1280x720'
@@ -58,17 +58,6 @@ class Params:
 def _get_win_cams():
     pass
 
-# card 1: C525 [HD Webcam C525], device 0: USB Audio [USB Audio]
-def _get_usb_params():
-    rec = subprocess.check_output(['arecord', '-l']).split('\n')
-    for line in rec:
-        if len(line) > 1:
-            atoms = line.split(',')
-            if len(atoms) > 1:
-                if Params.usb_camera_keywords in atoms[0]:
-                    Params.usb_record_hw_card = atoms[0].split(':')[0].split('card ')[1]
-                    Params.usb_record_hw_dev = atoms[1].split(':')[0].split(' device ')[1]
-                    print "Found audio card {}:{}".format(Params.usb_record_hw_card, Params.usb_record_hw_dev)
 
 
 def _run_ffmpeg_pi():
@@ -133,7 +122,7 @@ def _run_ffmpeg_usb():
              '-i', 'hw:{}'.format(Params.usb_record_hw_card), '-r', str(Params.usb_framerate),
              '-f', 'video4linux2',
              '-thread_queue_size', '8192',
-             '-i', Params.usb_camera_dev_name,
+             '-i', Params.usb_camera_dev_path,
              '-vf', 'drawtext=text=\'%{localtime\:%c}\':fontcolor=white@0.8:fontsize=32:x=10:y=10',
              '-s', Params.usb_max_resolution, "-c:v", "h264_omx", "-b:v", "2000k",
              '-frag_duration', '1000',

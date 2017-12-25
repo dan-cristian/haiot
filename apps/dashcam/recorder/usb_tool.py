@@ -1,4 +1,5 @@
 import subprocess
+import os
 #import shlex
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
@@ -27,22 +28,30 @@ def _get_usb_dev_root(dev_name):
 
 
 def _get_usb_dev(dev_name):
-    process = subprocess.Popen(['ls /dev/v4l/by-id/*'],
-                               stdout=subprocess.PIPE, shell=True)
-    output = None
-    while True:
-        output = process.stdout.readline()
-        if output == '' and process.poll() is not None:
+    res = None
+    for filename in os.listdir('/dev/v4l/by-id/'):
+        if dev_name in filename:
+            res = filename
             break
-        if output:
-            if dev_name in output:
-                break
-    rc = process.poll()
-    if output is not None:
-        # /dev/v4l/by-id/usb-046d_HD_Webcam_C525_1B0A4790-video-index0
-        output = output.strip()
-        # /sys/devices/platform/soc/3f980000.usb/usb1/1-1/1-1.5/
-    return output
+    return res
+
+
+# card 1: C525 [HD Webcam C525], device 0: USB Audio [USB Audio]
+def _get_usb_params(dev_name):
+    rec = subprocess.check_output(['arecord', '-l']).split('\n')
+    res = None
+    for line in rec:
+        if len(line) > 1:
+            atoms = line.split(',')
+            if len(atoms) > 1:
+                if dev_name in atoms[0]:
+                    hw_card = atoms[0].split(':')[0].split('card ')[1]
+                    hw_dev = atoms[1].split(':')[0].split(' device ')[1]
+                    res = '{}:{}'.format(hw_card, hw_dev)
+                    print "Found audio card {}".format(res)
+                    break
+    return res
+
 
 
 if __name__ == '__main__':
