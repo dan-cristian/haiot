@@ -9,6 +9,7 @@ import time
 import datetime as dt
 #from nbstreamreader import NonBlockingStreamReader as NBSR
 import traceback
+import usb_tool
 try:
     from common import Constant
 except Exception:
