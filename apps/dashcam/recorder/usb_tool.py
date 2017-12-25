@@ -34,9 +34,10 @@ def _get_usb_vendor_prod(dev_name):
     vendor = product = None
     for line in rec:
         if dev_name in line:
+            #Bus 001 Device 004: ID 046d:0826 Logitech, Inc. HD Webcam C525
             atoms = line.split(' ID ')
             if len(atoms) > 1:
-                ven_prod = atoms.split(' ')[0].split(':')
+                ven_prod = atoms[1].split(' ')[0].split(':')
                 vendor = ven_prod[0]
                 product = ven_prod[1]
                 print "Vendor:Product for {} is {}:{}".format(dev_name, vendor, product)
@@ -75,6 +76,7 @@ def get_usb_audio(dev_name):
 def recover_usb_video(dev_name):
     # rmmod uvcvideo
     # modprobe uvcvideo
+
     vendor, product = _get_usb_vendor_prod(dev_name)
     dev = finddev(idVendor=hex(vendor), idProduct=hex(product))
     if dev is not None:
