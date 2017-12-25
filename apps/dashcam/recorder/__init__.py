@@ -266,7 +266,6 @@ def init():
     if Params.is_pi_camera_on:
         _pi_init()
     if Params.is_usb_camera_on:
-        _get_usb_params()
         _usb_init()
     initialised = True
 
@@ -291,7 +290,6 @@ def thread_run():
 
 
 if __name__ == '__main__':
-    _get_usb_params()
     _run_ffmpeg_usb(no_sound=True)
     if Params.ffmpeg_usb._child_created:
         Params.is_recording_usb = True
