@@ -226,7 +226,7 @@ def _pi_stop():
                 except Exception:
                     pass
                 Params.ffmpeg_pi = None
-            Params.pi_camera.stop_recording()
+            # Params.pi_camera.stop_recording()
             Params.pi_camera.close()
             if Params.pi_out_std is not None:
                 Params.pi_out_std.close()
