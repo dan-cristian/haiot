@@ -8,6 +8,7 @@ import os
 import time
 import datetime as dt
 import traceback
+import shutil
 import usb_tool
 try:
     from common import Constant
@@ -106,7 +107,10 @@ def _run_ffmpeg_usb():
 
 
 def _recover_usb():
-    ferr = open(Params.recordings_root + Params.usb_out_filename_err)
+    src = Params.recordings_root + Params.usb_out_filename_err
+    # make a copy for debug
+    shutil.copy(src, src + '.' + time.time())
+    ferr = open(src)
     contents = ferr.read()
     ferr.close()
 
@@ -140,7 +144,7 @@ def _usb_record_loop():
         if Params.ffmpeg_usb.returncode is not None:
             print("usb record exit with code {}".format(Params.ffmpeg_usb.returncode))
             if Params.ffmpeg_usb.returncode != 0:
-                print("USB recording stopped with error")
+                print("USB recording stopped")
             else:
                 print("USB exit, not an error?")
             _usb_stop()
