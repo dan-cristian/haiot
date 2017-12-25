@@ -10,15 +10,15 @@ _exclude_time_delta = 120 # exclude files modified in the last x seconds
 
 
 def _upload_file(file_path, file_date):
-    fd = datetime.fromtimestamp(file_date)
+    fd = datetime.datetime.fromtimestamp(file_date)
     subfolder = str(fd.year) + '-' + str(fd.month) + '-' + str(fd.day)
     #ssh -T -p 222 -c arcfour -o Compression=no $SSH_SERVER "mkdir -p $dest_parent"
     res = subprocess.check_output(['ssh -T -p ' + _port + ' -c arcfour -o Compression=no ' +
-                                   _server + '"mkdir -p "' + subfolder])
+                                   _server + '"mkdir -p "' + subfolder], shell=True)
     print res
     # rsync -avrPe 'ssh -p 222 -T -c arcfour -o Compression=no -x ' $src haiot@$HOST_DEST:/media/usb/$dest
     res = subprocess.check_output(["rsync -avrPe 'ssh -p " + _port + " -T -c arcfour -o Compression=no -x '" +
-                                   file_path + ' ' + _server + ':' + _dest_folder + subfolder])
+                                   file_path + ' ' + _server + ':' + _dest_folder + subfolder], shell=True)
     print res
 
 
