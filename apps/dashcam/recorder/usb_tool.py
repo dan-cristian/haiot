@@ -1,7 +1,6 @@
 import subprocess
 import os
 import time
-from usb.core import find as finddev
 try:
     import fcntl
 except Exception:
@@ -48,7 +47,7 @@ def _get_usb_dev_info(dev_name):
                 ven_prod = atoms[1].split(' ')[0].split(':')
                 vendor = ven_prod[0]
                 product = ven_prod[1]
-                print "Vendor:Product for {} is {}:{}".format(dev_name, vendor, product)
+                print("Vendor:Product for {} is {}:{}".format(dev_name, vendor, product))
                 break
     return vendor, product, bus, device
 
@@ -59,7 +58,7 @@ def get_usb_dev(dev_name):
     for filename in os.listdir(root):
         if dev_name in filename:
             res = root + filename
-            print "Found usb cam at {}".format(res)
+            print("Found usb cam at {}".format(res))
             break
     return res
 
@@ -76,25 +75,13 @@ def get_usb_audio(dev_name):
                     hw_card = atoms[0].split(':')[0].split('card ')[1]
                     hw_dev = atoms[1].split(':')[0].split(' device ')[1]
                     res = '{},{}'.format(hw_card, hw_dev)
-                    print "Found audio card {}".format(res)
+                    print("Found audio card {}".format(res))
                     break
     return res
 
 
-def recover_usb_video(dev_name):
-    # rmmod uvcvideo
-    # modprobe uvcvideo
-
-    vendor, product, bus, device = _get_usb_dev_info(dev_name)
-    dev = finddev(idVendor=hex(int('0x' + vendor, 16)), idProduct=hex(int('0x' + product, 16)))
-    if dev is not None:
-        print "Reseting USB {}".format(dev)
-        dev.reset()
-    else:
-        print "USB dev not found for reset"
-
-
-def send_reset(dev_name):
+def sudo_send_usb_reset(dev_name):
+    # https://gist.github.com/PaulFurtado/fce98aef890469f34d51
     # Equivalent of the _IO('U', 20) constant in the linux kernel.
     USBDEVFS_RESET = ord('U') << (4 * 2) | 20
     """
@@ -105,19 +92,17 @@ def send_reset(dev_name):
     """
     vendor, product, bus, device = _get_usb_dev_info(dev_name)
     dev_path = '/dev/bus/usb/%s/%s' % (bus, device)
+    print('Sending usb reset to {}'.format(dev_path))
     fd = os.open(dev_path, os.O_WRONLY)
     try:
         fcntl.ioctl(fd, USBDEVFS_RESET, 0)
     finally:
         os.close(fd)
 
-if __name__ == '__main__':
-    print _get_usb_dev_root('C525')
-    print get_usb_dev('C525')
-    print "Recover"
-    recover_usb_video('C525')
-    time.sleep(10)
-    print "Reset"
-    send_reset('C525')
 
+if __name__ == '__main__':
+    print(_get_usb_dev_root('C525'))
+    print(get_usb_dev('C525'))
+    print("Reset")
+    sudo_send_usb_reset('C525')
 
