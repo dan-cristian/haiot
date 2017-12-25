@@ -32,7 +32,9 @@ def _read_gps():
             State.reported_no_fix = True
         pass
     else:
-        State.reported_no_fix = False
+        if State.reported_no_fix:
+            print "Got gps fix, sats={} valid={} mode={}".format(r.sats, r.sats_valid, r.mode)
+            State.reported_no_fix = False
         if r.mode == 2:
             alt = -9999
         else:
@@ -78,7 +80,7 @@ def _upload_buffer():
             State.url_buffer.append(url)
             print "Buffer has {} elements".format(len(State.url_buffer))
     if initial - len(State.url_buffer) > 1:
-        print "Buffer smaller, now has {} elements".format(len(State.url_buffer))
+        print "Buffer catches up, now has {} elements".format(len(State.url_buffer))
 
 
 def unload():
