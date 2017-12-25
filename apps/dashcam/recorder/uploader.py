@@ -4,14 +4,14 @@ import os, sys, time, datetime
 
 _server = 'haiot@192.168.0.18'
 _port = '222'
-_dest_folder = '/media/usb/dashcam/'
+_dest_folder = '/media/usb/dashcam'
 _include_ext = '.mp4'
 _exclude_time_delta = 120 # exclude files modified in the last x seconds
 
 
 def _upload_file(file_path, file_date):
     fd = datetime.datetime.fromtimestamp(file_date)
-    subfolder = str(fd.year) + '-' + str(fd.month) + '-' + str(fd.day) + '/'
+    subfolder = '/' + str(fd.year) + '-' + str(fd.month) + '-' + str(fd.day)
     #ssh -T -p 222 -c arcfour -o Compression=no $SSH_SERVER "mkdir -p $dest_parent"
     res = subprocess.check_output(['ssh -T -p ' + _port + ' -c arcfour -o Compression=no ' +
                                    _server + ' "mkdir -p "' + _dest_folder + subfolder], shell=True)
