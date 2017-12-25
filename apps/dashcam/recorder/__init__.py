@@ -40,10 +40,9 @@ class Params:
     usb_out_filename_err = 'usb.err'
     usb_out_std = None
     usb_out_err = None
-    usb_camera_keywords = 'HD Webcam C525'
+    usb_camera_keywords = 'C525'
     usb_camera_dev_path = '/dev/video0'
-    usb_record_hw_card = 1
-    usb_record_hw_dev = 0
+    usb_record_hw = '1:0'
     usb_max_resolution = '1280x720'
     pi_max_resolution = (1296, 972)
     win_camera_dev_name = "Integrated Camera"
@@ -115,11 +114,14 @@ def _run_ffmpeg_usb():
         Params.usb_out_std = open(Params.recordings_root + Params.usb_out_filename_std, 'w')
         Params.usb_out_err = open(Params.recordings_root + Params.usb_out_filename_err, 'w')
 
+        Params.usb_record_hw = usb_tool.get_usb_audio(Params.usb_camera_keywords)
+        Params.usb_camera_dev_path = usb_tool.get_usb_dev(Params.usb_camera_keywords)
+
         Params.ffmpeg_usb = subprocess.Popen(
             ['ffmpeg', '-y', '-f', 'alsa',
              '-thread_queue_size', '8192',
              '-ac', '1',
-             '-i', 'hw:{}'.format(Params.usb_record_hw_card), '-r', str(Params.usb_framerate),
+             '-i', 'hw:{}'.format(Params.usb_record_hw), '-r', str(Params.usb_framerate),
              '-f', 'video4linux2',
              '-thread_queue_size', '8192',
              '-i', Params.usb_camera_dev_path,
