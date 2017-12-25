@@ -105,9 +105,9 @@ def _run_ffmpeg_usb_win(no_sound=True):
 # ffmpeg -y -f alsa -thread_queue_size 16384 -ac 1 -i hw:1 -r 8 -f video4linux2 -thread_queue_size 8192 -i /dev/video0 -vf "drawtext=text='%{localtime\:%c}': fontcolor=white@0.8: fontsize=32: x=10: y=10" -s 1280x720 -c:v h264_omx -b:v 3000k -frag_duration 1000 -f segment -segment_time 3600 -reset_timestamps 1  -force_key_frames "expr:gte(t,n_forced*2)" -strftime 1 /home/haiot/recordings/usb_%Y-%m-%d_%H-%M-%S.mp4
 def _run_ffmpeg_usb():
     if Params.usb_sound_enabled:
-        sound_param = ""
+        sound_param = [""]
     else:
-        sound_param = "-an"
+        sound_param = ["-an"]
     if Params.ffmpeg_usb is None:
         overlay = '%{localtime\:%c}'
         #cmd_line = 'ffmpeg -y -f alsa -thread_queue_size 16384 -ac 1 -i hw:{} -r 8 -f video4linux2 ' \
@@ -133,7 +133,7 @@ def _run_ffmpeg_usb():
              '-thread_queue_size', '8192',
              '-i', Params.usb_camera_dev_name,
              '-vf', 'drawtext=text=\'%{localtime\:%c}\':fontcolor=white@0.8:fontsize=32:x=10:y=10',
-             '-s', Params.usb_max_resolution, sound_param, "-c:v", "h264_omx", "-b:v", "2000k",
+             '-s', Params.usb_max_resolution] + sound_param + ["-c:v", "h264_omx", "-b:v", "2000k",
              '-frag_duration', '1000',
              '-f', 'segment', '-segment_time', str(Params.segment_duration),
              '-reset_timestamps', '1',
@@ -223,13 +223,14 @@ def _pi_init():
 
 
 def _pi_stop():
+    print "Stopping PI"
     Params.is_recording_pi = False
     if Params.pi_camera is not None:
-        Params.pi_camera.stop_recording()
-        Params.pi_camera.close()
         if Params.ffmpeg_pi is not None:
             Params.ffmpeg_pi.terminate()
             Params.ffmpeg_pi = None
+        Params.pi_camera.stop_recording()
+        Params.pi_camera.close()
         if Params.pi_out_std is not None:
             Params.pi_out_std.close()
         if Params.pi_out_err is not None:
@@ -237,6 +238,7 @@ def _pi_stop():
 
 
 def _usb_stop():
+    print "Stopping USB"
     Params.is_recording_usb = False
     if Params.ffmpeg_usb is not None:
         Params.ffmpeg_usb.terminate()
