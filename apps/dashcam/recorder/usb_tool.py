@@ -27,17 +27,18 @@ def _get_usb_dev_root(dev_name):
     return prev_line
 
 
-def _get_usb_dev(dev_name):
+def get_usb_dev(dev_name):
     res = None
-    for filename in os.listdir('/dev/v4l/by-id/'):
+    root = '/dev/v4l/by-id/'
+    for filename in os.listdir(root):
         if dev_name in filename:
-            res = filename
+            res = root + filename
             break
     return res
 
 
 # card 1: C525 [HD Webcam C525], device 0: USB Audio [USB Audio]
-def _get_usb_params(dev_name):
+def get_usb_audio(dev_name):
     rec = subprocess.check_output(['arecord', '-l']).split('\n')
     res = None
     for line in rec:
