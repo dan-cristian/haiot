@@ -55,7 +55,6 @@ def get_usb_audio(dev_name):
     return res
 
 
-
 if __name__ == '__main__':
     print _get_usb_dev_root('C525')
     print get_usb_dev('C525')
