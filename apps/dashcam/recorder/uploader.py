@@ -2,19 +2,23 @@ import subprocess
 from stat import S_ISREG, ST_CTIME, ST_MODE, ST_MTIME
 import os, sys, time, datetime
 
-_user = 'haiot'
-_host = '192.168.0.18'
+_server = 'haiot@192.168.0.18'
 _port = '222'
 _dest_folder = '/media/usb/dashcam/'
 _include_ext = '.mp4'
 _exclude_time_delta = 120 # exclude files modified in the last x seconds
 
 
-def _upload_file(file_path):
-    subfolder = ""
+def _upload_file(file_path, file_date):
+    fd = datetime.fromtimestamp(file_date)
+    subfolder = str(fd.year) + '-' + str(fd.month) + '-' + str(fd.day)
+    #ssh -T -p 222 -c arcfour -o Compression=no $SSH_SERVER "mkdir -p $dest_parent"
+    res = subprocess.check_output(['ssh -T -p ' + _port + ' -c arcfour -o Compression=no ' +
+                                   _server + '"mkdir -p "' + subfolder])
+    print res
     # rsync -avrPe 'ssh -p 222 -T -c arcfour -o Compression=no -x ' $src haiot@$HOST_DEST:/media/usb/$dest
     res = subprocess.check_output(["rsync -avrPe 'ssh -p " + _port + " -T -c arcfour -o Compression=no -x '" +
-                                   file_path + ' ' + _user + '@' + _host + ':' + _dest_folder + subfolder])
+                                   file_path + ' ' + _server + ':' + _dest_folder + subfolder])
     print res
 
 
@@ -38,7 +42,7 @@ def _file_list(folder, exclude_delta):
             # print time.ctime(cdate), path
             delta_sec = (now - cdate)
             if delta_sec > exclude_delta:
-                result.append(path)
+                result.append([path, cdate])
                 print('Added {}'.format(path))
     return result
 
@@ -46,7 +50,7 @@ def _file_list(folder, exclude_delta):
 def upload(root_folder):
     files = _file_list(root_folder, exclude_delta=_exclude_time_delta)
     for file in files:
-        _upload_file(file)
+        _upload_file(file_path=file[0], file_date=file[1])
 
 
 
