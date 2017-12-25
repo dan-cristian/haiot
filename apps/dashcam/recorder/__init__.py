@@ -28,6 +28,8 @@ class Params:
     is_usb_camera_on = True
     usb_sound_enabled = True
     recordings_root = '/home/haiot/recordings/'
+    recordings_uploaded = 'uploaded'
+    recordings_safe = 'safe'
     pi_out_filename = recordings_root + '%Y-%m-%d_%H-%M-%S_pi.mp4'
     usb_out_filename = recordings_root + '%Y-%m-%d_%H-%M-%S_usb.mp4'
     pi_out_filename_std = 'pi.std'
@@ -254,6 +256,10 @@ def init():
     global initialised
     if not os.path.exists(Params.recordings_root):
         os.makedirs(Params.recordings_root)
+    if not os.path.exists(Params.recordings_root + Params.recordings_uploaded):
+        os.makedirs(Params.recordings_root + Params.recordings_uploaded)
+    if not os.path.exists(Params.recordings_root + Params.recordings_safe):
+        os.makedirs(Params.recordings_root + Params.recordings_safe)
     if Params.is_pi_camera_on:
         _pi_init()
     if Params.is_usb_camera_on:
