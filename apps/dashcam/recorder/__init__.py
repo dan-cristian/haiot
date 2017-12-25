@@ -109,6 +109,7 @@ def _run_ffmpeg_usb():
 def _recover_usb():
     src = Params.recordings_root + Params.usb_out_filename_err
     # make a copy for debug
+    print('Copy usb output file for debug')
     shutil.copy(src, src + '.' + time.time())
     ferr = open(src)
     contents = ferr.read()
@@ -118,8 +119,12 @@ def _recover_usb():
     if is_exit_normal:
         print('Exit was normal, nothing to do to recover')
     else:
-        print('Unknown error')
-        print(contents)
+        is_exit_io_err = 'Input/output error' in contents
+        if is_exit_io_err:
+            usb_tool.reset_usb(Params.usb_camera_keywords)
+        else:
+            print('Unknown error')
+            print(contents)
 
 
 def _usb_init():
