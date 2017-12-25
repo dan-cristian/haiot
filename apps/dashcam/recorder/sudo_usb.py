@@ -1,7 +1,7 @@
 import os
 import subprocess
 import sys
-import fnctl
+import fcntl
 
 
 def _get_usb_dev_info(dev_name):
@@ -34,14 +34,17 @@ def sudo_send_usb_reset(dev_name):
                        See get_teensy for example of how to obtain this.
     """
     vendor, product, bus, device = _get_usb_dev_info(dev_name)
-    dev_path = '/dev/bus/usb/%s/%s' % (bus, device)
-    print('Sending usb reset to {}'.format(dev_path))
-    fd = os.open(dev_path, os.O_WRONLY)
-    try:
-        fcntl.ioctl(fd, USBDEVFS_RESET, 0)
-        print('Usb reset complete')
-    finally:
-        os.close(fd)
+    if bus is not None and device is not None:
+        dev_path = '/dev/bus/usb/%s/%s' % (bus, device)
+        print('Sending usb reset to {}'.format(dev_path))
+        fd = os.open(dev_path, os.O_WRONLY)
+        try:
+            fcntl.ioctl(fd, USBDEVFS_RESET, 0)
+            print('Usb reset complete')
+        finally:
+            os.close(fd)
+    else:
+        print('Cannot find usb bus/device for {}, reset failed'.format(dev_name))
 
 
 def sudo_reload_uvc_module():
