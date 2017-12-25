@@ -7,7 +7,8 @@ import subprocess
 import os
 import time
 import datetime as dt
-from nbstreamreader import NonBlockingStreamReader as NBSR
+#from nbstreamreader import NonBlockingStreamReader as NBSR
+import traceback
 try:
     from common import Constant
 except Exception:
@@ -269,18 +270,22 @@ def init():
 
 
 def thread_run():
-    if Params.is_pi_camera_on:
-        if Params.is_recording_pi:
-            _pi_record_loop()
-        else:
-            print "Starting PI camera, should have been on"
-            _pi_init()
-    if Params.is_usb_camera_on:
-        if Params.is_recording_usb:
-            _usb_record_loop()
-        else:
-            print "Starting USB camera, should have been on"
-            _usb_init()
+    try:
+        if Params.is_pi_camera_on:
+            if Params.is_recording_pi:
+                _pi_record_loop()
+            else:
+                print "Starting PI camera, should have been on"
+                _pi_init()
+        if Params.is_usb_camera_on:
+            if Params.is_recording_usb:
+                _usb_record_loop()
+            else:
+                print "Starting USB camera, should have been on"
+                _usb_init()
+    except Exception, ex:
+        print "Error in recorder thread_run, ex={}".format(ex)
+        print traceback.print_exc()
 
 
 if __name__ == '__main__':
