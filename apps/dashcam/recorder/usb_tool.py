@@ -82,7 +82,8 @@ def recover_usb_video(dev_name):
     if dev is not None:
         print "Reseting USB {}".format(dev)
         dev.reset()
-
+    else:
+        print "USB dev not found for reset"
 
 if __name__ == '__main__':
     print _get_usb_dev_root('C525')
