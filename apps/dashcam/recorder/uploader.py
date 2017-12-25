@@ -3,7 +3,7 @@ from stat import S_ISREG, ST_CTIME, ST_MODE, ST_MTIME
 import os, sys, time, datetime
 
 _user = 'haiot'
-_host = 'www.dancristian.ro'
+_host = '192.168.0.18'
 _port = '222'
 _dest_folder = '/media/usb/dashcam/'
 _include_ext = '.mp4'
@@ -15,6 +15,8 @@ def _upload_file(file_path):
     # rsync -avrPe 'ssh -p 222 -T -c arcfour -o Compression=no -x ' $src haiot@$HOST_DEST:/media/usb/$dest
     res = subprocess.check_output(["rsync -avrPe 'ssh -p " + _port + " -T -c arcfour -o Compression=no -x '" +
                                    file_path + ' ' + _user + '@' + _host + ':' + _dest_folder + subfolder])
+    print res
+
 
 
 def _file_list(folder, exclude_delta):
@@ -44,8 +46,8 @@ def _file_list(folder, exclude_delta):
 def upload(root_folder):
     files = _file_list(root_folder, exclude_delta=_exclude_time_delta)
     for file in files:
-        #_upload_file(file)
-        pass
+        _upload_file(file)
+
 
 
 if __name__ == '__main__':
