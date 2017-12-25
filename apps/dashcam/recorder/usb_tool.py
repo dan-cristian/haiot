@@ -31,12 +31,16 @@ def _get_usb_dev_root(dev_name):
 def get_usb_dev(dev_name):
     res = None
     root = '/dev/v4l/by-id/'
-    for filename in os.listdir(root):
-        if dev_name in filename:
-            res = root + filename
-            print("Found usb cam at {}".format(res))
-            break
-    return res
+    if os.path.exists(root):
+        for filename in os.listdir(root):
+            if dev_name in filename:
+                res = root + filename
+                print("Found usb cam at {}".format(res))
+                break
+        return res
+    else:
+        print('No v4l folder, probably no usb vide device yet available')
+        return None
 
 
 # card 1: C525 [HD Webcam C525], device 0: USB Audio [USB Audio]
