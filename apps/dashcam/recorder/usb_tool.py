@@ -78,7 +78,7 @@ def recover_usb_video(dev_name):
     # modprobe uvcvideo
 
     vendor, product = _get_usb_vendor_prod(dev_name)
-    dev = finddev(idVendor=hex(vendor), idProduct=hex(product))
+    dev = finddev(idVendor=hex(int('0x' + vendor, 16)), idProduct=hex(int('0x' + product, 16)))
     if dev is not None:
         print "Reseting USB {}".format(dev)
         dev.reset()
