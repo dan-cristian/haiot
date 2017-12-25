@@ -94,16 +94,17 @@ def _run_ffmpeg_usb():
         Params.usb_record_hw = usb_tool.get_usb_audio(Params.usb_camera_keywords)
         Params.usb_camera_dev_path = usb_tool.get_usb_dev(Params.usb_camera_keywords)
 
-        Params.ffmpeg_usb = subprocess.Popen(
-            ['ffmpeg', '-y', '-f', 'alsa', '-thread_queue_size', '8192', '-ac', '1',
-             '-i', 'hw:{}'.format(Params.usb_record_hw), '-r', str(Params.usb_framerate),
-             '-f', 'video4linux2', '-thread_queue_size', '8192', '-i', Params.usb_camera_dev_path,
-             '-vf', 'drawtext=text=\'%{localtime\:%c}\':fontcolor=white@0.8:fontsize=32:x=10:y=10',
-             '-s', Params.usb_max_resolution, "-c:v", "h264_omx", "-b:v", "2000k",
-             '-frag_duration', '1000', '-f', 'segment', '-segment_time', str(Params.segment_duration),
-             '-reset_timestamps', '1', '-force_key_frames', 'expr:gte(t,n_forced*10)', '-strftime', '1',
-             '-nostats', '-loglevel', 'info', Params.usb_out_filename],
-            stdin=subprocess.PIPE, stdout=Params.usb_out_std, stderr=Params.usb_out_err)
+        if Params.usb_camera_dev_path is not None:
+            Params.ffmpeg_usb = subprocess.Popen(
+                ['ffmpeg', '-y', '-f', 'alsa', '-thread_queue_size', '8192', '-ac', '1',
+                 '-i', 'hw:{}'.format(Params.usb_record_hw), '-r', str(Params.usb_framerate),
+                 '-f', 'video4linux2', '-thread_queue_size', '8192', '-i', Params.usb_camera_dev_path,
+                 '-vf', 'drawtext=text=\'%{localtime\:%c}\':fontcolor=white@0.8:fontsize=32:x=10:y=10',
+                 '-s', Params.usb_max_resolution, "-c:v", "h264_omx", "-b:v", "2000k",
+                 '-frag_duration', '1000', '-f', 'segment', '-segment_time', str(Params.segment_duration),
+                 '-reset_timestamps', '1', '-force_key_frames', 'expr:gte(t,n_forced*10)', '-strftime', '1',
+                 '-nostats', '-loglevel', 'info', Params.usb_out_filename],
+                stdin=subprocess.PIPE, stdout=Params.usb_out_std, stderr=Params.usb_out_err)
 
 
 def _recover_usb():
@@ -119,12 +120,13 @@ def _recover_usb():
     if is_exit_normal:
         print('Exit was normal, nothing to do to recover')
     else:
-        is_exit_io_err = 'Input/output error' in contents
+        is_exit_io_err = 'Input/output error' in contents or 'no soundcards found' in contents
         if is_exit_io_err:
-            usb_tool.reset_usb(Params.usb_camera_keywords)
+            print('Found an USB I/O error')
         else:
-            print('Unknown error')
+            print('Unknown USB error')
             print(contents)
+        usb_tool.reset_usb(Params.usb_camera_keywords)
 
 
 def _usb_init():
@@ -134,8 +136,8 @@ def _usb_init():
             _run_ffmpeg_usb_win()
         else:
             _run_ffmpeg_usb()
+        if Params.ffmpeg_usb is not None and Params.ffmpeg_usb._child_created:
             print("Recording started")
-        if Params.ffmpeg_usb._child_created:
             Params.is_recording_usb = True
         else:
             print("Recording process not created")
@@ -187,6 +189,7 @@ def _pi_init():
             _run_ffmpeg_pi()
             Params.pi_camera.start_recording(Params.ffmpeg_pi.stdin, format='h264', bitrate=Params.pi_bitrate)
             if Params.ffmpeg_pi._child_created:
+                print("Recording PI started")
                 Params.is_recording_pi = True
         except Exception, ex:
             print("Unable to initialise picamera, ex={}".format(ex))
