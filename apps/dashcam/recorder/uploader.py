@@ -17,7 +17,7 @@ def _upload_file(file_path, file_date):
                                    _server + ' "mkdir -p "' + _dest_folder + subfolder], shell=True)
     print('Created folder {}, res=[{}]'.format(subfolder, res))
     # rsync -avrPe 'ssh -p 222 -T -c arcfour -o Compression=no -x ' $src haiot@$HOST_DEST:/media/usb/$dest
-    res = subprocess.check_output(['rsync -avrPe "ssh -p ' + _port + ' -T -c arcfour -o Compression=no -x"' +
+    res = subprocess.check_output(['rsync -avrPe "ssh -p ' + _port + ' -T -c arcfour -o Compression=no -x" ' +
                                    file_path + ' ' + _server + ':' + _dest_folder + subfolder], shell=True)
     print('Uploaded file {}, res=[{}]'.format(file_path, res))
 
@@ -50,8 +50,10 @@ def _file_list(folder, exclude_delta):
 def upload(root_folder):
     files = _file_list(root_folder, exclude_delta=_exclude_time_delta)
     for file in files:
-        _upload_file(file_path=file[0], file_date=file[1])
-
+        try:
+            _upload_file(file_path=file[0], file_date=file[1])
+        except Exception, ex:
+            print('Exception uploading file {}, ex={}'.format(file[0], ex))
 
 
 if __name__ == '__main__':
