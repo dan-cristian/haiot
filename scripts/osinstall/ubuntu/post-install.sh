@@ -693,6 +693,10 @@ if [ "$ENABLE_MYSQL_SERVER" == "1" ]; then
     nano /etc/apparmor.d/usr.sbin.mysqld
     chown mysql:mysql -R $MYSQL_DATA_ROOT
     /etc/init.d/mysql restart
+
+    #https://stackoverflow.com/questions/9293042/how-to-perform-a-mysqldump-without-a-password-prompt
+    echo "Set default user for mysqldump operations in ~/.my.cnf"
+    sleep 5
 fi
 
 if [ "$ENABLE_BACKUP_SERVER" == "1" ]; then
@@ -873,6 +877,8 @@ if [ "$ENABLE_DASHCAM_PI" == "1" ]; then
 		sed /boot/config.txt -i -e "s/^startx/#startx/"
 		sed /boot/config.txt -i -e "s/^fixup_file/#fixup_file/"
 	fi
+	#https://raspberrypi.stackexchange.com/questions/169/how-can-i-extend-the-life-of-my-sd-card
+	apt-get remove dphys-swapfile
 	#https://github.com/waveform80/picamera/issues/288#issuecomment-222636171
 	apt install -y python-picamera
 
