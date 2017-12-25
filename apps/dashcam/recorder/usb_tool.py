@@ -1,11 +1,12 @@
 import subprocess
-import shlex
+#import shlex
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 
 def _get_usb_dev_root(dev_name):
-    cmd = 'tail /sys/devices/platform/soc/*/*/*/*/product'
-    process = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE, shell=True)
+    #cmd = 'tail /sys/devices/platform/soc/*/*/*/*/product'
+    process = subprocess.Popen(['tail', '/sys/devices/platform/soc/*/*/*/*/product'],
+                               stdout=subprocess.PIPE, shell=True)
     prev_line = None
     while True:
         output = process.stdout.readline()
