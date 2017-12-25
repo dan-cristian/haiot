@@ -66,7 +66,7 @@ def _run_ffmpeg_pi():
             '-f', 'segment', '-segment_time', str(Params.segment_duration), '-segment_format', 'mp4',
             '-reset_timestamps', '1', '-force_key_frames', '"expr:gte(t,n_forced*10)"',
             '-frag_duration', '1000', '-strftime', '1', '-an',
-            '-nostats', '-loglevel', 'warning', Params.pi_out_filename],
+            '-nostats', '-loglevel', 'info', Params.pi_out_filename],
             stdin=subprocess.PIPE, stdout=Params.pi_out_std, stderr=Params.pi_out_err)
 
 
@@ -101,7 +101,7 @@ def _run_ffmpeg_usb():
              '-s', Params.usb_max_resolution, "-c:v", "h264_omx", "-b:v", "2000k",
              '-frag_duration', '1000', '-f', 'segment', '-segment_time', str(Params.segment_duration),
              '-reset_timestamps', '1', '-force_key_frames', 'expr:gte(t,n_forced*10)', '-strftime', '1',
-             '-nostats', '-loglevel', 'warning', Params.usb_out_filename],
+             '-nostats', '-loglevel', 'info', Params.usb_out_filename],
             stdin=subprocess.PIPE, stdout=Params.usb_out_std, stderr=Params.usb_out_err)
 
 
