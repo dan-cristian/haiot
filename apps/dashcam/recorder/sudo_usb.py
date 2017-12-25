@@ -48,10 +48,16 @@ def sudo_send_usb_reset(dev_name):
 
 
 def sudo_reload_uvc_module():
-    res = subprocess.check_output(['rmmod', 'uvcvideo'])
-    print('Module remove returned {}'.format(res))
-    res = subprocess.check_output(['modprobe', 'uvcvideo'])
-    print('Module load returned {}'.format(res))
+    try:
+        res = subprocess.check_output(['rmmod', 'uvcvideo'])
+        print('Module remove returned {}'.format(res))
+    except Exception, ex:
+        print('Module remove error, ex={}'.format(ex))
+    try:
+        res = subprocess.check_output(['modprobe', 'uvcvideo'])
+        print('Module load returned {}'.format(res))
+    except Exception, ex:
+        print('Module load error, ex={}'.format(ex))
 
 
 if __name__ == '__main__':
