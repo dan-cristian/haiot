@@ -70,7 +70,7 @@
     {"id":33, "active":"0", "start_order":"33", "name":"utility"},
     {"id":35, "active":"1", "start_order":"35", "name":"cloud.newtifry"},
     {"id":37, "active":"1", "start_order":"37", "name":"cloud.hipchat"},
-    {"id":39, "active":"1", "start_order":"39", "name":"presence"},
+    {"id":39, "active":"0", "start_order":"39", "name":"presence"},
     {"id":41, "active":"0", "start_order":"41", "name":"cloud.alexa"},
     {"id":101, "active":"0", "start_order":"101", "name":"webui.chart"},
     {"id":102, "active":"1", "start_order":"102", "name":"webui.api"},

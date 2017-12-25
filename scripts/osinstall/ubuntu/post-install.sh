@@ -291,7 +291,7 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
     apt-get -y install mosquitto owfs
     echo "Instaling bluetooth modules"
     apt install -y bluez python-bluez
-    apt build-dep -y python-bluez
+    apt-get -y build-dep python-bluez
 
     pip -V
     if [ "$?" != "0" ]; then
