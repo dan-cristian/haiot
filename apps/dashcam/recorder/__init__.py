@@ -10,6 +10,7 @@ import datetime as dt
 import traceback
 import shutil
 import usb_tool
+import uploader
 try:
     from common import Constant
 except Exception:
@@ -260,6 +261,8 @@ def init():
         os.makedirs(Params.recordings_root + Params.recordings_uploaded)
     if not os.path.exists(Params.recordings_root + Params.recordings_safe):
         os.makedirs(Params.recordings_root + Params.recordings_safe)
+    uploader.P.root_folder = Params.recordings_root
+    uploader.P.move_folder = Params.recordings_root + Params.recordings_uploaded
     if Params.is_pi_camera_on:
         _pi_init()
     if Params.is_usb_camera_on:
