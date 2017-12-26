@@ -293,12 +293,14 @@ def init():
         event.on_models_committed(sender, changes)
 
     Log.logger.info('Feeding dogs with grass until app will exit')
+    global exit_code
     # stop app from exiting
     try:
         while not shutting_down:
             time.sleep(1)
     except KeyboardInterrupt:
         print('CTRL+C was pressed, exiting')
+        exit_code = 1
     except Exception, ex:
         print('Main exit with exception {}'.format(ex))
     finally:
