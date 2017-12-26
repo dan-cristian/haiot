@@ -112,6 +112,21 @@ def _run_ffmpeg_usb():
                 stdin=subprocess.PIPE, stdout=Params.usb_out_std, stderr=Params.usb_out_err)
 
 
+def _kill_proc(keywords):
+    kill_try = 0
+    while True:
+        pid = utils.get_proc()
+        if pid is not None:
+            print('Found process {} with pid {}, killing attempt {}'.format(keywords, pid, kill_try))
+            if kill_try == 0:
+                os.kill(pid, 15)
+            else:
+                os.kill(pid, 9)
+            kill_try += 1
+        else:
+            break
+
+
 def _recover_usb():
     src = Params.recordings_root + Params.usb_out_filename_err
     # make a copy for debug
@@ -137,9 +152,7 @@ def _recover_usb():
 def _usb_init():
     print("Recording USB")
     try:
-        pid = utils.get_proc(Params.usb_out_filename)
-        if pid is not None:
-            os.kill(pid, 15)
+        _kill_proc(Params.usb_out_filename)
         if Constant.IS_OS_WINDOWS():
             _run_ffmpeg_usb_win()
         else:
@@ -189,9 +202,7 @@ def _pi_record_loop():
 def _pi_init():
     if __has_picamera:
         try:
-            pid = utils.get_proc(Params.pi_out_filename)
-            if pid is not None:
-                os.kill(pid, 15)
+            _kill_proc(Params.pi_out_filename)
             Params.pi_camera = picamera.PiCamera()
             Params.pi_camera.resolution = Params.pi_max_resolution
             Params.pi_camera.framerate = Params.pi_framerate
