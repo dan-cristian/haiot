@@ -62,4 +62,4 @@ def upload(root_folder, move_folder):
 
 
 if __name__ == '__main__':
-    upload('/home/haiot/recordings', '/home/haiot/recordings/uploaded')
+    upload('/home/haiot/recordings', '/home/haiot/recordings/uploaded/')
