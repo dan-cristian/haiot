@@ -155,10 +155,17 @@ def _clean_space():
 def unload():
     P.app_is_exiting = True
     if P.current_upload_file is not None:
-        pid = utils.get_proc(P.current_upload_file)
-        if pid is not None:
-            print('Killing hanging rsync with pid {} on file {}'.format(pid, P.current_upload_file))
-            os.kill(pid, 15)
+        while True:
+            pid = utils.get_proc(P.current_upload_file)
+            if pid is not None:
+                print('Killing hanging rsync with pid {} on file {}'.format(pid, P.current_upload_file))
+                os.kill(pid, 15)
+                new_pid = utils.get_proc(P.current_upload_file)
+                if new_pid == pid:
+                    # force kill
+                    os.kill(pid, 9)
+            else:
+                break
 
 
 def thread_run():
