@@ -124,6 +124,7 @@ def _kill_proc(keywords):
                 os.kill(pid, 9)
             kill_try += 1
         else:
+            print('Process to kill not found with keywords {} in attempt {}'.format(keywords, kill_try))
             break
 
 
