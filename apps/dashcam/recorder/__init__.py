@@ -115,7 +115,7 @@ def _run_ffmpeg_usb():
 def _kill_proc(keywords):
     kill_try = 0
     while True:
-        pid = utils.get_proc()
+        pid = utils.get_proc(keywords)
         if pid is not None:
             print('Found process {} with pid {}, killing attempt {}'.format(keywords, pid, kill_try))
             if kill_try == 0:
