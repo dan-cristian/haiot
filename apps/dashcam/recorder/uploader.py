@@ -2,6 +2,7 @@ import subprocess
 from stat import S_ISREG, ST_CTIME, ST_MODE, ST_MTIME
 import os, sys, time, datetime
 import shutil
+import utils
 from collections import namedtuple
 
 disk_ntuple = namedtuple('partition',  'device mountpoint fstype')
@@ -19,6 +20,7 @@ class P():
     days_to_keep = 30
     max_disk_used_percent = 80 #
     upload_batch = 2
+    current_upload_file = None
     folder_dict = set()
 
 
@@ -67,8 +69,8 @@ def disk_usage(path):
     return usage_ntuple(total, used, free, round(percent, 1))
 
 
-
 def _upload_file(file_path, file_date):
+    start = time.time()
     fd = datetime.datetime.fromtimestamp(file_date)
     subfolder = str(fd.year) + '-' + str(fd.month) + '-' + str(fd.day) + '/'
     if subfolder not in P.folder_dict:
@@ -78,12 +80,13 @@ def _upload_file(file_path, file_date):
         print('Created folder {}, res=[{}]'.format(subfolder, res))
         P.folder_dict.add(subfolder)
     print('Uploading file {}]'.format(subfolder, file_path))
+    P.current_upload_file = file_path
     # rsync -avrPe 'ssh -p 222 -T -c arcfour -o Compression=no -x ' $src haiot@$HOST_DEST:/media/usb/$dest
     res = subprocess.check_output(['rsync -avrPe "ssh -p ' + P.port + ' -T -c arcfour -o Compression=no -x" ' +
                                    file_path + ' ' + P.server + ':' + P.dest_folder + subfolder], shell=True)
-    print('Uploaded file {}, res=[{}]'.format(file_path, res))
-
-
+    duration = datetime.timedelta(time.time(), start).total_seconds()/60
+    print('Uploaded file {}, res=[{}], duration in mins={}'.format(file_path, res, duration))
+    P.current_upload_file = None
 
 
 def _file_list(folder, exclude_delta=0):
@@ -144,6 +147,14 @@ def _clean_space():
             usage = disk_usage(parti.mountpoint).percent
             if usage > P.max_disk_used_percent:
                 print('Disk usage is {}, need to remove files to stay at {}'.format(usage, P.max_disk_used_percent))
+
+
+def unload():
+    if P.current_upload_file is not None:
+        pid = utils.get_proc(P.current_upload_file)
+        if pid is not None:
+            print('Killing hanging rsync with pid {} on file {}'.format(pid, P.current_upload_file))
+            os.kill(pid, 0)
 
 
 def thread_run():
