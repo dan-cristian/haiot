@@ -85,8 +85,8 @@ def _upload_file(file_path, file_date):
     # rsync -avrPe 'ssh -p 222 -T -c arcfour -o Compression=no -x ' $src haiot@$HOST_DEST:/media/usb/$dest
     res = subprocess.check_output(['rsync -avrPe "ssh -p ' + P.port + ' -T -c arcfour -o Compression=no -x" ' +
                                    file_path + ' ' + P.server + ':' + P.dest_folder + subfolder], shell=True)
-    duration = datetime.timedelta(time.time(), start).total_seconds()/60
-    print('Uploaded file {}, res=[{}], duration in mins={}'.format(file_path, res, duration))
+    duration_min = (time.time() - start) / 60
+    print('Uploaded file {}, res=[{}], duration in mins={}'.format(file_path, res, duration_min))
     P.current_upload_file = None
 
 
