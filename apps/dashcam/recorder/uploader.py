@@ -18,6 +18,7 @@ class P():
     exclude_time_delta = 120 # exclude files modified in the last x seconds
     days_to_keep = 30
     max_disk_used_percent = 80 #
+    upload_batch = 2
     folder_dict = set()
 
 
@@ -76,6 +77,7 @@ def _upload_file(file_path, file_date):
                                        P.server + ' "mkdir -p "' + P.dest_folder + subfolder], shell=True)
         print('Created folder {}, res=[{}]'.format(subfolder, res))
         P.folder_dict.add(subfolder)
+    print('Uploading file {}]'.format(subfolder, file_path))
     # rsync -avrPe 'ssh -p 222 -T -c arcfour -o Compression=no -x ' $src haiot@$HOST_DEST:/media/usb/$dest
     res = subprocess.check_output(['rsync -avrPe "ssh -p ' + P.port + ' -T -c arcfour -o Compression=no -x" ' +
                                    file_path + ' ' + P.server + ':' + P.dest_folder + subfolder], shell=True)
@@ -110,11 +112,15 @@ def _file_list(folder, exclude_delta=0):
 
 def _upload():
     files = _file_list(P.root_folder, exclude_delta=P.exclude_time_delta)
+    count = 0
     for file in files:
         try:
             _upload_file(file_path=file[0], file_date=file[1])
             shutil.move(file[0], P.move_folder)
             print('File {} moved to {}'.format(file[0], P.move_folder))
+            count += 1
+            if count == P.upload_batch:
+                break
         except Exception, ex:
             print('Exception uploading file {}, ex={}'.format(file[0], ex))
 
