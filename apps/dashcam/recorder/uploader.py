@@ -21,6 +21,7 @@ class P():
     max_disk_used_percent = 80 #
     upload_batch = 2
     current_upload_file = None
+    app_is_exiting = False
     folder_dict = set()
 
 
@@ -79,7 +80,7 @@ def _upload_file(file_path, file_date):
                                        P.server + ' "mkdir -p "' + P.dest_folder + subfolder], shell=True)
         print('Created folder {}, res=[{}]'.format(subfolder, res))
         P.folder_dict.add(subfolder)
-    print('Uploading file {}]'.format(subfolder, file_path))
+    print('Uploading file {}]'.format(file_path))
     P.current_upload_file = file_path
     # rsync -avrPe 'ssh -p 222 -T -c arcfour -o Compression=no -x ' $src haiot@$HOST_DEST:/media/usb/$dest
     res = subprocess.check_output(['rsync -avrPe "ssh -p ' + P.port + ' -T -c arcfour -o Compression=no -x" ' +
@@ -117,6 +118,8 @@ def _upload():
     files = _file_list(P.root_folder, exclude_delta=P.exclude_time_delta)
     count = 0
     for file in files:
+        if P.app_is_exiting is True:
+            break
         try:
             _upload_file(file_path=file[0], file_date=file[1])
             shutil.move(file[0], P.move_folder)
@@ -150,11 +153,12 @@ def _clean_space():
 
 
 def unload():
+    P.app_is_exiting = True
     if P.current_upload_file is not None:
         pid = utils.get_proc(P.current_upload_file)
         if pid is not None:
             print('Killing hanging rsync with pid {} on file {}'.format(pid, P.current_upload_file))
-            os.kill(pid, 0)
+            os.kill(pid, 15)
 
 
 def thread_run():
