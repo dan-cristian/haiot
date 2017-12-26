@@ -12,3 +12,7 @@ def get_proc(keywords):
             if atoms[0].isdigit():
                 res = int(atoms[0])
     return res
+
+
+if __name__ == '__main__':
+    print get_proc('/home/haiot/recordings/' + '%Y-%m-%d_%H-%M-%S_usb.mp4')
