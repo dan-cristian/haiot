@@ -139,7 +139,7 @@ def _usb_init():
     try:
         pid = utils.get_proc(Params.usb_out_filename)
         if pid is not None:
-            os.kill(pid, 0)
+            os.kill(pid, 15)
         if Constant.IS_OS_WINDOWS():
             _run_ffmpeg_usb_win()
         else:
@@ -191,7 +191,7 @@ def _pi_init():
         try:
             pid = utils.get_proc(Params.pi_out_filename)
             if pid is not None:
-                os.kill(pid, 0)
+                os.kill(pid, 15)
             Params.pi_camera = picamera.PiCamera()
             Params.pi_camera.resolution = Params.pi_max_resolution
             Params.pi_camera.framerate = Params.pi_framerate
