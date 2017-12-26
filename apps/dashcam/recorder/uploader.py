@@ -1,21 +1,25 @@
 import subprocess
 from stat import S_ISREG, ST_CTIME, ST_MODE, ST_MTIME
 import os, sys, time, datetime
+import shutil
 
 _server = 'haiot@192.168.0.18'
 _port = '222'
 _dest_folder = '/media/usb/dashcam'
 _include_ext = '.mp4'
 _exclude_time_delta = 120 # exclude files modified in the last x seconds
-
+_folder_dict = set()
 
 def _upload_file(file_path, file_date):
+    global _folder_dict
     fd = datetime.datetime.fromtimestamp(file_date)
     subfolder = '/' + str(fd.year) + '-' + str(fd.month) + '-' + str(fd.day)
-    #ssh -T -p 222 -c arcfour -o Compression=no $SSH_SERVER "mkdir -p $dest_parent"
-    res = subprocess.check_output(['ssh -T -p ' + _port + ' -c arcfour -o Compression=no ' +
-                                   _server + ' "mkdir -p "' + _dest_folder + subfolder], shell=True)
-    print('Created folder {}, res=[{}]'.format(subfolder, res))
+    if subfolder not in _folder_dict:
+        #ssh -T -p 222 -c arcfour -o Compression=no $SSH_SERVER "mkdir -p $dest_parent"
+        res = subprocess.check_output(['ssh -T -p ' + _port + ' -c arcfour -o Compression=no ' +
+                                       _server + ' "mkdir -p "' + _dest_folder + subfolder], shell=True)
+        print('Created folder {}, res=[{}]'.format(subfolder, res))
+        _folder_dict.add(subfolder)
     # rsync -avrPe 'ssh -p 222 -T -c arcfour -o Compression=no -x ' $src haiot@$HOST_DEST:/media/usb/$dest
     res = subprocess.check_output(['rsync -avrPe "ssh -p ' + _port + ' -T -c arcfour -o Compression=no -x" ' +
                                    file_path + ' ' + _server + ':' + _dest_folder + subfolder], shell=True)
@@ -47,14 +51,15 @@ def _file_list(folder, exclude_delta):
     return result
 
 
-def upload(root_folder):
+def upload(root_folder, move_folder):
     files = _file_list(root_folder, exclude_delta=_exclude_time_delta)
     for file in files:
         try:
             _upload_file(file_path=file[0], file_date=file[1])
+            shutil.move(file[0], move_folder)
         except Exception, ex:
             print('Exception uploading file {}, ex={}'.format(file[0], ex))
 
 
 if __name__ == '__main__':
-    upload('/home/haiot/recordings')
+    upload('/home/haiot/recordings', '/home/haiot/recordings/uploaded')
