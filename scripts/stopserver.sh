@@ -3,7 +3,7 @@
 try_kill=0
 while :
 do
-    if [ try_kill == 1 ]; then
+    if [ $try_kill == 1 ]; then
         echo "Stop process failed, check if you own the process!"
     fi
     proc_pid=$(ps w | grep '[h]aiot.py' | awk '{print $1}')
