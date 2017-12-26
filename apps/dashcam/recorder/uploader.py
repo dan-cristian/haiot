@@ -83,6 +83,7 @@ def _upload_file(file_path, file_date):
 
 
 
+
 def _file_list(folder, exclude_delta=0):
     # https://stackoverflow.com/questions/168409/how-do-you-get-a-directory-listing-sorted-by-creation-date-in-python
     # get all entries in the directory w/ stats
@@ -103,7 +104,7 @@ def _file_list(folder, exclude_delta=0):
             delta_sec = (now - cdate)
             if delta_sec > exclude_delta:
                 result.append([path, cdate])
-                print('Added {}'.format(path))
+                #print('Added {}'.format(path))
     return result
 
 
@@ -113,6 +114,7 @@ def _upload():
         try:
             _upload_file(file_path=file[0], file_date=file[1])
             shutil.move(file[0], P.move_folder)
+            print('File {} moved to {}'.format(file[0], P.move_folder))
         except Exception, ex:
             print('Exception uploading file {}, ex={}'.format(file[0], ex))
 
@@ -135,7 +137,7 @@ def _clean_space():
         if parti.mountpoint == P.root_mountpoint:
             usage = disk_usage(parti.mountpoint).percent
             if usage > P.max_disk_used_percent:
-                print('Disk usage is {}, need to clean to stay at {}'.format(usage, P.max_disk_used_percent))
+                print('Disk usage is {}, need to remove files to stay at {}'.format(usage, P.max_disk_used_percent))
 
 
 def thread_run():
@@ -145,9 +147,9 @@ def thread_run():
 
 
 if __name__ == '__main__':
-    for part in disk_partitions():
-        print(part)
-        print("%s\n" % str(disk_usage(part.mountpoint)))
+    #for part in disk_partitions():
+    #    print(part)
+    #    print("%s\n" % str(disk_usage(part.mountpoint)))
     P.root_folder = '/home/haiot/recordings/'
     P.move_folder = '/home/haiot/recordings/uploaded/'
     P.root_mountpoint = '/'
