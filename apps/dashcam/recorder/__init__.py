@@ -111,6 +111,20 @@ def _run_ffmpeg_usb():
                 stdin=subprocess.PIPE, stdout=Params.usb_out_std, stderr=Params.usb_out_err)
 
 
+#   PID TTY      STAT   TIME COMMAND
+# 4222 pts/1    Ss     0:00 -bash
+# 4555 pts/1    R      8:49 ffmpeg -y -f alsa -thread_queue_size 8192 -ac 1 -i hw:1,0 -r 8 -f video4linux2 -thread_queue_size 8192 -i /dev/v4l/by-id/usb-046d_HD_
+def _get_proc(keywords):
+    out = subprocess.check_output(['ps', 'w']).split('\n')
+    res = None
+    for line in out:
+        if keywords in line:
+            atoms = line.strip().split(' ')
+            if atoms[0].isdigit():
+                res = int(atoms[0])
+    return res
+
+
 def _recover_usb():
     src = Params.recordings_root + Params.usb_out_filename_err
     # make a copy for debug
@@ -136,6 +150,9 @@ def _recover_usb():
 def _usb_init():
     print("Recording USB")
     try:
+        pid = _get_proc(Params.usb_out_filename)
+        if pid is not None:
+            os.kill(pid, 0)
         if Constant.IS_OS_WINDOWS():
             _run_ffmpeg_usb_win()
         else:
@@ -185,6 +202,9 @@ def _pi_record_loop():
 def _pi_init():
     if __has_picamera:
         try:
+            pid = _get_proc(Params.pi_out_filename)
+            if pid is not None:
+                os.kill(pid, 0)
             Params.pi_camera = picamera.PiCamera()
             Params.pi_camera.resolution = Params.pi_max_resolution
             Params.pi_camera.framerate = Params.pi_framerate
