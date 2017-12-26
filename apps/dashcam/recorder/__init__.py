@@ -28,6 +28,7 @@ class Params:
     is_pi_camera_on = True
     is_usb_camera_on = True
     usb_sound_enabled = True
+    root_mountpoint = '/'
     recordings_root = '/home/haiot/recordings/'
     recordings_uploaded = 'uploaded'
     recordings_safe = 'safe'
@@ -263,6 +264,7 @@ def init():
         os.makedirs(Params.recordings_root + Params.recordings_safe)
     uploader.P.root_folder = Params.recordings_root
     uploader.P.move_folder = Params.recordings_root + Params.recordings_uploaded
+    uploader.P.root_mountpoint = Params.root_mountpoint
     if Params.is_pi_camera_on:
         _pi_init()
     if Params.is_usb_camera_on:

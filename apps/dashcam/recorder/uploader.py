@@ -12,6 +12,7 @@ class P():
     port = '222'
     dest_folder = '/media/usb/dashcam/'
     include_ext = '.mp4'
+    root_mountpoint = None
     root_folder = None
     move_folder = None
     exclude_time_delta = 120 # exclude files modified in the last x seconds
@@ -116,7 +117,7 @@ def _upload():
             print('Exception uploading file {}, ex={}'.format(file[0], ex))
 
 
-def _clean():
+def _clean_old():
     files = _file_list(P.move_folder)
     for file in files:
         now = time.time()
@@ -129,15 +130,25 @@ def _clean():
             pass
 
 
+def _clean_space():
+    for parti in disk_partitions():
+        if parti.mountpoint == P.root_mountpoint:
+            usage = disk_usage(parti.mountpoint).percent
+            if usage > P.max_disk_used_percent:
+                print('Disk usage is {}, need to clean to stay at {}'.format(usage, P.max_disk_used_percent))
+
+
 def thread_run():
     _upload()
-    _clean()
+    _clean_old()
+    _clean_space()
 
 
 if __name__ == '__main__':
     for part in disk_partitions():
         print(part)
-        print("    %s\n" % str(disk_usage(part.mountpoint)))
+        print("%s\n" % str(disk_usage(part.mountpoint)))
     P.root_folder = '/home/haiot/recordings/'
     P.move_folder = '/home/haiot/recordings/uploaded/'
-    #_upload()
+    P.root_mountpoint = '/'
+    _clean_space()
