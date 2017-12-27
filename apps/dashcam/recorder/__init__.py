@@ -215,6 +215,9 @@ def _pi_init():
                 print("Recording PI started")
                 Params.is_recording_pi = True
         except Exception, ex:
+            if 'Camera is not enabled' in str(ex):
+                global __has_picamera
+                __has_picamera = False
             print("Unable to initialise picamera, ex={}".format(ex))
     else:
         print("No picamera module")
