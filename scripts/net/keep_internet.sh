@@ -136,3 +136,4 @@ if [ ! -f /tmp/haveinternet ]; then
         wvdial &
     fi
 fi
+
