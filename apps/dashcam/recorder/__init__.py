@@ -218,9 +218,11 @@ def _pi_init():
             if 'Camera is not enabled' in str(ex):
                 global __has_picamera
                 __has_picamera = False
+                Params.is_pi_camera_on = False
             print("Unable to initialise picamera, ex={}".format(ex))
     else:
-        print("No picamera module")
+        #print("No picamera module")
+        pass
 
 
 def _pi_stop():
