@@ -28,12 +28,12 @@ def _read_gps():
     r = gpsd.get_current()
     if r.mode < 2:
         if not State.reported_no_fix:
-            print "No gps fix, sats={} valid={} mode={}".format(r.sats, r.sats_valid, r.mode)
+            print("No gps fix, sats={} valid={} mode={}".format(r.sats, r.sats_valid, r.mode))
             State.reported_no_fix = True
         pass
     else:
         if State.reported_no_fix:
-            print "Got gps fix, sats={} valid={} mode={}".format(r.sats, r.sats_valid, r.mode)
+            print("Got gps fix, sats={} valid={} mode={}".format(r.sats, r.sats_valid, r.mode))
             State.reported_no_fix = False
         if r.mode == 2:
             alt = -9999
@@ -74,13 +74,13 @@ def _upload_buffer():
             if resp == "null":
                 State.url_buffer.remove(url)
             else:
-                print "Unexpected response {}".format(resp)
+                print("Unexpected response {}".format(resp))
         except Exception, ex:
-            # print ex
+            print("Unable to upload position, err={}".format(ex))
             State.url_buffer.append(url)
-            print "Buffer has {} elements".format(len(State.url_buffer))
+            print("Buffer has {} elements".format(len(State.url_buffer)))
     if initial - len(State.url_buffer) > 1:
-        print "Buffer catches up, now has {} elements".format(len(State.url_buffer))
+        print("Buffer catches up, now has {} elements".format(len(State.url_buffer)))
 
 
 def unload():
@@ -88,13 +88,14 @@ def unload():
     gpsd.gpsd_socket.close()
     initialised = False
 
+
 def init():
     global initialised
     try:
         gpsd.connect()
         initialised = True
     except Exception, ex:
-        print "Error connecting gps, ex={}".format(ex)
+        print("Unable to connect to gps daemon, ex={}".format(ex))
 
 
 def thread_run():
