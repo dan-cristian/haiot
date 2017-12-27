@@ -122,16 +122,16 @@ while :
 do
     have_internet
     if [ ! -f /tmp/haveinternet ]; then
-    ifconfig | grep ppp0
-    if [ $? -eq 1 ]; then
-        echo "No ppp0 interface detected, starting wvdial"
-        killall -q wvdial
-        /usr/bin/wvdial &
-    else
-        echo "Restarting ppp"
-        killall -q pppd
-        killall -q wvdial
-        /usr/bin/wvdial &
+        ifconfig | grep ppp0
+        if [ $? -eq 1 ]; then
+            echo "No ppp0 interface detected, starting wvdial"
+            killall -q -v wvdial
+            /usr/bin/wvdial &
+        else
+            echo "Restarting ppp"
+            killall -q -v pppd
+            killall -q -v wvdial
+            /usr/bin/wvdial &
     fi
     sleep 5
 fi
