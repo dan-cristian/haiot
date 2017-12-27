@@ -45,18 +45,21 @@ def get_usb_dev(dev_name):
 
 # card 1: C525 [HD Webcam C525], device 0: USB Audio [USB Audio]
 def get_usb_audio(dev_name):
-    rec = subprocess.check_output(['arecord', '-l']).split('\n')
     res = None
-    for line in rec:
-        if len(line) > 1:
-            atoms = line.split(',')
-            if len(atoms) > 1:
-                if dev_name in atoms[0]:
-                    hw_card = atoms[0].split(':')[0].split('card ')[1]
-                    hw_dev = atoms[1].split(':')[0].split(' device ')[1]
-                    res = '{},{}'.format(hw_card, hw_dev)
-                    print("Found audio card {}".format(res))
-                    break
+    try:
+        rec = subprocess.check_output(['arecord', '-l']).split('\n')
+        for line in rec:
+            if len(line) > 1:
+                atoms = line.split(',')
+                if len(atoms) > 1:
+                    if dev_name in atoms[0]:
+                        hw_card = atoms[0].split(':')[0].split('card ')[1]
+                        hw_dev = atoms[1].split(':')[0].split(' device ')[1]
+                        res = '{},{}'.format(hw_card, hw_dev)
+                        print("Found audio card {}".format(res))
+                        break
+    except Exception, ex:
+        print("Got error when looking for audio interface, ex={}".format(ex))
     return res
 
 

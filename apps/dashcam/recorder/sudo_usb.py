@@ -1,8 +1,10 @@
 import os
 import subprocess
 import sys
-import fcntl
-
+try:
+    import fcntl
+except Exception:
+    pass
 
 def _get_usb_dev_info(dev_name):
     rec = subprocess.check_output(['lsusb']).split('\n')
