@@ -954,6 +954,9 @@ if [ "$ENABLE_DASHCAM_PI" == "1" ]; then
     echo "Configuring fwknop"
     apt install -y fwknop-client
 
+    echo "Set proper network gw order"
+    # https://unix.stackexchange.com/questions/292940/how-to-set-a-routing-table-that-prefers-wlan-dhcp-interface-as-default-route
+
 
 if [ "$ENABLE_DASHCAM_MOTION" == "1" ]; then
     apt install -y motion
@@ -1070,7 +1073,11 @@ exit 0
     #echo 'ACTION=="add",SUBSYSTEMS=="usb",ATTRS{manufacturer}=="ZTE,Incorporated",RUN+="/usr/bin/wvdial & disown"' > /etc/udev/rules.d/10-3gstick.rules
 
     # https://unix.stackexchange.com/questions/296347/crontab-never-running-while-in-etc-cron-d
-    cat ${HAIOT_DIR}/apps/dashcam/scripts/cron.d.3gdial >> /etc/crontab
+    #cat ${HAIOT_DIR}/apps/dashcam/scripts/cron.d.3gdial >> /etc/crontab
+
+    cp $HAIOT_DIR/scripts/net/keep_internet.service /lib/systemd/system/
+    systemctl enable keep_internet.service
+    systemctl start keep_internet.service
 fi
 
 echo "Optimise for flash and ssd usage"
