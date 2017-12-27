@@ -1,8 +1,10 @@
 try:
     import picamera
-    __has_picamera = True
+    global _has_picamera
+    _has_picamera = True
 except Exception, ex:
-    __has_picamera = False
+    global _has_picamera
+    _has_picamera = False
 import subprocess
 import os
 import time
@@ -74,7 +76,7 @@ def _run_ffmpeg_pi():
             '-reset_timestamps', '1', '-force_key_frames', '"expr:gte(t,n_forced*10)"',
             '-frag_duration', '1000', '-strftime', '1', '-an',
             '-nostats', '-loglevel', 'info', P.pi_out_filename],
-            stdin=subprocess.PIPE, stdout=P.pi_out_filepath_std, stderr=P.pi_out_filepath_err)
+            stdin=subprocess.PIPE, stdout=P.pi_out_std, stderr=P.pi_out_err)
 
 
 def _run_ffmpeg_usb_win(no_sound=True):
@@ -100,17 +102,22 @@ def _run_ffmpeg_usb():
         P.usb_record_hw = usb_tool.get_usb_audio(P.usb_camera_keywords)
         P.usb_camera_dev_path = usb_tool.get_usb_dev(P.usb_camera_keywords)
 
+        if P.usb_record_hw is not None:
+            audio = ['-i', 'hw:{}'.format(P.usb_record_hw)]
+        else:
+            audio = ['-na']
+
         if P.usb_camera_dev_path is not None:
             P.ffmpeg_usb = subprocess.Popen(
-                ['ffmpeg', '-y', '-f', 'alsa', '-thread_queue_size', '8192', '-ac', '1',
-                 '-i', 'hw:{}'.format(P.usb_record_hw), '-r', str(P.usb_framerate),
+                ['ffmpeg', '-y', '-f', 'alsa', '-thread_queue_size', '8192', '-ac', '1'] + audio +
+                ['-r', str(P.usb_framerate),
                  '-f', 'video4linux2', '-thread_queue_size', '8192', '-i', P.usb_camera_dev_path,
                  '-vf', 'drawtext=text=\'%{localtime\:%c}\':fontcolor=white@0.8:fontsize=32:x=10:y=10',
                  '-s', P.usb_max_resolution, "-c:v", "h264_omx", "-b:v", "2000k",
                  '-frag_duration', '1000', '-f', 'segment', '-segment_time', str(P.segment_duration),
                  '-reset_timestamps', '1', '-force_key_frames', 'expr:gte(t,n_forced*10)', '-strftime', '1',
                  '-nostats', '-loglevel', 'info', P.usb_out_filename],
-                stdin=subprocess.PIPE, stdout=P.usb_out_filepath_std, stderr=P.usb_out_filepath_err)
+                stdin=subprocess.PIPE, stdout=P.usb_out_std, stderr=P.usb_out_err)
 
 
 def _kill_proc(keywords):
@@ -202,7 +209,7 @@ def _pi_record_loop():
 
 
 def _pi_init():
-    if __has_picamera:
+    if _has_picamera:
         try:
             _kill_proc(P.pi_out_filename)
             P.pi_camera = picamera.PiCamera()
@@ -217,13 +224,13 @@ def _pi_init():
                 P.is_recording_pi = True
         except Exception, ex:
             if 'Camera is not enabled' in str(ex):
-                global __has_picamera
-                __has_picamera = False
+                global _has_picamera
+                _has_picamera = False
                 P.is_pi_camera_on = False
             print("Unable to initialise picamera, ex={}".format(ex))
     else:
         #print("No picamera module")
-        pass
+        P.is_pi_camera_on = False
 
 
 def _pi_stop():
@@ -321,15 +328,5 @@ def thread_run():
 
 
 if __name__ == '__main__':
-    _run_ffmpeg_usb()
-    if P.ffmpeg_usb._child_created:
-        P.is_recording_usb = True
-        print("Recording started")
-        #Params.ffmpeg_usb_out = NBSR(Params.ffmpeg_usb.stdout)
-    else:
-        print("Recording process not created")
-    _pi_init()
-    while True:
-        _usb_record_loop()
-        _pi_record_loop()
-        time.sleep(2)
+    init()
+    thread_run()
