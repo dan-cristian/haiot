@@ -799,6 +799,8 @@ if [ "$ENABLE_SECURE_SSH" == "1" ]; then
     modprobe cryptodev
     echo cryptodev >> /etc/modules
 
+    # http://mgalgs.github.io/2014/10/22/enable-arcfour-and-other-fast-ciphers-on-recent-versions-of-openssh.html
+    echo "ciphers arcfour,arcfour128,arcfour256" >> /etc/ssh/sshd_config
 
 fi
 

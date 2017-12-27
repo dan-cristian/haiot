@@ -283,7 +283,7 @@ def init():
     if not os.path.exists(Params.recordings_root + Params.recordings_safe):
         os.makedirs(Params.recordings_root + Params.recordings_safe)
     uploader.P.root_folder = Params.recordings_root
-    uploader.P.move_folder = Params.recordings_root + Params.recordings_uploaded
+    uploader.P.uploaded_folder = Params.recordings_root + Params.recordings_uploaded
     uploader.P.root_mountpoint = Params.root_mountpoint
     if Params.is_pi_camera_on:
         _pi_init()
