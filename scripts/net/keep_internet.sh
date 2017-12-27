@@ -128,12 +128,12 @@ if [ ! -f /tmp/haveinternet ]; then
     ifconfig | grep ppp0
     if [ $? -eq 1 ]; then
         killall wvdial
-        wvdial &
+        /usr/bin/wvdial &
     else
         echo "Restarting ppp"
         killall pppd
         killall wvdial
-        wvdial &
+        /usr/bin/wvdial &
     fi
 fi
 
