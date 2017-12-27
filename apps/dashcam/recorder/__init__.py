@@ -1,10 +1,3 @@
-try:
-    import picamera
-    global _has_picamera
-    _has_picamera = True
-except Exception, ex:
-    global _has_picamera
-    _has_picamera = False
 import subprocess
 import os
 import time
@@ -17,6 +10,13 @@ import utils
 try:
     from common import Constant
 except Exception:
+    pass
+
+_has_picamera = False
+try:
+    import picamera
+    _has_picamera = True
+except Exception, ex:
     pass
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
@@ -209,6 +209,7 @@ def _pi_record_loop():
 
 
 def _pi_init():
+    global _has_picamera
     if _has_picamera:
         try:
             _kill_proc(P.pi_out_filename)
@@ -224,7 +225,6 @@ def _pi_init():
                 P.is_recording_pi = True
         except Exception, ex:
             if 'Camera is not enabled' in str(ex):
-                global _has_picamera
                 _has_picamera = False
                 P.is_pi_camera_on = False
             print("Unable to initialise picamera, ex={}".format(ex))
