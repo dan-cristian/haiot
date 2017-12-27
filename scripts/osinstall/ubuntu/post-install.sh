@@ -438,6 +438,7 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     rm -r triggerhappy
     ln -s $LOG_ROOT /mnt/log
     ln -s $MUSIC_ROOT /mnt/music
+    ln -s $HAIOT_DIR/scripts /home/scripts
     cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/mpd.conf /etc/
     cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/mpd@.service /lib/systemd/system/
     cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/mpd@*.socket /lib/systemd/system/
@@ -1075,6 +1076,7 @@ exit 0
     # https://unix.stackexchange.com/questions/296347/crontab-never-running-while-in-etc-cron-d
     #cat ${HAIOT_DIR}/apps/dashcam/scripts/cron.d.3gdial >> /etc/crontab
 
+    ln -s $HAIOT_DIR/scripts /home/scripts
     cp $HAIOT_DIR/scripts/net/keep_internet.service /lib/systemd/system/
     systemctl enable keep_internet.service
     systemctl start keep_internet.service
