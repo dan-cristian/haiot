@@ -9,13 +9,13 @@ disk_ntuple = namedtuple('partition',  'device mountpoint fstype')
 usage_ntuple = namedtuple('usage',  'total used free percent')
 
 class P():
-    server = 'haiot@192.168.0.18'
-    port = '222'
-    dest_folder = '/media/usb/dashcam/'
+    server = 'haiot@192.168.0.9'
+    port = '22'
+    dest_folder = '/mnt/motion/tmp/timelapse/dashcam/'  # need trailing /
     include_ext = '.mp4'
     root_mountpoint = None
     root_folder = None
-    move_folder = None
+    uploaded_folder = None
     exclude_time_delta = 120 # exclude files modified in the last x seconds
     days_to_keep = 30
     max_disk_used_percent = 80 #
@@ -82,7 +82,7 @@ def _upload_file(file_path, file_date):
         P.folder_dict.add(subfolder)
     print('Uploading file {}]'.format(file_path))
     P.current_upload_file = file_path
-    # rsync -avrPe 'ssh -p 222 -T -c arcfour -o Compression=no -x ' $src haiot@$HOST_DEST:/media/usb/$dest
+    # rsync -avrPe 'ssh -p 22 -T -c arcfour -o Compression=no -x ' 2017-12-25_13-26-08_pi.mp4 haiot@$192.168.0.9://mnt/motion/tmp/timelapse/dashcam
     res = subprocess.check_output(['rsync -avrPe "ssh -p ' + P.port + ' -T -c arcfour -o Compression=no -x" ' +
                                    file_path + ' ' + P.server + ':' + P.dest_folder + subfolder], shell=True)
     duration_min = (time.time() - start) / 60
@@ -122,8 +122,8 @@ def _upload():
             break
         try:
             _upload_file(file_path=file[0], file_date=file[1])
-            shutil.move(file[0], P.move_folder)
-            print('File {} moved to {}'.format(file[0], P.move_folder))
+            shutil.move(file[0], P.uploaded_folder)
+            print('File {} moved to {}'.format(file[0], P.uploaded_folder))
             count += 1
             if count == P.upload_batch:
                 break
@@ -131,13 +131,13 @@ def _upload():
             print('Exception uploading file {}, ex={}'.format(file[0], ex))
 
 
-def _clean_old():
-    files = _file_list(P.move_folder)
+def _clean_old(days_to_keep, folder):
+    files = _file_list(folder)
     for file in files:
         now = time.time()
         try:
             delta_days = (now - file[1]) / (60*60*24)
-            if delta_days > P.days_to_keep:
+            if delta_days > days_to_keep:
                 os.remove(file[0])
                 print('Old {} days file deleted {}'.format(delta_days, file[0]))
         except Exception, ex:
@@ -145,11 +145,27 @@ def _clean_old():
 
 
 def _clean_space():
-    for parti in disk_partitions():
-        if parti.mountpoint == P.root_mountpoint:
-            usage = disk_usage(parti.mountpoint).percent
-            if usage > P.max_disk_used_percent:
-                print('Disk usage is {}, need to remove files to stay at {}'.format(usage, P.max_disk_used_percent))
+    days_keep = P.days_to_keep
+    folder = P.uploaded_folder
+    while True:
+        for parti in disk_partitions():
+            if parti.mountpoint == P.root_mountpoint:
+                usage = disk_usage(parti.mountpoint).percent
+                if usage > P.max_disk_used_percent:
+                    print('Disk usage is {}, removing files older than {} to stay at {}'.format(
+                        usage, days_keep, P.max_disk_used_percent))
+                    if days_keep > 0:
+                        _clean_old(days_keep, folder)
+                        days_keep -= 1
+                    else:
+                        print('Warning, need to remove files from files not uploaded folder {}'.format(P.root_folder))
+                        if days_keep > 0:
+                            days_keep = P.days_to_keep
+                            folder = P.root_folder
+                        else:
+                            print('Something is wrong, cannot free up more space!')
+                else:
+                    break
 
 
 def unload():
@@ -170,7 +186,6 @@ def unload():
 
 def thread_run():
     _upload()
-    _clean_old()
     _clean_space()
 
 
@@ -179,6 +194,6 @@ if __name__ == '__main__':
     #    print(part)
     #    print("%s\n" % str(disk_usage(part.mountpoint)))
     P.root_folder = '/home/haiot/recordings/'
-    P.move_folder = '/home/haiot/recordings/uploaded/'
+    P.uploaded_folder = '/home/haiot/recordings/uploaded/'
     P.root_mountpoint = '/'
     _clean_space()
