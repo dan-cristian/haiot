@@ -801,6 +801,7 @@ if [ "$ENABLE_SECURE_SSH" == "1" ]; then
 
     # http://mgalgs.github.io/2014/10/22/enable-arcfour-and-other-fast-ciphers-on-recent-versions-of-openssh.html
     echo "ciphers arcfour,arcfour128,arcfour256" >> /etc/ssh/sshd_config
+    # https://www.daveperrett.com/articles/2010/09/14/ssh-authentication-refused/
 
 fi
 
@@ -949,6 +950,9 @@ if [ "$ENABLE_DASHCAM_PI" == "1" ]; then
     cgps -s
     # https://gitlab.com/eneiluj/phonetrack-oc
     echo "gpsd /dev/ttyS0 -F /var/run/gpsd.sock" >> /etc/rc.local
+
+    echo "Configuring fwknop"
+    apt install -y fwknop-client
 
 
 if [ "$ENABLE_DASHCAM_MOTION" == "1" ]; then
