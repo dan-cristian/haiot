@@ -20,7 +20,7 @@ except Exception:
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 initialised = False
 
-class Params:
+class P:
     ffmpeg_pi = None
     ffmpeg_usb = None
     segment_duration = 900  # in seconds
@@ -31,16 +31,17 @@ class Params:
     usb_sound_enabled = True
     root_mountpoint = '/'
     recordings_root = '/home/haiot/recordings/'
-    recordings_uploaded = 'uploaded'
-    recordings_safe = 'safe'
+    dir_recordings_uploaded = recordings_root + 'uploaded'
+    dir_recordings_safe = recordings_root + 'safe'
+    dir_pipe_out = recordings_root + '/out/'
     pi_out_filename = recordings_root + '%Y-%m-%d_%H-%M-%S_pi.mp4'
     usb_out_filename = recordings_root + '%Y-%m-%d_%H-%M-%S_usb.mp4'
-    pi_out_filename_std = 'pi.std'
-    pi_out_filename_err = 'pi.err'
+    pi_out_filepath_std = dir_pipe_out + 'pi.std'
+    pi_out_filepath_err = dir_pipe_out + 'pi.err'
     pi_out_std = None
     pi_out_err = None
-    usb_out_filename_std = 'usb.std'
-    usb_out_filename_err = 'usb.err'
+    usb_out_filepath_std = dir_pipe_out + 'usb.std'
+    usb_out_filepath_err = dir_pipe_out + 'usb.err'
     usb_out_std = None
     usb_out_err = None
     usb_camera_keywords = 'C525'
@@ -63,53 +64,53 @@ def _get_win_cams():
 
 
 def _run_ffmpeg_pi():
-    print "Recording on {}".format(Params.pi_out_filename)
-    Params.pi_out_std = open(Params.recordings_root + Params.pi_out_filename_std, 'w')
-    Params.pi_out_err = open(Params.recordings_root + Params.pi_out_filename_err, 'w')
-    if Params.ffmpeg_pi is None:
-        Params.ffmpeg_pi = subprocess.Popen([
-            'ffmpeg', '-y', '-r', str(Params.pi_framerate), '-i', '-', '-vcodec', 'copy',
-            '-f', 'segment', '-segment_time', str(Params.segment_duration), '-segment_format', 'mp4',
+    print "Recording on {}".format(P.pi_out_filename)
+    P.pi_out_std = open(P.pi_out_filepath_std, 'w')
+    P.pi_out_err = open(P.pi_out_filepath_err, 'w')
+    if P.ffmpeg_pi is None:
+        P.ffmpeg_pi = subprocess.Popen([
+            'ffmpeg', '-y', '-r', str(P.pi_framerate), '-i', '-', '-vcodec', 'copy',
+            '-f', 'segment', '-segment_time', str(P.segment_duration), '-segment_format', 'mp4',
             '-reset_timestamps', '1', '-force_key_frames', '"expr:gte(t,n_forced*10)"',
             '-frag_duration', '1000', '-strftime', '1', '-an',
-            '-nostats', '-loglevel', 'info', Params.pi_out_filename],
-            stdin=subprocess.PIPE, stdout=Params.pi_out_std, stderr=Params.pi_out_err)
+            '-nostats', '-loglevel', 'info', P.pi_out_filename],
+            stdin=subprocess.PIPE, stdout=P.pi_out_filepath_std, stderr=P.pi_out_filepath_err)
 
 
 def _run_ffmpeg_usb_win(no_sound=True):
-    if Params.ffmpeg_usb is None:
-        Params.ffmpeg_usb = subprocess.Popen([
-            'ffmpeg', '-y', '-f', 'dshow', '-i', 'video={}'.format(Params.win_camera_dev_name),
-            '-an', '-c:v', 'libx264', '-b:v', '3000k', '-r', Params.usb_framerate,
-            '-f', 'segment', '-segment_time', Params.segment_duration, '-segment_format', 'mp4',
+    if P.ffmpeg_usb is None:
+        P.ffmpeg_usb = subprocess.Popen([
+            'ffmpeg', '-y', '-f', 'dshow', '-i', 'video={}'.format(P.win_camera_dev_name),
+            '-an', '-c:v', 'libx264', '-b:v', '3000k', '-r', P.usb_framerate,
+            '-f', 'segment', '-segment_time', P.segment_duration, '-segment_format', 'mp4',
             '-reset_timestamps', '1',
             '-force_key_frames', 'expr:gte(t,n_forced*10)',
             #'-vf', '"drawtext=fontfile=/Windows/Fonts/arial.ttf: text=\'%{localtime\:%c}\': fontcolor=white@0.8: fontsize=32: x=10: y=10"',
             '-s', '800x600', '-frag_duration', '1000',
             '-strftime', '1',
-            Params.usb_out_filename])
+            P.usb_out_filename])
 
 
 # ffmpeg -y -f alsa -thread_queue_size 16384 -ac 1 -i hw:1 -r 8 -f video4linux2 -thread_queue_size 8192 -i /dev/video0 -vf "drawtext=text='%{localtime\:%c}': fontcolor=white@0.8: fontsize=32: x=10: y=10" -s 1280x720 -c:v h264_omx -b:v 3000k -frag_duration 1000 -f segment -segment_time 3600 -reset_timestamps 1  -force_key_frames "expr:gte(t,n_forced*2)" -strftime 1 /home/haiot/recordings/usb_%Y-%m-%d_%H-%M-%S.mp4
 def _run_ffmpeg_usb():
-    if Params.ffmpeg_usb is None:
-        Params.usb_out_std = open(Params.recordings_root + Params.usb_out_filename_std, 'w')
-        Params.usb_out_err = open(Params.recordings_root + Params.usb_out_filename_err, 'w')
+    if P.ffmpeg_usb is None:
+        P.usb_out_std = open(P.usb_out_filepath_std, 'w')
+        P.usb_out_err = open(P.usb_out_filepath_err, 'w')
 
-        Params.usb_record_hw = usb_tool.get_usb_audio(Params.usb_camera_keywords)
-        Params.usb_camera_dev_path = usb_tool.get_usb_dev(Params.usb_camera_keywords)
+        P.usb_record_hw = usb_tool.get_usb_audio(P.usb_camera_keywords)
+        P.usb_camera_dev_path = usb_tool.get_usb_dev(P.usb_camera_keywords)
 
-        if Params.usb_camera_dev_path is not None:
-            Params.ffmpeg_usb = subprocess.Popen(
+        if P.usb_camera_dev_path is not None:
+            P.ffmpeg_usb = subprocess.Popen(
                 ['ffmpeg', '-y', '-f', 'alsa', '-thread_queue_size', '8192', '-ac', '1',
-                 '-i', 'hw:{}'.format(Params.usb_record_hw), '-r', str(Params.usb_framerate),
-                 '-f', 'video4linux2', '-thread_queue_size', '8192', '-i', Params.usb_camera_dev_path,
+                 '-i', 'hw:{}'.format(P.usb_record_hw), '-r', str(P.usb_framerate),
+                 '-f', 'video4linux2', '-thread_queue_size', '8192', '-i', P.usb_camera_dev_path,
                  '-vf', 'drawtext=text=\'%{localtime\:%c}\':fontcolor=white@0.8:fontsize=32:x=10:y=10',
-                 '-s', Params.usb_max_resolution, "-c:v", "h264_omx", "-b:v", "2000k",
-                 '-frag_duration', '1000', '-f', 'segment', '-segment_time', str(Params.segment_duration),
+                 '-s', P.usb_max_resolution, "-c:v", "h264_omx", "-b:v", "2000k",
+                 '-frag_duration', '1000', '-f', 'segment', '-segment_time', str(P.segment_duration),
                  '-reset_timestamps', '1', '-force_key_frames', 'expr:gte(t,n_forced*10)', '-strftime', '1',
-                 '-nostats', '-loglevel', 'info', Params.usb_out_filename],
-                stdin=subprocess.PIPE, stdout=Params.usb_out_std, stderr=Params.usb_out_err)
+                 '-nostats', '-loglevel', 'info', P.usb_out_filename],
+                stdin=subprocess.PIPE, stdout=P.usb_out_filepath_std, stderr=P.usb_out_filepath_err)
 
 
 def _kill_proc(keywords):
@@ -129,7 +130,7 @@ def _kill_proc(keywords):
 
 
 def _recover_usb():
-    src = Params.recordings_root + Params.usb_out_filename_err
+    src = P.recordings_root + P.usb_out_filepath_err
     # make a copy for debug
     print('Copy usb output file for debug')
     shutil.copy(src, src + '.' + str(time.time()))
@@ -147,20 +148,20 @@ def _recover_usb():
         else:
             print('Unknown USB error')
             print(contents)
-        usb_tool.reset_usb(Params.usb_camera_keywords)
+        usb_tool.reset_usb(P.usb_camera_keywords)
 
 
 def _usb_init():
     print("Recording USB")
     try:
-        _kill_proc(Params.usb_out_filename)
+        _kill_proc(P.usb_out_filename)
         if Constant.IS_OS_WINDOWS():
             _run_ffmpeg_usb_win()
         else:
             _run_ffmpeg_usb()
-        if Params.ffmpeg_usb is not None and Params.ffmpeg_usb._child_created:
+        if P.ffmpeg_usb is not None and P.ffmpeg_usb._child_created:
             print("Recording started")
-            Params.is_recording_usb = True
+            P.is_recording_usb = True
         else:
             print("Recording process not created")
     except Exception, ex:
@@ -168,11 +169,11 @@ def _usb_init():
 
 
 def _usb_record_loop():
-    if Params.is_recording_usb:
-        Params.ffmpeg_usb.poll()
-        if Params.ffmpeg_usb.returncode is not None:
-            print("usb record exit with code {}".format(Params.ffmpeg_usb.returncode))
-            if Params.ffmpeg_usb.returncode != 0:
+    if P.is_recording_usb:
+        P.ffmpeg_usb.poll()
+        if P.ffmpeg_usb.returncode is not None:
+            print("usb record exit with code {}".format(P.ffmpeg_usb.returncode))
+            if P.ffmpeg_usb.returncode != 0:
                 print("USB recording stopped")
             else:
                 print("USB exit, not an error?")
@@ -184,12 +185,12 @@ def _usb_record_loop():
 
 
 def _pi_record_loop():
-    if Params.is_recording_pi:
-        Params.pi_camera.annotate_text = dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        Params.ffmpeg_pi.poll()
-        if Params.ffmpeg_pi.returncode is not None:
-            print("PI record exit with code {}".format(Params.ffmpeg_pi.returncode))
-            if Params.ffmpeg_pi.returncode != 0:
+    if P.is_recording_pi:
+        P.pi_camera.annotate_text = dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        P.ffmpeg_pi.poll()
+        if P.ffmpeg_pi.returncode is not None:
+            print("PI record exit with code {}".format(P.ffmpeg_pi.returncode))
+            if P.ffmpeg_pi.returncode != 0:
                 print("PI recording stopped with error")
             else:
                 print("PI exit, not an error?")
@@ -203,22 +204,22 @@ def _pi_record_loop():
 def _pi_init():
     if __has_picamera:
         try:
-            _kill_proc(Params.pi_out_filename)
-            Params.pi_camera = picamera.PiCamera()
-            Params.pi_camera.resolution = Params.pi_max_resolution
-            Params.pi_camera.framerate = Params.pi_framerate
-            Params.pi_camera.annotate_background = picamera.Color('black')
+            _kill_proc(P.pi_out_filename)
+            P.pi_camera = picamera.PiCamera()
+            P.pi_camera.resolution = P.pi_max_resolution
+            P.pi_camera.framerate = P.pi_framerate
+            P.pi_camera.annotate_background = picamera.Color('black')
             print("Recording PI")
             _run_ffmpeg_pi()
-            Params.pi_camera.start_recording(Params.ffmpeg_pi.stdin, format='h264', bitrate=Params.pi_bitrate)
-            if Params.ffmpeg_pi._child_created:
+            P.pi_camera.start_recording(P.ffmpeg_pi.stdin, format='h264', bitrate=P.pi_bitrate)
+            if P.ffmpeg_pi._child_created:
                 print("Recording PI started")
-                Params.is_recording_pi = True
+                P.is_recording_pi = True
         except Exception, ex:
             if 'Camera is not enabled' in str(ex):
                 global __has_picamera
                 __has_picamera = False
-                Params.is_pi_camera_on = False
+                P.is_pi_camera_on = False
             print("Unable to initialise picamera, ex={}".format(ex))
     else:
         #print("No picamera module")
@@ -228,29 +229,29 @@ def _pi_init():
 def _pi_stop():
     print "Stopping PI"
     try:
-        Params.is_recording_pi = False
-        if Params.pi_camera is not None:
-            if Params.ffmpeg_pi is not None:
+        P.is_recording_pi = False
+        if P.pi_camera is not None:
+            if P.ffmpeg_pi is not None:
                 try:
-                    Params.ffmpeg_pi.terminate()
+                    P.ffmpeg_pi.terminate()
                 except Exception:
                     pass
-                Params.ffmpeg_pi = None
+                P.ffmpeg_pi = None
             try:
-                print("Camera closed={} recording={}".format(Params.pi_camera.closed, Params.pi_camera.recording))
-                Params.pi_camera.stop_recording()
+                print("Camera closed={} recording={}".format(P.pi_camera.closed, P.pi_camera.recording))
+                P.pi_camera.stop_recording()
             except Exception, ex:
                 print("Exception on pi camera stop, ex={}".format(ex))
             try:
-                print("Camera closed={} recording={}".format(Params.pi_camera.closed, Params.pi_camera.recording))
-                Params.pi_camera.close()
+                print("Camera closed={} recording={}".format(P.pi_camera.closed, P.pi_camera.recording))
+                P.pi_camera.close()
             except Exception, ex:
                 print("Exception on pi camera close, ex={}".format(ex))
-            print("Camera closed={} recording={}".format(Params.pi_camera.closed, Params.pi_camera.recording))
-            if Params.pi_out_std is not None:
-                Params.pi_out_std.close()
-            if Params.pi_out_err is not None:
-                Params.pi_out_err.close()
+            print("Camera closed={} recording={}".format(P.pi_camera.closed, P.pi_camera.recording))
+            if P.pi_out_std is not None:
+                P.pi_out_std.close()
+            if P.pi_out_err is not None:
+                P.pi_out_err.close()
     except Exception, ex:
         print("Error in pi_stop, ex={}".format(ex))
         print(traceback.print_exc())
@@ -258,17 +259,17 @@ def _pi_stop():
 
 def _usb_stop():
     print "Stopping USB"
-    Params.is_recording_usb = False
-    if Params.ffmpeg_usb is not None:
+    P.is_recording_usb = False
+    if P.ffmpeg_usb is not None:
         try:
-            Params.ffmpeg_usb.terminate()
+            P.ffmpeg_usb.terminate()
         except Exception:
             pass
-        Params.ffmpeg_usb = None
-        if Params.usb_out_std is not None:
-            Params.usb_out_std.close()
-        if Params.usb_out_err is not None:
-            Params.usb_out_err.close()
+        P.ffmpeg_usb = None
+        if P.usb_out_std is not None:
+            P.usb_out_std.close()
+        if P.usb_out_err is not None:
+            P.usb_out_err.close()
 
 
 def unload():
@@ -281,32 +282,34 @@ def unload():
 
 def init():
     global initialised
-    if not os.path.exists(Params.recordings_root):
-        os.makedirs(Params.recordings_root)
-    if not os.path.exists(Params.recordings_root + Params.recordings_uploaded):
-        os.makedirs(Params.recordings_root + Params.recordings_uploaded)
-    if not os.path.exists(Params.recordings_root + Params.recordings_safe):
-        os.makedirs(Params.recordings_root + Params.recordings_safe)
-    uploader.P.root_folder = Params.recordings_root
-    uploader.P.uploaded_folder = Params.recordings_root + Params.recordings_uploaded
-    uploader.P.root_mountpoint = Params.root_mountpoint
-    if Params.is_pi_camera_on:
+    if not os.path.exists(P.recordings_root):
+        os.makedirs(P.recordings_root)
+    if not os.path.exists(P.dir_recordings_uploaded):
+        os.makedirs(P.dir_recordings_uploaded)
+    if not os.path.exists(P.dir_recordings_safe):
+        os.makedirs(P.dir_recordings_safe)
+    if not os.path.exists(P.dir_pipe_out):
+        os.makedirs(P.dir_pipe_out)
+    uploader.P.root_folder = P.recordings_root
+    uploader.P.uploaded_folder = P.dir_recordings_uploaded
+    uploader.P.root_mountpoint = P.root_mountpoint
+    if P.is_pi_camera_on:
         _pi_init()
-    if Params.is_usb_camera_on:
+    if P.is_usb_camera_on:
         _usb_init()
     initialised = True
 
 
 def thread_run():
     try:
-        if Params.is_pi_camera_on:
-            if Params.is_recording_pi:
+        if P.is_pi_camera_on:
+            if P.is_recording_pi:
                 _pi_record_loop()
             else:
                 print("Starting PI camera, should have been on")
                 _pi_init()
-        if Params.is_usb_camera_on:
-            if Params.is_recording_usb:
+        if P.is_usb_camera_on:
+            if P.is_recording_usb:
                 _usb_record_loop()
             else:
                 print("Starting USB camera, should have been on")
@@ -319,8 +322,8 @@ def thread_run():
 
 if __name__ == '__main__':
     _run_ffmpeg_usb()
-    if Params.ffmpeg_usb._child_created:
-        Params.is_recording_usb = True
+    if P.ffmpeg_usb._child_created:
+        P.is_recording_usb = True
         print("Recording started")
         #Params.ffmpeg_usb_out = NBSR(Params.ffmpeg_usb.stdout)
     else:
