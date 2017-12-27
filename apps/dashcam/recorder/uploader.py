@@ -147,7 +147,8 @@ def _clean_old(days_to_keep, folder):
 def _clean_space():
     days_keep = P.days_to_keep
     folder = P.uploaded_folder
-    while True:
+    keep_try = True
+    while keep_try:
         for parti in disk_partitions():
             if parti.mountpoint == P.root_mountpoint:
                 usage = disk_usage(parti.mountpoint).percent
@@ -164,7 +165,10 @@ def _clean_space():
                             folder = P.root_folder
                         else:
                             print('Something is wrong, cannot free up more space!')
+                            keep_try = False
+                            break
                 else:
+                    keep_try = False
                     break
 
 
