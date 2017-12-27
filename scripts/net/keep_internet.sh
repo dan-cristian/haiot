@@ -121,19 +121,23 @@ function loop
 while :
 do
     have_internet
-done
-}
-
-if [ ! -f /tmp/haveinternet ]; then
+    if [ ! -f /tmp/haveinternet ]; then
     ifconfig | grep ppp0
     if [ $? -eq 1 ]; then
-        killall wvdial
+        echo "No ppp0 interface detected, starting wvdial"
+        killall -q wvdial
         /usr/bin/wvdial &
     else
         echo "Restarting ppp"
-        killall pppd
-        killall wvdial
+        killall -q pppd
+        killall -q wvdial
         /usr/bin/wvdial &
     fi
+    sleep 5
 fi
 
+done
+}
+
+echo "Keep_internet service started, looping"
+loop
