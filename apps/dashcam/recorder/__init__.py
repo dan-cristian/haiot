@@ -130,7 +130,7 @@ def _kill_proc(keywords):
 
 
 def _recover_usb():
-    src = P.recordings_root + P.usb_out_filepath_err
+    src = P.usb_out_filepath_err
     # make a copy for debug
     print('Copy usb output file for debug')
     shutil.copy(src, src + '.' + str(time.time()))
