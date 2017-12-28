@@ -26,7 +26,7 @@ if [ $exit_code == 128 ]; then
     fi
 
 while $must_run; do
-    if [[ "$@" == "standalone" ]]; then
+    if [[ ! "${@#standalone}" = "$@" ]]; then
         echo "Standalone mode, deleting db"
         rm /var/ram/database.db
     fi
@@ -66,7 +66,7 @@ stop() {
 }
 
 START_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-echo "Current dir on start is $START_DIR, script start parameters are: " $1 $2 $3 $4 $5 $6 $7 $8 $9
+echo "Current dir on start is $START_DIR, script start parameters are: " $@
 DIR=~/PYC
 echo "Base dir is $DIR"
 
