@@ -8,7 +8,7 @@ pppdns1=`cat /etc/ppp/resolv.conf | awk '/nameserver/ {print $2}' | awk 'NR == 1
 pppdns2=`cat /etc/ppp/resolv.conf | awk '/nameserver/ {print $2}' | awk 'NR == 2 {print; exit}'`
 checkdomain=google.com
 pcount=2
-timeout=5
+timeout=10
 ENABLE_WIFI=1
 ENABLE_3G=1
 IF_3G=ppp0
@@ -125,7 +125,7 @@ function have_if {
     out=`ifconfig ${IF} | grep "inet "`
     if [ $? == 0 ]; then
         arr=(`echo ${out}`)
-        echo "I have ${IF}, ip is " ${arr[1]}
+        #echo "I have ${IF}, ip is " ${arr[1]}
         if [ ${arr[4]} == "destination" ]; then
             gw=${arr[5]}
             #dns1=${pppdns1}
@@ -141,7 +141,7 @@ function have_if {
                 echo "Unexpected empty outcome"
             fi
         fi
-        echo "${IF} gateway is " ${gw}
+        #echo "${IF} gateway is " ${gw}
         pingnet ${checkdomain} ${IF}
         if [ $? == 0 ]; then
             touch ${TOUCH}
