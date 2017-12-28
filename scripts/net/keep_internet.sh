@@ -4,8 +4,10 @@
 
 GW=`/sbin/ip route | awk '/default/ { print $3 }'`
 checkdns=`cat /etc/resolv.conf | awk '/nameserver/ {print $2}' | awk 'NR == 1 {print; exit}'`
+pppdns=`cat /etc/ppp/resolv.conf | awk '/nameserver/ {print $2}' | awk 'NR == 1 {print; exit}'`
 checkdomain=google.com
 pcount=2
+timeout=4
 ENABLE_WIFI=1
 ENABLE_3G=1
 IF_3G=ppp0
@@ -17,12 +19,14 @@ TOUCH_HAVE_3G=/tmp/have3g
 
 function portscan
 {
+  host=$1
+  port=$2
   #echo "Starting port scan of $checkdomain port 80"
-  if nc -zw1 -w 5 $checkdomain 80; then
+  if nc -zw1 -w ${timeout} ${host} ${port}; then
     #echo "Port scan good, $checkdomain port 80 available"
     return 0
   else
-    echo "Port scan of $checkdomain port 80 failed."
+    echo "Port scan of ${host}:${port} failed."
     return 1
   fi
 }
@@ -31,7 +35,7 @@ function pingnet
 {
   #Google has the most reliable host name. Feel free to change it.
   echo "Pinging $1 to check for internet connection." && echo
-  ping $1 -c $pcount
+  ping $1 -c ${pcount} -W ${timeout}
 
   if [ $? -eq 0 ]
     then
@@ -50,7 +54,7 @@ function pingdns
 {
   #Grab first DNS server from /etc/resolv.conf
   echo "Pinging first DNS server in resolv.conf ($checkdns) to check name resolution" && echo
-  ping $checkdns -c $pcount
+  ping $checkdns -c ${pcount} -W ${timeout}
     if [ $? -eq 0 ]
     then
       echo && echo "$checkdns pingable. Proceeding with domain check."
@@ -81,7 +85,7 @@ function checkgw
         echo "There is no gateway. Probably disconnected..."
     #    exit 1
     fi
-    ping $GW -c $pcount
+    ping ${GW} -c ${pcount} -W ${timeout}
     return $?
 }
 
@@ -107,7 +111,7 @@ function debug {
       echo && echo "LAN Gateway pingable. Proceeding with internet connectivity check."
       pingdns
       pingnet $checkdomain
-      portscan
+      portscan $checkdomain 80
       httpreq
       echo > /tmp/haveinternet
       return 0
@@ -115,7 +119,7 @@ function debug {
       echo && echo "Something is wrong with LAN (Gateway unreachable)"
       pingdns
       pingnet $checkdomain
-      portscan
+      portscan $checkdomain 80
       httpreq
       #  exit 1
     fi
@@ -137,6 +141,7 @@ function have_if {
         echo "I have ${IF}, ip is " ${arr[1]}
         if [ ${arr[4]} == "destination" ]; then
             gw=${arr[5]}
+            dns=${pppdns}
         else
             out=`route -n | grep ${IF} | grep U`
             if [ $? == 0 ]; then
@@ -153,7 +158,15 @@ function have_if {
             chmod 777 ${TOUCH}
             return 0
         else
-            echo "Gateway ${gw} not responding to ping"
+            echo "Gateway ${gw} not responding to ping, trying DNS scan ${dns}"
+            portscan ${dns} 53
+            if [ $? == 0 ]; then
+                touch ${TOUCH}
+                chmod 777 ${TOUCH}
+                return 0
+            else
+                echo "DNS not responding as well, no internet connectivity via interface ${IF}"
+            fi
         fi
     fi
     if [ -f ${TOUCH} ]; then
@@ -183,12 +196,12 @@ do
     have_if ${IF_WIFI} ${TOUCH_HAVE_WLAN}
     have_if ${IF_3G} ${TOUCH_HAVE_3G}
 
-    if [ ${ENABLE_WIFI} == 1 ] && [! -f ${TOUCH_HAVE_WLAN} ]; then
+    if [ ${ENABLE_WIFI} == 1 ] && [ ! -f ${TOUCH_HAVE_WLAN} ]; then
         restart_wifi
     fi
 
-    if [ ${ENABLE_3G} == 1 ] && [! -f ${TOUCH_HAVE_3G} ]; then
-        restart_wifi
+    if [ ${ENABLE_3G} == 1 ] && [ ! -f ${TOUCH_HAVE_3G} ]; then
+        restart_3g
     fi
 
     sleep 5
