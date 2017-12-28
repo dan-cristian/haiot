@@ -43,7 +43,7 @@ function pingnet
       #Insert any command you like here
       return 0
     else
-      echo && echo "Could not establish internet connection. Something may be wrong here." >&2
+      echo && echo "Could not establish internet connection in pingnet. Something may be wrong here." >&2
       return 1
       #Insert any command you like here
 #      exit 1
@@ -161,6 +161,7 @@ function have_if {
             echo "Gateway ${gw} not responding to ping, trying DNS scan ${dns}"
             portscan ${dns} 53
             if [ $? == 0 ]; then
+                echo "DNS ${dns} responded to scan"
                 touch ${TOUCH}
                 chmod 777 ${TOUCH}
                 return 0
@@ -177,6 +178,7 @@ function have_if {
 
 
 function restart_wifi {
+    echo "Restarting wifi"
     ifconfig ${IF_WIFI} up
 }
 
