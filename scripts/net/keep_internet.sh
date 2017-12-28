@@ -4,10 +4,11 @@
 
 GW=`/sbin/ip route | awk '/default/ { print $3 }'`
 checkdns=`cat /etc/resolv.conf | awk '/nameserver/ {print $2}' | awk 'NR == 1 {print; exit}'`
-pppdns=`cat /etc/ppp/resolv.conf | awk '/nameserver/ {print $2}' | awk 'NR == 1 {print; exit}'`
+pppdns1=`cat /etc/ppp/resolv.conf | awk '/nameserver/ {print $2}' | awk 'NR == 1 {print; exit}'`
+pppdns2=`cat /etc/ppp/resolv.conf | awk '/nameserver/ {print $2}' | awk 'NR == 2 {print; exit}'`
 checkdomain=google.com
 pcount=2
-timeout=4
+timeout=5
 ENABLE_WIFI=1
 ENABLE_3G=1
 IF_3G=ppp0
@@ -141,12 +142,15 @@ function have_if {
         echo "I have ${IF}, ip is " ${arr[1]}
         if [ ${arr[4]} == "destination" ]; then
             gw=${arr[5]}
-            dns=${pppdns}
+            dns1=${pppdns1}
+            dns2=${pppdns2}
         else
             out=`route -n | grep ${IF} | grep U`
             if [ $? == 0 ]; then
                 arr=(`echo ${out}`)
                 gw=${arr[1]}
+                dns1=${checkdns}
+                dns2=""
             else
                 echo "Unexpected empty outcome"
             fi
@@ -158,10 +162,16 @@ function have_if {
             chmod 777 ${TOUCH}
             return 0
         else
-            echo "Gateway ${gw} not responding to ping, trying DNS scan ${dns}"
-            portscan ${dns} 53
-            if [ $? == 0 ]; then
-                echo "DNS ${dns} responded to scan"
+            echo "Gateway ${gw} not responding to ping, trying DNS scan ${dns1}"
+            portscan ${dns1} 53
+            res=$?
+            if [ ${res} != 0 ]; then
+                echo "First DNS not responding to scan, trying 2nd DNS scan ${dns2}"
+                portscan ${dns2} 53
+                res=$?
+            fi
+            if [ ${res} == 0 ]; then
+                echo "DNS responded to scan"
                 touch ${TOUCH}
                 chmod 777 ${TOUCH}
                 return 0
