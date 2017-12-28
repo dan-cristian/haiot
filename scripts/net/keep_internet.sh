@@ -6,6 +6,13 @@ GW=`/sbin/ip route | awk '/default/ { print $3 }'`
 checkdns=`cat /etc/resolv.conf | awk '/nameserver/ {print $2}' | awk 'NR == 1 {print; exit}'`
 checkdomain=google.com
 pcount=2
+ENABLE_WIFI=1
+ENABLE_3G=1
+IF_3G=ppp0
+IF_WIFI=wlan0
+TOUCH_HAVE_INTERNET=/tmp/haveinternet
+TOUCH_HAVE_WLAN=/tmp/havewlan
+TOUCH_HAVE_3G=/tmp/have3g
 #some functions
 
 function portscan
@@ -23,15 +30,17 @@ function portscan
 function pingnet
 {
   #Google has the most reliable host name. Feel free to change it.
-  echo "Pinging $checkdomain to check for internet connection." && echo
-  ping $checkdomain -c $pcount
+  echo "Pinging $1 to check for internet connection." && echo
+  ping $1 -c $pcount
 
   if [ $? -eq 0 ]
     then
-      echo && echo "$checkdomain pingable. Internet connection is most probably available."&& echo
+      echo && echo "$1 pingable. Internet connection is most probably available."&& echo
       #Insert any command you like here
+      return 0
     else
       echo && echo "Could not establish internet connection. Something may be wrong here." >&2
+      return 1
       #Insert any command you like here
 #      exit 1
   fi
@@ -94,7 +103,7 @@ function debug {
     then
       echo && echo "LAN Gateway pingable. Proceeding with internet connectivity check."
       pingdns
-      pingnet
+      pingnet $checkdomain
       portscan
       httpreq
       echo > /tmp/haveinternet
@@ -102,7 +111,7 @@ function debug {
     else
       echo && echo "Something is wrong with LAN (Gateway unreachable)"
       pingdns
-      pingnet
+      pingnet $checkdomain
       portscan
       httpreq
       #  exit 1
@@ -116,12 +125,47 @@ function have_internet_no_traffic
     return 0
 }
 
+function have_if {
+    IF=$1
+    TOUCH=$2
+    out=`ifconfig ${IF} | grep "inet "`
+    if [ $? == 0 ]; then
+        arr=(`echo ${out}`)
+        echo "I have ${IF}, ip is " ${arr[1]}
+        if [ ${arr[4]} == "destination" ]; then
+            gw=${arr[5]}
+        else
+            out=`route -n | grep ${IF} | grep U`
+            if [ $? == 0 ]; then
+                arr=(`echo ${out}`)
+                gw=${arr[1]}
+            else
+                echo "Unexpected empty outcome"
+            fi
+        fi
+        echo "${IF} gateway is " ${gw}
+        pingnet ${gw}
+        if [ $? == 0 ]; then
+            touch ${TOUCH}
+            return 0
+        else
+            echo "Gateway ${gw} not responding to ping"
+        fi
+    fi
+    rm ${TOUCH}
+    return 1
+}
+
+
 function loop
 {
 while :
 do
     have_internet
-    if [ ! -f /tmp/haveinternet ]; then
+    have_if ${IF_WIFI} ${TOUCH_HAVE_WLAN}
+    have_if ${IF_3G} ${TOUCH_HAVE_3G}
+
+    if [ ! -f ${TOUCH_HAVE_INTERNET} ]; then
         ifconfig | grep ppp0
         if [ $? -eq 1 ]; then
             echo "No ppp0 interface detected, starting wvdial"
@@ -139,5 +183,6 @@ fi
 done
 }
 
-echo "Keep_internet service started, looping"
+echo "Keep_internet service started with params=" $@
 loop
+
