@@ -1080,6 +1080,7 @@ exit 0
     cp $HAIOT_DIR/scripts/net/keep_internet.service /lib/systemd/system/
     systemctl enable keep_internet.service
     systemctl start keep_internet.service
+    echo "defaultroute" >> /etc/ppp/options
 fi
 
 echo "Optimise for flash and ssd usage"
