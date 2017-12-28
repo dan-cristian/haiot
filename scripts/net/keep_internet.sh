@@ -38,7 +38,7 @@ function pingnet
   #echo "Pinging $1 to check for internet connection." && echo
   host=$1
   if=$2
-  ping $1 -c ${pcount} -W ${timeout} -q -I ${if}
+  ping $1 -c ${pcount} -W ${timeout} -q -I ${if} > /dev/null
 
   if [ $? -eq 0 ]
     then
