@@ -92,7 +92,7 @@ function checkgw
 function have_internet
 {
     #echo "Fast check for HTTPS connectivity" && echo
-    if portscan; then
+    if portscan ${checkdomain} 80; then
         touch ${TOUCH_HAVE_INTERNET}
         chmod 777 ${TOUCH_HAVE_INTERNET}
         return 0;
