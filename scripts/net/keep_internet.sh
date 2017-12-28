@@ -93,7 +93,9 @@ function have_internet
         chmod 777 ${TOUCH_HAVE_INTERNET}
         return 0;
     fi
-    rm ${TOUCH_HAVE_INTERNET}
+    if [ -f ${TOUCH_HAVE_INTERNET} ]; then
+        rm ${TOUCH_HAVE_INTERNET}
+    fi
     return 1
 }
 
@@ -154,8 +156,22 @@ function have_if {
             echo "Gateway ${gw} not responding to ping"
         fi
     fi
-    rm ${TOUCH}
+    if [ -f ${TOUCH} ]; then
+        rm ${TOUCH}
+    fi
     return 1
+}
+
+
+function restart_wifi {
+    ifconfig ${IF_WIFI} up
+}
+
+function restart_3g {
+    echo "Restarting ppp"
+    killall -q -v pppd
+    killall -q -v wvdial
+    /usr/bin/wvdial &
 }
 
 
@@ -167,21 +183,15 @@ do
     have_if ${IF_WIFI} ${TOUCH_HAVE_WLAN}
     have_if ${IF_3G} ${TOUCH_HAVE_3G}
 
-    if [ ! -f ${TOUCH_HAVE_INTERNET} ]; then
-        ifconfig | grep ppp0
-        if [ $? -eq 1 ]; then
-            echo "No ppp0 interface detected, starting wvdial"
-            killall -q -v wvdial
-            /usr/bin/wvdial &
-        else
-            echo "Restarting ppp"
-            killall -q -v pppd
-            killall -q -v wvdial
-            /usr/bin/wvdial &
+    if [ ${ENABLE_WIFI} == 1 ] && [! -f ${TOUCH_HAVE_WLAN} ]; then
+        restart_wifi
     fi
-    sleep 5
-fi
 
+    if [ ${ENABLE_3G} == 1 ] && [! -f ${TOUCH_HAVE_3G} ]; then
+        restart_wifi
+    fi
+
+    sleep 5
 done
 }
 
