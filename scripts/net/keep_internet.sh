@@ -89,10 +89,11 @@ function have_internet
 {
     #echo "Fast check for HTTPS connectivity" && echo
     if portscan; then
-        echo > /tmp/haveinternet
+        touch ${TOUCH_HAVE_INTERNET}
+        chmod 777 ${TOUCH_HAVE_INTERNET}
         return 0;
     fi
-    rm /tmp/haveinternet
+    rm ${TOUCH_HAVE_INTERNET}
     return 1
 }
 
@@ -147,6 +148,7 @@ function have_if {
         pingnet ${gw}
         if [ $? == 0 ]; then
             touch ${TOUCH}
+            chmod 777 ${TOUCH}
             return 0
         else
             echo "Gateway ${gw} not responding to ping"
@@ -183,6 +185,6 @@ fi
 done
 }
 
-echo "Keep_internet service started with params=" $@
+echo "Keep_internet service started with params=${@}"
 loop
 
