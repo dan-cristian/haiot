@@ -36,7 +36,9 @@ function pingnet
 {
   #Google has the most reliable host name. Feel free to change it.
   #echo "Pinging $1 to check for internet connection." && echo
-  ping $1 -c ${pcount} -W ${timeout} -q
+  host=$1
+  if=$2
+  ping $1 -c ${pcount} -W ${timeout} -q -I ${if}
 
   if [ $? -eq 0 ]
     then
@@ -94,16 +96,16 @@ function debug {
     if [ $? -eq 0 ]
     then
       echo && echo "LAN Gateway pingable. Proceeding with internet connectivity check."
-      pingnet $checkdns
-      pingnet $checkdomain
+      pingnet $checkdns $IF_WIFI
+      pingnet $checkdomain $IF_WIFI
       portscan $checkdomain 80
       httpreq
       echo > /tmp/haveinternet
       return 0
     else
       echo && echo "Something is wrong with LAN (Gateway unreachable)"
-      pingnet $checkdns
-      pingnet $checkdomain
+      pingnet $checkdns $IF_WIFI
+      pingnet $checkdomain $IF_WIFI
       portscan $checkdomain 80
       httpreq
       #  exit 1
@@ -126,42 +128,43 @@ function have_if {
         echo "I have ${IF}, ip is " ${arr[1]}
         if [ ${arr[4]} == "destination" ]; then
             gw=${arr[5]}
-            dns1=${pppdns1}
-            dns2=${pppdns2}
+            #dns1=${pppdns1}
+            #dns2=${pppdns2}
         else
             out=`route -n | grep ${IF} | grep U`
             if [ $? == 0 ]; then
                 arr=(`echo ${out}`)
                 gw=${arr[1]}
-                dns1=${checkdns}
-                dns2=""
+                #dns1=${checkdns}
+                #dns2=""
             else
                 echo "Unexpected empty outcome"
             fi
         fi
         echo "${IF} gateway is " ${gw}
-        pingnet ${gw}
+        pingnet ${checkdomain} ${IF}
         if [ $? == 0 ]; then
             touch ${TOUCH}
             chmod 777 ${TOUCH}
             return 0
         else
-            echo "Gateway ${gw} not responding to ping, trying DNS scan ${dns1}"
-            portscan ${dns1} 53
-            res=$?
-            if [ ${res} != 0 ]; then
-                echo "First DNS not responding to scan, trying 2nd DNS scan ${dns2}"
-                portscan ${dns2} 53
-                res=$?
-            fi
-            if [ ${res} == 0 ]; then
-                echo "DNS responded to scan"
-                touch ${TOUCH}
-                chmod 777 ${TOUCH}
-                return 0
-            else
-                echo "DNS not responding as well, no internet connectivity via interface ${IF}"
-            fi
+            echo "${checkdomain} not responding to ping"
+            #portscan ${dns1} 53
+            #res=$?
+            #if [ ${res} != 0 ]; then
+            #    echo "First DNS not responding to scan, trying 2nd DNS scan ${dns2}"
+            #    portscan ${dns2} 53
+            #    res=$?
+            #fi
+
+            #if [ ${res} == 0 ]; then
+            #    echo "DNS responded to scan"
+            #    touch ${TOUCH}
+            #    chmod 777 ${TOUCH}
+            #    return 0
+            #else
+            #    echo "DNS not responding as well, no internet connectivity via interface ${IF}"
+            #fi
         fi
     fi
     if [ -f ${TOUCH} ]; then
