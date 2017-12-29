@@ -29,35 +29,38 @@ def init_solar_aps():
 def thread_solar_aps_run():
     global __start_keyword, __end_keyword, _initialised_solar_aps
     if variable.NODE_THIS_IS_MASTER_OVERALL:
-        production = utils.parse_http(model_helper.get_param(Constant.P_SOLAR_APS_LOCAL_URL),
-                                      __start_keyword, __end_keyword)
-        last_power = utils.parse_http(model_helper.get_param(Constant.P_SOLAR_APS_LOCAL_URL),
-                                      __start_keyword_now, __end_keyword_now)
-        if production is not None:
-            production = float(production)
-            utility_name = model_helper.get_param(Constant.P_SOLAR_UTILITY_NAME)
-            record = models.Utility()
-            record.utility_name = utility_name
-            current_record = models.Utility.query.filter_by(utility_name=utility_name).first()
-            if current_record is not None:
-                if current_record.units_total is None:
-                    record.units_delta = 0
+        try:
+            production = utils.parse_http(model_helper.get_param(Constant.P_SOLAR_APS_LOCAL_URL),
+                                          __start_keyword, __end_keyword)
+            last_power = utils.parse_http(model_helper.get_param(Constant.P_SOLAR_APS_LOCAL_URL),
+                                          __start_keyword_now, __end_keyword_now)
+            if production is not None:
+                production = float(production)
+                utility_name = model_helper.get_param(Constant.P_SOLAR_UTILITY_NAME)
+                record = models.Utility()
+                record.utility_name = utility_name
+                current_record = models.Utility.query.filter_by(utility_name=utility_name).first()
+                if current_record is not None:
+                    if current_record.units_total is None:
+                        record.units_delta = 0
+                    else:
+                        record.units_delta = production - current_record.units_total
+                        if record.units_delta == 0:
+                            # do not waste db space if no power generated
+                            return
+                    record.units_total = production
+                    record.unit_name = current_record.unit_name
+                    record.units_2_delta = last_power
+                    record.unit_2_name = current_record.unit_2_name
                 else:
-                    record.units_delta = production - current_record.units_total
-                    if record.units_delta == 0:
-                        # do not waste db space if no power generated
-                        return
-                record.units_total = production
-                record.unit_name = current_record.unit_name
-                record.units_2_delta = last_power
-                record.unit_2_name = current_record.unit_2_name
-            else:
-                record.units_delta = production
-                record.units_total = production
-            if current_record.unit_cost is None:
-                current_record.unit_cost = 0.0
-            record.cost = 1.0 * record.units_delta * current_record.unit_cost
-            record.save_changed_fields(current_record=current_record, new_record=record, debug=False,
-                                       notify_transport_enabled=True, save_to_graph=True, save_all_fields=True)
+                    record.units_delta = production
+                    record.units_total = production
+                if current_record.unit_cost is None:
+                    current_record.unit_cost = 0.0
+                record.cost = 1.0 * record.units_delta * current_record.unit_cost
+                record.save_changed_fields(current_record=current_record, new_record=record, debug=False,
+                                           notify_transport_enabled=True, save_to_graph=True, save_all_fields=True)
+        except Exception, ex:
+            Log.logger.warning("Got exception on solar thread run, ex={}".format(ex))
 
 
