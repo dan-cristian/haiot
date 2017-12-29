@@ -234,7 +234,7 @@ function loop
 {
 while :
 do
-    have_internet
+    set_default_route ${IF_WIFI}
 
     if [ ${ENABLE_WIFI} == 1 ]; then
         have_if ${IF_WIFI} ${TOUCH_HAVE_WLAN}
@@ -263,6 +263,9 @@ do
             echo "3G modem not detected"
         fi
     fi
+
+    have_internet
+
     sleep 30
 done
 }
