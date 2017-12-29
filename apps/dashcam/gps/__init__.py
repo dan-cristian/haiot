@@ -77,7 +77,7 @@ def _upload_buffer():
                 print("Unexpected response {}".format(resp))
         except Exception, ex:
             print("Unable to upload position, err={}".format(ex))
-            State.url_buffer.append(url)
+            #State.url_buffer.append(url)
             print("Buffer has {} elements".format(len(State.url_buffer)))
     if initial - len(State.url_buffer) > 1:
         print("Buffer catches up, now has {} elements".format(len(State.url_buffer)))
@@ -96,6 +96,7 @@ def init():
         initialised = True
     except Exception, ex:
         print("Unable to connect to gps daemon, ex={}".format(ex))
+        initialised = False
 
 
 def thread_run():
