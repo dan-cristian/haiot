@@ -22,6 +22,8 @@ TOUCH_HAVE_WLAN=/tmp/havewlan
 TOUCH_HAVE_3G=/tmp/have3g
 MODEM_3G_KEYWORD='ZTE WCDMA'
 DHCP_DEBUG_FILE=/tmp/dhclient-script.debug
+GW_WLAN=""
+GW_3G=""
 #some functions
 
 function portscan
@@ -44,7 +46,7 @@ function pingnet
   #echo "Pinging $1 to check for internet connection." && echo
   host=$1
   if=$2
-  ping $1 -c ${pcount} -W ${timeout} -q -I ${if} > /dev/null
+  ping ${host} -c ${pcount} -W ${timeout} -q -I ${if} > /dev/null
 
   if [ $? -eq 0 ]
     then
@@ -59,6 +61,23 @@ function pingnet
   fi
 }
 
+function ping_via_gw {
+    if=$1
+    gw=$2
+    line=`getent ahostsv4 ${checkdomain} | head -1`
+    host=${line%  *}
+    route add -host ${host} gw ${gw}
+    ping ${host} -c ${pcount} -W ${timeout} -q -I ${if} > /dev/null
+    res=$?
+    route del -host ${host}
+    if [ ${res} -eq 0 ]; then
+        return 0
+    else
+        return 1
+    fi
+
+}
+
 function httpreq
 {
   #echo && echo "Checking for HTTP Connectivity"
@@ -70,17 +89,6 @@ function httpreq
 #  exit 0
 }
 
-function checkgw
-{
-    #Ping gateway first to verify connectivity with LAN
-    #echo "Pinging gateway ($GW) to check for LAN connectivity" && echo;
-    if [ "$GW" = "" ]; then
-        echo "There is no gateway. Probably disconnected..."
-    #    exit 1
-    fi
-    ping ${GW} -c ${pcount} -W ${timeout} -q
-    return $?
-}
 
 function have_internet
 {
@@ -97,29 +105,6 @@ function have_internet
 }
 
 
-function debug {
-    checkgw
-    if [ $? -eq 0 ]
-    then
-      echo && echo "LAN Gateway pingable. Proceeding with internet connectivity check."
-      pingnet $checkdns $IF_WIFI
-      pingnet $checkdomain $IF_WIFI
-      portscan $checkdomain 80
-      httpreq
-      echo > /tmp/haveinternet
-      return 0
-    else
-      echo && echo "Something is wrong with LAN (Gateway unreachable)"
-      pingnet $checkdns $IF_WIFI
-      pingnet $checkdomain $IF_WIFI
-      portscan $checkdomain 80
-      httpreq
-      #  exit 1
-    fi
-
-}
-
-
 function have_3g_modem {
     lsusb | grep -q "${MODEM_3G_KEYWORD}"
     if [ $? == 0 ]; then
@@ -131,19 +116,21 @@ function have_3g_modem {
 }
 
 function have_if {
-    IF=$1
-    TOUCH=$2
-    pingnet ${checkdomain} ${IF}
+    if=$1
+    touch=$2
+    gw=$3
+    #pingnet ${checkdomain} ${IF}
+    ping_via_gw ${if} ${gw}
     if [ $? == 0 ]; then
-        touch ${TOUCH}
-        chmod 777 ${TOUCH}
+        touch ${touch}
+        chmod 777 ${touch}
         return 0
     else
         echo "${checkdomain} not responding to ping"
     fi
 
-    if [ -f ${TOUCH} ]; then
-        rm ${TOUCH}
+    if [ -f ${touch} ]; then
+        rm ${touch}
     fi
     return 1
 }
@@ -193,11 +180,12 @@ function set_route_default {
     fi
 }
 
-function set_default_route_dhcp {
+function set_default_route_wlan {
     if=$1
     if [ -f ${DHCP_DEBUG_FILE} ]; then
         line=`grep -A 9 -B 1 ${if} ${DHCP_DEBUG_FILE} | tail -10 | grep new_routers`
         gw=${line##*=}
+        ${GW_WLAN}=${gw}
         echo "Got dhcp network ${gw} for interface ${if}"
         set_route_default ${if} ${gw}
     else
@@ -213,6 +201,7 @@ function set_default_route_ppp {
         arr=(`echo ${out}`)
         if [ ${arr[4]} == "destination" ]; then
             gw=${arr[5]}
+            ${GW_3G}=${gw}
             echo "Got destintion network ${gw} for interface ${if}"
             set_route_default ${if} ${gw}
             return 0
@@ -230,19 +219,19 @@ function loop
 while :
 do
     if [ ${ENABLE_WIFI} == 1 ]; then
-        have_if ${IF_WIFI} ${TOUCH_HAVE_WLAN}
+        have_if ${IF_WIFI} ${TOUCH_HAVE_WLAN} ${GW_WLAN}
         if [ ! -f ${TOUCH_HAVE_WLAN} ]; then
             restart_wifi
         else
             # set wlan as default gw
-            set_default_route_dhcp ${IF_WIFI}
+            set_default_route_wlan ${IF_WIFI}
         fi
     fi
 
     if [ ${ENABLE_3G} == 1 ]; then
         have_3g_modem
         if [ $? == 0 ]; then
-            have_if ${IF_3G} ${TOUCH_HAVE_3G}
+            have_if ${IF_3G} ${TOUCH_HAVE_3G} ${GW_3G}
             if [ ! -f ${TOUCH_HAVE_3G} ]; then
                 restart_3g
             else
