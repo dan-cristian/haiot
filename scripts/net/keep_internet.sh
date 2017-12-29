@@ -11,6 +11,10 @@ pcount=2
 timeout=10
 ENABLE_WIFI=1
 ENABLE_3G=1
+ENABLE_SSH_TUNNEL=1
+SSH_USER_HOST=haiot@www.dancristian.ro
+FWKNOCK_SSH_PROFILE=router
+FWKNOCK_CHECK_HOST=192.168.0.1
 IF_3G=ppp0
 IF_WIFI=wlan0
 TOUCH_HAVE_INTERNET=/tmp/haveinternet
@@ -126,6 +130,7 @@ function have_3g_modem {
         return 0
     else
         echo "3G modem ${MODEM_3G_KEYWORD} not found"
+        return 1
     fi
 }
 
@@ -186,37 +191,50 @@ function have_if {
 
 function restart_wifi {
     echo "Restarting wifi"
-    ifconfig ${IF_WIFI} up
+    #ifconfig ${IF_WIFI} up
 }
 
 function restart_3g {
     echo "Restarting ppp"
-    killall -q -v pppd
     killall -q -v wvdial
+    killall -q -v pppd
     /usr/bin/wvdial &
+    sleep 30
 }
 
+
+function start_ssh {
+    /usr/bin/fwknop -s -n ${FWKNOCK_SSH_PROFILE} --verbose
+    /usr/bin/ssh -N -R 9091:localhost:22 ${SSH_USER_HOST}
+
+}
 
 function loop
 {
 while :
 do
     have_internet
-    have_if ${IF_WIFI} ${TOUCH_HAVE_WLAN}
-    have_if ${IF_3G} ${TOUCH_HAVE_3G}
 
-    if [ ${ENABLE_WIFI} == 1 ] && [ ! -f ${TOUCH_HAVE_WLAN} ]; then
-        restart_wifi
-    fi
-
-    if [ ${ENABLE_3G} == 1 ] && [ ! -f ${TOUCH_HAVE_3G} ]; then
-        have_3g_modem
-        if [ $? == 0 ]; then
-            restart_3g
+    if [ ${ENABLE_WIFI} == 1 ]; then
+        have_if ${IF_WIFI} ${TOUCH_HAVE_WLAN}
+        if [ ! -f ${TOUCH_HAVE_WLAN} ]; then
+            restart_wifi
         fi
     fi
 
-    sleep 10
+    if [ ${ENABLE_3G} == 1 ]; then
+        have_3g_modem
+        if [ $? == 0 ]; then
+            have_if ${IF_3G} ${TOUCH_HAVE_3G}
+            if [ ! -f ${TOUCH_HAVE_3G} ]; then
+                restart_3g
+            fi
+        else
+            # restart 3G usb port?
+            echo "3G modem not detected"
+        fi
+    fi
+    sleep 30
 done
 }
 
