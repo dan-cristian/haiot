@@ -182,5 +182,8 @@ def init():
 
 def thread_run():
     global initialised, __serial
+    if not initialised:
+        init()
+
     if initialised and __serial is not None:
         __read_ups_status()
