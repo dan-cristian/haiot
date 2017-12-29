@@ -59,6 +59,7 @@ class P:
     usb_framerate = 8
     pi_camera = None
     pi_bitrate = 2000000
+    inactivity_duration = 300  # seconds from last event after which camera will turn off
     last_move_time = None
 
 
@@ -288,6 +289,15 @@ def _handle_event_alarm(zone_name, pin_connected):
     P.is_pi_camera_on = True
 
 
+def _set_camera_state():
+    now = datetime.datetime().now()
+    move_lapsed = (now - P.last_move_time).total_seconds()
+    if move_lapsed > P.inactivity_duration:
+        print("Stopping cameras as no activity in the last {} seconds".format(move_lapsed))
+        P.is_pi_camera_on = False
+        P.is_usb_camera_on = False
+
+
 def unload():
     global initialised
     _pi_stop()
@@ -319,6 +329,7 @@ def init():
 
 def thread_run():
     try:
+        _set_camera_state()
         if P.is_pi_camera_on:
             if P.is_recording_pi:
                 _pi_record_loop()
@@ -334,8 +345,10 @@ def thread_run():
                 _usb_init()
         if not P.is_pi_camera_on and P.is_recording_pi:
             print("Stopping PI recording")
+            _pi_stop()
         if not P.is_usb_camera_on and P.is_recording_usb:
             print("Stopping USB recording")
+            _usb_stop()
 
 
     except Exception, ex:
