@@ -206,8 +206,26 @@ function restart_3g {
 function start_ssh {
     /usr/bin/fwknop -s -n ${FWKNOCK_SSH_PROFILE} --verbose
     /usr/bin/ssh -N -R 9091:localhost:22 ${SSH_USER_HOST}
-
 }
+
+
+function set_default_route {
+    if=$1
+    set `grep -A 9 -B 1 ${if} dhclient-script.debug | tail -10 | grep new_routers`
+    gw=${new_routers}
+    echo "Got dhcp gateway ${gw} for interface ${if}"
+    #check if default gw not already set
+    out=`route -n | grep UG`
+    if [ $? == 0 ]; then
+        arr=(`echo ${out}`)
+        if [ ${gw} != ${arr[1]} ]; then
+            echo "Setting default gw to ${gw} for interface ${if}"
+            ip route del default
+            ip route add default via ${gw} dev ${if}
+        fi
+    fi
+}
+
 
 function loop
 {
@@ -219,6 +237,9 @@ do
         have_if ${IF_WIFI} ${TOUCH_HAVE_WLAN}
         if [ ! -f ${TOUCH_HAVE_WLAN} ]; then
             restart_wifi
+        else
+            # set wlan as default gw
+            set_wifi_default_route ${IF_WIFI}
         fi
     fi
 
@@ -228,6 +249,11 @@ do
             have_if ${IF_3G} ${TOUCH_HAVE_3G}
             if [ ! -f ${TOUCH_HAVE_3G} ]; then
                 restart_3g
+            else
+                # set 3g as default gw only if wlan is off
+                if [ ! -f ${TOUCH_HAVE_WLAN} ]; then
+                    set_wifi_default_route ${IF_3G}
+                fi
             fi
         else
             # restart 3G usb port?
