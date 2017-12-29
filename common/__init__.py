@@ -27,6 +27,7 @@ class Constant:
     SIGNAL_CHAT_NOTIFICATION = 'signal-chat-notification'
     SIGNAL_EMAIL_NOTIFICATION = 'signal-email-notification'
     SIGNAL_PRESENCE = 'signal-presence'
+    SIGNAL_ALARM='signal-alarm'
 
     PRESENCE_TYPE_CAM = 'cam'
     

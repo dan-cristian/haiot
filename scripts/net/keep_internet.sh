@@ -16,6 +16,7 @@ IF_WIFI=wlan0
 TOUCH_HAVE_INTERNET=/tmp/haveinternet
 TOUCH_HAVE_WLAN=/tmp/havewlan
 TOUCH_HAVE_3G=/tmp/have3g
+MODEM_3G_KEYWORD='ZTE WCDMA'
 #some functions
 
 function portscan
@@ -119,6 +120,15 @@ function have_internet_no_traffic
     return 0
 }
 
+function have_3g_modem {
+    lsusb | grep -q "${MODEM_3G_KEYWORD}"
+    if [ $? == 0 ]; then
+        return 0
+    else
+        echo "3G modem ${MODEM_3G_KEYWORD} not found"
+    fi
+}
+
 function have_if {
     IF=$1
     TOUCH=$2
@@ -200,7 +210,10 @@ do
     fi
 
     if [ ${ENABLE_3G} == 1 ] && [ ! -f ${TOUCH_HAVE_3G} ]; then
-        restart_3g
+        have_3g_modem
+        if [ $? == 0 ]; then
+            restart_3g
+        fi
     fi
 
     sleep 10

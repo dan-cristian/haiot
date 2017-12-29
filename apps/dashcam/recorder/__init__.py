@@ -7,6 +7,7 @@ import shutil
 import usb_tool
 import uploader
 import utils
+from pydispatch import dispatcher
 try:
     from common import Constant
 except Exception:
@@ -279,6 +280,10 @@ def _usb_stop():
             P.usb_out_err.close()
 
 
+def _handle_event_alarm(zone_name, pin_connected):
+    print("Got alarm in {} with pin connected {}".format(zone_name, pin_connected))
+
+
 def unload():
     global initialised
     _pi_stop()
@@ -304,6 +309,7 @@ def init():
         _pi_init()
     if P.is_usb_camera_on:
         _usb_init()
+    dispatcher.connect(_handle_event_alarm, signal=Constant.SIGNAL_ALARM, sender=dispatcher.Any)
     initialised = True
 
 

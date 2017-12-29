@@ -14,7 +14,7 @@ except Exception, ex:
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 
-class Params:
+class P:
     lastrecord = None
     #sensor = None
     calibration = None
@@ -22,6 +22,7 @@ class Params:
     urls = ('/', 'Index')
     web_thread = None
     web_app = None
+    stop_app = False
 
 
 class Raw:
@@ -70,7 +71,7 @@ class Raw:
 
 
 def _represent():
-    last = Params.lastrecord
+    last = P.lastrecord
     res = None
     try:
         res = json.dumps(last)
@@ -99,16 +100,17 @@ def calibrate():
 
 def _run_web_server():
     try:
-        Params.web_app = web.application(Params.urls, globals())
-        web.httpserver.runsimple(Params.web_app.wsgifunc(), ("0.0.0.0", Params.WEB_PORT))
+        P.web_app = web.application(P.urls, globals())
+        web.httpserver.runsimple(P.web_app.wsgifunc(), ("0.0.0.0", P.WEB_PORT))
     except Exception, ex:
         print ex
 
 
 def unload():
-    if Params.web_app is not None:
-        Params.web_app.stop()
-        Params.web_thread.join()
+    P.stop_app = True
+    if P.web_app is not None:
+        P.web_app.stop()
+    P.web_thread.join()
 
 
 def init():
@@ -117,10 +119,10 @@ def init():
     except Exception, ex:
         print ex
 
-    if Params.WEB_PORT != 0:
-        Params.web_thread = threading.Thread(target=_run_web_server)
-        Params.web_thread.name = 'WebAccel'
-        Params.web_thread.start()
+    if P.WEB_PORT != 0:
+        P.web_thread = threading.Thread(target=_run_web_server)
+        P.web_thread.name = 'WebAccel'
+        P.web_thread.start()
 
 
 def read_sensor():
@@ -135,7 +137,7 @@ def read_sensor():
         print ex
         sensor_all = [{'y': -0.49320554199218747, 'x': -9.528922607421874, 'z': 1.0414777221679687},
                       {'y': -0.8625954198473282, 'x': -3.0839694656488548, 'z': 0.7938931297709924}, 99]
-    Params.lastrecord = sensor_all
+    P.lastrecord = sensor_all
     return sensor_all
 
 
@@ -151,5 +153,5 @@ if __name__ == "__main__":
             thread_run()
             time.sleep(0.1)
     finally:
-        Params.web_app.stop()
-        Params.web_thread.join()
+        P.web_app.stop()
+        P.web_thread.join()

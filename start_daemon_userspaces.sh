@@ -26,7 +26,7 @@ if [ $exit_code == 128 ]; then
     fi
 
 while $must_run; do
-    if [[ ! "${@#standalone}" = "$@" ]]; then
+    if [[ ! "${@#standalone}" == "$@" ]]; then
         echo "Standalone mode, deleting db"
         rm /var/ram/database.db
     fi
