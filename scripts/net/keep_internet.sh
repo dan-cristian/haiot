@@ -144,7 +144,7 @@ function restart_wifi {
 }
 
 function restart_3g {
-    echo "Restarting ppp"
+    echo "Restarting 3g/ppp"
     killall -q -v wvdial
     killall -q -v pppd
     /usr/bin/wvdial &
@@ -206,6 +206,7 @@ function get_gw_3g {
             gw=${arr[5]}
             GW_3G=${gw}
             echo "Got destination network ${GW_3G} for interface ${if}"
+            return 0
         else
             echo "Could not find destination ip for ${if}"
         fi
