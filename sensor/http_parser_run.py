@@ -17,13 +17,16 @@ __end_keyword_now = ' W</td>'
 
 def init_solar_aps():
     global __start_keyword, __end_keyword, _initialised_solar_aps
-    production = utils.parse_http(model_helper.get_param(Constant.P_SOLAR_APS_LOCAL_URL),
-                                  __start_keyword, __end_keyword)
-    if production is not None and production is not '':
-        _initialised_solar_aps = True
-    else:
-        _initialised_solar_aps = False
-    return _initialised_solar_aps
+    try:
+        production = utils.parse_http(model_helper.get_param(Constant.P_SOLAR_APS_LOCAL_URL),
+                                      __start_keyword, __end_keyword)
+        if production is not None and production is not '':
+            _initialised_solar_aps = True
+        else:
+            _initialised_solar_aps = False
+        return _initialised_solar_aps
+    except Exception, ex:
+        Log.logger.warning("Unable to connect to aps solar server, ex={}".format(ex))
 
 
 def thread_solar_aps_run():
