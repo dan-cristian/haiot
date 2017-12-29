@@ -1,10 +1,7 @@
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
-import time
-import serial
 from main.logger_helper import Log
 from common import Constant, utils, variable
-import serial_common
 from main.admin import models, model_helper
 
 # APS SOLAR ECU LINK: http://192.168.0.10/cgi-bin/home
@@ -31,7 +28,10 @@ def init_solar_aps():
 
 def thread_solar_aps_run():
     global __start_keyword, __end_keyword, _initialised_solar_aps
-    if variable.NODE_THIS_IS_MASTER_OVERALL:
+    if not _initialised_solar_aps:
+        init_solar_aps()
+
+    if variable.NODE_THIS_IS_MASTER_OVERALL and _initialised_solar_aps:
         try:
             production = utils.parse_http(model_helper.get_param(Constant.P_SOLAR_APS_LOCAL_URL),
                                           __start_keyword, __end_keyword)
