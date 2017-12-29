@@ -113,6 +113,9 @@ function have_wlan_connected {
     else
         echo "${if} is not connected"
     fi
+    if [ -f ${TOUCH_HAVE_WLAN} ]; then
+        rm ${TOUCH_HAVE_WLAN}
+    fi
     return 1
 }
 
@@ -123,8 +126,11 @@ function have_3g_modem {
         return 0
     else
         echo "3G modem ${MODEM_3G_KEYWORD} not found"
-        return 1
     fi
+    if [ -f ${TOUCH_HAVE_3G} ]; then
+        rm ${TOUCH_HAVE_3G}
+    fi
+    return 1
 }
 
 function have_if {
