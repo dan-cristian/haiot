@@ -239,7 +239,7 @@ do
             restart_wifi
         else
             # set wlan as default gw
-            set_wifi_default_route ${IF_WIFI}
+            set_default_route ${IF_WIFI}
         fi
     fi
 
@@ -252,7 +252,7 @@ do
             else
                 # set 3g as default gw only if wlan is off
                 if [ ! -f ${TOUCH_HAVE_WLAN} ]; then
-                    set_wifi_default_route ${IF_3G}
+                    set_default_route ${IF_3G}
                 fi
             fi
         else
