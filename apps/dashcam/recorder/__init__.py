@@ -1,7 +1,7 @@
 import subprocess
 import os
 import time
-import datetime as dt
+import datetime
 import traceback
 import shutil
 import usb_tool
@@ -59,6 +59,7 @@ class P:
     usb_framerate = 8
     pi_camera = None
     pi_bitrate = 2000000
+    last_move_time = None
 
 
 def _get_win_cams():
@@ -194,7 +195,7 @@ def _usb_record_loop():
 
 def _pi_record_loop():
     if P.is_recording_pi:
-        P.pi_camera.annotate_text = dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        P.pi_camera.annotate_text = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         P.ffmpeg_pi.poll()
         if P.ffmpeg_pi.returncode is not None:
             print("PI record exit with code {}".format(P.ffmpeg_pi.returncode))
@@ -282,6 +283,9 @@ def _usb_stop():
 
 def _handle_event_alarm(zone_name, pin_connected):
     print("Got alarm in {} with pin connected {}".format(zone_name, pin_connected))
+    P.last_move_time = datetime.datetime.now()
+    P.is_usb_camera_on = True
+    P.is_pi_camera_on = True
 
 
 def unload():
@@ -328,6 +332,12 @@ def thread_run():
                 print("Starting USB camera, should have been on")
                 _recover_usb()
                 _usb_init()
+        if not P.is_pi_camera_on and P.is_recording_pi:
+            print("Stopping PI recording")
+        if not P.is_usb_camera_on and P.is_recording_usb:
+            print("Stopping USB recording")
+
+
     except Exception, ex:
         print "Error in recorder thread_run, ex={}".format(ex)
         print traceback.print_exc()
