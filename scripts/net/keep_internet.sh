@@ -52,7 +52,7 @@ function pingnet
       #Insert any command you like here
       return 0
     else
-      echo && echo "Could not establish internet connection in pingnet. Something may be wrong here." >&2
+      echo && echo "Could not establish internet connection in pingnet for ${if}." >&2
       return 1
       #Insert any command you like here
 #      exit 1
@@ -133,51 +133,15 @@ function have_3g_modem {
 function have_if {
     IF=$1
     TOUCH=$2
-    out=`ifconfig ${IF} | grep "inet "`
+    pingnet ${checkdomain} ${IF}
     if [ $? == 0 ]; then
-        arr=(`echo ${out}`)
-        #echo "I have ${IF}, ip is " ${arr[1]}
-        if [ ${arr[4]} == "destination" ]; then
-            gw=${arr[5]}
-            #dns1=${pppdns1}
-            #dns2=${pppdns2}
-        else
-            out=`route -n | grep ${IF} | grep U`
-            if [ $? == 0 ]; then
-                arr=(`echo ${out}`)
-                gw=${arr[1]}
-                #dns1=${checkdns}
-                #dns2=""
-            else
-                echo "Unexpected empty outcome"
-            fi
-        fi
-        #echo "${IF} gateway is " ${gw}
-        pingnet ${checkdomain} ${IF}
-        if [ $? == 0 ]; then
-            touch ${TOUCH}
-            chmod 777 ${TOUCH}
-            return 0
-        else
-            echo "${checkdomain} not responding to ping"
-            #portscan ${dns1} 53
-            #res=$?
-            #if [ ${res} != 0 ]; then
-            #    echo "First DNS not responding to scan, trying 2nd DNS scan ${dns2}"
-            #    portscan ${dns2} 53
-            #    res=$?
-            #fi
-
-            #if [ ${res} == 0 ]; then
-            #    echo "DNS responded to scan"
-            #    touch ${TOUCH}
-            #    chmod 777 ${TOUCH}
-            #    return 0
-            #else
-            #    echo "DNS not responding as well, no internet connectivity via interface ${IF}"
-            #fi
-        fi
+        touch ${TOUCH}
+        chmod 777 ${TOUCH}
+        return 0
+    else
+        echo "${checkdomain} not responding to ping"
     fi
+
     if [ -f ${TOUCH} ]; then
         rm ${TOUCH}
     fi
@@ -204,42 +168,74 @@ function start_ssh {
     /usr/bin/ssh -N -R 9091:localhost:22 ${SSH_USER_HOST}
 }
 
+#Kernel IP routing table
+#Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+#192.168.0.0     0.0.0.0         255.255.255.0   U     0      0        0 wlan0
 
-function set_default_route {
+#Kernel IP routing table
+#Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+#0.0.0.0         0.0.0.0         0.0.0.0         U     0      0        0 ppp0
+#10.64.64.64     0.0.0.0         255.255.255.255 UH    0      0        0 ppp0
+#192.168.0.0     0.0.0.0         255.255.255.0   U     0      0        0 wlan0
+
+function set_route_default {
+    if=$1
+    gw=$2
+    #check if default gw not already set
+    out=`route -n | grep 0.0.0.0 | head -1`
+    if [ $? == 0 ]; then
+        arr=(`echo ${out}`)
+        if [ "${gw}" != "${arr[1]}" ]; then
+            echo "Setting default gw to ${gw} for interface ${if}"
+            ip route del default
+            ip route add default via ${gw} dev ${if}
+        fi
+    fi
+}
+
+function set_default_route_dhcp {
     if=$1
     if [ -f ${DHCP_DEBUG_FILE} ]; then
         line=`grep -A 9 -B 1 ${if} ${DHCP_DEBUG_FILE} | tail -10 | grep new_routers`
         gw=${line##*=}
-        echo "Got dhcp gateway ${gw} for interface ${if}"
-        #check if default gw not already set
-        out=`route -n | grep UG`
-        if [ $? == 0 ]; then
-            arr=(`echo ${out}`)
-            if [ "${gw}" != "${arr[1]}" ]; then
-                echo "Setting default gw to ${gw} for interface ${if}"
-                ip route del default
-                ip route add default via ${gw} dev ${if}
-            fi
-        fi
+        echo "Got dhcp network ${gw} for interface ${if}"
+        set_route_default ${if} ${gw}
     else
         echo "DHCP debug file not found, activate it in /etc/dhcp/debug by setting RUN=Yes"
     fi
 }
 
 
+function set_default_route_ppp {
+    if=$1
+    out=`ifconfig ${if} | grep "inet "`
+    if [ $? == 0 ]; then
+        arr=(`echo ${out}`)
+        if [ ${arr[4]} == "destination" ]; then
+            gw=${arr[5]}
+            echo "Got destintion network ${gw} for interface ${if}"
+            set_route_default ${if} ${gw}
+            return 0
+        else
+            echo "Could not find destination ip for ${if}"
+        fi
+    else
+        echo "Could not find interface ${if}, is it active?"
+    fi
+    return 1
+}
+
 function loop
 {
 while :
 do
-    set_default_route ${IF_WIFI}
-
     if [ ${ENABLE_WIFI} == 1 ]; then
         have_if ${IF_WIFI} ${TOUCH_HAVE_WLAN}
         if [ ! -f ${TOUCH_HAVE_WLAN} ]; then
             restart_wifi
         else
             # set wlan as default gw
-            set_default_route ${IF_WIFI}
+            set_default_route_dhcp ${IF_WIFI}
         fi
     fi
 
@@ -252,7 +248,7 @@ do
             else
                 # set 3g as default gw only if wlan is off
                 if [ ! -f ${TOUCH_HAVE_WLAN} ]; then
-                    set_default_route ${IF_3G}
+                    set_default_route_ppp ${IF_3G}
                 fi
             fi
         else
