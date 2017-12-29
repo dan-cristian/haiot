@@ -73,6 +73,7 @@ function ping_via_gw {
     if [ ${res} -eq 0 ]; then
         return 0
     else
+        echo && echo "Could not establish internet connection in ping ${host} via gw ${gw} on ${if}" >&2
         return 1
     fi
 
@@ -189,7 +190,7 @@ function get_gw_wlan {
         line=`grep -A 9 -B 1 ${if} ${DHCP_DEBUG_FILE} | tail -10 | grep new_routers`
         gw=${line##*=}
         GW_WLAN=${gw//\'} #strip quotes
-        echo "Got dhcp network ${GW_WLAN} for interface ${if}"
+        #echo "Got dhcp network ${GW_WLAN} for interface ${if}"
         return 0
     else
         echo "DHCP debug file not found, activate it in /etc/dhcp/debug by setting RUN=Yes"
@@ -205,7 +206,7 @@ function get_gw_3g {
         if [ ${arr[4]} == "destination" ]; then
             gw=${arr[5]}
             GW_3G=${gw}
-            echo "Got destination network ${GW_3G} for interface ${if}"
+            #echo "Got destination network ${GW_3G} for interface ${if}"
             return 0
         else
             echo "Could not find destination ip for ${if}"
@@ -237,6 +238,8 @@ do
                 # set wlan as default gw
                 set_route_default ${IF_WIFI} ${GW_WLAN}
             fi
+        else
+            echo "Unable to check WLAN link"
         fi
     fi
 
@@ -260,6 +263,8 @@ do
                         set_route_default ${IF_3G} ${GW_3G}
                     fi
                 fi
+            else
+                echo "Unable to check 3G link"
             fi
         else
             # restart 3G usb port?
