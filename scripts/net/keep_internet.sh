@@ -180,21 +180,22 @@ function set_route_default {
     fi
 }
 
-function set_default_route_wlan {
+
+function get_gw_wlan {
     if=$1
     if [ -f ${DHCP_DEBUG_FILE} ]; then
         line=`grep -A 9 -B 1 ${if} ${DHCP_DEBUG_FILE} | tail -10 | grep new_routers`
         gw=${line##*=}
         ${GW_WLAN}=${gw}
         echo "Got dhcp network ${gw} for interface ${if}"
-        set_route_default ${if} ${gw}
+        return 0
     else
         echo "DHCP debug file not found, activate it in /etc/dhcp/debug by setting RUN=Yes"
     fi
+    return 1
 }
 
-
-function set_default_route_ppp {
+function get_gw_3g {
     if=$1
     out=`ifconfig ${if} | grep "inet "`
     if [ $? == 0 ]; then
@@ -203,8 +204,6 @@ function set_default_route_ppp {
             gw=${arr[5]}
             ${GW_3G}=${gw}
             echo "Got destintion network ${gw} for interface ${if}"
-            set_route_default ${if} ${gw}
-            return 0
         else
             echo "Could not find destination ip for ${if}"
         fi
@@ -214,30 +213,33 @@ function set_default_route_ppp {
     return 1
 }
 
+
 function loop
 {
 while :
 do
     if [ ${ENABLE_WIFI} == 1 ]; then
+        get_gw_wlan ${IF_WIFI}
         have_if ${IF_WIFI} ${TOUCH_HAVE_WLAN} ${GW_WLAN}
         if [ ! -f ${TOUCH_HAVE_WLAN} ]; then
             restart_wifi
         else
             # set wlan as default gw
-            set_default_route_wlan ${IF_WIFI}
+            set_route_default ${IF_WIFI} ${GW_WLAN}
         fi
     fi
 
     if [ ${ENABLE_3G} == 1 ]; then
         have_3g_modem
         if [ $? == 0 ]; then
+            get_gw_3g ${IF_3G}
             have_if ${IF_3G} ${TOUCH_HAVE_3G} ${GW_3G}
             if [ ! -f ${TOUCH_HAVE_3G} ]; then
                 restart_3g
             else
                 # set 3g as default gw only if wlan is off
                 if [ ! -f ${TOUCH_HAVE_WLAN} ]; then
-                    set_default_route_ppp ${IF_3G}
+                    set_route_default ${IF_3G} ${GW_3G}
                 fi
             fi
         else
