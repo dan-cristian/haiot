@@ -186,7 +186,7 @@ function get_gw_wlan {
     if [ -f ${DHCP_DEBUG_FILE} ]; then
         line=`grep -A 9 -B 1 ${if} ${DHCP_DEBUG_FILE} | tail -10 | grep new_routers`
         gw=${line##*=}
-        GW_WLAN=${gw}
+        GW_WLAN=${gw//\'} #strip quotes
         echo "Got dhcp network ${GW_WLAN} for interface ${if}"
         return 0
     else
