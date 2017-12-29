@@ -290,7 +290,7 @@ def _handle_event_alarm(zone_name, pin_connected):
 
 
 def _set_camera_state():
-    now = datetime.datetime().now()
+    now = datetime.datetime.now()
     move_lapsed = (now - P.last_move_time).total_seconds()
     if move_lapsed > P.inactivity_duration:
         print("Stopping cameras as no activity in the last {} seconds".format(move_lapsed))
@@ -319,6 +319,7 @@ def init():
     uploader.P.root_folder = P.recordings_root
     uploader.P.uploaded_folder = P.dir_recordings_uploaded
     uploader.P.root_mountpoint = P.root_mountpoint
+    P.last_move_time = datetime.datetime.now()
     if P.is_pi_camera_on:
         _pi_init()
     if P.is_usb_camera_on:
