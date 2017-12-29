@@ -186,8 +186,8 @@ function get_gw_wlan {
     if [ -f ${DHCP_DEBUG_FILE} ]; then
         line=`grep -A 9 -B 1 ${if} ${DHCP_DEBUG_FILE} | tail -10 | grep new_routers`
         gw=${line##*=}
-        ${GW_WLAN}=${gw}
-        echo "Got dhcp network ${gw} for interface ${if}"
+        GW_WLAN=${gw}
+        echo "Got dhcp network ${GW_WLAN} for interface ${if}"
         return 0
     else
         echo "DHCP debug file not found, activate it in /etc/dhcp/debug by setting RUN=Yes"
@@ -202,8 +202,8 @@ function get_gw_3g {
         arr=(`echo ${out}`)
         if [ ${arr[4]} == "destination" ]; then
             gw=${arr[5]}
-            ${GW_3G}=${gw}
-            echo "Got destintion network ${gw} for interface ${if}"
+            GW_3G=${gw}
+            echo "Got destination network ${GW_3G} for interface ${if}"
         else
             echo "Could not find destination ip for ${if}"
         fi
