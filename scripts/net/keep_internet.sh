@@ -21,6 +21,7 @@ TOUCH_HAVE_INTERNET=/tmp/haveinternet
 TOUCH_HAVE_WLAN=/tmp/havewlan
 TOUCH_HAVE_3G=/tmp/have3g
 MODEM_3G_KEYWORD='ZTE WCDMA'
+DHCP_DEBUG_FILE=/tmp/dhclient-script.debug
 #some functions
 
 function portscan
@@ -118,11 +119,6 @@ function debug {
 
 }
 
-# test internet connectivity without making traffic (via interface status etc)
-function have_internet_no_traffic
-{
-    return 0
-}
 
 function have_3g_modem {
     lsusb | grep -q "${MODEM_3G_KEYWORD}"
@@ -211,18 +207,22 @@ function start_ssh {
 
 function set_default_route {
     if=$1
-    set `grep -A 9 -B 1 ${if} dhclient-script.debug | tail -10 | grep new_routers`
-    gw=${new_routers}
-    echo "Got dhcp gateway ${gw} for interface ${if}"
-    #check if default gw not already set
-    out=`route -n | grep UG`
-    if [ $? == 0 ]; then
-        arr=(`echo ${out}`)
-        if [ ${gw} != ${arr[1]} ]; then
-            echo "Setting default gw to ${gw} for interface ${if}"
-            ip route del default
-            ip route add default via ${gw} dev ${if}
+    if [ -f ${DHCP_DEBUG_FILE} ]; then
+        set `grep -A 9 -B 1 ${if} ${DHCP_DEBUG_FILE} | tail -10 | grep new_routers`
+        gw=${new_routers}
+        echo "Got dhcp gateway ${gw} for interface ${if}"
+        #check if default gw not already set
+        out=`route -n | grep UG`
+        if [ $? == 0 ]; then
+            arr=(`echo ${out}`)
+            if [ ${gw} != ${arr[1]} ]; then
+                echo "Setting default gw to ${gw} for interface ${if}"
+                ip route del default
+                ip route add default via ${gw} dev ${if}
+            fi
         fi
+    else
+        echo "DHCP debug file not found, activate it in /etc/dhcp/debug by setting RUN=Yes"
     fi
 }
 
