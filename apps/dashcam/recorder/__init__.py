@@ -292,7 +292,7 @@ def _handle_event_alarm(zone_name, pin_connected):
 def _set_camera_state():
     now = datetime.datetime.now()
     move_lapsed = (now - P.last_move_time).total_seconds()
-    if move_lapsed > P.inactivity_duration:
+    if (move_lapsed > P.inactivity_duration) and (P.is_recording_usb or P.is_recording_pi):
         print("Stopping cameras as no activity in the last {} seconds".format(move_lapsed))
         P.is_pi_camera_on = False
         P.is_usb_camera_on = False
