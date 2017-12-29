@@ -208,11 +208,8 @@ function start_ssh {
 function set_default_route {
     if=$1
     if [ -f ${DHCP_DEBUG_FILE} ]; then
-        grep -A 9 -B 1 ${if} ${DHCP_DEBUG_FILE} | tail -10
-        grep -A 9 -B 1 ${if} ${DHCP_DEBUG_FILE} | tail -10 | grep new_routers
-
-        set `grep -A 9 -B 1 ${if} ${DHCP_DEBUG_FILE} | tail -10 | grep new_routers`
-        gw=${new_routers}
+        line=`grep -A 9 -B 1 ${if} ${DHCP_DEBUG_FILE} | tail -10 | grep new_routers`
+        gw=${line##*=}
         echo "Got dhcp gateway ${gw} for interface ${if}"
         #check if default gw not already set
         out=`route -n | grep UG`
