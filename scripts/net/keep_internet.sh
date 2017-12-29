@@ -215,7 +215,7 @@ function set_default_route {
         out=`route -n | grep UG`
         if [ $? == 0 ]; then
             arr=(`echo ${out}`)
-            if [ ${gw} != ${arr[1]} ]; then
+            if [ "${gw}" != "${arr[1]}" ]; then
                 echo "Setting default gw to ${gw} for interface ${if}"
                 ip route del default
                 ip route add default via ${gw} dev ${if}
