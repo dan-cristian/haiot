@@ -138,7 +138,9 @@ function have_if {
 
 function restart_wifi {
     echo "Restarting wifi"
-    #ifconfig ${IF_WIFI} up
+    ifconfig ${IF_WIFI} down
+    ifconfig ${IF_WIFI} up
+    sleep 10
 }
 
 function restart_3g {
@@ -220,12 +222,20 @@ while :
 do
     if [ ${ENABLE_WIFI} == 1 ]; then
         get_gw_wlan ${IF_WIFI}
-        have_if ${IF_WIFI} ${TOUCH_HAVE_WLAN} ${GW_WLAN}
-        if [ ! -f ${TOUCH_HAVE_WLAN} ]; then
+        res=$?
+        if [ ${res} != 0 ]; then
             restart_wifi
-        else
-            # set wlan as default gw
-            set_route_default ${IF_WIFI} ${GW_WLAN}
+            get_gw_wlan ${IF_WIFI}
+            res=$?
+        fi
+        if [ ${res} == 0 ]; then
+            have_if ${IF_WIFI} ${TOUCH_HAVE_WLAN} ${GW_WLAN}
+            if [ ! -f ${TOUCH_HAVE_WLAN} ]; then
+                restart_wifi
+            else
+                # set wlan as default gw
+                set_route_default ${IF_WIFI} ${GW_WLAN}
+            fi
         fi
     fi
 
@@ -233,13 +243,21 @@ do
         have_3g_modem
         if [ $? == 0 ]; then
             get_gw_3g ${IF_3G}
-            have_if ${IF_3G} ${TOUCH_HAVE_3G} ${GW_3G}
-            if [ ! -f ${TOUCH_HAVE_3G} ]; then
+            res=$?
+            if [ ${res} != 0 ]; then
                 restart_3g
-            else
-                # set 3g as default gw only if wlan is off
-                if [ ! -f ${TOUCH_HAVE_WLAN} ]; then
-                    set_route_default ${IF_3G} ${GW_3G}
+                get_gw_3g ${IF_3G}
+                res=$?
+            fi
+            if [ ${res} == 0 ]; then
+                have_if ${IF_3G} ${TOUCH_HAVE_3G} ${GW_3G}
+                if [ ! -f ${TOUCH_HAVE_3G} ]; then
+                    restart_3g
+                else
+                    # set 3g as default gw only if wlan is off
+                    if [ ! -f ${TOUCH_HAVE_WLAN} ]; then
+                        set_route_default ${IF_3G} ${GW_3G}
+                    fi
                 fi
             fi
         else
