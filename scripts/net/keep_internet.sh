@@ -12,8 +12,9 @@ timeout=10
 ENABLE_WIFI=1
 ENABLE_3G=1
 ENABLE_SSH_TUNNEL=1
-SSH_USER_HOST=haiot@www.dancristian.ro
-FWKNOCK_SSH_PROFILE=router
+SSH_HOST=www.dancristian.ro
+SSH_USER=haiot
+FWKNOCK_SSH_PROFILE=nas
 FWKNOCK_CHECK_HOST=192.168.0.1
 IF_3G=ppp0
 IF_WIFI=wlan0
@@ -76,7 +77,6 @@ function ping_via_gw {
         echo && echo "Could not establish internet connection in ping ${host} via gw ${gw} on ${if}" >&2
         return 1
     fi
-
 }
 
 function httpreq
@@ -101,6 +101,17 @@ function have_internet
     fi
     if [ -f ${TOUCH_HAVE_INTERNET} ]; then
         rm ${TOUCH_HAVE_INTERNET}
+    fi
+    return 1
+}
+
+function have_wlan_connected {
+    if=$1
+    out=`ifconfig ${if} | grep "inet "`
+    if [ $? == 0 ]; then
+        return 0
+    else
+        echo "${if} is not connected"
     fi
     return 1
 }
@@ -154,8 +165,22 @@ function restart_3g {
 
 
 function start_ssh {
+    if=$1
+    gw=$2
+    line=`getent ahostsv4 ${SSH_HOST} | head -1`
+    host=${line%  *}
+    # send knock via external interface (3g)
+    route add -host ${host} gw ${gw}
     /usr/bin/fwknop -s -n ${FWKNOCK_SSH_PROFILE} --verbose
-    /usr/bin/ssh -N -R 9091:localhost:22 ${SSH_USER_HOST}
+    if [ $? -eq 0 ]; then
+        /usr/bin/ssh -N -R 9091:localhost:22 ${SSH_USER}@${SSH_HOST}
+        code=0
+    else
+        echo && echo "Could not ssh connect to ${host} via gw ${gw} on ${if}" >&2
+        code=1
+    fi
+    route del -host ${host}
+    return ${code}
 }
 
 #Kernel IP routing table
@@ -223,23 +248,34 @@ function loop
 while :
 do
     if [ ${ENABLE_WIFI} == 1 ]; then
-        get_gw_wlan ${IF_WIFI}
-        res=$?
-        if [ ${res} != 0 ]; then
+        have_wlan_connected ${IF_WIFI}
+        if [ $? != 0 ]; then
             restart_wifi
-            get_gw_wlan ${IF_WIFI}
-            res=$?
-        fi
-        if [ ${res} == 0 ]; then
-            have_if ${IF_WIFI} ${TOUCH_HAVE_WLAN} ${GW_WLAN}
-            if [ ! -f ${TOUCH_HAVE_WLAN} ]; then
-                restart_wifi
+            have_wlan_connected ${IF_WIFI}
+            if [ $? == 0 ]; then
+                get_gw_wlan ${IF_WIFI}
+                res=$?
+                if [ ${res} != 0 ]; then
+                    restart_wifi
+                    get_gw_wlan ${IF_WIFI}
+                    res=$?
+                fi
+                if [ ${res} == 0 ]; then
+                    have_if ${IF_WIFI} ${TOUCH_HAVE_WLAN} ${GW_WLAN}
+                    if [ ! -f ${TOUCH_HAVE_WLAN} ]; then
+                        restart_wifi
+                    else
+                        # set wlan as default gw
+                        set_route_default ${IF_WIFI} ${GW_WLAN}
+                    fi
+                else
+                    echo "Unable to check WLAN link"
+                fi
             else
-                # set wlan as default gw
-                set_route_default ${IF_WIFI} ${GW_WLAN}
+                echo "WLAN is down after restart, skip checking link"
             fi
         else
-            echo "Unable to check WLAN link"
+            echo "WLAN is down, skip checking link"
         fi
     fi
 
@@ -258,6 +294,7 @@ do
                 if [ ! -f ${TOUCH_HAVE_3G} ]; then
                     restart_3g
                 else
+                    start_ssh ${IF_3G} ${GW_3G}
                     # set 3g as default gw only if wlan is off
                     if [ ! -f ${TOUCH_HAVE_WLAN} ]; then
                         set_route_default ${IF_3G} ${GW_3G}
