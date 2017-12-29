@@ -89,6 +89,7 @@ def init():
         thread_pool.add_interval_callable(rfxcom_run.thread_run, run_interval_second=60)
     # init ups only on host specified in config
     if model_helper.get_param(Constant.P_UPS_ON_HOST) == Constant.HOST_NAME:
+        #fixme: retry solar init periodically
         if ups_legrand_run.init():
             thread_pool.add_interval_callable(ups_legrand_run.thread_run, run_interval_second=30)
     if model_helper.get_param(Constant.P_SOLAR_PARSER_ON_HOST) == Constant.HOST_NAME:
