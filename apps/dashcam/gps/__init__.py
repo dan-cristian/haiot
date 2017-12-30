@@ -53,7 +53,7 @@ def _upload_pos_buffer():
         try:
             url = State.UPLOAD_SERVER_URL.replace("<lat>", str(p.lat)).replace("<lon>", str(p.lon)).replace(
                 "<alt>", str(p.alt)).replace("<sat>", str(p.sats_valid)).replace(
-                "<acc>", str(p.acc).replace("<bat>", str(p.bat)).replace("<time>", str(p.timestamp)))
+                "<acc>", str(p.acc)).replace("<bat>", str(p.bat)).replace("<time>", str(p.timestamp))
             # https://stackoverflow.com/questions/27835619/urllib-and-ssl-certificate-verify-failed-error
             f = urllib2.urlopen(url, timeout=State.url_timeout, context=State.context)
             resp = f.read()
@@ -92,7 +92,7 @@ def _read_gps():
             alt = r.alt
         pos = Position(lat=r.lat, lon=r.lon, alt=alt, sats_valid=r.sats_valid,
                        acc=r.position_precision()[0], bat=r.hspeed, timestamp=time.time())
-        print("Got gps position {}".format(pos))
+        #print("Got gps position {}".format(pos))
         State.pos_buffer.append(pos)
         # use battery fields to report horizontal speed
         #url = State.UPLOAD_SERVER_URL.replace("<lat>", str(r.lat)).replace("<lon>", str(r.lon)).replace(
