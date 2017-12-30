@@ -58,7 +58,7 @@ def _upload_pos_buffer():
             print("Buffer has {} elements".format(len(State.pos_buffer)))
     if initial - len(State.pos_buffer) > 1:
         print("Buffer catches up, now has {} elements".format(len(State.pos_buffer)))
-    if len(State.pos_buffer > 0):
+    if len(State.pos_buffer) > 0:
         _save_position()
     else:
         if os.path.isfile(State.disk_pos_buffer_file):
