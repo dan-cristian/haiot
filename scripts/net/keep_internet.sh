@@ -16,6 +16,7 @@ SSH_HOST=www.dancristian.ro
 SSH_USER=haiot
 SSH_REMOTE_PORT=60000
 SSH_OUT=/tmp/ssh.out
+SSH_LOG=/tmp/ssh.log
 FWKNOCK_PORT=62222
 FWKNOCK_SSH_PROFILE=nas
 FWKNOCK_CHECK_HOST=192.168.0.1
@@ -199,7 +200,7 @@ function set_route_default {
 }
 
 function check_ssh {
-    ps ww | grep -q "[s]sh"
+    ps ax | grep -q ${SSH_LOG} | head -1
     if [ $? == 0 ]; then
         grep -q "remote forward success" ${SSH_OUT}
         if [ $? == 0 ]; then
@@ -209,6 +210,11 @@ function check_ssh {
         fi
     else
         echo "SSH not started ok"
+        out=`ps ax | grep ${SSH_LOG} | head -1`
+        arr=(`echo ${out}`)
+        pid=${arr[0]}
+        echo "Killing instance ${pid}"
+        kill ${pid}
     fi
     return 1
 }
@@ -227,7 +233,7 @@ function start_ssh {
     source=`curl --interface ${if} -s http://whatismyip.akamai.com/`
     su -lc "/usr/bin/fwknop -a ${source} -n ${FWKNOCK_SSH_PROFILE} --verbose" ${SSH_USER}
     if [ $? -eq 0 ]; then
-        su -lc "/usr/bin/ssh -v -N -R ${SSH_REMOTE_PORT}:localhost:22 ${SSH_USER}@${SSH_HOST} -p ${FWKNOCK_PORT} > ${SSH_OUT} 2>&1 &" ${SSH_USER}
+        su -lc "/usr/bin/ssh -v -N -E ${SSH_LOG} -R ${SSH_REMOTE_PORT}:localhost:22 ${SSH_USER}@${SSH_HOST} -p ${FWKNOCK_PORT} > ${SSH_OUT} 2>&1 &" ${SSH_USER}
         sleep 10
         check_ssh
         code=$?
