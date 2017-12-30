@@ -35,8 +35,9 @@ class Position:
 
 def _save_position():
     # persist to disk in case of outage
-    with open(State.disk_pos_buffer_file, 'w') as outfile:
-        json.dump(State.pos_buffer, outfile)
+    #with open(State.disk_pos_buffer_file, 'w') as outfile:
+    #    json.dump(State.pos_buffer, outfile)
+    pass
 
 
 def _upload_pos_buffer():
@@ -56,6 +57,7 @@ def _upload_pos_buffer():
         except Exception, ex:
             print("Unable to upload position, err={}".format(ex))
             print("Buffer has {} elements".format(len(State.pos_buffer)))
+            print("URL WAS:{}".format(url))
     if initial - len(State.pos_buffer) > 1:
         print("Buffer catches up, now has {} elements".format(len(State.pos_buffer)))
     if len(State.pos_buffer) > 0:
