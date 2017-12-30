@@ -867,6 +867,12 @@ fi
 
 if [ "$ENABLE_DASHCAM_PI" == "1" ]; then
     cd /home/${USERNAME}
+	ln -s $HAIOT_DIR/scripts /home/scripts
+
+    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/haiot_standalone.service /lib/systemd/system/
+    systemctl enable haiot_standalone.service
+    #systemctl start keep_internet.service
+
 	#http://pidashcam.blogspot.ro/2013/09/install.html#front
     if ! grep -q "gpu_mem" /boot/config.txt; then
         #enable camera
@@ -881,6 +887,9 @@ if [ "$ENABLE_DASHCAM_PI" == "1" ]; then
 		sed /boot/config.txt -i -e "s/^startx/#startx/"
 		sed /boot/config.txt -i -e "s/^fixup_file/#fixup_file/"
 	fi
+	echo "Disabling not needed services"
+	systemctl disable dhcpcd
+
 	#https://raspberrypi.stackexchange.com/questions/169/how-can-i-extend-the-life-of-my-sd-card
 	apt-get remove dphys-swapfile
 	#https://github.com/waveform80/picamera/issues/288#issuecomment-222636171
@@ -957,6 +966,11 @@ if [ "$ENABLE_DASHCAM_PI" == "1" ]; then
 
     echo "Set proper network gw order"
     # https://unix.stackexchange.com/questions/292940/how-to-set-a-routing-table-that-prefers-wlan-dhcp-interface-as-default-route
+
+    echo "Install USB power control app"
+    sudo apt install -y libusb-dev
+    https://raw.githubusercontent.com/codazoda/hub-ctrl.c/master/hub-ctrl.c
+    gcc -o hub-ctrl hub-ctrl.c -lusb
 
 
 if [ "$ENABLE_DASHCAM_MOTION" == "1" ]; then
@@ -1077,7 +1091,8 @@ exit 0
     #cat ${HAIOT_DIR}/apps/dashcam/scripts/cron.d.3gdial >> /etc/crontab
 
     ln -s $HAIOT_DIR/scripts /home/scripts
-    cp $HAIOT_DIR/scripts/net/keep_internet.service /lib/systemd/system/
+
+    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/keep_internet.service /lib/systemd/system/
     systemctl enable keep_internet.service
     systemctl start keep_internet.service
 
