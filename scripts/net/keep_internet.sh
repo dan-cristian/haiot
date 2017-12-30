@@ -14,6 +14,9 @@ ENABLE_3G=1
 ENABLE_SSH_TUNNEL=1
 SSH_HOST=www.dancristian.ro
 SSH_USER=haiot
+SSH_REMOTE_PORT=60000
+SSH_OUT=/tmp/ssh.out
+FWKNOCK_PORT=62222
 FWKNOCK_SSH_PROFILE=nas
 FWKNOCK_CHECK_HOST=192.168.0.1
 IF_3G=ppp0
@@ -170,25 +173,6 @@ function restart_3g {
 }
 
 
-function start_ssh {
-    if=$1
-    gw=$2
-    line=`getent ahostsv4 ${SSH_HOST} | head -1`
-    host=${line%  *}
-    # send knock via external interface (3g)
-    route add -host ${host} gw ${gw}
-    /usr/bin/fwknop -s -n ${FWKNOCK_SSH_PROFILE} --verbose
-    if [ $? -eq 0 ]; then
-        /usr/bin/ssh -N -R 9091:localhost:22 ${SSH_USER}@${SSH_HOST}
-        code=0
-    else
-        echo && echo "Could not ssh connect to ${host} via gw ${gw} on ${if}" >&2
-        code=1
-    fi
-    route del -host ${host}
-    return ${code}
-}
-
 #Kernel IP routing table
 #Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
 #192.168.0.0     0.0.0.0         255.255.255.0   U     0      0        0 wlan0
@@ -213,6 +197,43 @@ function set_route_default {
         fi
     fi
 }
+
+function check_ssh {
+    grep -q "remote forward success" ${SSH_OUT}
+    if [ $? == 0 ]; then
+        return 0
+    fi
+    echo "SSH failed to start"
+    return 1
+}
+
+# http://www.thirdway.ch/En/projects/raspberry_pi_3g/index.php
+function start_ssh {
+    if=$1
+    gw=$2
+    #line=`getent ahostsv4 ${SSH_HOST} | head -1`
+    #host=${line%  *}
+    # send knock via external interface (3g)
+    #route add -host ${host} gw ${gw}
+
+    #set ppp as default interface
+    set_route_default ${if} ${gw}
+    source=`curl --interface ${if} -s http://whatismyip.akamai.com/`
+    /usr/bin/fwknop -a ${source} -n ${FWKNOCK_SSH_PROFILE} --verbose
+    if [ $? -eq 0 ]; then
+       su -lc "/usr/bin/ssh -v -N -R ${SSH_REMOTE_PORT}:localhost:22 ${SSH_USER}@${SSH_HOST} -p ${FWKNOCK_PORT} > ${SSH_OUT} 2>&1 &" ${SSH_USER}
+        check_ssh
+        code=$?
+    else
+        echo && echo "Could not ssh connect to ${host} via gw ${gw} on ${if}" >&2
+        code=1
+    fi
+
+    #route del -host ${host}
+    #route del -host ${ext_host}
+    return ${code}
+}
+
 
 
 function get_gw_wlan {
@@ -300,7 +321,10 @@ do
                 if [ ! -f ${TOUCH_HAVE_3G} ]; then
                     restart_3g
                 else
-                    start_ssh ${IF_3G} ${GW_3G}
+                    check_ssh
+                    if [ $? != 0 ]; then
+                        start_ssh ${IF_3G} ${GW_3G}
+                    fi
                     # set 3g as default gw only if wlan is off
                     if [ ! -f ${TOUCH_HAVE_WLAN} ]; then
                         set_route_default ${IF_3G} ${GW_3G}
