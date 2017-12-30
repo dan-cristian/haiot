@@ -2,6 +2,8 @@
 After=network.service
 
 [Service]
+User=haiot
+Group=haiot
 ExecStart=/home/scripts/../start_daemon_userspaces.sh
 StandardOutput=syslog
 StandardError=syslog
