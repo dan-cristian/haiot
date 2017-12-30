@@ -225,7 +225,7 @@ function start_ssh {
     #set ppp as default interface
     set_route_default ${if} ${gw}
     source=`curl --interface ${if} -s http://whatismyip.akamai.com/`
-    /usr/bin/fwknop -a ${source} -n ${FWKNOCK_SSH_PROFILE} --verbose
+    su -lc "/usr/bin/fwknop -a ${source} -n ${FWKNOCK_SSH_PROFILE} --verbose" ${SSH_USER}
     if [ $? -eq 0 ]; then
        su -lc "/usr/bin/ssh -v -N -R ${SSH_REMOTE_PORT}:localhost:22 ${SSH_USER}@${SSH_HOST} -p ${FWKNOCK_PORT} > ${SSH_OUT} 2>&1 &" ${SSH_USER}
         check_ssh
