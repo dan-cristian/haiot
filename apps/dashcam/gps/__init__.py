@@ -29,8 +29,10 @@ class State:
 
 class Position:
     def __init__(self, lat, lon, alt, sats_valid, acc, bat, timestamp):
-        self.lat, self.lon, self.alt, self.sats_valid =lat, lon, alt, sats_valid
-        self.acc, self.bat, self.timestamp = acc, bat, timestamp
+        self.lat, self.lon, self.alt, self.sats_valid = lat, lon, alt, sats_valid
+        self.acc = acc
+        self.bat = bat
+        self.timestamp = timestamp
 
 
 def _save_position():
@@ -83,8 +85,8 @@ def _read_gps():
             alt = -9999
         else:
             alt = r.alt
-        pos=Position(lat=r.lat, lon=r.lon, alt=alt, sats_valid=r.sats_valid, acc=r.position_precision()[0],
-                     bat=r.hspeed, timestamp=time.time())
+        pos = Position(lat=r.lat, lon=r.lon, alt=alt, sats_valid=r.sats_valid, acc=r.position_precision()[0],
+                       bat=r.hspeed, timestamp=time.time())
         State.pos_buffer.append(pos)
         # use battery fields to report horizontal speed
         #url = State.UPLOAD_SERVER_URL.replace("<lat>", str(r.lat)).replace("<lon>", str(r.lon)).replace(
