@@ -34,6 +34,10 @@ class Position:
         self.bat = bat
         self.timestamp = timestamp
 
+    def __repr__(self):
+        r = "Lat={} Lon={} Alt={} Sats={} Acc={} Bat={} Time={}".format(self.lat, self.lon, self.alt, self.sats_valid,
+                                                                        self.acc, self.bat, self.timestamp)
+
 
 def _save_position():
     # persist to disk in case of outage
@@ -85,8 +89,9 @@ def _read_gps():
             alt = -9999
         else:
             alt = r.alt
-        pos = Position(lat=r.lat, lon=r.lon, alt=alt, sats_valid=r.sats_valid, acc=r.position_precision()[0],
-                       bat=r.hspeed, timestamp=time.time())
+        pos = Position(lat=r.lat, lon=r.lon, alt=alt, sats_valid=r.sats_valid,
+                       acc=r.position_precision()[0], bat=r.hspeed, timestamp=time.time())
+        print("Got gps position {}".format(pos))
         State.pos_buffer.append(pos)
         # use battery fields to report horizontal speed
         #url = State.UPLOAD_SERVER_URL.replace("<lat>", str(r.lat)).replace("<lon>", str(r.lon)).replace(
