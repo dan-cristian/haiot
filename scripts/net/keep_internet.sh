@@ -224,6 +224,9 @@ function start_ssh {
        su -lc "/usr/bin/ssh -v -N -R ${SSH_REMOTE_PORT}:localhost:22 ${SSH_USER}@${SSH_HOST} -p ${FWKNOCK_PORT} > ${SSH_OUT} 2>&1 &" ${SSH_USER}
         check_ssh
         code=$?
+        if [ ${code} == 0 ]; then
+            echo "Started SSH succesfully"
+        fi
     else
         echo && echo "Could not ssh connect to ${host} via gw ${gw} on ${if}" >&2
         code=1
@@ -278,28 +281,26 @@ do
         have_wlan_connected ${IF_WIFI}
         if [ $? != 0 ]; then
             restart_wifi
-            have_wlan_connected ${IF_WIFI}
-            if [ $? == 0 ]; then
+        fi
+        have_wlan_connected ${IF_WIFI}
+        if [ $? == 0 ]; then
+            get_gw_wlan ${IF_WIFI}
+            res=$?
+            if [ ${res} != 0 ]; then
+                restart_wifi
                 get_gw_wlan ${IF_WIFI}
                 res=$?
-                if [ ${res} != 0 ]; then
+            fi
+            if [ ${res} == 0 ]; then
+                have_if ${IF_WIFI} ${TOUCH_HAVE_WLAN} ${GW_WLAN}
+                if [ ! -f ${TOUCH_HAVE_WLAN} ]; then
                     restart_wifi
-                    get_gw_wlan ${IF_WIFI}
-                    res=$?
-                fi
-                if [ ${res} == 0 ]; then
-                    have_if ${IF_WIFI} ${TOUCH_HAVE_WLAN} ${GW_WLAN}
-                    if [ ! -f ${TOUCH_HAVE_WLAN} ]; then
-                        restart_wifi
-                    else
-                        # set wlan as default gw
-                        set_route_default ${IF_WIFI} ${GW_WLAN}
-                    fi
                 else
-                    echo "Unable to check WLAN link"
+                    # set wlan as default gw
+                    set_route_default ${IF_WIFI} ${GW_WLAN}
                 fi
             else
-                echo "WLAN is down after restart, skip checking link"
+                echo "Unable to check WLAN link"
             fi
         else
             echo "WLAN is down, skip checking link"
