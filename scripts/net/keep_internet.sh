@@ -7,24 +7,30 @@ checkdns=`cat /etc/resolv.conf | awk '/nameserver/ {print $2}' | awk 'NR == 1 {p
 pppdns1=`cat /etc/ppp/resolv.conf | awk '/nameserver/ {print $2}' | awk 'NR == 1 {print; exit}'`
 pppdns2=`cat /etc/ppp/resolv.conf | awk '/nameserver/ {print $2}' | awk 'NR == 2 {print; exit}'`
 checkdomain=google.com
-pcount=2
+pcount=3
 timeout=10
 ENABLE_WIFI=1
 ENABLE_3G=1
+ENABLE_ETH=0
 ENABLE_SSH_TUNNEL=1
 SSH_HOST=www.dancristian.ro
 SSH_USER=haiot
 SSH_REMOTE_PORT=60000
+SSH_CHECK_REMOTE_HOST=192.168.0.9
 SSH_LOG=/tmp/ssh.log
 FWKNOCK_PORT=62222
 FWKNOCK_SSH_PROFILE=nas
-FWKNOCK_CHECK_HOST=192.168.0.1
+MY_IP_HOST=67.20.100.192
+MY_IP_URL=https://${MY_IP_HOST}/cgi-bin/myip
 IF_3G=ppp0
 IF_WIFI=wlan0
 TOUCH_HAVE_INTERNET=/tmp/haveinternet
 TOUCH_HAVE_WLAN=/tmp/havewlan
 TOUCH_HAVE_3G=/tmp/have3g
 MODEM_3G_KEYWORD='ZTE WCDMA'
+MODEM_CONF_FILE=/etc/wvdial.conf
+MODEM_DEV_1=/dev/gsmmodem
+MODEM_DEV_2=/dev/ttyUSB2
 DHCP_DEBUG_FILE=/tmp/dhclient-script.debug
 GW_WLAN=""
 GW_3G=""
@@ -108,16 +114,17 @@ function have_internet
     return 1
 }
 
-function have_wlan_connected {
+function have_lan_connected {
     if=$1
+    touch=$2
     out=`ifconfig ${if} | grep "inet "`
     if [ $? == 0 ]; then
         return 0
     else
         echo "${if} is not connected"
     fi
-    if [ -f ${TOUCH_HAVE_WLAN} ]; then
-        rm ${TOUCH_HAVE_WLAN}
+    if [ -f ${touch} ]; then
+        rm ${touch}
     fi
     return 1
 }
@@ -222,17 +229,16 @@ function check_ssh {
 function start_ssh {
     if=$1
     gw=$2
-    #line=`getent ahostsv4 ${SSH_HOST} | head -1`
-    #host=${line%  *}
-    # send knock via external interface (3g)
-    #route add -host ${host} gw ${gw}
-
+    #add route for ssh
+    route add -host ${SSH_HOST} gw ${gw}
+    route add -host ${MY_IP_HOST} gw ${gw}
     #set ppp as default interface
-    set_route_default ${if} ${gw}
-    source=`curl --interface ${if} -s http://whatismyip.akamai.com/`
-    su -lc "/usr/bin/fwknop -a ${source} -n ${FWKNOCK_SSH_PROFILE} --verbose" ${SSH_USER}
+    #set_route_default ${if} ${gw}
+    source=`curl --interface ${if} -k -s ${MY_IP_URL} | tr -d '[:cntrl:]'` # clean string
+    su -lc "/usr/bin/fwknop -a ${source} -n ${FWKNOCK_SSH_PROFILE}" ${SSH_USER}
     if [ $? -eq 0 ]; then
-        su -lc "/usr/bin/ssh -v -N -E ${SSH_LOG} -R ${SSH_REMOTE_PORT}:localhost:22 ${SSH_USER}@${SSH_HOST} -p ${FWKNOCK_PORT} 2>&1 &" ${SSH_USER}
+        su -lc "/usr/bin/ssh -t ${SSH_USER}@${SSH_HOST} -p ${FWKNOCK_PORT} 'sudo netstat -anlp | grep 60000'"
+        su -lc "/usr/bin/ssh -v -N -E ${SSH_LOG} -R ${SSH_REMOTE_PORT}:localhost:22 ${SSH_USER}@${SSH_HOST} -p ${FWKNOCK_PORT} &" ${SSH_USER}
         sleep 10
         check_ssh
         code=$?
@@ -284,13 +290,35 @@ function get_gw_3g {
     return 1
 }
 
+function shut_usb_eth {
+    echo "Turn off eth usb port"
+    ${HAIOT_DIR}/../hub-ctrl -h 0 -P 1 -p 0
+}
+
+# https://www.raspberrypi.org/forums/viewtopic.php?t=196827
+function cycle_usb_ports {
+    ${HAIOT_DIR}/../hub-ctrl -h 0 -P 2 -p 0
+    sleep 5
+    ${HAIOT_DIR}/../hub-ctrl -h 0 -P 2 -p 1
+}
 
 function loop
 {
+if [ ${ENABLE_ETH} == 0 ]; then
+    shut_usb_eth
+fi
+
 while :
 do
+    if [ ${ENABLE_ETH} == 1 ]; then
+        ::
+    else
+        ifconfig eth0 down
+
+    fi
+
     if [ ${ENABLE_WIFI} == 1 ]; then
-        have_wlan_connected ${IF_WIFI}
+        have_lan_connected ${IF_WIFI} ${TOUCH_HAVE_WLAN}
         if [ $? != 0 ]; then
             restart_wifi
         fi
