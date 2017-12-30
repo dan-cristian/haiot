@@ -208,7 +208,7 @@ function check_ssh {
             echo "SSH failed to start"
         fi
     else
-        echo "SSH not started"
+        echo "SSH not started ok"
     fi
     return 1
 }
@@ -227,7 +227,8 @@ function start_ssh {
     source=`curl --interface ${if} -s http://whatismyip.akamai.com/`
     su -lc "/usr/bin/fwknop -a ${source} -n ${FWKNOCK_SSH_PROFILE} --verbose" ${SSH_USER}
     if [ $? -eq 0 ]; then
-       su -lc "/usr/bin/ssh -v -N -R ${SSH_REMOTE_PORT}:localhost:22 ${SSH_USER}@${SSH_HOST} -p ${FWKNOCK_PORT} > ${SSH_OUT} 2>&1 &" ${SSH_USER}
+        su -lc "/usr/bin/ssh -v -N -R ${SSH_REMOTE_PORT}:localhost:22 ${SSH_USER}@${SSH_HOST} -p ${FWKNOCK_PORT} > ${SSH_OUT} 2>&1 &" ${SSH_USER}
+        sleep 10
         check_ssh
         code=$?
         if [ ${code} == 0 ]; then
