@@ -199,11 +199,17 @@ function set_route_default {
 }
 
 function check_ssh {
-    grep -q "remote forward success" ${SSH_OUT}
+    ps ww | grep -q "[s]sh"
     if [ $? == 0 ]; then
-        return 0
+        grep -q "remote forward success" ${SSH_OUT}
+        if [ $? == 0 ]; then
+            return 0
+        else
+            echo "SSH failed to start"
+        fi
+    else
+        echo "SSH not started"
     fi
-    echo "SSH failed to start"
     return 1
 }
 
