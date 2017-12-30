@@ -37,6 +37,7 @@ class Position:
     def __repr__(self):
         r = "Lat={} Lon={} Alt={} Sats={} Acc={} Bat={} Time={}".format(self.lat, self.lon, self.alt, self.sats_valid,
                                                                         self.acc, self.bat, self.timestamp)
+        return r
 
 
 def _save_position():
