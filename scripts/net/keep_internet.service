@@ -3,6 +3,8 @@ After=network.service
 
 [Service]
 ExecStart=/home/scripts/net/keep_internet.sh
+StandardOutput=syslog
+StandardError=syslog
 
 [Install]
 WantedBy=default.target
