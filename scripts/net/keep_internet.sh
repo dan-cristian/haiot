@@ -290,28 +290,32 @@ function get_3g_ext_ip {
 }
 
 function check_ssh {
-    ps ax | grep -q ${SSH_LOG} | head -1
-    if [ $? == 0 ]; then
-        grep -q "remote forward success" ${SSH_LOG}
+    if [ -f ${SSH_LOG} ]; then
+        ps ax | grep -q ${SSH_LOG} | head -1
         if [ $? == 0 ]; then
-            LAST_EXT_IP=${EXT_IP_3G}
-            get_3g_ext_ip
-            if [ "${LAST_EXT_IP}" != "${EXT_IP_3G}" ]; then
-                echo "SSH is probably freezed as 3G ip changed since got connected"
+            grep -q "remote forward success" ${SSH_LOG}
+            if [ $? == 0 ]; then
+                LAST_EXT_IP=${EXT_IP_3G}
+                get_3g_ext_ip
+                if [ "${LAST_EXT_IP}" != "${EXT_IP_3G}" ]; then
+                    echo "SSH is probably freezed as 3G ip changed since got connected"
+                else
+                    return 0
+                fi
             else
-                return 0
+                echo "SSH failed to start"
             fi
         else
-            echo "SSH failed to start"
+            echo "SSH not started ok"
         fi
+        out=`ps ax | grep ${SSH_LOG} | head -1`
+        arr=(`echo ${out}`)
+        pid=${arr[0]}
+        echo "Killing instance ${pid}"
+        kill ${pid}
     else
-        echo "SSH not started ok"
+        echo "SSH not started as log not found"
     fi
-    out=`ps ax | grep ${SSH_LOG} | head -1`
-    arr=(`echo ${out}`)
-    pid=${arr[0]}
-    echo "Killing instance ${pid}"
-    kill ${pid}
     return 1
 }
 
@@ -321,9 +325,12 @@ function start_ssh {
     gw=$2
     get_3g_ext_ip
     route add -host ${SSH_HOST} gw ${gw} #  force route for fwknop and ssh via ppp
+    echo "Sending knop package"
     su -lc "/usr/bin/fwknop -a ${EXT_IP_3G} -n ${FWKNOCK_SSH_PROFILE}" ${SSH_USER}
     if [ $? -eq 0 ]; then
+        echo "Checking hanging remote ssh"
         su -lc "/usr/bin/ssh -t ${SSH_USER}@${SSH_HOST} -p ${FWKNOCK_PORT} 'sudo netstat -anlp | grep 127.0.0.1:60000'"
+        echo "Opening remote ssh tunnel"
         su -lc "/usr/bin/ssh -v -N -E ${SSH_LOG} -R ${SSH_REMOTE_PORT}:127.0.0.1:22 ${SSH_USER}@${SSH_HOST} -p ${FWKNOCK_PORT} &" ${SSH_USER}
         sleep 10
         check_ssh
