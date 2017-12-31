@@ -213,6 +213,7 @@ function start_pppd {
     else
         echo "Restarting ppp daemon skipped, process found, see below"
         ps ax | grep [p]ppd
+        sleep 10
     fi
 }
 
