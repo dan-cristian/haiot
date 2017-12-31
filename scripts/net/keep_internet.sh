@@ -45,19 +45,23 @@ function shut_usb_eth {
 
 # https://www.raspberrypi.org/forums/viewtopic.php?t=196827
 function cycle_usb_ports {
+    echo "Cycling power for all USB ports"
     /usr/local/bin/hub-ctrl -h 0 -P 2 -p 0
     sleep 5
     /usr/local/bin/hub-ctrl -h 0 -P 2 -p 1
+    echo "Cycling power for all USB ports completed"
 }
 
 # https://unix.stackexchange.com/questions/242546/how-to-get-bus-id-of-an-usb-device
 function reset_3g_port {
+    echo "Reseting 3G USB port"
     out=`tail /sys/bus/usb/devices/*/product | grep -B 1 "${MODEM_3G_KEYWORD}" | head -1`
     #==> /sys/bus/usb/devices/1-1.2/product <==
     bus_id=`echo $out | cut -d/ -f 6`
     echo -n "${bus_id}" > /sys/bus/usb/drivers/usb/unbind
     sleep 3
     echo -n "${bus_id}" > /sys/bus/usb/drivers/usb/bind
+    echo "Reseting 3G USB port on ${bus_id} completed"
 }
 
 
@@ -214,11 +218,12 @@ function restart_3g {
             next_step=2
         fi
         if [ ! -f ${TOUCH_HAVE_3G} ] && [ ${next_step} == 0 ]; then
-            echo "Restarting ppp daemon"
+            echo "Restarting ppp daemon and wait"
             killall -q -v wvdial
             killall -q -v pppd
             /usr/bin/wvdial &
             sleep 30
+            echo "Restarting ppp daemon completed"
             next_step=1
         fi
         if [ -f ${TOUCH_HAVE_3G} ]; then
