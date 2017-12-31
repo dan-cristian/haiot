@@ -37,6 +37,30 @@ EXT_IP_3G="" # external ip via 3g
 SSH_EXT_IP_CONNECTED="" # ip to which ssh connected succesfully last time
 #some functions
 
+
+function shut_usb_eth {
+    echo "Turn off eth usb port"
+    /usr/local/bin/hub-ctrl -h 0 -P 1 -p 0
+}
+
+# https://www.raspberrypi.org/forums/viewtopic.php?t=196827
+function cycle_usb_ports {
+    /usr/local/bin/hub-ctrl -h 0 -P 2 -p 0
+    sleep 5
+    /usr/local/bin/hub-ctrl -h 0 -P 2 -p 1
+}
+
+# https://unix.stackexchange.com/questions/242546/how-to-get-bus-id-of-an-usb-device
+function reset_3g_port {
+    out=`tail /sys/bus/usb/devices/*/product | grep -B 1 "${MODEM_3G_KEYWORD}" | head -1`
+    #==> /sys/bus/usb/devices/1-1.2/product <==
+    bus_id=`echo $out | cut -d/ -f 6`
+    echo -n "${bus_id}" > /sys/bus/usb/drivers/usb/unbind
+    sleep 3
+    echo -n "${bus_id}" > /sys/bus/usb/drivers/usb/bind
+}
+
+
 function portscan
 {
   host=$1
@@ -173,11 +197,36 @@ function restart_wifi {
 }
 
 function restart_3g {
-    echo "Restarting 3g/ppp"
-    killall -q -v wvdial
-    killall -q -v pppd
-    /usr/bin/wvdial &
-    sleep 30
+    next_step=0
+    while :
+    do
+        have_if ${IF_3G} ${TOUCH_HAVE_3G} ${GW_3G}
+        if [ ! -f ${TOUCH_HAVE_3G} ] && [ ${next_step} == 0 ]; then
+            echo "Restarting ppp daemon"
+            killall -q -v wvdial
+            killall -q -v pppd
+            /usr/bin/wvdial &
+            sleep 30
+            next_step=1
+        fi
+        if [ ! -f ${TOUCH_HAVE_3G} ] && [ ${next_step} == 1 ]; then
+            reset_3g_port
+            next_step=2
+        fi
+        if [ ! -f ${TOUCH_HAVE_3G} ] && [ ${next_step} == 2 ]; then
+            cycle_usb_ports
+            next_step=3
+        fi
+        if [ ! -f ${TOUCH_HAVE_3G} ] && [ ${next_step} == 3 ]; then
+            echo "Unable to recover 3G link"
+            break
+        fi
+        if [ -f ${TOUCH_HAVE_3G} ]; then
+            echo "3G link recovery succesfull"
+            return 0
+        fi
+    done
+    return 1
 }
 
 
@@ -302,17 +351,6 @@ function get_gw_3g {
     return 1
 }
 
-function shut_usb_eth {
-    echo "Turn off eth usb port"
-    /usr/local/bin/hub-ctrl -h 0 -P 1 -p 0
-}
-
-# https://www.raspberrypi.org/forums/viewtopic.php?t=196827
-function cycle_usb_ports {
-    /usr/local/bin/hub-ctrl -h 0 -P 2 -p 0
-    sleep 5
-    /usr/local/bin/hub-ctrl -h 0 -P 2 -p 1
-}
 
 function loop
 {
