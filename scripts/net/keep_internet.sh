@@ -65,8 +65,7 @@ function reset_3g_port {
 }
 
 
-function portscan
-{
+function portscan {
   host=$1
   port=$2
   #echo "Starting port scan of $checkdomain port 80"
@@ -79,8 +78,7 @@ function portscan
   fi
 }
 
-function pingnet
-{
+function pingnet {
   #Google has the most reliable host name. Feel free to change it.
   #echo "Pinging $1 to check for internet connection." && echo
   host=$1
@@ -129,8 +127,7 @@ function httpreq
 }
 
 
-function have_internet
-{
+function have_internet {
     #echo "Fast check for HTTPS connectivity" && echo
     if portscan ${checkdomain} 80; then
         touch ${TOUCH_HAVE_INTERNET}
@@ -262,9 +259,12 @@ function set_route_default {
 
 
 function get_3g_ext_ip {
-    route add -host ${MY_IP_HOST} gw ${GW_3G}
-    #set ppp as default interface
-    #set_route_default ${if} ${gw}
+    route -n | grep -q 67.20.100.192
+    if [ $? == 0 ] && [ "${GW_3G}" != "" ]; then
+        route add -host ${MY_IP_HOST} gw ${GW_3G}
+        #set ppp as default interface
+        #set_route_default ${if} ${gw}
+    fi
     EXT_IP_3G=`curl --interface ${IF_3G} -k -s ${MY_IP_URL} | tr -d '[:cntrl:]'` # clean string
 }
 
