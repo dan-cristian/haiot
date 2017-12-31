@@ -325,7 +325,7 @@ do
         if [ $? != 0 ]; then
             restart_wifi
         fi
-        have_wlan_connected ${IF_WIFI}
+        have_lan_connected ${IF_WIFI} ${TOUCH_HAVE_WLAN}
         if [ $? == 0 ]; then
             get_gw_wlan ${IF_WIFI}
             res=$?
