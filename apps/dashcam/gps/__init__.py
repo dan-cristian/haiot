@@ -138,6 +138,7 @@ def _upload_buffer():
         print("Buffer catches up, now has {} elements".format(len(State.url_buffer)))
 '''
 
+
 def unload():
     global initialised
     gpsd.gpsd_socket.close()
