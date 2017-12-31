@@ -256,6 +256,9 @@ function start_ssh {
         if [ ${code} == 0 ]; then
             echo "Started SSH succesfully"
             SSH_EXT_IP_CONNECTED=${EXT_IP_3G}
+            if [ "${LAST_EXT_IP}" == "" ]; then
+                LAST_EXT_IP=${EXT_IP_3G} # init if empty
+            fi
         fi
     else
         echo && echo "Could not ssh connect to ${host} via gw ${gw} on ${if}" >&2
