@@ -33,7 +33,9 @@ MODEM_DEV_1=/dev/gsmmodem
 MODEM_DEV_2=/dev/ttyUSB2
 DHCP_DEBUG_FILE=/tmp/dhclient-script.debug
 GW_WLAN=""
-GW_3G=""
+GW_3G="" # gateway for 3g link
+EXT_IP_3G="" # external ip via 3g
+SSH_EXT_IP_CONNECTED="" # ip to which ssh connected succesfully last time
 #some functions
 
 function portscan
@@ -205,12 +207,26 @@ function set_route_default {
     fi
 }
 
+
+function get_3g_ext_ip {
+    route add -host ${MY_IP_HOST} gw ${GW_3G}
+    #set ppp as default interface
+    #set_route_default ${if} ${gw}
+    EXT_IP_3G=`curl --interface ${IF_3G} -k -s ${MY_IP_URL} | tr -d '[:cntrl:]'` # clean string
+}
+
 function check_ssh {
     ps ax | grep -q ${SSH_LOG} | head -1
     if [ $? == 0 ]; then
         grep -q "remote forward success" ${SSH_LOG}
         if [ $? == 0 ]; then
-            return 0
+            LAST_EXT_IP=${EXT_IP_3G}
+            get_3g_ext_ip
+            if [ ${LAST_EXT_IP} != ${EXT_IP_3G} ]; then
+                echo "SSH is probably freezed as 3G ip changed since got connected"
+            else
+                return 0
+            fi
         else
             echo "SSH failed to start"
         fi
@@ -229,29 +245,23 @@ function check_ssh {
 function start_ssh {
     if=$1
     gw=$2
-    #add route for ssh
-    route add -host ${SSH_HOST} gw ${gw}
-    route add -host ${MY_IP_HOST} gw ${gw}
-    #set ppp as default interface
-    #set_route_default ${if} ${gw}
-    source=`curl --interface ${if} -k -s ${MY_IP_URL} | tr -d '[:cntrl:]'` # clean string
-    su -lc "/usr/bin/fwknop -a ${source} -n ${FWKNOCK_SSH_PROFILE}" ${SSH_USER}
+    get_3g_ext_ip
+    route add -host ${SSH_HOST} gw ${gw} #  force route for fwknop and ssh via ppp
+    su -lc "/usr/bin/fwknop -a ${EXT_IP_3G} -n ${FWKNOCK_SSH_PROFILE}" ${SSH_USER}
     if [ $? -eq 0 ]; then
-        su -lc "/usr/bin/ssh -t ${SSH_USER}@${SSH_HOST} -p ${FWKNOCK_PORT} 'sudo netstat -anlp | grep 60000'"
-        su -lc "/usr/bin/ssh -v -N -E ${SSH_LOG} -R ${SSH_REMOTE_PORT}:localhost:22 ${SSH_USER}@${SSH_HOST} -p ${FWKNOCK_PORT} &" ${SSH_USER}
+        su -lc "/usr/bin/ssh -t ${SSH_USER}@${SSH_HOST} -p ${FWKNOCK_PORT} 'sudo netstat -anlp | grep 127.0.0.1:60000'"
+        su -lc "/usr/bin/ssh -v -N -E ${SSH_LOG} -R ${SSH_REMOTE_PORT}:127.0.0.1:22 ${SSH_USER}@${SSH_HOST} -p ${FWKNOCK_PORT} &" ${SSH_USER}
         sleep 10
         check_ssh
         code=$?
         if [ ${code} == 0 ]; then
             echo "Started SSH succesfully"
+            SSH_EXT_IP_CONNECTED=${EXT_IP_3G}
         fi
     else
         echo && echo "Could not ssh connect to ${host} via gw ${gw} on ${if}" >&2
         code=1
     fi
-
-    #route del -host ${host}
-    #route del -host ${ext_host}
     return ${code}
 }
 
@@ -305,18 +315,12 @@ function cycle_usb_ports {
 function loop
 {
 if [ ${ENABLE_ETH} == 0 ]; then
+    ifconfig eth0 down
     shut_usb_eth
 fi
 
 while :
 do
-    if [ ${ENABLE_ETH} == 1 ]; then
-        ::
-    else
-        ifconfig eth0 down
-
-    fi
-
     if [ ${ENABLE_WIFI} == 1 ]; then
         have_lan_connected ${IF_WIFI} ${TOUCH_HAVE_WLAN}
         if [ $? != 0 ]; then
