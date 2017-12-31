@@ -201,6 +201,18 @@ function restart_3g {
     while :
     do
         have_if ${IF_3G} ${TOUCH_HAVE_3G} ${GW_3G}
+        if [ ! -f ${TOUCH_HAVE_3G} ] && [ ${next_step} == 3 ]; then
+            echo "Unable to recover 3G link"
+            break
+        fi
+        if [ ! -f ${TOUCH_HAVE_3G} ] && [ ${next_step} == 2 ]; then
+            cycle_usb_ports
+            next_step=3
+        fi
+        if [ ! -f ${TOUCH_HAVE_3G} ] && [ ${next_step} == 1 ]; then
+            reset_3g_port
+            next_step=2
+        fi
         if [ ! -f ${TOUCH_HAVE_3G} ] && [ ${next_step} == 0 ]; then
             echo "Restarting ppp daemon"
             killall -q -v wvdial
@@ -208,18 +220,6 @@ function restart_3g {
             /usr/bin/wvdial &
             sleep 30
             next_step=1
-        fi
-        if [ ! -f ${TOUCH_HAVE_3G} ] && [ ${next_step} == 1 ]; then
-            reset_3g_port
-            next_step=2
-        fi
-        if [ ! -f ${TOUCH_HAVE_3G} ] && [ ${next_step} == 2 ]; then
-            cycle_usb_ports
-            next_step=3
-        fi
-        if [ ! -f ${TOUCH_HAVE_3G} ] && [ ${next_step} == 3 ]; then
-            echo "Unable to recover 3G link"
-            break
         fi
         if [ -f ${TOUCH_HAVE_3G} ]; then
             echo "3G link recovery succesfull"
