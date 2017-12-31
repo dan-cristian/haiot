@@ -4,9 +4,11 @@ import os, sys, time, datetime
 import shutil
 import utils
 from collections import namedtuple
+from main.logger_helper import Log
 
 disk_ntuple = namedtuple('partition',  'device mountpoint fstype')
 usage_ntuple = namedtuple('usage',  'total used free percent')
+
 
 class P():
     server = 'haiot@192.168.0.9'
@@ -78,15 +80,15 @@ def _upload_file(file_path, file_date):
         #ssh -T -p 222 -c arcfour -o Compression=no $SSH_SERVER "mkdir -p $dest_parent"
         res = subprocess.check_output(['ssh -T -p ' + P.port + ' -c arcfour -o Compression=no ' +
                                        P.server + ' "mkdir -p "' + P.dest_folder + subfolder], shell=True)
-        print('Created folder {}, res=[{}]'.format(subfolder, res))
+        Log.logger.info('Created folder {}, res=[{}]'.format(subfolder, res))
         P.folder_dict.add(subfolder)
-    print('Uploading file {}]'.format(file_path))
+    Log.logger.info('Uploading file {}]'.format(file_path))
     P.current_upload_file = file_path
     # rsync -avrPe 'ssh -p 22 -T -c arcfour -o Compression=no -x ' 2017-12-25_13-26-08_pi.mp4 haiot@$192.168.0.9://mnt/motion/tmp/timelapse/dashcam
     res = subprocess.check_output(['rsync -avrPe "ssh -p ' + P.port + ' -T -c arcfour -o Compression=no -x" ' +
                                    file_path + ' ' + P.server + ':' + P.dest_folder + subfolder], shell=True)
     duration_min = (time.time() - start) / 60
-    print('Uploaded file {}, res=[{}], duration in mins={}'.format(file_path, res, duration_min))
+    Log.logger.info('Uploaded file {}, res=[{}], duration in mins={}'.format(file_path, res, duration_min))
     P.current_upload_file = None
 
 
@@ -110,7 +112,7 @@ def _file_list(folder, exclude_delta=0):
             delta_sec = (now - cdate)
             if delta_sec > exclude_delta:
                 result.append([path, cdate])
-                #print('Added {}'.format(path))
+                #Log.logger.info('Added {}'.format(path))
     return result
 
 
@@ -123,12 +125,12 @@ def _upload():
         try:
             _upload_file(file_path=file[0], file_date=file[1])
             shutil.move(file[0], P.uploaded_folder)
-            print('File {} moved to {}'.format(file[0], P.uploaded_folder))
+            Log.logger.info('File {} moved to {}'.format(file[0], P.uploaded_folder))
             count += 1
             if count == P.upload_batch:
                 break
         except Exception, ex:
-            print('Exception uploading file {}, ex={}'.format(file[0], ex))
+            Log.logger.info('Exception uploading file {}, ex={}'.format(file[0], ex))
 
 
 def _clean_old(days_to_keep, folder):
@@ -139,7 +141,7 @@ def _clean_old(days_to_keep, folder):
             delta_days = (now - file[1]) / (60*60*24)
             if delta_days > days_to_keep:
                 os.remove(file[0])
-                print('Old {} days file deleted {}'.format(delta_days, file[0]))
+                Log.logger.info('Old {} days file deleted {}'.format(delta_days, file[0]))
         except Exception, ex:
             pass
 
@@ -153,18 +155,18 @@ def _clean_space():
             if parti.mountpoint == P.root_mountpoint:
                 usage = disk_usage(parti.mountpoint).percent
                 if usage > P.max_disk_used_percent:
-                    print('Disk usage is {}, removing files older than {} to stay at {}'.format(
+                    Log.logger.info('Disk usage is {}, removing files older than {} to stay at {}'.format(
                         usage, days_keep, P.max_disk_used_percent))
                     if days_keep > 0:
                         _clean_old(days_keep, folder)
                         days_keep -= 1
                     else:
-                        print('Warning, need to remove files from files not uploaded folder {}'.format(P.root_folder))
+                        Log.logger.info('Warning, need to remove files from files not uploaded folder {}'.format(P.root_folder))
                         if days_keep > 0:
                             days_keep = P.days_to_keep
                             folder = P.root_folder
                         else:
-                            print('Something is wrong, cannot free up more space!')
+                            Log.logger.info('Something is wrong, cannot free up more space!')
                             keep_try = False
                             break
                 else:
@@ -178,7 +180,7 @@ def unload():
         while True:
             pid = utils.get_proc(P.current_upload_file)
             if pid is not None:
-                print('Killing hanging rsync with pid {} on file {}'.format(pid, P.current_upload_file))
+                Log.logger.info('Killing hanging rsync with pid {} on file {}'.format(pid, P.current_upload_file))
                 os.kill(pid, 15)
                 new_pid = utils.get_proc(P.current_upload_file)
                 if new_pid == pid:
@@ -195,8 +197,8 @@ def thread_run():
 
 if __name__ == '__main__':
     #for part in disk_partitions():
-    #    print(part)
-    #    print("%s\n" % str(disk_usage(part.mountpoint)))
+    #    Log.logger.info(part)
+    #    Log.logger.info("%s\n" % str(disk_usage(part.mountpoint)))
     P.root_folder = '/home/haiot/recordings/'
     P.uploaded_folder = '/home/haiot/recordings/uploaded/'
     P.root_mountpoint = '/'
