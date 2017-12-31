@@ -201,6 +201,18 @@ function restart_wifi {
     sleep 10
 }
 
+function start_pppd {
+    ps ax | grep [p]ppd
+    if [ $? == 0 ]; then
+        echo "Restarting ppp daemon and wait"
+        killall -q -v wvdial
+        killall -q -v pppd
+        /usr/bin/wvdial &
+        sleep 30
+        echo "Restarting ppp daemon completed"
+    fi
+}
+
 function restart_3g {
     next_step=0
     while :
@@ -219,12 +231,7 @@ function restart_3g {
             next_step=2
         fi
         if [ ! -f ${TOUCH_HAVE_3G} ] && [ ${next_step} == 0 ]; then
-            echo "Restarting ppp daemon and wait"
-            killall -q -v wvdial
-            killall -q -v pppd
-            /usr/bin/wvdial &
-            sleep 30
-            echo "Restarting ppp daemon completed"
+            start_pppd
             next_step=1
         fi
         if [ -f ${TOUCH_HAVE_3G} ]; then
