@@ -4,6 +4,7 @@ import ssl
 import time
 import json
 import os
+from main.logger_helper import Log
 from main.admin import models
 
 initialised = False
@@ -60,13 +61,13 @@ def _upload_pos_buffer():
             if resp == "null":
                 State.pos_buffer.remove(p)
             else:
-                print("Unexpected response {}".format(resp))
+                Log.logger.info("Unexpected response {}".format(resp))
         except Exception, ex:
-            print("Unable to upload position, err={}".format(ex))
-            print("Buffer has {} elements".format(len(State.pos_buffer)))
-            print("URL WAS:{}".format(url))
+            Log.logger.info("Unable to upload position, err={}".format(ex))
+            Log.logger.info("Buffer has {} elements".format(len(State.pos_buffer)))
+            Log.logger.info("URL WAS:{}".format(url))
     if initial - len(State.pos_buffer) > 1:
-        print("Buffer catches up, now has {} elements".format(len(State.pos_buffer)))
+        Log.logger.info("Buffer catches up, now has {} elements".format(len(State.pos_buffer)))
     if len(State.pos_buffer) > 0:
         _save_position()
     else:
@@ -79,12 +80,12 @@ def _read_gps():
     r = gpsd.get_current()
     if r.mode < 2:
         if not State.reported_no_fix:
-            print("No gps fix, sats={} valid={} mode={}".format(r.sats, r.sats_valid, r.mode))
+            Log.logger.info("No gps fix, sats={} valid={} mode={}".format(r.sats, r.sats_valid, r.mode))
             State.reported_no_fix = True
         pass
     else:
         if State.reported_no_fix:
-            print("Got gps fix, sats={} valid={} mode={}".format(r.sats, r.sats_valid, r.mode))
+            Log.logger.info("Got gps fix, sats={} valid={} mode={}".format(r.sats, r.sats_valid, r.mode))
             State.reported_no_fix = False
         if r.mode == 2:
             alt = -9999
@@ -92,7 +93,7 @@ def _read_gps():
             alt = r.alt
         pos = Position(lat=r.lat, lon=r.lon, alt=alt, sats_valid=r.sats_valid,
                        acc=r.position_precision()[0], bat=r.hspeed, timestamp=time.time())
-        #print("Got gps position {}".format(pos))
+        #Log.logger.info("Got gps position {}".format(pos))
         State.pos_buffer.append(pos)
         # use battery fields to report horizontal speed
         #url = State.UPLOAD_SERVER_URL.replace("<lat>", str(r.lat)).replace("<lon>", str(r.lon)).replace(
@@ -129,13 +130,13 @@ def _upload_buffer():
             if resp == "null":
                 State.url_buffer.remove(url)
             else:
-                print("Unexpected response {}".format(resp))
+                Log.logger.info("Unexpected response {}".format(resp))
         except Exception, ex:
-            print("Unable to upload position, err={}".format(ex))
+            Log.logger.info("Unable to upload position, err={}".format(ex))
             #State.url_buffer.append(url)
-            print("Buffer has {} elements".format(len(State.url_buffer)))
+            Log.logger.info("Buffer has {} elements".format(len(State.url_buffer)))
     if initial - len(State.url_buffer) > 1:
-        print("Buffer catches up, now has {} elements".format(len(State.url_buffer)))
+        Log.logger.info("Buffer catches up, now has {} elements".format(len(State.url_buffer)))
 '''
 
 
@@ -151,7 +152,7 @@ def init():
         gpsd.connect()
         initialised = True
     except Exception, ex:
-        print("Unable to connect to gps daemon, ex={}".format(ex))
+        Log.logger.info("Unable to connect to gps daemon, ex={}".format(ex))
         initialised = False
 
 

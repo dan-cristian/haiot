@@ -1,6 +1,7 @@
 import subprocess
 import os
 import sudo_usb
+from main.logger_helper import Log
 #import shlex
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
@@ -35,11 +36,11 @@ def get_usb_dev(dev_name):
         for filename in os.listdir(root):
             if dev_name in filename:
                 res = root + filename
-                print("Found usb cam at {}".format(res))
+                Log.logger.info("Found usb cam at {}".format(res))
                 break
         return res
     else:
-        print('No v4l folder, probably no usb vide device yet available')
+        Log.logger.info('No v4l folder, probably no usb vide device yet available')
         return None
 
 
@@ -56,21 +57,21 @@ def get_usb_audio(dev_name):
                         hw_card = atoms[0].split(':')[0].split('card ')[1]
                         hw_dev = atoms[1].split(':')[0].split(' device ')[1]
                         res = '{},{}'.format(hw_card, hw_dev)
-                        print("Found audio card {}".format(res))
+                        Log.logger.info("Found audio card {}".format(res))
                         break
     except Exception, ex:
-        print("Got error when looking for audio interface, ex={}".format(ex))
+        Log.logger.info("Got error when looking for audio interface, ex={}".format(ex))
     return res
 
 
 def reset_usb(dev_name):
     path = sudo_usb.__file__.replace(".pyc", ".py")
     res = subprocess.check_output(['sudo', 'python', path, dev_name])
-    print('Reset returned {}'.format(res))
+    Log.logger.info('Reset returned {}'.format(res))
 
 
 if __name__ == '__main__':
-    print(_get_usb_dev_root('C525'))
-    print(get_usb_dev('C525'))
+    Log.logger.info(_get_usb_dev_root('C525'))
+    Log.logger.info(get_usb_dev('C525'))
     reset_usb('C525')
 
