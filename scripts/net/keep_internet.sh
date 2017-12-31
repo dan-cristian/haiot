@@ -203,7 +203,8 @@ function restart_wifi {
 
 function start_pppd {
     ps ax | grep -q [p]ppd
-    if [ $? == 0 ]; then
+    res=$?
+    if [ ${res} -eq 0 ]; then
         echo "Restarting ppp daemon and wait"
         killall -q -v wvdial
         killall -q -v pppd
@@ -211,7 +212,7 @@ function start_pppd {
         sleep 30
         echo "Restarting ppp daemon completed"
     else
-        echo "Restarting ppp daemon skipped, process found, see below"
+        echo "Restarting ppp daemon skipped, process found, res=${res}"
         ps ax | grep [p]ppd
         sleep 10
     fi
