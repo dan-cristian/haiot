@@ -174,13 +174,17 @@ function have_if {
     touch=$2
     gw=$3
     #pingnet ${checkdomain} ${IF}
-    ping_via_gw ${if} ${gw}
-    if [ $? == 0 ]; then
-        touch ${touch}
-        chmod 777 ${touch}
-        return 0
+    if [ "${gw}" != "" ]; then
+        ping_via_gw ${if} ${gw}
+        if [ $? == 0 ]; then
+            touch ${touch}
+            chmod 777 ${touch}
+            return 0
+        else
+            echo "${checkdomain} not responding to ping"
+        fi
     else
-        echo "${checkdomain} not responding to ping"
+        echo "Gateway for ${if} is blank, assume link down"
     fi
 
     if [ -f ${touch} ]; then
@@ -359,6 +363,7 @@ function get_gw_3g {
 
 function loop
 {
+
 if [ ${ENABLE_ETH} == 0 ]; then
     ifconfig eth0 down
     shut_usb_eth
