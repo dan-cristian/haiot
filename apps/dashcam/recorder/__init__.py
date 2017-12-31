@@ -8,6 +8,7 @@ import usb_tool
 import uploader
 import utils
 from pydispatch import dispatcher
+from main.logger_helper import Log
 try:
     from common import Constant
 except Exception:
@@ -128,21 +129,21 @@ def _kill_proc(keywords):
     while True:
         pid = utils.get_proc(keywords)
         if pid is not None:
-            print('Found process {} with pid {}, killing attempt {}'.format(keywords, pid, kill_try))
+            Log.logger.info('Found process {} with pid {}, killing attempt {}'.format(keywords, pid, kill_try))
             if kill_try == 0:
                 os.kill(pid, 15)
             else:
                 os.kill(pid, 9)
             kill_try += 1
         else:
-            print('Process to kill not found with keywords {} in attempt {}'.format(keywords, kill_try))
+            Log.logger.info('Process to kill not found with keywords {} in attempt {}'.format(keywords, kill_try))
             break
 
 
 def _recover_usb():
     src = P.usb_out_filepath_err
     # make a copy for debug
-    print('Copy usb output file for debug')
+    Log.logger.info('Copy usb output file for debug')
     shutil.copy(src, src + '.' + str(time.time()))
     ferr = open(src)
     contents = ferr.read()
@@ -150,19 +151,19 @@ def _recover_usb():
 
     is_exit_normal = 'Exiting normally, received signal' in contents
     if is_exit_normal:
-        print('Exit was normal, nothing to do to recover')
+        Log.logger.info('Exit was normal, nothing to do to recover')
     else:
         is_exit_io_err = 'Input/output error' in contents or 'no soundcards found' in contents
         if is_exit_io_err:
-            print('Found an USB I/O error')
+            Log.logger.info('Found an USB I/O error')
         else:
-            print('Unknown USB error')
-            print(contents)
+            Log.logger.info('Unknown USB error')
+            Log.logger.info(contents)
         usb_tool.reset_usb(P.usb_camera_keywords)
 
 
 def _usb_init():
-    print("Recording USB")
+    Log.logger.info("Recording USB")
     try:
         _kill_proc(P.usb_out_filename)
         if Constant.IS_OS_WINDOWS():
@@ -170,28 +171,28 @@ def _usb_init():
         else:
             _run_ffmpeg_usb()
         if P.ffmpeg_usb is not None and P.ffmpeg_usb._child_created:
-            print("Recording started")
+            Log.logger.info("Recording started")
             P.is_recording_usb = True
         else:
-            print("Recording process not created")
+            Log.logger.info("Recording process not created")
     except Exception, ex:
-        print("Unable to initialise USB camera, ex={}".format(ex))
+        Log.logger.info("Unable to initialise USB camera, ex={}".format(ex))
 
 
 def _usb_record_loop():
     if P.is_recording_usb:
         P.ffmpeg_usb.poll()
         if P.ffmpeg_usb.returncode is not None:
-            print("usb record exit with code {}".format(P.ffmpeg_usb.returncode))
+            Log.logger.info("usb record exit with code {}".format(P.ffmpeg_usb.returncode))
             if P.ffmpeg_usb.returncode != 0:
-                print("USB recording stopped")
+                Log.logger.info("USB recording stopped")
             else:
-                print("USB exit, not an error?")
+                Log.logger.info("USB exit, not an error?")
             _usb_stop()
         else:
             pass
     else:
-        print("USB not recording")
+        Log.logger.info("USB not recording")
 
 
 def _pi_record_loop():
@@ -199,16 +200,16 @@ def _pi_record_loop():
         P.pi_camera.annotate_text = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         P.ffmpeg_pi.poll()
         if P.ffmpeg_pi.returncode is not None:
-            print("PI record exit with code {}".format(P.ffmpeg_pi.returncode))
+            Log.logger.info("PI record exit with code {}".format(P.ffmpeg_pi.returncode))
             if P.ffmpeg_pi.returncode != 0:
-                print("PI recording stopped with error")
+                Log.logger.info("PI recording stopped with error")
             else:
-                print("PI exit, not an error?")
+                Log.logger.info("PI exit, not an error?")
             _pi_stop()
         else:
             pass
     else:
-        print("PI not recording")
+        Log.logger.info("PI not recording")
 
 
 def _pi_init():
@@ -220,19 +221,19 @@ def _pi_init():
             P.pi_camera.resolution = P.pi_max_resolution
             P.pi_camera.framerate = P.pi_framerate
             P.pi_camera.annotate_background = picamera.Color('black')
-            print("Recording PI")
+            Log.logger.info("Recording PI")
             _run_ffmpeg_pi()
             P.pi_camera.start_recording(P.ffmpeg_pi.stdin, format='h264', bitrate=P.pi_bitrate)
             if P.ffmpeg_pi._child_created:
-                print("Recording PI started")
+                Log.logger.info("Recording PI started")
                 P.is_recording_pi = True
         except Exception, ex:
             if 'Camera is not enabled' in str(ex):
                 _has_picamera = False
                 P.is_pi_camera_on = False
-            print("Unable to initialise picamera, ex={}".format(ex))
+            Log.logger.info("Unable to initialise picamera, ex={}".format(ex))
     else:
-        #print("No picamera module")
+        #Log.logger.info("No picamera module")
         P.is_pi_camera_on = False
 
 
@@ -248,23 +249,23 @@ def _pi_stop():
                     pass
                 P.ffmpeg_pi = None
             try:
-                print("Camera closed={} recording={}".format(P.pi_camera.closed, P.pi_camera.recording))
+                Log.logger.info("Camera closed={} recording={}".format(P.pi_camera.closed, P.pi_camera.recording))
                 P.pi_camera.stop_recording()
             except Exception, ex:
-                print("Exception on pi camera stop, ex={}".format(ex))
+                Log.logger.info("Exception on pi camera stop, ex={}".format(ex))
             try:
-                print("Camera closed={} recording={}".format(P.pi_camera.closed, P.pi_camera.recording))
+                Log.logger.info("Camera closed={} recording={}".format(P.pi_camera.closed, P.pi_camera.recording))
                 P.pi_camera.close()
             except Exception, ex:
-                print("Exception on pi camera close, ex={}".format(ex))
-            print("Camera closed={} recording={}".format(P.pi_camera.closed, P.pi_camera.recording))
+                Log.logger.info("Exception on pi camera close, ex={}".format(ex))
+            Log.logger.info("Camera closed={} recording={}".format(P.pi_camera.closed, P.pi_camera.recording))
             if P.pi_out_std is not None:
                 P.pi_out_std.close()
             if P.pi_out_err is not None:
                 P.pi_out_err.close()
     except Exception, ex:
-        print("Error in pi_stop, ex={}".format(ex))
-        print(traceback.print_exc())
+        Log.logger.info("Error in pi_stop, ex={}".format(ex))
+        Log.logger.info(traceback.print_exc())
 
 
 def _usb_stop():
@@ -283,7 +284,7 @@ def _usb_stop():
 
 
 def _handle_event_alarm(zone_name, pin_connected):
-    print("Got alarm in {} with pin connected {}".format(zone_name, pin_connected))
+    Log.logger.info("Got alarm in {} with pin connected {}".format(zone_name, pin_connected))
     P.last_move_time = datetime.datetime.now()
     P.is_usb_camera_on = True
     P.is_pi_camera_on = True
@@ -293,7 +294,7 @@ def _set_camera_state():
     now = datetime.datetime.now()
     move_lapsed = (now - P.last_move_time).total_seconds()
     if (move_lapsed > P.inactivity_duration) and (P.is_recording_usb or P.is_recording_pi):
-        print("Stopping cameras as no activity in the last {} seconds".format(move_lapsed))
+        Log.logger.info("Stopping cameras as no activity in the last {} seconds".format(move_lapsed))
         P.is_pi_camera_on = False
         P.is_usb_camera_on = False
 
@@ -335,20 +336,20 @@ def thread_run():
             if P.is_recording_pi:
                 _pi_record_loop()
             else:
-                print("Starting PI camera, should have been on")
+                Log.logger.info("Starting PI camera, should have been on")
                 _pi_init()
         if P.is_usb_camera_on:
             if P.is_recording_usb:
                 _usb_record_loop()
             else:
-                print("Starting USB camera, should have been on")
+                Log.logger.info("Starting USB camera, should have been on")
                 _recover_usb()
                 _usb_init()
         if not P.is_pi_camera_on and P.is_recording_pi:
-            print("Stopping PI recording")
+            Log.logger.info("Stopping PI recording")
             _pi_stop()
         if not P.is_usb_camera_on and P.is_recording_usb:
-            print("Stopping USB recording")
+            Log.logger.info("Stopping USB recording")
             _usb_stop()
 
 
