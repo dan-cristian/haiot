@@ -58,7 +58,7 @@ def _upload_pos_buffer():
             f = urllib2.urlopen(url, timeout=State.url_timeout, context=State.context)
             resp = f.read()
             if resp == "null":
-                State.pos_buffer.remove(url)
+                State.pos_buffer.remove(p)
             else:
                 print("Unexpected response {}".format(resp))
         except Exception, ex:
