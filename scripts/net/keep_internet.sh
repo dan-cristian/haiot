@@ -214,10 +214,12 @@ function start_pppd {
 }
 
 function restart_3g {
+    echo "Restarting 3G"
     next_step=0
     have_if ${IF_3G} ${TOUCH_HAVE_3G} ${GW_3G}
     while :
     do
+        echo "Restarting 3G - recovery step ${next_step}"
         if [ ! -f ${TOUCH_HAVE_3G} ] && [ ${next_step} == 3 ]; then
             echo "Unable to recover 3G link"
             break
