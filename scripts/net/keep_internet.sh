@@ -240,10 +240,13 @@ function restart_3g {
             start_pppd
             next_step=1
         fi
-        have_if ${IF_3G} ${TOUCH_HAVE_3G} ${GW_3G}
-        if [ -f ${TOUCH_HAVE_3G} ]; then
-            echo "3G link recovery succesfull"
-            return 0
+        get_gw_3g ${IF_3G}
+        if [ $? == 0 ]; then
+            have_if ${IF_3G} ${TOUCH_HAVE_3G} ${GW_3G}
+            if [ -f ${TOUCH_HAVE_3G} ]; then
+                echo "3G link recovery succesfull"
+                return 0
+            fi
         fi
     done
     return 1
