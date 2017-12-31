@@ -1,5 +1,5 @@
 [Unit]
-After=network.service
+After=network.service sound.target
 
 [Service]
 User=haiot
