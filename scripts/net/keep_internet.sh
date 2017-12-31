@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # https://unix.stackexchange.com/questions/190513/shell-scripting-proper-way-to-check-for-internet-connectivity
-
 GW=`/sbin/ip route | awk '/default/ { print $3 }'`
 checkdns=`cat /etc/resolv.conf | awk '/nameserver/ {print $2}' | awk 'NR == 1 {print; exit}'`
 pppdns1=`cat /etc/ppp/resolv.conf | awk '/nameserver/ {print $2}' | awk 'NR == 1 {print; exit}'`
@@ -222,7 +221,7 @@ function check_ssh {
         if [ $? == 0 ]; then
             LAST_EXT_IP=${EXT_IP_3G}
             get_3g_ext_ip
-            if [ ${LAST_EXT_IP} != ${EXT_IP_3G} ]; then
+            if [ "${LAST_EXT_IP}" != "${EXT_IP_3G}" ]; then
                 echo "SSH is probably freezed as 3G ip changed since got connected"
             else
                 return 0
@@ -302,14 +301,14 @@ function get_gw_3g {
 
 function shut_usb_eth {
     echo "Turn off eth usb port"
-    ${HAIOT_DIR}/../hub-ctrl -h 0 -P 1 -p 0
+    /usr/local/bin/hub-ctrl -h 0 -P 1 -p 0
 }
 
 # https://www.raspberrypi.org/forums/viewtopic.php?t=196827
 function cycle_usb_ports {
-    ${HAIOT_DIR}/../hub-ctrl -h 0 -P 2 -p 0
+    /usr/local/bin/hub-ctrl -h 0 -P 2 -p 0
     sleep 5
-    ${HAIOT_DIR}/../hub-ctrl -h 0 -P 2 -p 1
+    /usr/local/bin/hub-ctrl -h 0 -P 2 -p 1
 }
 
 function loop
