@@ -1,7 +1,7 @@
 import traceback
 import pyownet.protocol
 from pydispatch import dispatcher
-from main.logger_helper import Log
+from main.logger_helper import L
 from common import Constant, utils
 from main.admin import model_helper, models
 
@@ -43,11 +43,11 @@ def do_device():
             sensor_dict[dev['address']] = dev
             save_to_db(dev)
         except pyownet.protocol.ConnError, er:
-            Log.logger.warning('Connection error owserver: {}'.format(er))
+            L.l.warning('Connection error owserver: {}'.format(er))
         except pyownet.Error, ex:
-            Log.logger.warning('Error reading sensor type={}: {}'.format(sensortype, ex))
+            L.l.warning('Error reading sensor type={}: {}'.format(sensortype, ex))
         except Exception, ex:
-            Log.logger.warning('Other error reading sensors: {}'.format(ex))
+            L.l.warning('Other error reading sensors: {}'.format(ex))
             traceback.print_exc()
     return sensor_dict
 
@@ -119,7 +119,7 @@ def save_to_db(dev):
         if record.vad is not None:
             dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=record.sensor_name, value=record.vad)
     except Exception, ex:
-        Log.logger.error('Error saving sensor to DB, err {}'.format(ex), exc_info=True)
+        L.l.error('Error saving sensor to DB, err {}'.format(ex), exc_info=True)
         # finally:
         #    db_lock.release()
 
@@ -198,7 +198,7 @@ def check_inactive(sensor_dict):
             record.save_changed_fields(current_record=None, new_record=record, save_to_graph=True, save_all_fields=True)
         elapsed = round((utils.get_base_location_now_date() - sensor.updated_on).total_seconds() / 60, 0)
         if elapsed > 2 * sampling_period_seconds:
-            Log.logger.warning('Sensor {} type {} not responding since {} min'.format(
+            L.l.warning('Sensor {} type {} not responding since {} min'.format(
                 sensor.sensor_name,sensor.type, elapsed))
 
 
@@ -209,7 +209,7 @@ def get_unknown(sensor, dev):
 
 
 def init():
-    Log.logger.debug('Initialising owssensor')
+    L.l.debug('Initialising owssensor')
     global __owproxy, initialised
     host = "none"
     port = "none"
@@ -219,14 +219,14 @@ def init():
         __owproxy = pyownet.protocol.proxy(host=host, port=port)
         initialised = True
     except Exception, ex:
-        Log.logger.info('1-wire owserver not found on host {} port {}'.format(host, port))
+        L.l.info('1-wire owserver not found on host {} port {}'.format(host, port))
         initialised = False
     return initialised
 
 
 def thread_run():
     global initialised
-    Log.logger.debug('Processing sensors')
+    L.l.debug('Processing sensors')
     if initialised:
         sensor_dict = do_device()
         check_inactive(sensor_dict)

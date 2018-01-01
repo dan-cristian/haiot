@@ -2,7 +2,7 @@
 
 import requests
 import json
-from main.logger_helper import Log
+from main.logger_helper import L
 from common import Constant
 from main.admin import model_helper
 from pydispatch import dispatcher
@@ -59,7 +59,7 @@ def hipchat_notify(message, color='yellow', notify=False, format='html', host='a
 
 
 def unload():
-    Log.logger.info('Hipchat module unloading')
+    L.l.info('Hipchat module unloading')
     #dispatcher.disconnect(dispatcher.connect(hipchat_notify, signal=Constant.SIGNAL_PUSH_NOTIFICATION,
     #                                         sender=dispatcher.Any))
     global initialised
@@ -67,7 +67,7 @@ def unload():
 
 
 def init():
-    Log.logger.debug('Hipchat module initialising')
+    L.l.debug('Hipchat module initialising')
     dispatcher.connect(hipchat_notify, signal=Constant.SIGNAL_CHAT_NOTIFICATION, sender=dispatcher.Any)
     global _token, _room
     _token = model_helper.get_param(Constant.P_HIPCHAT_TOKEN)
@@ -78,7 +78,7 @@ def init():
         # send_message(title="Initialised", message="Module initialised")
         # send_message(title="Initialised 2", message="Module initialised 2")
     except Exception, ex:
-        Log.logger.error("Unable tp init hipchat %s" % ex)
+        L.l.error("Unable tp init hipchat %s" % ex)
     # thread_pool.add_interval_callable(_send_queue, run_interval_second=60)
     global initialised
     initialised = True

@@ -36,7 +36,7 @@ import time
 import urllib
 import uuid
 from inspect import getmembers, isfunction
-from main.logger_helper import Log
+from main.logger_helper import L
 from main import thread_pool
 from main.admin.model_helper import get_param
 from common import Constant
@@ -104,7 +104,7 @@ class poller:
                 if target:
                     target.do_read(one_ready[0])
         except Exception, ex:
-            Log.logger.error("Error in wemo poll: {}".format(ex))
+            L.l.error("Error in wemo poll: {}".format(ex))
 
 
 # Base class for a generic UPnP device. This is far from complete
@@ -124,7 +124,7 @@ class upnp_device(object):
             except:
                 upnp_device.this_host_ip = '127.0.0.1'
             del (temp_socket)
-            Log.logger.info("got local address of %s" % upnp_device.this_host_ip)
+            L.l.info("got local address of %s" % upnp_device.this_host_ip)
         return upnp_device.this_host_ip
 
     def __init__(self, listener, pooller, port, index, root_url, server_version, persistent_uuid, other_headers=None,
@@ -176,7 +176,7 @@ class upnp_device(object):
         return "unknown"
 
     def respond_to_search(self, destination, search_target):
-        Log.logger.info("Responding to search for %s" % self.get_name())
+        L.l.info("Responding to search for %s" % self.get_name())
         date_str = email.utils.formatdate(timeval=None, localtime=False, usegmt=True)
         location_url = self.root_url % {'ip_address': self.ip_address, 'port': self.port}
         message = ("HTTP/1.1 200 OK\r\n"
@@ -222,14 +222,14 @@ class fauxmo(upnp_device):
             self.action_handler_off = action_handler_off
         #else:
         #    self.action_handler_on = self
-        Log.logger.info("WeMo device '%s' ready on %s:%s" % (self.name, self.ip_address, self.port))
+        L.l.info("WeMo device '%s' ready on %s:%s" % (self.name, self.ip_address, self.port))
 
     def get_name(self):
         return self.name
 
     def handle_request(self, data, sender, socket):
         if data.find('GET /setup.xml HTTP/1.1') == 0:
-            Log.logger.info("Responding to setup.xml for %s" % self.name)
+            L.l.info("Responding to setup.xml for %s" % self.name)
             xml = SETUP_XML % {'device_name': self.name, 'device_serial': self.serial}
             date_str = email.utils.formatdate(timeval=None, localtime=False, usegmt=True)
             message = ("HTTP/1.1 200 OK\r\n"
@@ -247,17 +247,17 @@ class fauxmo(upnp_device):
             success = False
             if data.find('<BinaryState>1</BinaryState>') != -1:
                 # on
-                Log.logger.info("Responding to ON for %s" % self.name)
+                L.l.info("Responding to ON for %s" % self.name)
                 success = rule.execute_rule(self.action_handler_on)
                 # success = self.action_handler_on()
             elif data.find('<BinaryState>0</BinaryState>') != -1:
                 # off
-                Log.logger.info("Responding to OFF for %s" % self.name)
+                L.l.info("Responding to OFF for %s" % self.name)
                 success = rule.execute_rule(self.action_handler_off)
                 # success = self.action_handler_off()
             else:
-                Log.logger.info("Unknown Binary State request:")
-                Log.logger.info(data)
+                L.l.info("Unknown Binary State request:")
+                L.l.info(data)
             if success:
                 # The echo is happy with the 200 status code and doesn't
                 # appear to care about the SOAP response body
@@ -275,7 +275,7 @@ class fauxmo(upnp_device):
                            "%s" % (len(soap), date_str, soap))
                 socket.send(message)
         else:
-            Log.logger.info(data)
+            L.l.info(data)
 
     def on(self):
         return False
@@ -314,20 +314,20 @@ class upnp_broadcast_responder(object):
             try:
                 self.ssock.bind(('', self.port))
             except Exception, e:
-                Log.logger.warning("WARNING: Failed to bind %s:%d: %s", (self.ip, self.port, e))
+                L.l.warning("WARNING: Failed to bind %s:%d: %s", (self.ip, self.port, e))
                 ok = False
 
             try:
                 self.ssock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, self.mreq)
             except Exception, e:
-                Log.logger.warning('WARNING: Failed to join multicast group:', e)
+                L.l.warning('WARNING: Failed to join multicast group:', e)
                 ok = False
 
         except Exception, e:
-            Log.logger.warning("Failed to initialize UPnP sockets:", e)
+            L.l.warning("Failed to initialize UPnP sockets:", e)
             return False
         if ok:
-            Log.logger.warning("Listening for UPnP broadcasts")
+            L.l.warning("Listening for UPnP broadcasts")
 
     def fileno(self):
         return self.ssock.fileno()
@@ -357,12 +357,12 @@ class upnp_broadcast_responder(object):
             else:
                 return False, False
         except Exception, e:
-            Log.logger.warning(e)
+            L.l.warning(e)
             return False, False
 
     def add_device(self, device):
         self.devices.append(device)
-        Log.logger.info("UPnP broadcast listener: new device registered")
+        L.l.info("UPnP broadcast listener: new device registered")
 
 
 def unload():
@@ -371,7 +371,7 @@ def unload():
 
 
 def init():
-    Log.logger.info('Wemo module initialising')
+    L.l.info('Wemo module initialising')
     global _pooler
 
     # Set up our singleton for polling the sockets for data read
