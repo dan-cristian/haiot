@@ -103,7 +103,7 @@ function ping_via_gw {
     gw=$2
     line=`getent ahostsv4 ${checkdomain} | head -1`
     host=${line%  *}
-    if [ ${host} == "" ]; then
+    if [ "${host}" == "" ]; then
         echo "Could not resolve address ${checkdomain}, trying again"
         out=`ping ${checkdomain} -c 1`
         arr=(`echo ${out}`)
@@ -111,7 +111,7 @@ function ping_via_gw {
         host=${host//\(}
         host=${host//)}
     fi
-    if [ ${host} == "" ]; then
+    if [ "${host}" == "" ]; then
         echo "Could not resolve address ${checkdomain}, giving up"
     else
         route add -host ${host} gw ${gw}
