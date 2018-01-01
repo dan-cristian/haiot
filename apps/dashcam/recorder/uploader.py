@@ -170,6 +170,7 @@ def _clean_space():
                             keep_try = False
                             break
                 else:
+                    Log.logger.info('Disk usage is {}'.format(usage))
                     keep_try = False
                     break
 
