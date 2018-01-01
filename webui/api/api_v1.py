@@ -2,7 +2,7 @@ import os
 from pydispatch import dispatcher
 from flask import abort, send_file, render_template, request
 from main import app, db
-from main.logger_helper import Log
+from main.logger_helper import L
 from main.admin.model_helper import commit
 from common import Constant, utils
 import cloud.alexa.mpd_run
@@ -23,8 +23,8 @@ def return_web_message(pin_value, ok_message='', err_message=''):
            '&field_name=<field_name>&filter_value=<filter_value>&field_value=<field_value>')
 def generic_db_update(model_name, filter_name, filter_value, field_name, field_value):
     try:
-        Log.logger.info("Execute API generic_db_update model={} filter={} filtervalue={} field={} fieldvalue={}"
-                        .format(model_name, filter_name, filter_value, field_name, field_value))
+        L.l.info("Execute API generic_db_update model={} filter={} filtervalue={} field={} fieldvalue={}"
+                 .format(model_name, filter_name, filter_value, field_name, field_value))
         table = utils.class_for_name('main.admin.models', model_name)
         # http://stackoverflow.com/questions/19506105/flask-sqlalchemy-query-with-keyword-as-variable
         kwargs = {filter_name: filter_value}
@@ -42,15 +42,15 @@ def generic_db_update(model_name, filter_name, filter_value, field_name, field_v
                 return '%s: %s' % (Constant.SCRIPT_RESPONSE_OK, record)
             else:
                 msg = 'Field {} not found in record {}'.format(field_name, record)
-                Log.logger.warning(msg)
+                L.l.warning(msg)
                 return '%s: %s' % (Constant.SCRIPT_RESPONSE_NOTOK, msg)
         else:
             msg = 'No records returned for filter_name={} and filter_value={}'.format(filter_name, filter_value)
-            Log.logger.warning(msg)
+            L.l.warning(msg)
             return '%s: %s' % (Constant.SCRIPT_RESPONSE_NOTOK, msg)
     except Exception, ex:
         msg = 'Exception on /apiv1/db_update: {}'.format(ex)
-        Log.logger.error(msg, exc_info=1)
+        L.l.error(msg, exc_info=1)
         return '%s: %s' % (Constant.SCRIPT_RESPONSE_NOTOK, msg)
     finally:
         # db.session.remove()
@@ -65,9 +65,9 @@ def camera_alert(zone_name, cam_name, has_move):
 
 @app.route('/apiv1/amp_power/state=<power_state>&relay_name=<relay_name>&amp_zone_index=<amp_zone_index>')
 def amp_power(power_state, relay_name, amp_zone_index=None):
-    Log.logger.info("Started amp_power api request")
+    L.l.info("Started amp_power api request")
     result = amp.set_amp_power(int(power_state), relay_name, int(amp_zone_index))
-    Log.logger.info("Done amp_power api request result={}".format(result))
+    L.l.info("Done amp_power api request result={}".format(result))
     return result
 
 
@@ -182,4 +182,4 @@ def dir_listing(req_path):
     except Exception, ex:
         return 'Error request={}, err={}'.format(req_path, ex)
 
-Log.logger.info('API V1 module initialised')
+L.l.info('API V1 module initialised')

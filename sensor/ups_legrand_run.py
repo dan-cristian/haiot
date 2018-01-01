@@ -2,7 +2,7 @@ __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
 import time
 import serial
-from main.logger_helper import Log
+from main.logger_helper import L
 from common import Constant, utils
 import serial_common
 from main.admin import models
@@ -41,7 +41,7 @@ def __open_port(ser):
         ser.open()
         return True
     except Exception, ex:
-        Log.logger.warning('Unable to open serial port {}'.format(ser.port))
+        L.l.warning('Unable to open serial port {}'.format(ser.port))
         return False
 
 
@@ -55,9 +55,9 @@ def __write_read_port(ser, command):
             time.sleep(0.3)
             response = str(ser.readline()).replace('\n', '')
         except Exception, ex:
-            Log.logger.warning('Error writing to serial {}, err={}'.format(ser.port, ex))
+            L.l.warning('Error writing to serial {}, err={}'.format(ser.port, ex))
     else:
-        Log.logger.warning('Error writing to closed serial {}'.format(ser.port))
+        L.l.warning('Error writing to closed serial {}'.format(ser.port))
     return response
 
 
@@ -72,7 +72,7 @@ def __search_ups(port_name):
             response = __write_read_port(ser, 'I\r')
             # [#                           JP00106G  #015]
             if "JP00106G" in response:
-                Log.logger.info('Got serial response [{}] on ups init port {}'.format(response, port_name))
+                L.l.info('Got serial response [{}] on ups init port {}'.format(response, port_name))
                 __serial = ser
                 __ups = LegrandUps()
                 __ups.Id = str(response).replace(' ', '').replace('\r', '')
@@ -80,7 +80,7 @@ def __search_ups(port_name):
                 __ups.Port = port_name
                 break
             else:
-                Log.logger.info('Got unknown response [{}][{}] on ups init port {}'.format(
+                L.l.info('Got unknown response [{}][{}] on ups init port {}'.format(
                     response, len(response), port_name))
     if __serial is None:
         ser.close()
@@ -125,12 +125,12 @@ def __read_ups_status():
             record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
                                        save_to_graph=True)
 
-            Log.logger.debug('UPS remaining={} load={} input={} output={}'.format(
+            L.l.debug('UPS remaining={} load={} input={} output={}'.format(
                 __ups.RemainingMinutes, __ups.LoadPercent, __ups.InputVoltage, __ups.OutputVoltage))
         else:
-            Log.logger.warning('Unexpected number of parameters ({}) on ups status read'.format(len(atoms)))
+            L.l.warning('Unexpected number of parameters ({}) on ups status read'.format(len(atoms)))
     else:
-        Log.logger.info('Read empty UPS status')
+        L.l.info('Read empty UPS status')
 
 
 def _create_dummy_entry():
@@ -159,22 +159,22 @@ def init():
     initialised = False
     try:
         # if constant.OS in constant.OS_LINUX:
-        Log.logger.info('Looking for serial ports')
+        L.l.info('Looking for serial ports')
         serial_list = serial_common.get_standard_serial_device_list()
         # else:
         #    portpath = None
         #    #fixme windows autodetect version
         if len(serial_list) > 0:
-            Log.logger.info('Looking for Legrand UPS on {} serial ports'.format(len(serial_list)))
+            L.l.info('Looking for Legrand UPS on {} serial ports'.format(len(serial_list)))
             for device in serial_list:
                 __search_ups(device)
                 if __serial is not None:
                     break
             initialised = True
         else:
-            Log.logger.info('No standard open serial ports detected on this system')
+            L.l.info('No standard open serial ports detected on this system')
     except Exception, ex:
-        Log.logger.warning('Unable to open ups port, err {}'.format(ex))
+        L.l.warning('Unable to open ups port, err {}'.format(ex))
     if not initialised:
         _create_dummy_entry()
     return initialised

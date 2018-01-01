@@ -4,7 +4,7 @@ import pylast
 from main.admin.model_helper import get_param
 from common import Constant
 from music import mpd, gmusicproxy
-from main.logger_helper import Log
+from main.logger_helper import L
 import json
 
 USERNAME = None
@@ -83,13 +83,13 @@ def _add_to_playlist(tracks):
                 artist = track[0].artist.name
                 title = track[0].title
             # print track[0].artist.name, track[0].title
-            Log.logger.info("Searching for {} - {}".format(artist.encode('utf-8'), title.encode('utf-8')))
+            L.l.info("Searching for {} - {}".format(artist.encode('utf-8'), title.encode('utf-8')))
             res = mpd_client.search("any", title)
             if len(res) == 0:
-                Log.logger.info("Search again in mpd")
+                L.l.info("Search again in mpd")
                 res = mpd_client.search("file", title)
             if len(res) == 0:
-                Log.logger.info("Searching in Google Music as song not found in mpd")
+                L.l.info("Searching in Google Music as song not found in mpd")
                 gsong_id = gmusicproxy.get_song_id(artist=artist, title=title)
                 if gsong_id is not None:
                     # adding stream songs first to encourage first play (these are newer I guess)
@@ -97,14 +97,14 @@ def _add_to_playlist(tracks):
                         addindex = 1  # keep first song first
                     else:
                         addindex = 0
-                    Log.logger.info("Added file {}".format(gmusicproxy.get_song_url(gsong_id)))
+                    L.l.info("Added file {}".format(gmusicproxy.get_song_url(gsong_id)))
                     mpd_client.addid(gmusicproxy.get_song_url(gsong_id), addindex)
                     added += 1
                 else:
-                    Log.logger.warning("Could not find the song in Google Music")
+                    L.l.warning("Could not find the song in Google Music")
             else:
                 mpd_client.add(res[0]['file'])
-                Log.logger.info("Added file {}".format(res[0]['file']))
+                L.l.info("Added file {}".format(res[0]['file']))
                 added += 1
             if added == 1:  # fixme: might re-play several times
                 mpd_client.play(0)
@@ -113,7 +113,7 @@ def _add_to_playlist(tracks):
         result = 'Added {} songs'.format(added)
     else:
         result = 'Lastfm: No active mpd instance found'
-        Log.logger.warning(result)
+        L.l.warning(result)
     return result
 
 
