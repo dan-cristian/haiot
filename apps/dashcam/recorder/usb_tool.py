@@ -1,7 +1,7 @@
 import subprocess
 import os
 import sudo_usb
-from main.logger_helper import Log
+from main.logger_helper import L
 #import shlex
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
@@ -36,11 +36,11 @@ def get_usb_dev(dev_name):
         for filename in os.listdir(root):
             if dev_name in filename:
                 res = root + filename
-                Log.logger.info("Found usb cam at {}".format(res))
+                L.l.info("Found usb cam at {}".format(res))
                 break
         return res
     else:
-        Log.logger.info('No v4l folder, probably no usb vide device yet available')
+        L.l.info('No v4l folder, probably no usb vide device yet available')
         return None
 
 
@@ -57,21 +57,24 @@ def get_usb_audio(dev_name):
                         hw_card = atoms[0].split(':')[0].split('card ')[1]
                         hw_dev = atoms[1].split(':')[0].split(' device ')[1]
                         res = '{},{}'.format(hw_card, hw_dev)
-                        Log.logger.info("Found audio card {}".format(res))
+                        L.l.info("Found audio card {}".format(res))
                         break
     except Exception, ex:
-        Log.logger.info("Got error when looking for audio interface, ex={}".format(ex))
+        L.l.info("Got error when looking for audio interface, ex={}".format(ex))
     return res
 
 
 def reset_usb(dev_name):
-    path = sudo_usb.__file__.replace(".pyc", ".py")
-    res = subprocess.check_output(['sudo', 'python', path, dev_name])
-    Log.logger.info('Reset returned {}'.format(res))
+    try:
+        path = sudo_usb.__file__.replace(".pyc", ".py")
+        res = subprocess.check_output(['sudo', 'python', path, dev_name])
+        L.l.info('Reset returned {}'.format(res))
+    except Exception, ex:
+        L.l.error("Error on reset_usb {}".format(ex))
 
 
 if __name__ == '__main__':
-    Log.logger.info(_get_usb_dev_root('C525'))
-    Log.logger.info(get_usb_dev('C525'))
+    L.l.info(_get_usb_dev_root('C525'))
+    L.l.info(get_usb_dev('C525'))
     reset_usb('C525')
 

@@ -10,7 +10,7 @@ try:
 except Exception, ex:
     __inotify_import_ok = False
 from pydispatch import dispatcher
-from main.logger_helper import Log
+from main.logger_helper import L
 from main.admin import model_helper
 from common import Constant
 
@@ -42,7 +42,7 @@ def init():
     global __observer, initialised, __inotify_import_ok
     if __inotify_import_ok:
         path = model_helper.get_param(Constant.P_MOTION_VIDEO_PATH)
-        Log.logger.info('Initialising file watchdog for folder={}'.format(path))
+        L.l.info('Initialising file watchdog for folder={}'.format(path))
         if os.path.exists(path):
             event_handler = EventHandler()
             __observer = Observer()
@@ -50,6 +50,6 @@ def init():
             initialised = True
             __observer.start()
         else:
-            Log.logger.warning('Filewatch not initialised watch path={} not found'.format(path))
+            L.l.warning('Filewatch not initialised watch path={} not found'.format(path))
     else:
-        Log.logger.info('Inotify observer not available,  not initialising file watch')
+        L.l.info('Inotify observer not available,  not initialising file watch')

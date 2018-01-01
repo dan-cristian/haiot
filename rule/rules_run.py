@@ -2,7 +2,7 @@ import time
 import sys
 import thread
 import datetime
-from main.logger_helper import Log
+from main.logger_helper import L
 from main.admin import models
 import rule_common
 from music import mpd
@@ -30,7 +30,7 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 def execute_macro(obj=models.Rule(), field_changed_list=None, force_exec=False):
     if obj.execute_now or force_exec:
-        Log.logger.info('Execute macro {} as execute_now is True'.format(obj.command))
+        L.l.info('Execute macro {} as execute_now is True'.format(obj.command))
         # obj.execute_now = False
         # obj.commit_record_to_db()
         func = getattr(sys.modules[__name__], obj.command)
@@ -40,7 +40,7 @@ def execute_macro(obj=models.Rule(), field_changed_list=None, force_exec=False):
         else:
             result = func()
     else:
-        Log.logger.info('Ignoring execute macro as execute_now is False')
+        L.l.info('Ignoring execute macro as execute_now is False')
         result = "Rule not executed as execute_now is False"
     return result
 
@@ -55,7 +55,7 @@ def rule_alarm(obj=models.ZoneAlarm(), field_changed_list=None):
     # Log.logger.info('Rule Alarm: obj={} fields={}'.format(obj, field_changed_list))
     if obj.alarm_pin_triggered:
         if obj.start_alarm:
-            Log.logger.debug('Rule Alarm ON:  pin={} triggered={}'.format(obj.alarm_pin_name, obj.alarm_pin_triggered))
+            L.l.debug('Rule Alarm ON:  pin={} triggered={}'.format(obj.alarm_pin_name, obj.alarm_pin_triggered))
             msg = 'Alarm ON {}'.format(obj.alarm_pin_name)
             rule_common.notify_via_all(title=msg, message=msg, priority=3)
         if obj.alarm_pin_name == 'sonerie':
@@ -131,7 +131,7 @@ def rule_ups_power(obj=models.Ups(), field_changed_list=None):
 
 def test_code():
     """second=18;is_active=0"""
-    Log.logger.info("Test rule code 3")
+    L.l.info("Test rule code 3")
     #rule_common.update_custom_relay('test_relay', True)
     #time.sleep(0.5)
     #rule_common.update_custom_relay('test_relay', False)
@@ -141,16 +141,16 @@ def test_code():
 
 
 def toggle_gate():
-    Log.logger.info('Rule: toggle gate relay on {}'.format(datetime.datetime.now()))
+    L.l.info('Rule: toggle gate relay on {}'.format(datetime.datetime.now()))
     rule_common.update_custom_relay('gate_relay', True)
     time.sleep(1)
-    Log.logger.info('Rule: toggle gate relay off{}'.format(datetime.datetime.now()))
+    L.l.info('Rule: toggle gate relay off{}'.format(datetime.datetime.now()))
     rule_common.update_custom_relay('gate_relay', False)
 
 
 def morning_alarm_dormitor():
     """day_of_week=1-5;hour=7;minute=15;is_active=1"""
-    Log.logger.info('Rule: morning alarm dormitor')
+    L.l.info('Rule: morning alarm dormitor')
     execfile("~/PYC/scripts/audio/mpc-play.sh 6603 music")
 
 
@@ -196,7 +196,7 @@ def water_back_main_3_minute():
 
 def back_pump_on():
     """month=05-09;hour=07;minute=50;is_active=0"""
-    Log.logger.info('Rule: back pump on')
+    L.l.info('Rule: back pump on')
     rule_common.update_custom_relay('back_pump_relay', True)
     # with app.test_request_context():
     #    Log.logger.info(redirect('/apiv1/relay/get'))
@@ -206,20 +206,20 @@ def back_pump_on():
 
 def back_pump_off():
     """month=05-09;hour=07;minute=56;is_active=0"""
-    Log.logger.info('back pump off')
+    L.l.info('back pump off')
     rule_common.update_custom_relay('back_pump_relay', False)
 
 
 def water_front_on():
     """month=05-09;hour=07;minute=50;is_active=0"""
-    Log.logger.info('water front on')
+    L.l.info('water front on')
     back_pump_on()
     rule_common.update_custom_relay('front_valve_relay', True)
 
 
 def water_front_off():
     """month=05-09;hour=07;minute=52;is_active=0"""
-    Log.logger.info('water front off')
+    L.l.info('water front off')
     rule_common.update_custom_relay('front_valve_relay', False)
     # let the pump build some pressure
     time.sleep(5)
@@ -229,28 +229,28 @@ def water_front_off():
 
 def water_front_main_on():
     """month=05-09;hour=07;minute=50;is_active=0"""
-    Log.logger.info('water front main on')
+    L.l.info('water front main on')
     rule_common.update_custom_relay('front_main_valve_relay', True)
     rule_common.update_custom_relay('front_valve_relay', True)
 
 
 def water_front_main_off():
     """month=05-09;hour=07;minute=52;is_active=0"""
-    Log.logger.info('water front main off')
+    L.l.info('water front main off')
     rule_common.update_custom_relay('front_main_valve_relay', False)
     rule_common.update_custom_relay('front_valve_relay', True)
 
 
 def water_back_on():
     """month=05-09;hour=07;minute=54;is_active=0"""
-    Log.logger.info('water back on')
+    L.l.info('water back on')
     back_pump_on()
     rule_common.update_custom_relay('back_valve_relay', True)
 
 
 def water_back_off():
     """month=05-09;hour=07;minute=57;is_active=0"""
-    Log.logger.info('water back off')
+    L.l.info('water back off')
     rule_common.update_custom_relay('back_valve_relay', False)
     # let the pump build some pressure
     time.sleep(5)
@@ -260,14 +260,14 @@ def water_back_off():
 
 def water_back_main_on():
     """month=05-09;hour=07;minute=54;is_active=0"""
-    Log.logger.info('water back main on')
+    L.l.info('water back main on')
     rule_common.update_custom_relay('front_main_valve_relay', True)
     rule_common.update_custom_relay('back_valve_relay', True)
 
 
 def water_back_main_off():
     """month=05-09;hour=07;minute=57;is_active=0"""
-    Log.logger.info('water back main off')
+    L.l.info('water back main off')
     rule_common.update_custom_relay('front_main_valve_relay', False)
     rule_common.update_custom_relay('back_valve_relay', False)
 

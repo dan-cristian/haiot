@@ -1,4 +1,4 @@
-from main.logger_helper import Log
+from main.logger_helper import L
 from main import thread_pool
 import template_run
 
@@ -8,7 +8,7 @@ initialised = False
 
 
 def unload():
-    Log.logger.info('Template module unloading')
+    L.l.info('Template module unloading')
     # ...
     thread_pool.remove_callable(template_run.thread_run)
     global initialised
@@ -16,7 +16,7 @@ def unload():
 
 
 def init():
-    Log.logger.info('Template module initialising')
+    L.l.info('Template module initialising')
     thread_pool.add_interval_callable(template_run.thread_run, run_interval_second=60)
     global initialised
     initialised = True

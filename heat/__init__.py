@@ -3,7 +3,7 @@ __author__ = 'dcristian'
 from pydispatch import dispatcher
 
 import heat_loop
-from main.logger_helper import Log
+from main.logger_helper import L
 from main import thread_pool
 from main.admin import models
 from common import Constant, utils
@@ -25,14 +25,14 @@ def record_update(obj_dict=None):
         is_on = utils.get_object_field_value(obj_dict,utils.get_model_field_name(models.ZoneHeatRelay.heat_is_on))
         # fixme: remove hard reference to object field
         sent_on = utils.get_object_field_value(obj_dict, "event_sent_datetime")
-        Log.logger.info('Received heat relay update from {} zoneid={} pin={} is_on={} sent={}'.format(
+        L.l.info('Received heat relay update from {} zoneid={} pin={} is_on={} sent={}'.format(
             source_host_name, zone_id, pin_name, is_on, sent_on))
         zone_heat_relay = models.ZoneHeatRelay.query.filter_by(zone_id=zone_id).first()
         if zone_heat_relay:
             gpio_host_name = zone_heat_relay.gpio_host_name
             cmd_heat_is_on = utils.get_object_field_value(obj_dict,
                                                           utils.get_model_field_name(models.ZoneHeatRelay.heat_is_on))
-            Log.logger.debug('Local heat state zone_id {} must be changed to {} on pin {}'.format(
+            L.l.debug('Local heat state zone_id {} must be changed to {} on pin {}'.format(
                 zone_id, cmd_heat_is_on, zone_heat_relay.gpio_pin_code))
             if cmd_heat_is_on:
                 pin_value = 1
@@ -49,12 +49,12 @@ def record_update(obj_dict=None):
                 zone_heat_relay.notify_transport_enabled = False
                 commit()
             else:
-                Log.logger.warning(
+                L.l.warning(
                     'Heat state zone_id {} unexpected val={} after setval={}'.format(zone_id, pin_state, pin_value))
         else:
-            Log.logger.warning('No heat relay defined for zone {}, db data issue?'.format(zone_id))
+            L.l.warning('No heat relay defined for zone {}, db data issue?'.format(zone_id))
     except Exception, ex:
-        Log.logger.warning('Error updating heat relay state, err {}'.format(ex))
+        L.l.warning('Error updating heat relay state, err {}'.format(ex))
 
 
 def handle_event_heat(zone='', heat_is_on=''):
@@ -63,7 +63,7 @@ def handle_event_heat(zone='', heat_is_on=''):
 
 
 def unload():
-    Log.logger.info('Heat module unloading')
+    L.l.info('Heat module unloading')
     global initialised
     initialised = False
     thread_pool.remove_callable(heat_loop.thread_run)
@@ -71,7 +71,7 @@ def unload():
 
 
 def init():
-    Log.logger.info('Heat module initialising')
+    L.l.info('Heat module initialising')
     dispatcher.connect(handle_event_heat, signal=Constant.SIGNAL_HEAT, sender=dispatcher.Any)
     thread_pool.add_interval_callable(heat_loop.thread_run, 60)
     global initialised

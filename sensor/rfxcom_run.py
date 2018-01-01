@@ -1,6 +1,6 @@
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
-from main.logger_helper import Log
+from main.logger_helper import L
 from RFXtrx.pyserial import PySerialTransport
 import RFXtrx
 from main.admin import models
@@ -22,7 +22,7 @@ def __rfx_reading(packet):
             global last_packet_received
             last_packet_received = utils.get_base_location_now_date()
         except Exception, ex:
-            Log.logger.info('Unknown rfx packet type {} err={}'.format(packet, ex))
+            L.l.info('Unknown rfx packet type {} err={}'.format(packet, ex))
 
 
 def __save_sensor_db(p_id='', p_type='', value_list=None):
@@ -61,25 +61,25 @@ def init():
             portpath = None
             # fixme windows autodetect version
         if portpath:
-            Log.logger.info('Initialising RFXCOM on port {}'.format(portpath))
+            L.l.info('Initialising RFXCOM on port {}'.format(portpath))
             transport = PySerialTransport(portpath, debug=True)
             transport.reset()
             initialised = True
         else:
-            Log.logger.info('No RFX device detected on this system')
+            L.l.info('No RFX device detected on this system')
     except Exception, ex:
-        Log.logger.warning('Unable to open RFX tty port, err {}'.format(ex))
+        L.l.warning('Unable to open RFX tty port, err {}'.format(ex))
     return initialised
 
 
 def thread_run():
     global transport, initialised, last_packet_received
     try:
-        Log.logger.debug('Waiting for RFX event')
+        L.l.debug('Waiting for RFX event')
         time_elapsed_minutes = (utils.get_base_location_now_date() - last_packet_received).seconds / 60
         if time_elapsed_minutes > 10:
-            Log.logger.warning('RFX event not received since {} minutes, device error?'.format(time_elapsed_minutes))
+            L.l.warning('RFX event not received since {} minutes, device error?'.format(time_elapsed_minutes))
         if initialised:
             __rfx_reading(transport.receive_blocking())
     except Exception, ex:
-        Log.logger.warning('Error read RFX tty port, err {}'.format(ex))
+        L.l.warning('Error read RFX tty port, err {}'.format(ex))

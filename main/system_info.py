@@ -2,7 +2,7 @@ __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
 from collections import OrderedDict
 
-from main.logger_helper import Log
+from main.logger_helper import L
 from common import Constant
 
 description_system_type = None
@@ -42,7 +42,7 @@ def init():
                     words = line.split(':')
                     sysinfo[words[0].strip().lower()] = words[1].strip()
                 except Exception, ex:
-                    Log.logger.debug('get sysinfo line split error [{}] line [{}]'.format(ex, line))
+                    L.l.debug('get sysinfo line split error [{}] line [{}]'.format(ex, line))
             global description_model_name, description_machine, description_system_type, description_hardware, \
                 description_revision, description_cpu_model
             if 'model name' in sysinfo:     description_model_name = sysinfo['model name']
@@ -65,10 +65,10 @@ def init():
                 Constant.HOST_MACHINE_TYPE = Constant.MACHINE_TYPE_INTEL_LINUX
                 Constant.IS_MACHINE_INTEL = True
         if Constant.HOST_MACHINE_TYPE == Constant.NOT_INIT:
-            Log.logger.error("Unknown machine type")
+            L.l.error("Unknown machine type")
     elif Constant.IS_OS_WINDOWS():
         import platform
         Constant.HOST_MACHINE_TYPE = platform.machine()
     else:
-        Log.logger.warning("Unknown OS on system init")
+        L.l.warning("Unknown OS on system init")
 
