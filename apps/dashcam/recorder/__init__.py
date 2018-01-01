@@ -23,6 +23,7 @@ except Exception, ex:
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 initialised = False
+thread_tick=1
 
 class P:
     ffmpeg_pi = None
@@ -62,6 +63,7 @@ class P:
     pi_bitrate = 2000000
     inactivity_duration = 300  # seconds from last event after which camera will turn off
     last_move_time = None
+    last_clock_time=None
 
 
 def _get_win_cams():
@@ -309,6 +311,7 @@ def unload():
 
 def init():
     global initialised
+    P.last_clock_time = datetime.datetime.now()
     if not os.path.exists(P.recordings_root):
         os.makedirs(P.recordings_root)
     if not os.path.exists(P.dir_recordings_uploaded):
@@ -331,6 +334,10 @@ def init():
 
 def thread_run():
     try:
+        # detect ntp time drift, if clock changed adjust last move to avoid sudden recording stop
+        if (datetime.datetime.now() - P.last_clock_time).total_seconds() > thread_tick + 60:
+            P.last_move_time = datetime.datetime.now()
+        P.last_clock_time = datetime.datetime.now()
         _set_camera_state()
         if P.is_pi_camera_on:
             if P.is_recording_pi:
