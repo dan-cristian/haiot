@@ -161,7 +161,8 @@ def _clean_space():
                         _clean_old(days_keep, folder)
                         days_keep -= 1
                     else:
-                        Log.logger.info('Warning, need to remove files from files not uploaded folder {}'.format(P.root_folder))
+                        Log.logger.warning('Warning, need to remove files from files not uploaded folder {}'.format(
+                            P.root_folder))
                         if days_keep > 0:
                             days_keep = P.days_to_keep
                             folder = P.root_folder
@@ -170,7 +171,7 @@ def _clean_space():
                             keep_try = False
                             break
                 else:
-                    Log.logger.info('Disk usage is {}'.format(usage))
+                    #Log.logger.info('Disk usage is {}'.format(usage))
                     keep_try = False
                     break
 
