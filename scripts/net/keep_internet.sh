@@ -350,7 +350,7 @@ function start_ssh {
     su -lc "/usr/bin/fwknop -a ${EXT_IP_3G} -n ${FWKNOCK_SSH_PROFILE}" ${SSH_USER}
     if [ $? -eq 0 ]; then
         echo "Checking hanging remote ssh"
-        su -lc "/usr/bin/ssh -t ${SSH_USER}@${SSH_HOST} -p ${FWKNOCK_PORT} 'sudo netstat -anlp | grep 127.0.0.1:60000'"
+        su -lc "/usr/bin/ssh -t ${SSH_USER}@${SSH_HOST} -p ${FWKNOCK_PORT} 'sudo netstat -anlp | grep 127.0.0.1:60000'" ${SSH_USER}
         echo "Opening remote ssh tunnel"
         su -lc "/usr/bin/ssh -v -N -E ${SSH_LOG} -R ${SSH_REMOTE_PORT}:127.0.0.1:22 ${SSH_USER}@${SSH_HOST} -p ${FWKNOCK_PORT} &" ${SSH_USER}
         sleep 10
