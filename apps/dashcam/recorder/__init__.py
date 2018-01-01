@@ -233,7 +233,7 @@ def _pi_init():
                 P.is_pi_camera_on = False
             Log.logger.info("Unable to initialise picamera, ex={}".format(ex))
     else:
-        #Log.logger.info("No picamera module")
+        Log.logger.info("No picamera module, cannot start")
         P.is_pi_camera_on = False
 
 
