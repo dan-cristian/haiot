@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from flask import render_template, request, send_file
 from sqlalchemy import func, extract
 from main import app, db
-from main.logger_helper import Log
+from main.logger_helper import L
 from main.admin import models
 from common import Constant, utils
 import dashboard
@@ -55,7 +55,7 @@ def _get_sensor_records(group_by, function, sensor_name, start, end, sensor_type
     elif sensor_type == 'vad':
         field = models.SensorHistory.vad
     else:
-        Log.logger.warning("Unknown sensor type {}".format(sensor_type))
+        L.l.warning("Unknown sensor type {}".format(sensor_type))
         field = models.SensorHistory.temperature
 
     records = db.session.query(
@@ -90,7 +90,7 @@ def _get_interval(args):
     elif request.args.get('water') is not None:
         sensor_type = 'water'
     else:
-        Log.logger.warning("Unspecified sensor type, defaulting to temperature")
+        L.l.warning("Unspecified sensor type, defaulting to temperature")
         sensor_type = 'temperature'
 
     '''
@@ -163,10 +163,10 @@ def _get_interval(args):
                 function_list.append(func.avg)
             else:
                 function_list.append(func.avg)
-                Log.logger.warning("Unknown function {}, set default as AVG".format(args.get('function')))
+                L.l.warning("Unknown function {}, set default as AVG".format(args.get('function')))
     else:
         function_list.append(func.avg)
-        Log.logger.warning("Unspecified function, set default as AVG")
+        L.l.warning("Unspecified function, set default as AVG")
     return sensor_name_list, start, end, group_by, function_list, sensor_type, group_by_prefix
 
 
@@ -229,7 +229,7 @@ def graph_ups(key_name):
 
 
 def unload():
-    Log.logger.info('Chart module unloading')
+    L.l.info('Chart module unloading')
     # ...
     # thread_pool.remove_callable(template_run.thread_run)
     global initialised
@@ -237,7 +237,7 @@ def unload():
 
 
 def init():
-    Log.logger.info('Chart module initialising')
+    L.l.info('Chart module initialising')
     # thread_pool.add_interval_callable(template_run.thread_run, run_interval_second=60)
     global initialised
     initialised = True

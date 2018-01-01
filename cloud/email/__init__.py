@@ -1,4 +1,4 @@
-from main.logger_helper import Log
+from main.logger_helper import L
 from common import Constant
 from main.admin import model_helper
 from main import thread_pool
@@ -23,7 +23,7 @@ def _get_pass(email=None):
                 record = config_list[email]
                 return record['password']
     except Exception, ex:
-        Log.logger.warning("Could not read credential email file {}".format(config_file ))
+        L.l.warning("Could not read credential email file {}".format(config_file))
     return None
 
 
@@ -49,21 +49,21 @@ def send_notification(subject=None, body=None):
             server.close()
             return True
         except Exception, ex:
-            Log.logger.warning("Email not sent, err={}".format(ex))
+            L.l.warning("Email not sent, err={}".format(ex))
     else:
-        Log.logger.warning("Could not get credential for email {}".format(sent_from))
+        L.l.warning("Could not get credential for email {}".format(sent_from))
     return False
 
 
 def unload():
-    Log.logger.info('Email module unloading')
+    L.l.info('Email module unloading')
     # ...
     global initialised
     initialised = False
 
 
 def init():
-    Log.logger.debug('Email module initialising')
+    L.l.debug('Email module initialising')
     dispatcher.connect(send_notification, signal=Constant.SIGNAL_EMAIL_NOTIFICATION, sender=dispatcher.Any)
     global __notif_from, __notif_pass, __notif_dest
     __notif_from = model_helper.get_param(Constant.P_GMAIL_NOTIFY_FROM_EMAIL)

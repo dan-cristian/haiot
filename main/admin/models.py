@@ -2,7 +2,7 @@ from datetime import datetime
 import traceback
 import sys
 from copy import deepcopy
-from main.logger_helper import Log
+from main.logger_helper import L
 from main import db
 from common import Constant
 import graphs
@@ -28,7 +28,7 @@ class DbBase:
         query_details = function.im_self
         elapsed = performance.add_query(start_time, query_details=query_details)
         if elapsed > 5000:  # with sqlite a long query will throw an error
-            Log.logger.critical("Long running DB query, seconds elapsed={}, result={}".format(elapsed, query_details))
+            L.l.critical("Long running DB query, seconds elapsed={}, result={}".format(elapsed, query_details))
             # db.session.rollback()
             # Log.logger.info("Session was rolled back")
         return result
@@ -120,9 +120,9 @@ class DbBase:
                                          notify_transport_enabled=False, save_to_graph=False)
                 db.session.commit()
             else:
-                Log.logger.warning('Unique key not found in json record, save aborted')
+                L.l.warning('Unique key not found in json record, save aborted')
         except Exception, ex:
-            Log.logger.error('Exception save json to db {}'.format(ex))
+            L.l.error('Exception save json to db {}'.format(ex))
 
     # graph_save_frequency in seconds
     def save_changed_fields(self, current_record='', new_record='', notify_transport_enabled=False, save_to_graph=False,
@@ -138,7 +138,7 @@ class DbBase:
                     save_to_graph_elapsed = (utils.get_base_location_now_date() -
                                              current_record.last_save_to_graph).total_seconds()
                     if save_to_graph_elapsed > graph_save_frequency:
-                        Log.logger.debug('Saving to graph record {}'.format(new_record))
+                        L.l.debug('Saving to graph record {}'.format(new_record))
                         current_record.save_to_graph = save_to_graph
                         current_record.save_to_history = save_to_graph
                     else:
@@ -159,7 +159,7 @@ class DbBase:
                     new_value = getattr(new_record, column_name)
                     old_value = getattr(current_record, column_name)
                     if debug:
-                        Log.logger.info('DEBUG process Col={} New={} Old={} Saveall={}'.format(
+                        L.l.info('DEBUG process Col={} New={} Old={} Saveall={}'.format(
                             column_name, new_value, old_value, save_all_fields))
                     # todo: comparison not working for float, because str appends .0
                     if ((new_value is not None) and (str(old_value) != str(new_value))) \
@@ -177,10 +177,10 @@ class DbBase:
                             setattr(current_record, column_name, new_value)
                             current_record.last_commit_field_changed_list.append(column_name)
                             if debug:
-                                Log.logger.info('DEBUG change COL={} to VAL={}'.format(column_name, new_value))
+                                L.l.info('DEBUG change COL={} to VAL={}'.format(column_name, new_value))
                     else:
                         if debug:
-                            Log.logger.info('DEBUG not changing current column={}'.format(column_name))
+                            L.l.info('DEBUG not changing current column={}'.format(column_name))
                 if len(current_record.last_commit_field_changed_list) == 0:
                     current_record.notify_transport_enabled = False
                 # fixme: remove hardcoded field name
@@ -195,7 +195,7 @@ class DbBase:
                     if new_value:
                         new_record.last_commit_field_changed_list.append(column_name)
                 if debug:
-                    Log.logger.info('DEBUG new record={}'.format(new_record))
+                    L.l.info('DEBUG new record={}'.format(new_record))
                 db.session.add(new_record)
             # fixme: remove hardcoded field name
             if hasattr(new_record, 'last_save_to_graph'):
@@ -206,13 +206,13 @@ class DbBase:
         except Exception, ex:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             ex_trace = traceback.format_exception(exc_type, exc_value, exc_traceback)
-            Log.logger.error('Error when saving db changes [{}], err={}, trace=\n{}'.format(new_record, ex, ex_trace),
-                             exc_info=True)
+            L.l.error('Error when saving db changes [{}], err={}, trace=\n{}'.format(new_record, ex, ex_trace),
+                      exc_info=True)
             if len(db.session.dirty) > 0:
-                Log.logger.info('Session dirty records={}, rolling back'.format(len(db.session.dirty)))
+                L.l.info('Session dirty records={}, rolling back'.format(len(db.session.dirty)))
                 db.session.rollback()
             else:
-                Log.logger.info('No session dirty records to rollback for error {}'.format(ex))
+                L.l.info('No session dirty records to rollback for error {}'.format(ex))
             raise ex
             # else:
             #    Log.logger.warning('Incorrect parameters received on save changed fields to db')
