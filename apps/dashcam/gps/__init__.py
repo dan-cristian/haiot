@@ -66,7 +66,7 @@ def _upload_pos_buffer():
             Log.logger.info("Unable to upload position, err={}".format(ex))
             Log.logger.info("Buffer has {} elements".format(len(State.pos_buffer)))
             Log.logger.info("URL WAS:{}".format(url))
-    if initial - len(State.pos_buffer) > 1:
+    if (initial > 1) and (initial - len(State.pos_buffer) > 1):
         Log.logger.info("Buffer catches up, now has {} elements".format(len(State.pos_buffer)))
     if len(State.pos_buffer) > 0:
         _save_position()

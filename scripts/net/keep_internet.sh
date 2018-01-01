@@ -103,16 +103,28 @@ function ping_via_gw {
     gw=$2
     line=`getent ahostsv4 ${checkdomain} | head -1`
     host=${line%  *}
-    route add -host ${host} gw ${gw}
-    ping ${host} -c ${pcount} -W ${timeout} -q -I ${if} > /dev/null
-    res=$?
-    route del -host ${host}
-    if [ ${res} -eq 0 ]; then
-        return 0
-    else
-        echo && echo "Could not establish internet connection in ping ${host} via gw ${gw} on ${if}" >&2
-        return 1
+    if [ ${host} == "" ]; then
+        echo "Could not resolve address ${checkdomain}, trying again"
+        out=`ping ${checkdomain} -c 1`
+        arr=(`echo ${out}`)
+        host=${arr[2]}
+        host=${host//\(}
+        host=${host//)}
     fi
+    if [ ${host} == "" ]; then
+        echo "Could not resolve address ${checkdomain}, giving up"
+    else
+        route add -host ${host} gw ${gw}
+        ping ${host} -c ${pcount} -W ${timeout} -q -I ${if} > /dev/null
+        res=$?
+        route del -host ${host}
+        if [ ${res} -eq 0 ]; then
+            return 0
+        else
+            echo && echo "Could not establish internet connection in ping ${host} via gw ${gw} on ${if}" >&2
+        fi
+    fi
+    return 1
 }
 
 function httpreq
@@ -262,6 +274,15 @@ function restart_3g {
 #0.0.0.0         0.0.0.0         0.0.0.0         U     0      0        0 ppp0
 #10.64.64.64     0.0.0.0         255.255.255.255 UH    0      0        0 ppp0
 #192.168.0.0     0.0.0.0         255.255.255.0   U     0      0        0 wlan0
+
+
+#Kernel IP routing table
+#Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+#0.0.0.0         192.168.0.1     0.0.0.0         UG    0      0        0 wlan0
+#10.64.64.64     0.0.0.0         255.255.255.255 UH    0      0        0 ppp0
+#82.78.34.124    10.64.64.64     255.255.255.255 UGH   0      0        0 ppp0
+#192.168.0.0     0.0.0.0         255.255.255.0   U     0      0        0 wlan0
+
 
 function set_route_default {
     if=$1
