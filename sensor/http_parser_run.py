@@ -1,6 +1,6 @@
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
-from main.logger_helper import Log
+from main.logger_helper import L
 from common import Constant, utils, variable
 from main.admin import models, model_helper
 
@@ -23,7 +23,7 @@ def init_solar_aps():
             _initialised_solar_aps = False
         return _initialised_solar_aps
     except Exception, ex:
-        Log.logger.warning("Unable to connect to aps solar server, ex={}".format(ex))
+        L.l.warning("Unable to connect to aps solar server, ex={}".format(ex))
 
 
 def thread_solar_aps_run():
@@ -64,6 +64,6 @@ def thread_solar_aps_run():
                 record.save_changed_fields(current_record=current_record, new_record=record, debug=False,
                                            notify_transport_enabled=True, save_to_graph=True, save_all_fields=True)
         except Exception, ex:
-            Log.logger.warning("Got exception on solar thread run, ex={}".format(ex))
+            L.l.warning("Got exception on solar thread run, ex={}".format(ex))
 
 

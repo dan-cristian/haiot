@@ -1,6 +1,6 @@
 from pydispatch import dispatcher
 import threading
-from main.logger_helper import Log
+from main.logger_helper import L
 from main import thread_pool, persistence
 from common import Constant, variable, utils
 import transport
@@ -24,7 +24,7 @@ __mqtt_lock = threading.Lock()
 # executed on local db changes done via web ui only, including API calls
 def handle_local_event_db_post(model, row):
     processed = False
-    Log.logger.debug('Local DB change sent by model {} row {}'.format(model, row))
+    L.l.debug('Local DB change sent by model {} row {}'.format(model, row))
     if str(models.Parameter) in str(model):
         # fixme: update app if params are changing to avoid need for restart
         processed = True
@@ -48,9 +48,9 @@ def handle_local_event_db_post(model, row):
         processed = True
 
     if processed:
-        Log.logger.info('Detected {} record change, row={}, trigger executed'.format(model, row))
+        L.l.info('Detected {} record change, row={}, trigger executed'.format(model, row))
     else:
-        Log.logger.info('Detected {} record change, row={}, but change processing ignored'.format(model, row))
+        L.l.info('Detected {} record change, row={}, but change processing ignored'.format(model, row))
 
 
 # executed on every mqqt message received (except those sent by this host)
@@ -88,7 +88,7 @@ def on_models_committed(sender, changes):
             # send object to rule parser, if connected
             dispatcher.send(Constant.SIGNAL_DB_CHANGE_FOR_RULES, obj=obj, change=change)
     except Exception, ex:
-        Log.logger.exception('Error in DB commit hook, {}'.format(ex))
+        L.l.exception('Error in DB commit hook, {}'.format(ex))
 
 
 # runs periodically and executes received mqqt messages from queue
@@ -147,7 +147,7 @@ def mqtt_thread_run():
                         # no additional processing
                         pass
                     else:
-                        Log.logger.warning('Table %s content from %s is not mqtt processed' % (table, source_host))
+                        L.l.warning('Table %s content from %s is not mqtt processed' % (table, source_host))
 
                 if Constant.JSON_MESSAGE_TYPE in obj:
                     if variable.NODE_THIS_IS_MASTER_LOGGING:
@@ -157,15 +157,15 @@ def mqtt_thread_run():
                             msgdatetime = obj['datetime']
                             message = '{}, {}, {}'.format(source_host, msgdatetime, msg)
                             if levelname == 'INFO':
-                                Log.remote_logger.info(message)
+                                L.remote_logger.info(message)
                             elif levelname == 'WARNING':
-                                Log.remote_logger.warning(message)
+                                L.remote_logger.warning(message)
                             elif levelname == 'CRITICAL':
-                                Log.remote_logger.critical(message)
+                                L.remote_logger.critical(message)
                             elif levelname == 'ERROR':
-                                Log.remote_logger.error(message)
+                                L.remote_logger.error(message)
                             elif levelname == 'DEBUG':
-                                Log.remote_logger.debug(message)
+                                L.remote_logger.debug(message)
                         # else:
                             # Log.logger.warning('This node is master logging but emits remote logs, is a circular reference')
 
@@ -196,13 +196,13 @@ def mqtt_thread_run():
                             #else:
                             #    Log.logger.debug('Graph not initialised on obj upload to graph')
                     else:
-                        Log.logger.info("Received mqtt object without history save tag: {}".format(obj))
+                        L.l.info("Received mqtt object without history save tag: {}".format(obj))
                 if len(__mqtt_event_list) > last_count:
-                    Log.logger.debug('Not keeping up with {} mqtt events'.format(len(__mqtt_event_list)))
+                    L.l.debug('Not keeping up with {} mqtt events'.format(len(__mqtt_event_list)))
             except Exception, ex:
-                Log.logger.critical("Error processing event err={}, mqtt={}".format(ex, obj))
+                L.l.critical("Error processing event err={}, mqtt={}".format(ex, obj))
     except Exception, ex:
-        Log.logger.critical("General error processing mqtt: {}".format(ex))
+        L.l.critical("General error processing mqtt: {}".format(ex))
     finally:
         __mqtt_lock.release()
         pass

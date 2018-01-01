@@ -1,7 +1,7 @@
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
 
-from main.logger_helper import Log
+from main.logger_helper import L
 from main import thread_pool
 import api_v1
 
@@ -9,7 +9,7 @@ initialised = False
 
 
 def unload():
-    Log.logger.info('API module unloading')
+    L.l.info('API module unloading')
     # ...
     # thread_pool.remove_callable(template_run.thread_run)
     global initialised
@@ -17,7 +17,7 @@ def unload():
 
 
 def init():
-    Log.logger.debug('API module initialising')
+    L.l.debug('API module initialising')
     # thread_pool.add_interval_callable(template_run.thread_run, run_interval_second=60)
     global initialised
     initialised = True

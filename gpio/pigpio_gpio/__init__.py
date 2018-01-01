@@ -2,7 +2,7 @@ import socket
 import time
 from threading import Thread, Lock
 from pydispatch import dispatcher
-from main import Log
+from main import L
 from main import thread_pool
 from main.admin import models
 from main.admin.model_helper import commit
@@ -44,7 +44,7 @@ try:
     __import_ok = True
 except Exception, ex:
     __import_ok = False
-    Log.logger.info('Not importing pigpio_gpio, message={}'.format(ex))
+    L.l.info('Not importing pigpio_gpio, message={}'.format(ex))
 
 '''
 http://abyz.co.uk/rpi/pigpio_gpio/index.html
@@ -99,8 +99,8 @@ def set_pin_value(pin_index_bcm=None, pin_value=None):
 
 
 def announce_event(event):
-    Log.logger.info("DISPATCH IN io={} lvl={} count={} tick={}".format(event.gpio, event.level, event.event_count,
-                                                                       event.tick))
+    L.l.info("DISPATCH IN io={} lvl={} count={} tick={}".format(event.gpio, event.level, event.event_count,
+                                                                event.tick))
     # pin connected state assumes pins are pull-up enabled
     dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=event.gpio,
                     direction=Constant.GPIO_PIN_DIRECTION_IN,
@@ -152,8 +152,8 @@ def input_event(gpio, level, tick):
     else:
         if tick < pin_tick_event.tick:
             # ignore record events in the past
-            Log.logger.debug("Ignore old gpio={} lvl={} tick={} current={} delta={}".format(gpio, level, tick, current,
-                                                                                            delta))
+            L.l.debug("Ignore old gpio={} lvl={} tick={} current={} delta={}".format(gpio, level, tick, current,
+                                                                                     delta))
         else:
             global __lock_dict
             lock = __lock_dict.get(gpio)
@@ -179,17 +179,17 @@ def setup_in_ports(gpio_pin_list):
     # Log.logger.info('Socket timeout={}'.format(socket.getdefaulttimeout()))
     # socket.setdefaulttimeout(None)
     global __callback, __pi
-    Log.logger.info('Configuring {} gpio input ports'.format(len(gpio_pin_list)))
+    L.l.info('Configuring {} gpio input ports'.format(len(gpio_pin_list)))
     if __pi:
         if socket.getdefaulttimeout() is not None:
-            Log.logger.critical('PiGpio callbacks cannot be started as socket timeout is not None')
+            L.l.critical('PiGpio callbacks cannot be started as socket timeout is not None')
         else:
             for gpio_pin in gpio_pin_list:
                 if gpio_pin.pin_type == Constant.GPIO_PIN_TYPE_PI_STDGPIO:
                     try:
-                        Log.logger.info('Set pincode={} type={} index={} as input'.format(gpio_pin.pin_code,
-                                                                                          gpio_pin.pin_type,
-                                                                                          gpio_pin.pin_index_bcm))
+                        L.l.info('Set pincode={} type={} index={} as input'.format(gpio_pin.pin_code,
+                                                                                   gpio_pin.pin_type,
+                                                                                   gpio_pin.pin_index_bcm))
                         __pi.set_mode(int(gpio_pin.pin_index_bcm), pigpio.INPUT)
                         # https://learn.sparkfun.com/tutorials/pull-up-resistors
                         __pi.set_pull_up_down(int(gpio_pin.pin_index_bcm), pigpio.PUD_UP)
@@ -201,13 +201,13 @@ def setup_in_ports(gpio_pin_list):
                         gpio_pin_record.pin_direction = Constant.GPIO_PIN_DIRECTION_IN
                         commit()
                     except Exception, ex1:
-                        Log.logger.critical('Unable to setup pigpio_gpio pin, er={}'.format(ex1))
+                        L.l.critical('Unable to setup pigpio_gpio pin, er={}'.format(ex1))
                 else:
-                    Log.logger.info('Skipping PiGpio setup for pin {} with type {}'.format(gpio_pin.pin_code,
-                                                                                           gpio_pin.pin_type))
-        Log.logger.info('Exit gpio callback thread loop')
+                    L.l.info('Skipping PiGpio setup for pin {} with type {}'.format(gpio_pin.pin_code,
+                                                                                    gpio_pin.pin_type))
+        L.l.info('Exit gpio callback thread loop')
     else:
-        Log.logger.critical('PiGpio not yet initialised but was asked to setup IN ports. Check module init order.')
+        L.l.critical('PiGpio not yet initialised but was asked to setup IN ports. Check module init order.')
 
 
 def thread_run():
@@ -221,7 +221,7 @@ def unload():
 
 
 def init():
-    Log.logger.info('PiGpio initialising')
+    L.l.info('PiGpio initialising')
     global initialised
     global __pi
     if __import_ok:
@@ -232,10 +232,10 @@ def init():
             # setup this to receive list of ports that must be set as "IN" and have callbacks defined
             dispatcher.connect(setup_in_ports, signal=Constant.SIGNAL_GPIO_INPUT_PORT_LIST, sender=dispatcher.Any)
             initialised = True
-            Log.logger.info('PiGpio initialised OK')
+            L.l.info('PiGpio initialised OK')
         except Exception, ex1:
-            Log.logger.info('Unable to initialise PiGpio, err={}'.format(ex1))
+            L.l.info('Unable to initialise PiGpio, err={}'.format(ex1))
             __pi = None
             initialised = False
     else:
-        Log.logger.info('PiGpio NOT initialised, module unavailable on this system')
+        L.l.info('PiGpio NOT initialised, module unavailable on this system')

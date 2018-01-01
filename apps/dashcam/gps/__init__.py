@@ -2,50 +2,49 @@ import gpsd
 import urllib2
 import ssl
 import time
+import datetime
 import json
 import os
-from main.logger_helper import Log
-from main.admin import models
+from collections import namedtuple
+from main.logger_helper import L
+try:
+    from main.admin import models
+except Exception, ex:
+    print "Exception {} on gps import".format(ex)
 
 initialised = False
+Position = namedtuple('Position', 'lat lon alt sats_valid acc bat timestamp')
 
 
 class State:
     context = ssl._create_unverified_context()
-    url_timeout = 5
+    url_timeout = 10
     device_name = "skoda"
     disk_pos_buffer_file="/home/haiot/gps_positions"
     UPLOAD_SERVER_URL = "https://www.dancristian.ro/nextcloud/index.php/apps/phonetrack/log/gpslogger/" \
                         "643fee139ee4efd90437176e88298a94/{}?lat=<lat>&lon=<lon>&sat=<sat>&alt=<alt>&acc=<acc>&" \
                         "timestamp=<time>&bat=<bat>".format(device_name)
-    last = None
     url_buffer = []
     pos_buffer = []
     # timestamp with moves that helps reducing gps report frequency
-    last_vibrate = None
-    last_move_inside = None
-    last_move_outside = None
+    #last_vibrate = None
+    #last_move_inside = None
+    #last_move_outside = None
     reported_no_fix = False
-
-
-class Position:
-    def __init__(self, lat, lon, alt, sats_valid, acc, bat, timestamp):
-        self.lat, self.lon, self.alt, self.sats_valid = lat, lon, alt, sats_valid
-        self.acc = acc
-        self.bat = bat
-        self.timestamp = timestamp
-
-    def __repr__(self):
-        r = "Lat={} Lon={} Alt={} Sats={} Acc={} Bat={} Time={}".format(self.lat, self.lon, self.alt, self.sats_valid,
-                                                                        self.acc, self.bat, self.timestamp)
-        return r
 
 
 def _save_position():
     # persist to disk in case of outage
-    #with open(State.disk_pos_buffer_file, 'w') as outfile:
-    #    json.dump(State.pos_buffer, outfile)
-    pass
+    with open(State.disk_pos_buffer_file, 'w') as outfile:
+        json.dump(State.pos_buffer, outfile)
+        L.l.info("Saved {} positions to disk".format(len(State.pos_buffer)))
+
+
+def _load_positions():
+    if os.path.isfile(State.disk_pos_buffer_file):
+        with open(State.disk_pos_buffer_file, 'w') as infile:
+            State.pos_buffer = json.load(infile)
+            L.l.info("Loaded {} positions from disk".format(len(State.pos_buffer)))
 
 
 def _upload_pos_buffer():
@@ -61,13 +60,13 @@ def _upload_pos_buffer():
             if resp == "null":
                 State.pos_buffer.remove(p)
             else:
-                Log.logger.info("Unexpected response {}".format(resp))
+                L.l.info("Unexpected response {}".format(resp))
         except Exception, ex:
-            Log.logger.info("Unable to upload position, err={}".format(ex))
-            Log.logger.info("Buffer has {} elements".format(len(State.pos_buffer)))
-            Log.logger.info("URL WAS:{}".format(url))
+            L.l.info("Unable to upload position, err={}".format(ex))
+            L.l.info("Buffer has {} elements".format(len(State.pos_buffer)))
+            L.l.info("URL WAS:{}".format(url))
     if (initial > 1) and (initial - len(State.pos_buffer) > 1):
-        Log.logger.info("Buffer catches up, now has {} elements".format(len(State.pos_buffer)))
+        L.l.info("Buffer catches up, now has {} elements".format(len(State.pos_buffer)))
     if len(State.pos_buffer) > 0:
         _save_position()
     else:
@@ -80,28 +79,22 @@ def _read_gps():
     r = gpsd.get_current()
     if r.mode < 2:
         if not State.reported_no_fix:
-            Log.logger.info("No gps fix, sats={} valid={} mode={}".format(r.sats, r.sats_valid, r.mode))
+            L.l.info("No gps fix, sats={} valid={} mode={}".format(r.sats, r.sats_valid, r.mode))
             State.reported_no_fix = True
         pass
     else:
         if State.reported_no_fix:
-            Log.logger.info("Got gps fix, sats={} valid={} mode={}".format(r.sats, r.sats_valid, r.mode))
+            L.l.info("Got gps fix, sats={} valid={} mode={}".format(r.sats, r.sats_valid, r.mode))
             State.reported_no_fix = False
         if r.mode == 2:
             alt = -9999
         else:
             alt = r.alt
-        pos = Position(lat=r.lat, lon=r.lon, alt=alt, sats_valid=r.sats_valid,
-                       acc=r.position_precision()[0], bat=r.hspeed, timestamp=time.time())
+        pos = Position(lat=r.lat, lon=r.lon, alt=alt, sats_valid=r.sats_valid, acc=r.position_precision()[0],
+                       bat=r.hspeed, timestamp=time.time())
+        # use battery fields to report horizontal speed
         #Log.logger.info("Got gps position {}".format(pos))
         State.pos_buffer.append(pos)
-        # use battery fields to report horizontal speed
-        #url = State.UPLOAD_SERVER_URL.replace("<lat>", str(r.lat)).replace("<lon>", str(r.lon)).replace(
-        #    "<alt>", str(alt)).replace("<sat>", str(r.sats_valid)).replace(
-        #    "<acc>", str(r.position_precision()[0])).replace("<bat>", str(r.hspeed)).replace("<time>", str(time.time()))
-        # put this first, but might not work
-        #State.url_buffer.insert(1, url)
-        #State.url_buffer.append(url)
         d = models.Device
         dev = d().query_filter_first(d.name == State.device_name)
         if dev is not None:
@@ -148,11 +141,12 @@ def unload():
 
 def init():
     global initialised
+    _load_positions()
     try:
         gpsd.connect()
         initialised = True
     except Exception, ex:
-        Log.logger.info("Unable to connect to gps daemon, ex={}".format(ex))
+        L.l.info("Unable to connect to gps daemon, ex={}".format(ex))
         initialised = False
 
 
@@ -165,7 +159,6 @@ def thread_run():
 
 
 if __name__ == "__main__":
-    init()
-    while True:
-        thread_run()
-        time.sleep(10)
+    p = Position(lat=1.22,lon=2.45,alt=10,sats_valid=3,acc=2,bat=5,timestamp=1000)
+    print json.dumps(p)
+    pass

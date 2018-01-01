@@ -4,7 +4,7 @@ import os, sys, time, datetime
 import shutil
 import utils
 from collections import namedtuple
-from main.logger_helper import Log
+from main.logger_helper import L
 
 disk_ntuple = namedtuple('partition',  'device mountpoint fstype')
 usage_ntuple = namedtuple('usage',  'total used free percent')
@@ -21,6 +21,7 @@ class P():
     exclude_time_delta = 120 # exclude files modified in the last x seconds
     days_to_keep = 30
     max_disk_used_percent = 80 #
+    disk_usage_adjust = 4 # adjust usage percent (add to reported one)
     upload_batch = 2
     current_upload_file = None
     app_is_exiting = False
@@ -80,15 +81,15 @@ def _upload_file(file_path, file_date):
         #ssh -T -p 222 -c arcfour -o Compression=no $SSH_SERVER "mkdir -p $dest_parent"
         res = subprocess.check_output(['ssh -T -p ' + P.port + ' -c arcfour -o Compression=no ' +
                                        P.server + ' "mkdir -p "' + P.dest_folder + subfolder], shell=True)
-        Log.logger.info('Created folder {}, res=[{}]'.format(subfolder, res))
+        L.l.info('Created folder {}, res=[{}]'.format(subfolder, res))
         P.folder_dict.add(subfolder)
-    Log.logger.info('Uploading file {}]'.format(file_path))
+    L.l.info('Uploading file {}]'.format(file_path))
     P.current_upload_file = file_path
     # rsync -avrPe 'ssh -p 22 -T -c arcfour -o Compression=no -x ' 2017-12-25_13-26-08_pi.mp4 haiot@$192.168.0.9://mnt/motion/tmp/timelapse/dashcam
     res = subprocess.check_output(['rsync -avrPe "ssh -p ' + P.port + ' -T -c arcfour -o Compression=no -x" ' +
                                    file_path + ' ' + P.server + ':' + P.dest_folder + subfolder], shell=True)
     duration_min = (time.time() - start) / 60
-    Log.logger.info('Uploaded file {}, res=[{}], duration in mins={}'.format(file_path, res, duration_min))
+    L.l.info('Uploaded file {}, res=[{}], duration in mins={}'.format(file_path, res, duration_min))
     P.current_upload_file = None
 
 
@@ -125,12 +126,12 @@ def _upload():
         try:
             _upload_file(file_path=file[0], file_date=file[1])
             shutil.move(file[0], P.uploaded_folder)
-            Log.logger.info('File {} moved to {}'.format(file[0], P.uploaded_folder))
+            L.l.info('File {} moved to {}'.format(file[0], P.uploaded_folder))
             count += 1
             if count == P.upload_batch:
                 break
         except Exception, ex:
-            Log.logger.info('Exception uploading file {}, ex={}'.format(file[0], ex))
+            L.l.info('Exception uploading file {}, ex={}'.format(file[0], ex))
 
 
 def _clean_old(days_to_keep, folder):
@@ -141,7 +142,7 @@ def _clean_old(days_to_keep, folder):
             delta_days = (now - file[1]) / (60*60*24)
             if delta_days > days_to_keep:
                 os.remove(file[0])
-                Log.logger.info('Old {} days file deleted {}'.format(delta_days, file[0]))
+                L.l.info('Old {} days file deleted {}'.format(delta_days, file[0]))
         except Exception, ex:
             pass
 
@@ -153,21 +154,21 @@ def _clean_space():
     while keep_try:
         for parti in disk_partitions():
             if parti.mountpoint == P.root_mountpoint:
-                usage = disk_usage(parti.mountpoint).percent
+                usage = disk_usage(parti.mountpoint).percent + P.disk_usage_adjust
                 if usage > P.max_disk_used_percent:
-                    Log.logger.info('Disk usage is {}, removing files older than {} to stay at {}'.format(
+                    L.l.info('Disk usage is {}, removing files older than {} to stay at {}'.format(
                         usage, days_keep, P.max_disk_used_percent))
                     if days_keep > 0:
                         _clean_old(days_keep, folder)
                         days_keep -= 1
                     else:
-                        Log.logger.warning('Warning, need to remove files from files not uploaded folder {}'.format(
+                        L.l.warning('Warning, need to remove files from files not uploaded folder {}'.format(
                             P.root_folder))
                         if days_keep > 0:
                             days_keep = P.days_to_keep
                             folder = P.root_folder
                         else:
-                            Log.logger.info('Something is wrong, cannot free up more space!')
+                            L.l.info('Something is wrong, cannot free up more space!')
                             keep_try = False
                             break
                 else:
@@ -182,7 +183,7 @@ def unload():
         while True:
             pid = utils.get_proc(P.current_upload_file)
             if pid is not None:
-                Log.logger.info('Killing hanging rsync with pid {} on file {}'.format(pid, P.current_upload_file))
+                L.l.info('Killing hanging rsync with pid {} on file {}'.format(pid, P.current_upload_file))
                 os.kill(pid, 15)
                 new_pid = utils.get_proc(P.current_upload_file)
                 if new_pid == pid:

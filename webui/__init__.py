@@ -1,6 +1,6 @@
 import os
 from flask import request, render_template, redirect, url_for, send_from_directory, send_file
-from main.logger_helper import Log
+from main.logger_helper import L
 from main import app, BIND_IP, BIND_PORT
 from main.admin import model_helper
 from common import Constant
@@ -52,33 +52,33 @@ class ReverseProxied(object):
 
 @app.route('/exit', methods=['POST'])
 def exit_module():
-    Log.logger.info('WebUI module unloading')
+    L.l.info('WebUI module unloading')
     try:
         if not app.testing:
-            Log.logger.warning('Unable to shutdown werk if not in testing mode')
+            L.l.warning('Unable to shutdown werk if not in testing mode')
         else:
             #with app.app_context():
                 func = request.environ.get('werkzeug.server.shutdown')
                 if func is None:
-                    Log.logger.warning('unable to unload webui, not running with the Werkzeug Server')
+                    L.l.warning('unable to unload webui, not running with the Werkzeug Server')
                 else:
-                    Log.logger.info('shuting down werkzeug')
+                    L.l.info('shuting down werkzeug')
                     func()
                 global initialised
                 initialised = False
                 return 'werkzeug exited'
     except Exception, ex:
-        Log.logger.warning('Unable to shutdown werkzeug, err {}'.format(ex))
+        L.l.warning('Unable to shutdown werkzeug, err {}'.format(ex))
     return 'werkzeug not exited'
 
 
 def unload():
-    Log.logger.info('Webui module unloading')
+    L.l.info('Webui module unloading')
     # response = app.test_client().post('/exit')
 
 
 def init():
-    Log.logger.debug('WebUI module initialising')
+    L.l.debug('WebUI module initialising')
     # thread_pool.add_callable(webui.thread_run, run_interval_second=60)
     from crud import admin, user
     crud.init_crud()
@@ -115,25 +115,25 @@ def favicon():
 @app.before_request
 def log_before_request():
     # if app.config.get('LOG_REQUESTS'):
-    Log.logger.debug('HTTP Request START: {}'.format(request))
+    L.l.debug('HTTP Request START: {}'.format(request))
 
 
 @app.after_request
 def log_after_request(response):
     # if app.config.get('LOG_REQUESTS'):
-    Log.logger.debug('HTTP Request END: {} ARG={}'.format(request, response))
+    L.l.debug('HTTP Request END: {} ARG={}'.format(request, response))
     return response
 
 
 @app.errorhandler(Exception)
 def exceptions(e):
     tb = traceback.format_exc()
-    Log.logger.error('%s %s %s %s 5xx INTERNAL SERVER ERROR\n%s',
-        request.remote_addr, request.method, request.scheme, request.full_path, tb)
+    L.l.error('%s %s %s %s 5xx INTERNAL SERVER ERROR\n%s',
+              request.remote_addr, request.method, request.scheme, request.full_path, tb)
     return e.status_code
 
 
 @app.errorhandler(404)
 def page_not_found(e):
-    Log.logger.error('Error {} [{}]'.format(e, request.path))
+    L.l.error('Error {} [{}]'.format(e, request.path))
     return render_template('404.html'), 404

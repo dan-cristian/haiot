@@ -1,4 +1,4 @@
-from main.logger_helper import Log
+from main.logger_helper import L
 from main import thread_pool
 import ui
 #import rpusbdisp
@@ -12,7 +12,7 @@ initialised = False
 
 
 def unload():
-    Log.logger.info('Dashcam module unloading')
+    L.l.info('Dashcam module unloading')
     # ...
     thread_pool.remove_callable(recorder.thread_run)
     recorder.unload()
@@ -25,7 +25,7 @@ def unload():
 
 
 def init():
-    Log.logger.info('Dashcam module initialising')
+    L.l.info('Dashcam module initialising')
     recorder.init()
     thread_pool.add_interval_callable(recorder.thread_run, run_interval_second=recorder.thread_tick)
     thread_pool.add_interval_callable(uploader.thread_run, run_interval_second=10)

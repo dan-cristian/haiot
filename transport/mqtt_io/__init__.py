@@ -1,7 +1,7 @@
 import time
 import socket
 from main import thread_pool
-from main.logger_helper import Log
+from main.logger_helper import L
 from main.admin import model_helper
 from common import Constant, utils
 import receiver
@@ -37,19 +37,19 @@ last_connect_attempt = None
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect_paho(client, userdata, flags, rc):
-    Log.logger.info("Connected to mqtt paho with result code " + str(rc))
+    L.l.info("Connected to mqtt paho with result code " + str(rc))
     global client_connected
     client_connected = True
     subscribe()
 
 def on_connect_mosquitto(mosq, userdata, rc):
-    Log.logger.info("Connected to mqtt mosquitto with result code " + str(rc))
+    L.l.info("Connected to mqtt mosquitto with result code " + str(rc))
     subscribe()
 
 def on_disconnect(client, userdata, rc):
     if rc != 0:
-        Log.logger.warning("Unexpected disconnection from mqtt")
-    Log.logger.warning("Disconnected from mqtt")
+        L.l.warning("Unexpected disconnection from mqtt")
+    L.l.warning("Disconnected from mqtt")
     global client_connected
     client_connected = False
 
@@ -67,7 +67,7 @@ def on_unsubscribe(client, userdata, mid):
 
 def subscribe():
     global topic
-    Log.logger.info('Subscribing to mqtt topic={}'.format(topic))
+    L.l.info('Subscribing to mqtt topic={}'.format(topic))
     mqtt_client.username_pw_set(Constant.HOST_NAME)
     mqtt_client.user_data_set(Constant.HOST_NAME + " userdata")
     mqtt_client.will_set(Constant.HOST_NAME + " DIE")
@@ -79,16 +79,16 @@ def unload():
     try:
         mqtt_client.loop_stop()
     except Exception, ex:
-        Log.logger.warning('Unable to stop mqtt loop, err {}'.format(ex))
+        L.l.warning('Unable to stop mqtt loop, err {}'.format(ex))
     mqtt_client.disconnect()
 
 def init():
     if mqtt_mosquitto_exists:
-        Log.logger.info("INIT, Using mosquitto as mqtt client")
+        L.l.info("INIT, Using mosquitto as mqtt client")
     elif mqtt_paho_exists:
-        Log.logger.info("INIT, Using paho as mqtt client")
+        L.l.info("INIT, Using paho as mqtt client")
     else:
-        Log.logger.critical("No mqtt client enabled via import")
+        L.l.critical("No mqtt client enabled via import")
         raise Exception("No mqtt client enabled via import")
 
     # not a good ideea to set a timeout as it will crash pigpio_gpio callback
@@ -96,7 +96,7 @@ def init():
     try:
         global client_connecting
         if client_connecting:
-            Log.logger.warning('Mqtt client already in connection process, skipping attempt to connect until done')
+            L.l.warning('Mqtt client already in connection process, skipping attempt to connect until done')
             return
 
         host_list=[
@@ -119,7 +119,7 @@ def init():
             client_connecting = True
             host = host_port[0]
             port = host_port[1]
-            Log.logger.info('MQTT publisher module initialising, host={} port={}'.format(host, port))
+            L.l.info('MQTT publisher module initialising, host={} port={}'.format(host, port))
             client_connected=False
             retry_count=0
             while (not client_connected) and (retry_count < Constant.ERROR_CONNECT_MAX_RETRY_COUNT):
@@ -145,10 +145,10 @@ def init():
                         initialised = True
                         client_connecting = False
                     else:
-                        Log.logger.warning('Timeout connecting to mqtt')
+                        L.l.warning('Timeout connecting to mqtt')
                         retry_count += 1
                 except socket.error, ex:
-                    Log.logger.error('mqtt client not connected, err {}, pause and retry {}'.format(ex, retry_count))
+                    L.l.error('mqtt client not connected, err {}, pause and retry {}'.format(ex, retry_count))
                     retry_count += 1
                     time.sleep(Constant.ERROR_CONNECT_PAUSE_SECOND)
                 finally:
@@ -158,9 +158,9 @@ def init():
             if client_connected:
                 break
             else:
-                Log.logger.warning('Unable to connect to mqtt server {}:{}'.format(host, port))
+                L.l.warning('Unable to connect to mqtt server {}:{}'.format(host, port))
         if not client_connected:
-            Log.logger.critical('MQTT connection not available, all connect attempts failed')
+            L.l.critical('MQTT connection not available, all connect attempts failed')
     except Exception, ex:
-        Log.logger.error('Exception on mqtt init, err={}'.format(ex))
+        L.l.error('Exception on mqtt init, err={}'.format(ex))
 

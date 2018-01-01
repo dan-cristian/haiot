@@ -1,6 +1,6 @@
 from main import db
 from main import thread_pool
-from main.logger_helper import Log
+from main.logger_helper import L
 from main.admin import model_helper
 from common import utils, Constant
 import owsensor_loop
@@ -20,7 +20,7 @@ def record_update(obj):
     # save sensor state to db, except for current node
     try:
         sensor_host_name = utils.get_object_field_value(obj, 'name')
-        Log.logger.debug('Received sensor state update from {}'.format(sensor_host_name))
+        L.l.debug('Received sensor state update from {}'.format(sensor_host_name))
         # avoid node to update itself in infinite recursion
         if sensor_host_name != Constant.HOST_NAME:
             address = utils.get_object_field_value(obj, 'address')
@@ -66,7 +66,7 @@ def record_update(obj):
                                 total_units_b=record.counters_b,
                                 sampling_period_seconds=owsensor_loop.sampling_period_seconds)
     except Exception, ex:
-        Log.logger.error('Error on sensor update, err {}'.format(ex), exc_info=True)
+        L.l.error('Error on sensor update, err {}'.format(ex), exc_info=True)
         db.session.rollback()
 
 
@@ -80,7 +80,7 @@ def unload():
 
 
 def init():
-    Log.logger.debug('Sensor module initialising')
+    L.l.debug('Sensor module initialising')
     if owsensor_loop.init():
         thread_pool.add_interval_callable(owsensor_loop.thread_run,
                                           run_interval_second=owsensor_loop.sampling_period_seconds)

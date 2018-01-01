@@ -12,7 +12,7 @@ from requests import HTTPError
 
 from common import utils
 from common import Constant
-from main.logger_helper import Log
+from main.logger_helper import L
 from main.admin import models
 
 
@@ -61,7 +61,7 @@ def populate_trace_for_extend(x=None, y=None, graph_legend_item_name='', trace_u
         else:
             trace_empty = graph_objs.Scatter(x=[], y=[], line = graph_objs.Line(shape=shape_type))
             trace_list.append(trace_empty)
-    Log.logger.debug('Extending graph serie {} {}'.format(graph_legend_item_name, trace_unique_id))
+    L.l.debug('Extending graph serie {} {}'.format(graph_legend_item_name, trace_unique_id))
     return trace_list
 
 def populate_trace_for_append(x=None, y=None, graph_legend_item_name='', trace_unique_id='', show_legend=True,
@@ -74,7 +74,7 @@ def populate_trace_for_append(x=None, y=None, graph_legend_item_name='', trace_u
     trace_append = graph_objs.Scatter(x=x, y=y, name=graph_legend_item_name, text=trace_unique_id,
                                       showlegend=show_legend, line = graph_objs.Line(shape=shape_type))
     trace_list = [trace_append]
-    Log.logger.debug('Appending new graph serie {} {}'.format(graph_legend_item_name, trace_unique_id))
+    L.l.debug('Appending new graph serie {} {}'.format(graph_legend_item_name, trace_unique_id))
     return trace_list
 
 #check if graph exists in memory. Used this function rather than checking graph dict variable directly
@@ -108,11 +108,11 @@ def upload_reference_graph(graph_unique_name=''):
         py.plot(fig, filename=graph_unique_name, fileopt='overwrite', auto_open=False)
         #clean graph from memory to force graph traces reload in the right order
         clean_graph_memory(graph_unique_name)
-        Log.logger.info('New reference graph {} uploaded ok'.format(graph_unique_name))
+        L.l.info('New reference graph {} uploaded ok'.format(graph_unique_name))
     except PlotlyListEntryError, ex:
-        Log.logger.warning('Error uploading new reference graph {} err {}'.format(graph_unique_name, ex))
+        L.l.warning('Error uploading new reference graph {} err {}'.format(graph_unique_name, ex))
     except PlotlyAccountError, ex:
-        Log.logger.warning('Unable to upload new reference graph {} err {}'.format(graph_unique_name, ex))
+        L.l.warning('Unable to upload new reference graph {} err {}'.format(graph_unique_name, ex))
 
 
 
@@ -142,20 +142,20 @@ def get_reference_trace_for_append(graph_unique_name='', shape_type=''):
                               mode='none', showlegend=False, line = graph_objs.Line(shape=shape_type))
 
 def download_trace_id_list(graph_unique_name='', shape_type=''):
-    Log.logger.info('Downloading online traces in memory, graph {} shape {}'.format(graph_unique_name, shape_type))
+    L.l.info('Downloading online traces in memory, graph {} shape {}'.format(graph_unique_name, shape_type))
     start_date = utils.get_base_location_now_date()
     result = -1
     try:
         result=py.file_ops.mkdirs(get_folder_name())
-        Log.logger.debug('Created archiving folder {} result {}'.format(get_folder_name(), result))
+        L.l.debug('Created archiving folder {} result {}'.format(get_folder_name(), result))
     except PlotlyRequestError, ex:
         if hasattr(ex, 'HTTPError'):
             msg = str(ex.HTTPError) + ex.HTTPError.response.content
         else:
             msg = str(ex)
-        Log.logger.info('Ignoring error on create archive folder {} err={}'.format(get_folder_name(), msg))
+        L.l.info('Ignoring error on create archive folder {} err={}'.format(get_folder_name(), msg))
     except Exception, ex:
-        Log.logger.warning('Unable to create archive folder {} err={} res={}'.format(get_folder_name(), ex, result))
+        L.l.warning('Unable to create archive folder {} err={} res={}'.format(get_folder_name(), ex, result))
 
     global g_reference_trace_id
     #reseting known series and graphs to download again clean
@@ -178,7 +178,7 @@ def download_trace_id_list(graph_unique_name='', shape_type=''):
         except PlotlyError, ex:
             #usually first try will give an error
             if i>1:
-                Log.logger.info('Error extending graph {} in pass {}, err={}'.format(graph_unique_name, i, ex))
+                L.l.info('Error extending graph {} in pass {}, err={}'.format(graph_unique_name, i, ex))
             #first time failed, so second time we try an extend, but trace definition will change
             trace_list[0]=trace_ref_extend
             if i>1:
@@ -191,7 +191,7 @@ def download_trace_id_list(graph_unique_name='', shape_type=''):
                 if 'name' in serie:
                     remote_name=serie['name']
                 else:
-                    Log.logger.warning('Unable to find name field in graph, skipping')
+                    L.l.warning('Unable to find name field in graph, skipping')
                     remote_name = 'N/A'
                 #remote_x=serie['x']
                 #remote_y=serie['y']
@@ -203,11 +203,11 @@ def download_trace_id_list(graph_unique_name='', shape_type=''):
                     remote_id_text = remote_name
                 add_new_serie(graph_unique_name=graph_unique_name, url=graph_url, trace_unique_id=remote_id_text)
         except PlotlyError, ex:
-            Log.logger.warning('Unable to get figure {} err={}'.format(graph_url, ex))
+            L.l.warning('Unable to get figure {} err={}'.format(graph_url, ex))
     else:
-        Log.logger.critical('Unable to get or setup remote graph {}'.format(graph_unique_name))
+        L.l.critical('Unable to get or setup remote graph {}'.format(graph_unique_name))
     elapsed = (utils.get_base_location_now_date()-start_date).seconds
-    Log.logger.info('Download {} completed in {} seconds'.format(graph_unique_name, elapsed))
+    L.l.info('Download {} completed in {} seconds'.format(graph_unique_name, elapsed))
 
 def add_graph_data(data, graph_unique_name, trace_unique_id, file_opt):
     if graph_list.has_key(graph_unique_name):
@@ -260,7 +260,7 @@ def __announce_grid_cache():
                                    save_to_graph=False)
 
 def thread_run():
-    Log.logger.debug('Processing graph_plotly_run')
+    L.l.debug('Processing graph_plotly_run')
     __upload_cached_plotly_data()
     __announce_grid_cache()
     return 'Processed graph_plotly_run'
@@ -313,7 +313,7 @@ class PlotlyGrid:
     def _create_or_get_grid(self):
         grid = models.PlotlyCache().query_filter_first(models.PlotlyCache.grid_name.in_([self.grid_unique_name]))
         if grid:
-            Log.logger.info("Loading {} grid metadata from db cache".format(self.grid_unique_name))
+            L.l.info("Loading {} grid metadata from db cache".format(self.grid_unique_name))
             self.grid_url = grid.grid_url
             # loading the column names for appending data in the right order
             self.column_name_list_uploaded = grid.column_name_list.split(",")
@@ -322,7 +322,7 @@ class PlotlyGrid:
             self._upload_new_grid()
 
     def _upload_new_grid(self):
-        Log.logger.info("Uploading new {} grid metadata to plot.ly".format(self.grid_unique_name))
+        L.l.info("Uploading new {} grid metadata to plot.ly".format(self.grid_unique_name))
         # grid was not retrieved yet from plotly, create it
         upload_columns = []
         # create column list for grid upload, put first column = x axis
@@ -344,7 +344,7 @@ class PlotlyGrid:
         plotly_cache_record = models.PlotlyCache().query_filter_first(models.PlotlyCache.grid_name.in_(
             [self.grid_unique_name]))
         if plotly_cache_record:
-            Log.logger.critical("While uploading a new grid found a cached one in DB, unexpected failure!")
+            L.l.critical("While uploading a new grid found a cached one in DB, unexpected failure!")
         else:
             plotly_cache_record = models.PlotlyCache(grid_name=self.grid_unique_name)
             plotly_cache_record.grid_url = self.grid_url
@@ -353,7 +353,7 @@ class PlotlyGrid:
             plotly_cache_record.created_by_node_name = Constant.HOST_NAME
             plotly_cache_record.save_changed_fields(new_record=plotly_cache_record, notify_transport_enabled=True,
                                    save_to_graph=False)
-        Log.logger.info("Uploading {} grid completed".format(self.grid_unique_name))
+        L.l.info("Uploading {} grid completed".format(self.grid_unique_name))
 
     def _update_grid(self):
         # append empty new columns that were not yet uploaded to cloud grid
@@ -362,8 +362,8 @@ class PlotlyGrid:
             if column_name not in self.column_name_list_uploaded:
                 upload_columns.append(Column([], column_name))
         if len(upload_columns) > 0:
-            Log.logger.info("Appending new columns grid={} count={}".format(self.grid_unique_name,
-                                                                            len(upload_columns)))
+            L.l.info("Appending new columns grid={} count={}".format(self.grid_unique_name,
+                                                                     len(upload_columns)))
             py.grid_ops.append_columns(columns=upload_columns, grid_url=self.grid_url)
         # save new uploaded column names to maintain upload order
         for grid_column in upload_columns:
@@ -387,15 +387,15 @@ class PlotlyGrid:
             upload_rows.append(row)
             index += 1
         if len(upload_rows) > 0:
-            Log.logger.info("Appending grid {} rows={}".format(self.grid_unique_name, len(upload_rows)))
+            L.l.info("Appending grid {} rows={}".format(self.grid_unique_name, len(upload_rows)))
             # upload all rows. column order and number of columns must match the grid in the cloud
             py.grid_ops.append_rows(grid_url=self.grid_url, rows=upload_rows)
-        Log.logger.info("Uploading {} grid completed".format(self.grid_unique_name))
+        L.l.info("Uploading {} grid completed".format(self.grid_unique_name))
 
     def upload_data(self):
         try:
             self.uploading_data = True
-            Log.logger.info("Uploading plotly grid {}".format(self.grid_unique_name))
+            L.l.info("Uploading plotly grid {}".format(self.grid_unique_name))
             if self.grid_url:
                 self._update_grid()
             else:
@@ -406,16 +406,16 @@ class PlotlyGrid:
             self.last_save = utils.get_base_location_now_date()
             PlotlyGrid.save_interval_seconds = max(300, PlotlyGrid.save_interval_seconds - 60)
         except HTTPError, er:
-            Log.logger.warning("Error uploading plotly grid={}, er={} cause={}".format(self.grid_unique_name,
-                                                                                       er, er.response.text))
+            L.l.warning("Error uploading plotly grid={}, er={} cause={}".format(self.grid_unique_name,
+                                                                                er, er.response.text))
             if "file already exists" in er.response.text:
-                Log.logger.critical("Fatal error, unable to resume saving data to plotly grid")
+                L.l.critical("Fatal error, unable to resume saving data to plotly grid")
 
             if "throttled" in er.response.text:
                 PlotlyGrid.save_interval_seconds = min(1200, PlotlyGrid.save_interval_seconds + 60)
-                Log.logger.info("Plotly upload interval is {}s".format(PlotlyGrid.save_interval_seconds))
+                L.l.info("Plotly upload interval is {}s".format(PlotlyGrid.save_interval_seconds))
         except Exception, ex:
-            Log.logger.warning("Exception uploading plotly grid={}, er={}".format(self.grid_unique_name, ex))
+            L.l.warning("Exception uploading plotly grid={}, er={}".format(self.grid_unique_name, ex))
         finally:
             self.uploading_data = False
 
@@ -447,7 +447,7 @@ class PlotlyGraph:
                         self.data[i]['name'] = data_line['name']
                     i += 1
         except Exception, ex:
-            Log.logger.warning('Err {} add_data data={}'.format(ex, data))
+            L.l.warning('Err {} add_data data={}'.format(ex, data))
         finally:
             self.lock.release()
 
@@ -461,11 +461,11 @@ class PlotlyGraph:
                 self.data = [] #reset data as it was uploaded
                 known_graph_url = get_graph_url_from_memory(self.graph_unique_name)
                 if url != known_graph_url:
-                    Log.logger.warning('Original graph {} removed from plotly'.format(self.graph_unique_name))
+                    L.l.warning('Original graph {} removed from plotly'.format(self.graph_unique_name))
                     upload_reference_graph(self.graph_unique_name)
                     if self.file_opt=='append' or self.file_opt=='new':
                         add_new_serie(self.graph_unique_name, url, self.trace_unique_id)
         except PlotlyAccountError, ex:
-            Log.logger.warning('Unable to plot graph, err {}'.format(ex))
+            L.l.warning('Unable to plot graph, err {}'.format(ex))
         finally:
             self.lock.release()

@@ -3,7 +3,7 @@ import imp
 import os
 from pydispatch import dispatcher
 from apscheduler.schedulers.background import BackgroundScheduler
-from main.logger_helper import Log
+from main.logger_helper import L
 from main import thread_pool
 from main.admin import models
 from common import Constant
@@ -18,7 +18,7 @@ try:
     scheduler = BackgroundScheduler()
 except Exception, ex:
     scheduler = None
-    Log.logger.warning('Cannot initialise apscheduler er={}'.format(ex))
+    L.l.warning('Cannot initialise apscheduler er={}'.format(ex))
 
 if scheduler:
     import rules_run
@@ -34,7 +34,7 @@ def parse_rules(obj, change):
     global __func_list
     global __event_list
     # executed on all db value changes
-    Log.logger.debug('Received obj={} change={} for rule parsing'.format(obj, change))
+    L.l.debug('Received obj={} change={} for rule parsing'.format(obj, change))
     try:
         # extract only changed fields
         if hasattr(obj, 'last_commit_field_changed_list'):
@@ -50,9 +50,9 @@ def parse_rules(obj, change):
                         # fixme: implement processing queue for rules to avoid sql session errors
                         # __event_list.append([obj, func[0], field_changed_list])
                         result = getattr(rules_run, func[0])(obj=obj, field_changed_list=field_changed_list)
-                        Log.logger.debug('Rule returned {}'.format(result))
+                        L.l.debug('Rule returned {}'.format(result))
     except Exception:
-        Log.logger.exception('Error parsing rules')
+        L.l.exception('Error parsing rules')
 
 
 # unused yet
@@ -62,20 +62,20 @@ def process_events():
         try:
             __event_list.remove(obj_array)
             result = getattr(rules_run, obj_array[1])(obj=obj_array[0], field_changed_list=obj_array[2])
-            Log.logger.debug('Rule returned {}'.format(result))
+            L.l.debug('Rule returned {}'.format(result))
         except Exception, ex:
-            Log.logger.critical("Error processing rule event err={}".format(ex), exc_info=1)
+            L.l.critical("Error processing rule event err={}".format(ex), exc_info=1)
 
 
 def thread_run():
-    Log.logger.debug('Processing rules thread_run')
+    L.l.debug('Processing rules thread_run')
     reload_rules()
     process_events()
     return 'Processed rules thread_run'
 
 
 def unload():
-    Log.logger.info('Rules module unloading')
+    L.l.info('Rules module unloading')
     # ...
     thread_pool.remove_callable(thread_run)
     global initialised
@@ -83,14 +83,14 @@ def unload():
 
 
 def record_update(record):
-    Log.logger.info("Rule definitions changed in db, ignoring for now")
+    L.l.info("Rule definitions changed in db, ignoring for now")
     # __load_rules_from_db()
     pass
 
 
 # load rules definition from database into the scheduler object list
 def __load_rules_from_db():
-    Log.logger.info("Loading scheduled rules definition from db")
+    L.l.info("Loading scheduled rules definition from db")
     # keep host name default to '' rather than None (which does not work on filter in_)
     try:
         # rule_list = models.Rule.query.filter(models.Rule.host_name.in_([constant.HOST_NAME, ""])).all()
@@ -110,9 +110,9 @@ def __load_rules_from_db():
                 scheduler.add_job(method_to_call, 'cron', year=year, month=month, day=day, week=week,
                                   day_of_week=day_of_week, hour=hour, minute=minute, second=second)
             else:
-                Log.logger.info("Rule {} is marked as inactive, skipping".format(rule.command))
+                L.l.info("Rule {} is marked as inactive, skipping".format(rule.command))
     except Exception, ex1:
-        Log.logger.error("Unable to load rules from db, err={}".format(ex1, exc_info=True))
+        L.l.error("Unable to load rules from db, err={}".format(ex1, exc_info=True))
 
 
 def get_alexawemo_rules():
@@ -154,7 +154,7 @@ def execute_rule(rule_name):
     if rule is not None:
         return rules_run.execute_macro(rule, force_exec=True)
     else:
-        Log.logger.warning("No rule found in db with name {}".format(rule_name))
+        L.l.warning("No rule found in db with name {}".format(rule_name))
         return False
 
 
@@ -219,10 +219,10 @@ def __add_rules_into_db():
                                               second=record.second, hour=record.hour, minute=record.minute,
                                               max_instances=1,
                                               misfire_grace_time=None)
-                            Log.logger.info("Adding rule {}:{} to scheduler ".format(record.name, record.command))
+                            L.l.info("Adding rule {}:{} to scheduler ".format(record.name, record.command))
                     record.add_commit_record_to_db()
     except Exception, ex:
-        Log.logger.exception('Error adding rules into db {}'.format(ex), exc_info=1)
+        L.l.exception('Error adding rules into db {}'.format(ex), exc_info=1)
 
 
 def _get_stamp():
@@ -235,7 +235,7 @@ def reload_rules():
     global __rules_timestamp
     new_stamp = _get_stamp()
     if new_stamp != __rules_timestamp:
-        Log.logger.info('Reloading rules {} as timestamp changed, {} != {}'.format(path, __rules_timestamp, new_stamp))
+        L.l.info('Reloading rules {} as timestamp changed, {} != {}'.format(path, __rules_timestamp, new_stamp))
         imp.reload(rules_run)
         __add_rules_into_db()
         __rules_timestamp = new_stamp
@@ -246,16 +246,16 @@ def reload_rules():
 
 def init():
     global scheduler
-    Log.logger.debug('Rules module initialising')
+    L.l.debug('Rules module initialising')
     if scheduler:
         __add_rules_into_db()
         # __load_rules_from_db()
         scheduler.start()
-        Log.logger.info('Scheduler started')
+        L.l.info('Scheduler started')
         global __rules_timestamp
         __rules_timestamp = _get_stamp()
     else:
-        Log.logger.warning('Rules not initialised as scheduler is not available')
+        L.l.warning('Rules not initialised as scheduler is not available')
     thread_pool.add_interval_callable(thread_run, run_interval_second=3)
     # connect rules processor for all db chages trigger
     dispatcher.connect(parse_rules, signal=Constant.SIGNAL_DB_CHANGE_FOR_RULES, sender=dispatcher.Any)
