@@ -16,7 +16,7 @@ class P:
 def _upload_field(model, fields):
     upload = P.channels[P.upload_prefix + model]
     res = upload.update(fields)
-    L.l.info("res={}".format(res))
+    # L.l.info("res={}".format(res))
 
 
 def _handle_record(record=None):
