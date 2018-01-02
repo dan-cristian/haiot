@@ -7,6 +7,7 @@ from main import db
 from common import Constant
 import graphs
 from common import utils, performance
+from pydispatch import dispatcher
 from main.admin.model_helper import commit
 
 
@@ -202,6 +203,9 @@ class DbBase:
                 if current_record is not None:
                     current_record.last_save_to_graph = utils.get_base_location_now_date()
                 new_record.last_save_to_graph = utils.get_base_location_now_date()
+            # signal other modules we have a new record to process (i.e. upload to cloud)
+            if save_to_graph:
+                dispatcher.send(signal=Constant.SIGNAL_STORABLE_RECORD, record=new_record)
             commit()
         except Exception, ex:
             exc_type, exc_value, exc_traceback = sys.exc_info()

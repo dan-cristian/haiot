@@ -17,4 +17,5 @@ def init():
     thread_pool.add_interval_callable_progress(func=health_monitor_loop.thread_run, run_interval_second=120,
                                      progress_func=health_monitor_loop.get_progress)
     global initialised
+    health_monitor_loop.thread_run()
     initialised = True
