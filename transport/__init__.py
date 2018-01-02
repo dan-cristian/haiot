@@ -25,7 +25,7 @@ def thread_run():
     __mqtt_lock.acquire()
     try:
         # FIXME: complete this, will potentially accumulate too many requests
-        for json in __send_json_queue:
+        for json in list(__send_json_queue):
             #  Log.logger.info("Sending mqtt {}".format(json))
             if mqtt_io.sender.send_message(json):
                 __send_json_queue.remove(json)
