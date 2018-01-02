@@ -1,18 +1,12 @@
 import subprocess
 from webui.api import api_v1
 from main.logger_helper import L
-from main import app
 from main.admin import models
 from common import Constant
 from pydispatch import dispatcher
 
 # import mpd
 from main.admin.model_helper import get_param
-
-
-class P:
-    THINGSPEAK_API_WRITE = None
-    THINGSPEAK_API_READ = None
 
 
 def update_custom_relay(relay_pin_name, power_is_on):
@@ -61,6 +55,3 @@ def notify_via_all(title=None, message=None, priority=None):
     send_chat(message=message)
     send_email(subject=title, body=message)
 
-
-def init():
-    pass
