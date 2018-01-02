@@ -61,9 +61,11 @@ def on_subscribe(client, userdata, mid, granted_qos):
 #def on_subscribe(client, userdata, mid, granted_qos):
 #    Log.logger.info('Subscribed as user {} mid {} qos {}'.format(str(userdata), str(mid), str(granted_qos)))
 
+
 def on_unsubscribe(client, userdata, mid):
     global client_connected
     client_connected = False
+
 
 def subscribe():
     global topic
@@ -73,6 +75,7 @@ def subscribe():
     mqtt_client.will_set(Constant.HOST_NAME + " DIE")
     mqtt_client.subscribe(topic=topic, qos=0)
 
+
 def unload():
     global mqtt_client, topic, mqtt_paho_exists, mqtt_mosquitto_exists
     mqtt_client.unsubscribe(topic)
@@ -81,6 +84,7 @@ def unload():
     except Exception, ex:
         L.l.warning('Unable to stop mqtt loop, err {}'.format(ex))
     mqtt_client.disconnect()
+
 
 def init():
     if mqtt_mosquitto_exists:
