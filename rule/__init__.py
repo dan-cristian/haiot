@@ -7,7 +7,7 @@ from main.logger_helper import L
 from main import thread_pool
 from main.admin import models
 from common import Constant
-
+import rule_common
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
@@ -247,6 +247,7 @@ def reload_rules():
 def init():
     global scheduler
     L.l.debug('Rules module initialising')
+    rule_common.init()
     if scheduler:
         __add_rules_into_db()
         # __load_rules_from_db()
