@@ -16,19 +16,21 @@ _channel_lock = threading.Lock()
 
 class P:
     key_separator = ':'
-    key_model = 'model'
+    key_model = 'model' #  meta should contain: model=Tablename,key=fieldname
     key_key = 'key'
-    fields = {}
+    fields = {} #  key = model name
     keys = {}
-    channels = {}
+    channels = {}  # channel cloud object list for uploads, key = model name
+    # fields definition as unique id to detect settings changes in cloud and reload
+    # {'model_name':{'channel_id1':'signature1', 'channel_id2':'signature2'}}
     signatures = {}
-    profile_channels = {}
+    profile_channels = {}  # all channels defined on cloud
     last_upload_ok = datetime.datetime.now()
     timezone = tzlocal.get_localzone().zone
 
 
-def _upload_field(model, fields):
-    upload = P.channels[model]
+def _upload_field(model, fields, ch_index):
+    upload = P.channels[model].values()[ch_index]
     fields['timezone'] = P.timezone
     err = False
     for i in range(1, 3):
@@ -65,26 +67,29 @@ def _handle_record(record=None):
         try:
             _channel_lock.acquire()
             if model in P.fields:
-                cloud_fields = P.fields[model]  # only one instance supported for now
-                #cloud_keys = P.keys[model]
-                field_index = 1
-                fields = {}
-                for cloud_field in cloud_fields:
-                    cloud_field_name = cloud_field[0]
-                    if hasattr(record, cloud_field_name):
-                        cloud_key_val = cloud_field[1]
-                        record_key_val = getattr(record, cloud_field[2])
-                        if record_key_val == cloud_key_val:
-                            fields['field' + str(field_index)] = getattr(record, cloud_field_name)
-                            #_upload_field(model, field_index, getattr(record, cloud_field), created_at)
-                    field_index += 1
-                if len(fields) > 0:
-                    if hasattr(record, Constant.DB_FIELD_UPDATE):
-                        created_at = getattr(record, Constant.DB_FIELD_UPDATE)
-                    else:
-                        created_at = None
-                    fields['created_at'] = created_at
-                _upload_field(model, fields)
+                ch_index = 0
+                for cloud_fields in P.fields[model].values():
+                    #cloud_fields = P.fields[model]  # only one instance supported for now
+                    #cloud_keys = P.keys[model]
+                    field_index = 1
+                    fields = {}
+                    for cloud_field in cloud_fields:
+                        cloud_field_name = cloud_field[0]
+                        if hasattr(record, cloud_field_name):
+                            cloud_key_val = cloud_field[1]
+                            record_key_val = getattr(record, cloud_field[2])
+                            if record_key_val == cloud_key_val:
+                                fields['field' + str(field_index)] = getattr(record, cloud_field_name)
+                                #_upload_field(model, field_index, getattr(record, cloud_field), created_at)
+                        field_index += 1
+                    if len(fields) > 0:
+                        if hasattr(record, Constant.DB_FIELD_UPDATE):
+                            created_at = getattr(record, Constant.DB_FIELD_UPDATE)
+                        else:
+                            created_at = None
+                        fields['created_at'] = created_at
+                    _upload_field(model, fields, ch_index)
+                    ch_index += 1
         except Exception, ex:
             L.l.error("Unable to upload record, ex={}".format(ex))
         finally:
@@ -131,15 +136,22 @@ def _get_channel(chid, read_api, write_api):
             if end >= 0:
                 # check if channel is already loaded and not changed
                 signature = params[:end]
-                if model in P.signatures and signature == P.signatures[model]:
-                    # model not changed
+                if model in P.signatures and chid in P.signatures[model] and signature == P.signatures[model][chid]:
+                    # channel loaded already and is not changed
                     pass
                 else:
-                    # channel def changed, reload
-                    P.signatures[model] = signature
-                    P.channels[model] = ch
+                    # channel not found or def changed, reload
+                    L.l.info("Loading channel definition for model {} channel {}".format(model, chid))
+                    if model not in P.signatures:
+                        P.signatures[model] = {}
+                    P.signatures[model][chid] = signature
+                    if model not in P.channels:
+                        P.channels[model] = {}
+                    P.channels[model][chid] = ch
+                    if model not in P.keys:
+                        P.keys[model] = {}
                     if key is not None:
-                        P.keys[model] = key
+                        P.keys[model][chid] = key
                         # setup['model'] = model
                     for f in range(1, 8):
                         field = 'field' + str(f)
@@ -153,11 +165,9 @@ def _get_channel(chid, read_api, write_api):
                             fields.append([fname, key_val, key])
                         else:
                             break
-                    if model in P.fields:
-                        # fixme: add support for
-                        # P.channels[model].append(fields)
-                        L.l.error("Multiple channels with same field not yet supported")
-                    P.fields[model] = fields
+                    if model not in P.fields:
+                        P.fields[model] = {}
+                    P.fields[model][chid] = fields
 
 
 def _check_def_change():
@@ -175,7 +185,7 @@ def _check_def_change():
             channel_list = json.loads(response)
             for ch in channel_list:
                 if P.key_model in ch['metadata']:
-                    L.l.info("Found uploadable channel {}".format(ch['name']))
+                    #L.l.info("Found uploadable channel {}".format(ch['name']))
                     P.profile_channels[ch['id']] = ch
                     for key in ch['api_keys']:
                         if key['write_flag']:
