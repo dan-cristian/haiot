@@ -19,12 +19,16 @@ class P:
 
 def _upload_field(model, fields):
     upload = P.channels[model]
-    res = upload.update(fields)
-    if res == 0:
-        delta = (datetime.datetime.now() - P.last_upload_ok).total_seconds()
-        L.l.warning("Failed to upload data, last request ok was {} seconds ago".format(delta))
-    else:
-        P.last_upload_ok = datetime.datetime.now()
+    for i in range(1, 3):
+        try:
+            res = upload.update(fields)
+            if res == 0:
+                delta = (datetime.datetime.now() - P.last_upload_ok).total_seconds()
+                L.l.warning("Failed to upload data, last request ok was {} seconds ago".format(delta))
+            else:
+                P.last_upload_ok = datetime.datetime.now()
+        except Exception, ex:
+            L.l.warning("Error when uploading things, ex={}".format(ex))
     # L.l.info("res={}".format(res))
 
 
