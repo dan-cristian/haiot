@@ -79,8 +79,11 @@ def _handle_record(record=None):
                             cloud_key_val = cloud_field[1]
                             record_key_val = getattr(record, cloud_field[2])
                             if (cloud_key_val is not None and record_key_val == cloud_key_val) or cloud_key_val is None:
-                                fields['field' + str(field_index)] = getattr(record, cloud_field_name)
-                                #_upload_field(model, field_index, getattr(record, cloud_field), created_at)
+                                if hasattr(record, cloud_field_name):
+                                    fields['field' + str(field_index)] = getattr(record, cloud_field_name)
+                                else:
+                                    L.l.warning("Attribute [{}] not found in record {}".format(
+                                        cloud_field_name, record))
                         field_index += 1
                     if len(fields) > 0:
                         if hasattr(record, Constant.DB_FIELD_UPDATE):
