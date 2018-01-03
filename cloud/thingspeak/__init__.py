@@ -4,6 +4,7 @@ from common import Constant
 from main.logger_helper import L
 from pydispatch import dispatcher
 import thingspeak
+import datetime
 initialised = False
 
 
@@ -11,11 +12,17 @@ class P:
     upload_prefix = "upload_"
     channels = {}
     upload = {}
+    last_upload_ok = datetime.datetime.now()
 
 
 def _upload_field(model, fields):
     upload = P.channels[P.upload_prefix + model]
     res = upload.update(fields)
+    if res == 0:
+        delta = (datetime.datetime.now() - P.last_upload_ok).total_seconds()
+        L.l.warning("Failed to upload data, last request ok was {} seconds ago".format(delta))
+    else:
+        P.last_upload_ok = datetime.datetime.now()
     # L.l.info("res={}".format(res))
 
 
