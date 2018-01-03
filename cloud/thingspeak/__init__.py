@@ -6,6 +6,7 @@ from pydispatch import dispatcher
 import thingspeak
 import datetime
 import traceback
+import tzlocal
 initialised = False
 
 
@@ -15,10 +16,12 @@ class P:
     keys = {}
     channels = {}
     last_upload_ok = datetime.datetime.now()
+    timezone = tzlocal.get_localzone().zone
 
 
 def _upload_field(model, fields):
     upload = P.channels[model]
+    fields['timezone'] = P.timezone
     for i in range(1, 3):
         try:
             res = upload.update(fields)
