@@ -78,7 +78,7 @@ def _handle_record(record=None):
                         if hasattr(record, cloud_field_name):
                             cloud_key_val = cloud_field[1]
                             record_key_val = getattr(record, cloud_field[2])
-                            if record_key_val == cloud_key_val:
+                            if (cloud_key_val is not None and record_key_val == cloud_key_val) or cloud_key_val is None:
                                 fields['field' + str(field_index)] = getattr(record, cloud_field_name)
                                 #_upload_field(model, field_index, getattr(record, cloud_field), created_at)
                         field_index += 1
@@ -91,7 +91,7 @@ def _handle_record(record=None):
                     _upload_field(model, fields, ch_index)
                     ch_index += 1
         except Exception, ex:
-            L.l.error("Unable to upload record, ex={}".format(ex))
+            L.l.error("Unable to handle record, ex={}, record={}".format(ex, record))
         finally:
             _channel_lock.release()
 
@@ -119,16 +119,17 @@ def _get_channel(chid, read_api, write_api):
         key = None
         fields = []
         for atom in atoms:
-            pair = atom.split('=')
-            if len(pair) == 2:
-                kname = pair[0]
-                kval = pair[1]
-                if kname == P.key_model:
-                    model = kval
-                elif kname == P.key_key:
-                    key = kval
-            else:
-                L.l.warning("Wrong meta format, <key=value> expected, got instead {}".format(atom))
+            if atom != '':
+                pair = atom.split('=')
+                if len(pair) == 2:
+                    kname = pair[0]
+                    kval = pair[1]
+                    if kname == P.key_model:
+                        model = kval
+                    elif kname == P.key_key:
+                        key = kval
+                else:
+                    L.l.warning("Wrong meta format, <key=value> expected, got instead [{}]".format(atom))
         if model is None:
             L.l.warning("Expected model=TableName not found in metadata {}".format(setup['metadata']))
         else:
