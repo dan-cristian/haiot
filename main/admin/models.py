@@ -205,7 +205,8 @@ class DbBase:
                 new_record.last_save_to_graph = utils.get_base_location_now_date()
             # signal other modules we have a new record to process (i.e. upload to cloud)
             if save_to_graph:
-                dispatcher.send(signal=Constant.SIGNAL_STORABLE_RECORD, record=new_record)
+                dispatcher.send(signal=Constant.SIGNAL_STORABLE_RECORD,
+                                new_record=new_record, current_record=current_record)
             commit()
         except Exception, ex:
             exc_type, exc_value, exc_traceback = sys.exc_info()

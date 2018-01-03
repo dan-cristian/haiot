@@ -50,9 +50,9 @@ def _upload_field(model, fields, ch_index):
     # L.l.info("res={}".format(res))
 
 
-def _handle_record(record=None):
+def _handle_record(new_record=None, current_record=None):
     global _channel_lock
-    cls = str(type(record))
+    cls = str(type(new_record))
     key = 'models.'
     start = cls.find(key)
     model = None
@@ -75,27 +75,29 @@ def _handle_record(record=None):
                     fields = {}
                     for cloud_field in cloud_fields:
                         cloud_field_name = cloud_field[0]
-                        if hasattr(record, cloud_field_name):
+                        # only save changed value fields
+                        if hasattr(new_record, cloud_field_name) and (current_record is None or cloud_field_name
+                                                                      in current_record.last_commit_field_changed_list):
                             cloud_key_val = cloud_field[1]
                             if cloud_key_val is not None:
-                                record_key_name = getattr(record, cloud_field[2])
+                                record_key_name = getattr(new_record, cloud_field[2])
                             if (cloud_key_val is not None and record_key_name == cloud_key_val) or cloud_key_val is None:
-                                if hasattr(record, cloud_field_name):
-                                    fields['field' + str(field_index)] = getattr(record, cloud_field_name)
+                                if hasattr(new_record, cloud_field_name):
+                                    fields['field' + str(field_index)] = getattr(new_record, cloud_field_name)
                                 else:
                                     L.l.warning("Attribute [{}] not found in record {}".format(
-                                        cloud_field_name, record))
+                                        cloud_field_name, new_record))
                         field_index += 1
                     if len(fields) > 0:
-                        if hasattr(record, Constant.DB_FIELD_UPDATE):
-                            created_at = getattr(record, Constant.DB_FIELD_UPDATE)
+                        if hasattr(new_record, Constant.DB_FIELD_UPDATE):
+                            created_at = getattr(new_record, Constant.DB_FIELD_UPDATE)
                         else:
                             created_at = None
                         fields['created_at'] = created_at
                     _upload_field(model, fields, ch_index)
                     ch_index += 1
         except Exception, ex:
-            L.l.error("Unable to handle record, ex={}, record={}".format(ex, record))
+            L.l.error("Unable to handle record, ex={}, record={}".format(ex, new_record))
         finally:
             _channel_lock.release()
 
