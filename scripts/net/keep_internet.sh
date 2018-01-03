@@ -44,11 +44,24 @@ function shut_usb_eth {
 }
 
 # https://www.raspberrypi.org/forums/viewtopic.php?t=196827
+
+function stop_usb_ports_power {
+    echo "Stopping power for all USB ports"
+    /usr/local/bin/hub-ctrl -h 0 -P 2 -p 0
+}
+
+
+function start_usb_ports_power {
+    echo "Starting power for all USB ports"
+    /usr/local/bin/hub-ctrl -h 0 -P 2 -p 1
+}
+
+
 function cycle_usb_ports {
     echo "Cycling power for all USB ports"
-    /usr/local/bin/hub-ctrl -h 0 -P 2 -p 0
+    stop_usb_ports_power
     sleep 5
-    /usr/local/bin/hub-ctrl -h 0 -P 2 -p 1
+    start_usb_ports_power
     echo "Cycling power for all USB ports completed"
 }
 
@@ -474,8 +487,10 @@ do
                 echo "Unable to check 3G link"
             fi
         else
-            # restart 3G usb port?
             echo "3G modem not detected"
+            # start 3G usb port
+            # fix this, check power status to avoid too many restarts
+            start_usb_ports_power
         fi
     fi
 
