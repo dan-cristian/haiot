@@ -77,8 +77,9 @@ def _handle_record(record=None):
                         cloud_field_name = cloud_field[0]
                         if hasattr(record, cloud_field_name):
                             cloud_key_val = cloud_field[1]
-                            record_key_val = getattr(record, cloud_field[2])
-                            if (cloud_key_val is not None and record_key_val == cloud_key_val) or cloud_key_val is None:
+                            if cloud_key_val is not None:
+                                record_key_name = getattr(record, cloud_field[2])
+                            if (cloud_key_val is not None and record_key_name == cloud_key_val) or cloud_key_val is None:
                                 if hasattr(record, cloud_field_name):
                                     fields['field' + str(field_index)] = getattr(record, cloud_field_name)
                                 else:
