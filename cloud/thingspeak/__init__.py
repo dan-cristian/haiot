@@ -78,56 +78,62 @@ def init():
                 write_api = channel_list[chid]['write_api']
                 ch = thingspeak.Channel(chid, api_key=read_api)
                 ch.write_key = write_api
-                for i in range(1, 2):
+                params = None
+                for i in range(1, 3):
                     try:
                         params = ch.get({'results': 0, 'metadata': 'true'})
                         break
                     except Exception, ex:
                         L.l.warning("Error while getting cloud data, ex={}".format(ex))
-                setup = json.loads(params)['channel']
-                meta = setup['metadata']
-                if ',' not in meta:
-                    meta = meta + ','
-                atoms = meta.split(',')
-                model = None
-                key = None
-                fields = []
-                for atom in atoms:
-                    pair = atom.split('=')
-                    if len(pair) == 2:
-                        kname = pair[0]
-                        kval = pair[1]
-                        if kname == 'model':
-                            model = kval
-                        elif kname == "key":
-                            key = kval
-                    else:
-                        L.l.warning("Wrong meta format, <key=value> expected, got instead {}".format(atom))
-                if model is None:
-                    L.l.warning("Expected model=TableName not found in metadata {}".format(setup['metadata']))
+                if params is None:
+                    L.l.error('Unable to read cloud data')
+                    initialised = False
                 else:
-                    P.channels[model] = ch
-                    if key is not None:
-                        P.keys[model] = key
-                        # setup['model'] = model
-                    for f in range(1, 8):
-                        field = 'field' + str(f)
-                        key_val = None
-                        if field in setup:
-                            fname = setup[field]
-                            if key is not None and P.key_separator in fname:
-                                fpair = fname.split(P.key_separator)
-                                fname = fpair[0]
-                                key_val = fpair[1]
-                            fields.append([fname, key_val, key])
+                    setup = json.loads(params)['channel']
+                    meta = setup['metadata']
+                    if ',' not in meta:
+                        meta = meta + ','
+                    atoms = meta.split(',')
+                    model = None
+                    key = None
+                    fields = []
+                    for atom in atoms:
+                        pair = atom.split('=')
+                        if len(pair) == 2:
+                            kname = pair[0]
+                            kval = pair[1]
+                            if kname == 'model':
+                                model = kval
+                            elif kname == "key":
+                                key = kval
                         else:
-                            break
-                    if model in P.fields:
-                        # fixme: add support for
-                        # P.channels[model].append(fields)
-                        L.l.error("Multiple channels with same field not yet supported")
-                    P.fields[model] = fields
-        initialised = True
-        dispatcher.connect(_handle_record, signal=Constant.SIGNAL_STORABLE_RECORD, sender=dispatcher.Any)
+                            L.l.warning("Wrong meta format, <key=value> expected, got instead {}".format(atom))
+                    if model is None:
+                        L.l.warning("Expected model=TableName not found in metadata {}".format(setup['metadata']))
+                    else:
+                        P.channels[model] = ch
+                        if key is not None:
+                            P.keys[model] = key
+                            # setup['model'] = model
+                        for f in range(1, 8):
+                            field = 'field' + str(f)
+                            key_val = None
+                            if field in setup:
+                                fname = setup[field]
+                                if key is not None and P.key_separator in fname:
+                                    fpair = fname.split(P.key_separator)
+                                    fname = fpair[0]
+                                    key_val = fpair[1]
+                                fields.append([fname, key_val, key])
+                            else:
+                                break
+                        if model in P.fields:
+                            # fixme: add support for
+                            # P.channels[model].append(fields)
+                            L.l.error("Multiple channels with same field not yet supported")
+                        P.fields[model] = fields
+                        initialised = True
+        if initialised:
+            dispatcher.connect(_handle_record, signal=Constant.SIGNAL_STORABLE_RECORD, sender=dispatcher.Any)
     except Exception, ex:
         L.l.warning("Unable to read config or init thingspeak, stack={}".format(traceback.print_exc()))
