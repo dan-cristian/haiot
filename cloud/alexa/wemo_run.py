@@ -327,7 +327,7 @@ class upnp_broadcast_responder(object):
             L.l.warning("Failed to initialize UPnP sockets:", e)
             return False
         if ok:
-            L.l.warning("Listening for UPnP broadcasts")
+            L.l.info("Listening for UPnP broadcasts")
 
     def fileno(self):
         return self.ssock.fileno()
