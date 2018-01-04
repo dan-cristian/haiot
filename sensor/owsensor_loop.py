@@ -14,7 +14,7 @@ Created on Mar 9, 2015
 
 initialised = False
 __owproxy = None
-sampling_period_seconds = 1
+sampling_period_seconds = 15
 
 
 def do_device():
@@ -186,12 +186,17 @@ def get_io(sensor, dev):
     return dev
 
 
-def check_inactive(sensor_dict):
+def check_inactive():
     """check for inactive sensors not read recently but in database"""
-    inactive_list = ''
-    record_list = models.Sensor().query_all()
-    for sensor in record_list:
-        if sensor.address not in sensor_dict.keys():
+    sensor_list = models.Sensor().query_all()
+    defined_sensor_list = models.ZoneSensor().query_all()
+    ref_list = []
+    for sensor in defined_sensor_list:
+        ref_list.append(sensor.address)
+    for sensor in sensor_list:
+        elapsed = round((utils.get_base_location_now_date() - sensor.updated_on).total_seconds() / 60, 0)
+        if sensor.address not in ref_list:
+            L.l.warning('Sensor {} not found ever'.format(sensor.address))
             current_record = models.SensorError.query.filter_by(sensor_address=sensor.address).first()
             record = models.SensorError()
             record.sensor_name = sensor.sensor_name
@@ -202,10 +207,9 @@ def check_inactive(sensor_dict):
             record.error_count += 1
             record.error_type = 0
             record.save_changed_fields(current_record=None, new_record=record, save_to_graph=True, save_all_fields=True)
-        elapsed = round((utils.get_base_location_now_date() - sensor.updated_on).total_seconds() / 60, 0)
         if elapsed > 2 * sampling_period_seconds:
             L.l.warning('Sensor {} type {} not responding since {} min'.format(
-                sensor.sensor_name,sensor.type, elapsed))
+                sensor.sensor_name, sensor.type, elapsed))
 
 
 def get_unknown(sensor, dev):
@@ -235,4 +239,4 @@ def thread_run():
     L.l.debug('Processing sensors')
     if initialised:
         sensor_dict = do_device()
-        check_inactive(sensor_dict)
+        check_inactive()
