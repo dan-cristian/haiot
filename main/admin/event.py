@@ -170,7 +170,8 @@ def mqtt_thread_run():
                             # Log.logger.warning('This node is master logging but emits remote logs, is a circular reference')
 
                 # if record has fields that enables persistence (in cloud or local)
-                if variable.NODE_THIS_IS_MASTER_OVERALL:
+                #if variable.NODE_THIS_IS_MASTER_OVERALL:
+                if source_host == Constant.HOST_NAME:
                     if Constant.JSON_PUBLISH_SAVE_TO_HISTORY in obj:
                         # if record must be saved to local db
                         if obj[Constant.JSON_PUBLISH_SAVE_TO_HISTORY] and Constant.HAS_LOCAL_DB_REPORTING_CAPABILITY:
