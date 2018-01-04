@@ -4,7 +4,7 @@ from pydispatch import dispatcher
 from main.logger_helper import L
 from common import Constant, utils
 from main.admin import model_helper, models
-
+import datetime
 '''
 Created on Mar 9, 2015
 
@@ -23,6 +23,7 @@ def do_device():
     sensortype = 'n/a'
     sensors = __owproxy.dir('/', slash=True, bus=False)
     for sensor in sensors:
+        start = datetime.datetime.now()
         try:
             dev = {}
             sensortype = __owproxy.read(sensor + 'type')
@@ -49,6 +50,8 @@ def do_device():
         except Exception, ex:
             L.l.warning('Other error reading sensors: {}'.format(ex))
             traceback.print_exc()
+        delta = (datetime.datetime.now() - start).total_seconds()
+        L.l.info("Sensor {} read took {} seconds".format(dev['address'], delta))
     return sensor_dict
 
 
