@@ -14,13 +14,14 @@ Created on Mar 9, 2015
 
 initialised = False
 __owproxy = None
-sampling_period_seconds = 45
+sampling_period_seconds = 1
 
 
 def do_device():
     global __owproxy
     sensor_dict = {}
     sensortype = 'n/a'
+    all_start = datetime.datetime.now()
     sensors = __owproxy.dir('/', slash=True, bus=False)
     for sensor in sensors:
         start = datetime.datetime.now()
@@ -52,6 +53,8 @@ def do_device():
             traceback.print_exc()
         delta = (datetime.datetime.now() - start).total_seconds()
         L.l.info("Sensor {} read took {} seconds".format(dev['address'], delta))
+    all_delta = (datetime.datetime.now() - all_start).total_seconds()
+    L.l.info("All sensors read took {} seconds".format(all_delta))
     return sensor_dict
 
 
