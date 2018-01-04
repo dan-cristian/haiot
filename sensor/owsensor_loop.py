@@ -208,7 +208,7 @@ def check_inactive():
             record.error_type = 0
             record.save_changed_fields(current_record=None, new_record=record, save_to_graph=True, save_all_fields=True)
         if elapsed > 2 * sampling_period_seconds:
-            L.l.warning('Sensor {} type {} not responding since {} min'.format(
+            L.l.warning('Sensor {} type {} not updated since {} min'.format(
                 sensor.sensor_name, sensor.type, elapsed))
 
 
