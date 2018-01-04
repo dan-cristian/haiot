@@ -948,7 +948,7 @@ if [ "$ENABLE_DASHCAM_PI" == "1" ]; then
     #echo "Installing accel + gyro lib"
     #pip install mpu6050-raspberrypi
 
-    echo "Disable UART console"
+    echo "Disable UART console for GPS use"
     sed -i -e "s/console=serial0,115200//g" /boot/cmdline.txt
 
     echo "Installing GPS"
