@@ -191,8 +191,8 @@ def check_inactive():
     sensor_list = models.Sensor().query_all()
     defined_sensor_list = models.ZoneSensor().query_all()
     ref_list = []
-    for sensor in defined_sensor_list:
-        ref_list.append(sensor.address)
+    for zone_sensor in defined_sensor_list:
+        ref_list.append(zone_sensor.sensor_address)
     for sensor in sensor_list:
         elapsed = round((utils.get_base_location_now_date() - sensor.updated_on).total_seconds() / 60, 0)
         if sensor.address not in ref_list:
