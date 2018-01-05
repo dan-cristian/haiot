@@ -1,11 +1,21 @@
 import traceback
 import pyownet.protocol
 from pydispatch import dispatcher
-from main.logger_helper import L
-from common import Constant, utils
-from main.admin import model_helper, models
-from main import thread_pool
 import datetime
+try:
+    from common import Constant, utils
+    from main.logger_helper import L
+    from main.admin import model_helper, models
+    from main import thread_pool
+except Exception, ex:
+    print "Exception importing key modules, probably started via main"
+    class L:
+        class l:
+            @staticmethod
+            def info(msg): print msg
+            @staticmethod
+            def warning(msg): print msg
+
 '''
 Created on Mar 9, 2015
 
@@ -17,17 +27,13 @@ initialised = False
 
 class P:
     last_warning = datetime.datetime.min
-    owproxy1 = None
-    owpath1 = '/bus.0'
-    owproxy2 = None
-    owpath2 = '/bus.4'
     check_period = 60
     sampling_period_seconds = 15
     ow_conn_list = {}  # key is busname, value is ow connection
     warning_issued = False
 
 
-def do_device(ow, path='/'):
+def do_device(ow, path):
     # http://pyownet.readthedocs.io/en/latest/protocol.html
     sensor_dict = {}
     sensortype = 'n/a'
@@ -35,41 +41,41 @@ def do_device(ow, path='/'):
     sensors = ow.dir(path, slash=True, bus=False)
     count = 0
     for sensor in sensors:
-        if 'interface' in sensor:
-            break
-        #start = datetime.datetime.now()
-        try:
-            dev = {}
-            sensortype = ow.read(sensor + 'type')
-            if sensortype == 'DS2423':
-                dev = get_counter(sensor, dev, ow)
-            elif sensortype == 'DS2413':
-                dev = get_io(sensor, dev, ow)
-            elif sensortype == 'DS18B20':
-                dev = get_temperature(sensor, dev, ow)
-            elif sensortype == 'DS2438':
-                dev = get_temperature(sensor, dev, ow)
-                dev = get_voltage(sensor, dev, ow)
-                dev = get_humidity(sensor, dev, ow)
-            elif sensortype == 'DS2401':
-                dev = get_bus(sensor, dev, ow)
-            else:
-                dev = get_unknown(sensor, dev, ow)
-            sensor_dict[dev['address']] = dev
-            save_to_db(dev)
-            count += 1
-        except pyownet.protocol.ConnError, er:
-            L.l.warning('Connection error owserver: {}'.format(er))
-        except pyownet.Error, ex:
-            L.l.warning('Error reading sensor type={}, sensor={}, ex={}'.format(sensortype, sensor, ex))
-        except Exception, ex:
-            L.l.warning('Other error reading sensors: {}'.format(ex))
-            traceback.print_exc()
-        #delta = (datetime.datetime.now() - start).total_seconds()
-        #L.l.info("Sensor {} read took {} seconds".format(dev['address'], delta))
+        # L.l.info("process sensor {}".format(sensor))
+        if not ('interface' in sensor or 'simultaneous' in sensor or 'alarm' in sensor):
+            # start = datetime.datetime.now()
+            try:
+                dev = {}
+                sensortype = ow.read(sensor + 'type')
+                if sensortype == 'DS2423':
+                    dev = get_counter(sensor, dev, ow)
+                elif sensortype == 'DS2413':
+                    dev = get_io(sensor, dev, ow)
+                elif sensortype == 'DS18B20':
+                    dev = get_temperature(sensor, dev, ow)
+                elif sensortype == 'DS2438':
+                    dev = get_temperature(sensor, dev, ow)
+                    dev = get_voltage(sensor, dev, ow)
+                    dev = get_humidity(sensor, dev, ow)
+                elif sensortype == 'DS2401':
+                    dev = get_bus(sensor, dev, ow)
+                else:
+                    dev = get_unknown(sensor, dev, ow)
+                sensor_dict[dev['address']] = dev
+                save_to_db(dev)
+                count += 1
+            except pyownet.protocol.ConnError, er:
+                L.l.warning('Connection error owserver: {}'.format(er))
+            except pyownet.Error, ex:
+                L.l.warning('Error reading sensor type={}, sensor={}, ex={}'.format(sensortype, sensor, ex))
+            except Exception, ex:
+                L.l.warning('Other error reading sensors: {}'.format(ex))
+                traceback.print_exc()
+            #delta = (datetime.datetime.now() - start).total_seconds()
+            #L.l.info("Sensor {} read took {} seconds".format(dev['address'], delta))
     all_delta = (datetime.datetime.now() - all_start).total_seconds()
-    #if all_delta > 1:
-    L.l.info("All {} sensors read in bus {} took {} seconds".format(count, path, all_delta))
+    if count > 0 and all_delta > 1:
+        L.l.info("All {} sensors read in bus {} took {} seconds".format(count, path, all_delta))
     return sensor_dict
 
 
@@ -235,7 +241,7 @@ def _dynamic_thread_run(ow_conn, ow_bus):
 
 def _get_bus_list(host, port):
     ow = pyownet.protocol.proxy(host=host, port=port)
-    items = ow.dir('/', slash=True, bus=True)
+    items = ow.dir('/', slash=False, bus=True)
     for item in items:
         if 'bus' in item:
             ow_new = pyownet.protocol.proxy(host=host, port=port, flags=pyownet.protocol.FLG_UNCACHED)
@@ -269,3 +275,18 @@ def thread_run():
         check_inactive()
     else:
         init()
+
+
+if __name__ == "__main__":
+    host = '127.0.0.1'
+    port = 4304
+    ow1 = pyownet.protocol.proxy(host=host, port=port)
+    items = ow1.dir('/', slash=False, bus=True)
+    for item in items:
+        if 'bus' in item:
+            ow_new = pyownet.protocol.proxy(host=host, port=port, flags=pyownet.protocol.FLG_UNCACHED)
+            P.ow_conn_list[item] = ow_new
+            try:
+                do_device(ow=ow_new, path=item)
+            except Exception, ex:
+                print ex
