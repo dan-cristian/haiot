@@ -145,20 +145,20 @@ def get_bus(sensor, dev, ow):
 
 
 def get_temperature(sensor, dev, ow):
-    dev = get_prefix(sensor, dev)
+    dev = get_prefix(sensor, dev, ow)
     # 2 digits round
     dev['temperature'] = utils.round_sensor_value(ow.read(sensor + 'temperature'))
     return dev
 
 
 def get_humidity(sensor, dev, ow):
-    dev = get_prefix(sensor, dev)
+    dev = get_prefix(sensor, dev, ow)
     dev['humidity'] = utils.round_sensor_value(ow.read(sensor + 'humidity'))
     return dev
 
 
 def get_voltage(sensor, dev, ow):
-    dev = get_prefix(sensor, dev)
+    dev = get_prefix(sensor, dev, ow)
     dev['iad'] = float(ow.read(sensor + 'IAD'))
     dev['vad'] = float(ow.read(sensor + 'VAD'))
     dev['vdd'] = float(ow.read(sensor + 'VDD'))
@@ -166,7 +166,7 @@ def get_voltage(sensor, dev, ow):
 
 
 def get_counter(sensor, dev, ow):
-    dev = get_prefix(sensor, dev)
+    dev = get_prefix(sensor, dev, ow)
     dev['counters_a'] = int(ow.read(sensor + 'counters.A'))
     dev['counters_b'] = int(ow.read(sensor + 'counters.B'))
     return dev
@@ -174,7 +174,7 @@ def get_counter(sensor, dev, ow):
 
 def get_io(sensor, dev, ow):
     # IMPORTANT: do not use . in field names as it throws error on JSON, only use "_"
-    dev = get_prefix(sensor, dev)
+    dev = get_prefix(sensor, dev, ow)
     dev['pio_a'] = str(ow.read(sensor + 'PIO.A')).strip()
     dev['pio_b'] = str(ow.read(sensor + 'PIO.B')).strip()
     dev['sensed_a'] = str(ow.read(sensor + 'sensed.A')).strip()
