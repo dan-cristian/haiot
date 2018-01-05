@@ -3,13 +3,17 @@ import pyownet.protocol
 from pydispatch import dispatcher
 import datetime
 
-from main.logger_helper import L
 from common import Constant, utils
 try:
+    from main.logger_helper import L
     from main.admin import model_helper, models
     from main import thread_pool
 except Exception, ex:
-    pass
+    class L:
+        class l:
+            def info(self, msg):
+                print msg
+
 
 '''
 Created on Mar 9, 2015
