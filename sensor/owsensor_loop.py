@@ -66,8 +66,8 @@ def do_device(ow, path='/'):
         #delta = (datetime.datetime.now() - start).total_seconds()
         #L.l.info("Sensor {} read took {} seconds".format(dev['address'], delta))
     all_delta = (datetime.datetime.now() - all_start).total_seconds()
-    if all_delta > 1:
-        L.l.info("Slower read, all sensors read in bus {} took {} seconds".format(path, all_delta))
+    #if all_delta > 1:
+    L.l.info("All sensors read in bus {} took {} seconds".format(path, all_delta))
     return sensor_dict
 
 
@@ -204,7 +204,7 @@ def check_inactive():
     for sensor in sensor_list:
         elapsed = round((utils.get_base_location_now_date() - sensor.updated_on).total_seconds() / 60, 0)
         if sensor.address not in ref_list:
-            L.l.warning('Sensor {} not found ever'.format(sensor.address))
+            L.l.warning('Sensor {} {} not found ever'.format(sensor.address, sensor.sensor_name))
             current_record = models.SensorError.query.filter_by(sensor_address=sensor.address).first()
             record = models.SensorError()
             record.sensor_name = sensor.sensor_name
