@@ -213,8 +213,8 @@ def check_inactive():
             P.last_warning = datetime.datetime.now()
 
 
-def get_unknown(sensor, dev):
-    dev = get_prefix(sensor, dev)
+def get_unknown(sensor, dev, ow):
+    dev = get_prefix(sensor, dev, ow)
     return dev
 
 
