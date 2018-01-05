@@ -8,11 +8,11 @@ try:
     from main.admin import model_helper, models
     from main import thread_pool
 except Exception, ex:
+    print "Exception importing key modules, probably started via main"
     class L:
         class l:
             @staticmethod
-            def info(msg):
-                print msg
+            def info(msg): print msg
 
 '''
 Created on Mar 9, 2015
@@ -25,17 +25,13 @@ initialised = False
 
 class P:
     last_warning = datetime.datetime.min
-    owproxy1 = None
-    owpath1 = '/bus.0'
-    owproxy2 = None
-    owpath2 = '/bus.4'
     check_period = 60
     sampling_period_seconds = 15
     ow_conn_list = {}  # key is busname, value is ow connection
     warning_issued = False
 
 
-def do_device(ow, path='/'):
+def do_device(ow, path):
     # http://pyownet.readthedocs.io/en/latest/protocol.html
     sensor_dict = {}
     sensortype = 'n/a'
@@ -43,10 +39,10 @@ def do_device(ow, path='/'):
     sensors = ow.dir(path, slash=True, bus=False)
     count = 0
     for sensor in sensors:
-        L.l.info("process sensor {}".format(sensor))
-        if 'interface' or 'simultaneous' or 'alarm' in sensor:
+        # L.l.info("process sensor {}".format(sensor))
+        if 'interface' in sensor or 'simultaneous' in sensor or 'alarm' in sensor:
             break
-        #start = datetime.datetime.now()
+        # start = datetime.datetime.now()
         try:
             dev = {}
             sensortype = ow.read(sensor + 'type')
@@ -281,15 +277,15 @@ def thread_run():
 
 
 if __name__ == "__main__":
-    host='127.0.0.1'
-    port=4304
-    ow = pyownet.protocol.proxy(host=host, port=port)
-    items = ow.dir('/', slash=False, bus=True)
+    host = '127.0.0.1'
+    port = 4304
+    ow1 = pyownet.protocol.proxy(host=host, port=port)
+    items = ow1.dir('/', slash=False, bus=True)
     for item in items:
         if 'bus' in item:
             ow_new = pyownet.protocol.proxy(host=host, port=port, flags=pyownet.protocol.FLG_UNCACHED)
             P.ow_conn_list[item] = ow_new
             try:
-                do_device(ow_new, item)
+                do_device(ow=ow_new, path=item)
             except Exception, ex:
                 print ex
