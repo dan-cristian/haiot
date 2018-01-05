@@ -82,8 +82,8 @@ def unload():
 def init():
     L.l.debug('Sensor module initialising')
     if owsensor_loop.init():
-        thread_pool.add_interval_callable(owsensor_loop.thread_run,
-                                          run_interval_second=owsensor_loop.sampling_period_seconds)
+        thread_pool.add_interval_callable(owsensor_loop.thread_run, owsensor_loop.sampling_period_seconds)
+        thread_pool.add_interval_callable(owsensor_loop.thread_run_2, owsensor_loop.sampling_period_seconds)
     if rfxcom_run.init():
         thread_pool.add_interval_callable(rfxcom_run.thread_run, run_interval_second=60)
     # init ups only on host specified in config
