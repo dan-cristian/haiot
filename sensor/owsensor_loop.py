@@ -51,8 +51,8 @@ def do_device():
         except Exception, ex:
             L.l.warning('Other error reading sensors: {}'.format(ex))
             traceback.print_exc()
-        delta = (datetime.datetime.now() - start).total_seconds()
-        L.l.info("Sensor {} read took {} seconds".format(dev['address'], delta))
+        #delta = (datetime.datetime.now() - start).total_seconds()
+        #L.l.info("Sensor {} read took {} seconds".format(dev['address'], delta))
     all_delta = (datetime.datetime.now() - all_start).total_seconds()
     L.l.info("All sensors read took {} seconds".format(all_delta))
     return sensor_dict

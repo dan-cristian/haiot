@@ -10,6 +10,7 @@ import traceback
 import tzlocal
 import urllib2
 import threading
+import logging
 
 initialised = False
 _channel_lock = threading.Lock()
@@ -219,6 +220,8 @@ def unload():
 def init():
     global initialised
     try:
+        # https://stackoverflow.com/questions/11029717/how-do-i-disable-log-messages-from-the-requests-library
+        logging.getLogger("requests").setLevel(logging.WARNING)
         _check_def_change()
         initialised = True
         dispatcher.connect(_handle_record, signal=Constant.SIGNAL_STORABLE_RECORD, sender=dispatcher.Any)
