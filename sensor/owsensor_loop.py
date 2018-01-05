@@ -91,7 +91,7 @@ def save_to_db(dev):
         if zone_sensor:
             record.sensor_name = zone_sensor.sensor_name
         else:
-            record.sensor_name = '(not defined) {} {}'.format(address, dev['type'])
+            record.sensor_name = '(undefined) {} {}'.format(address, dev['type'])
         record.type = dev['type']
         record.updated_on = utils.get_base_location_now_date()
         if dev.has_key('counters_a'):
