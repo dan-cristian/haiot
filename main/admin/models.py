@@ -178,10 +178,10 @@ class DbBase:
                             setattr(current_record, column_name, new_value)
                             current_record.last_commit_field_changed_list.append(column_name)
                             if debug:
-                                L.l.info('DEBUG change COL={} to VAL={}'.format(column_name, new_value))
+                                L.l.info('DEBUG CHANGE COL={} to VAL={}'.format(column_name, new_value))
                     else:
                         if debug:
-                            L.l.info('DEBUG not changing current column={}'.format(column_name))
+                            L.l.info('DEBUG NOT change col={}'.format(column_name))
                 if len(current_record.last_commit_field_changed_list) == 0:
                     current_record.notify_transport_enabled = False
                 # fixme: remove hardcoded field name
