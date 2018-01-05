@@ -33,6 +33,7 @@ def do_device(ow, path='/'):
     sensortype = 'n/a'
     all_start = datetime.datetime.now()
     sensors = ow.dir(path, slash=True, bus=False)
+    count = 0
     for sensor in sensors:
         if 'interface' in sensor:
             break
@@ -56,6 +57,7 @@ def do_device(ow, path='/'):
                 dev = get_unknown(sensor, dev, ow)
             sensor_dict[dev['address']] = dev
             save_to_db(dev)
+            count += 1
         except pyownet.protocol.ConnError, er:
             L.l.warning('Connection error owserver: {}'.format(er))
         except pyownet.Error, ex:
@@ -67,7 +69,7 @@ def do_device(ow, path='/'):
         #L.l.info("Sensor {} read took {} seconds".format(dev['address'], delta))
     all_delta = (datetime.datetime.now() - all_start).total_seconds()
     #if all_delta > 1:
-    L.l.info("All {} sensors read in bus {} took {} seconds".format(len(sensors), path, all_delta))
+    L.l.info("All {} sensors read in bus {} took {} seconds".format(count, path, all_delta))
     return sensor_dict
 
 
