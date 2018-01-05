@@ -17,6 +17,10 @@ __owproxy = None
 sampling_period_seconds = 15
 
 
+class P:
+    last_warning = datetime.datetime.min
+
+
 def do_device():
     global __owproxy
     sensor_dict = {}
@@ -191,6 +195,8 @@ def check_inactive():
     sensor_list = models.Sensor().query_all()
     defined_sensor_list = models.ZoneSensor().query_all()
     ref_list = []
+    delta = (datetime.datetime.now() - P.last_warning).total_seconds()
+    log_warn = (delta > 60 * 15)
     for zone_sensor in defined_sensor_list:
         ref_list.append(zone_sensor.sensor_address)
     for sensor in sensor_list:
@@ -207,9 +213,9 @@ def check_inactive():
             record.error_count += 1
             record.error_type = 0
             record.save_changed_fields(current_record=None, new_record=record, save_to_graph=True, save_all_fields=True)
-        if elapsed > 2 * sampling_period_seconds:
-            L.l.warning('Sensor {} type {} not updated since {} min'.format(
-                sensor.sensor_name, sensor.type, elapsed))
+        if log_warn and elapsed > 2 * sampling_period_seconds:
+            L.l.warning('Sensor {} type {} not updated since {} min'.format(sensor.sensor_name, sensor.type, elapsed))
+            P.last_warning = datetime.datetime.now()
 
 
 def get_unknown(sensor, dev):
