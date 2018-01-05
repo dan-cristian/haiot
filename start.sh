@@ -2,7 +2,6 @@
 
 function run_app {
     $DIR/scripts/stopserver.sh
-    sleep 2
     echo Starting app with parameter $1 $2 $3 $4 $5 $6 $7 $8 $9
     source $DIR/venv/bin/activate
     python $DIR/haiot.py $1 $2 $3 $4 $5 $6 $7 $8 $9 2>&1
