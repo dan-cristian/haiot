@@ -35,7 +35,8 @@ def do_device(ow, path='/'):
     sensors = ow.dir(path, slash=True, bus=False)
     count = 0
     for sensor in sensors:
-        if 'interface' in sensor:
+        L.l.info("process sensor {}".format(sensor))
+        if 'interface' or 'simultaneous' or 'alarm' in sensor:
             break
         #start = datetime.datetime.now()
         try:
