@@ -5,7 +5,8 @@ import concurrent.futures
 
 from main.logger_helper import L
 
-__callable_list=[]
+__callable_list = []
+__callable_args = []
 __callable_progress_list={}
 __exec_interval_list={}
 __exec_last_date_list={}
@@ -14,16 +15,18 @@ __dict_future_func={}
 
 __immediate_executor = None
 
+
 def __get_print_name_callable(func):
     return func.func_globals['__name__']+'.'+ func.func_name
 
-def add_interval_callable(func, run_interval_second=60):
+
+def add_interval_callable(func, run_interval_second, *args):
     print_name = __get_print_name_callable(func)
     if func not in __callable_list:
         __callable_list.append(func)
-        __exec_last_date_list[func]=datetime.now()
-        __exec_interval_list[func]=run_interval_second
-        L.l.debug('Added for processing callable ' + print_name)
+        __callable_args.append(*args)
+        __exec_last_date_list[func] = datetime.now()
+        __exec_interval_list[func] = run_interval_second
     else:
         L.l.info('Callable not added, already there')
 
@@ -65,7 +68,7 @@ def run_thread_pool():
                 L.l.info('Initialising interval thread processing with {} functions'.format(len(__callable_list)))
                 __dict_future_func = {executor.submit(call_obj): call_obj for call_obj in __callable_list}
             for future_obj in __dict_future_func :
-                func=__dict_future_func [future_obj]
+                func=__dict_future_func[future_obj]
                 print_name = func.func_globals['__name__']+'.'+ func.func_name
                 exec_interval = __exec_interval_list.get(func, None)
                 if not exec_interval:

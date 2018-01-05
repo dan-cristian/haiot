@@ -11,41 +11,40 @@ Created on Mar 9, 2015
 @author: dcristian
 '''
 
-
 initialised = False
-__owproxy = None
-sampling_period_seconds = 15
 
 
 class P:
     last_warning = datetime.datetime.min
+    owproxy1 = None
+    owproxy2 = None
+    sampling_period_seconds = 15
 
 
-def do_device():
-    global __owproxy
+def do_device(ow):
     sensor_dict = {}
     sensortype = 'n/a'
     all_start = datetime.datetime.now()
-    sensors = __owproxy.dir('/', slash=True, bus=False)
+    sensors = ow.dir('/', slash=True, bus=False)
     for sensor in sensors:
         start = datetime.datetime.now()
         try:
             dev = {}
-            sensortype = __owproxy.read(sensor + 'type')
+            sensortype = ow.read(sensor + 'type')
             if sensortype == 'DS2423':
-                dev = get_counter(sensor, dev)
+                dev = get_counter(sensor, dev, ow)
             elif sensortype == 'DS2413':
-                dev = get_io(sensor, dev)
+                dev = get_io(sensor, dev, ow)
             elif sensortype == 'DS18B20':
-                dev = get_temperature(sensor, dev)
+                dev = get_temperature(sensor, dev, ow)
             elif sensortype == 'DS2438':
-                dev = get_temperature(sensor, dev)
-                dev = get_voltage(sensor, dev)
-                dev = get_humidity(sensor, dev)
+                dev = get_temperature(sensor, dev, ow)
+                dev = get_voltage(sensor, dev, ow)
+                dev = get_humidity(sensor, dev, ow)
             elif sensortype == 'DS2401':
-                dev = get_bus(sensor, dev)
+                dev = get_bus(sensor, dev, ow)
             else:
-                dev = get_unknown(sensor, dev)
+                dev = get_unknown(sensor, dev, ow)
             sensor_dict[dev['address']] = dev
             save_to_db(dev)
         except pyownet.protocol.ConnError, er:
@@ -86,7 +85,7 @@ def save_to_db(dev):
                 delta_time_counters = (utils.get_base_location_now_date() - current_record.updated_on).total_seconds()
             else:
                 record.delta_counters_a = 0  # don't know prev. count, assume no consumption (ticks could be lost)
-                delta_time_counters = sampling_period_seconds
+                delta_time_counters = P.sampling_period_seconds
         if dev.has_key('counters_b'):
             record.counters_b = dev['counters_b']
             if current_record:
@@ -134,59 +133,52 @@ def save_to_db(dev):
         #    db_lock.release()
 
 
-def get_prefix(sensor, dev):
-    global __owproxy
-    dev['address'] = str(__owproxy.read(sensor + 'r_address'))
-    dev['type'] = str(__owproxy.read(sensor + 'type'))
+def get_prefix(sensor, dev, ow):
+    dev['address'] = str(ow.read(sensor + 'r_address'))
+    dev['type'] = str(ow.read(sensor + 'type'))
     return dev
 
 
-def get_bus(sensor, dev):
-    global __owproxy
-    dev = get_prefix(sensor, dev)
+def get_bus(sensor, dev, ow):
+    dev = get_prefix(sensor, dev, ow)
     return dev
 
 
-def get_temperature(sensor, dev):
-    global __owproxy
+def get_temperature(sensor, dev, ow):
     dev = get_prefix(sensor, dev)
     # 2 digits round
-    dev['temperature'] = utils.round_sensor_value(__owproxy.read(sensor + 'temperature'))
+    dev['temperature'] = utils.round_sensor_value(ow.read(sensor + 'temperature'))
     return dev
 
 
-def get_humidity(sensor, dev):
-    global __owproxy
+def get_humidity(sensor, dev, ow):
     dev = get_prefix(sensor, dev)
-    dev['humidity'] = utils.round_sensor_value(__owproxy.read(sensor + 'humidity'))
+    dev['humidity'] = utils.round_sensor_value(ow.read(sensor + 'humidity'))
     return dev
 
 
-def get_voltage(sensor, dev):
-    global __owproxy
+def get_voltage(sensor, dev, ow):
     dev = get_prefix(sensor, dev)
-    dev['iad'] = float(__owproxy.read(sensor + 'IAD'))
-    dev['vad'] = float(__owproxy.read(sensor + 'VAD'))
-    dev['vdd'] = float(__owproxy.read(sensor + 'VDD'))
+    dev['iad'] = float(ow.read(sensor + 'IAD'))
+    dev['vad'] = float(ow.read(sensor + 'VAD'))
+    dev['vdd'] = float(ow.read(sensor + 'VDD'))
     return dev
 
 
-def get_counter(sensor, dev):
-    global __owproxy
+def get_counter(sensor, dev, ow):
     dev = get_prefix(sensor, dev)
-    dev['counters_a'] = int(__owproxy.read(sensor + 'counters.A'))
-    dev['counters_b'] = int(__owproxy.read(sensor + 'counters.B'))
+    dev['counters_a'] = int(ow.read(sensor + 'counters.A'))
+    dev['counters_b'] = int(ow.read(sensor + 'counters.B'))
     return dev
 
 
-def get_io(sensor, dev):
-    global __owproxy
+def get_io(sensor, dev, ow):
     # IMPORTANT: do not use . in field names as it throws error on JSON, only use "_"
     dev = get_prefix(sensor, dev)
-    dev['pio_a'] = str(__owproxy.read(sensor + 'PIO.A')).strip()
-    dev['pio_b'] = str(__owproxy.read(sensor + 'PIO.B')).strip()
-    dev['sensed_a'] = str(__owproxy.read(sensor + 'sensed.A')).strip()
-    dev['sensed_b'] = str(__owproxy.read(sensor + 'sensed.B')).strip()
+    dev['pio_a'] = str(ow.read(sensor + 'PIO.A')).strip()
+    dev['pio_b'] = str(ow.read(sensor + 'PIO.B')).strip()
+    dev['sensed_a'] = str(ow.read(sensor + 'sensed.A')).strip()
+    dev['sensed_b'] = str(ow.read(sensor + 'sensed.B')).strip()
     return dev
 
 
@@ -213,26 +205,25 @@ def check_inactive():
             record.error_count += 1
             record.error_type = 0
             record.save_changed_fields(current_record=None, new_record=record, save_to_graph=True, save_all_fields=True)
-        if log_warn and elapsed > 2 * sampling_period_seconds:
+        if log_warn and elapsed > 2 * P.sampling_period_seconds:
             L.l.warning('Sensor {} type {} not updated since {} min'.format(sensor.sensor_name, sensor.type, elapsed))
             P.last_warning = datetime.datetime.now()
 
 
 def get_unknown(sensor, dev):
-    global __owproxy
     dev = get_prefix(sensor, dev)
     return dev
 
 
 def init():
-    L.l.debug('Initialising owssensor')
-    global __owproxy, initialised
+    global initialised
     host = "none"
     port = "none"
     try:
         host = model_helper.get_param(Constant.P_OWSERVER_HOST_1)
         port = str(model_helper.get_param(Constant.P_OWSERVER_PORT_1))
-        __owproxy = pyownet.protocol.proxy(host=host, port=port)
+        P.owproxy1 = pyownet.protocol.proxy(host=host, port=port)
+        P.owproxy2 = pyownet.protocol.proxy(host=host, port=port)
         initialised = True
     except Exception, ex:
         L.l.info('1-wire owserver not found on host {} port {}'.format(host, port))
@@ -242,7 +233,12 @@ def init():
 
 def thread_run():
     global initialised
-    L.l.debug('Processing sensors')
     if initialised:
-        sensor_dict = do_device()
+        do_device(P.owproxy1)
         check_inactive()
+
+
+def thread_run_2():
+    global initialised
+    if initialised:
+        do_device(P.owproxy2)
