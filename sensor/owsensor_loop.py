@@ -66,7 +66,8 @@ def do_device(ow, path='/'):
         #delta = (datetime.datetime.now() - start).total_seconds()
         #L.l.info("Sensor {} read took {} seconds".format(dev['address'], delta))
     all_delta = (datetime.datetime.now() - all_start).total_seconds()
-    L.l.info("All sensors read in bus {} took {} seconds".format(path, all_delta))
+    if all_delta > 1:
+        L.l.info("Slower read, all sensors read in bus {} took {} seconds".format(path, all_delta))
     return sensor_dict
 
 
@@ -235,7 +236,7 @@ def _get_bus_list(host, port):
     items = ow.dir('/', slash=True, bus=True)
     for item in items:
         if 'bus' in item:
-            ow_new = pyownet.protocol.proxy(host=host, port=port)
+            ow_new = pyownet.protocol.proxy(host=host, port=port, flags=pyownet.protocol.FLG_UNCACHED)
             P.ow_conn_list[item] = ow_new
             func = _dynamic_thread_run(ow_conn=ow_new, ow_bus=item)
             thread_pool.add_interval_callable(func, P.sampling_period_seconds)
