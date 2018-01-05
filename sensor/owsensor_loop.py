@@ -2,9 +2,8 @@ import traceback
 import pyownet.protocol
 from pydispatch import dispatcher
 import datetime
-
-from common import Constant, utils
 try:
+    from common import Constant, utils
     from main.logger_helper import L
     from main.admin import model_helper, models
     from main import thread_pool
