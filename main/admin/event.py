@@ -197,8 +197,8 @@ def mqtt_thread_run():
                             #    Log.logger.debug('Graph not initialised on obj upload to graph')
                     else:
                         L.l.info("Received mqtt object without history save tag: {}".format(obj))
-                else:
-                    L.l.info("Dropping message from {}, not matching {}".format(source_host, Constant.HOST_NAME))
+                #else:
+                #    L.l.info("Dropping message from {}, not matching {}".format(source_host, Constant.HOST_NAME))
                 if len(__mqtt_event_list) > last_count:
                     L.l.debug('Not keeping up with {} mqtt events'.format(len(__mqtt_event_list)))
             except Exception, ex:
