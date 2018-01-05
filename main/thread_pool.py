@@ -62,7 +62,7 @@ def run_thread_pool():
     #https://docs.python.org/3.3/library/concurrent.futures.html
     global __dict_future_func
     __dict_future_func={}
-    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
         while __thread_pool_enabled:
             if len(__callable_list) != len(__dict_future_func):
                 L.l.info('Initialising interval thread processing with {} functions'.format(len(__callable_list)))
@@ -89,15 +89,16 @@ def run_thread_pool():
                         __dict_future_func[executor.submit(func)] = func
                         __exec_last_date_list[func] = datetime.now()
                 elif future_obj.running():
-                    if elapsed_seconds>1*30:
-                        L.l.debug('Threaded function {} is long running for {} seconds'.format(
-                            print_name,elapsed_seconds))
+                    if elapsed_seconds > 1*30:
+                        L.l.debug('Threaded function {} is long running for {} seconds'.format(print_name,
+                                                                                               elapsed_seconds))
                         if __callable_progress_list.has_key(func):
                             progress_status=__callable_progress_list[func].func_globals['progress_status']
                             L.l.warning('Progress Status is {}'.format(progress_status))
             time.sleep(2)
         executor.shutdown()
         L.l.info('Interval thread pool processor exit')
+
 
 #immediately runs submitted job using a thread pool
 def do_job(function):

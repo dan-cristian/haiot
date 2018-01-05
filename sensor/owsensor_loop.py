@@ -4,6 +4,7 @@ from pydispatch import dispatcher
 from main.logger_helper import L
 from common import Constant, utils
 from main.admin import model_helper, models
+from main import thread_pool
 import datetime
 '''
 Created on Mar 9, 2015
@@ -20,7 +21,10 @@ class P:
     owpath1 = '/bus.0'
     owproxy2 = None
     owpath2 = '/bus.4'
+    check_period = 60
     sampling_period_seconds = 15
+    ow_conn_list = {}  # key is busname, value is ow connection
+    warning_issued = False
 
 
 def do_device(ow, path='/'):
@@ -62,7 +66,7 @@ def do_device(ow, path='/'):
         #delta = (datetime.datetime.now() - start).total_seconds()
         #L.l.info("Sensor {} read took {} seconds".format(dev['address'], delta))
     all_delta = (datetime.datetime.now() - all_start).total_seconds()
-    L.l.info("All sensors read took {} seconds".format(all_delta))
+    L.l.info("All sensors read in bus {} took {} seconds".format(path, all_delta))
     return sensor_dict
 
 
@@ -220,6 +224,24 @@ def get_unknown(sensor, dev, ow):
     return dev
 
 
+def _dynamic_thread_run(ow_conn, ow_bus):
+    def _function():
+        do_device(ow=ow_conn, path=ow_bus)
+    return _function
+
+
+def _get_bus_list(host, port):
+    ow = pyownet.protocol.proxy(host=host, port=port)
+    items = ow.dir('/', slash=True, bus=True)
+    for item in items:
+        if 'bus' in item:
+            ow_new = pyownet.protocol.proxy(host=host, port=port)
+            P.ow_conn_list[item] = ow_new
+            func = _dynamic_thread_run(ow_conn=ow_new, ow_bus=item)
+            thread_pool.add_interval_callable(func, P.sampling_period_seconds)
+    L.l.info("Found {} owfs busses and initialised threads".format(len(P.bus_list)))
+
+
 def init():
     global initialised
     host = "none"
@@ -227,23 +249,20 @@ def init():
     try:
         host = model_helper.get_param(Constant.P_OWSERVER_HOST_1)
         port = str(model_helper.get_param(Constant.P_OWSERVER_PORT_1))
-        P.owproxy1 = pyownet.protocol.proxy(host=host, port=port)
-        P.owproxy2 = pyownet.protocol.proxy(host=host, port=port)
+        _get_bus_list(host, port)
         initialised = True
+        P.warning_issued = False
     except Exception, ex:
-        L.l.info('1-wire owserver not found on host {} port {}'.format(host, port))
-        initialised = False
+        if not P.warning_issued:
+            L.l.info('1-wire owserver not found on host {} port {}'.format(host, port))
+            initialised = False
+            P.warning_issued = True
     return initialised
 
 
 def thread_run():
     global initialised
     if initialised:
-        do_device(ow=P.owproxy1, path=P.owpath1)
         check_inactive()
-
-
-def thread_run_2():
-    global initialised
-    if initialised:
-        do_device(ow=P.owproxy2, path=P.owpath2)
+    else:
+        init()
