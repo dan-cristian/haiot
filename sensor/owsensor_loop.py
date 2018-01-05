@@ -1,11 +1,15 @@
 import traceback
 import pyownet.protocol
 from pydispatch import dispatcher
+import datetime
+
 from main.logger_helper import L
 from common import Constant, utils
-from main.admin import model_helper, models
-from main import thread_pool
-import datetime
+try:
+    from main.admin import model_helper, models
+    from main import thread_pool
+except Exception, ex:
+    pass
 '''
 Created on Mar 9, 2015
 
@@ -236,7 +240,7 @@ def _dynamic_thread_run(ow_conn, ow_bus):
 
 def _get_bus_list(host, port):
     ow = pyownet.protocol.proxy(host=host, port=port)
-    items = ow.dir('/', slash=True, bus=True)
+    items = ow.dir('/', slash=False, bus=True)
     for item in items:
         if 'bus' in item:
             ow_new = pyownet.protocol.proxy(host=host, port=port, flags=pyownet.protocol.FLG_UNCACHED)
@@ -270,3 +274,18 @@ def thread_run():
         check_inactive()
     else:
         init()
+
+
+if __name__ == "__main__":
+    host='127.0.0.1'
+    port=4304
+    ow = pyownet.protocol.proxy(host=host, port=port)
+    items = ow.dir('/', slash=False, bus=True)
+    for item in items:
+        if 'bus' in item:
+            ow_new = pyownet.protocol.proxy(host=host, port=port, flags=pyownet.protocol.FLG_UNCACHED)
+            P.ow_conn_list[item] = ow_new
+            try:
+                do_device(ow_new, item)
+            except Exception, ex:
+                pass
