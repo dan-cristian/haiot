@@ -57,13 +57,12 @@ def do_device(ow, path):
                     dev = get_temperature(sensor, dev, ow)
                     dev = get_voltage(sensor, dev, ow)
                     dev = get_humidity(sensor, dev, ow)
-                elif sensortype == 'DS2401':
-                    dev = get_bus(sensor, dev, ow)
                 else:
                     dev = get_unknown(sensor, dev, ow)
                 sensor_dict[dev['address']] = dev
-                save_to_db(dev)
-                count += 1
+                if 'DS2401' not in sensortype:
+                    save_to_db(dev)
+                    count += 1
             except pyownet.protocol.ConnError, er:
                 L.l.warning('Connection error owserver: {}'.format(er))
             except pyownet.Error, ex:
