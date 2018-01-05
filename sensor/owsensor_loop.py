@@ -292,4 +292,4 @@ if __name__ == "__main__":
             try:
                 do_device(ow_new, item)
             except Exception, ex:
-                pass
+                print ex
