@@ -6,7 +6,7 @@ import concurrent.futures
 from main.logger_helper import L
 
 __callable_list = []
-__callable_args = []
+#__callable_args = []
 __callable_progress_list={}
 __exec_interval_list={}
 __exec_last_date_list={}
@@ -20,11 +20,11 @@ def __get_print_name_callable(func):
     return func.func_globals['__name__']+'.'+ func.func_name
 
 
-def add_interval_callable(func, run_interval_second, *args):
+def add_interval_callable(func, run_interval_second):#, *args):
     print_name = __get_print_name_callable(func)
     if func not in __callable_list:
         __callable_list.append(func)
-        __callable_args.append(*args)
+        #__callable_args.append(*args)
         __exec_last_date_list[func] = datetime.now()
         __exec_interval_list[func] = run_interval_second
     else:
