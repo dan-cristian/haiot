@@ -9,11 +9,10 @@ try:
     from main import thread_pool
 except Exception, ex:
     class L:
-        @staticmethod
         class l:
+            @staticmethod
             def info(msg):
                 print msg
-
 
 '''
 Created on Mar 9, 2015
