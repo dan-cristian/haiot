@@ -239,7 +239,7 @@ def _get_bus_list(host, port):
             P.ow_conn_list[item] = ow_new
             func = _dynamic_thread_run(ow_conn=ow_new, ow_bus=item)
             thread_pool.add_interval_callable(func, P.sampling_period_seconds)
-    L.l.info("Found {} owfs busses and initialised threads".format(len(P.bus_list)))
+    L.l.info("Found {} owfs busses and initialised threads".format(len(P.ow_conn_list)))
 
 
 def init():
