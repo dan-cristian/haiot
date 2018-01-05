@@ -95,14 +95,13 @@ def on_models_committed(sender, changes):
 def mqtt_thread_run():
     global __mqtt_lock
     __mqtt_lock.acquire()
-    from cloud import graph_plotly
+    #from cloud import graph_plotly
     try:
         last_count = len(__mqtt_event_list)
-        for obj in __mqtt_event_list:
+        for obj in list(__mqtt_event_list):
             try:
                 __mqtt_event_list.remove(obj)
                 # events received via mqtt transport
-                table = None
                 # fixme: make it generic to work with any transport
                 source_host = obj[Constant.JSON_PUBLISH_SOURCE_HOST]
                 if Constant.JSON_PUBLISH_TABLE in obj:
@@ -132,8 +131,8 @@ def mqtt_thread_run():
                         rule.record_update(obj)
                     elif table == utils.get_table_name(models.Presence):
                         presence.record_update(obj)
-                    elif table == utils.get_table_name(models.PlotlyCache):
-                        graph_plotly.record_update(obj)
+                    #elif table == utils.get_table_name(models.PlotlyCache):
+                    #    graph_plotly.record_update(obj)
                     elif table == utils.get_table_name(models.ZoneAlarm):
                         # no processing (no local save)
                         pass
@@ -215,4 +214,4 @@ def mqtt_thread_run():
 def init():
     dispatcher.connect(handle_local_event_db_post, signal=Constant.SIGNAL_UI_DB_POST, sender=dispatcher.Any)
     dispatcher.connect(handle_event_mqtt_received, signal=Constant.SIGNAL_MQTT_RECEIVED, sender=dispatcher.Any)
-    thread_pool.add_interval_callable(mqtt_thread_run, run_interval_second=1)
+    thread_pool.add_interval_callable(mqtt_thread_run, run_interval_second=0.5)
