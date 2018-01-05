@@ -30,7 +30,9 @@ def do_device(ow, path='/'):
     all_start = datetime.datetime.now()
     sensors = ow.dir(path, slash=True, bus=False)
     for sensor in sensors:
-        start = datetime.datetime.now()
+        if 'interface' in sensor:
+            break
+        #start = datetime.datetime.now()
         try:
             dev = {}
             sensortype = ow.read(sensor + 'type')
@@ -53,7 +55,7 @@ def do_device(ow, path='/'):
         except pyownet.protocol.ConnError, er:
             L.l.warning('Connection error owserver: {}'.format(er))
         except pyownet.Error, ex:
-            L.l.warning('Error reading sensor type={}: {}'.format(sensortype, ex))
+            L.l.warning('Error reading sensor type={}, sensor={}, ex={}'.format(sensortype, sensor, ex))
         except Exception, ex:
             L.l.warning('Other error reading sensors: {}'.format(ex))
             traceback.print_exc()
