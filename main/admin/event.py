@@ -176,9 +176,9 @@ def mqtt_thread_run():
                         if obj[Constant.JSON_PUBLISH_SAVE_TO_HISTORY] and Constant.HAS_LOCAL_DB_REPORTING_CAPABILITY:
                             persistence.save_to_history_db(obj)
                         else:
-                            L.l.info("Not saving to db, json publish={} has db={}, obj={}".format(
-                                obj[Constant.JSON_PUBLISH_SAVE_TO_HISTORY], Constant.HAS_LOCAL_DB_REPORTING_CAPABILITY,
-                                obj))
+                            #L.l.info("Not saving to db, json publish={} has db={}, obj={}".format(
+                            #    obj[Constant.JSON_PUBLISH_SAVE_TO_HISTORY], Constant.HAS_LOCAL_DB_REPORTING_CAPABILITY,
+                            #    obj))
                             pass
                         # if record is marked to be uploaded to a graph
                         #if Constant.JSON_PUBLISH_SAVE_TO_GRAPH in obj and obj[Constant.JSON_PUBLISH_SAVE_TO_GRAPH]:
