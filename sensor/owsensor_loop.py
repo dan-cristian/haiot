@@ -254,7 +254,7 @@ def init():
         P.warning_issued = False
     except Exception, ex:
         if not P.warning_issued:
-            L.l.info('1-wire owserver not found on host {} port {}'.format(host, port))
+            L.l.info('1-wire owserver not initialised on host {} port {}, ex={}'.format(host, port, ex))
             initialised = False
             P.warning_issued = True
     return initialised
