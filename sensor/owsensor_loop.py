@@ -92,7 +92,7 @@ def save_to_db(dev):
         if zone_sensor:
             record.sensor_name = zone_sensor.sensor_name
         else:
-            record.sensor_name = '(not defined) {}'.format(address)
+            record.sensor_name = '(not defined) {} {}'.format(address, dev['type'])
         record.type = dev['type']
         record.updated_on = utils.get_base_location_now_date()
         if dev.has_key('counters_a'):
@@ -101,7 +101,7 @@ def save_to_db(dev):
                 record.delta_counters_a = record.counters_a - current_record.counters_a
                 # get accurate interval (e.g. to establish power consumption in watts)
                 delta_time_counters = (utils.get_base_location_now_date() - current_record.updated_on).total_seconds()
-            else:
+            else:  # when running first time with db empty
                 record.delta_counters_a = 0  # don't know prev. count, assume no consumption (ticks could be lost)
                 delta_time_counters = P.sampling_period_seconds
         if dev.has_key('counters_b'):
@@ -137,7 +137,7 @@ def save_to_db(dev):
             if record.delta_counters_b != 0:
                 current_record.delta_counters_b = 0
         record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
-                                   save_to_graph=True, debug=False)
+                                   save_to_graph=True, debug=True)
         if record.delta_counters_a is not None or record.delta_counters_b is not None:
             dispatcher.send(Constant.SIGNAL_UTILITY, sensor_name=record.sensor_name,
                             units_delta_a=record.delta_counters_a, units_delta_b=record.delta_counters_b,
