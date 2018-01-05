@@ -13,6 +13,8 @@ except Exception, ex:
         class l:
             @staticmethod
             def info(msg): print msg
+            @staticmethod
+            def warning(msg): print msg
 
 '''
 Created on Mar 9, 2015
@@ -40,7 +42,7 @@ def do_device(ow, path):
     count = 0
     for sensor in sensors:
         # L.l.info("process sensor {}".format(sensor))
-        if not ('interface' or 'simultaneous' or 'alarm' in sensor):
+        if not ('interface' in sensor or 'simultaneous' in sensor or 'alarm' in sensor):
             # start = datetime.datetime.now()
             try:
                 dev = {}
