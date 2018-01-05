@@ -83,7 +83,7 @@ def save_to_history_db(obj):
                 if hasattr(new_record, field) and field != "id":
                     setattr(new_record, field, obj[field])
             if new_record.add_commit_record_to_db():
-                L.l.debug('Saved OK to local db table {} obj={}'.format(dest_table, new_record))
+                L.l.info('Saved OK to local db table {} obj={}'.format(dest_table, new_record))
             else:
                 L.l.critical("Cannot save history db record={}".format(obj))
         except Exception, ex:
