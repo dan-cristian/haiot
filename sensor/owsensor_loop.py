@@ -17,15 +17,18 @@ initialised = False
 class P:
     last_warning = datetime.datetime.min
     owproxy1 = None
+    owpath1 = '/bus.0'
     owproxy2 = None
+    owpath2 = '/bus.4'
     sampling_period_seconds = 15
 
 
-def do_device(ow):
+def do_device(ow, path='/'):
+    # http://pyownet.readthedocs.io/en/latest/protocol.html
     sensor_dict = {}
     sensortype = 'n/a'
     all_start = datetime.datetime.now()
-    sensors = ow.dir('/', slash=True, bus=False)
+    sensors = ow.dir(path, slash=True, bus=False)
     for sensor in sensors:
         start = datetime.datetime.now()
         try:
@@ -234,11 +237,11 @@ def init():
 def thread_run():
     global initialised
     if initialised:
-        do_device(P.owproxy1)
+        do_device(ow=P.owproxy1, path=P.owpath1)
         check_inactive()
 
 
 def thread_run_2():
     global initialised
     if initialised:
-        do_device(P.owproxy2)
+        do_device(ow=P.owproxy2, path=P.owpath2)
