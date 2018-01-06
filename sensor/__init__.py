@@ -24,13 +24,15 @@ def record_update(obj):
         # avoid node to update itself in infinite recursion
         if sensor_host_name != Constant.HOST_NAME:
             address = utils.get_object_field_value(obj, 'address')
+            n_address = utils.get_object_field_value(obj, 'n_address')
+            sensor_type = utils.get_object_field_value(obj, 'type')
             record = models.Sensor(address=address)
             assert isinstance(record, models.Sensor)
             zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=address).first()
             if zone_sensor:
                 record.sensor_name = zone_sensor.sensor_name
             else:
-                record.sensor_name = '(not defined) {}'.format(address)
+                record.sensor_name = '(not defined) {} {} {}'.format(address, n_address, sensor_type)
             record.type = utils.get_object_field_value(obj, 'type')
             record.updated_on = utils.get_base_location_now_date()
             if obj.has_key('counters_a'): record.counters_a = utils.get_object_field_value(obj, 'counters_a')
