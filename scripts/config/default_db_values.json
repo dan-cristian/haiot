@@ -68,7 +68,7 @@
     {"id":23, "active":"0", "start_order":"23", "name":"sysutils.filewatch"},
     {"id":25, "active":"1", "start_order":"25", "name":"rule"},
     {"id":27, "active":"1", "start_order":"27", "name":"node"},
-    {"id":33, "active":"0", "start_order":"33", "name":"utility"},
+    {"id":33, "active":"1", "start_order":"33", "name":"utility"},
     {"id":35, "active":"1", "start_order":"35", "name":"cloud.newtifry"},
     {"id":37, "active":"1", "start_order":"37", "name":"cloud.hipchat"},
     {"id":39, "active":"0", "start_order":"39", "name":"presence"},
@@ -79,14 +79,10 @@
     {"id":102, "active":"1", "start_order":"102", "name":"webui.api"},
     {"id":103, "active":"1", "start_order":"103", "name":"webui"},
 
-
-
     {"id":121, "active":"0", "start_order":"21", "name":"cloud.youtube", "host_name":"nas"},
     {"id":123, "active":"0", "start_order":"23", "name":"sysutils.filewatch", "host_name":"nas"},
-    {"id":119, "active":"1", "start_order":"19", "name":"ddns", "host_name":"nas"},
 
     {"id":209, "active":"0", "start_order":"9", "name":"heat", "host_name":"pi-power"},
-    {"id":233, "active":"1", "start_order":"33", "name":"utility", "host_name":"pi-power"},
 
     {"id":401, "active":"1", "start_order":"50", "name":"apps.dashcam", "host_name":"pidash"},
     {"id":411, "active":"1", "start_order":"11", "name":"alarm", "host_name":"pidash"},
@@ -99,8 +95,8 @@
 
     {"id":609, "active":"1", "start_order":"9", "name":"heat", "host_name":"pi-face"},
     {"id":611, "active":"1", "start_order":"11", "name":"alarm", "host_name":"pi-face"},
-    {"id":641, "active":"1", "start_order":"41", "name":"cloud.alexa", "host_name":"pi-face"},
-    {"id":633, "active":"1", "start_order":"33", "name":"utility", "host_name":"pi-face"}
+    {"id":619, "active":"1", "start_order":"19", "name":"ddns", "host_name":"pi-face"},
+    {"id":641, "active":"1", "start_order":"41", "name":"cloud.alexa", "host_name":"pi-face"}
   ],
 
   "People": [
