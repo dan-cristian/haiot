@@ -317,7 +317,8 @@
     {"zone_id":29 , "sensor_address": "EF0000000F97CA1D", "sensor_name": "power main 2"},
     {"zone_id":29 , "sensor_address": "F90000000FFEAB1D", "sensor_name": "power rack"},
     {"zone_id":10 , "sensor_address": "1C0000000F99851D", "sensor_name": "utility beci"},
-    {"zone_id":29 , "sensor_address": "AB0000000F60491D", "sensor_name": "water beci"}
+    {"zone_id":29 , "sensor_address": "AB0000000F60491D", "sensor_name": "water beci"},
+    {"zone_id":4 , "sensor_address": "FB00000017413E3A", "sensor_name": "dormitor bedroom"}
   ],
 
   "Utility": [
