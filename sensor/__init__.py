@@ -32,7 +32,7 @@ def record_update(obj):
             if zone_sensor:
                 record.sensor_name = zone_sensor.sensor_name
             else:
-                record.sensor_name = '(not defined) {} {} {}'.format(address, n_address, sensor_type)
+                record.sensor_name = '(n/a) {} {} {}'.format(address, n_address, sensor_type)
             record.type = utils.get_object_field_value(obj, 'type')
             record.updated_on = utils.get_base_location_now_date()
             if obj.has_key('counters_a'): record.counters_a = utils.get_object_field_value(obj, 'counters_a')
