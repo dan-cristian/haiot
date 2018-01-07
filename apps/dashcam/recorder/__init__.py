@@ -179,6 +179,8 @@ def _recover_usb():
 
 
 def _usb_init():
+    if not P.is_usb_camera_detected:
+        _recover_usb()
     if P.is_usb_camera_detected:
         try:
             P.is_usb_camera_detected = (usb_tool.get_usb_dev(P.usb_camera_keywords) is not None)
@@ -200,6 +202,7 @@ def _usb_init():
                     L.l.info("Recording process not created")
         except Exception, ex:
             L.l.info("Unable to initialise USB camera, ex={}".format(ex))
+
 
 
 def _usb_record_loop():
@@ -378,8 +381,8 @@ def thread_run():
             if P.is_recording_usb:
                 _usb_record_loop()
             else:
-                L.l.info("Starting USB camera, should have been on")
-                _recover_usb()
+                if P.is_usb_camera_detected:  # stay silent if recovery failed
+                    L.l.info("Starting USB camera, should have been on")
                 _usb_init()
         if not P.is_pi_camera_on and P.is_recording_pi:
             L.l.info("Stopping PI recording")
