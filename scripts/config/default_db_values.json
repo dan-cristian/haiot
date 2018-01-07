@@ -86,6 +86,8 @@
 
     {"id":401, "active":"1", "start_order":"50", "name":"apps.dashcam", "host_name":"pidash"},
     {"id":411, "active":"1", "start_order":"11", "name":"alarm", "host_name":"pidash"},
+    {"id":427, "active":"0", "start_order":"27", "name":"node", "host_name":"pidash"},
+    {"id":443, "active":"0", "start_order":"43", "name":"cloud.thingspeak", "host_name":"pidash"},
 
     {"id":501, "active":"0", "start_order":"50", "name":"apps.dashcam", "host_name":"netbook"},
     {"id":509, "active":"0", "start_order":"9", "name":"heat", "host_name":"netbook"},
@@ -356,7 +358,8 @@
 
     {"zone_id":7 , "gpio_pin_code":"1", "gpio_host_name": "pi-face", "alarm_pin_name": "portita", "sensor_type": "contact"},
     {"zone_id":29 , "gpio_pin_code":"18", "gpio_host_name": "pi-face", "alarm_pin_name": "beci test"},
-    {"zone_id":200 , "gpio_pin_code":"24", "gpio_host_name": "pidash", "alarm_pin_name": "car vibrate", "sensor_type": "contact"}
+    {"zone_id":200 , "gpio_pin_code":"24", "gpio_host_name": "pidash", "alarm_pin_name": "car vibrate", "sensor_type": "contact"},
+    {"zone_id":201 , "gpio_pin_code":"17", "gpio_host_name": "pidash", "alarm_pin_name": "pidash battery low", "sensor_type": "contact"}
   ],
 
   "_ZoneAlarmComments": [

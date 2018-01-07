@@ -23,7 +23,8 @@ def handle_event_alarm(gpio_pin_code='', direction='', pin_value='', pin_connect
         else:
             L.l.warning('Zone %s not mapped to an area' % zonealarm.zone_id)
         zone = models.Zone.query.filter_by(id=zonealarm.zone_id).first()
-        dispatcher.send(signal=Constant.SIGNAL_ALARM, zone_name=zone.name, pin_connected=pin_connected)
+        dispatcher.send(signal=Constant.SIGNAL_ALARM, zone_name=zone.name, alarm_pin_name=zonealarm.alarm_pin_name,
+                        pin_connected=pin_connected)
         L.l.debug('Got alarm event in {} zoneid={} pin_connected={} pin_value={}'.format(
             zone.name, zonealarm.zone_id, pin_connected, pin_value))
         zonealarm.alarm_pin_triggered = pin_value
