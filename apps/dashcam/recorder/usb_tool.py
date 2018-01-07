@@ -69,8 +69,10 @@ def reset_usb(dev_name):
         path = sudo_usb.__file__.replace(".pyc", ".py")
         res = subprocess.check_output(['sudo', 'python', path, dev_name])
         L.l.info('Reset returned {}'.format(res))
+        return True
     except Exception, ex:
         L.l.error("Error on reset_usb {}".format(ex))
+        return False
 
 
 if __name__ == '__main__':
