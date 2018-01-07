@@ -205,6 +205,7 @@ def _usb_init():
             L.l.info("Unable to initialise USB camera, ex={}".format(ex))
     else:
         L.l.info("No USB camera, recording cannot start")
+        P.is_usb_camera_on = False
 
 
 def _usb_record_loop():
