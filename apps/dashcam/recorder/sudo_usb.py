@@ -43,10 +43,13 @@ def sudo_send_usb_reset(dev_name):
         try:
             fcntl.ioctl(fd, USBDEVFS_RESET, 0)
             print('Usb reset complete')
+            res = True
         finally:
             os.close(fd)
     else:
         print('Cannot find usb bus/device for {}, reset failed'.format(dev_name))
+        res = False
+    return res
 
 
 def sudo_reload_uvc_module():
@@ -67,7 +70,7 @@ if __name__ == '__main__':
         print('Script must run as root/sudo for usb & mod actions')
     else:
         if len(sys.argv) == 2:
-            sudo_send_usb_reset(sys.argv[1])
-            sudo_reload_uvc_module()
+            if sudo_send_usb_reset(sys.argv[1]):
+                sudo_reload_uvc_module()
         else:
             print('Unexpected number of arguments, only one needed: <usb dev name>')
