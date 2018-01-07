@@ -36,15 +36,22 @@ class State:
 def _save_position():
     # persist to disk in case of outage
     with open(State.disk_pos_buffer_file, 'w') as outfile:
-        json.dump(State.pos_buffer, outfile)
-        L.l.info("Saved {} positions to disk".format(len(State.pos_buffer)))
+        try:
+            json.dump(State.pos_buffer, outfile)
+            L.l.info("Saved {} positions to disk".format(len(State.pos_buffer)))
+        except Exception, ex:
+            L.l.error("Cannot save gps positions to {}, err={}".format(State.disk_pos_buffer_file, ex))
 
 
 def _load_positions():
     if os.path.isfile(State.disk_pos_buffer_file):
-        with open(State.disk_pos_buffer_file, 'w') as infile:
-            State.pos_buffer = json.load(infile)
-            L.l.info("Loaded {} positions from disk".format(len(State.pos_buffer)))
+        try:
+            if os.path.getsize(State.disk_pos_buffer_file) > 0:
+                with open(State.disk_pos_buffer_file, 'r') as infile:
+                    State.pos_buffer = json.load(infile)
+                    L.l.info("Loaded {} positions from disk".format(len(State.pos_buffer)))
+        except Exception, ex:
+            L.l.error("Cannot load gps positions from {}, err={}".format(State.disk_pos_buffer_file, ex))
 
 
 def _upload_pos_buffer():
