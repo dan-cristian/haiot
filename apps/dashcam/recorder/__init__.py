@@ -285,11 +285,19 @@ def _usb_stop():
             P.usb_out_err.close()
 
 
-def _handle_event_alarm(zone_name, pin_connected):
-    L.l.info("Got alarm in {} with pin connected {}".format(zone_name, pin_connected))
-    P.last_move_time = datetime.datetime.now()
-    P.is_usb_camera_on = True
-    P.is_pi_camera_on = True
+def _handle_event_alarm(zone_name, alarm_pin_name, pin_connected):
+    L.l.info("Got alarm in {} name={} with pin connected {}".format(zone_name, alarm_pin_name, pin_connected))
+    if alarm_pin_name == 'car vibrate':
+        P.last_move_time = datetime.datetime.now()
+        P.is_usb_camera_on = True
+        P.is_pi_camera_on = True
+    elif alarm_pin_name == 'pidash battery low':
+        if not pin_connected:
+            L.l.info("Battery is LOW")
+            P.is_usb_camera_on = False
+            P.is_pi_camera_on = False
+        else:
+            L.l.info("Battery is OK")
 
 
 def _set_camera_state():
