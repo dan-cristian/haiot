@@ -174,6 +174,7 @@ def _recover_usb():
         P.usb_recover_count += 1
         if P.usb_recover_count == P.usb_recover_attempts_limit:
             P.usb_last_recovery_attempt = datetime.datetime.now()
+            P.is_usb_camera_on = False
     else:
         if (datetime.datetime.now() - P.usb_last_recovery_attempt).total_seconds() > P.usb_recover_pause:
             P.usb_recover_count = 0
@@ -205,7 +206,6 @@ def _usb_init():
             L.l.info("Unable to initialise USB camera, ex={}".format(ex))
     else:
         L.l.info("No USB camera, recording cannot start")
-        P.is_usb_camera_on = False
 
 
 def _usb_record_loop():
