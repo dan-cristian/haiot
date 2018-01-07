@@ -203,7 +203,8 @@ def _usb_init():
                     L.l.info("Recording process not created")
         except Exception, ex:
             L.l.info("Unable to initialise USB camera, ex={}".format(ex))
-
+    else:
+        L.l.info("No USB camera, recording cannot start")
 
 
 def _usb_record_loop():
@@ -263,7 +264,7 @@ def _pi_init():
                 L.l.error("PI camera not found, disabling the camera, no recording from now")
             L.l.info("Unable to initialise picamera, ex={}".format(ex))
     else:
-        L.l.info("No picamera module, cannot start")
+        L.l.info("No picamera module, recording cannot start")
         P.is_pi_camera_on = False
 
 
