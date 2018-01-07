@@ -14,16 +14,17 @@ try:
 except Exception:
     pass
 
-_has_picamera = False
+_has_picamera_module = False
 try:
     import picamera
-    _has_picamera = True
+    _has_picamera_module = True
 except Exception, ex:
     pass
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 initialised = False
-thread_tick=1
+thread_tick = 1
+
 
 class P:
     ffmpeg_pi = None
@@ -33,6 +34,7 @@ class P:
     is_recording_usb = False
     is_pi_camera_on = True
     is_usb_camera_on = True
+    is_usb_camera_detected = True
     usb_sound_enabled = True
     root_mountpoint = '/'
     recordings_root = '/home/haiot/recordings/'
@@ -63,7 +65,11 @@ class P:
     pi_bitrate = 2000000
     inactivity_duration = 300  # seconds from last event after which camera will turn off
     last_move_time = None
-    last_clock_time=None
+    last_clock_time = None
+    usb_recover_count = 0
+    usb_recover_attempts_limit = 5 # number of recovery attempts before pausing
+    usb_recover_pause = 300  # pause 300 seconds between usb recovery attempts
+    usb_last_recovery_attempt = datetime.datetime.min
 
 
 def _get_win_cams():
@@ -143,40 +149,52 @@ def _kill_proc(keywords):
 
 
 def _recover_usb():
-    src = P.usb_out_filepath_err
-    # make a copy for debug
-    L.l.info('Copy usb output file for debug')
-    shutil.copy(src, src + '.' + str(time.time()))
-    ferr = open(src)
-    contents = ferr.read()
-    ferr.close()
+    if P.usb_recover_count <= P.usb_recover_attempts_limit:
+        src = P.usb_out_filepath_err
+        # make a copy for debug
+        L.l.info('Copy usb output file for debug')
+        shutil.copy(src, src + '.' + str(time.time()))
+        ferr = open(src)
+        contents = ferr.read()
+        ferr.close()
 
-    is_exit_normal = 'Exiting normally, received signal' in contents
-    if is_exit_normal:
-        L.l.info('Exit was normal, nothing to do to recover')
-    else:
-        is_exit_io_err = 'Input/output error' in contents or 'no soundcards found' in contents
-        if is_exit_io_err:
-            L.l.info('Found an USB I/O error')
+        is_exit_normal = 'Exiting normally, received signal' in contents
+        if is_exit_normal:
+            L.l.info('Exit was normal, nothing to do to recover')
         else:
-            L.l.info('Unknown USB error')
-            L.l.info(contents)
-        usb_tool.reset_usb(P.usb_camera_keywords)
+            is_exit_io_err = 'Input/output error' in contents or 'no soundcards found' in contents
+            if is_exit_io_err:
+                L.l.info('Found an USB I/O error')
+            else:
+                L.l.info('Unknown USB error')
+                L.l.info(contents)
+            usb_tool.reset_usb(P.usb_camera_keywords)
+        P.usb_recover_count += 1
+        if P.usb_recover_count == P.usb_recover_attempts_limit:
+            P.usb_last_recovery_attempt = datetime.datetime.now()
+    else:
+        if (datetime.datetime.now() - P.usb_last_recovery_attempt).total_seconds() > P.usb_recover_pause:
+            P.usb_recover_count = 0
 
 
 def _usb_init():
-    L.l.info("Recording USB")
+    L.l.info("Starting USB Recording ")
     try:
-        _kill_proc(P.usb_out_filename)
-        if Constant.IS_OS_WINDOWS():
-            _run_ffmpeg_usb_win()
+        P.usb_camera_dev_path = usb_tool.get_usb_dev(P.usb_camera_keywords)
+        if P.usb_camera_dev_path == None:
+            L.l.info("USB camera {} not detected, recovering usb".format(P.usb_camera_keywords))
+            _recover_usb()
         else:
-            _run_ffmpeg_usb()
-        if P.ffmpeg_usb is not None and P.ffmpeg_usb._child_created:
-            L.l.info("Recording started")
-            P.is_recording_usb = True
-        else:
-            L.l.info("Recording process not created")
+            _kill_proc(P.usb_out_filename)
+            if Constant.IS_OS_WINDOWS():
+                _run_ffmpeg_usb_win()
+            else:
+                _run_ffmpeg_usb()
+            if P.ffmpeg_usb is not None and P.ffmpeg_usb._child_created:
+                L.l.info("Recording started")
+                P.is_recording_usb = True
+            else:
+                L.l.info("Recording process not created")
     except Exception, ex:
         L.l.info("Unable to initialise USB camera, ex={}".format(ex))
 
@@ -215,15 +233,15 @@ def _pi_record_loop():
 
 
 def _pi_init():
-    global _has_picamera
-    if _has_picamera:
+    global _has_picamera_module
+    if _has_picamera_module:
         try:
+            L.l.info("Starting PI Recording")
             _kill_proc(P.pi_out_filename)
             P.pi_camera = picamera.PiCamera()
             P.pi_camera.resolution = P.pi_max_resolution
             P.pi_camera.framerate = P.pi_framerate
             P.pi_camera.annotate_background = picamera.Color('black')
-            L.l.info("Recording PI")
             _run_ffmpeg_pi()
             P.pi_camera.start_recording(P.ffmpeg_pi.stdin, format='h264', bitrate=P.pi_bitrate)
             if P.ffmpeg_pi._child_created:
@@ -231,7 +249,7 @@ def _pi_init():
                 P.is_recording_pi = True
         except Exception, ex:
             if 'Camera is not enabled' in str(ex):
-                _has_picamera = False
+                _has_picamera_module = False
                 P.is_pi_camera_on = False
             L.l.info("Unable to initialise picamera, ex={}".format(ex))
     else:
