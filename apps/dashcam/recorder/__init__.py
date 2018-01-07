@@ -68,7 +68,7 @@ class P:
     last_clock_time = None
     usb_recover_count = 0
     usb_recover_attempts_limit = 5 # number of recovery attempts before pausing
-    usb_recover_pause = 300  # pause 300 seconds between usb recovery attempts
+    usb_recover_pause = 600  # pause x seconds between usb recovery attempts
     usb_last_recovery_attempt = datetime.datetime.min
 
 
