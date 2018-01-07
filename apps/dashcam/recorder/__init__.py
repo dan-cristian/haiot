@@ -33,6 +33,7 @@ class P:
     is_recording_pi = False
     is_recording_usb = False
     is_pi_camera_on = True
+    is_pi_camera_detected = True
     is_usb_camera_on = True
     is_usb_camera_detected = True
     usb_sound_enabled = True
@@ -240,7 +241,7 @@ def _pi_record_loop():
 
 def _pi_init():
     global _has_picamera_module
-    if _has_picamera_module:
+    if _has_picamera_module and P.is_pi_camera_detected:
         try:
             L.l.info("Starting PI Recording")
             _kill_proc(P.pi_out_filename)
@@ -253,10 +254,13 @@ def _pi_init():
             if P.ffmpeg_pi._child_created:
                 L.l.info("Recording PI started")
                 P.is_recording_pi = True
+                P.is_pi_camera_detected = True
         except Exception, ex:
             if 'Camera is not enabled' in str(ex):
                 _has_picamera_module = False
+                P.is_pi_camera_detected = False
                 P.is_pi_camera_on = False
+                L.l.error("PI camera not found, disabling the camera, no recording from now")
             L.l.info("Unable to initialise picamera, ex={}".format(ex))
     else:
         L.l.info("No picamera module, cannot start")
@@ -375,7 +379,8 @@ def thread_run():
             if P.is_recording_pi:
                 _pi_record_loop()
             else:
-                L.l.info("Starting PI camera, should have been on")
+                if P.is_pi_camera_detected:
+                    L.l.info("Starting PI camera, should have been on")
                 _pi_init()
         if P.is_usb_camera_on:
             if P.is_recording_usb:
