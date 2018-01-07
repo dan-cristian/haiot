@@ -40,7 +40,7 @@ def get_usb_dev(dev_name):
                 break
         return res
     else:
-        L.l.info('No v4l folder, probably no usb vide device yet available')
+        #L.l.info('No v4l folder, probably no usb vide device yet available')
         return None
 
 
