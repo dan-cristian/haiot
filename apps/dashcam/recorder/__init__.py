@@ -117,23 +117,28 @@ def _run_ffmpeg_usb():
         P.usb_record_hw = usb_tool.get_usb_audio(P.usb_camera_keywords)
         P.usb_camera_dev_path = usb_tool.get_usb_dev(P.usb_camera_keywords)
 
-        if P.usb_record_hw is not None:
-            audio = ['-i', 'hw:{}'.format(P.usb_record_hw)]
+        if P.usb_camera_dev_path is None:
+            res = False
+            L.l.error("No camera detected before starting USB recording")
         else:
-            audio = ['-na']
-
-        if P.usb_camera_dev_path is not None:
-            P.ffmpeg_usb = subprocess.Popen(
-                ['ffmpeg', '-y', '-f', 'alsa', '-thread_queue_size', '8192', '-ac', '1'] + audio +
-                ['-r', str(P.usb_framerate),
-                 '-f', 'video4linux2', '-thread_queue_size', '8192', '-i', P.usb_camera_dev_path,
-                 '-vf', P.usb_rotation_filter,
-                 '-vf', 'drawtext=text=\'%{localtime\:%c}\':fontcolor=white@0.8:fontsize=32:x=10:y=10',
-                 '-s', P.usb_max_resolution, "-c:v", "h264_omx", "-b:v", "2000k",
-                 '-frag_duration', '1000', '-f', 'segment', '-segment_time', str(P.segment_duration),
-                 '-reset_timestamps', '1', '-force_key_frames', 'expr:gte(t,n_forced*10)', '-strftime', '1',
-                 '-nostats', '-loglevel', 'info', P.usb_out_filename],
-                stdin=subprocess.PIPE, stdout=P.usb_out_std, stderr=P.usb_out_err)
+            if P.usb_record_hw is not None:
+                audio = ['-i', 'hw:{}'.format(P.usb_record_hw)]
+            else:
+                audio = ['-na']
+            if P.usb_camera_dev_path is not None:
+                P.ffmpeg_usb = subprocess.Popen(
+                    ['ffmpeg', '-y', '-f', 'alsa', '-thread_queue_size', '8192', '-ac', '1'] + audio +
+                    ['-r', str(P.usb_framerate),
+                     '-f', 'video4linux2', '-thread_queue_size', '8192', '-i', P.usb_camera_dev_path,
+                     '-vf', P.usb_rotation_filter,
+                     '-vf', 'drawtext=text=\'%{localtime\:%c}\':fontcolor=white@0.8:fontsize=32:x=10:y=10',
+                     '-s', P.usb_max_resolution, "-c:v", "h264_omx", "-b:v", "2000k",
+                     '-frag_duration', '1000', '-f', 'segment', '-segment_time', str(P.segment_duration),
+                     '-reset_timestamps', '1', '-force_key_frames', 'expr:gte(t,n_forced*10)', '-strftime', '1',
+                     '-nostats', '-loglevel', 'info', P.usb_out_filename],
+                    stdin=subprocess.PIPE, stdout=P.usb_out_std, stderr=P.usb_out_err)
+                res = True
+        return res
 
 
 def _kill_proc(keywords):
