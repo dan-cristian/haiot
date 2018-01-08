@@ -188,6 +188,7 @@ def _recover_usb():
         if P.usb_recover_count == P.usb_recover_attempts_limit:
             P.usb_last_recovery_attempt = datetime.datetime.now()
             P.is_usb_camera_on = False
+            L.l.info('Pausing USB recover attempts')
     else:
         if (datetime.datetime.now() - P.usb_last_recovery_attempt).total_seconds() > P.usb_recover_pause:
             P.usb_recover_count = 0
@@ -336,6 +337,7 @@ def _handle_event_alarm(zone_name, alarm_pin_name, pin_connected):
     if alarm_pin_name == 'car vibrate':
         P.last_move_time = datetime.datetime.now()
         P.is_usb_camera_on = True
+        P.usb_recover_count = 0
         P.is_pi_camera_on = True
     elif alarm_pin_name == 'pidash battery low':
         if not pin_connected:
