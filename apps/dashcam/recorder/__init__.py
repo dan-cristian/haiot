@@ -37,6 +37,8 @@ class P:
     is_usb_camera_on = True
     is_usb_camera_detected = True
     usb_sound_enabled = True
+    usb_rotation_filter = 'vflip'
+    pi_rotation_degree = 90
     root_mountpoint = '/'
     recordings_root = '/home/haiot/recordings/'
     dir_recordings_uploaded = recordings_root + 'uploaded'
@@ -125,6 +127,7 @@ def _run_ffmpeg_usb():
                 ['ffmpeg', '-y', '-f', 'alsa', '-thread_queue_size', '8192', '-ac', '1'] + audio +
                 ['-r', str(P.usb_framerate),
                  '-f', 'video4linux2', '-thread_queue_size', '8192', '-i', P.usb_camera_dev_path,
+                 '-vf', P.usb_rotation_filter,
                  '-vf', 'drawtext=text=\'%{localtime\:%c}\':fontcolor=white@0.8:fontsize=32:x=10:y=10',
                  '-s', P.usb_max_resolution, "-c:v", "h264_omx", "-b:v", "2000k",
                  '-frag_duration', '1000', '-f', 'segment', '-segment_time', str(P.segment_duration),
@@ -250,6 +253,7 @@ def _pi_init():
             P.pi_camera = picamera.PiCamera()
             P.pi_camera.resolution = P.pi_max_resolution
             P.pi_camera.framerate = P.pi_framerate
+            P.pi_camera.rotation = P.pi_rotation_degree
             P.pi_camera.annotate_background = picamera.Color('black')
             _run_ffmpeg_pi()
             P.pi_camera.start_recording(P.ffmpeg_pi.stdin, format='h264', bitrate=P.pi_bitrate)
@@ -375,6 +379,7 @@ def thread_run():
         # detect ntp time drift, if clock changed adjust last move to avoid sudden recording stop
         if (datetime.datetime.now() - P.last_clock_time).total_seconds() > thread_tick + 60:
             P.last_move_time = datetime.datetime.now()
+            L.l.warning("Detected clock adjustment")
         P.last_clock_time = datetime.datetime.now()
         _set_camera_state()
         if P.is_pi_camera_on:
