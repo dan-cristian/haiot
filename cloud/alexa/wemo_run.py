@@ -27,15 +27,11 @@ THE SOFTWARE.
 # For a complete discussion, see http://www.makermusings.com
 
 import email.utils
-import requests
 import select
 import socket
 import struct
-import sys
 import time
-import urllib
 import uuid
-from inspect import getmembers, isfunction
 from main.logger_helper import L
 from main import thread_pool
 from main.admin.model_helper import get_param

@@ -49,6 +49,10 @@ def _load_positions():
             if os.path.getsize(State.disk_pos_buffer_file) > 0:
                 with open(State.disk_pos_buffer_file, 'r') as infile:
                     State.pos_buffer = json.load(infile)
+                    i = 0
+                    for pos in State.pos_buffer:
+                        State.pos_buffer[i] = Position(*pos)
+                        i += 1
                     L.l.info("Loaded {} positions from disk".format(len(State.pos_buffer)))
         except Exception, ex:
             L.l.error("Cannot load gps positions from {}, err={}".format(State.disk_pos_buffer_file, ex))
@@ -56,6 +60,7 @@ def _load_positions():
 
 def _upload_pos_buffer():
     initial = len(State.pos_buffer)
+    url = None
     for p in list(State.pos_buffer):
         try:
             url = State.UPLOAD_SERVER_URL.replace("<lat>", str(p.lat)).replace("<lon>", str(p.lon)).replace(
@@ -149,6 +154,8 @@ def unload():
 def init():
     global initialised
     _load_positions()
+    if len(State.pos_buffer) > 0:
+        _upload_pos_buffer()
     try:
         gpsd.connect()
         initialised = True

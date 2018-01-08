@@ -89,7 +89,7 @@
     {"id":427, "active":"0", "start_order":"27", "name":"node", "host_name":"pidash"},
     {"id":443, "active":"0", "start_order":"43", "name":"cloud.thingspeak", "host_name":"pidash"},
 
-    {"id":501, "active":"0", "start_order":"50", "name":"apps.dashcam", "host_name":"netbook"},
+    {"id":501, "active":"1", "start_order":"50", "name":"apps.dashcam", "host_name":"netbook"},
     {"id":509, "active":"0", "start_order":"9", "name":"heat", "host_name":"netbook"},
     {"id":599, "active":"0", "start_order":"99", "name":"test", "host_name":"netbook"},
     {"id":511, "active":"0", "start_order":"11", "name":"alarm", "host_name":"netbook"},
