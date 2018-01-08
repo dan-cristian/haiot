@@ -159,26 +159,31 @@ def _kill_proc(keywords):
 
 def _recover_usb():
     if P.usb_recover_count <= P.usb_recover_attempts_limit:
-        src = P.usb_out_filepath_err
-        # make a copy for debug
-        L.l.info('Copy usb output file for debug')
-        shutil.copy(src, src + '.' + str(time.time()))
-        ferr = open(src)
-        contents = ferr.read()
-        ferr.close()
-
-        is_exit_normal = 'Exiting normally, received signal' in contents
-        if is_exit_normal:
-            L.l.info('Exit was normal, nothing to do to recover')
-        else:
-            is_exit_io_err = 'Input/output error' in contents or 'no soundcards found' in contents
-            if is_exit_io_err:
-                L.l.info('Found an USB I/O error')
-            else:
-                L.l.info('Unknown USB error')
-                L.l.info(contents)
+        if not os.path.isfile(P.usb_out_filepath_err):
+            L.l.info('Unknown USB error, no recent ffmpeg output found')
             usb_tool.reset_usb(P.usb_camera_keywords)
             time.sleep(5)  # let camera to be detected
+        else:
+            src = P.usb_out_filepath_err
+            # make a copy for debug
+            L.l.info('Copy usb output file for debug')
+            shutil.copy(src, src + '.' + str(time.time()))
+            ferr = open(src)
+            contents = ferr.read()
+            ferr.close()
+
+            is_exit_normal = 'Exiting normally, received signal' in contents
+            if is_exit_normal:
+                L.l.info('Exit was normal, nothing to do to recover')
+            else:
+                is_exit_io_err = 'Input/output error' in contents or 'no soundcards found' in contents
+                if is_exit_io_err:
+                    L.l.info('Found an USB I/O error')
+                else:
+                    L.l.info('Unknown USB error, details below:')
+                    L.l.info(contents)
+                usb_tool.reset_usb(P.usb_camera_keywords)
+                time.sleep(5)  # let camera to be detected
         P.usb_recover_count += 1
         if P.usb_recover_count == P.usb_recover_attempts_limit:
             P.usb_last_recovery_attempt = datetime.datetime.now()
@@ -189,6 +194,8 @@ def _recover_usb():
 
 
 def _usb_init():
+    if os.path.isfile(P.usb_out_filepath_err):
+        os.remove(P.usb_out_filepath_err)
     if not P.is_usb_camera_detected:
         _recover_usb()
     if P.is_usb_camera_detected:
