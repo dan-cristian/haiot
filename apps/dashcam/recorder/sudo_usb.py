@@ -6,6 +6,7 @@ try:
 except Exception:
     pass
 
+
 def _get_usb_dev_info(dev_name):
     rec = subprocess.check_output(['lsusb']).split('\n')
     vendor = product = bus = device = None
