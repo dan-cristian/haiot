@@ -11,6 +11,8 @@ usage_ntuple = namedtuple('usage',  'total used free percent')
 
 
 class P():
+    have_internet_file = '/tmp/haveinternet'
+    have_wlan = '/tmp/havewlan'
     server = 'haiot@192.168.0.9'
     port = '22'
     dest_folder = '/mnt/motion/tmp/timelapse/dashcam/'  # need trailing /
@@ -118,20 +120,22 @@ def _file_list(folder, exclude_delta=0):
 
 
 def _upload():
-    files = _file_list(P.root_folder, exclude_delta=P.exclude_time_delta)
-    count = 0
-    for file in files:
-        if P.app_is_exiting is True:
-            break
-        try:
-            _upload_file(file_path=file[0], file_date=file[1])
-            shutil.move(file[0], P.uploaded_folder)
-            L.l.info('File {} moved to {}'.format(file[0], P.uploaded_folder))
-            count += 1
-            if count == P.upload_batch:
+    # try to upload only if fast internet via wlan is available
+    if os.path.isfile(P.have_internet_file) and os.path.isfile(P.have_wlan):
+        files = _file_list(P.root_folder, exclude_delta=P.exclude_time_delta)
+        count = 0
+        for file in files:
+            if P.app_is_exiting is True:
                 break
-        except Exception, ex:
-            L.l.info('Exception uploading file {}, ex={}'.format(file[0], ex))
+            try:
+                _upload_file(file_path=file[0], file_date=file[1])
+                shutil.move(file[0], P.uploaded_folder)
+                L.l.info('File {} moved to {}'.format(file[0], P.uploaded_folder))
+                count += 1
+                if count == P.upload_batch:
+                    break
+            except Exception, ex:
+                L.l.info('Exception uploading file {}, ex={}'.format(file[0], ex))
 
 
 def _clean_old(days_to_keep, folder):
