@@ -13,6 +13,7 @@ def _get_usb_dev_info(dev_name):
     for line in rec:
         if dev_name in line:
             #Bus 001 Device 004: ID 046d:0826 Logitech, Inc. HD Webcam C525
+            #Bus 001 Device 049: ID 046d:081b Logitech, Inc. Webcam C310
             parts = line.split()
             bus = parts[1]
             device = parts[3][:3]

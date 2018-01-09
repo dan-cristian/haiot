@@ -54,7 +54,7 @@ class P:
     usb_out_filepath_err = dir_pipe_out + 'usb.err'
     usb_out_std = None
     usb_out_err = None
-    usb_camera_keywords = 'C525'
+    usb_camera_name = None
     usb_camera_dev_path = '/dev/video0'
     usb_record_hw = '1:0'
     usb_max_resolution = '1280x720'
@@ -114,8 +114,8 @@ def _run_ffmpeg_usb():
         P.usb_out_std = open(P.usb_out_filepath_std, 'w')
         P.usb_out_err = open(P.usb_out_filepath_err, 'w')
 
-        P.usb_record_hw = usb_tool.get_usb_audio()#P.usb_camera_keywords)
-        P.usb_camera_dev_path = usb_tool.get_usb_dev(P.usb_camera_keywords)
+        P.usb_record_hw = usb_tool.get_usb_audio()  # P.usb_camera_keywords)
+        P.usb_camera_dev_path = usb_tool.get_first_usb_video_dev()  # P.usb_camera_keywords)
 
         if P.usb_camera_dev_path is None:
             res = False
@@ -161,7 +161,7 @@ def _recover_usb():
     if P.usb_recover_count <= P.usb_recover_attempts_limit:
         if not os.path.isfile(P.usb_out_filepath_err):
             L.l.info('Unknown USB error, no recent ffmpeg output found')
-            usb_tool.reset_usb(P.usb_camera_keywords)
+            usb_tool.reset_usb(P.usb_camera_name)
             time.sleep(5)  # let camera to be detected
         else:
             src = P.usb_out_filepath_err
@@ -182,7 +182,7 @@ def _recover_usb():
                 else:
                     L.l.info('Unknown USB error, details below:')
                     L.l.info(contents)
-                usb_tool.reset_usb(P.usb_camera_keywords)
+                usb_tool.reset_usb(P.usb_camera_name)
                 time.sleep(5)  # let camera to be detected
         P.usb_recover_count += 1
         if P.usb_recover_count == P.usb_recover_attempts_limit:
@@ -201,20 +201,21 @@ def _usb_init():
         _recover_usb()
     if P.is_usb_camera_detected:
         try:
-            P.is_usb_camera_detected = (usb_tool.get_usb_dev(P.usb_camera_keywords) is not None)
+            P.is_usb_camera_detected = (usb_tool.get_first_usb_video_dev() is not None)
             if not P.is_usb_camera_detected:
-                L.l.info("USB camera {} not detected, recovering usb".format(P.usb_camera_keywords))
+                L.l.info("USB camera not detected, recovering usb".format())
                 _recover_usb()
-            P.is_usb_camera_detected = (usb_tool.get_usb_dev(P.usb_camera_keywords) is not None)
+            P.is_usb_camera_detected = (usb_tool.get_first_usb_video_dev() is not None)
             if P.is_usb_camera_detected:
-                L.l.info("Starting USB Recording ")
+                P.usb_camera_name = usb_tool.get_usb_camera_name()
+                L.l.info("Starting USB Recording on {}".format(P.usb_camera_name))
                 _kill_proc(P.usb_out_filename)
                 if Constant.IS_OS_WINDOWS():
                     _run_ffmpeg_usb_win()
                 else:
                     _run_ffmpeg_usb()
                 if P.ffmpeg_usb is not None and P.ffmpeg_usb._child_created:
-                    L.l.info("Recording started")
+                    L.l.info("Recording started on {}".format(P.usb_camera_name))
                     P.is_recording_usb = True
                 else:
                     L.l.info("Recording process not created")
