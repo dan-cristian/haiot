@@ -1,8 +1,11 @@
 import subprocess
 import os
 import sudo_usb
-from main.logger_helper import L
-#import shlex
+try:
+    from main.logger_helper import L
+except Exception:
+    pass
+
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
