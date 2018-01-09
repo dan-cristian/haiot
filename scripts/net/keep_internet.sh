@@ -306,9 +306,12 @@ function set_route_default {
     if [ $? == 0 ]; then
         arr=(`echo ${out}`)
         if [ "${gw}" != "${arr[1]}" ]; then
-            echo "Setting default gw to ${gw} for interface ${if}"
+            echo "Deleting default gateway=${arr[1]}"
             ip route del default
+            echo "Setting default gw to ${gw} for interface ${if}"
             ip route add default via ${gw} dev ${if}
+            echo "Routing table is now:"
+            route -n
         fi
     fi
 }

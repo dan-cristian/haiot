@@ -29,6 +29,23 @@ def _get_usb_dev_root(dev_name):
     return prev_line
 
 
+# /dev/v4l/by-id/usb-046d_081b_5CB759A0-video-index0
+def _get_first_usb_video_dev_id():
+    root = '/dev/v4l/by-id/'
+    vendor = None
+    prod = None
+    if os.path.exists(root):
+        for filename in os.listdir(root):
+            if 'video' in filename:
+                p = filename.split('usb-')
+                if len(p) > 1:
+                    p = p[0].split('_')
+                    vendor = p[0]
+                    prod = p[1]
+                    break
+    return vendor, prod
+
+
 def get_usb_dev(dev_name):
     res = None
     root = '/dev/v4l/by-id/'
@@ -64,6 +81,20 @@ def get_usb_audio(dev_name):
     return res
 
 
+# Bus 001 Device 049: ID 046d:081b Logitech, Inc. Webcam C310
+def get_usb_camera_name():
+    vendor, prod = _get_first_usb_video_dev_id()
+    camera_name = None
+    if vendor is not None:
+        out = subprocess.check_output(['lsusb']).split('\n')
+        for line in out:
+            if vendor in line and prod in line:
+                p = line.split(prod + " ")
+                camera_name = p[1]
+                break
+    return camera_name
+
+
 def reset_usb(dev_name):
     try:
         path = sudo_usb.__file__.replace(".pyc", ".py")
@@ -76,7 +107,9 @@ def reset_usb(dev_name):
 
 
 if __name__ == '__main__':
-    L.l.info(_get_usb_dev_root('C525'))
-    L.l.info(get_usb_dev('C525'))
-    reset_usb('C525')
+    #L.l.info(_get_usb_dev_root('C525'))
+    #L.l.info(get_usb_dev('C525'))
+    #reset_usb('C525')
+    cam = get_usb_camera_name()
+    print cam
 
