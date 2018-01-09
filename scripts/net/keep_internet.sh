@@ -62,7 +62,8 @@ function cycle_usb_ports {
     stop_usb_ports_power
     sleep 5
     start_usb_ports_power
-    echo "Cycling power for all USB ports completed"
+    echo "Cycling power for all USB ports completed, waiting 10 seconds for reinit"
+    sleep 10
 }
 
 # https://unix.stackexchange.com/questions/242546/how-to-get-bus-id-of-an-usb-device
