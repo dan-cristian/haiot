@@ -354,6 +354,11 @@ def _handle_event_alarm(zone_name, alarm_pin_name, pin_connected):
             P.is_pi_camera_on = False
         else:
             L.l.info("Battery is OK")
+    elif alarm_pin_name == 'pidash low power':
+        L.l.info("PI power is LOW")
+        P.is_usb_camera_on = False
+        P.is_pi_camera_on = False
+        dispatcher.send(Constant.SIGNAL_EMAIL_NOTIFICATION, subject="Pidash power low", body="got low power signal")
 
 
 def _set_camera_state():
