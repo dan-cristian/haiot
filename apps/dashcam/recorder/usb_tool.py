@@ -10,26 +10,26 @@ except Exception:
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 
-def _get_usb_dev_root(dev_name):
-    process = subprocess.Popen(['tail /sys/devices/platform/soc/*/*/*/*/product'],
-                               stdout=subprocess.PIPE, shell=True)
-    prev_line = None
-    while True:
-        output = process.stdout.readline()
-        if output == '' and process.poll() is not None:
-            break
-        if output:
-            if dev_name in output:
-                break
-            else:
-                prev_line = output
-    rc = process.poll()
-    if prev_line is not None:
-        # ==> /sys/devices/platform/soc/3f980000.usb/usb1/1-1/1-1.5/product <==
-        # HD Webcam C525
-        prev_line = prev_line.replace('==> ', '').replace(' <==', '').replace('product', '').strip()
-        # /sys/devices/platform/soc/3f980000.usb/usb1/1-1/1-1.5/
-    return prev_line
+#def _get_usb_dev_root(dev_name):
+#    process = subprocess.Popen(['tail /sys/devices/platform/soc/*/*/*/*/product'],
+#                               stdout=subprocess.PIPE, shell=True)
+#    prev_line = None
+#    while True:
+#        output = process.stdout.readline()
+#        if output == '' and process.poll() is not None:
+#            break
+#        if output:
+#            if dev_name in output:
+#                break
+#            else:
+#                prev_line = output
+#    rc = process.poll()
+#    if prev_line is not None:
+#        # ==> /sys/devices/platform/soc/3f980000.usb/usb1/1-1/1-1.5/product <==
+#        # HD Webcam C525
+#        prev_line = prev_line.replace('==> ', '').replace(' <==', '').replace('product', '').strip()
+#        # /sys/devices/platform/soc/3f980000.usb/usb1/1-1/1-1.5/
+#    return prev_line
 
 
 # /dev/v4l/by-id/usb-046d_081b_5CB759A0-video-index0
@@ -65,7 +65,9 @@ def get_usb_dev(dev_name):
 
 
 # card 1: C525 [HD Webcam C525], device 0: USB Audio [USB Audio]
-def get_usb_audio(dev_name):
+# card 1: U0x46d0x81b [USB Device 0x46d:0x81b], device 0: USB Audio [USB Audio]
+def get_usb_audio():
+    dev_name = 'USB Audio'
     res = None
     try:
         rec = subprocess.check_output(['arecord', '-l']).split('\n')
@@ -110,7 +112,6 @@ def reset_usb(dev_name):
 
 
 if __name__ == '__main__':
-    #L.l.info(_get_usb_dev_root('C525'))
     #L.l.info(get_usb_dev('C525'))
     #reset_usb('C525')
     cam = get_usb_camera_name()
