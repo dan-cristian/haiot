@@ -49,12 +49,12 @@ def _get_first_usb_video_dev_id():
     return vendor, prod
 
 
-def get_usb_dev(dev_name):
+def get_first_usb_video_dev():
     res = None
     root = '/dev/v4l/by-id/'
     if os.path.exists(root):
         for filename in os.listdir(root):
-            if dev_name in filename:
+            if 'video' in filename:
                 res = root + filename
                 L.l.info("Found usb cam at {}".format(res))
                 break
