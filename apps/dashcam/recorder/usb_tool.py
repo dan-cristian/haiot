@@ -42,7 +42,7 @@ def _get_first_usb_video_dev_id():
             if 'video' in filename:
                 p = filename.split('usb-')
                 if len(p) > 1:
-                    p = p[0].split('_')
+                    p = p[1].split('_')
                     vendor = p[0]
                     prod = p[1]
                     break
