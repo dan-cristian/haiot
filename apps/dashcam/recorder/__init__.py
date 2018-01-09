@@ -37,7 +37,7 @@ class P:
     is_usb_camera_on = True
     is_usb_camera_detected = True
     usb_sound_enabled = True
-    usb_rotation_filter = '"vflip"'
+    usb_rotation_filter = ':vflip'
     pi_rotation_degree = 90
     root_mountpoint = '/'
     recordings_root = '/home/haiot/recordings/'
@@ -131,8 +131,8 @@ def _run_ffmpeg_usb():
                     ['ffmpeg', '-y', '-f', 'alsa', '-thread_queue_size', '8192', '-ac', '1'] + audio +
                     ['-r', str(P.usb_framerate),
                      '-f', 'video4linux2', '-thread_queue_size', '8192', '-i', P.usb_camera_dev_path,
-                     '-vf', P.usb_rotation_filter,
-                     '-vf', 'drawtext=text=\'%{localtime\:%c}\':fontcolor=white@0.8:fontsize=32:x=10:y=10',
+                     '-vf', 'drawtext=text=\'%{localtime\:%c}\':fontcolor=white@0.8:fontsize=32:x=10:y=10'
+                     + P.usb_rotation_filter,
                      '-s', P.usb_max_resolution, "-c:v", "h264_omx", "-b:v", "2000k",
                      '-frag_duration', '1000', '-f', 'segment', '-segment_time', str(P.segment_duration),
                      '-reset_timestamps', '1', '-force_key_frames', 'expr:gte(t,n_forced*10)', '-strftime', '1',
