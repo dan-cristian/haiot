@@ -124,7 +124,8 @@ def _run_ffmpeg_usb():
             if P.usb_record_hw is not None:
                 audio = ['-i', 'hw:{}'.format(P.usb_record_hw)]
             else:
-                audio = ['-na']
+                L.l.warning("USB audio not detected, starting record without audio")
+                audio = ['-an']
             if P.usb_camera_dev_path is not None:
                 P.ffmpeg_usb = subprocess.Popen(
                     ['ffmpeg', '-y', '-f', 'alsa', '-thread_queue_size', '8192', '-ac', '1'] + audio +
@@ -157,6 +158,17 @@ def _kill_proc(keywords):
             break
 
 
+def _save_usb_err_output():
+    src = P.usb_out_filepath_err
+    # make a copy for debug
+    L.l.info('Copy usb output file for debug')
+    shutil.copy(src, src + '.' + str(time.time()))
+    ferr = open(src)
+    contents = ferr.read()
+    ferr.close()
+    return contents
+
+
 def _recover_usb():
     if P.usb_recover_count <= P.usb_recover_attempts_limit:
         if not os.path.isfile(P.usb_out_filepath_err):
@@ -164,14 +176,7 @@ def _recover_usb():
             usb_tool.reset_usb(P.usb_camera_name)
             time.sleep(5)  # let camera to be detected
         else:
-            src = P.usb_out_filepath_err
-            # make a copy for debug
-            L.l.info('Copy usb output file for debug')
-            shutil.copy(src, src + '.' + str(time.time()))
-            ferr = open(src)
-            contents = ferr.read()
-            ferr.close()
-
+            contents = _save_usb_err_output()
             is_exit_normal = 'Exiting normally, received signal' in contents
             if is_exit_normal:
                 L.l.info('Exit was normal, nothing to do to recover')
@@ -232,6 +237,7 @@ def _usb_record_loop():
             L.l.info("usb record exit with code {}".format(P.ffmpeg_usb.returncode))
             if P.ffmpeg_usb.returncode != 0:
                 L.l.info("USB recording stopped")
+                _save_usb_err_output()
             else:
                 L.l.info("USB exit, not an error?")
             _usb_stop()
