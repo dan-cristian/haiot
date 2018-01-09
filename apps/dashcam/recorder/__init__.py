@@ -114,7 +114,7 @@ def _run_ffmpeg_usb():
         P.usb_out_std = open(P.usb_out_filepath_std, 'w')
         P.usb_out_err = open(P.usb_out_filepath_err, 'w')
 
-        P.usb_record_hw = usb_tool.get_usb_audio(P.usb_camera_keywords)
+        P.usb_record_hw = usb_tool.get_usb_audio()#P.usb_camera_keywords)
         P.usb_camera_dev_path = usb_tool.get_usb_dev(P.usb_camera_keywords)
 
         if P.usb_camera_dev_path is None:
