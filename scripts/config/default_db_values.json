@@ -359,7 +359,6 @@
     {"zone_id":7 , "gpio_pin_code":"1", "gpio_host_name": "pi-face", "alarm_pin_name": "portita", "sensor_type": "contact"},
     {"zone_id":29 , "gpio_pin_code":"18", "gpio_host_name": "pi-face", "alarm_pin_name": "beci test"},
     {"zone_id":200 , "gpio_pin_code":"24", "gpio_host_name": "pidash", "alarm_pin_name": "car vibrate", "sensor_type": "contact"},
-    {"zone_id":200 , "gpio_pin_code":"35", "gpio_host_name": "pidash", "alarm_pin_name": "pidash low power", "sensor_type": "contact"},
     {"zone_id":200 , "gpio_pin_code":"17", "gpio_host_name": "pidash", "alarm_pin_name": "pidash battery low", "sensor_type": "contact"}
   ],
 
