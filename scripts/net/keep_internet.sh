@@ -221,10 +221,10 @@ function have_if {
 
 
 function restart_wifi {
-    echo "Restarting wifi"
-    ifconfig ${IF_WIFI} down
-    ifconfig ${IF_WIFI} up
-    sleep 10
+    echo "Restarting wifi - skipped"
+    #ifconfig ${IF_WIFI} down
+    #ifconfig ${IF_WIFI} up
+    #sleep 10
 }
 
 function start_pppd {
