@@ -119,7 +119,7 @@ function ping_via_gw {
     #host=${line%  *}
     #if [ "${host}" == "" ]; then
     #    echo "Could not resolve address ${checkdomain}, out was [${line}], trying again"
-        out=`ping ${checkdomain} -c 1`
+        out=`ping ${checkdomain} -c 1 -W ${timeout}`
         arr=(`echo ${out}`)
         host=${arr[2]}
         host=${host//\(}
