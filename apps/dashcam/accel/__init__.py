@@ -110,7 +110,8 @@ def unload():
     P.stop_app = True
     if P.web_app is not None:
         P.web_app.stop()
-    P.web_thread.join()
+    if P.web_thread is not None:
+        P.web_thread.join()
 
 
 def init():
