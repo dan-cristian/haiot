@@ -115,16 +115,16 @@ function pingnet {
 function ping_via_gw {
     if=$1
     gw=$2
-    line=`getent ahostsv4 ${checkdomain} | head -1`
-    host=${line%  *}
-    if [ "${host}" == "" ]; then
-        echo "Could not resolve address ${checkdomain}, out was [${line}], trying again"
+    #line=`getent ahostsv4 ${checkdomain} | head -1`
+    #host=${line%  *}
+    #if [ "${host}" == "" ]; then
+    #    echo "Could not resolve address ${checkdomain}, out was [${line}], trying again"
         out=`ping ${checkdomain} -c 1`
         arr=(`echo ${out}`)
         host=${arr[2]}
         host=${host//\(}
         host=${host//)}
-    fi
+    #fi
     if [ "${host}" == "" ]; then
         echo "Could not resolve address ${checkdomain}, out was [${out}] giving up"
     else
