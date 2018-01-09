@@ -37,7 +37,7 @@ class P:
     is_usb_camera_on = True
     is_usb_camera_detected = True
     usb_sound_enabled = True
-    usb_rotation_filter = ',vflip'
+    usb_rotation_filter = 'vflip,'
     pi_rotation_degree = 90
     root_mountpoint = '/'
     recordings_root = '/home/haiot/recordings/'
