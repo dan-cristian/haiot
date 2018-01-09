@@ -386,6 +386,7 @@ def init():
     uploader.P.root_folder = P.recordings_root
     uploader.P.uploaded_folder = P.dir_recordings_uploaded
     uploader.P.root_mountpoint = P.root_mountpoint
+    uploader.P.std_out_folder = P.recordings_root + P.dir_pipe_out
     P.last_move_time = datetime.datetime.now()
     if P.is_pi_camera_on:
         _pi_init()

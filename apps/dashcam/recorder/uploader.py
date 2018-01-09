@@ -19,6 +19,7 @@ class P():
     include_ext = '.mp4'
     root_mountpoint = None
     root_folder = None
+    std_out_folder = None
     uploaded_folder = None
     exclude_time_delta = 120 # exclude files modified in the last x seconds
     days_to_keep = 30
@@ -170,7 +171,12 @@ def _clean_space():
                             P.root_folder))
                         if days_keep > 0:
                             days_keep = P.days_to_keep
-                            folder = P.root_folder
+                            if folder == P.root_folder:
+                                # secondly clean this
+                                folder = P.std_out_folder
+                            else:
+                                # first clean this
+                                folder = P.root_folder
                         else:
                             L.l.info('Something is wrong, cannot free up more space!')
                             keep_try = False
