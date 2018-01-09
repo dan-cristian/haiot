@@ -126,13 +126,14 @@ def _run_ffmpeg_usb():
             else:
                 L.l.warning("USB audio not detected, starting record without audio")
                 audio = ['-an']
+            # https://superuser.com/questions/578321/how-to-rotate-a-video-180-with-ffmpeg/578329#578329
             if P.usb_camera_dev_path is not None:
                 P.ffmpeg_usb = subprocess.Popen(
                     ['ffmpeg', '-y', '-f', 'alsa', '-thread_queue_size', '8192', '-ac', '1'] + audio +
                     ['-r', str(P.usb_framerate),
                      '-f', 'video4linux2', '-thread_queue_size', '8192', '-i', P.usb_camera_dev_path,
-                     '-vf', P.usb_rotation_filter
-                     + 'drawtext=text=\'%{localtime\:%c}\':fontcolor=white@0.8:fontsize=32:x=10:y=10 '
+                     '-vf', P.usb_rotation_filter +
+                     'drawtext=text=\'%{localtime\:%c}\':fontcolor=white@0.8:fontsize=32:x=10:y=10',
                      '-s', P.usb_max_resolution, "-c:v", "h264_omx", "-b:v", "2000k",
                      '-frag_duration', '1000', '-f', 'segment', '-segment_time', str(P.segment_duration),
                      '-reset_timestamps', '1', '-force_key_frames', 'expr:gte(t,n_forced*10)', '-strftime', '1',
