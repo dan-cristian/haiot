@@ -119,15 +119,20 @@ function ping_via_gw {
     #host=${line%  *}
     #if [ "${host}" == "" ]; then
     #    echo "Could not resolve address ${checkdomain}, out was [${line}], trying again"
+    for i in {1..pcount}
+    do
         out=`ping ${checkdomain} -c 1 -W ${timeout}`
         arr=(`echo ${out}`)
         host=${arr[2]}
         host=${host//\(}
         host=${host//)}
-    #fi
-    if [ "${host}" == "" ]; then
-        echo "Could not resolve address ${checkdomain}, out was [${out}] giving up"
-    else
+        if [ "${host}" == "" ]; then
+            echo "Could not resolve address ${checkdomain} in attempt ${i}, out was [${out}]"
+        else
+            break
+        fi
+    done
+    if [ "${host}" != "" ]; then
         route add -host ${host} gw ${gw}
         ping ${host} -c ${pcount} -W ${timeout} -q -I ${if} > /dev/null
         res=$?
