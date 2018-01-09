@@ -119,7 +119,7 @@ function ping_via_gw {
     #host=${line%  *}
     #if [ "${host}" == "" ]; then
     #    echo "Could not resolve address ${checkdomain}, out was [${line}], trying again"
-    for i in {1..pcount}
+    for i in 1 2 3
     do
         out=`ping ${checkdomain} -c 1 -W ${timeout}`
         arr=(`echo ${out}`)
