@@ -205,26 +205,25 @@ def _usb_init():
         os.remove(P.usb_out_filepath_err)
     if not P.is_usb_camera_detected:
         _recover_usb()
+    P.is_usb_camera_detected = (usb_tool.get_first_usb_video_dev() is not None)
+    if not P.is_usb_camera_detected:
+        L.l.info("USB camera not detected, recovering usb".format())
+        _recover_usb()
+        P.is_usb_camera_detected = (usb_tool.get_first_usb_video_dev() is not None)
     if P.is_usb_camera_detected:
         try:
-            P.is_usb_camera_detected = (usb_tool.get_first_usb_video_dev() is not None)
-            if not P.is_usb_camera_detected:
-                L.l.info("USB camera not detected, recovering usb".format())
-                _recover_usb()
-            P.is_usb_camera_detected = (usb_tool.get_first_usb_video_dev() is not None)
-            if P.is_usb_camera_detected:
-                P.usb_camera_name = usb_tool.get_usb_camera_name()
-                L.l.info("Starting USB Recording on {}".format(P.usb_camera_name))
-                _kill_proc(P.usb_out_filename)
-                if Constant.IS_OS_WINDOWS():
-                    _run_ffmpeg_usb_win()
-                else:
-                    _run_ffmpeg_usb()
-                if P.ffmpeg_usb is not None and P.ffmpeg_usb._child_created:
-                    L.l.info("Recording started on {}".format(P.usb_camera_name))
-                    P.is_recording_usb = True
-                else:
-                    L.l.info("Recording process not created")
+            P.usb_camera_name = usb_tool.get_usb_camera_name()
+            L.l.info("Starting USB Recording on {}".format(P.usb_camera_name))
+            _kill_proc(P.usb_out_filename)
+            if Constant.IS_OS_WINDOWS():
+                _run_ffmpeg_usb_win()
+            else:
+                _run_ffmpeg_usb()
+            if P.ffmpeg_usb is not None and P.ffmpeg_usb._child_created:
+                L.l.info("Recording started on {}".format(P.usb_camera_name))
+                P.is_recording_usb = True
+            else:
+                L.l.info("Recording process not created")
         except Exception, ex:
             L.l.info("Unable to initialise USB camera, ex={}".format(ex))
     #else:
