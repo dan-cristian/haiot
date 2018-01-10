@@ -125,18 +125,18 @@ def _upload():
     if os.path.isfile(P.have_internet_file) and os.path.isfile(P.have_wlan):
         files = _file_list(P.root_folder, exclude_delta=P.exclude_time_delta)
         count = 0
-        for file in files:
+        for f in files:
             if P.app_is_exiting is True:
                 break
             try:
-                _upload_file(file_path=file[0], file_date=file[1])
-                shutil.move(file[0], P.uploaded_folder)
-                L.l.info('File {} moved to {}'.format(file[0], P.uploaded_folder))
+                _upload_file(file_path=f[0], file_date=f[1])
+                shutil.move(f[0], P.uploaded_folder)
+                L.l.info('File {} moved to {}'.format(f[0], P.uploaded_folder))
                 count += 1
                 if count == P.upload_batch:
                     break
             except Exception, ex:
-                L.l.info('Exception uploading file {}, ex={}'.format(file[0], ex))
+                L.l.info('Exception uploading file {}, ex={}'.format(f[0], ex))
 
 
 def _clean_old(days_to_keep, folder):
