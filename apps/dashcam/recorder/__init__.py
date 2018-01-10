@@ -44,7 +44,7 @@ class P:
     dir_recordings_uploaded = recordings_root + 'uploaded'
     dir_recordings_safe = recordings_root + 'safe'
     dir_pipe_out = recordings_root + '/out/'
-    pi_out_filename = recordings_root + '%Y-%m-%d_%H-%M-%S_pi.mp4'
+    pi_out_filename = recordings_root + '%Y-%m-%d_%H-%M-%S_pi.mkv'
     usb_out_filename = recordings_root + '%Y-%m-%d_%H-%M-%S_usb.mp4'
     pi_out_filepath_std = dir_pipe_out + 'pi.std'
     pi_out_filepath_err = dir_pipe_out + 'pi.err'
@@ -87,7 +87,7 @@ def _run_ffmpeg_pi():
     if P.ffmpeg_pi is None:
         P.ffmpeg_pi = subprocess.Popen([
             'ffmpeg', '-y', '-r', str(P.pi_framerate), '-i', '-', '-vcodec', 'copy',
-            '-f', 'segment', '-segment_time', str(P.segment_duration), '-segment_format', 'mp4',
+            '-f', 'segment', '-segment_time', str(P.segment_duration), #'-segment_format', 'mp4',
             '-reset_timestamps', '1', '-force_key_frames', '"expr:gte(t,n_forced*10)"',
             '-frag_duration', '1000', '-strftime', '1', '-an',
             '-nostats', '-loglevel', 'info', P.pi_out_filename],
