@@ -101,15 +101,18 @@ def get_usb_camera_name():
 
 
 def reset_usb(dev_name):
-    try:
-        path = sudo_usb.__file__.replace(".pyc", ".py")
-        res = subprocess.check_output(['sudo', 'python', path, dev_name])
-        L.l.info('Reset returned {}'.format(res))
-        return True
-    except Exception, ex:
-        L.l.error("Error on reset_usb {}".format(ex))
-        return False
-
+    res = False
+    if dev_name is None:
+        L.l.info('Trying to reset a None name device, ignoring reset attempt')
+    else:
+        try:
+            path = sudo_usb.__file__.replace(".pyc", ".py")
+            res = subprocess.check_output(['sudo', 'python', path, dev_name])
+            L.l.info('Reset returned {}'.format(res))
+            res = True
+        except Exception, ex:
+            L.l.error("Error for device=[{}] on reset_usb {}".format(dev_name, ex))
+    return res
 
 if __name__ == '__main__':
     #L.l.info(get_usb_dev('C525'))
