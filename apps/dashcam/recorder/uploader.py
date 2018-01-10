@@ -16,7 +16,7 @@ class P():
     server = 'haiot@192.168.0.9'
     port = '22'
     dest_folder = '/mnt/motion/tmp/timelapse/dashcam/'  # need trailing /
-    include_ext = '.mp4'
+    include_ext = '.mkv'
     root_mountpoint = None
     root_folder = None
     std_out_folder = None
@@ -216,3 +216,4 @@ if __name__ == '__main__':
     P.uploaded_folder = '/home/haiot/recordings/uploaded/'
     P.root_mountpoint = '/'
     _clean_space()
+    _upload()
