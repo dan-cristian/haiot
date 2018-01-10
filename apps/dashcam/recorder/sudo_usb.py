@@ -24,7 +24,7 @@ def _get_usb_dev_info(dev_name):
                 product = ven_prod[1]
                 print("Vendor:Product for {} is {}:{}".format(dev_name, vendor, product))
                 break
-    return vendor, product, bus, device
+    return vendor, product, bus, device, rec
 
 
 def sudo_send_usb_reset(dev_name):
@@ -37,7 +37,7 @@ def sudo_send_usb_reset(dev_name):
             dev_path - The devfs path to the USB device (under /dev/bus/usb/)
                        See get_teensy for example of how to obtain this.
     """
-    vendor, product, bus, device = _get_usb_dev_info(dev_name)
+    vendor, product, bus, device, output = _get_usb_dev_info(dev_name)
     if bus is not None and device is not None:
         dev_path = '/dev/bus/usb/%s/%s' % (bus, device)
         print('Sending usb reset to {}'.format(dev_path))
@@ -49,7 +49,8 @@ def sudo_send_usb_reset(dev_name):
         finally:
             os.close(fd)
     else:
-        print('Cannot find usb bus/device for {}, reset failed'.format(dev_name))
+        print('Cannot find usb bus/device for [{}], reset failed'.format(dev_name))
+        print('Ouput was:'.format(output))
         res = False
     return res
 
