@@ -33,6 +33,7 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 
 # /dev/v4l/by-id/usb-046d_081b_5CB759A0-video-index0
+# /dev/v4l/by-id/usb-046d_HD_Webcam_C525_1B0A4790-video-index0
 def _get_first_usb_video_dev_id():
     root = '/dev/v4l/by-id/'
     vendor = None
@@ -87,6 +88,7 @@ def get_usb_audio():
 
 
 # Bus 001 Device 049: ID 046d:081b Logitech, Inc. Webcam C310
+# Bus 001 Device 010: ID 046d:0826 Logitech, Inc. HD Webcam C525
 def get_usb_camera_name():
     vendor, prod = _get_first_usb_video_dev_id()
     camera_name = None
@@ -94,8 +96,9 @@ def get_usb_camera_name():
         out = subprocess.check_output(['lsusb']).split('\n')
         for line in out:
             if vendor in line and prod in line:
-                p = line.split(prod + " ")
-                camera_name = p[1]
+                p = line.split(vendor + ":")
+                start = p[1].index(' ')
+                camera_name = p[1][start + 1:]
                 break
     return camera_name
 
