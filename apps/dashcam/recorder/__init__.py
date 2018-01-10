@@ -298,12 +298,6 @@ def _pi_stop():
     try:
         P.is_recording_pi = False
         if P.pi_camera is not None:
-            if P.ffmpeg_pi is not None:
-                try:
-                    P.ffmpeg_pi.terminate()
-                except Exception:
-                    pass
-                P.ffmpeg_pi = None
             try:
                 L.l.info("Camera closed={} recording={}".format(P.pi_camera.closed, P.pi_camera.recording))
                 P.pi_camera.stop_recording()
@@ -315,6 +309,12 @@ def _pi_stop():
             except Exception, ex:
                 L.l.info("Exception on pi camera close, ex={}".format(ex))
             L.l.info("Camera closed={} recording={}".format(P.pi_camera.closed, P.pi_camera.recording))
+            if P.ffmpeg_pi is not None:
+                try:
+                    P.ffmpeg_pi.terminate()
+                except Exception:
+                    pass
+                P.ffmpeg_pi = None
             if P.pi_out_std is not None:
                 P.pi_out_std.close()
             if P.pi_out_err is not None:
