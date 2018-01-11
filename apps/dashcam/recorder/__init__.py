@@ -27,8 +27,8 @@ thread_tick = 1
 
 
 class P:
-    ffmpeg_pi = None
-    ffmpeg_usb = None
+    ffmpeg_pi = None  # process encoding
+    ffmpeg_usb = {}  # list with usb process encoding
     segment_duration = 900  # in seconds
     is_recording_pi = False
     is_recording_usb = False
@@ -37,31 +37,34 @@ class P:
     is_usb_camera_on = True
     is_usb_camera_detected = True
     usb_sound_enabled = True
-    usb_rotation_filter = 'vflip,'  # comma needed
+    usb_rotation_filter = [{'C525': 'vflip,'}]  # comma needed as suffix for flip filter
     pi_rotation_degree = 90
-    root_mountpoint = '/' # to check space available for recording
+    root_mountpoint = '/'  # to check space available for recording
     recordings_root = '/home/haiot/recordings/'  # recording is stored here
     dir_recordings_uploaded = recordings_root + 'uploaded'  # video moved here after upload
     dir_recordings_safe = recordings_root + 'safe'  # not yet used
     dir_pipe_out = recordings_root + '/out/'
     pi_out_filename = recordings_root + '%Y-%m-%d_%H-%M-%S_pi.mkv'
-    usb_out_filename = recordings_root + '%Y-%m-%d_%H-%M-%S_usb.mkv'
+    usb_out_filename_template = recordings_root + '%Y-%m-%d_%H-%M-%S_usb_x.mkv'  # x to be replaced with camera ID
+    usb_out_filename = {}
     pi_out_filepath_std = dir_pipe_out + 'pi.std'
     pi_out_filepath_err = dir_pipe_out + 'pi.err'
     pi_out_std = None
     pi_out_err = None
-    usb_out_filepath_std = dir_pipe_out + 'usb.std'
-    usb_out_filepath_err = dir_pipe_out + 'usb.err'
-    usb_out_std = None
-    usb_out_err = None
-    usb_camera_name = None
-    usb_camera_dev_path = '/dev/video0'
-    usb_record_hw = '1:0'
+    usb_out_filepath_std_template = dir_pipe_out + 'usb_x.std'
+    usb_out_filepath_err_template = dir_pipe_out + 'usb_x.err'
+    usb_out_filepath_std = {}
+    usb_out_filepath_err = {}
+    usb_out_std = {}
+    usb_out_err = {}
+    #usb_camera_name = {}
+    usb_camera_dev_path = {}  # '/dev/video0'
+    usb_record_hw = {}  # '1:0'
     usb_max_resolution = '1280x720'
     pi_max_resolution = (1296, 972)
     win_camera_dev_name = "Integrated Camera"
     pi_thread = None
-    usb_thread = None
+    usb_thread = {}  # None
     pi_framerate = 8
     usb_framerate = 8
     pi_camera = None
@@ -70,7 +73,7 @@ class P:
     last_move_time = None
     last_clock_time = None
     usb_recover_count = 0
-    usb_recover_attempts_limit = 5 # number of recovery attempts before pausing
+    usb_recover_attempts_limit = 5  # number of recovery attempts before pausing
     usb_recover_pause = 600  # pause x seconds between usb recovery attempts
     usb_last_recovery_attempt = datetime.datetime.min
 
@@ -79,9 +82,8 @@ def _get_win_cams():
     pass
 
 
-
 def _run_ffmpeg_pi():
-    print "Recording on {}".format(P.pi_out_filename)
+    L.l.info("Recording on {}".format(P.pi_out_filename))
     P.pi_out_std = open(P.pi_out_filepath_std, 'w')
     P.pi_out_err = open(P.pi_out_filepath_err, 'w')
     if P.ffmpeg_pi is None:
@@ -109,38 +111,40 @@ def _run_ffmpeg_usb_win(no_sound=True):
 
 
 # ffmpeg -y -f alsa -thread_queue_size 16384 -ac 1 -i hw:1 -r 8 -f video4linux2 -thread_queue_size 8192 -i /dev/video0 -vf "drawtext=text='%{localtime\:%c}': fontcolor=white@0.8: fontsize=32: x=10: y=10" -s 1280x720 -c:v h264_omx -b:v 3000k -frag_duration 1000 -f segment -segment_time 3600 -reset_timestamps 1  -force_key_frames "expr:gte(t,n_forced*2)" -strftime 1 /home/haiot/recordings/usb_%Y-%m-%d_%H-%M-%S.mp4
-def _run_ffmpeg_usb():
-    if P.ffmpeg_usb is None:
-        P.usb_out_std = open(P.usb_out_filepath_std, 'w')
-        P.usb_out_err = open(P.usb_out_filepath_err, 'w')
+def _run_ffmpeg_usb(cam_name):
+    res = False
+    if P.ffmpeg_usb[cam_name] is None:
+        P.usb_out_std[cam_name] = open(P.usb_out_filepath_std[cam_name], 'w')
+        P.usb_out_err[cam_name] = open(P.usb_out_filepath_err[cam_name], 'w')
 
-        P.usb_record_hw = usb_tool.get_usb_audio()  # P.usb_camera_keywords)
-        P.usb_camera_dev_path = usb_tool.get_first_usb_video_dev()  # P.usb_camera_keywords)
+        P.usb_record_hw[cam_name] = usb_tool.get_usb_audio(cam_name)  # P.usb_camera_keywords)
+        P.usb_camera_dev_path[cam_name] = usb_tool.get_usb_video_dev(cam_name)  # P.usb_camera_keywords)
 
-        if P.usb_camera_dev_path is None:
+        if P.usb_camera_dev_path[cam_name] is None:
             res = False
             L.l.error("No camera detected before starting USB recording")
         else:
-            if P.usb_record_hw is not None:
-                audio = ['-i', 'hw:{}'.format(P.usb_record_hw)]
+            if P.usb_record_hw[cam_name] is not None:
+                audio = ['-i', 'hw:{}'.format(P.usb_record_hw[cam_name])]
             else:
                 L.l.warning("USB audio not detected, starting record without audio")
                 audio = ['-an']
             # https://superuser.com/questions/578321/how-to-rotate-a-video-180-with-ffmpeg/578329#578329
-            if P.usb_camera_dev_path is not None:
-                P.ffmpeg_usb = subprocess.Popen(
+            if P.usb_camera_dev_path[cam_name] is not None:
+                P.usb_out_filename[cam_name] = P.usb_out_filename_template.replace('_x', cam_name)
+                P.ffmpeg_usb[cam_name] = subprocess.Popen(
                     ['ffmpeg', '-y', '-f', 'alsa', '-thread_queue_size', '8192', '-ac', '1'] + audio +
                     ['-r', str(P.usb_framerate),
-                     '-f', 'video4linux2', '-thread_queue_size', '8192', '-i', P.usb_camera_dev_path,
-                     '-vf', P.usb_rotation_filter +
+                     '-f', 'video4linux2', '-thread_queue_size', '8192', '-i', P.usb_camera_dev_path[cam_name],
+                     '-vf', P.usb_rotation_filter[cam_name] +
                      'drawtext=text=\'%{localtime\:%c}\':fontcolor=white@0.8:fontsize=32:x=10:y=10',
                      '-s', P.usb_max_resolution, "-c:v", "h264_omx", "-b:v", "2000k",
                      '-frag_duration', '1000', '-f', 'segment', '-segment_time', str(P.segment_duration),
                      '-reset_timestamps', '1', '-force_key_frames', 'expr:gte(t,n_forced*10)', '-strftime', '1',
-                     '-nostats', '-loglevel', 'info', P.usb_out_filename],
-                    stdin=subprocess.PIPE, stdout=P.usb_out_std, stderr=P.usb_out_err)
+                     '-nostats', '-loglevel', 'info', P.usb_out_filename[cam_name]],
+                    stdin=subprocess.PIPE, stdout=P.usb_out_std[cam_name], stderr=P.usb_out_err[cam_name])
                 res = True
-        return res
+    return res
 
 
 def _kill_proc(keywords):
@@ -159,8 +163,8 @@ def _kill_proc(keywords):
             break
 
 
-def _save_usb_err_output():
-    src = P.usb_out_filepath_err
+def _save_usb_err_output(cam_name):
+    src = P.usb_out_filepath_err[cam_name]
     # make a copy for debug
     L.l.info('Copy usb output file for debug')
     shutil.copy(src, src + '.' + str(time.time()))
@@ -170,14 +174,14 @@ def _save_usb_err_output():
     return contents
 
 
-def _recover_usb():
+def _recover_usb(cam_name):
     if P.usb_recover_count <= P.usb_recover_attempts_limit:
-        if not os.path.isfile(P.usb_out_filepath_err):
+        if not os.path.isfile(P.usb_out_filepath_err[cam_name]):
             L.l.info('Unknown USB error, no recent ffmpeg output found')
-            usb_tool.reset_usb(P.usb_camera_name)
+            usb_tool.reset_usb(cam_name)
             time.sleep(5)  # let camera to be detected
         else:
-            contents = _save_usb_err_output()
+            contents = _save_usb_err_output(cam_name)
             is_exit_normal = 'Exiting normally, received signal' in contents
             if is_exit_normal:
                 L.l.info('Exit was normal, nothing to do to recover')
@@ -188,7 +192,7 @@ def _recover_usb():
                 else:
                     L.l.info('Unknown USB error, details below:')
                     L.l.info(contents)
-                usb_tool.reset_usb(P.usb_camera_name)
+                usb_tool.reset_usb(cam_name)
                 time.sleep(5)  # let camera to be detected
         P.usb_recover_count += 1
         if P.usb_recover_count == P.usb_recover_attempts_limit:
@@ -200,20 +204,20 @@ def _recover_usb():
             P.usb_recover_count = 0
 
 
-def _usb_init():
-    if os.path.isfile(P.usb_out_filepath_err):
-        os.remove(P.usb_out_filepath_err)
+def _usb_init(cam_name):
+    if os.path.isfile(P.usb_out_filepath_err[cam_name]):
+        os.remove(P.usb_out_filepath_err[cam_name])
     if not P.is_usb_camera_detected:
-        _recover_usb()
-    P.is_usb_camera_detected = (usb_tool.get_first_usb_video_dev() is not None)
+        _recover_usb(cam_name)
+    P.is_usb_camera_detected = (usb_tool.get_usb_video_dev(cam_name) is not None)
     if not P.is_usb_camera_detected:
-        L.l.info("USB camera not detected, recovering usb".format())
-        _recover_usb()
-        P.is_usb_camera_detected = (usb_tool.get_first_usb_video_dev() is not None)
+        L.l.info("USB camera [{}] not detected, recovering usb".format(cam_name))
+        _recover_usb(cam_name)
+        P.is_usb_camera_detected = (usb_tool.get_usb_video_dev(cam_name) is not None)
     if P.is_usb_camera_detected:
         try:
             P.usb_camera_name = usb_tool.get_usb_camera_name()
-            L.l.info("Starting USB Recording on {}".format(P.usb_camera_name))
+            L.l.info("Starting USB Recording on {}".format(cam_name))
             _kill_proc(P.usb_out_filename)
             if Constant.IS_OS_WINDOWS():
                 _run_ffmpeg_usb_win()
@@ -232,17 +236,18 @@ def _usb_init():
 
 def _usb_record_loop():
     if P.is_recording_usb:
-        P.ffmpeg_usb.poll()
-        if P.ffmpeg_usb.returncode is not None:
-            L.l.info("usb record exit with code {}".format(P.ffmpeg_usb.returncode))
-            if P.ffmpeg_usb.returncode != 0:
-                L.l.info("USB recording stopped")
-                _save_usb_err_output()
+        for cam_name in P.ffmpeg_usb.iterkeys():
+            P.ffmpeg_usb[cam_name].poll()
+            if P.ffmpeg_usb[cam_name].returncode is not None:
+                L.l.info("usb record exit with code {}".format(P.ffmpeg_usb[cam_name].returncode))
+                if P.ffmpeg_usb[cam_name].returncode != 0:
+                    L.l.info("USB recording stopped")
+                    _save_usb_err_output(cam_name)
+                else:
+                    L.l.info("USB exit, not an error?")
+                _usb_stop(cam_name)
             else:
-                L.l.info("USB exit, not an error?")
-            _usb_stop()
-        else:
-            pass
+                pass
     else:
         L.l.info("USB not recording")
 
@@ -294,7 +299,7 @@ def _pi_init():
 
 
 def _pi_stop():
-    print "Stopping PI"
+    L.l.info("Stopping PI")
     try:
         P.is_recording_pi = False
         if P.pi_camera is not None:
@@ -323,19 +328,19 @@ def _pi_stop():
         L.l.info(traceback.print_exc())
 
 
-def _usb_stop():
-    print "Stopping USB"
+def _usb_stop(cam_name):
+    L.l.info("Stopping USB {}".format(cam_name))
     P.is_recording_usb = False
     if P.ffmpeg_usb is not None:
         try:
-            P.ffmpeg_usb.terminate()
+            P.ffmpeg_usb[cam_name].terminate()
         except Exception:
             pass
-        P.ffmpeg_usb = None
-        if P.usb_out_std is not None:
-            P.usb_out_std.close()
-        if P.usb_out_err is not None:
-            P.usb_out_err.close()
+        del P.ffmpeg_usb[cam_name]
+        if cam_name in P.usb_out_std:
+            P.usb_out_std[cam_name].close()
+        if cam_name in P.usb_out_err:
+            P.usb_out_err[cam_name].close()
 
 
 def _handle_event_alarm(zone_name, alarm_pin_name, pin_connected):
