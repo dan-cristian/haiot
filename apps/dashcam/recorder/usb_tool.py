@@ -34,6 +34,7 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 # /dev/v4l/by-id/usb-046d_081b_5CB759A0-video-index0
 # /dev/v4l/by-id/usb-046d_HD_Webcam_C525_1B0A4790-video-index0
+# /dev/v4l/by-id/usb-HD_Camera_Manufacturer_HD_USB_Camera-video-index0
 def _get_first_usb_video_dev_id():
     root = '/dev/v4l/by-id/'
     vendor = None
@@ -50,7 +51,7 @@ def _get_first_usb_video_dev_id():
     return vendor, prod
 
 
-def get_first_usb_video_dev():
+def get_usb_video_dev(cam_name):
     res = None
     root = '/dev/v4l/by-id/'
     if os.path.exists(root):
@@ -67,7 +68,7 @@ def get_first_usb_video_dev():
 
 # card 1: C525 [HD Webcam C525], device 0: USB Audio [USB Audio]
 # card 1: U0x46d0x81b [USB Device 0x46d:0x81b], device 0: USB Audio [USB Audio]
-def get_usb_audio():
+def get_usb_audio(cam_name):
     dev_name = 'USB Audio'
     res = None
     try:
@@ -89,6 +90,7 @@ def get_usb_audio():
 
 # Bus 001 Device 049: ID 046d:081b Logitech, Inc. Webcam C310
 # Bus 001 Device 010: ID 046d:0826 Logitech, Inc. HD Webcam C525
+# Bus 001 Device 019: ID 05a3:9520 ARC International
 def get_usb_camera_name():
     vendor, prod = _get_first_usb_video_dev_id()
     camera_name = None
