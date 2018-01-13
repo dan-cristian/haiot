@@ -103,8 +103,8 @@ def _get_usb_audio(camera):
                         found = True
                     else:
                         # try second detect method by vendor/prod id
-                        vendor = cam.vendor
-                        prod = cam.prod
+                        vendor = camera.vendor
+                        prod = camera.prod
                         if vendor[0] == '0':
                             vendor = '0x' + vendor[1]
                         if prod[0] == '0':
@@ -130,19 +130,19 @@ def _get_usb_audio(camera):
 #Bus 001 Device 003: ID 0424:ec00 Standard Microsystems Corp. SMSC9512/9514 Fast Ethernet Adapter
 #Bus 001 Device 002: ID 0424:9514 Standard Microsystems Corp. SMC9514 Hub
 #Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
-def _set_cam_attrib(cam):
+def _set_cam_attrib(camera):
     out = subprocess.check_output(['lsusb']).split('\n')
     for line in out:
-        if cam.name in line:
+        if camera.name in line:
             p = line.split(": ID ")
             b = p[0].split(' Device ')
-            cam.bus = b[0].split(' ')[1]
-            cam.device = b[1].split(' ')[1]
+            camera.bus = b[0].split(' ')[1]
+            camera.device = b[1].split(' ')[1]
             p = p[1].split(' ').split(':')
-            cam.vendor = p[0]
-            cam.prod = p[1]
+            camera.vendor = p[0]
+            camera.prod = p[1]
             break
-    cam.audio = _get_usb_audio(cam)
+    camera.audio = _get_usb_audio(camera)
 
 
 # Bus 001 Device 049: ID 046d:081b Logitech, Inc. Webcam C310
