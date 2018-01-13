@@ -8,7 +8,16 @@ import usb_tool
 import uploader
 import utils
 from pydispatch import dispatcher
-from main.logger_helper import L
+try:
+    from main.logger_helper import L
+except Exception:
+    class L:
+        class l:
+            @staticmethod
+            def info(msg): print msg
+            @staticmethod
+            def warning(msg): print msg
+
 try:
     from common import Constant
 except Exception:
@@ -31,11 +40,13 @@ class P:
     ffmpeg_usb = {}  # list with usb process encoding
     segment_duration = 900  # in seconds
     is_recording_pi = False
-    is_recording_usb = False
+    is_recording_usb = {}
+    is_one_recording_usb = False
     is_pi_camera_on = True
     is_pi_camera_detected = True
     is_usb_camera_on = True
-    is_usb_camera_detected = True
+    is_one_usb_camera_detected = False
+    is_usb_camera_detected = {}
     usb_sound_enabled = True
     usb_rotation_filter = [{'C525': 'vflip,'}]  # comma needed as suffix for flip filter
     pi_rotation_degree = 90
@@ -131,7 +142,6 @@ def _run_ffmpeg_usb(cam_name):
                 audio = ['-an']
             # https://superuser.com/questions/578321/how-to-rotate-a-video-180-with-ffmpeg/578329#578329
             if P.usb_camera_dev_path[cam_name] is not None:
-                P.usb_out_filename[cam_name] = P.usb_out_filename_template.replace('_x', cam_name)
                 P.ffmpeg_usb[cam_name] = subprocess.Popen(
                     ['ffmpeg', '-y', '-f', 'alsa', '-thread_queue_size', '8192', '-ac', '1'] + audio +
                     ['-r', str(P.usb_framerate),
@@ -204,30 +214,36 @@ def _recover_usb(cam_name):
             P.usb_recover_count = 0
 
 
-def _usb_init(cam_name):
-    if os.path.isfile(P.usb_out_filepath_err[cam_name]):
-        os.remove(P.usb_out_filepath_err[cam_name])
-    if not P.is_usb_camera_detected:
-        _recover_usb(cam_name)
-    P.is_usb_camera_detected = (usb_tool.get_usb_video_dev(cam_name) is not None)
-    if not P.is_usb_camera_detected:
-        L.l.info("USB camera [{}] not detected, recovering usb".format(cam_name))
-        _recover_usb(cam_name)
-        P.is_usb_camera_detected = (usb_tool.get_usb_video_dev(cam_name) is not None)
-    if P.is_usb_camera_detected:
+def _usb_init():
+    cam_list = usb_tool.get_usb_camera_list()
+    for cam_name in cam_list.iterkeys():
+        P.usb_out_filepath_err[cam_name] = P.usb_out_filepath_err_template.replace('_x', cam_name)
+        P.usb_out_filename[cam_name] = P.usb_out_filename_template.replace('_x', cam_name)
+        if cam_name not in P.ffmpeg_usb:
+            P.ffmpeg_usb[cam_name] = None
+        if os.path.isfile(P.usb_out_filepath_err[cam_name]):
+            os.remove(P.usb_out_filepath_err[cam_name])
+        #if not P.is_one_usb_camera_detected:
+        #    _recover_usb(cam_name)
+        #if not P.is_usb_camera_detected[cam_name]:
+        #    L.l.info("USB camera [{}] not detected, recovering usb".format(cam_name))
+        #    _recover_usb(cam_name)
+        #    P.is_usb_camera_detected = (usb_tool.get_usb_video_dev(cam_name) is not None)
+    #if P.is_usb_camera_detected:
         try:
-            P.usb_camera_name = usb_tool.get_usb_camera_name()
+            #P.usb_camera_name = usb_tool.get_usb_camera_name()
             L.l.info("Starting USB Recording on {}".format(cam_name))
-            _kill_proc(P.usb_out_filename)
+            _kill_proc(P.usb_out_filename[cam_name])
             if Constant.IS_OS_WINDOWS():
                 _run_ffmpeg_usb_win()
             else:
-                _run_ffmpeg_usb()
-            if P.ffmpeg_usb is not None and P.ffmpeg_usb._child_created:
-                L.l.info("Recording started on {}".format(P.usb_camera_name))
-                P.is_recording_usb = True
+                _run_ffmpeg_usb(cam_name)
+            if P.ffmpeg_usb[cam_name] is not None and P.ffmpeg_usb._child_created:
+                L.l.info("Recording started on {}".format(cam_name))
+                P.is_recording_usb[cam_name] = True
+                P.is_one_recording_usb = True
             else:
-                L.l.info("Recording process not created")
+                L.l.info("Recording process not created for {}".format(cam_name))
         except Exception, ex:
             L.l.info("Unable to initialise USB camera, ex={}".format(ex))
     #else:
@@ -424,7 +440,7 @@ def thread_run():
             if P.is_recording_usb:
                 _usb_record_loop()
             else:
-                if P.is_usb_camera_detected:  # stay silent if recovery failed
+                if P.is_one_usb_camera_detected:  # stay silent if recovery failed
                     L.l.info("Starting USB camera, should have been on")
                 _usb_init()
         if not P.is_pi_camera_on and P.is_recording_pi:
