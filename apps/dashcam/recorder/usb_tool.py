@@ -180,8 +180,9 @@ def get_usb_camera_list():
                 res[camera.name] = camera
             camera = Camera(name=a[0], devpath=None, audio=None, bus=None, device=None, vendor=None, prod=None)
         else:
-            camera.dev = line.strip()
+            camera.devpath = line.strip()
             _set_cam_attrib(camera)
+            L.l.info("Cam is {}".format(camera))
     # save previous cam
     if camera is not None:
         res[camera.name] = camera
