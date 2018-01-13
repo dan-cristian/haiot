@@ -4,7 +4,16 @@ import os, sys, time, datetime
 import shutil
 import utils
 from collections import namedtuple
-from main.logger_helper import L
+try:
+    from main.logger_helper import L
+except Exception:
+    class L:
+        class l:
+            @staticmethod
+            def info(msg): print msg
+            @staticmethod
+            def warning(msg): print msg
+
 
 disk_ntuple = namedtuple('partition',  'device mountpoint fstype')
 usage_ntuple = namedtuple('usage',  'total used free percent')
