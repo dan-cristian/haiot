@@ -34,28 +34,30 @@ def _get_usb_audio(camera):
     try:
         rec = subprocess.check_output(['arecord', '-l']).split('\n')
         for line in rec:
-            found = False
-            if len(line) > 1:
+            if 'card' in line and ', device' in line:
+                found = False
                 atoms = line.split(',')
-                if len(atoms) > 1:
-                    if camera.name in atoms[1]:
+                #if len(atoms) > 1:
+                if camera.name in atoms[1]:
+                    found = True
+                else:
+                    # try second detect method by vendor/prod id
+                    vendor = camera.vendor
+                    prod = camera.prod
+                    if vendor[0] == '0':
+                        vendor = '0x' + vendor[1]
+                    if prod[0] == '0':
+                        prod = '0x' + vendor[1]
+                    if vendor in atoms[1] and prod in atoms[1]:
                         found = True
-                    else:
-                        # try second detect method by vendor/prod id
-                        vendor = camera.vendor
-                        prod = camera.prod
-                        if vendor[0] == '0':
-                            vendor = '0x' + vendor[1]
-                        if prod[0] == '0':
-                            prod = '0x' + vendor[1]
-                        if vendor in atoms[1] and prod in atoms[1]:
-                            found = True
-                    if found:
-                        hw_card = atoms[0].split(':')[0].split('card ')[1]
-                        hw_dev = atoms[1].split(':')[0].split(' device ')[1]
-                        res = '{},{}'.format(hw_card, hw_dev)
-                        L.l.info("Found audio card {}".format(res))
-                        break
+                if found:
+                    hw_card = atoms[0].split(':')[0].split('card ')[1]
+                    hw_dev = atoms[1].split(':')[0].split(' device ')[1]
+                    res = '{},{}'.format(hw_card, hw_dev)
+                    L.l.info("Found audio card {}".format(res))
+                    break
+                else:
+                    L.l.info("Could not map camera {} to audio record entry {}".format(camera.name, line))
     except Exception, ex:
         L.l.info("Got error when looking for audio interface, ex={}".format(ex))
     camera.audio = res
@@ -82,10 +84,9 @@ def _set_cam_attrib(camera):
             camera.prod = p[1]
             break
     if camera.vendor is None:
-        L.l.error("Could no retrieve details for camera ".format(camera))
+        L.l.error("Could no retrieve details for camera [{}]".format(camera))
     else:
         camera.audio = _get_usb_audio(camera)
-
 
 
 #UVC Camera (046d:081b) (usb-3f980000.usb-1.2):
