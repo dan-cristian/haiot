@@ -31,3 +31,4 @@ web.py
 pybluez
 thingspeak
 tzlocal
+recordtype
