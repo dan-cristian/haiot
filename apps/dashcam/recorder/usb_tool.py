@@ -19,68 +19,7 @@ except Exception:
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 Camera = recordtype('Camera', 'name devpath audio bus device vendor prod')
-
-#def _get_usb_dev_root(dev_name):
-#    process = subprocess.Popen(['tail /sys/devices/platform/soc/*/*/*/*/product'],
-#                               stdout=subprocess.PIPE, shell=True)
-#    prev_line = None
-#    while True:
-#        output = process.stdout.readline()
-#        if output == '' and process.poll() is not None:
-#            break
-#        if output:
-#            if dev_name in output:
-#                break
-#            else:
-#                prev_line = output
-#    rc = process.poll()
-#    if prev_line is not None:
-#        # ==> /sys/devices/platform/soc/3f980000.usb/usb1/1-1/1-1.5/product <==
-#        # HD Webcam C525
-#        prev_line = prev_line.replace('==> ', '').replace(' <==', '').replace('product', '').strip()
-#        # /sys/devices/platform/soc/3f980000.usb/usb1/1-1/1-1.5/
-#    return prev_line
-
 _v4l_root = '/dev/v4l/by-id/'
-
-
-# /dev/v4l/by-id/usb-046d_081b_5CB759A0-video-index0
-# /dev/v4l/by-id/usb-046d_HD_Webcam_C525_1B0A4790-video-index0
-# /dev/v4l/by-id/usb-HD_Camera_Manufacturer_HD_USB_Camera-video-index0
-#def _get_first_usb_video_dev_id():
-#    vendor = None
-#    prod = None
-#    if os.path.exists(_v4l_root):
-#        for filename in os.listdir(_v4l_root):
-#            if 'video' in filename:
-#                p = filename.split('usb-')
-#                if len(p) > 1:
-#                    p = p[1].split('_')
-#                    vendor = p[0]
-#                    prod = p[1]
-#                    break
-#    return vendor, prod
-
-
-#def get_usb_video_dev(cam_name):
-#    res = None
-#    if os.path.exists(_v4l_root):
-#        for filename in os.listdir(_v4l_root):
-#            if 'video' in filename:
-#                res = _v4l_root + filename
-#                L.l.info("Found usb cam at {}".format(res))
-#                break
-#        return res
-#    else:
-#        #L.l.info('No v4l folder, probably no usb vide device yet available')
-#        return None
-
-
-# card 1: C525 [HD Webcam C525], device 0: USB Audio [USB Audio]
-# card 1: U0x46d0x81b [USB Device 0x46d:0x81b], device 0: USB Audio [USB Audio]
-
-
-pass
 
 
 #**** List of CAPTURE Hardware Devices ****
@@ -148,22 +87,6 @@ def _set_cam_attrib(camera):
         camera.audio = _get_usb_audio(camera)
 
 
-# Bus 001 Device 049: ID 046d:081b Logitech, Inc. Webcam C310
-# Bus 001 Device 010: ID 046d:0826 Logitech, Inc. HD Webcam C525
-# Bus 001 Device 019: ID 05a3:9520 ARC International
-#def get_usb_camera_name():
-#    vendor, prod = _get_first_usb_video_dev_id()
-#    camera_name = None
-#    if vendor is not None:
-#        out = subprocess.check_output(['lsusb']).split('\n')
-#        for line in out:
-#            if vendor in line and prod in line:
-#                p = line.split(vendor + ":")
-#                start = p[1].index(' ')
-#                camera_name = p[1][start + 1:]
-#                break
-#    return camera_name
-
 
 #UVC Camera (046d:081b) (usb-3f980000.usb-1.2):
 #        /dev/video1
@@ -183,6 +106,15 @@ def get_usb_camera_list():
             if camera is not None:
                 res[camera.name] = camera
             camera = Camera(name=a[0], devpath=None, audio=None, bus=None, device=None, vendor=None, prod=None)
+            # try to detect vendor & prod for nasty cams
+            a = camera.name.split[':']
+            if len(a) > 1:
+                v = a[0].split('(')
+                if len(v) > 1:
+                    camera.vendor = v[1]
+                    p = a[1].split(')')
+                    if len(p) > 1:
+                        camera.prod = p[0]
         else:
             camera.devpath = line.strip()
             _set_cam_attrib(camera)
@@ -211,3 +143,77 @@ def reset_usb(dev_name):
 if __name__ == '__main__':
     for cam in get_usb_camera_list():
         print cam
+
+
+# Bus 001 Device 049: ID 046d:081b Logitech, Inc. Webcam C310
+# Bus 001 Device 010: ID 046d:0826 Logitech, Inc. HD Webcam C525
+# Bus 001 Device 019: ID 05a3:9520 ARC International
+#def get_usb_camera_name():
+#    vendor, prod = _get_first_usb_video_dev_id()
+#    camera_name = None
+#    if vendor is not None:
+#        out = subprocess.check_output(['lsusb']).split('\n')
+#        for line in out:
+#            if vendor in line and prod in line:
+#                p = line.split(vendor + ":")
+#                start = p[1].index(' ')
+#                camera_name = p[1][start + 1:]
+#                break
+#    return camera_name
+
+#def _get_usb_dev_root(dev_name):
+#    process = subprocess.Popen(['tail /sys/devices/platform/soc/*/*/*/*/product'],
+#                               stdout=subprocess.PIPE, shell=True)
+#    prev_line = None
+#    while True:
+#        output = process.stdout.readline()
+#        if output == '' and process.poll() is not None:
+#            break
+#        if output:
+#            if dev_name in output:
+#                break
+#            else:
+#                prev_line = output
+#    rc = process.poll()
+#    if prev_line is not None:
+#        # ==> /sys/devices/platform/soc/3f980000.usb/usb1/1-1/1-1.5/product <==
+#        # HD Webcam C525
+#        prev_line = prev_line.replace('==> ', '').replace(' <==', '').replace('product', '').strip()
+#        # /sys/devices/platform/soc/3f980000.usb/usb1/1-1/1-1.5/
+#    return prev_line
+
+# /dev/v4l/by-id/usb-046d_081b_5CB759A0-video-index0
+# /dev/v4l/by-id/usb-046d_HD_Webcam_C525_1B0A4790-video-index0
+# /dev/v4l/by-id/usb-HD_Camera_Manufacturer_HD_USB_Camera-video-index0
+#def _get_first_usb_video_dev_id():
+#    vendor = None
+#    prod = None
+#    if os.path.exists(_v4l_root):
+#        for filename in os.listdir(_v4l_root):
+#            if 'video' in filename:
+#                p = filename.split('usb-')
+#                if len(p) > 1:
+#                    p = p[1].split('_')
+#                    vendor = p[0]
+#                    prod = p[1]
+#                    break
+#    return vendor, prod
+
+
+#def get_usb_video_dev(cam_name):
+#    res = None
+#    if os.path.exists(_v4l_root):
+#        for filename in os.listdir(_v4l_root):
+#            if 'video' in filename:
+#                res = _v4l_root + filename
+#                L.l.info("Found usb cam at {}".format(res))
+#                break
+#        return res
+#    else:
+#        #L.l.info('No v4l folder, probably no usb vide device yet available')
+#        return None
+
+
+# card 1: C525 [HD Webcam C525], device 0: USB Audio [USB Audio]
+# card 1: U0x46d0x81b [USB Device 0x46d:0x81b], device 0: USB Audio [USB Audio]
+
