@@ -134,7 +134,6 @@ def _set_cam_attrib(cam):
     for line in out:
         if cam.name in line:
             p = line.split(": ID ")
-            # todo
             b = p[0].split(' Device ')
             cam.bus = b[0].split(' ')[1]
             cam.device = b[1].split(' ')[1]
@@ -179,7 +178,7 @@ def get_usb_camera_list():
             # save previous cam
             if camera is not None:
                 res[camera.name] = camera
-            camera = Camera(name=a[0])
+            camera = Camera(name=a[0], devpath=None, audio=None, bus=None, device=None, vendor=None, prod=None)
         else:
             camera.dev = line.strip()
             _set_cam_attrib(camera)
