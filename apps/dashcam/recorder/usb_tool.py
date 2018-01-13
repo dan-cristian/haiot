@@ -1,6 +1,7 @@
 import subprocess
 import os
-from collections import namedtuple
+#from collections import namedtuple
+from recordtype import recordtype
 import sudo_usb
 try:
     from main.logger_helper import L
@@ -17,7 +18,7 @@ except Exception:
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
-Camera = namedtuple('Camera', 'name devpath audio bus device vendor prod')
+Camera = recordtype('Camera', 'name devpath audio bus device vendor prod')
 
 #def _get_usb_dev_root(dev_name):
 #    process = subprocess.Popen(['tail /sys/devices/platform/soc/*/*/*/*/product'],
