@@ -23,7 +23,7 @@ except Exception:
 try:
     from common import Constant
 except Exception:
-    pass
+    L.l.error("Cannot import Constant, running standalone I guess")
 
 _has_picamera_module = False
 try:
@@ -236,10 +236,10 @@ def _usb_init():
             #P.usb_camera_name = usb_tool.get_usb_camera_name()
             L.l.info("Starting USB Recording on {}".format(cam_name))
             _kill_proc(P.usb_out_filename[cam_name])
-            if Constant.IS_OS_WINDOWS():
-                _run_ffmpeg_usb_win()
-            else:
-                _run_ffmpeg_usb(cam_name)
+            #if Constant.IS_OS_WINDOWS():
+            #    _run_ffmpeg_usb_win()
+            #else:
+            _run_ffmpeg_usb(cam_name)
             if P.ffmpeg_usb[cam_name] is not None and P.ffmpeg_usb._child_created:
                 L.l.info("Recording started on {}".format(cam_name))
                 P.is_recording_usb[cam_name] = True
@@ -419,7 +419,10 @@ def init():
         _pi_init()
     if P.is_usb_camera_on:
         _usb_init()
-    dispatcher.connect(_handle_event_alarm, signal=Constant.SIGNAL_ALARM, sender=dispatcher.Any)
+    try:
+        dispatcher.connect(_handle_event_alarm, signal=Constant.SIGNAL_ALARM, sender=dispatcher.Any)
+    except Exception, ex:
+        L.l.error("Unable to connect to alarm dispatch, ex={}".format(ex))
     initialised = True
 
 
