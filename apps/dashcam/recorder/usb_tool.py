@@ -46,8 +46,10 @@ def _get_usb_audio(camera):
                     prod = camera.prod
                     if vendor[0] == '0':
                         vendor = '0x' + vendor[1:]
+                        L.l.info("Vendor={}".format(vendor))
                     if prod[0] == '0':
-                        prod = '0x' + vendor[1:]
+                        prod = '0x' + prod[1:]
+                        L.l.info("Prod={}".format(prod))
                     if vendor in atoms[0] and prod in atoms[0]:
                         found = True
                 if found:
