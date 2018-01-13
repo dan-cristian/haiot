@@ -82,7 +82,7 @@ def _set_cam_attrib(camera):
             camera.prod = p[1]
             break
     if camera.vendor is None:
-        L.l.error("Could no retrieve detils for camera ".format(camera.name))
+        L.l.error("Could no retrieve details for camera ".format(camera))
     else:
         camera.audio = _get_usb_audio(camera)
 
@@ -141,7 +141,7 @@ def reset_usb(dev_name):
 
 
 if __name__ == '__main__':
-    for cam in get_usb_camera_list():
+    for cam in get_usb_camera_list().itervalues():
         print cam
 
 
