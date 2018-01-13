@@ -7,6 +7,7 @@ import shutil
 import usb_tool
 import uploader
 import utils
+from usb_tool import Camera
 from pydispatch import dispatcher
 try:
     from main.logger_helper import L
@@ -125,6 +126,7 @@ def _run_ffmpeg_usb_win(no_sound=True):
 
 # ffmpeg -y -f alsa -thread_queue_size 16384 -ac 1 -i hw:1 -r 8 -f video4linux2 -thread_queue_size 8192 -i /dev/video0 -vf "drawtext=text='%{localtime\:%c}': fontcolor=white@0.8: fontsize=32: x=10: y=10" -s 1280x720 -c:v h264_omx -b:v 3000k -frag_duration 1000 -f segment -segment_time 3600 -reset_timestamps 1  -force_key_frames "expr:gte(t,n_forced*2)" -strftime 1 /home/haiot/recordings/usb_%Y-%m-%d_%H-%M-%S.mp4
 def _run_ffmpeg_usb(cam_name):
+    L.l.info("Starting ffmpeg process for cam {}".format(cam_name))
     res = False
     if P.ffmpeg_usb[cam_name] is None:
         P.usb_out_std[cam_name] = open(P.usb_out_filepath_std[cam_name], 'w')
@@ -218,13 +220,15 @@ def _recover_usb(cam_name):
 
 def _usb_init():
     cam_list = usb_tool.get_usb_camera_list()
-    for cam_name in cam_list.iterkeys():
-        P.usb_out_filepath_err[cam_name] = P.usb_out_filepath_err_template.replace('_x', cam_name)
-        P.usb_out_filename[cam_name] = P.usb_out_filename_template.replace('_x', cam_name)
-        if cam_name not in P.ffmpeg_usb:
-            P.ffmpeg_usb[cam_name] = None
-        if os.path.isfile(P.usb_out_filepath_err[cam_name]):
-            os.remove(P.usb_out_filepath_err[cam_name])
+    for cam in cam_list:
+        P.usb_out_filepath_err[cam.name] = P.usb_out_filepath_err_template.replace('_x', cam.name)
+        P.usb_out_filename[cam.name] = P.usb_out_filename_template.replace('_x', cam.name)
+        if cam.name not in P.ffmpeg_usb:
+            P.ffmpeg_usb[cam.name] = None
+        if os.path.isfile(P.usb_out_filepath_err[cam.name]):
+            os.remove(P.usb_out_filepath_err[cam.name])
+        P.usb_camera_dev_path[cam.name] = cam.devpath
+        P.usb_record_hw[cam.name] = cam.audio
         #if not P.is_one_usb_camera_detected:
         #    _recover_usb(cam_name)
         #if not P.is_usb_camera_detected[cam_name]:
@@ -234,18 +238,18 @@ def _usb_init():
     #if P.is_usb_camera_detected:
         try:
             #P.usb_camera_name = usb_tool.get_usb_camera_name()
-            L.l.info("Starting USB Recording on {}".format(cam_name))
-            _kill_proc(P.usb_out_filename[cam_name])
+            L.l.info("Starting USB Recording on {}".format(cam.name))
+            _kill_proc(P.usb_out_filename[cam.name])
             #if Constant.IS_OS_WINDOWS():
             #    _run_ffmpeg_usb_win()
             #else:
-            _run_ffmpeg_usb(cam_name)
-            if P.ffmpeg_usb[cam_name] is not None and P.ffmpeg_usb._child_created:
-                L.l.info("Recording started on {}".format(cam_name))
-                P.is_recording_usb[cam_name] = True
+            _run_ffmpeg_usb(cam.name)
+            if P.ffmpeg_usb[cam.name] is not None and P.ffmpeg_usb[cam.name]._child_created:
+                L.l.info("Recording started on {}".format(cam.name))
+                P.is_recording_usb[cam.name] = True
                 P.is_one_recording_usb = True
             else:
-                L.l.info("Recording process not created for {}".format(cam_name))
+                L.l.info("Recording process not created for {}".format(cam.name))
         except Exception, ex:
             L.l.info("Unable to initialise USB camera, ex={}".format(ex))
     #else:
