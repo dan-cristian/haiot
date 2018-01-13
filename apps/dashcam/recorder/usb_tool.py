@@ -31,16 +31,16 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 #        # /sys/devices/platform/soc/3f980000.usb/usb1/1-1/1-1.5/
 #    return prev_line
 
+_v4l_root = '/dev/v4l/by-id/'
 
 # /dev/v4l/by-id/usb-046d_081b_5CB759A0-video-index0
 # /dev/v4l/by-id/usb-046d_HD_Webcam_C525_1B0A4790-video-index0
 # /dev/v4l/by-id/usb-HD_Camera_Manufacturer_HD_USB_Camera-video-index0
 def _get_first_usb_video_dev_id():
-    root = '/dev/v4l/by-id/'
     vendor = None
     prod = None
-    if os.path.exists(root):
-        for filename in os.listdir(root):
+    if os.path.exists(_v4l_root):
+        for filename in os.listdir(_v4l_root):
             if 'video' in filename:
                 p = filename.split('usb-')
                 if len(p) > 1:
@@ -53,11 +53,10 @@ def _get_first_usb_video_dev_id():
 
 def get_usb_video_dev(cam_name):
     res = None
-    root = '/dev/v4l/by-id/'
-    if os.path.exists(root):
-        for filename in os.listdir(root):
+    if os.path.exists(_v4l_root):
+        for filename in os.listdir(_v4l_root):
             if 'video' in filename:
-                res = root + filename
+                res = _v4l_root + filename
                 L.l.info("Found usb cam at {}".format(res))
                 break
         return res
@@ -103,6 +102,26 @@ def get_usb_camera_name():
                 camera_name = p[1][start + 1:]
                 break
     return camera_name
+
+
+#UVC Camera (046d:081b) (usb-3f980000.usb-1.2):
+#        /dev/video1
+#HD USB Camera (usb-3f980000.usb-1.3):
+#        /dev/video2
+#HD Webcam C525 (usb-3f980000.usb-1.5):
+#        /dev/video0
+def get_usb_camera_list():
+    res = {}
+    cam_name = None
+    out = subprocess.check_output(['v4l2-ctl', '--list-devices']).split('\n')
+    for line in out:
+        if '/dev' not in line:
+            a = line.split(' (usb')
+            cam_name = a[0]
+        else:
+            dev = line.strip()
+            res[cam_name] = dev
+    return res
 
 
 def reset_usb(dev_name):
