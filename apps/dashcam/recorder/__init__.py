@@ -17,6 +17,8 @@ except Exception:
             def info(msg): print msg
             @staticmethod
             def warning(msg): print msg
+            @staticmethod
+            def error(msg): print msg
 
 try:
     from common import Constant
