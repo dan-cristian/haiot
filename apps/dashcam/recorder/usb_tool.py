@@ -137,12 +137,15 @@ def _set_cam_attrib(camera):
             p = line.split(": ID ")
             b = p[0].split(' Device ')
             camera.bus = b[0].split(' ')[1]
-            camera.device = b[1].split(' ')[1]
+            camera.device = b[1]
             p = p[1].split(' ').split(':')
             camera.vendor = p[0]
             camera.prod = p[1]
             break
-    camera.audio = _get_usb_audio(camera)
+    if camera.vendor is None:
+        L.l.error("Could no retrieve detils for camera ".format(camera.name))
+    else:
+        camera.audio = _get_usb_audio(camera)
 
 
 # Bus 001 Device 049: ID 046d:081b Logitech, Inc. Webcam C310
