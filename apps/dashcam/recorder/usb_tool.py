@@ -107,7 +107,7 @@ def get_usb_camera_list():
                 res[camera.name] = camera
             camera = Camera(name=a[0], devpath=None, audio=None, bus=None, device=None, vendor=None, prod=None)
             # try to detect vendor & prod for nasty cams
-            a = camera.name.split[':']
+            a = camera.name.split(':')
             if len(a) > 1:
                 v = a[0].split('(')
                 if len(v) > 1:
