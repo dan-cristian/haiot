@@ -4,7 +4,14 @@ import sudo_usb
 try:
     from main.logger_helper import L
 except Exception:
-    pass
+    class L:
+        class l:
+            @staticmethod
+            def info(msg): print msg
+            @staticmethod
+            def warning(msg): print msg
+            @staticmethod
+            def error(msg): print msg
 
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'

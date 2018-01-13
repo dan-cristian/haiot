@@ -13,6 +13,8 @@ except Exception:
             def info(msg): print msg
             @staticmethod
             def warning(msg): print msg
+            @staticmethod
+            def error(msg): print msg
 
 
 disk_ntuple = namedtuple('partition',  'device mountpoint fstype')
