@@ -138,7 +138,7 @@ def _set_cam_attrib(camera):
             b = p[0].split(' Device ')
             camera.bus = b[0].split(' ')[1]
             camera.device = b[1]
-            p = p[1].split(' ').split(':')
+            p = p[1].split(' ')[0].split(':')
             camera.vendor = p[0]
             camera.prod = p[1]
             break
