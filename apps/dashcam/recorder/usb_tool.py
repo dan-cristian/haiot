@@ -1,5 +1,6 @@
 import subprocess
 import os
+from collections import namedtuple
 import sudo_usb
 try:
     from main.logger_helper import L
@@ -16,6 +17,7 @@ except Exception:
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
+Camera = namedtuple('Camera', 'name devpath audio bus device vendor prod')
 
 #def _get_usb_dev_root(dev_name):
 #    process = subprocess.Popen(['tail /sys/devices/platform/soc/*/*/*/*/product'],
@@ -40,50 +42,75 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 _v4l_root = '/dev/v4l/by-id/'
 
+
 # /dev/v4l/by-id/usb-046d_081b_5CB759A0-video-index0
 # /dev/v4l/by-id/usb-046d_HD_Webcam_C525_1B0A4790-video-index0
 # /dev/v4l/by-id/usb-HD_Camera_Manufacturer_HD_USB_Camera-video-index0
-def _get_first_usb_video_dev_id():
-    vendor = None
-    prod = None
-    if os.path.exists(_v4l_root):
-        for filename in os.listdir(_v4l_root):
-            if 'video' in filename:
-                p = filename.split('usb-')
-                if len(p) > 1:
-                    p = p[1].split('_')
-                    vendor = p[0]
-                    prod = p[1]
-                    break
-    return vendor, prod
+#def _get_first_usb_video_dev_id():
+#    vendor = None
+#    prod = None
+#    if os.path.exists(_v4l_root):
+#        for filename in os.listdir(_v4l_root):
+#            if 'video' in filename:
+#                p = filename.split('usb-')
+#                if len(p) > 1:
+#                    p = p[1].split('_')
+#                    vendor = p[0]
+#                    prod = p[1]
+#                    break
+#    return vendor, prod
 
 
-def get_usb_video_dev(cam_name):
-    res = None
-    if os.path.exists(_v4l_root):
-        for filename in os.listdir(_v4l_root):
-            if 'video' in filename:
-                res = _v4l_root + filename
-                L.l.info("Found usb cam at {}".format(res))
-                break
-        return res
-    else:
-        #L.l.info('No v4l folder, probably no usb vide device yet available')
-        return None
+#def get_usb_video_dev(cam_name):
+#    res = None
+#    if os.path.exists(_v4l_root):
+#        for filename in os.listdir(_v4l_root):
+#            if 'video' in filename:
+#                res = _v4l_root + filename
+#                L.l.info("Found usb cam at {}".format(res))
+#                break
+#        return res
+#    else:
+#        #L.l.info('No v4l folder, probably no usb vide device yet available')
+#        return None
 
 
 # card 1: C525 [HD Webcam C525], device 0: USB Audio [USB Audio]
 # card 1: U0x46d0x81b [USB Device 0x46d:0x81b], device 0: USB Audio [USB Audio]
-def get_usb_audio(cam_name):
-    dev_name = 'USB Audio'
+
+
+pass
+
+
+#**** List of CAPTURE Hardware Devices ****
+#card 0: C525 [HD Webcam C525], device 0: USB Audio [USB Audio]
+#  Subdevices: 1/1
+#  Subdevice #0: subdevice #0
+#card 1: U0x46d0x81b [USB Device 0x46d:0x81b], device 0: USB Audio [USB Audio]
+#  Subdevices: 1/1
+#  Subdevice #0: subdevice #0
+def _get_usb_audio(camera):
     res = None
     try:
         rec = subprocess.check_output(['arecord', '-l']).split('\n')
         for line in rec:
+            found = False
             if len(line) > 1:
                 atoms = line.split(',')
                 if len(atoms) > 1:
-                    if dev_name in atoms[1]:
+                    if camera.name in atoms[1]:
+                        found = True
+                    else:
+                        # try second detect method by vendor/prod id
+                        vendor = cam.vendor
+                        prod = cam.prod
+                        if vendor[0] == '0':
+                            vendor = '0x' + vendor[1]
+                        if prod[0] == '0':
+                            prod = '0x' + vendor[1]
+                        if vendor in atoms[1] and prod in atoms[1]:
+                            found = True
+                    if found:
                         hw_card = atoms[0].split(':')[0].split('card ')[1]
                         hw_dev = atoms[1].split(':')[0].split(' device ')[1]
                         res = '{},{}'.format(hw_card, hw_dev)
@@ -91,24 +118,48 @@ def get_usb_audio(cam_name):
                         break
     except Exception, ex:
         L.l.info("Got error when looking for audio interface, ex={}".format(ex))
+    camera.audio = res
     return res
+
+
+#Bus 001 Device 011: ID 046d:0826 Logitech, Inc. HD Webcam C525
+#Bus 001 Device 013: ID 19d2:0016 ZTE WCDMA Technologies MSM
+#Bus 001 Device 010: ID 05a3:9520 ARC International
+#Bus 001 Device 009: ID 046d:081b Logitech, Inc. Webcam C310
+#Bus 001 Device 003: ID 0424:ec00 Standard Microsystems Corp. SMSC9512/9514 Fast Ethernet Adapter
+#Bus 001 Device 002: ID 0424:9514 Standard Microsystems Corp. SMC9514 Hub
+#Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+def _set_cam_attrib(cam):
+    out = subprocess.check_output(['lsusb']).split('\n')
+    for line in out:
+        if cam.name in line:
+            p = line.split(": ID ")
+            # todo
+            b = p[0].split(' Device ')
+            cam.bus = b[0].split(' ')[1]
+            cam.device = b[1].split(' ')[1]
+            p = p[1].split(' ').split(':')
+            cam.vendor = p[0]
+            cam.prod = p[1]
+            break
+    cam.audio = _get_usb_audio(cam)
 
 
 # Bus 001 Device 049: ID 046d:081b Logitech, Inc. Webcam C310
 # Bus 001 Device 010: ID 046d:0826 Logitech, Inc. HD Webcam C525
 # Bus 001 Device 019: ID 05a3:9520 ARC International
-def get_usb_camera_name():
-    vendor, prod = _get_first_usb_video_dev_id()
-    camera_name = None
-    if vendor is not None:
-        out = subprocess.check_output(['lsusb']).split('\n')
-        for line in out:
-            if vendor in line and prod in line:
-                p = line.split(vendor + ":")
-                start = p[1].index(' ')
-                camera_name = p[1][start + 1:]
-                break
-    return camera_name
+#def get_usb_camera_name():
+#    vendor, prod = _get_first_usb_video_dev_id()
+#    camera_name = None
+#    if vendor is not None:
+#        out = subprocess.check_output(['lsusb']).split('\n')
+#        for line in out:
+#            if vendor in line and prod in line:
+#                p = line.split(vendor + ":")
+#                start = p[1].index(' ')
+#                camera_name = p[1][start + 1:]
+#                break
+#    return camera_name
 
 
 #UVC Camera (046d:081b) (usb-3f980000.usb-1.2):
@@ -120,14 +171,21 @@ def get_usb_camera_name():
 def get_usb_camera_list():
     res = {}
     cam_name = None
+    camera = None
     out = subprocess.check_output(['v4l2-ctl', '--list-devices']).split('\n')
     for line in out:
         if '/dev' not in line:
             a = line.split(' (usb')
-            cam_name = a[0]
+            # save previous cam
+            if camera is not None:
+                res[camera.name] = camera
+            camera = Camera(name=a[0])
         else:
-            dev = line.strip()
-            res[cam_name] = dev
+            camera.dev = line.strip()
+            _set_cam_attrib(camera)
+    # save previous cam
+    if camera is not None:
+        res[camera.name] = camera
     return res
 
 
@@ -145,9 +203,7 @@ def reset_usb(dev_name):
             L.l.error("Error for device=[{}] on reset_usb {}".format(dev_name, ex))
     return res
 
-if __name__ == '__main__':
-    #L.l.info(get_usb_dev('C525'))
-    #reset_usb('C525')
-    cam = get_usb_camera_name()
-    print cam
 
+if __name__ == '__main__':
+    for cam in get_usb_camera_list():
+        print cam
