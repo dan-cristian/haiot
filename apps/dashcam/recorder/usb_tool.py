@@ -38,7 +38,7 @@ def _get_usb_audio(camera):
                 found = False
                 atoms = line.split(',')
                 #if len(atoms) > 1:
-                if camera.name in atoms[1]:
+                if camera.name in atoms[0]:
                     found = True
                 else:
                     # try second detect method by vendor/prod id
