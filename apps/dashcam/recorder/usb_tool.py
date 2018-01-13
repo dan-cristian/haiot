@@ -48,7 +48,7 @@ def _get_usb_audio(camera):
                         vendor = '0x' + vendor[1]
                     if prod[0] == '0':
                         prod = '0x' + vendor[1]
-                    if vendor in atoms[1] and prod in atoms[1]:
+                    if vendor in atoms[0] and prod in atoms[0]:
                         found = True
                 if found:
                     hw_card = atoms[0].split(':')[0].split('card ')[1]
