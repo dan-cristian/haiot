@@ -87,7 +87,7 @@ def _set_cam_attrib(camera):
             camera.longname = p[1][start + 1:]
             break
     if camera.vendor is None:
-        L.l.info("Could no retrieve details for camera [{}], trying alternate".format(camera))
+        L.l.info("Could no retrieve details for camera [{}], trying alternate".format(camera.name))
         if not _set_attrib_alt(camera):
             L.l.warning("Could no retrieve alternate details for camera [{}]".format(camera))
     else:
@@ -95,7 +95,7 @@ def _set_cam_attrib(camera):
 
 
 def _set_attrib_alt(camera):
-    p1 = subprocess.Popen(['tail', '/sys/devices/platform/soc/*/*/*/*/product'], stdout=subprocess.PIPE)
+    p1 = subprocess.Popen(['tail', '/sys/devices/platform/soc/*/*/*/*/product'], stdout=subprocess.PIPE, shell=True)
     p2 = subprocess.Popen(['grep', '-B', '1', camera.name], stdin=p1.stdout, stdout=subprocess.PIPE,
                           stderr=subprocess.PIPE)
     p1.stdout.close()
@@ -130,9 +130,6 @@ def get_usb_camera_list():
     for line in out:
         if '/dev' not in line:
             a = line.split(' (usb')
-            # save previous cam
-            if camera is not None:
-                res[camera.name] = camera
             camera = Camera(name=a[0], longname=a[0], devpath=None, audio=None, bus=None, device=None, vendor=None,
                             prod=None)
             # try to detect vendor & prod for nasty cams
@@ -147,10 +144,8 @@ def get_usb_camera_list():
         else:
             camera.devpath = line.strip()
             _set_cam_attrib(camera)
+            res[camera.name] = camera
             L.l.info("Cam is {}".format(camera))
-    # save previous cam
-    if camera is not None:
-        res[camera.name] = camera
     return res
 
 
