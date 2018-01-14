@@ -59,8 +59,8 @@ def rule_alarm(obj=models.ZoneAlarm(), field_changed_list=None):
             msg = 'Alarm ON {}'.format(obj.alarm_pin_name)
             rule_common.notify_via_all(title=msg, message=msg, priority=3)
         if obj.alarm_pin_name == 'sonerie':
-            # thread.start_new_thread(rule_common.play_bell_local, ('SonnetteBasse.wav', ))
-            # rule_common.notify_via_all(title="Sonerie", message="Sonerie", priority=1)
+            thread.start_new_thread(rule_common.play_bell_local, ('SonnetteBasse.wav', ))
+            rule_common.notify_via_all(title="Sonerie", message="Sonerie", priority=1)
             pass
             # rule_common.send_notification(title="Sonerie", priority=2)
             # rule_common.send_chat(message="Sonerie", notify=True)
