@@ -105,9 +105,9 @@ def get_usb_camera_list():
     out = subprocess.check_output(['v4l2-ctl', '--list-devices']).split('\n')
     for line in out:
         if '/dev' not in line:
+            a = line.split(' (usb-')
             camera = Camera(name=a[0], longname=a[0], devpath=None, audio=None, bus=None, device=None, vendor=None,
                             prod=None)
-            a = line.split(' (usb-')
             b = a[1].split('-')
             soc = b[0]
             usb = b[1].split('):')[0]
