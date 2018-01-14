@@ -18,7 +18,7 @@ except Exception:
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
-Camera = recordtype('Camera', 'name devpath audio bus device vendor prod')
+Camera = recordtype('Camera', 'name longname devpath audio bus device vendor prod')
 _v4l_root = '/dev/v4l/by-id/'
 
 
@@ -46,20 +46,19 @@ def _get_usb_audio(camera):
                     prod = camera.prod
                     if vendor[0] == '0':
                         vendor = '0x' + vendor[1:]
-                        L.l.info("Vendor={}".format(vendor))
                     if prod[0] == '0':
                         prod = '0x' + prod[1:]
-                        L.l.info("Prod={}".format(prod))
                     if vendor in atoms[0] and prod in atoms[0]:
                         found = True
                 if found:
                     hw_card = atoms[0].split(':')[0].split('card ')[1]
                     hw_dev = atoms[1].split(':')[0].split(' device ')[1]
                     res = '{},{}'.format(hw_card, hw_dev)
-                    L.l.info("Found audio card {}".format(res))
+                    L.l.info("Found audio card {} for camera {}".format(res, camera.name))
                     break
                 else:
-                    L.l.info("Could not map camera {} to audio record entry {}".format(camera.name, line))
+                    #L.l.info("Could not map camera {} to audio record entry {}".format(camera.name, line))
+                    pass
     except Exception, ex:
         L.l.info("Got error when looking for audio interface, ex={}".format(ex))
     camera.audio = res
@@ -76,19 +75,45 @@ def _get_usb_audio(camera):
 def _set_cam_attrib(camera):
     out = subprocess.check_output(['lsusb']).split('\n')
     for line in out:
-        if camera.name in line:
+        if camera.name in line or (camera.vendor in line and camera.prod in line):
             p = line.split(": ID ")
             b = p[0].split(' Device ')
             camera.bus = b[0].split(' ')[1]
             camera.device = b[1]
-            p = p[1].split(' ')[0].split(':')
-            camera.vendor = p[0]
-            camera.prod = p[1]
+            v = p[1].split(' ')[0].split(':')
+            camera.vendor = v[0]
+            camera.prod = v[1]
+            start = p[1].index(' ')
+            camera.longname = p[1][start + 1:]
             break
     if camera.vendor is None:
-        L.l.error("Could no retrieve details for camera [{}]".format(camera))
+        L.l.info("Could no retrieve details for camera [{}], trying alternate".format(camera))
+        if not _set_attrib_alt(camera):
+            L.l.warning("Could no retrieve alternate details for camera [{}]".format(camera))
     else:
         camera.audio = _get_usb_audio(camera)
+
+
+def _set_attrib_alt(camera):
+    p1 = subprocess.Popen(['tail', '/sys/devices/platform/soc/*/*/*/*/product'], stdout=subprocess.PIPE)
+    p2 = subprocess.Popen(['grep', '-B', '1', camera.name], stdin=p1.stdout, stdout=subprocess.PIPE,
+                          stderr=subprocess.PIPE)
+    p1.stdout.close()
+    out, err = p2.communicate()
+    lines = out.split('\n')
+    res = False
+    if len(lines) > 0:
+        # ==> /sys/devices/platform/soc/3f980000.usb/usb1/1-1/1-1.5/product <==
+        line = lines[0].replace('==> ', '').replace(' <==', '').replace('product', '').strip()
+        vendor_path = line + "/idVendor"
+        prod_path = line + "/idProduct"
+        if os.path.isfile(vendor_path) and os.path.isfile(prod_path):
+            with open(vendor_path, 'r') as f:
+                camera.vendor = f.read().replace('\n', '')
+            with open(prod_path, 'r') as f:
+                camera.prod = f.read().replace('\n', '')
+            res = True
+    return res
 
 
 #UVC Camera (046d:081b) (usb-3f980000.usb-1.2):
@@ -108,7 +133,8 @@ def get_usb_camera_list():
             # save previous cam
             if camera is not None:
                 res[camera.name] = camera
-            camera = Camera(name=a[0], devpath=None, audio=None, bus=None, device=None, vendor=None, prod=None)
+            camera = Camera(name=a[0], longname=a[0], devpath=None, audio=None, bus=None, device=None, vendor=None,
+                            prod=None)
             # try to detect vendor & prod for nasty cams
             a = camera.name.split(':')
             if len(a) > 1:
