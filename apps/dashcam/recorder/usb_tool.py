@@ -75,7 +75,7 @@ def _get_usb_audio(camera):
 def _set_cam_attrib(camera):
     out = subprocess.check_output(['lsusb']).split('\n')
     for line in out:
-        if camera.name in line or (camera.vendor in line and camera.prod in line):
+        if camera.name in line or (camera.vendor is not None and (camera.vendor in line and camera.prod in line)):
             p = line.split(": ID ")
             b = p[0].split(' Device ')
             camera.bus = b[0].split(' ')[1]
