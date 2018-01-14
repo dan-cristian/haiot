@@ -39,8 +39,8 @@ def input_event(event):
     board_index = event.chip.hardware_addr
     direction = event.direction  # 0 for press/contact, 1 for release/disconnect
     gpio_pin_code = format_pin_code(board_index=board_index, pin_direction=Constant.GPIO_PIN_DIRECTION_IN, pin_index=pin_num)
-    if gpio_pin_code == 7:
-        L.l.info('Event piface gpio={} direction={}'.format(gpio_pin_code, direction))
+    #if gpio_pin_code == 7:
+    L.l.info('Event piface gpio={} direction={}'.format(gpio_pin_code, direction))
     dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio_pin_code, direction=Constant.GPIO_PIN_DIRECTION_IN,
                     pin_value=direction, pin_connected=(direction == 0))
 
