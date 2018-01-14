@@ -285,7 +285,7 @@ def _usb_init():
 
 
 def _usb_record_loop():
-    for cp in P.cam_param:
+    for cp in P.cam_param.itervalues():
         if cp.is_recording:
             cp.ffmpeg_proc.poll()
             if cp.ffmpeg_proc.returncode is not None:
