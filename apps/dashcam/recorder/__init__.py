@@ -231,7 +231,7 @@ def _usb_init():
         _usb_stop(cam.name)
     P.cam_list = usb_tool.get_usb_camera_list()
     L.l.info("Found {} USB cameras".format(len(P.cam_list)))
-    for cam in P.cam_list:
+    for cam in P.cam_list.itervalues():
         cp = CamParam(name=cam.name, is_on=True, is_recording=False, ffmpeg_proc=None, rec_filename=None,
                       pipe_std_path=None, pipe_err_path=None, std_pipe=None, err_pipe=None)
         cp.pipe_std_path = P.usb_out_filepath_std_template.replace('_x', cam.name)
