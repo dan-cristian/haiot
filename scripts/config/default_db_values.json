@@ -318,7 +318,8 @@
     {"zone_id":10 , "sensor_address": "1C0000000F99851D", "sensor_name": "utility beci"},
     {"zone_id":29 , "sensor_address": "AB0000000F60491D", "sensor_name": "water beci"},
     {"zone_id":4 , "sensor_address": "FB00000017413E3A", "sensor_name": "dormitor bedroom"},
-    {"zone_id":7 , "sensor_address": "C8000004F3495728", "sensor_name": "curte fata"}
+    {"zone_id":7 , "sensor_address": "C8000004F3495728", "sensor_name": "curte fata"},
+    {"zone_id":27 , "sensor_address": "02000004F31C1C28", "sensor_name": "pod fata", "alt_address": ""}
   ],
 
   "Utility": [
