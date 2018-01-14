@@ -276,6 +276,8 @@ def _usb_init():
                 L.l.info("Recording process not created for {}".format(cam.name))
         except Exception, ex:
             L.l.info("Unable to initialise USB camera, ex={}".format(ex))
+            traceback.print_exc()
+
     #else:
     #    L.l.info("No USB camera, recording cannot start")
 
