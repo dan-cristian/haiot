@@ -7,7 +7,7 @@ import shutil
 import usb_tool
 import uploader
 import utils
-from usb_tool import Camera
+from recordtype import recordtype
 from pydispatch import dispatcher
 try:
     from main.logger_helper import L
@@ -36,21 +36,24 @@ except Exception, ex:
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 initialised = False
 thread_tick = 1
+CamParam = recordtype(
+    'CamParam', 'name is_on is_recording ffmpeg_proc rec_filename pipe_std_path pipe_err_path std_pipe err_pipe')
 
 
 class P:
+    cam_list = {}  # detected camera list
+    cam_param = {}  # camera parameters
     ffmpeg_pi = None  # process encoding
-    ffmpeg_usb = {}  # list with usb process encoding
+    #ffmpeg_usb = {}  # list with usb process encoding
     segment_duration = 900  # in seconds
     is_recording_pi = False
-    is_recording_usb = {}
+    #is_recording_usb = {}
     is_one_recording_usb = False
-    is_pi_camera_on = True
     is_pi_camera_detected = True
-    is_usb_camera_on = True
+    is_recording_on = True
     is_one_usb_camera_detected = False
-    is_usb_camera_detected = {}
-    usb_sound_enabled = True
+    #is_usb_camera_detected = {}
+    #usb_sound_enabled = True
     usb_rotation_filter = [{'C525': 'vflip,'}]  # comma needed as suffix for flip filter
     pi_rotation_degree = 90
     root_mountpoint = '/'  # to check space available for recording
@@ -60,20 +63,20 @@ class P:
     dir_pipe_out = recordings_root + '/out/'
     pi_out_filename = recordings_root + '%Y-%m-%d_%H-%M-%S_pi.mkv'
     usb_out_filename_template = recordings_root + '%Y-%m-%d_%H-%M-%S_usb_x.mkv'  # x to be replaced with camera ID
-    usb_out_filename = {}
+    #usb_out_filename = {}
     pi_out_filepath_std = dir_pipe_out + 'pi.std'
     pi_out_filepath_err = dir_pipe_out + 'pi.err'
-    pi_out_std = None
-    pi_out_err = None
+    #pi_out_std = None
+    #pi_out_err = None
     usb_out_filepath_std_template = dir_pipe_out + 'usb_x.std'
     usb_out_filepath_err_template = dir_pipe_out + 'usb_x.err'
-    usb_out_filepath_std = {}
-    usb_out_filepath_err = {}
-    usb_out_std = {}
-    usb_out_err = {}
+    #usb_out_filepath_std = {}
+    #usb_out_filepath_err = {}
+    #usb_out_std = {}
+    #usb_out_err = {}
     #usb_camera_name = {}
-    usb_camera_dev_path = {}  # '/dev/video0'
-    usb_record_hw = {}  # '1:0'
+    #usb_camera_dev_path = {}  # '/dev/video0'
+    #usb_record_hw = {}  # '1:0'
     usb_max_resolution = '1280x720'
     pi_max_resolution = (1296, 972)
     win_camera_dev_name = "Integrated Camera"
@@ -128,36 +131,40 @@ def _run_ffmpeg_usb_win(no_sound=True):
 def _run_ffmpeg_usb(cam_name):
     L.l.info("Starting ffmpeg process for cam {}".format(cam_name))
     res = False
-    if P.ffmpeg_usb[cam_name] is None:
-        P.usb_out_std[cam_name] = open(P.usb_out_filepath_std[cam_name], 'w')
-        P.usb_out_err[cam_name] = open(P.usb_out_filepath_err[cam_name], 'w')
+    cp = P.cam_param[cam_name]
+    cam = P.cam_list[cam_name]
+    if cp.ffmpeg_proc is None:
+        cp.std_pipe = open(cp.pipe_std_path, 'w')
+        cp.err_pipe = open(cp.pipe_err_path, 'w')
+        #P.usb_out_std[cam_name] = open(P.usb_out_filepath_std[cam_name], 'w')
+        #P.usb_out_err[cam_name] = open(P.usb_out_filepath_err[cam_name], 'w')
+        #P.usb_record_hw[cam_name] = usb_tool.get_usb_audio(cam_name)  # P.usb_camera_keywords)
+        #P.usb_camera_dev_path[cam_name] = usb_tool.get_usb_video_dev(cam_name)  # P.usb_camera_keywords)
 
-        P.usb_record_hw[cam_name] = usb_tool.get_usb_audio(cam_name)  # P.usb_camera_keywords)
-        P.usb_camera_dev_path[cam_name] = usb_tool.get_usb_video_dev(cam_name)  # P.usb_camera_keywords)
-
-        if P.usb_camera_dev_path[cam_name] is None:
+        if cam.devpath is None:
             res = False
             L.l.error("No camera detected before starting USB recording")
         else:
-            if P.usb_record_hw[cam_name] is not None:
-                audio = ['-i', 'hw:{}'.format(P.usb_record_hw[cam_name])]
+            if cam.audio is not None:
+                audio = ['-i', 'hw:{}'.format(cam.audio)]
             else:
                 L.l.warning("USB audio not detected, starting record without audio")
                 audio = ['-an']
             # https://superuser.com/questions/578321/how-to-rotate-a-video-180-with-ffmpeg/578329#578329
-            if P.usb_camera_dev_path[cam_name] is not None:
-                P.ffmpeg_usb[cam_name] = subprocess.Popen(
-                    ['ffmpeg', '-y', '-f', 'alsa', '-thread_queue_size', '8192', '-ac', '1'] + audio +
-                    ['-r', str(P.usb_framerate),
-                     '-f', 'video4linux2', '-thread_queue_size', '8192', '-i', P.usb_camera_dev_path[cam_name],
-                     '-vf', P.usb_rotation_filter[cam_name] +
-                     'drawtext=text=\'%{localtime\:%c}\':fontcolor=white@0.8:fontsize=32:x=10:y=10',
-                     '-s', P.usb_max_resolution, "-c:v", "h264_omx", "-b:v", "2000k",
-                     '-frag_duration', '1000', '-f', 'segment', '-segment_time', str(P.segment_duration),
-                     '-reset_timestamps', '1', '-force_key_frames', 'expr:gte(t,n_forced*10)', '-strftime', '1',
-                     '-nostats', '-loglevel', 'info', P.usb_out_filename[cam_name]],
-                    stdin=subprocess.PIPE, stdout=P.usb_out_std[cam_name], stderr=P.usb_out_err[cam_name])
-                res = True
+            cp.ffmpeg_proc = subprocess.Popen(
+                ['ffmpeg', '-y', '-f', 'alsa', '-thread_queue_size', '8192', '-ac', '1'] + audio +
+                ['-r', str(P.usb_framerate),
+                 '-f', 'video4linux2', '-thread_queue_size', '8192', '-i', cam.devpath,
+                 '-vf', P.usb_rotation_filter[cam_name] +
+                 'drawtext=text=\'%{localtime\:%c}\':fontcolor=white@0.8:fontsize=32:x=10:y=10',
+                 '-s', P.usb_max_resolution, "-c:v", "h264_omx", "-b:v", "2000k",
+                 '-frag_duration', '1000', '-f', 'segment', '-segment_time', str(P.segment_duration),
+                 '-reset_timestamps', '1', '-force_key_frames', 'expr:gte(t,n_forced*10)', '-strftime', '1',
+                 '-nostats', '-loglevel', 'info', cp.rec_filename],
+                stdin=subprocess.PIPE, stdout=cp.std_pipe, stderr=cp.err_pipe)
+            res = True
+    else:
+        L.l.warning("ffmpeg not null on record start")
     return res
 
 
@@ -178,19 +185,20 @@ def _kill_proc(keywords):
 
 
 def _save_usb_err_output(cam_name):
-    src = P.usb_out_filepath_err[cam_name]
+    cp = P.cam_param[cam_name]
     # make a copy for debug
     L.l.info('Copy usb output file for debug')
-    shutil.copy(src, src + '.' + str(time.time()))
-    ferr = open(src)
+    shutil.copy(cp.out_err_path, cp.out_err_path + '.' + str(time.time()))
+    ferr = open(cp.out_err_path)
     contents = ferr.read()
     ferr.close()
     return contents
 
 
 def _recover_usb(cam_name):
+    cp = P.cam_param[cam_name]
     if P.usb_recover_count <= P.usb_recover_attempts_limit:
-        if not os.path.isfile(P.usb_out_filepath_err[cam_name]):
+        if not os.path.isfile(cp.out_err_path):
             L.l.info('Unknown USB error, no recent ffmpeg output found')
             usb_tool.reset_usb(cam_name)
             time.sleep(5)  # let camera to be detected
@@ -211,7 +219,7 @@ def _recover_usb(cam_name):
         P.usb_recover_count += 1
         if P.usb_recover_count == P.usb_recover_attempts_limit:
             P.usb_last_recovery_attempt = datetime.datetime.now()
-            P.is_usb_camera_on = False
+            P.is_recording_on = False
             L.l.info('Pausing USB recover attempts')
     else:
         if (datetime.datetime.now() - P.usb_last_recovery_attempt).total_seconds() > P.usb_recover_pause:
@@ -219,16 +227,26 @@ def _recover_usb(cam_name):
 
 
 def _usb_init():
-    cam_list = usb_tool.get_usb_camera_list()
-    for cam in cam_list:
-        P.usb_out_filepath_err[cam.name] = P.usb_out_filepath_err_template.replace('_x', cam.name)
-        P.usb_out_filename[cam.name] = P.usb_out_filename_template.replace('_x', cam.name)
-        if cam.name not in P.ffmpeg_usb:
-            P.ffmpeg_usb[cam.name] = None
-        if os.path.isfile(P.usb_out_filepath_err[cam.name]):
-            os.remove(P.usb_out_filepath_err[cam.name])
-        P.usb_camera_dev_path[cam.name] = cam.devpath
-        P.usb_record_hw[cam.name] = cam.audio
+    P.cam_list = usb_tool.get_usb_camera_list()
+    for cam in P.cam_list:
+        cp = CamParam(name=cam.name, is_on=True, is_recording=False, ffmpeg_proc=None, rec_filename=None,
+                      pipe_std_path=None, pipe_err_path=None, std_pipe=None, err_pipe=None)
+        cp.pipe_std_path = P.usb_out_filepath_std_template.replace('_x', cam.name)
+        cp.pipe_err_path = P.usb_out_filepath_err_template.replace('_x', cam.name)
+        cp.rec_filename = P.usb_out_filename_template.replace('_x', cam.name)
+
+        #P.usb_out_filepath_err[cam.name] = P.usb_out_filepath_err_template.replace('_x', cam.name)
+        #P.usb_out_filename[cam.name] = P.usb_out_filename_template.replace('_x', cam.name)
+        #if cam.name not in P.ffmpeg_usb:
+        #    P.ffmpeg_usb[cam.name] = None
+        if os.path.isfile(cp.out_err_path):
+            os.remove(cp.out_err_path)
+        #if os.path.isfile(P.usb_out_filepath_err[cam.name]):
+        #    os.remove(P.usb_out_filepath_err[cam.name])
+        #P.usb_camera_dev_path[cam.name] = cam.devpath
+        #P.usb_record_hw[cam.name] = cam.audio
+        P.cam_param[cam.name] = cp
+
         #if not P.is_one_usb_camera_detected:
         #    _recover_usb(cam_name)
         #if not P.is_usb_camera_detected[cam_name]:
@@ -239,15 +257,16 @@ def _usb_init():
         try:
             #P.usb_camera_name = usb_tool.get_usb_camera_name()
             L.l.info("Starting USB Recording on {}".format(cam.name))
-            _kill_proc(P.usb_out_filename[cam.name])
+            _kill_proc(cp.rec_filename)
             #if Constant.IS_OS_WINDOWS():
             #    _run_ffmpeg_usb_win()
             #else:
             _run_ffmpeg_usb(cam.name)
-            if P.ffmpeg_usb[cam.name] is not None and P.ffmpeg_usb[cam.name]._child_created:
+            if cp.ffmpeg_proc is not None and cp.ffmpeg_proc._child_created:
                 L.l.info("Recording started on {}".format(cam.name))
-                P.is_recording_usb[cam.name] = True
+                cp.is_recording = True
                 P.is_one_recording_usb = True
+                P.is_one_usb_camera_detected = True
             else:
                 L.l.info("Recording process not created for {}".format(cam.name))
         except Exception, ex:
@@ -257,21 +276,19 @@ def _usb_init():
 
 
 def _usb_record_loop():
-    if P.is_recording_usb:
-        for cam_name in P.ffmpeg_usb.iterkeys():
-            P.ffmpeg_usb[cam_name].poll()
-            if P.ffmpeg_usb[cam_name].returncode is not None:
-                L.l.info("usb record exit with code {}".format(P.ffmpeg_usb[cam_name].returncode))
-                if P.ffmpeg_usb[cam_name].returncode != 0:
-                    L.l.info("USB recording stopped")
-                    _save_usb_err_output(cam_name)
+    for cp in P.cam_param:
+        if cp.is_recording:
+            cp.ffmpeg_proc.poll()
+            if cp.ffmpeg_proc.returncode is not None:
+                L.l.info("USB record exit with code {}".format(cp.ffmpeg_proc.returncode))
+                if cp.ffmpeg_proc.returncode != 0:
+                    L.l.info("USB recording stopped for camera {}".format(cp.name))
+                    _save_usb_err_output(cp.name)
                 else:
-                    L.l.info("USB exit, not an error?")
-                _usb_stop(cam_name)
+                    L.l.info("USB exit, not an error for camera {}?".format(cp.name))
+                _usb_stop(cp.name)
             else:
                 pass
-    else:
-        L.l.info("USB not recording")
 
 
 def _pi_record_loop():
@@ -312,12 +329,12 @@ def _pi_init():
             if 'Camera is not enabled' in str(ex):
                 _has_picamera_module = False
                 P.is_pi_camera_detected = False
-                P.is_pi_camera_on = False
+                P.is_recording_on = False
                 L.l.error("PI camera not found, disabling the camera, no recording from now")
             L.l.info("Unable to initialise picamera, ex={}".format(ex))
     else:
         L.l.info("No picamera module, recording cannot start")
-        P.is_pi_camera_on = False
+        P.is_recording_on = False
 
 
 def _pi_stop():
@@ -352,37 +369,41 @@ def _pi_stop():
 
 def _usb_stop(cam_name):
     L.l.info("Stopping USB {}".format(cam_name))
-    P.is_recording_usb = False
-    if P.ffmpeg_usb is not None:
+    #cam = P.cam_list[cam_name]
+    cp = P.cam_param[cam_name]
+    #P.is_recording_usb = False
+    if cp.ffmpeg_proc is not None:
         try:
-            P.ffmpeg_usb[cam_name].terminate()
+            cp.ffmpeg_proc.terminate()
         except Exception:
             pass
-        del P.ffmpeg_usb[cam_name]
-        if cam_name in P.usb_out_std:
-            P.usb_out_std[cam_name].close()
-        if cam_name in P.usb_out_err:
-            P.usb_out_err[cam_name].close()
+        cp.ffmpeg_proc = None
+        if cp.std_pipe is not None:
+            cp.std_pipe.close()
+            cp.std_pipe = None
+        if cp.err_pipe is not None:
+            cp.err_pipe.close()
+            cp.err_pipe = None
 
 
 def _handle_event_alarm(zone_name, alarm_pin_name, pin_connected):
     L.l.info("Got alarm in {} name={} with pin connected {}".format(zone_name, alarm_pin_name, pin_connected))
     if alarm_pin_name == 'car vibrate':
         P.last_move_time = datetime.datetime.now()
-        P.is_usb_camera_on = True
+        P.is_recording_on = True
         P.usb_recover_count = 0
-        P.is_pi_camera_on = True
+        P.is_recording_on = True
     elif alarm_pin_name == 'pidash battery low':
         if not pin_connected:
             L.l.info("Battery is LOW")
-            P.is_usb_camera_on = False
-            P.is_pi_camera_on = False
+            P.is_recording_on = False
+            P.is_recording_on = False
         else:
             L.l.info("Battery is OK")
     elif alarm_pin_name == 'pidash low power':
         L.l.info("PI power is LOW")
-        P.is_usb_camera_on = False
-        P.is_pi_camera_on = False
+        P.is_recording_on = False
+        P.is_recording_on = False
         dispatcher.send(Constant.SIGNAL_EMAIL_NOTIFICATION, subject="Pidash power low", body="got low power signal")
 
 
@@ -391,8 +412,8 @@ def _set_camera_state():
     move_lapsed = (now - P.last_move_time).total_seconds()
     if (move_lapsed > P.inactivity_duration) and (P.is_recording_usb or P.is_recording_pi):
         L.l.info("Stopping cameras as no activity in the last {} seconds".format(move_lapsed))
-        P.is_pi_camera_on = False
-        P.is_usb_camera_on = False
+        P.is_recording_on = False
+        P.is_recording_on = False
 
 
 def unload():
@@ -419,9 +440,9 @@ def init():
     uploader.P.root_mountpoint = P.root_mountpoint
     uploader.P.std_out_folder = P.recordings_root + P.dir_pipe_out
     P.last_move_time = datetime.datetime.now()
-    if P.is_pi_camera_on:
+    if P.is_recording_on:
         _pi_init()
-    if P.is_usb_camera_on:
+    if P.is_recording_on:
         _usb_init()
     try:
         dispatcher.connect(_handle_event_alarm, signal=Constant.SIGNAL_ALARM, sender=dispatcher.Any)
@@ -438,28 +459,26 @@ def thread_run():
             L.l.warning("Detected clock adjustment")
         P.last_clock_time = datetime.datetime.now()
         _set_camera_state()
-        if P.is_pi_camera_on:
+        if P.is_recording_on:
             if P.is_recording_pi:
                 _pi_record_loop()
             else:
                 if P.is_pi_camera_detected:
                     L.l.info("Starting PI camera, should have been on")
                 _pi_init()
-        if P.is_usb_camera_on:
-            if P.is_recording_usb:
+            if P.is_one_recording_usb:
+                #if P.is_recording_usb:
                 _usb_record_loop()
             else:
                 if P.is_one_usb_camera_detected:  # stay silent if recovery failed
                     L.l.info("Starting USB camera, should have been on")
                 _usb_init()
-        if not P.is_pi_camera_on and P.is_recording_pi:
+        if not P.is_recording_on and P.is_recording_pi:
             L.l.info("Stopping PI recording")
             _pi_stop()
-        if not P.is_usb_camera_on and P.is_recording_usb:
+        if not P.is_recording_on and P.is_one_recording_usb:
             L.l.info("Stopping USB recording")
             _usb_stop()
-
-
     except Exception, ex:
         print "Error in recorder thread_run, ex={}".format(ex)
         print traceback.print_exc()
