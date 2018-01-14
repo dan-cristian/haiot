@@ -238,9 +238,9 @@ def _usb_init():
     for cam in P.cam_list.itervalues():
         cp = CamParam(name=cam.name, is_on=True, is_recording=False, ffmpeg_proc=None, rec_filename=None,
                       pipe_std_path=None, pipe_err_path=None, std_pipe=None, err_pipe=None)
-        cp.pipe_std_path = P.usb_out_filepath_std_template.replace('_x', cam.name)
-        cp.pipe_err_path = P.usb_out_filepath_err_template.replace('_x', cam.name)
-        cp.rec_filename = P.usb_out_filename_template.replace('_x', cam.name)
+        cp.pipe_std_path = P.usb_out_filepath_std_template.replace('_x', '_' + cam.name.strip())
+        cp.pipe_err_path = P.usb_out_filepath_err_template.replace('_x', '_' + cam.name.strip())
+        cp.rec_filename = P.usb_out_filename_template.replace('_x', '_' + cam.name.strip())
 
         #P.usb_out_filepath_err[cam.name] = P.usb_out_filepath_err_template.replace('_x', cam.name)
         #P.usb_out_filename[cam.name] = P.usb_out_filename_template.replace('_x', cam.name)
@@ -341,8 +341,8 @@ def _pi_init():
                 #P.is_recording_on = False
                 L.l.error("PI camera not found, disabling the camera, no recording from now")
             L.l.info("Unable to initialise picamera, ex={}".format(ex))
-    else:
-        L.l.info("No picamera module, recording cannot start")
+    #else:
+    #    L.l.info("No picamera module, recording cannot start")
 
 
 def _pi_stop():
