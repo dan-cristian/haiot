@@ -88,32 +88,8 @@ def _set_cam_attrib(camera):
             break
     if camera.vendor is None:
         L.l.info("Could no retrieve details for camera [{}], trying alternate".format(camera.name))
-        if not _set_attrib_alt(camera):
-            L.l.warning("Could no retrieve alternate details for camera [{}]".format(camera))
     else:
         camera.audio = _get_usb_audio(camera)
-
-
-def _set_attrib_alt(camera):
-    p1 = subprocess.Popen(['tail', '/sys/devices/platform/soc/*/*/*/*/product'], stdout=subprocess.PIPE, shell=True)
-    p2 = subprocess.Popen(['grep', '-B', '1', camera.name], stdin=p1.stdout, stdout=subprocess.PIPE,
-                          stderr=subprocess.PIPE)
-    p1.stdout.close()
-    out, err = p2.communicate()
-    lines = out.split('\n')
-    res = False
-    if len(lines) > 0:
-        # ==> /sys/devices/platform/soc/3f980000.usb/usb1/1-1/1-1.5/product <==
-        line = lines[0].replace('==> ', '').replace(' <==', '').replace('product', '').strip()
-        vendor_path = line + "/idVendor"
-        prod_path = line + "/idProduct"
-        if os.path.isfile(vendor_path) and os.path.isfile(prod_path):
-            with open(vendor_path, 'r') as f:
-                camera.vendor = f.read().replace('\n', '')
-            with open(prod_path, 'r') as f:
-                camera.prod = f.read().replace('\n', '')
-            res = True
-    return res
 
 
 #UVC Camera (046d:081b) (usb-3f980000.usb-1.2):
@@ -129,18 +105,31 @@ def get_usb_camera_list():
     out = subprocess.check_output(['v4l2-ctl', '--list-devices']).split('\n')
     for line in out:
         if '/dev' not in line:
-            a = line.split(' (usb')
             camera = Camera(name=a[0], longname=a[0], devpath=None, audio=None, bus=None, device=None, vendor=None,
                             prod=None)
-            # try to detect vendor & prod for nasty cams
-            a = camera.name.split(':')
-            if len(a) > 1:
-                v = a[0].split('(')
-                if len(v) > 1:
-                    camera.vendor = v[1]
-                    p = a[1].split(')')
-                    if len(p) > 1:
-                        camera.prod = p[0]
+            a = line.split(' (usb-')
+            b = a[1].split('-')
+            soc = b[0]
+            usb = b[1].split('):')[0]
+            # ==> /sys/devices/platform/soc/3f980000.usb/usb1/driver/1-1.3/product <==
+            alt_folder = '/sys/devices/platform/soc/{}/usb1/driver/1-{}/'.format(soc, usb)
+            vendor_path = alt_folder + "/idVendor"
+            prod_path = alt_folder + "/idProduct"
+            if os.path.isfile(vendor_path) and os.path.isfile(prod_path):
+                with open(vendor_path, 'r') as f:
+                    camera.vendor = f.read().replace('\n', '')
+                with open(prod_path, 'r') as f:
+                    camera.prod = f.read().replace('\n', '')
+            if camera.vendor is None or camera.prod is None:
+                # try to detect vendor & prod for nasty cams
+                a = camera.name.split(':')
+                if len(a) > 1:
+                    v = a[0].split('(')
+                    if len(v) > 1:
+                        camera.vendor = v[1]
+                        p = a[1].split(')')
+                        if len(p) > 1:
+                            camera.prod = p[0]
         else:
             camera.devpath = line.strip()
             _set_cam_attrib(camera)
