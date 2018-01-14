@@ -231,57 +231,38 @@ def _recover_usb(cam_name):
 
 
 def _usb_init():
-    for cam in P.cam_list:
-        _usb_stop(cam.name)
-    P.cam_list = usb_tool.get_usb_camera_list()
-    L.l.info("Found {} USB cameras".format(len(P.cam_list)))
-    for cam in P.cam_list.itervalues():
-        cp = CamParam(name=cam.name, is_on=True, is_recording=False, ffmpeg_proc=None, rec_filename=None,
-                      pipe_std_path=None, pipe_err_path=None, std_pipe=None, err_pipe=None)
-        cp.pipe_std_path = P.usb_out_filepath_std_template.replace('_x', '_' + cam.name.strip())
-        cp.pipe_err_path = P.usb_out_filepath_err_template.replace('_x', '_' + cam.name.strip())
-        cp.rec_filename = P.usb_out_filename_template.replace('_x', '_' + cam.name.strip())
-
-        #P.usb_out_filepath_err[cam.name] = P.usb_out_filepath_err_template.replace('_x', cam.name)
-        #P.usb_out_filename[cam.name] = P.usb_out_filename_template.replace('_x', cam.name)
-        #if cam.name not in P.ffmpeg_usb:
-        #    P.ffmpeg_usb[cam.name] = None
-        if os.path.isfile(cp.pipe_err_path):
-            os.remove(cp.pipe_err_path)
-        #if os.path.isfile(P.usb_out_filepath_err[cam.name]):
-        #    os.remove(P.usb_out_filepath_err[cam.name])
-        #P.usb_camera_dev_path[cam.name] = cam.devpath
-        #P.usb_record_hw[cam.name] = cam.audio
-        P.cam_param[cam.name] = cp
-
-        #if not P.is_one_usb_camera_detected:
-        #    _recover_usb(cam_name)
-        #if not P.is_usb_camera_detected[cam_name]:
-        #    L.l.info("USB camera [{}] not detected, recovering usb".format(cam_name))
-        #    _recover_usb(cam_name)
-        #    P.is_usb_camera_detected = (usb_tool.get_usb_video_dev(cam_name) is not None)
-    #if P.is_usb_camera_detected:
-        try:
-            #P.usb_camera_name = usb_tool.get_usb_camera_name()
-            L.l.info("Starting USB Recording on {}".format(cam.name))
-            _kill_proc(cp.rec_filename)
-            #if Constant.IS_OS_WINDOWS():
-            #    _run_ffmpeg_usb_win()
-            #else:
-            _run_ffmpeg_usb(cam.name)
-            if cp.ffmpeg_proc is not None and cp.ffmpeg_proc._child_created:
-                L.l.info("Recording started on {}".format(cam.name))
-                cp.is_recording = True
-                P.is_one_recording_usb = True
-                P.is_one_usb_camera_detected = True
-            else:
-                L.l.info("Recording process not created for {}".format(cam.name))
-        except Exception, ex:
-            L.l.info("Unable to initialise USB camera, ex={}".format(ex))
-            traceback.print_exc()
-
-    #else:
-    #    L.l.info("No USB camera, recording cannot start")
+    #for cam in P.cam_list:
+    #    _usb_stop(cam.name)
+    new_cam_list = usb_tool.get_usb_camera_list()
+    L.l.info("Found {} USB cameras".format(len(P.new_cam_list)))
+    for cam in new_cam_list.itervalues():
+        if cam.name not in P.cam_list:
+            L.l.info("Initialising new USB cam {}".format(cam.name))
+            cp = CamParam(name=cam.name, is_on=True, is_recording=False, ffmpeg_proc=None, rec_filename=None,
+                          pipe_std_path=None, pipe_err_path=None, std_pipe=None, err_pipe=None)
+            cp.pipe_std_path = P.usb_out_filepath_std_template.replace('_x', '_' + cam.name.strip().replace(' ', '_'))
+            cp.pipe_err_path = P.usb_out_filepath_err_template.replace('_x', '_' + cam.name.strip().replace(' ', '_'))
+            cp.rec_filename = P.usb_out_filename_template.replace('_x', '_' + cam.name.strip().replace(' ', '_'))
+            if os.path.isfile(cp.pipe_err_path):
+                os.remove(cp.pipe_err_path)
+            P.cam_param[cam.name] = cp
+            try:
+                L.l.info("Starting USB Recording on {}".format(cam.name))
+                _kill_proc(cp.rec_filename)
+                #if Constant.IS_OS_WINDOWS():
+                #    _run_ffmpeg_usb_win()
+                #else:
+                _run_ffmpeg_usb(cam.name)
+                if cp.ffmpeg_proc is not None and cp.ffmpeg_proc._child_created:
+                    L.l.info("Recording started on {}".format(cam.name))
+                    cp.is_recording = True
+                    P.is_one_recording_usb = True
+                    P.is_one_usb_camera_detected = True
+                else:
+                    L.l.info("Recording process not created for {}".format(cam.name))
+            except Exception, ex:
+                L.l.info("Unable to initialise USB camera, ex={}".format(ex))
+                traceback.print_exc()
 
 
 def _usb_record_loop():
