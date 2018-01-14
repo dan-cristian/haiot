@@ -101,7 +101,7 @@ def _upload_file(file_path, file_date):
     P.current_upload_file = file_path
     # rsync -avrPe 'ssh -p 22 -T -c arcfour -o Compression=no -x ' 2017-12-25_13-26-08_pi.mp4 haiot@$192.168.0.9://mnt/motion/tmp/timelapse/dashcam
     res = subprocess.check_output(['rsync -avrPe "ssh -p ' + P.port + ' -T -c arcfour -o Compression=no -x" ' +
-                                   file_path + ' ' + P.server + ':' + P.dest_folder + subfolder], shell=True)
+                                   '"' + file_path + '" ' + P.server + ':' + P.dest_folder + subfolder], shell=True)
     duration_min = (time.time() - start) / 60
     L.l.info('Uploaded file {}, res=[{}], duration in mins={}'.format(file_path, res, duration_min))
     P.current_upload_file = None
