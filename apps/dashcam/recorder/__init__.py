@@ -238,6 +238,7 @@ def _usb_init():
     for cam in new_cam_list.itervalues():
         if cam.name not in P.cam_list:
             L.l.info("Initialising new USB cam {}".format(cam.name))
+            P.cam_list[cam.name] = cam
             cp = CamParam(name=cam.name, is_on=True, is_recording=False, ffmpeg_proc=None, rec_filename=None,
                           pipe_std_path=None, pipe_err_path=None, std_pipe=None, err_pipe=None)
             cp.pipe_std_path = P.usb_out_filepath_std_template.replace('_x', '_' + cam.name.strip().replace(' ', '_'))
