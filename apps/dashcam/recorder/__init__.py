@@ -227,7 +227,10 @@ def _recover_usb(cam_name):
 
 
 def _usb_init():
+    for cam in P.cam_list:
+        _usb_stop(cam.name)
     P.cam_list = usb_tool.get_usb_camera_list()
+    L.l.info("Found {} USB cameras".format(len(P.cam_list)))
     for cam in P.cam_list:
         cp = CamParam(name=cam.name, is_on=True, is_recording=False, ffmpeg_proc=None, rec_filename=None,
                       pipe_std_path=None, pipe_err_path=None, std_pipe=None, err_pipe=None)
@@ -441,8 +444,9 @@ def init():
     uploader.P.std_out_folder = P.recordings_root + P.dir_pipe_out
     P.last_move_time = datetime.datetime.now()
     if P.is_recording_on:
+        L.l.info("Initialising PI camera")
         _pi_init()
-    if P.is_recording_on:
+        L.l.info("Initialising USB cameras")
         _usb_init()
     try:
         dispatcher.connect(_handle_event_alarm, signal=Constant.SIGNAL_ALARM, sender=dispatcher.Any)
