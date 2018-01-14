@@ -205,6 +205,7 @@
     {"id":11, "area_id":"1", "zone_id":"29"},
     {"id":12, "area_id":"1", "zone_id":"47"},
     {"id":13, "area_id":"50", "zone_id":"200"},
+    {"id":14, "area_id":"6", "zone_id":"7"},
     {"id":200, "area_id":"2", "zone_id":"3"},
     {"id":201, "area_id":"2", "zone_id":"9"},
     {"id":300, "area_id":"3", "zone_id":"1"},
