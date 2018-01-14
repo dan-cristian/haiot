@@ -54,7 +54,9 @@ class P:
     is_one_usb_camera_detected = False
     #is_usb_camera_detected = {}
     #usb_sound_enabled = True
-    usb_rotation_filter = [{'C525': 'vflip,'}]  # comma needed as suffix for flip filter
+
+    # comma needed as suffix for flip filter
+    usb_rotation_filter = [{'HD Webcam C525': 'vflip,'}, {'UVC Camera (046d:081b)': ''}, {'HD USB Camera': ''}]
     pi_rotation_degree = 90
     root_mountpoint = '/'  # to check space available for recording
     recordings_root = '/home/haiot/recordings/'  # recording is stored here
