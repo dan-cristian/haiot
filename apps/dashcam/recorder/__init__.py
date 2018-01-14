@@ -234,7 +234,7 @@ def _usb_init():
     #for cam in P.cam_list:
     #    _usb_stop(cam.name)
     new_cam_list = usb_tool.get_usb_camera_list()
-    L.l.info("Found {} USB cameras".format(len(P.new_cam_list)))
+    L.l.info("Found {} USB cameras".format(len(new_cam_list)))
     for cam in new_cam_list.itervalues():
         if cam.name not in P.cam_list:
             L.l.info("Initialising new USB cam {}".format(cam.name))
