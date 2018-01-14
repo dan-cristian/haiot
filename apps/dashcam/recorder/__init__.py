@@ -242,8 +242,8 @@ def _usb_init():
         #P.usb_out_filename[cam.name] = P.usb_out_filename_template.replace('_x', cam.name)
         #if cam.name not in P.ffmpeg_usb:
         #    P.ffmpeg_usb[cam.name] = None
-        if os.path.isfile(cp.out_err_path):
-            os.remove(cp.out_err_path)
+        if os.path.isfile(cp.pipe_err_path):
+            os.remove(cp.pipe_err_path)
         #if os.path.isfile(P.usb_out_filepath_err[cam.name]):
         #    os.remove(P.usb_out_filepath_err[cam.name])
         #P.usb_camera_dev_path[cam.name] = cam.devpath
