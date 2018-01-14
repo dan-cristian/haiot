@@ -54,7 +54,6 @@ class P:
     is_one_usb_camera_detected = False
     #is_usb_camera_detected = {}
     #usb_sound_enabled = True
-
     # comma needed as suffix for flip filter
     usb_rotation_filter = {'HD Webcam C525': 'vflip,', 'UVC Camera (046d:081b)': '', 'HD USB Camera': ''}
     pi_rotation_degree = 90
@@ -152,13 +151,16 @@ def _run_ffmpeg_usb(cam_name):
             else:
                 L.l.warning("USB audio not detected, starting record without audio")
                 audio = ['-an']
+            if cam_name in P.usb_rotation_filter:
+                rotation = P.usb_rotation_filter[cam_name]
+            else:
+                L.l.info("No specific rotation setting for camera {}, assuming none".format(cam_name))
+                rotation = ''
             # https://superuser.com/questions/578321/how-to-rotate-a-video-180-with-ffmpeg/578329#578329
             cp.ffmpeg_proc = subprocess.Popen(
                 ['ffmpeg', '-y', '-f', 'alsa', '-thread_queue_size', '8192', '-ac', '1'] + audio +
-                ['-r', str(P.usb_framerate),
-                 '-f', 'video4linux2', '-thread_queue_size', '8192', '-i', cam.devpath,
-                 '-vf', P.usb_rotation_filter[cam_name] +
-                 'drawtext=text=\'%{localtime\:%c}\':fontcolor=white@0.8:fontsize=32:x=10:y=10',
+                ['-r', str(P.usb_framerate), '-f', 'video4linux2', '-thread_queue_size', '8192', '-i', cam.devpath,
+                 '-vf', rotation + 'drawtext=text=\'%{localtime\:%c}\':fontcolor=white@0.8:fontsize=32:x=10:y=10',
                  '-s', P.usb_max_resolution, "-c:v", "h264_omx", "-b:v", "2000k",
                  '-frag_duration', '1000', '-f', 'segment', '-segment_time', str(P.segment_duration),
                  '-reset_timestamps', '1', '-force_key_frames', 'expr:gte(t,n_forced*10)', '-strftime', '1',
@@ -336,12 +338,11 @@ def _pi_init():
             if 'Camera is not enabled' in str(ex):
                 _has_picamera_module = False
                 P.is_pi_camera_detected = False
-                P.is_recording_on = False
+                #P.is_recording_on = False
                 L.l.error("PI camera not found, disabling the camera, no recording from now")
             L.l.info("Unable to initialise picamera, ex={}".format(ex))
     else:
         L.l.info("No picamera module, recording cannot start")
-        P.is_recording_on = False
 
 
 def _pi_stop():
@@ -432,7 +433,9 @@ def unload():
 
 
 def init():
-    global initialised
+    global initialised, _has_picamera_module
+    if not _has_picamera_module:
+        P.is_pi_camera_detected = False
     P.last_clock_time = datetime.datetime.now()
     if not os.path.exists(P.recordings_root):
         os.makedirs(P.recordings_root)
@@ -448,8 +451,9 @@ def init():
     uploader.P.std_out_folder = P.recordings_root + P.dir_pipe_out
     P.last_move_time = datetime.datetime.now()
     if P.is_recording_on:
-        L.l.info("Initialising PI camera")
-        _pi_init()
+        if P.is_pi_camera_detected:
+            L.l.info("Initialising PI camera")
+            _pi_init()
         L.l.info("Initialising USB cameras")
         _usb_init()
     try:
