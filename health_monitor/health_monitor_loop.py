@@ -521,13 +521,12 @@ def _read_battery_power():
     if not _import_ina_failed:
         try:
             ina = INA219(shunt_ohms=0.1, address=0x40)
-            ina.configure(voltage_range=ina.RANGE_16V, gain=ina.GAIN_AUTO,
-                          bus_adc=ina.ADC_4SAMP, shunt_adc=ina.ADC_4SAMP)
+            ina.configure(voltage_range=ina.RANGE_16V, gain=ina.GAIN_AUTO)  #, bus_adc=ina.ADC_4SAMP, shunt_adc=ina.ADC_4SAMP)
             voltage = ina.voltage()
             current = ina.current()
             power = ina.power()
-            dispatcher.send(signal=Constant.SIGNAL_BATTERY_STAT,
-                            battery="INA", voltage=voltage, current=current, power=power)
+            dispatcher.send(signal=Constant.SIGNAL_BATTERY_STAT, battery="INA",
+                            voltage=voltage, current=current, power=power)
         except ImportError, imp:
             L.l.info("INA module not available on this system, ex={}".format(imp))
             _import_ina_failed = True
