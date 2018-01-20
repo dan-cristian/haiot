@@ -5,11 +5,14 @@ import shutil
 import time
 import math
 import datetime
+from pydispatch import dispatcher
 from collections import OrderedDict
 from main.logger_helper import L
 from common import Constant, utils
 from main.admin import model_helper, models
 from main import logger_helper
+from ina219 import INA219
+#from ina219 import DeviceRangeError
 
 __author__ = 'dcristian'
 
@@ -32,6 +35,7 @@ ERR_TEXT_NO_DEV = 'failed: No such device'
 ERR_TEXT_NO_DEV_2 = 'HDIO_GET_32BIT failed: Invalid argument'
 ERR_TEXT_NO_DEV_3 = 'Unknown USB bridge'
 
+_import_ina_failed = False
 
 # http://unix.stackexchange.com/questions/18830/how-to-run-a-specific-program-as-root-without-a-password-prompt
 # Cmnd alias specification
@@ -46,7 +50,7 @@ ERR_TEXT_NO_DEV_3 = 'Unknown USB bridge'
 # %dialout  ALL=(ALL) NOPASSWD: SMARTCTL
 # %dialout  ALL=(ALL) NOPASSWD: HDPARM
 
-def __read_all_hdd_smart():
+def _read_all_hdd_smart():
     output = cStringIO.StringIO()
     current_disk_valid = True
     disk_letter = 'a'
@@ -357,7 +361,7 @@ def __get_cpu_temperature():
     return temp
 
 
-def __read_system_attribs():
+def _read_system_attribs():
     global import_module_psutil_exist, progress_status
     try:
         record = models.SystemMonitor()
@@ -450,7 +454,7 @@ Description:
 '''
 
 
-def __read_disk_stats():
+def _read_disk_stats():
     if Constant.IS_OS_LINUX():
         with open('/proc/diskstats') as f:
             for line in f:
@@ -512,6 +516,26 @@ def __read_disk_stats():
                         'Unexpected lower number of split atoms={} in diskstat={}'.format(len(words), line))
 
 
+def _read_battery_power():
+    global _import_ina_failed
+    if not _import_ina_failed:
+        SHUNT_OHMS = 0.1
+        MAX_EXPECTED_AMPS = 2
+        try:
+            ina = INA219(SHUNT_OHMS, MAX_EXPECTED_AMPS)
+            ina.configure(voltage_range=ina.RANGE_16V, bus_adc=ina.ADC_128SAMP, shunt_adc=ina.ADC_128SAMP)
+            voltage = ina.voltage()
+            current = ina.current()
+            power = ina.power()
+            dispatcher.send(signal=Constant.SIGNAL_BATTERY_STAT,
+                            battery="INA", voltage=voltage, current=current, power=power)
+        except ImportError, imp:
+            L.l.info("INA module not available on this system, ex={}".format(imp))
+            _import_ina_failed = True
+        except Exception, ex:
+            L.l.error("Current out of device range with specified shunt resister, ex={}".format(ex))
+
+
 def init():
     pass
 
@@ -527,12 +551,13 @@ def get_progress():
 def thread_run():
     global progress_status, import_module_psutil_exist
     progress_status = 'reading hdd smart attribs'
-    __read_all_hdd_smart()
+    _read_all_hdd_smart()
     progress_status = 'reading system attribs'
-    __read_system_attribs()
+    _read_system_attribs()
     progress_status = 'reading disk stats'
-    __read_disk_stats()
-    progress_status = 'checking log size'
+    _read_disk_stats()
+    #progress_status = 'checking log size'
     # not needed if RotatingFileHandler if used for logging
     # __check_log_file_size()
+    _read_battery_power()
     progress_status = 'completed'
