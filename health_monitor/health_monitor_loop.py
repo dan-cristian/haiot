@@ -519,11 +519,10 @@ def _read_disk_stats():
 def _read_battery_power():
     global _import_ina_failed
     if not _import_ina_failed:
-        SHUNT_OHMS = 0.1
-        MAX_EXPECTED_AMPS = 2
         try:
-            ina = INA219(SHUNT_OHMS, MAX_EXPECTED_AMPS)
-            ina.configure(voltage_range=ina.RANGE_16V, bus_adc=ina.ADC_128SAMP, shunt_adc=ina.ADC_128SAMP)
+            ina = INA219(shunt_ohms=0.1, address=0x40)
+            ina.configure(voltage_range=ina.RANGE_16V, gain=ina.GAIN_AUTO,
+                          bus_adc=ina.ADC_4SAMP, shunt_adc=ina.ADC_4SAMP)
             voltage = ina.voltage()
             current = ina.current()
             power = ina.power()
