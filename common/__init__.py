@@ -29,6 +29,7 @@ class Constant:
     SIGNAL_PRESENCE = 'signal-presence'
     SIGNAL_ALARM='signal-alarm'
     SIGNAL_STORABLE_RECORD = 'signal-storable-record'
+    SIGNAL_BATTERY_STAT = 'signal-battery-stat'
 
     PRESENCE_TYPE_CAM = 'cam'
     
