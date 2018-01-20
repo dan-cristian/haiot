@@ -4,3 +4,4 @@ RPi.GPIO
 gpsd-py3
 pygame
 smbus2
+pi-ina219
