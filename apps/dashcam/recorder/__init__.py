@@ -94,7 +94,7 @@ class P:
     usb_recover_attempts_limit = 5  # number of recovery attempts before pausing
     usb_recover_pause = 600  # pause x seconds between usb recovery attempts
     usb_last_recovery_attempt = datetime.datetime.min
-
+    usb_last_cam_detect_attempt = datetime.datetime.min
 
 def _get_win_cams():
     pass
@@ -233,6 +233,10 @@ def _recover_usb(cam_name):
 def _usb_init():
     #for cam in P.cam_list:
     #    _usb_stop(cam.name)
+    delta = (datetime.datetime.now() - P.usb_last_cam_detect_attempt).total_seconds()
+    if delta <= P.usb_recover_pause:
+        return
+    P.usb_last_cam_detect_attempt = datetime.datetime.now()
     new_cam_list = usb_tool.get_usb_camera_list()
     L.l.info("Found {} USB cameras".format(len(new_cam_list)))
     for cam in new_cam_list.itervalues():
