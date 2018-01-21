@@ -48,26 +48,30 @@ def disk_partitions(all_part=False):
     """
     #https://stackoverflow.com/questions/4260116/find-size-and-free-space-of-the-filesystem-containing-a-given-file
     phydevs = []
-    f = open("/proc/filesystems", "r")
-    for line in f:
-        if not line.startswith("nodev"):
-            phydevs.append(line.strip())
-
     retlist = []
-    f = open('/etc/mtab', "r")
-    for line in f:
-        if not all_part and line.startswith('none'):
-            continue
-        fields = line.split()
-        device = fields[0]
-        mountpoint = fields[1]
-        fstype = fields[2]
-        if not all_part and fstype not in phydevs:
-            continue
-        if device == 'none':
-            device = ''
-        ntuple = disk_ntuple(device, mountpoint, fstype)
-        retlist.append(ntuple)
+    fs = "/proc/filesystems"
+    if os.path.isfile(fs):
+        f = open(fs, "r")
+        for line in f:
+            if not line.startswith("nodev"):
+                phydevs.append(line.strip())
+        f = open('/etc/mtab', "r")
+        for line in f:
+            if not all_part and line.startswith('none'):
+                continue
+            fields = line.split()
+            if len(fields) >= 3:
+                device = fields[0]
+                mountpoint = fields[1]
+                fstype = fields[2]
+                if not all_part and fstype not in phydevs:
+                    continue
+                if device == 'none':
+                    device = ''
+                ntuple = disk_ntuple(device, mountpoint, fstype)
+                retlist.append(ntuple)
+    else:
+        L.l.error("Unable to read disk partitions due to missing file {}".format(fs))
     return retlist
 
 
