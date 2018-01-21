@@ -581,6 +581,27 @@ class Ups(db.Model, graphs.UpsGraph, DbEvent, DbBase):
         return '{} {} {}'.format(self.id, self.name, self.updated_on)
 
 
+class PowerMonitor(db.Model, graphs.UpsGraph, DbEvent, DbBase):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True)
+    type = db.Column(db.String(50))  # INA, etc
+    host_name = db.Column(db.String(50))
+    voltage = db.Column(db.Float)  # volts
+    current = db.Column(db.Float)  # miliamps
+    power = db.Column(db.Float)
+    max_voltage = db.Column(db.Float)
+    warn_voltage = db.Column(db.Float)
+    critical_voltage = db.Column(db.Float)
+    min_voltage = db.Column(db.Float)
+    warn_current = db.Column(db.Integer)
+    critical_current = db.Column(db.Integer)
+    i2c_addr = db.Column(db.String(50))
+    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
+
+    def __repr__(self):
+        return '{} {} {}'.format(self.id, self.name, self.updated_on)
+
+
 class SystemDisk(db.Model, graphs.SystemDiskGraph, DbEvent, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     serial = db.Column(db.String(50), unique=True)

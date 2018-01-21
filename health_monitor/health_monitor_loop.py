@@ -12,7 +12,7 @@ from common import Constant, utils
 from main.admin import model_helper, models
 from main import logger_helper
 from ina219 import INA219
-#from ina219 import DeviceRangeError
+from ina219 import DeviceRangeError
 
 __author__ = 'dcristian'
 
@@ -49,6 +49,11 @@ _import_ina_failed = False
 # %users  ALL=(ALL) NOPASSWD: HDPARM
 # %dialout  ALL=(ALL) NOPASSWD: SMARTCTL
 # %dialout  ALL=(ALL) NOPASSWD: HDPARM
+
+
+class P:
+    power_monitor_ina_addr = []  # [[bat_name, bat_addr], []]
+
 
 def _read_all_hdd_smart():
     output = cStringIO.StringIO()
@@ -519,23 +524,34 @@ def _read_disk_stats():
 def _read_battery_power():
     global _import_ina_failed
     if not _import_ina_failed:
-        try:
-            ina = INA219(shunt_ohms=0.1, address=0x40)
-            ina.configure(voltage_range=ina.RANGE_16V, gain=ina.GAIN_AUTO)  #, bus_adc=ina.ADC_4SAMP, shunt_adc=ina.ADC_4SAMP)
-            voltage = ina.voltage()
-            current = ina.current()
-            power = ina.power()
-            dispatcher.send(signal=Constant.SIGNAL_BATTERY_STAT, battery="INA",
-                            voltage=voltage, current=current, power=power)
-        except ImportError, imp:
-            L.l.info("INA module not available on this system, ex={}".format(imp))
-            _import_ina_failed = True
-        except Exception, ex:
-            L.l.error("Current out of device range with specified shunt resister, ex={}".format(ex))
+        for addr in P.power_monitor_ina_addr:
+            try:
+                ina = INA219(shunt_ohms=0.1, address=addr[1])
+                ina.configure(voltage_range=ina.RANGE_16V, gain=ina.GAIN_AUTO)  #, bus_adc=ina.ADC_4SAMP, shunt_adc=ina.ADC_4SAMP)
+                voltage = ina.voltage()
+                current = ina.current()
+                power = ina.power()
+                dispatcher.send(signal=Constant.SIGNAL_BATTERY_STAT, battery_name=addr[0],
+                                voltage=voltage, current=current, power=power)
+            except ImportError, imp:
+                L.l.info("INA module not available on this system, ex={}".format(imp))
+                _import_ina_failed = True
+            except DeviceRangeError, ex:
+                L.l.error("Current out of device range with specified shunt resister, ex={}".format(ex))
+            except Exception, ex:
+                L.l.info("INA board not available on this system, ex={}".format(ex))
+                _import_ina_failed = True
 
 
 def init():
-    pass
+    power_list = models.PowerMonitor().query_all()
+    for power in power_list:
+        if power.host_name == Constant.HOST_NAME:
+            if "ina" in power.type:
+                addr = hex(int(power.i2c_addr, 16) + 0x200)
+                P.power_monitor_ina_addr.append([power.name, addr])
+            else:
+                L.l.warning("Unknown power monitor type {}, name={}".format(power.type, power.name))
 
 
 progress_status = None
