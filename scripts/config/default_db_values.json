@@ -238,8 +238,8 @@
   ],
 
   "PowerMonitor": [
-    {"id":1, "name":"dashcam lipo", "type":"ina", "i2c_addr":"41", "host_name":"pidash", "max_voltage":4.2, "warn_voltage":3.2, "critical_voltage":3.1, "min_voltage":3, "warn_current":900, "critical_current":1000},
-    {"id":2, "name":"dashcam car", "type":"ina", "i2c_addr":"40", "host_name":"pidash", "max_voltage":14.7, "warn_voltage":12.5, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000}
+    {"id":1, "name":"dashcam lipo", "type":"ina", "i2c_addr":"0x41", "host_name":"pidash", "max_voltage":4.2, "warn_voltage":3.2, "critical_voltage":3.1, "min_voltage":3, "warn_current":900, "critical_current":1000},
+    {"id":2, "name":"dashcam car", "type":"ina", "i2c_addr":"0x40", "host_name":"pidash", "max_voltage":14.7, "warn_voltage":12.5, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000}
   ],
 
   "TemperatureTarget": [
