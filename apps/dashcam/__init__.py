@@ -40,14 +40,14 @@ def unload():
 def _battery_stat(battery_name, voltage, current, power):
     if battery_name in P.power_monitor_list:
         power_monitor = P.power_monitor_list[battery_name]
-        if voltage <= power_monitor.warn_voltage:
-            L.l.warning("Battery voltage is very low at {}".format(voltage))
-            pass
         if voltage <= power_monitor.critical_voltage:
-            L.l.warning("Battery voltage is too low at {}".format(voltage))
+            L.l.warning("Battery {} voltage is too low at {}".format(battery_name, voltage))
             # shutdown_system
+        if voltage <= power_monitor.warn_voltage:
+            L.l.warning("Battery {} voltage is very low at {}".format(battery_name, voltage))
+            pass
         if current >= power_monitor.warn_current:
-            L.l.warning("Battery current used is very high at {}".format(current))
+            L.l.warning("Battery {} current used is very high at {}".format(battery_name, current))
             pass
         L.l.info("Battery {} v={} c={} p={}".format(battery_name, voltage, current, power))
     else:
