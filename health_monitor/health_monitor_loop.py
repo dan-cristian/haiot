@@ -548,7 +548,7 @@ def init():
     for power in power_list:
         if power.host_name == Constant.HOST_NAME:
             if "ina" in power.type:
-                addr = hex(int(power.i2c_addr, 16) + 0x200)
+                addr = int(power.i2c_addr, 16)
                 P.power_monitor_ina_addr.append([power.name, addr])
             else:
                 L.l.warning("Unknown power monitor type {}, name={}".format(power.type, power.name))
