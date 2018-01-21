@@ -237,6 +237,11 @@
     {"relay_pin_name": "front_valve_relay", "zone_id": "7", "gpio_pin_code": "4", "gpio_host_name": "pi-power"}
   ],
 
+  "PowerMonitor": [
+    {"id":1, "name":"dashcam lipo", "type":"ina", "i2c_addr":"0x41", "host_name":"pidash", "max_voltage":4.2, "warn_voltage":3.2, "critical_voltage":3.1, "min_voltage":3, "warn_current":900, "critical_current":1000},
+    {"id":2, "name":"dashcam car", "type":"ina", "i2c_addr":"0x40", "host_name":"pidash", "max_voltage":14.7, "warn_voltage":12.5, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000}
+  ],
+
   "TemperatureTarget": [
     {"code":".", "target":"18"},
     {"code":"0", "target":"20"},
@@ -361,7 +366,7 @@
 
     {"zone_id":7 , "gpio_pin_code":"1", "gpio_host_name": "pi-face", "alarm_pin_name": "portita", "sensor_type": "contact"},
     {"zone_id":29 , "gpio_pin_code":"18", "gpio_host_name": "pi-face", "alarm_pin_name": "beci test"},
-    {"zone_id":200 , "gpio_pin_code":"24", "gpio_host_name": "pidash", "alarm_pin_name": "car vibrate", "sensor_type": "contact"},
+    {"zone_id":200 , "gpio_pin_code":"16", "gpio_host_name": "pidash", "alarm_pin_name": "car vibrate", "sensor_type": "contact"},
     {"zone_id":200 , "gpio_pin_code":"17", "gpio_host_name": "pidash", "alarm_pin_name": "pidash battery low", "sensor_type": "contact"}
   ],
 

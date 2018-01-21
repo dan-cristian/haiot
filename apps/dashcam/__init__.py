@@ -8,18 +8,20 @@ import recorder
 from recorder import uploader
 import gps
 import accel
+from collections import namedtuple
+from main.admin import models
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 initialised = False
 
 
 class P:
-    battery_max_voltage = 4.1
-    #battery_min_voltage = 3.5
-    battery_warn_voltage = 3.6
-    battery_sleep_voltage = 3.4
-    battery_shutdown_voltage = 3.4
-    battery_warn_current = 1000
+    power_monitor_list = {}
+    #battery_max_voltage = 4.2
+    #battery_warn_voltage = 3.3
+    #battery_sleep_voltage = 3.2
+    #battery_shutdown_voltage = 3.1
+    #battery_warn_current = 1000
 
 
 def unload():
@@ -35,14 +37,28 @@ def unload():
     initialised = False
 
 
-def _battery_stat(battery, voltage, current, power):
-    if voltage <= P.battery_warn_voltage:
-        L.l.warning("Battery voltage is very low at {}".format(voltage))
-        pass
-    if voltage <= P.battery_shutdown_voltage:
-        L.l.warning("Battery voltage is too low at {}, shutting down system".format(voltage))
-        pass
-    L.l.info("Battery {} v={} c={} p={}".format(battery, voltage, current, power))
+def _battery_stat(battery_name, voltage, current, power):
+    if battery_name in P.power_monitor_list:
+        power_monitor = P.power_monitor_list[battery_name]
+        if voltage <= power_monitor.warn_voltage:
+            L.l.warning("Battery voltage is very low at {}".format(voltage))
+            pass
+        if voltage <= power_monitor.critical_voltage:
+            L.l.warning("Battery voltage is too low at {}".format(voltage))
+            # shutdown_system
+        if current >= power_monitor.warn_current:
+            L.l.warning("Battery current used is very high at {}".format(current))
+            pass
+        L.l.info("Battery {} v={} c={} p={}".format(battery_name, voltage, current, power))
+    else:
+        L.l.info("Unknown battery reading received, name={}".format(battery_name))
+
+
+def _battery_init():
+    power_list = models.PowerMonitor().query_all()
+    for power in power_list:
+        if power.host_name == Constant.HOST_NAME:
+            P.power_monitor_list[power.name] = power
 
 
 def thread_run():
@@ -56,6 +72,7 @@ def init():
     thread_pool.add_interval_callable(recorder.thread_run, run_interval_second=recorder.thread_tick)
     thread_pool.add_interval_callable(thread_run, run_interval_second=10)
     gps.init()
+    _battery_init()
     dispatcher.connect(_battery_stat, signal=Constant.SIGNAL_BATTERY_STAT, sender=dispatcher.Any)
     #accel.init()
     #thread_pool.add_interval_callable(accel.thread_run, run_interval_second=0.5)
