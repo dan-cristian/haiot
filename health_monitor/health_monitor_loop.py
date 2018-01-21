@@ -529,8 +529,8 @@ def _read_battery_power():
                 ina = INA219(shunt_ohms=0.1, address=addr[1])
                 ina.configure(voltage_range=ina.RANGE_16V, gain=ina.GAIN_AUTO)  #, bus_adc=ina.ADC_4SAMP, shunt_adc=ina.ADC_4SAMP)
                 voltage = ina.voltage()
-                current = ina.current()
-                power = ina.power()
+                current = round(ina.current(), 0)
+                power = round(ina.power(), 0)
                 dispatcher.send(signal=Constant.SIGNAL_BATTERY_STAT, battery_name=addr[0],
                                 voltage=voltage, current=current, power=power)
             except ImportError, imp:
