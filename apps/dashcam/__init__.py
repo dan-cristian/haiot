@@ -17,21 +17,16 @@ initialised = False
 
 class P:
     power_monitor_list = {}
-    #battery_max_voltage = 4.2
-    #battery_warn_voltage = 3.3
-    #battery_sleep_voltage = 3.2
-    #battery_shutdown_voltage = 3.1
-    #battery_warn_current = 1000
 
 
 def unload():
     L.l.info('Dashcam module unloading')
     # ...
     thread_pool.remove_callable(recorder.thread_run)
-    recorder.unload()
-    thread_pool.remove_callable(gps.thread_run)
-    gps.unload()
+    thread_pool.remove_callable(thread_run)
     thread_pool.remove_callable(accel.thread_run)
+    recorder.unload()
+    gps.unload()
     accel.unload()
     global initialised
     initialised = False
@@ -69,13 +64,13 @@ def thread_run():
 def init():
     L.l.info('Dashcam module initialising')
     recorder.init()
-    thread_pool.add_interval_callable(recorder.thread_run, run_interval_second=recorder.thread_tick)
-    thread_pool.add_interval_callable(thread_run, run_interval_second=10)
     gps.init()
     _battery_init()
+    accel.init()
+    thread_pool.add_interval_callable(recorder.thread_run, run_interval_second=recorder.thread_tick)
+    thread_pool.add_interval_callable(thread_run, run_interval_second=10)
+    thread_pool.add_interval_callable(accel.thread_run, run_interval_second=0.5)
     dispatcher.connect(_battery_stat, signal=Constant.SIGNAL_BATTERY_STAT, sender=dispatcher.Any)
-    #accel.init()
-    #thread_pool.add_interval_callable(accel.thread_run, run_interval_second=0.5)
     #ui.init()
     global initialised
     initialised = True
