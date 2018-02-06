@@ -113,9 +113,7 @@ class TempStore:
 
 # catch sudden changes or extremes (fire or cold)
 def rule_sensor_temp_extreme(obj=models.Sensor(), field_changed_list=None):
-    if not field_changed_list:
-        field_changed_list = []
-    if obj.temperature is not None:
+    if hasattr(obj, 'temperature') and obj.temperature is not None:
         m = models.ZoneSensor
         zonesensor = m().query_filter_first(m.sensor_name == obj.sensor_name)
         if zonesensor is not None and zonesensor.target_material is not None:
