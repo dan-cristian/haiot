@@ -24,8 +24,15 @@ if scheduler:
 
 initialised = False
 __func_list = None
-__event_list = []
 __rules_timestamp = None
+
+
+class P:
+    event_list = []
+
+
+class Obj:
+    pass
 
 
 def parse_rules(obj, change):
@@ -47,31 +54,31 @@ def parse_rules(obj, change):
                     # calling rule methods with first param type equal to passed object type
                     if type(obj) == type(first_param):
                         # fixme: implement processing queue for rules to avoid sql session errors
-                        # __event_list.append([obj, func[0], field_changed_list])
-                        try:
-                            result = getattr(rules_run, func[0])(obj=obj, field_changed_list=field_changed_list)
-                        except Exception, ex:
-                            L.l.error("Unable to execute rule {}, ex={}".format(func[0], ex))
-                        L.l.debug('Rule returned {}'.format(result))
+                        record = Obj()
+                        for attr, value in obj.__dict__.iteritems():
+                            setattr(record, attr, value)
+                        P.event_list.append([record, func[0], field_changed_list])
+                        #try:
+                        #    result = getattr(rules_run, func[0])(obj=obj, field_changed_list=field_changed_list)
+                        #except Exception, ex:
+                        #    from main import db
+                        #    L.l.error("Unable to execute rule {}, ex={}".format(func[0], ex))
+                        #L.l.debug('Rule returned {}'.format(result))
     except Exception:
         L.l.exception('Error parsing rules')
 
 
-# unused yet
 def process_events():
-    global __event_list
-    for obj_array in __event_list:
+    for obj in list(P.event_list):
         try:
-            __event_list.remove(obj_array)
-            result = getattr(rules_run, obj_array[1])(obj=obj_array[0], field_changed_list=obj_array[2])
+            result = getattr(rules_run, obj[1])(obj=obj[0], field_changed_list=obj[2])
             L.l.debug('Rule returned {}'.format(result))
+            P.event_list.remove(obj)
         except Exception, ex:
             L.l.critical("Error processing rule event err={}".format(ex), exc_info=1)
 
 
 def thread_run():
-    L.l.debug('Processing rules thread_run')
-    reload_rules()
     process_events()
     return 'Processed rules thread_run'
 
@@ -258,7 +265,8 @@ def init():
         __rules_timestamp = _get_stamp()
     else:
         L.l.warning('Rules not initialised as scheduler is not available')
-    thread_pool.add_interval_callable(thread_run, run_interval_second=3)
+    thread_pool.add_interval_callable(thread_run, run_interval_second=1)
+    thread_pool.add_interval_callable(reload_rules, run_interval_second=10)
     # connect rules processor for all db chages trigger
     dispatcher.connect(parse_rules, signal=Constant.SIGNAL_DB_CHANGE_FOR_RULES, sender=dispatcher.Any)
     global initialised
