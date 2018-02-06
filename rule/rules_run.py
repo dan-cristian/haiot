@@ -101,6 +101,60 @@ def rule_sensor_temp_target(obj=models.Sensor(), field_changed_list=None):
     return 'rule temp ok'
 
 
+class TempStore:
+    max_temp = {'indoor':           {'air': 30, 'water': 80, 'glicol': 90},
+                'indoor_heated':    {'air': 30, 'water': 80, 'glicol': 90},
+                'outdoor':          {'air': 39, 'water': 80, 'glicol': 90}}
+    min_temp = {'indoor':           {'air': 5, 'water': 5, 'glicol': 5},
+                'indoor_heated':    {'air': 15, 'water': 5, 'glicol': 5},
+                'outdoor':          {'air': -15, 'water': 1, 'glicol': 1}}
+    temp_last = {} # {name, []}
+
+
+# catch sudden changes or extremes (fire or cold)
+def rule_sensor_temp_extreme(obj=models.Sensor(), field_changed_list=None):
+    if not field_changed_list:
+        field_changed_list = []
+    if obj.temperature is not None:
+        m = models.ZoneSensor()
+        zonesensor = m.query_filter_first(m.sensor_name == obj.sensor_name)
+        if zonesensor is not None and zonesensor.target_material is not None:
+            m = models.Zone()
+            zone = m.query_filter_first(m.id == zonesensor.zone_id)
+            if zone is not None:
+                max = min = None
+                if zone.is_indoor:
+                    location = 'indoor'
+                elif zone.is_indoor_heated:
+                    location = 'indoor_heated'
+                elif zone.is_outdoor:
+                    location = 'outdoor'
+                else:
+                    L.l.warning("Zone {} has no indoor/outdoor location set".format(zone.name))
+                    return False
+
+                max_temp = TempStore.max_temp[location]
+                if max_temp.has_key(zonesensor.target_material):
+                    max = max_temp[zonesensor.target_material]
+                else:
+                    L.l.warning("Unknown max target material {}".format(zonesensor.target_material))
+                min_temp = TempStore.min_temp[location]
+                if min_temp.has_key(zonesensor.target_material):
+                    min = min_temp[zonesensor.target_material]
+                else:
+                    L.l.warning("Unknown min target material {}".format(zonesensor.target_material))
+
+                if max is not None and obj.temperature >= max:
+                    rule_common.notify_via_all(title="Max temperature reached for {} is {}".format(
+                        obj.sensor_name, obj.temperature), message="!", priority=1)
+                if min is not None and obj.temperature <= min:
+                    rule_common.notify_via_all(title="Min temperature reached for {} is {}".format(
+                        obj.sensor_name, obj.temperature), message="!", priority=1)
+            else:
+                L.l.warning("Cannot find a zone for zone_sensor {}".format(zonesensor))
+    return True
+
+
 # ups rule
 def rule_ups_power(obj=models.Ups(), field_changed_list=None):
     #Log.logger.info("changed list is {}".format(field_changed_list))

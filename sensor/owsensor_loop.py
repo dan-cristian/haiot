@@ -27,7 +27,7 @@ initialised = False
 
 class P:
     last_warning = datetime.datetime.min
-    check_period = 60
+    check_period = 30
     sampling_period_seconds = 15
     ow_conn_list = {}  # key is busname, value is ow connection
     warning_issued = False
@@ -40,6 +40,7 @@ def do_device(ow, path):
     all_start = datetime.datetime.now()
     sensors = ow.dir(path, slash=True, bus=False)
     count = 0
+    last_sensor = ''
     for sensor in sensors:
         # L.l.info("process sensor {}".format(sensor))
         if not ('interface' in sensor or 'simultaneous' in sensor or 'alarm' in sensor):
@@ -62,6 +63,7 @@ def do_device(ow, path):
                 sensor_dict[dev['address']] = dev
                 if 'DS2401' not in sensortype:
                     save_to_db(dev)
+                    last_sensor = dev['address']
                     count += 1
             except pyownet.protocol.ConnError, er:
                 L.l.warning('Connection error owserver: {}'.format(er))
@@ -74,7 +76,8 @@ def do_device(ow, path):
             #L.l.info("Sensor {} read took {} seconds".format(dev['address'], delta))
     all_delta = (datetime.datetime.now() - all_start).total_seconds()
     if count > 0 and all_delta > 1:
-        L.l.info("All {} sensors read in bus {} took {} seconds".format(count, path, all_delta))
+        L.l.info("All {} sensors read in bus {} took {} seconds, last was {}".format(
+            count, path, all_delta, last_sensor))
     return sensor_dict
 
 
