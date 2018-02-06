@@ -48,7 +48,10 @@ def parse_rules(obj, change):
                     if type(obj) == type(first_param):
                         # fixme: implement processing queue for rules to avoid sql session errors
                         # __event_list.append([obj, func[0], field_changed_list])
-                        result = getattr(rules_run, func[0])(obj=obj, field_changed_list=field_changed_list)
+                        try:
+                            result = getattr(rules_run, func[0])(obj=obj, field_changed_list=field_changed_list)
+                        except Exception, ex:
+                            L.l.error("Unable to execute rule {}, ex={}".format(func[0], ex))
                         L.l.debug('Rule returned {}'.format(result))
     except Exception:
         L.l.exception('Error parsing rules')

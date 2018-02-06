@@ -75,8 +75,9 @@ class DbBase:
     # m = models.Table
     # m().query_filter_first(m.host_name.in_([Constant.HOST_NAME]), m.name.in_([mod.name]))
     def query_filter_first(self, *query_filter):
-        function = self.query.filter(*query_filter).first
-        return self.__get_result(function)
+        res = self.query.filter(*query_filter).first()
+        return res
+        #return self.__get_result(function)
 
     #    def query_filters_first(self, *filter):
     #        function = self.query.filter(*filter).first
