@@ -652,6 +652,107 @@ if [ "$ENABLE_CAMERA" == "1" ]; then
     sleep 5
     nano /etc/init.d/motion
     /etc/init.d/motion restart
+
+    echo "Compiling ffmpeg with HW"
+    # https://gist.github.com/Brainiarc7/eb45d2e22afec7534f4a117d15fe6d89
+    apt-get -y install autoconf automake build-essential libass-dev libtool pkg-config texinfo zlib1g-dev libdrm-dev libva-dev vainfo libogg-dev
+    mkdir ffmpeg-hw
+    cd ffmpeg-hw
+    git clone https://github.com/01org/cmrt
+    cd cmrt
+    ./autogen.sh
+    ./configure
+    time make -j$(nproc) VERBOSE=1
+    make -j$(nproc) install
+    ldconfig -vvvv
+
+    cd ..
+    git clone https://github.com/01org/libva
+    cd libva
+    ./autogen.sh
+    ./configure
+    time make -j$(nproc) VERBOSE=1
+    make -j$(nproc) install
+
+
+    cd ..
+    cd intel-hybrid-driver
+    ./autogen.sh
+    ./configure
+    time make -j$(nproc) VERBOSE=1
+    make -j$(nproc) install
+    ldconfig -vvv
+
+    cd ./post-install.shgit clone https://github.com/01org/intel-vaapi-driver
+    cd intel-vaapi-driver
+    ./autogen.sh
+    ./configure --enable-hybrid-codec
+    time make -j$(nproc) VERBOSE=1
+    make -j$(nproc) install
+    ldconfig -vvvv
+
+
+    mkdir -p $HOME/bin
+    chown -Rc $USER:$USER $HOME/bin
+    mkdir -p ~/ffmpeg_sources
+    cd ~/ffmpeg_sources
+    wget wget http://www.nasm.us/pub/nasm/releasebuilds/2.14rc0/nasm-2.14rc0.tar.gz
+    tar xzvf nasm-2.14rc0.tar.gz
+    cd nasm-2.14rc0
+    ./configure --prefix="$HOME/bin" --bindir="$HOME/bin"
+    make -j$(nproc) VERBOSE=1
+    make -j$(nproc) install
+    make -j$(nproc) distclean
+
+    cd ~/ffmpeg_sources
+    wget http://download.videolan.org/pub/x264/snapshots/last_stable_x264.tar.bz2
+    tar xjvf last_stable_x264.tar.bz2
+    cd x264-snapshot*
+    PATH="$HOME/bin:$PATH" ./configure --prefix="$HOME/bin" --bindir="$HOME/bin" --enable-static --disable-opencl
+    PATH="$HOME/bin:$PATH" make -j$(nproc) VERBOSE=1
+    make -j$(nproc) install VERBOSE=1
+    make -j$(nproc) distclean
+
+    apt-get install cmake mercurial
+    cd ~/ffmpeg_sources
+    hg clone https://bitbucket.org/multicoreware/x265
+    cd ~/ffmpeg_sources/x265/build/linux
+    PATH="$HOME/bin:$PATH" cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$HOME/bin" -DENABLE_SHARED:bool=off ../../source
+    make -j$(nproc) VERBOSE=1
+    make -j$(nproc) install VERBOSE=1
+    make -j$(nproc) clean VERBOSE=1
+
+    cd ~/ffmpeg_sources
+    wget -O fdk-aac.tar.gz https://github.com/mstorsjo/fdk-aac/tarball/master
+    tar xzvf fdk-aac.tar.gz
+    cd mstorsjo-fdk-aac*
+    autoreconf -fiv
+    ./configure --prefix="$HOME/bin" --disable-shared
+    make -j$(nproc)
+    make -j$(nproc) install
+    make -j$(nproc) distclean
+
+    cd ~/ffmpeg_sources
+    git clone https://github.com/webmproject/libvpx/
+    cd libvpx
+    ./configure --prefix="$HOME/bin" --enable-runtime-cpu-detect --enable-vp9 --enable-vp8 \
+    --enable-postproc --enable-vp9-postproc --enable-multi-res-encoding --enable-webm-io --enable-vp9-highbitdepth --enable-onthefly-bitpacking --enable-realtime-only \
+    --cpu=native --as=yasm
+    time make -j$(nproc)
+    time make -j$(nproc) install
+    time make clean -j$(nproc)
+    time make distclean
+
+    cd ~/ffmpeg_sources
+    wget -c -v http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.5.tar.xz
+    tar -xvf libvorbis-1.3.5.tar.xz
+    cd libvorbis-1.3.5
+    ./configure --enable-static --prefix="$HOME/bin"
+    time make -j$(nproc)
+    time make -j$(nproc) install
+    time make clean -j$(nproc)
+    time make distclean
+
 fi
 
 if [ "$ENABLE_CAMERA_SHINOBI" == "1" ]; then
