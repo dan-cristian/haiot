@@ -48,17 +48,20 @@ class Raw:
 
     @staticmethod
     def read_all():
-        raw_gyro_data = Raw.bus.read_i2c_block_data(Raw.address, 0x43, 6)
-        raw_accel_data = Raw.bus.read_i2c_block_data(Raw.address, 0x3b, 6)
-        raw_temp_data = Raw.bus.read_i2c_block_data(Raw.address, 0x41, 6)
-        temp = (Raw.twos_compliment((raw_temp_data[0] << 8) + raw_temp_data[1]) / 340.0) + 36.53
-        gyro_scaled_x = Raw.twos_compliment((raw_gyro_data[0] << 8) + raw_gyro_data[1]) / Raw.gyro_scale
-        gyro_scaled_y = Raw.twos_compliment((raw_gyro_data[2] << 8) + raw_gyro_data[3]) / Raw.gyro_scale
-        gyro_scaled_z = Raw.twos_compliment((raw_gyro_data[4] << 8) + raw_gyro_data[5]) / Raw.gyro_scale
-        accel_scaled_x = Raw.twos_compliment((raw_accel_data[0] << 8) + raw_accel_data[1]) / Raw.accel_scale
-        accel_scaled_y = Raw.twos_compliment((raw_accel_data[2] << 8) + raw_accel_data[3]) / Raw.accel_scale
-        accel_scaled_z = Raw.twos_compliment((raw_accel_data[4] << 8) + raw_accel_data[5]) / Raw.accel_scale
-        return gyro_scaled_x, gyro_scaled_y, gyro_scaled_z, accel_scaled_x, accel_scaled_y, accel_scaled_z, temp
+        if Raw.bus is not None:
+            raw_gyro_data = Raw.bus.read_i2c_block_data(Raw.address, 0x43, 6)
+            raw_accel_data = Raw.bus.read_i2c_block_data(Raw.address, 0x3b, 6)
+            raw_temp_data = Raw.bus.read_i2c_block_data(Raw.address, 0x41, 6)
+            temp = (Raw.twos_compliment((raw_temp_data[0] << 8) + raw_temp_data[1]) / 340.0) + 36.53
+            gyro_scaled_x = Raw.twos_compliment((raw_gyro_data[0] << 8) + raw_gyro_data[1]) / Raw.gyro_scale
+            gyro_scaled_y = Raw.twos_compliment((raw_gyro_data[2] << 8) + raw_gyro_data[3]) / Raw.gyro_scale
+            gyro_scaled_z = Raw.twos_compliment((raw_gyro_data[4] << 8) + raw_gyro_data[5]) / Raw.gyro_scale
+            accel_scaled_x = Raw.twos_compliment((raw_accel_data[0] << 8) + raw_accel_data[1]) / Raw.accel_scale
+            accel_scaled_y = Raw.twos_compliment((raw_accel_data[2] << 8) + raw_accel_data[3]) / Raw.accel_scale
+            accel_scaled_z = Raw.twos_compliment((raw_accel_data[4] << 8) + raw_accel_data[5]) / Raw.accel_scale
+            return gyro_scaled_x, gyro_scaled_y, gyro_scaled_z, accel_scaled_x, accel_scaled_y, accel_scaled_z, temp
+        else:
+            return None
 
 
 ############
@@ -113,16 +116,19 @@ def init():
 
 
 def read_sensor():
-    try:
-        (gyro_scaled_x, gyro_scaled_y, gyro_scaled_z,
-         accel_scaled_x, accel_scaled_y, accel_scaled_z, temp) = Raw.read_all()
+    if Raw.bus is not None:
+        try:
+            (gyro_scaled_x, gyro_scaled_y, gyro_scaled_z,
+             accel_scaled_x, accel_scaled_y, accel_scaled_z, temp) = Raw.read_all()
 
-        sensor_all = [{'y': accel_scaled_y, 'x': accel_scaled_x, 'z': accel_scaled_z},
-                      {'y': gyro_scaled_y, 'x': gyro_scaled_x, 'z': gyro_scaled_z}, temp]
-    except Exception, ex:
-        L.l.error("Unable to read accel, ex={}".format(ex))
-    P.lastrecord = sensor_all
-    return sensor_all
+            sensor_all = [{'y': accel_scaled_y, 'x': accel_scaled_x, 'z': accel_scaled_z},
+                          {'y': gyro_scaled_y, 'x': gyro_scaled_x, 'z': gyro_scaled_z}, temp]
+        except Exception, ex:
+            L.l.error("Unable to read accel, ex={}".format(ex))
+        P.lastrecord = sensor_all
+        return sensor_all
+    else:
+        return None
 
 
 def thread_run():
