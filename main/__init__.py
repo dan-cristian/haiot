@@ -289,7 +289,7 @@ def init():
     @models_committed.connect_via(app)
     def on_models_committed(sender, changes):
         from main.admin import event
-        L.l.debug('Model commit detected sender {} change {}'.format(sender, changes))
+        #L.l.debug('Model commit detected sender {} change {}'.format(sender, changes))
         event.on_models_committed(sender, changes)
 
     L.l.info('Feeding dogs with grass until app will exit')

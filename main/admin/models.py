@@ -75,9 +75,9 @@ class DbBase:
     # m = models.Table
     # m().query_filter_first(m.host_name.in_([Constant.HOST_NAME]), m.name.in_([mod.name]))
     def query_filter_first(self, *query_filter):
-        res = self.query.filter(*query_filter).first()
-        return res
-        #return self.__get_result(function)
+        func = self.query.filter(*query_filter).first
+        #return res
+        return self.__get_result(func)
 
     #    def query_filters_first(self, *filter):
     #        function = self.query.filter(*filter).first
@@ -286,7 +286,7 @@ class Zone(db.Model, DbBase):
     heat_is_on = db.Column(db.Boolean, default=False)
     last_heat_status_update = db.Column(db.DateTime(), default=None)
     heat_target_temperature = db.Column(db.Integer)
-    is_indoor_heated = db.Column(db.Boolean, default=True)
+    is_indoor_heated = db.Column(db.Boolean)
     is_indoor = db.Column(db.Boolean)
     is_outdoor = db.Column(db.Boolean)
 
