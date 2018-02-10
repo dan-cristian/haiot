@@ -289,6 +289,7 @@ class Zone(db.Model, DbBase):
     is_indoor_heated = db.Column(db.Boolean)
     is_indoor = db.Column(db.Boolean)
     is_outdoor = db.Column(db.Boolean)
+    is_outdoor_heated = db.Column(db.Boolean)
 
     def __init__(self, id='', name=''):
         super(Zone, self).__init__()

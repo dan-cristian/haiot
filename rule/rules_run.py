@@ -104,10 +104,12 @@ def rule_sensor_temp_target(obj=models.Sensor(), field_changed_list=None):
 class TempStore:
     max_temp = {'indoor':           {'air': 30, 'water': 80, 'glicol': 90},
                 'indoor_heated':    {'air': 30, 'water': 80, 'glicol': 90},
-                'outdoor':          {'air': 39, 'water': 80, 'glicol': 90}}
+                'outdoor':          {'air': 39, 'water': 80, 'glicol': 90},
+                'outdoor_heated':   {'air': 95, 'water': 80, 'glicol': 90}}
     min_temp = {'indoor':           {'air': 5, 'water': 5, 'glicol': 5},
                 'indoor_heated':    {'air': 15, 'water': 5, 'glicol': 5},
-                'outdoor':          {'air': -15, 'water': 1, 'glicol': 1}}
+                'outdoor':          {'air': -15, 'water': 1, 'glicol': 1},
+                'outdoor_heated':   {'air': -15, 'water': 1, 'glicol': 1}}
     temp_last = {} # {name, []}
 
 
@@ -127,6 +129,8 @@ def rule_sensor_temp_extreme(obj=models.Sensor(), field_changed_list=None):
                     location = 'indoor_heated'
                 elif zone.is_outdoor:
                     location = 'outdoor'
+                elif zone.is_outdoor_heated:
+                    location = 'outdoor_heated'
                 else:
                     L.l.warning("Zone {} has no indoor/outdoor location set".format(zone.name))
                     return False
