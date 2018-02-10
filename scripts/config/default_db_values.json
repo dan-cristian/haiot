@@ -159,7 +159,7 @@
     {"id":30, "name":"power beci"},
     {"id":32, "name":"watermain"},
     {"id":33, "name":"watersecond"},
-    {"id":34, "name":"horn", "is_outdoor": 1},
+    {"id":34, "name":"horn", "is_outdoor_heated": 1},
     {"id":35, "name":"gas meter"},
     {"id":36, "name":"front valve"},
     {"id":37, "name":"back valve"},
