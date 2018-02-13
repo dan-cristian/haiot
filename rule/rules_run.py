@@ -97,7 +97,7 @@ def rule_alarm(obj=models.ZoneAlarm(), field_changed_list=None):
 def rule_sensor_temp_target(obj=models.Sensor(), field_changed_list=None):
     if not field_changed_list:
         field_changed_list = []
-    temp = obj.temperature
+    #temp = obj.temperature
     return 'rule temp ok'
 
 
