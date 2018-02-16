@@ -389,6 +389,7 @@ def _handle_event_alarm(zone_name, alarm_pin_name, pin_connected):
     L.l.info("Got alarm in {} name={} with pin connected {}".format(zone_name, alarm_pin_name, pin_connected))
     if alarm_pin_name == 'car vibrate':
         P.last_move_time = datetime.datetime.now()
+        P.usb_last_cam_detect_attempt = datetime.datetime.min
         P.is_recording_on = True
         P.usb_recover_count = 0
         P.is_recording_on = True
