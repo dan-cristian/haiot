@@ -383,6 +383,7 @@ def _usb_stop(cam_name):
 def _usb_stop_all():
     for cp in P.cam_param.itervalues():
         _usb_stop(cp.name)
+    P.is_one_recording_usb = False
 
 
 def _handle_event_alarm(zone_name, alarm_pin_name, pin_connected):
