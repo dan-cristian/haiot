@@ -381,8 +381,8 @@ def _usb_stop(cam_name):
 
 
 def _usb_stop_all():
-    for cam in P.cam_list:
-        _usb_stop(cam.name)
+    for cp in P.cam_param.itervalues():
+        _usb_stop(cp.name)
 
 
 def _handle_event_alarm(zone_name, alarm_pin_name, pin_connected):
