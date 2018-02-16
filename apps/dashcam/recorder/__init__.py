@@ -380,7 +380,7 @@ def _usb_stop(cam_name):
             cp.err_pipe = None
 
 
-def usb_stop():
+def _usb_stop_all():
     for cam in P.cam_list:
         _usb_stop(cam.name)
 
@@ -480,7 +480,7 @@ def thread_run():
             _pi_stop()
         if not P.is_recording_on and P.is_one_recording_usb:
             L.l.info("Stopping USB recording")
-            _usb_stop()
+            _usb_stop_all()
     except Exception, ex:
         print "Error in recorder thread_run, ex={}".format(ex)
         print traceback.print_exc()
