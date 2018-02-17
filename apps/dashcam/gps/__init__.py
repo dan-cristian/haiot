@@ -21,6 +21,7 @@ class State:
     url_timeout = 10
     device_name = "skoda"
     disk_pos_buffer_file="/home/haiot/gps_positions"
+    have_internet_file = '/tmp/haveinternet'
     UPLOAD_SERVER_URL = "https://www.dancristian.ro/nextcloud/index.php/apps/phonetrack/log/gpslogger/" \
                         "643fee139ee4efd90437176e88298a94/{}?lat=<lat>&lon=<lon>&sat=<sat>&alt=<alt>&acc=<acc>&" \
                         "timestamp=<time>&bat=<bat>".format(device_name)
@@ -59,31 +60,32 @@ def _load_positions():
 
 
 def _upload_pos_buffer():
-    initial = len(State.pos_buffer)
-    url = None
-    for p in list(State.pos_buffer):
-        try:
-            url = State.UPLOAD_SERVER_URL.replace("<lat>", str(p.lat)).replace("<lon>", str(p.lon)).replace(
-                "<alt>", str(p.alt)).replace("<sat>", str(p.sats_valid)).replace(
-                "<acc>", str(p.acc)).replace("<bat>", str(p.bat)).replace("<time>", str(p.timestamp))
-            # https://stackoverflow.com/questions/27835619/urllib-and-ssl-certificate-verify-failed-error
-            f = urllib2.urlopen(url, timeout=State.url_timeout, context=State.context)
-            resp = f.read()
-            if resp == "null":
-                State.pos_buffer.remove(p)
-            else:
-                L.l.info("Unexpected response {}".format(resp))
-        except Exception, ex:
-            L.l.info("Unable to upload position, err={}".format(ex))
-            L.l.info("Buffer has {} elements".format(len(State.pos_buffer)))
-            L.l.info("URL WAS:{}".format(url))
-    if (initial > 1) and (initial - len(State.pos_buffer) > 1):
-        L.l.info("Buffer catches up, now has {} elements".format(len(State.pos_buffer)))
-    if len(State.pos_buffer) > 0:
-        _save_position()
-    else:
-        if os.path.isfile(State.disk_pos_buffer_file):
-            os.remove(State.disk_pos_buffer_file)
+    if os.path.isfile(State.have_internet_file):
+        initial = len(State.pos_buffer)
+        url = None
+        for p in list(State.pos_buffer):
+            try:
+                url = State.UPLOAD_SERVER_URL.replace("<lat>", str(p.lat)).replace("<lon>", str(p.lon)).replace(
+                    "<alt>", str(p.alt)).replace("<sat>", str(p.sats_valid)).replace(
+                    "<acc>", str(p.acc)).replace("<bat>", str(p.bat)).replace("<time>", str(p.timestamp))
+                # https://stackoverflow.com/questions/27835619/urllib-and-ssl-certificate-verify-failed-error
+                f = urllib2.urlopen(url, timeout=State.url_timeout, context=State.context)
+                resp = f.read()
+                if resp == "null":
+                    State.pos_buffer.remove(p)
+                else:
+                    L.l.info("Unexpected response {}".format(resp))
+            except Exception, ex:
+                L.l.info("Unable to upload position, err={}".format(ex))
+                L.l.info("Buffer has {} elements".format(len(State.pos_buffer)))
+                L.l.info("URL WAS:{}".format(url))
+        if (initial > 1) and (initial - len(State.pos_buffer) > 1):
+            L.l.info("Buffer catches up, now has {} elements".format(len(State.pos_buffer)))
+        if len(State.pos_buffer) > 0:
+            _save_position()
+        else:
+            if os.path.isfile(State.disk_pos_buffer_file):
+                os.remove(State.disk_pos_buffer_file)
 
 
 # https://github.com/MartijnBraam/gpsd-py3/blob/master/DOCS.md
