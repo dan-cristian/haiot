@@ -251,6 +251,7 @@ def _usb_init():
             P.cam_param[cam.name] = cp
         else:
             L.l.info("Cam {} already initialised".format(cam.name))
+            cp = P.cam_param[cam.name]
         try:
             L.l.info("Starting USB Recording on {}".format(cam.name))
             _kill_proc(cp.rec_filename)
