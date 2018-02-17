@@ -231,8 +231,6 @@ def _recover_usb(cam_name):
 
 
 def _usb_init():
-    #for cam in P.cam_list:
-    #    _usb_stop(cam.name)
     delta = (datetime.datetime.now() - P.usb_last_cam_detect_attempt).total_seconds()
     if delta <= P.usb_recover_pause:
         return
@@ -251,23 +249,25 @@ def _usb_init():
             if os.path.isfile(cp.pipe_err_path):
                 os.remove(cp.pipe_err_path)
             P.cam_param[cam.name] = cp
-            try:
-                L.l.info("Starting USB Recording on {}".format(cam.name))
-                _kill_proc(cp.rec_filename)
-                #if Constant.IS_OS_WINDOWS():
-                #    _run_ffmpeg_usb_win()
-                #else:
-                _run_ffmpeg_usb(cam.name)
-                if cp.ffmpeg_proc is not None and cp.ffmpeg_proc._child_created:
-                    L.l.info("Recording started on {}".format(cam.name))
-                    cp.is_recording = True
-                    P.is_one_recording_usb = True
-                    P.is_one_usb_camera_detected = True
-                else:
-                    L.l.info("Recording process not created for {}".format(cam.name))
-            except Exception, ex:
-                L.l.info("Unable to initialise USB camera, ex={}".format(ex))
-                traceback.print_exc()
+        else:
+            L.l.info("Cam {} already initialised".format(cam.name))
+        try:
+            L.l.info("Starting USB Recording on {}".format(cam.name))
+            _kill_proc(cp.rec_filename)
+            # if Constant.IS_OS_WINDOWS():
+            #    _run_ffmpeg_usb_win()
+            # else:
+            _run_ffmpeg_usb(cam.name)
+            if cp.ffmpeg_proc is not None and cp.ffmpeg_proc._child_created:
+                L.l.info("Recording started on {}".format(cam.name))
+                cp.is_recording = True
+                P.is_one_recording_usb = True
+                P.is_one_usb_camera_detected = True
+            else:
+                L.l.info("Recording process not created for {}".format(cam.name))
+        except Exception, ex:
+            L.l.info("Unable to initialise USB camera, ex={}".format(ex))
+            traceback.print_exc()
 
 
 def _usb_record_loop():
