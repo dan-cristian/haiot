@@ -95,10 +95,18 @@ class P:
     usb_recover_pause = 30  # pause x seconds between usb recovery attempts
     usb_last_recovery_attempt = datetime.datetime.min
     usb_last_cam_detect_attempt = datetime.datetime.min
+    gps_lat = 0
+    gps_lon = 0
+    gps_hspeed = 0
+    gps_alt = 0
+
 
 def _get_win_cams():
     pass
 
+
+def _get_gps_text():
+    return '{}kph {}m {},{} '.format(P.gps_hspeed, P.gps_alt, P.gps_lat, P.gps_lon)
 
 def _run_ffmpeg_pi():
     L.l.info("Recording on {}".format(P.pi_out_filename))
@@ -160,7 +168,8 @@ def _run_ffmpeg_usb(cam_name):
             cp.ffmpeg_proc = subprocess.Popen(
                 ['ffmpeg', '-y', '-f', 'alsa', '-thread_queue_size', '8192', '-ac', '1'] + audio +
                 ['-r', str(P.usb_framerate), '-f', 'video4linux2', '-thread_queue_size', '8192', '-i', cam.devpath,
-                 '-vf', rotation + 'drawtext=text=\'%{localtime\:%c}\':fontcolor=white@0.8:fontsize=32:x=10:y=10',
+                 '-vf', rotation + 'drawtext=text=\'%{localtime\:%c}' +
+                 _get_gps_text() + '\':fontcolor=white@0.8:fontsize=16:x=10:y=10',
                  '-s', P.usb_max_resolution, "-c:v", "h264_omx", "-b:v", "2000k",
                  '-frag_duration', '1000', '-f', 'segment', '-segment_time', str(P.segment_duration),
                  '-reset_timestamps', '1', '-force_key_frames', 'expr:gte(t,n_forced*10)', '-strftime', '1',
@@ -387,6 +396,13 @@ def _usb_stop_all():
     P.is_one_recording_usb = False
 
 
+def _handle_event_gps(lat, lon, hspeed, alt):
+    P.gps_lat = lat
+    P.gps_lon = lon
+    P.gps_hspeed = hspeed
+    P.gps_alt = alt
+
+
 def _handle_event_alarm(zone_name, alarm_pin_name, pin_connected):
     L.l.info("Got alarm in {} name={} with pin connected {}".format(zone_name, alarm_pin_name, pin_connected))
     if alarm_pin_name == 'car vibrate':
@@ -451,6 +467,7 @@ def init():
         _usb_init()
     try:
         dispatcher.connect(_handle_event_alarm, signal=Constant.SIGNAL_ALARM, sender=dispatcher.Any)
+        dispatcher.connect(_handle_event_gps, signal=Constant.SIGNAL_GPS, sender=dispatcher.Any)
     except Exception, ex:
         L.l.error("Unable to connect to alarm dispatch, ex={}".format(ex))
     initialised = True
