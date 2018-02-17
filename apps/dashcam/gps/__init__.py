@@ -7,7 +7,9 @@ import json
 import os
 from collections import namedtuple
 from main.logger_helper import L
+from pydispatch import dispatcher
 try:
+    from common import Constant
     from main.admin import models
 except Exception, ex:
     print "Exception {} on gps import".format(ex)
@@ -108,6 +110,7 @@ def _read_gps():
                        bat=r.hspeed, timestamp=time.time())
         # use battery fields to report horizontal speed
         #Log.logger.info("Got gps position {}".format(pos))
+        dispatcher.send(Constant.SIGNAL_GPS, lat=r.lat, lon=r.lon, hspeed=r.hspeed, alt=alt)
         State.pos_buffer.append(pos)
         d = models.Device
         dev = d().query_filter_first(d.name == State.device_name)
