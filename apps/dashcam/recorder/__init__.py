@@ -106,7 +106,9 @@ def _get_win_cams():
 
 
 def _get_gps_text():
-    return ' {}kph {}m {},{} '.format(P.gps_hspeed, P.gps_alt, P.gps_lat, P.gps_lon)
+    speed = int(P.gps_hspeed)
+    alt = int(P.gps_alt)
+    return ' {}kph {}m {},{} '.format(speed, alt, P.gps_lat, P.gps_lon)
 
 def _run_ffmpeg_pi():
     L.l.info("Recording on {}".format(P.pi_out_filename))
