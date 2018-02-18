@@ -1082,6 +1082,15 @@ if [ "$ENABLE_DASHCAM_PI" == "1" ]; then
     https://raw.githubusercontent.com/codazoda/hub-ctrl.c/master/hub-ctrl.c
     gcc -o hub-ctrl hub-ctrl.c -lusb
 
+    echo "Enable RTC"
+    #https://www.raspberrypi-spy.co.uk/2015/05/adding-a-ds3231-real-time-clock-to-the-raspberry-pi/
+    if ! grep -q "^rtc[-_]ds1307" /etc/modules; then printf "rtc-ds1307\n" >> /etc/modules; fi
+    echo 'echo ds1307 0x68 > /sys/class/i2c-adapter/i2c-1/new_device' >> /etc/rc.local
+
+    echo "move exit 0 to the end in rc.local to allow scripts to run"
+    nano /etc/rc.local
+fi
+
 
 if [ "$ENABLE_DASHCAM_MOTION" == "1" ]; then
     apt install -y motion
