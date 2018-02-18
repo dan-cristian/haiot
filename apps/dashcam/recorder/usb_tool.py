@@ -54,7 +54,7 @@ def _get_usb_audio(camera):
                     hw_card = atoms[0].split(':')[0].split('card ')[1]
                     hw_dev = atoms[1].split(':')[0].split(' device ')[1]
                     res = '{},{}'.format(hw_card, hw_dev)
-                    L.l.info("Found audio card {} for camera {}".format(res, camera.name))
+                    #L.l.info("Found audio card {} for camera {}".format(res, camera.name))
                     break
                 else:
                     #L.l.info("Could not map camera {} to audio record entry {}".format(camera.name, line))
