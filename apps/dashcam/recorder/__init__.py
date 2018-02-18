@@ -83,6 +83,7 @@ class P:
     gps_hspeed = 0
     gps_alt = 0
     overlay_text_file = '/tmp/overlay_text'
+    overlay_text_file_tmp = '/tmp/overlay_text_tmp'
 
 
 def _get_win_cams():
@@ -97,9 +98,11 @@ def _get_overlay_text():
 
 
 def _write_overlay_text():
-    f = open(P.overlay_text_file, 'w')
+    f = open(P.overlay_text_file_tmp, 'w')
     f.write(_get_overlay_text())
     f.close()
+    # atomic operation
+    os.rename(P.overlay_text_file_tmp, P.overlay_text_file)
 
 
 def _run_ffmpeg_pi():
@@ -278,6 +281,8 @@ def _usb_init():
 
 
 def _usb_record_loop():
+    if len(P.cam_param) == 0:
+        L.l.warning("Looping empty usb camera list")
     for cp in P.cam_param.itervalues():
         if cp.is_recording:
             if cp.ffmpeg_proc is not None:
@@ -292,11 +297,14 @@ def _usb_record_loop():
                     _usb_stop(cp.name)
                     cp.is_recording = False
                 else:
+                    # all ok
                     pass
             else:
-                L.l.error("ffmpeg process is null for camera {}, stopping".format(cp.name))
+                L.l.error("ffmpeg process is null for usb camera {}, stopping".format(cp.name))
                 _save_usb_err_output(cp.name)
                 _usb_stop(cp.name)
+        else:
+            L.l.warning("Looping usb camera {} but is not recording".format(cp.name))
 
 
 def _pi_record_loop():
@@ -506,7 +514,7 @@ def thread_run():
                 _usb_record_loop()
             else:
                 if _usb_camera_count() > 0:  # stay silent if recovery failed
-                    L.l.info("Starting USB camera, should have been on")
+                    L.l.info("Starting {} USB cameras, should have been on".format(_usb_camera_count()))
                 _usb_init()
         if not P.is_recording_on:
             if P.is_recording_pi:
