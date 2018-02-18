@@ -509,7 +509,7 @@ def init():
             L.l.info("Initialising PI camera")
             _pi_init()
         L.l.info("Initialising USB cameras")
-        _usb_init()
+        _usb_init_all()
     try:
         dispatcher.connect(_handle_event_alarm, signal=Constant.SIGNAL_ALARM, sender=dispatcher.Any)
         dispatcher.connect(_handle_event_gps, signal=Constant.SIGNAL_GPS, sender=dispatcher.Any)
