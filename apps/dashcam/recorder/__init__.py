@@ -109,7 +109,7 @@ def _get_win_cams():
 def _get_overlay_text():
     speed = int(P.gps_hspeed)
     alt = int(P.gps_alt)
-    time_txt = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    time_txt = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     return '{} {}kph {}m {},{} '.format(time_txt, speed, alt, P.gps_lat, P.gps_lon)
 
 
