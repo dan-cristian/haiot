@@ -87,10 +87,10 @@ def _event_detected_falling(channel):
 
 def _event_detected_both(channel):
     now_state = GPIO.input(channel)
-    L.l.info("Both event, channel {}, now_state={}".format(channel, now_state))
+    #L.l.info("Both event, channel {}, now_state={}".format(channel, now_state))
     time.sleep(0.1)
     new_state = GPIO.input(channel)
-    L.l.info("Both event, channel {}, NEW_state={}".format(channel, new_state))
+    #L.l.info("Both event, channel {}, NEW_state={}".format(channel, new_state))
     _do_event(channel, new_state)
 
 
