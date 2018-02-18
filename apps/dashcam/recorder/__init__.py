@@ -291,17 +291,22 @@ def _usb_init():
 def _usb_record_loop():
     for cp in P.cam_param.itervalues():
         if cp.is_recording:
-            cp.ffmpeg_proc.poll()
-            if cp.ffmpeg_proc.returncode is not None:
-                L.l.info("USB record exit with code {}".format(cp.ffmpeg_proc.returncode))
-                if cp.ffmpeg_proc.returncode != 0:
-                    L.l.info("USB recording stopped for camera {}".format(cp.name))
-                    _save_usb_err_output(cp.name)
+            if cp.ffmpeg_proc is not None:
+                cp.ffmpeg_proc.poll()
+                if cp.ffmpeg_proc.returncode is not None:
+                    L.l.info("USB record exit with code {}".format(cp.ffmpeg_proc.returncode))
+                    if cp.ffmpeg_proc.returncode != 0:
+                        L.l.info("USB recording stopped for camera {}".format(cp.name))
+                        _save_usb_err_output(cp.name)
+                    else:
+                        L.l.info("USB exit, not an error for camera {}?".format(cp.name))
+                    _usb_stop(cp.name)
                 else:
-                    L.l.info("USB exit, not an error for camera {}?".format(cp.name))
-                _usb_stop(cp.name)
+                    pass
             else:
-                pass
+                L.l.error("ffmpeg process is null for camera {}, stopping".format(cp.name))
+                _save_usb_err_output(cp.name)
+                _usb_stop(cp.name)
 
 
 def _pi_record_loop():
