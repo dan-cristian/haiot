@@ -75,7 +75,7 @@ class P:
     last_clock_time = None
     usb_recover_count = 0
     usb_recover_attempts_limit = 5  # number of recovery attempts before pausing
-    usb_recover_pause = 30  # pause x seconds between usb recovery attempts
+    usb_cam_detect_interval = 30  # pause x seconds between usb recovery attempts
     usb_last_recovery_attempt = datetime.datetime.min
     usb_last_cam_detect_attempt = datetime.datetime.min
     gps_lat = 0
@@ -229,16 +229,64 @@ def _recover_usb(cam_name):
             P.is_recording_on = False
             L.l.info('Pausing USB recover attempts')
     else:
-        if (datetime.datetime.now() - P.usb_last_recovery_attempt).total_seconds() > P.usb_recover_pause:
+        if (datetime.datetime.now() - P.usb_last_recovery_attempt).total_seconds() > P.usb_cam_detect_interval:
             P.usb_recover_count = 0
 
 
-def _usb_init():
+# return none if no change in camera detected, else return detected camera list
+def _detect_usb_camera():
     delta = (datetime.datetime.now() - P.usb_last_cam_detect_attempt).total_seconds()
-    if delta <= P.usb_recover_pause:
-        return
+    if delta <= P.usb_cam_detect_interval:
+        return None
     P.usb_last_cam_detect_attempt = datetime.datetime.now()
     new_cam_list = usb_tool.get_usb_camera_list()
+    for old_cam in P.cam_list:
+        if old_cam not in new_cam_list:
+            return new_cam_list
+    for new_cam in new_cam_list:
+        if new_cam not in P.cam_list:
+            return new_cam_list
+    return None
+
+
+def _usb_init(cam):
+    L.l.info("Initialising usb cam {}".format(cam.name))
+    P.cam_list[cam.name] = cam
+    cp = CamParam(name=cam.name, is_on=True, is_recording=False, ffmpeg_proc=None, rec_filename=None,
+                  pipe_std_path=None, pipe_err_path=None, std_pipe=None, err_pipe=None)
+    cp.pipe_std_path = P.usb_out_filepath_std_template.replace('_x', '_' + cam.name.strip().replace(' ', '_'))
+    cp.pipe_err_path = P.usb_out_filepath_err_template.replace('_x', '_' + cam.name.strip().replace(' ', '_'))
+    cp.rec_filename = P.usb_out_filename_template.replace('_x', '_' + cam.name.strip().replace(' ', '_'))
+    if os.path.isfile(cp.pipe_err_path):
+        os.remove(cp.pipe_err_path)
+    P.cam_param[cam.name] = cp
+    cp = P.cam_param[cam.name]
+    if not cp.is_recording:
+        try:
+            L.l.info("Starting usb recording on {}".format(cam.name))
+            _kill_proc(cp.rec_filename)
+            # if Constant.IS_OS_WINDOWS():
+            #    _run_ffmpeg_usb_win()
+            # else:
+            _run_ffmpeg_usb(cam.name)
+            if cp.ffmpeg_proc is not None and cp.ffmpeg_proc._child_created:
+                L.l.info("Recording started on {}".format(cam.name))
+                cp.is_recording = True
+            else:
+                L.l.info("Recording process not created for usb cam {}".format(cam.name))
+        except Exception, ex:
+            L.l.info("Unable to initialise usb camera, ex={}".format(ex))
+            traceback.print_exc()
+    else:
+        L.l.info("Recording already started on usb camera {} at init".format(cam.name))
+
+
+def _usb_init_all():
+    res = _detect_usb_camera()
+    if res is None:
+        return
+    else:
+        new_cam_list = res
     L.l.info("Found {} USB cameras".format(len(new_cam_list)))
     # remove gone cameras
     for old_cam in P.cam_list:
@@ -250,34 +298,10 @@ def _usb_init():
     # init existing cameras
     for cam in new_cam_list.itervalues():
         if cam.name not in P.cam_list:
-            L.l.info("Initialising new USB cam {}".format(cam.name))
-            P.cam_list[cam.name] = cam
-            cp = CamParam(name=cam.name, is_on=True, is_recording=False, ffmpeg_proc=None, rec_filename=None,
-                          pipe_std_path=None, pipe_err_path=None, std_pipe=None, err_pipe=None)
-            cp.pipe_std_path = P.usb_out_filepath_std_template.replace('_x', '_' + cam.name.strip().replace(' ', '_'))
-            cp.pipe_err_path = P.usb_out_filepath_err_template.replace('_x', '_' + cam.name.strip().replace(' ', '_'))
-            cp.rec_filename = P.usb_out_filename_template.replace('_x', '_' + cam.name.strip().replace(' ', '_'))
-            if os.path.isfile(cp.pipe_err_path):
-                os.remove(cp.pipe_err_path)
-            P.cam_param[cam.name] = cp
+            L.l.info("New cam {} found".format(cam.name))
+            _usb_init(cam)
         else:
             L.l.info("Cam {} already initialised".format(cam.name))
-            cp = P.cam_param[cam.name]
-        try:
-            L.l.info("Starting USB Recording on {}".format(cam.name))
-            _kill_proc(cp.rec_filename)
-            # if Constant.IS_OS_WINDOWS():
-            #    _run_ffmpeg_usb_win()
-            # else:
-            _run_ffmpeg_usb(cam.name)
-            if cp.ffmpeg_proc is not None and cp.ffmpeg_proc._child_created:
-                L.l.info("Recording started on {}".format(cam.name))
-                cp.is_recording = True
-            else:
-                L.l.info("Recording process not created for {}".format(cam.name))
-        except Exception, ex:
-            L.l.info("Unable to initialise USB camera, ex={}".format(ex))
-            traceback.print_exc()
 
 
 def _usb_record_loop():
@@ -510,12 +534,14 @@ def thread_run():
                 if P.is_pi_camera_detected:
                     L.l.info("Starting PI camera, should have been on")
                 _pi_init()
+            # detect new cameras from time to time
+            _usb_init_all()
             if _usb_is_recording_count() > 0:
                 _usb_record_loop()
-            else:
-                if _usb_camera_count() > 0:  # stay silent if recovery failed
-                    L.l.info("Starting {} USB cameras, should have been on".format(_usb_camera_count()))
-                _usb_init()
+            #else:
+                #if _usb_camera_count() > 0:  # stay silent if recovery failed
+                #    L.l.info("Starting {} USB cameras, should have been on".format(_usb_camera_count()))
+            #    _usb_init_all()
         if not P.is_recording_on:
             if P.is_recording_pi:
                 L.l.info("Stopping PI recording")
