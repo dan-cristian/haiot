@@ -44,17 +44,12 @@ class P:
     cam_list = {}  # detected camera list
     cam_param = {}  # camera parameters
     ffmpeg_pi = None  # process encoding
-    #ffmpeg_usb = {}  # list with usb process encoding
     segment_duration = 900  # in seconds
     is_recording_pi = False
-    #is_recording_usb = {}
-    is_one_recording_usb = False
+    #is_one_recording_usb = False
     is_pi_camera_detected = True
     is_recording_on = True
-    is_one_usb_camera_detected = False
-    #is_usb_camera_detected = {}
-    #usb_sound_enabled = True
-    # comma needed as suffix for flip filter
+    #is_one_usb_camera_detected = False
     usb_rotation_filter = {'HD Webcam C525': 'vflip,', 'UVC Camera (046d:081b)': '', 'HD USB Camera': ''}
     pi_rotation_degree = 90
     root_mountpoint = '/'  # to check space available for recording
@@ -64,20 +59,10 @@ class P:
     dir_pipe_out = recordings_root + '/out/'
     pi_out_filename = recordings_root + '%Y-%m-%d_%H-%M-%S_pi.mkv'
     usb_out_filename_template = recordings_root + '%Y-%m-%d_%H-%M-%S_usb_x.mkv'  # x to be replaced with camera ID
-    #usb_out_filename = {}
     pi_out_filepath_std = dir_pipe_out + 'pi.std'
     pi_out_filepath_err = dir_pipe_out + 'pi.err'
-    #pi_out_std = None
-    #pi_out_err = None
     usb_out_filepath_std_template = dir_pipe_out + 'usb_x.std'
     usb_out_filepath_err_template = dir_pipe_out + 'usb_x.err'
-    #usb_out_filepath_std = {}
-    #usb_out_filepath_err = {}
-    #usb_out_std = {}
-    #usb_out_err = {}
-    #usb_camera_name = {}
-    #usb_camera_dev_path = {}  # '/dev/video0'
-    #usb_record_hw = {}  # '1:0'
     usb_max_resolution = '1280x720'
     pi_max_resolution = (1296, 972)
     win_camera_dev_name = "Integrated Camera"
@@ -177,7 +162,7 @@ def _run_ffmpeg_usb(cam_name):
                 ['ffmpeg', '-y', '-f', 'alsa', '-thread_queue_size', '8192', '-ac', '1'] + audio +
                 ['-r', str(P.usb_framerate), '-f', 'video4linux2', '-thread_queue_size', '8192', '-i', cam.devpath,
                  '-vf', rotation + 'drawtext=textfile=' + P.overlay_text_file
-                + ':fontcolor=yellow@0.8:fontsize=18:x=10:y=10:reload=1',
+                 + ':fontcolor=yellow@0.8:fontsize=18:x=10:y=10:reload=1',
                  '-s', P.usb_max_resolution, "-c:v", "h264_omx", "-b:v", "2000k",
                  '-frag_duration', '1000', '-f', 'segment', '-segment_time', str(P.segment_duration),
                  '-reset_timestamps', '1', '-force_key_frames', 'expr:gte(t,n_forced*10)', '-strftime', '1',
@@ -254,6 +239,14 @@ def _usb_init():
     P.usb_last_cam_detect_attempt = datetime.datetime.now()
     new_cam_list = usb_tool.get_usb_camera_list()
     L.l.info("Found {} USB cameras".format(len(new_cam_list)))
+    # remove gone cameras
+    for old_cam in P.cam_list:
+        if old_cam not in new_cam_list:
+            L.l.warning("Removing usb camera {}, not detected anymore".format(old_cam))
+            _usb_stop(old_cam)
+            del P.cam_list[old_cam]
+            del P.cam_param[old_cam]
+    # init existing cameras
     for cam in new_cam_list.itervalues():
         if cam.name not in P.cam_list:
             L.l.info("Initialising new USB cam {}".format(cam.name))
@@ -279,8 +272,6 @@ def _usb_init():
             if cp.ffmpeg_proc is not None and cp.ffmpeg_proc._child_created:
                 L.l.info("Recording started on {}".format(cam.name))
                 cp.is_recording = True
-                P.is_one_recording_usb = True
-                P.is_one_usb_camera_detected = True
             else:
                 L.l.info("Recording process not created for {}".format(cam.name))
         except Exception, ex:
@@ -387,9 +378,7 @@ def _pi_stop():
 
 def _usb_stop(cam_name):
     L.l.info("Stopping USB {}".format(cam_name))
-    #cam = P.cam_list[cam_name]
     cp = P.cam_param[cam_name]
-    #P.is_recording_usb = False
     if cp.ffmpeg_proc is not None:
         try:
             cp.ffmpeg_proc.terminate()
@@ -408,7 +397,18 @@ def _usb_stop(cam_name):
 def _usb_stop_all():
     for cp in P.cam_param.itervalues():
         _usb_stop(cp.name)
-    P.is_one_recording_usb = False
+
+
+def _usb_is_recording_count():
+    i = 0
+    for cp in P.cam_param.itervalues():
+        if cp.is_recording:
+            i += 1
+    return 1
+
+
+def _usb_camera_count():
+    return len(P.cam_list)
 
 
 def _handle_event_gps(lat, lon, hspeed, alt):
@@ -443,7 +443,7 @@ def _handle_event_alarm(zone_name, alarm_pin_name, pin_connected):
 def _set_camera_state():
     now = datetime.datetime.now()
     move_lapsed = (now - P.last_move_time).total_seconds()
-    if (move_lapsed > P.inactivity_duration) and (P.is_one_recording_usb or P.is_recording_pi):
+    if (move_lapsed > P.inactivity_duration) and (_usb_is_recording_count() > 0 or P.is_recording_pi):
         L.l.info("Stopping cameras as no activity in the last {} seconds".format(move_lapsed))
         P.is_recording_on = False
 
@@ -504,19 +504,19 @@ def thread_run():
                 if P.is_pi_camera_detected:
                     L.l.info("Starting PI camera, should have been on")
                 _pi_init()
-            if P.is_one_recording_usb:
-                #if P.is_recording_usb:
+            if _usb_is_recording_count() > 0:
                 _usb_record_loop()
             else:
-                if P.is_one_usb_camera_detected:  # stay silent if recovery failed
+                if _usb_camera_count() > 0:  # stay silent if recovery failed
                     L.l.info("Starting USB camera, should have been on")
                 _usb_init()
-        if not P.is_recording_on and P.is_recording_pi:
-            L.l.info("Stopping PI recording")
-            _pi_stop()
-        if not P.is_recording_on and P.is_one_recording_usb:
-            L.l.info("Stopping USB recording")
-            _usb_stop_all()
+        if not P.is_recording_on:
+            if P.is_recording_pi:
+                L.l.info("Stopping PI recording")
+                _pi_stop()
+            if _usb_is_recording_count() > 0:
+                L.l.info("Stopping USB recording")
+                _usb_stop_all()
     except Exception, ex:
         print "Error in recorder thread_run, ex={}".format(ex)
         print traceback.print_exc()
