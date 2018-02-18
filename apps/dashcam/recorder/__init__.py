@@ -46,10 +46,8 @@ class P:
     ffmpeg_pi = None  # process encoding
     segment_duration = 900  # in seconds
     is_recording_pi = False
-    #is_one_recording_usb = False
     is_pi_camera_detected = True
     is_recording_on = True
-    #is_one_usb_camera_detected = False
     usb_rotation_filter = {'HD Webcam C525': 'vflip,', 'UVC Camera (046d:081b)': '', 'HD USB Camera': ''}
     pi_rotation_degree = 90
     root_mountpoint = '/'  # to check space available for recording
