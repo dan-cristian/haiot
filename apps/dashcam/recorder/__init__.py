@@ -301,6 +301,7 @@ def _usb_record_loop():
                     else:
                         L.l.info("USB exit, not an error for camera {}?".format(cp.name))
                     _usb_stop(cp.name)
+                    cp.is_recording = False
                 else:
                     pass
             else:
@@ -395,12 +396,13 @@ def _usb_stop(cam_name):
         except Exception:
             pass
         cp.ffmpeg_proc = None
-        if cp.std_pipe is not None:
-            cp.std_pipe.close()
-            cp.std_pipe = None
-        if cp.err_pipe is not None:
-            cp.err_pipe.close()
-            cp.err_pipe = None
+    if cp.std_pipe is not None:
+        cp.std_pipe.close()
+        cp.std_pipe = None
+    if cp.err_pipe is not None:
+        cp.err_pipe.close()
+        cp.err_pipe = None
+    cp.is_recording = False
 
 
 def _usb_stop_all():
