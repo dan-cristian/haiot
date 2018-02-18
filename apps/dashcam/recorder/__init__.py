@@ -203,8 +203,8 @@ def _save_usb_err_output(cam_name):
     cp = P.cam_param[cam_name]
     # make a copy for debug
     L.l.info('Copy usb output file for debug')
-    shutil.copy(cp.out_err_path, cp.out_err_path + '.' + str(time.time()))
-    ferr = open(cp.out_err_path)
+    shutil.copy(cp.pipe_err_path, cp.pipe_err_path+ '.' + str(time.time()))
+    ferr = open(cp.pipe_err_path)
     contents = ferr.read()
     ferr.close()
     return contents
