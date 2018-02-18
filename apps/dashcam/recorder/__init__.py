@@ -156,10 +156,6 @@ def _run_ffmpeg_usb(cam_name):
     if cp.ffmpeg_proc is None:
         cp.std_pipe = open(cp.pipe_std_path, 'w')
         cp.err_pipe = open(cp.pipe_err_path, 'w')
-        #P.usb_out_std[cam_name] = open(P.usb_out_filepath_std[cam_name], 'w')
-        #P.usb_out_err[cam_name] = open(P.usb_out_filepath_err[cam_name], 'w')
-        #P.usb_record_hw[cam_name] = usb_tool.get_usb_audio(cam_name)  # P.usb_camera_keywords)
-        #P.usb_camera_dev_path[cam_name] = usb_tool.get_usb_video_dev(cam_name)  # P.usb_camera_keywords)
 
         if cam.devpath is None:
             res = False
@@ -180,7 +176,7 @@ def _run_ffmpeg_usb(cam_name):
             cp.ffmpeg_proc = subprocess.Popen(
                 ['ffmpeg', '-y', '-f', 'alsa', '-thread_queue_size', '8192', '-ac', '1'] + audio +
                 ['-r', str(P.usb_framerate), '-f', 'video4linux2', '-thread_queue_size', '8192', '-i', cam.devpath,
-                 '-vf', rotation + 'drawtext=text=' + P.overlay_text_file
+                 '-vf', rotation + 'drawtext=textfile=' + P.overlay_text_file
                 + ':fontcolor=white@0.8:fontsize=16:x=10:y=10:reload=1',
                  '-s', P.usb_max_resolution, "-c:v", "h264_omx", "-b:v", "2000k",
                  '-frag_duration', '1000', '-f', 'segment', '-segment_time', str(P.segment_duration),
