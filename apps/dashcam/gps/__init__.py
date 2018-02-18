@@ -103,7 +103,7 @@ def _read_gps():
             L.l.info("Got gps fix, sats={} valid={} mode={}".format(r.sats, r.sats_valid, r.mode))
             State.reported_no_fix = False
         if r.mode == 2:
-            alt = -9999
+            alt = -1
         else:
             alt = r.alt
         pos = Position(lat=r.lat, lon=r.lon, alt=alt, sats_valid=r.sats_valid, acc=r.position_precision()[0],

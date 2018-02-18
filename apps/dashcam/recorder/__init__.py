@@ -107,8 +107,8 @@ def _get_win_cams():
 
 
 def _get_overlay_text():
-    speed = int(P.gps_hspeed)
-    alt = int(P.gps_alt)
+    speed = round(float(P.gps_hspeed), 0)
+    alt = round(float(P.gps_alt), 0)
     time_txt = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     return '{} {}kph {}m {},{} '.format(time_txt, speed, alt, P.gps_lat, P.gps_lon)
 
@@ -420,7 +420,7 @@ def _handle_event_gps(lat, lon, hspeed, alt):
 
 def _handle_event_alarm(zone_name, alarm_pin_name, pin_connected):
     L.l.info("Got alarm in {} name={} with pin connected {}".format(zone_name, alarm_pin_name, pin_connected))
-    if alarm_pin_name == 'car vibrate':
+    if alarm_pin_name == 'car vibrate' or alarm_pin_name == 'car sound':
         P.last_move_time = datetime.datetime.now()
         P.usb_last_cam_detect_attempt = datetime.datetime.min
         P.is_recording_on = True
