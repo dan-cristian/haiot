@@ -135,7 +135,7 @@ def get_usb_camera_list():
                     camera.devpath = line.strip()
                     _set_cam_attrib(camera)
                     res[camera.name] = camera
-                    L.l.info("Cam is {}".format(camera))
+                    #L.l.info("Cam is {}".format(camera))
     except Exception, ex:
         L.l.info("Unable to detect USB cameras, er={}".format(ex))
     return res
