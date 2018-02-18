@@ -106,7 +106,7 @@ def _get_win_cams():
 
 
 def _get_gps_text():
-    return '{}kph {}m {},{} '.format(P.gps_hspeed, P.gps_alt, P.gps_lat, P.gps_lon)
+    return ' {}kph {}m {},{} '.format(P.gps_hspeed, P.gps_alt, P.gps_lat, P.gps_lon)
 
 def _run_ffmpeg_pi():
     L.l.info("Recording on {}".format(P.pi_out_filename))
@@ -169,7 +169,7 @@ def _run_ffmpeg_usb(cam_name):
                 ['ffmpeg', '-y', '-f', 'alsa', '-thread_queue_size', '8192', '-ac', '1'] + audio +
                 ['-r', str(P.usb_framerate), '-f', 'video4linux2', '-thread_queue_size', '8192', '-i', cam.devpath,
                  '-vf', rotation + 'drawtext=text=\'%{localtime\:%c}' +
-                 _get_gps_text() + '\':fontcolor=white@0.8:fontsize=16:x=10:y=10',
+                 _get_gps_text() + '\':fontcolor=white@0.8:fontsize=16:x=10:y=10:reload=1',
                  '-s', P.usb_max_resolution, "-c:v", "h264_omx", "-b:v", "2000k",
                  '-frag_duration', '1000', '-f', 'segment', '-segment_time', str(P.segment_duration),
                  '-reset_timestamps', '1', '-force_key_frames', 'expr:gte(t,n_forced*10)', '-strftime', '1',
