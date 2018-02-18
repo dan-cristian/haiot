@@ -36,10 +36,10 @@ def _battery_stat(battery_name, voltage, current, power):
     if battery_name in P.power_monitor_list:
         power_monitor = P.power_monitor_list[battery_name]
         # 1.03 voltage for INA means no current (no wires connected)
-        if 1.03 <= voltage <= power_monitor.critical_voltage and power != 0:
+        if 1.03 <= voltage <= power_monitor.critical_voltage and int(current) != 0:
             L.l.warning("Battery {} voltage is too low at {}".format(battery_name, voltage))
             # shutdown_system
-        if 1.03 <= voltage <= power_monitor.warn_voltage and power != 0:
+        if 1.03 <= voltage <= power_monitor.warn_voltage and int(current) != 0:
             L.l.warning("Battery {} voltage is very low at {}".format(battery_name, voltage))
             pass
         if current >= power_monitor.warn_current:
