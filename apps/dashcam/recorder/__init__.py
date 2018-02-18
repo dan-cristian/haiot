@@ -213,7 +213,7 @@ def _save_usb_err_output(cam_name):
 def _recover_usb(cam_name):
     cp = P.cam_param[cam_name]
     if P.usb_recover_count <= P.usb_recover_attempts_limit:
-        if not os.path.isfile(cp.out_err_path):
+        if not os.path.isfile(cp.pipe_err_path):
             L.l.info('Unknown USB error, no recent ffmpeg output found')
             usb_tool.reset_usb(cam_name)
             time.sleep(5)  # let camera to be detected
