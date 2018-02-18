@@ -30,7 +30,7 @@ class Raw:
     power_mgmt_2 = 0x6c
     gyro_scale = 131.0
     accel_scale = 16384.0
-    address = 0x68  # This is the default I2C address of ITG-MPU breakout board
+    address = 0x69  # This is the default I2C address of ITG-MPU breakout board
     bus = None
 
     @staticmethod
