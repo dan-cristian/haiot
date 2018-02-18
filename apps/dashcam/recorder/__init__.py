@@ -99,16 +99,25 @@ class P:
     gps_lon = 0
     gps_hspeed = 0
     gps_alt = 0
+    overlay_text_file = '/tmp/overlay_text'
 
 
 def _get_win_cams():
     pass
 
 
-def _get_gps_text():
+def _get_overlay_text():
     speed = int(P.gps_hspeed)
     alt = int(P.gps_alt)
-    return ' {}kph {}m {},{} '.format(speed, alt, P.gps_lat, P.gps_lon)
+    time_txt = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    return '{} {}kph {}m {},{} '.format(time_txt, speed, alt, P.gps_lat, P.gps_lon)
+
+
+def _write_overlay_text():
+    f = open(P.overlay_text_file, 'w')
+    f.write(_get_overlay_text())
+    f.close()
+
 
 def _run_ffmpeg_pi():
     L.l.info("Recording on {}".format(P.pi_out_filename))
@@ -167,11 +176,12 @@ def _run_ffmpeg_usb(cam_name):
                 L.l.info("No specific rotation setting for camera {}, assuming none".format(cam_name))
                 rotation = ''
             # https://superuser.com/questions/578321/how-to-rotate-a-video-180-with-ffmpeg/578329#578329
+            # '-vf', rotation + 'drawtext=text=\'%{localtime\:%c}\':fontcolor=white@0.8:fontsize=16:x=10:y=10',
             cp.ffmpeg_proc = subprocess.Popen(
                 ['ffmpeg', '-y', '-f', 'alsa', '-thread_queue_size', '8192', '-ac', '1'] + audio +
                 ['-r', str(P.usb_framerate), '-f', 'video4linux2', '-thread_queue_size', '8192', '-i', cam.devpath,
-                 '-vf', rotation + 'drawtext=text=\'%{localtime\:%c}' +
-                 _get_gps_text() + '\':fontcolor=white@0.8:fontsize=16:x=10:y=10:reload=1',
+                 '-vf', rotation + 'drawtext=text=' + P.overlay_text_file
+                + ':fontcolor=white@0.8:fontsize=16:x=10:y=10:reload=1',
                  '-s', P.usb_max_resolution, "-c:v", "h264_omx", "-b:v", "2000k",
                  '-frag_duration', '1000', '-f', 'segment', '-segment_time', str(P.segment_duration),
                  '-reset_timestamps', '1', '-force_key_frames', 'expr:gte(t,n_forced*10)', '-strftime', '1',
@@ -300,7 +310,7 @@ def _usb_record_loop():
 
 def _pi_record_loop():
     if P.is_recording_pi:
-        P.pi_camera.annotate_text = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        P.pi_camera.annotate_text = _get_overlay_text()
         P.ffmpeg_pi.poll()
         if P.ffmpeg_pi.returncode is not None:
             L.l.info("PI record exit with code {}".format(P.ffmpeg_pi.returncode))
@@ -477,6 +487,7 @@ def init():
 
 def thread_run():
     try:
+        _write_overlay_text()
         # detect ntp time drift, if clock changed adjust last move to avoid sudden recording stop
         if (datetime.datetime.now() - P.last_clock_time).total_seconds() > thread_tick + 60:
             P.last_move_time = datetime.datetime.now()
