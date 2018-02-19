@@ -249,17 +249,7 @@ def _detect_usb_camera():
     return None
 
 
-def _usb_init(cam):
-    L.l.info("Initialising usb cam {}".format(cam.name))
-    P.cam_list[cam.name] = cam
-    cp = CamParam(name=cam.name, is_on=True, is_recording=False, ffmpeg_proc=None, rec_filename=None,
-                  pipe_std_path=None, pipe_err_path=None, std_pipe=None, err_pipe=None)
-    cp.pipe_std_path = P.usb_out_filepath_std_template.replace('_x', '_' + cam.name.strip().replace(' ', '_'))
-    cp.pipe_err_path = P.usb_out_filepath_err_template.replace('_x', '_' + cam.name.strip().replace(' ', '_'))
-    cp.rec_filename = P.usb_out_filename_template.replace('_x', '_' + cam.name.strip().replace(' ', '_'))
-    if os.path.isfile(cp.pipe_err_path):
-        os.remove(cp.pipe_err_path)
-    P.cam_param[cam.name] = cp
+def _start_usb_cam(cam):
     cp = P.cam_param[cam.name]
     if not cp.is_recording:
         try:
@@ -281,9 +271,23 @@ def _usb_init(cam):
         L.l.info("Recording already started on usb camera {} at init".format(cam.name))
 
 
+def _usb_init(cam):
+    L.l.info("Initialising usb cam {}".format(cam.name))
+    P.cam_list[cam.name] = cam
+    cp = CamParam(name=cam.name, is_on=True, is_recording=False, ffmpeg_proc=None, rec_filename=None,
+                  pipe_std_path=None, pipe_err_path=None, std_pipe=None, err_pipe=None)
+    cp.pipe_std_path = P.usb_out_filepath_std_template.replace('_x', '_' + cam.name.strip().replace(' ', '_'))
+    cp.pipe_err_path = P.usb_out_filepath_err_template.replace('_x', '_' + cam.name.strip().replace(' ', '_'))
+    cp.rec_filename = P.usb_out_filename_template.replace('_x', '_' + cam.name.strip().replace(' ', '_'))
+    if os.path.isfile(cp.pipe_err_path):
+        os.remove(cp.pipe_err_path)
+    P.cam_param[cam.name] = cp
+    _start_usb_cam(cam)
+
+
 def _usb_init_all():
     res = _detect_usb_camera()
-    if res is None:
+    if res is None and _usb_is_recording_count() == _usb_camera_count():
         return
     else:
         new_cam_list = res
@@ -302,6 +306,7 @@ def _usb_init_all():
             _usb_init(cam)
         else:
             L.l.info("Cam {} already initialised".format(cam.name))
+            _start_usb_cam(cam)
 
 
 def _usb_record_loop():
@@ -312,7 +317,7 @@ def _usb_record_loop():
             if cp.ffmpeg_proc is not None:
                 cp.ffmpeg_proc.poll()
                 if cp.ffmpeg_proc.returncode is not None:
-                    L.l.info("USB record exit with code {}".format(cp.ffmpeg_proc.returncode))
+                    L.l.info("USB record for cam {} exit with code {}".format(cp.name, cp.ffmpeg_proc.returncode))
                     if cp.ffmpeg_proc.returncode != 0:
                         L.l.info("USB recording stopped for camera {}".format(cp.name))
                         _save_usb_err_output(cp.name)
@@ -454,7 +459,6 @@ def _handle_event_alarm(zone_name, alarm_pin_name, pin_connected):
         P.usb_last_cam_detect_attempt = datetime.datetime.min
         P.is_recording_on = True
         P.usb_recover_count = 0
-        P.is_recording_on = True
     elif alarm_pin_name == 'pidash battery low':
         if not pin_connected:
             L.l.info("Battery is LOW")
@@ -541,7 +545,7 @@ def thread_run():
                 #if _usb_camera_count() > 0:  # stay silent if recovery failed
                 #    L.l.info("Starting {} USB cameras, should have been on".format(_usb_camera_count()))
             #    _usb_init_all()
-        if not P.is_recording_on:
+        else:
             if P.is_recording_pi:
                 L.l.info("Stopping PI recording")
                 _pi_stop()
