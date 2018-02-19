@@ -293,7 +293,7 @@ def _usb_init_all():
         new_cam_list = res
     L.l.info("Found {} USB cameras".format(len(new_cam_list)))
     # remove gone cameras
-    for old_cam in P.cam_list:
+    for old_cam in list(P.cam_list):
         if old_cam not in new_cam_list:
             L.l.warning("Removing usb camera {}, not detected anymore".format(old_cam))
             _usb_stop(old_cam)
