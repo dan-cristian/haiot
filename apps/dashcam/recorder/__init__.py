@@ -319,7 +319,6 @@ def _usb_record_loop():
                     else:
                         L.l.info("USB exit, not an error for camera {}?".format(cp.name))
                     _usb_stop(cp.name)
-                    cp.is_recording = False
                 else:
                     # all ok
                     pass
@@ -434,7 +433,7 @@ def _usb_is_recording_count():
     for cp in P.cam_param.itervalues():
         if cp.is_recording:
             i += 1
-    return 1
+    return i
 
 
 def _usb_camera_count():
