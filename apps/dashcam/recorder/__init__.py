@@ -293,6 +293,8 @@ def _usb_init_all():
         return
     else:
         new_cam_list = res
+    L.l.info("entering usb init, res={}, rec_count={}, cam_count={}".format(
+        res, _usb_is_recording_count(), _usb_camera_count()))
     if new_cam_list is not None:
         L.l.info("Found {} USB cameras".format(len(new_cam_list)))
     # remove gone cameras
