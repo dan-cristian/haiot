@@ -287,7 +287,7 @@ def _usb_init(cam):
 
 def _usb_init_all():
     res = _detect_usb_camera()
-    if res is None and _usb_is_recording_count() == _usb_camera_count():
+    if res is None or _usb_is_recording_count() == _usb_camera_count():
         return
     else:
         new_cam_list = res
