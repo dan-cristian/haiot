@@ -76,11 +76,11 @@ def _upload_pos_buffer():
                 if resp == "null":
                     State.pos_buffer.remove(p)
                 else:
-                    L.l.info("Unexpected response {}".format(resp))
+                    L.l.warning("Unexpected response {}".format(resp))
             except Exception, ex:
-                L.l.info("Unable to upload position, err={}".format(ex))
-                L.l.info("Buffer has {} elements".format(len(State.pos_buffer)))
-                L.l.info("URL WAS:{}".format(url))
+                L.l.warning("Unable to upload position, buffer={} err={}".format(len(State.pos_buffer), ex))
+                #L.l.info("Buffer has {} elements".format(len(State.pos_buffer)))
+                # L.l.info("URL WAS:{}".format(url))
         if (initial > 1) and (initial - len(State.pos_buffer) > 1):
             L.l.info("Buffer catches up, now has {} elements".format(len(State.pos_buffer)))
         if len(State.pos_buffer) > 0:
