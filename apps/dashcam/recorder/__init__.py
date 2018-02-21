@@ -215,14 +215,14 @@ def _recover_usb(cam_name):
             if is_exit_normal:
                 L.l.info('Exit was normal, nothing to do to recover')
             else:
-                is_exit_io_err = 'Input/output error' in contents or 'no soundcards found' in contents
-                if is_exit_io_err:
-                    L.l.info('Found an USB I/O error')
+                if 'Input/output error' in contents or 'no soundcards found' in contents \
+                        or 'Device or resource busy' in contents:
+                    L.l.info('Found an USB I/O error, will reset usb bus')
+                    usb_tool.reset_usb(cam_name)
+                    time.sleep(5)  # let camera to be detected
                 else:
-                    L.l.info('Unknown USB error, details below:')
+                    L.l.info('Unknown USB error, details below, nothing to do')
                     L.l.info(contents)
-                usb_tool.reset_usb(cam_name)
-                time.sleep(5)  # let camera to be detected
         P.usb_recover_count += 1
         if P.usb_recover_count == P.usb_recover_attempts_limit:
             P.usb_last_recovery_attempt = datetime.datetime.now()
@@ -327,6 +327,7 @@ def _usb_record_loop():
                     if cp.ffmpeg_proc.returncode != 0:
                         L.l.info("USB recording stopped for camera {}".format(cp.name))
                         _save_usb_err_output(cp.name)
+                        _recover_usb(cp.name)
                     else:
                         L.l.info("USB exit, not an error for camera {}?".format(cp.name))
                     _usb_stop(cp.name)
