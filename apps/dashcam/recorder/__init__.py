@@ -289,7 +289,7 @@ def _usb_init_all():
     res = _detect_usb_camera()
     if res is None or (len(res) == _usb_is_recording_count() > 0):
         L.l.info("exit from usb init, res={}, rec_count={}, cam_count={}".format(
-            res, _usb_is_recording_count(), _usb_camera_count()))
+            res, _usb_is_recording_count(), len(res)))
         return
     else:
         new_cam_list = res
