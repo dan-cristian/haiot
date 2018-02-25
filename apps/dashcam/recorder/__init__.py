@@ -237,7 +237,7 @@ def _recover_usb(cam_name):
 def _detect_usb_camera():
     delta = (datetime.datetime.now() - P.usb_last_cam_detect_attempt).total_seconds()
     if delta <= P.usb_cam_detect_interval:
-        return None
+        return {}
     P.usb_last_cam_detect_attempt = datetime.datetime.now()
     new_cam_list = usb_tool.get_usb_camera_list()
     #for old_cam in P.cam_list:
@@ -287,15 +287,15 @@ def _usb_init(cam):
 
 def _usb_init_all():
     res = _detect_usb_camera()
-    if res is None or (len(res) == _usb_is_recording_count() > 0):
+    if len(res) == _usb_is_recording_count() > 0:
         L.l.info("exit from usb init, res={}, rec_count={}, cam_count={}".format(
             res, _usb_is_recording_count(), len(res)))
         return
     else:
         new_cam_list = res
     L.l.info("entering usb init, res={}, rec_count={}, cam_count={}".format(
-        res, _usb_is_recording_count(), _usb_camera_count()))
-    if new_cam_list is not None:
+        res, _usb_is_recording_count(), len(res)))
+    if len(new_cam_list) > 0:
         L.l.info("Found {} USB cameras".format(len(new_cam_list)))
     # remove gone cameras
     for old_cam in list(P.cam_list):
