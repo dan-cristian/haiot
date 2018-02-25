@@ -312,7 +312,8 @@ def _usb_init_all():
                 _usb_init(cam)
             else:
                 L.l.info("Cam {} already initialised".format(cam.name))
-                _start_usb_cam(cam)
+                _usb_init(cam) # init again in case device params have changed (e.g. dev path)
+                #_start_usb_cam(cam)
 
 
 def _usb_record_loop():
