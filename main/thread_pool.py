@@ -94,7 +94,7 @@ def run_thread_pool():
                                                                                                elapsed_seconds))
                         if __callable_progress_list.has_key(func):
                             progress_status=__callable_progress_list[func].func_globals['progress_status']
-                            L.l.warning('Progress Status is {}'.format(progress_status))
+                            L.l.warning('Progress Status since {} sec is {}'.format(elapsed_seconds, progress_status))
             time.sleep(2)
         executor.shutdown()
         L.l.info('Interval thread pool processor exit')
