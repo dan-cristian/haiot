@@ -163,9 +163,10 @@ def init():
         _upload_pos_buffer()
     try:
         gpsd.connect()
+        _read_gps()
         initialised = True
     except Exception, ex:
-        L.l.info("Unable to connect to gps daemon, ex={}".format(ex))
+        L.l.info("Unable to connect to gps daemon or read gps, ex={}".format(ex))
         initialised = False
 
 
