@@ -53,6 +53,7 @@ ENABLE_ROUTER=0
 ENABLE_DASHCAM_PI=1
 ENABLE_DASHCAM_PI_LCD_DF=1
 ENABLE_DASHCAM_MOTION=0
+ENABLE_UPS_PICO=1
 ENABLE_3G_MODEM=1
 ENABLE_LOG_RAM=0
 
@@ -1091,6 +1092,26 @@ if [ "$ENABLE_DASHCAM_PI" == "1" ]; then
     nano /etc/rc.local
 fi
 
+
+if [ "$ENABLE_UPS_PICO" == "1" ]; then
+    # https://github.com/modmypi/PiModules/wiki/UPS-PIco-Installation
+    echo "Installing UPS PICO prereq"
+    apt install -y python-rpi.gpio git python-dev python-serial python-smbus python-jinja2 python-xmltodict python-psutil python-pip
+    pip install xmltodict
+    cd /home/${USERNAME}
+    git clone https://github.com/modmypi/PiModules.git
+    cd PiModules/code/python/package
+    python setup.py install
+    cd /home/${USERNAME}
+    cd PiModules/code/python/upspico/picofssd
+    python setup.py install
+    update-rc.d picofssd defaults
+    update-rc.d picofssd enable
+    apt-get install -y i2c-tools
+    echo "Enable RTC"
+    if ! grep -q "^rtc[-_]ds1307" /etc/modules; then printf "rtc-ds1307\n" >> /etc/modules; fi
+    echo 'echo ds1307 0x68 > /sys/class/i2c-adapter/i2c-1/new_device' >> /etc/rc.local
+fi
 
 if [ "$ENABLE_DASHCAM_MOTION" == "1" ]; then
     apt install -y motion
