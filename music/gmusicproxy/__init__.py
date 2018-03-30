@@ -1,4 +1,4 @@
-from main.logger_helper import Log
+from main.logger_helper import L
 from main.admin.model_helper import get_param
 from common import Constant
 import requests
@@ -19,7 +19,7 @@ def get_song_id(artist, title):
         else:
             return result
     except Exception, ex:
-        Log.logger.critical("Error on get song from google proxy: {}".format(ex))
+        L.l.critical("Error on get song from google proxy: {}".format(ex))
         return None
 
 def get_song_url(song_id):

@@ -5,7 +5,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy  # workaround for resolve issue
 from flask_sqlalchemy import models_committed
 from wakeonlan import wol
-from main.logger_helper import Log
+from main.logger_helper import L
 
 try:
     import pymysql
@@ -36,25 +36,25 @@ def my_import(name):
             mod = getattr(mod, comp)
         return mod
     except Exception, ex:
-        Log.logger.warning("Unable to import module {}, err={}".format(name, ex))
+        L.l.warning("Unable to import module {}, err={}".format(name, ex))
         return None
 
 
 def init_module(module_name, module_is_active):
     if module_is_active:
-        Log.logger.info("Importing module {}".format(module_name))
+        L.l.info("Importing module {}".format(module_name))
         dynclass = my_import(module_name)
         if dynclass:
             # Log.logger.info('Module {} is marked as active'.format(module_name))
             if not dynclass.initialised:
-                Log.logger.info('Module {} initialising'.format(module_name))
+                L.l.info('Module {} initialising'.format(module_name))
                 dynclass.init()
             else:
-                Log.logger.info('Module {} already initialised, skipping init'.format(module_name))
+                L.l.info('Module {} already initialised, skipping init'.format(module_name))
         else:
-            Log.logger.critical("Module {} failed to load".format(module_name))
+            L.l.critical("Module {} failed to load".format(module_name))
     else:
-        Log.logger.info("Module {} is marked as not active, skipping load".format(module_name))
+        L.l.info("Module {} is marked as not active, skipping load".format(module_name))
         '''    if dynclass.initialised:
                 Log.logger.info('Module {} has been deactivated, unloading'.format(module_name))
                 dynclass.unload()
@@ -68,17 +68,17 @@ def unload_module(module_name):
     dynclass = my_import(module_name)
     if dynclass:
         if dynclass.initialised:
-            Log.logger.info('Module {} unloading'.format(module_name))
+            L.l.info('Module {} unloading'.format(module_name))
             dynclass.unload()
         else:
-            Log.logger.info('Module {} is not initialised, skipping unload'.format(module_name))
+            L.l.info('Module {} is not initialised, skipping unload'.format(module_name))
 
 
 def init_modules():
     import admin.models
     import admin.model_helper
     from common import Constant
-    from main.logger_helper import Log
+    from main.logger_helper import L
 
     m = admin.models.Module
     # http://docs.sqlalchemy.org/en/rel_0_9/core/sqlelement.html
@@ -102,7 +102,7 @@ def init_modules():
 
 
 def signal_handler(signal_name, frame):
-    Log.logger.info('I got signal {} frame {}, exiting'.format(signal_name, frame))
+    L.l.info('I got signal {} frame {}, exiting'.format(signal_name, frame))
     global exit_code
     exit_code = 1
     unload()
@@ -120,7 +120,7 @@ def execute_command(command, node=None):
         exit_code = 133
     elif command == 'wake':
         #http://techie-blog.blogspot.ro/2014/03/making-wake-on-lan-wol-work-in-windows.html
-        Log.logger.info('Sending wol magic packet to MAC {}'.format(node.mac))
+        L.l.info('Sending wol magic packet to MAC {}'.format(node.mac))
         wol.send_magic_packet(node.mac)
 
     if exit_code != 0:
@@ -131,7 +131,7 @@ def unload_modules():
     import admin.models
     #import admin.model_helper
     from common import Constant
-    from main.logger_helper import Log
+    from main.logger_helper import L
 
     m = admin.models.Module
     # http://docs.sqlalchemy.org/en/rel_0_9/core/sqlelement.html
@@ -150,7 +150,7 @@ def unload_modules():
 
 
 def unload():
-    Log.logger.info('Main module is unloading, application will exit')
+    L.l.info('Main module is unloading, application will exit')
     import main.thread_pool
 
     global shutting_down
@@ -176,10 +176,10 @@ def init():
     from common import utils
 
     common.init_simple()
-    logger_helper.Log.init_logging()
+    logger_helper.L.init_logging()
     signal.signal(signal.SIGTERM, signal_handler)
 
-    Log.logger.info('Collecting system info')
+    L.l.info('Collecting system info')
     from main import system_info
     system_info.init()
 
@@ -189,9 +189,9 @@ def init():
     global app, db, DB_LOCATION
     common.load_config_json()
     DB_LOCATION = "sqlite:///" + common.get_json_param(common.Constant.P_DB_PATH)
-    Log.logger.info('DB file is at ' + DB_LOCATION)
+    L.l.info('DB file is at ' + DB_LOCATION)
     # from main.logger_helper import LOG_TO_TRANSPORT
-    Log.logger.info('Initialising flask')
+    L.l.info('Initialising flask')
     # http://stackoverflow.com/questions/20646822/how-to-serve-static-files-in-flask
     # set the project root directory as the static folder, you can set others.
     app = Flask('main', static_folder='../webui/static')  # , static_url_path='')
@@ -201,11 +201,11 @@ def init():
     app.config['SECRET_KEY'] = 'secret'
     app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-    Log.logger.info('Initialising SQLAlchemy')
+    L.l.info('Initialising SQLAlchemy')
     db = SQLAlchemy(app)
     db.create_all()
 
-    Log.logger.info('Checking main db tables')
+    L.l.info('Checking main db tables')
     import admin.models
     import admin.model_helper
     global MODEL_AUTO_UPDATE
@@ -213,7 +213,7 @@ def init():
     admin.model_helper.populate_tables(MODEL_AUTO_UPDATE)
     reporting_enabled = admin.model_helper.get_param(Constant.DB_REPORTING_LOCATION_ENABLED)
     if reporting_enabled == "1" and not IS_STANDALONE_MODE:
-        Log.logger.info('Checking history db tables')
+        L.l.info('Checking history db tables')
         # http://docs.sqlalchemy.org/en/rel_0_9/dialects/mysql.html#module-sqlalchemy.dialects.mysql.mysqlconnector
         user = admin.model_helper.get_param(Constant.DB_REPORTING_USER)
         passwd = admin.model_helper.get_param(Constant.DB_REPORTING_PASS)
@@ -229,16 +229,16 @@ def init():
             Constant.HAS_LOCAL_DB_REPORTING_CAPABILITY = True
             admin.model_helper.check_history_tables()
         except Exception, ex:
-            Log.logger.critical("Local DB reporting capability is not available, err={}".format(ex))
+            L.l.critical("Local DB reporting capability is not available, err={}".format(ex))
             app.config['SQLALCHEMY_BINDS'] = None
     elif IS_STANDALONE_MODE:
-        Log.logger.info('Skipping reporting feature initialising, standalone mode')
+        L.l.info('Skipping reporting feature initialising, standalone mode')
 
     import transport
     if not IS_STANDALONE_MODE:
         transport.init()
     else:
-        Log.logger.info('Skipping transport initialising, standalone mode')
+        L.l.info('Skipping transport initialising, standalone mode')
 
     class LogMessage:
         def __init__(self):
@@ -259,20 +259,20 @@ def init():
                 msg.level = record.levelname
                 transport.send_message_json(utils.unsafeobj2json(msg))
 
-    if Log.LOG_TO_TRANSPORT:
-        Log.logger.addHandler(TransportLogging())
-        Log.logger.info('Initialised logging via transport proxy')
+    if L.LOG_TO_TRANSPORT:
+        L.l.addHandler(TransportLogging())
+        L.l.info('Initialised logging via transport proxy')
 
-    Log.logger.info('Initialising events - import')
+    L.l.info('Initialising events - import')
     from admin import event
-    Log.logger.info('Initialising events - init')
+    L.l.info('Initialising events - init')
     event.init()
 
-    Log.logger.info('Machine type is {}'.format(Constant.HOST_MACHINE_TYPE))
-    Log.logger.info('Initialising modules')
+    L.l.info('Machine type is {}'.format(Constant.HOST_MACHINE_TYPE))
+    L.l.info('Initialising modules')
     init_modules()
 
-    Log.logger.info('Initialising generic processing threads')
+    L.l.info('Initialising generic processing threads')
     from main import thread_pool
     import threading
     t = threading.Thread(target=thread_pool.run_thread_pool)
@@ -289,21 +289,23 @@ def init():
     @models_committed.connect_via(app)
     def on_models_committed(sender, changes):
         from main.admin import event
-        Log.logger.debug('Model commit detected sender {} change {}'.format(sender, changes))
+        #L.l.debug('Model commit detected sender {} change {}'.format(sender, changes))
         event.on_models_committed(sender, changes)
 
-    Log.logger.info('Feeding dogs with grass until app will exit')
+    L.l.info('Feeding dogs with grass until app will exit')
+    global exit_code
     # stop app from exiting
     try:
         while not shutting_down:
             time.sleep(1)
     except KeyboardInterrupt:
         print('CTRL+C was pressed, exiting')
+        exit_code = 1
     except Exception, ex:
         print('Main exit with exception {}'.format(ex))
     finally:
         unload()
-    Log.logger.critical('Looping ended, app will exit')
+    L.l.critical('Looping ended, app will exit')
 
 
 def run(arg_list):
@@ -320,28 +322,28 @@ def run(arg_list):
     import logging
     from main import logger_helper
     if 'debug' in arg_list:
-        Log.LOGGING_LEVEL = logging.DEBUG
+        L.LOGGING_LEVEL = logging.DEBUG
     elif 'warning' in arg_list:
-        Log.LOGGING_LEVEL = logging.WARNING
+        L.LOGGING_LEVEL = logging.WARNING
     else:
         # this filters out message priority from being logged
-        Log.LOGGING_LEVEL = logging.INFO
+        L.LOGGING_LEVEL = logging.INFO
 
-    Log.LOG_TO_SYSLOG = 'sysloglocal' in arg_list
-    Log.RUN_IN_LIVE = 'live' in arg_list
+    L.LOG_TO_SYSLOG = 'sysloglocal' in arg_list
+    L.RUN_IN_LIVE = 'live' in arg_list
 
     for s in arg_list:
         # carefull with the order for uniqueness, start with longest words first
         if 'transport_syslog' in s:
-            Log.LOG_TO_TRANSPORT = True
+            L.LOG_TO_TRANSPORT = True
         elif 'syslog=' in s:
             #syslog=logs2.papertrailapp.com:30445
             par_vals = s.split('=')[1].split(':')
-            Log.SYSLOG_ADDRESS = par_vals[0]
-            Log.SYSLOG_PORT = par_vals[1]
+            L.SYSLOG_ADDRESS = par_vals[0]
+            L.SYSLOG_PORT = par_vals[1]
         elif 'log=' in s:
             # log=c:\tmp\iot-nohup.out
-            Log.LOG_FILE=s.split('=')[1]
+            L.LOG_FILE=s.split('=')[1]
         elif 'bind_ip=' in s:
             global BIND_IP
             BIND_IP = s.split('=')[1]

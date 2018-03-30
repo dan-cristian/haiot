@@ -1,6 +1,6 @@
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
-from main.logger_helper import Log
+from main.logger_helper import L
 from main import thread_pool, IS_STANDALONE_MODE
 import node_run
 
@@ -16,13 +16,13 @@ def unload():
 
 def init():
     if not IS_STANDALONE_MODE:
-        Log.logger.debug('Node module initialising')
+        L.l.debug('Node module initialising')
         thread_pool.add_interval_callable_progress(node_run.thread_run, run_interval_second=30,
                                                    progress_func=node_run.get_progress)
         global initialised
         initialised = True
     else:
-        Log.logger.info('Skipping node module initialising, standalone mode')
+        L.l.info('Skipping node module initialising, standalone mode')
 
 
 if __name__ == '__main__':

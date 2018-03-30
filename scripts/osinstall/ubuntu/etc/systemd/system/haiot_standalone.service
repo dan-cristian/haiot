@@ -1,0 +1,15 @@
+[Unit]
+After=network.service sound.target
+
+[Service]
+User=haiot
+Group=haiot
+ExecStart=/home/scripts/../start.sh standalone
+StandardOutput=syslog
+StandardError=syslog
+Restart=always
+RestartSec=1min
+ExecStop=/home/scripts/../start.sh stop
+
+[Install]
+WantedBy=default.target

@@ -1,5 +1,5 @@
 from mpd import MPDClient
-from main.logger_helper import Log
+from main.logger_helper import L
 from main.admin.model_helper import get_param
 from common import Constant
 

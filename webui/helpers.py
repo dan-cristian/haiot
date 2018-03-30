@@ -1,5 +1,5 @@
 import threading
-from main.logger_helper import Log
+from main.logger_helper import L
 import main
 import time
 
@@ -30,11 +30,11 @@ class FlaskInThread(threading.Thread):
         """
         while not main.shutting_down:
             try:
-                Log.logger.info('Starting flask web ui on host {} port {}'.format(self._host, self._port))
+                L.l.info('Starting flask web ui on host {} port {}'.format(self._host, self._port))
                 self._app.run(host=self._host, port=self._port, debug=self._debug, use_reloader=self._use_reloader)
             except Exception, ex:
-                Log.logger.error('Error init flask on host {} port {}, err={}'.format(self._host, self._port, ex),
-                                 exc_info=1)
+                L.l.error('Error init flask on host {} port {}, err={}'.format(self._host, self._port, ex),
+                          exc_info=1)
             time.sleep(1)
 
     def shutdown(self):

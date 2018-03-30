@@ -26,7 +26,7 @@
 import urllib
 import urllib2
 import json
-from main.logger_helper import Log
+from main.logger_helper import L
 from common import Constant, utils
 from main.admin import model_helper
 from pydispatch import dispatcher
@@ -85,13 +85,13 @@ def _send_queue():
             # It's JSON - parse it
             contents = json.loads(body)
             if 'error' in contents.keys():
-                Log.logger.warning("Newtifry server did not accept our message: %s" % contents['error'])
+                L.l.warning("Newtifry server did not accept our message: %s" % contents['error'])
             else:
-                Log.logger.info("Newtifry message sent OK. Size: %d." % contents['size'])
+                L.l.info("Newtifry message sent OK. Size: %d." % contents['size'])
                 del _message_queue[:]
                 _last_send_date = utils.get_base_location_now_date()
         except urllib2.URLError, ex:
-            Log.logger.warning("Newtifry failed to make request to the server: " + str(ex))
+            L.l.warning("Newtifry failed to make request to the server: " + str(ex))
     finally:
         __queue_lock.release()
 
@@ -137,14 +137,14 @@ def send_message(title, message=None, url=None, priority=None, deviceid=None, im
         __queue_lock.release()
     # avoid sending notifications too often
     if (utils.get_base_location_now_date() - _last_send_date).seconds < 30:
-        Log.logger.info('Queuing newtifry message [%s] count %d' % (title, len(_message_queue)))
+        L.l.info('Queuing newtifry message [%s] count %d' % (title, len(_message_queue)))
         return
     else:
         _send_queue()
 
 
 def unload():
-    Log.logger.info('Newtifry module unloading')
+    L.l.info('Newtifry module unloading')
     #dispatcher.disconnect(dispatcher.connect(send_message, signal=Constant.SIGNAL_PUSH_NOTIFICATION,
     #                                         sender=dispatcher.Any))
     global initialised
@@ -152,7 +152,7 @@ def unload():
 
 
 def init():
-    Log.logger.debug('Newtifry module initialising')
+    L.l.debug('Newtifry module initialising')
     global _source_key
     _source_key = model_helper.get_param(Constant.P_NEWTIFY_KEY)
     dispatcher.connect(send_message, signal=Constant.SIGNAL_PUSH_NOTIFICATION, sender=dispatcher.Any)
