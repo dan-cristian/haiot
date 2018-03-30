@@ -2,11 +2,12 @@ from datetime import datetime
 import traceback
 import sys
 from copy import deepcopy
-from main.logger_helper import Log
+from main.logger_helper import L
 from main import db
 from common import Constant
 import graphs
 from common import utils, performance
+from pydispatch import dispatcher
 from main.admin.model_helper import commit
 
 
@@ -28,7 +29,7 @@ class DbBase:
         query_details = function.im_self
         elapsed = performance.add_query(start_time, query_details=query_details)
         if elapsed > 5000:  # with sqlite a long query will throw an error
-            Log.logger.critical("Long running DB query, seconds elapsed={}, result={}".format(elapsed, query_details))
+            L.l.critical("Long running DB query, seconds elapsed={}, result={}".format(elapsed, query_details))
             # db.session.rollback()
             # Log.logger.info("Session was rolled back")
         return result
@@ -74,8 +75,9 @@ class DbBase:
     # m = models.Table
     # m().query_filter_first(m.host_name.in_([Constant.HOST_NAME]), m.name.in_([mod.name]))
     def query_filter_first(self, *query_filter):
-        function = self.query.filter(*query_filter).first
-        return self.__get_result(function)
+        func = self.query.filter(*query_filter).first
+        #return res
+        return self.__get_result(func)
 
     #    def query_filters_first(self, *filter):
     #        function = self.query.filter(*filter).first
@@ -120,9 +122,9 @@ class DbBase:
                                          notify_transport_enabled=False, save_to_graph=False)
                 db.session.commit()
             else:
-                Log.logger.warning('Unique key not found in json record, save aborted')
+                L.l.warning('Unique key not found in json record, save aborted')
         except Exception, ex:
-            Log.logger.error('Exception save json to db {}'.format(ex))
+            L.l.error('Exception save json to db {}'.format(ex))
 
     # graph_save_frequency in seconds
     def save_changed_fields(self, current_record='', new_record='', notify_transport_enabled=False, save_to_graph=False,
@@ -138,7 +140,7 @@ class DbBase:
                     save_to_graph_elapsed = (utils.get_base_location_now_date() -
                                              current_record.last_save_to_graph).total_seconds()
                     if save_to_graph_elapsed > graph_save_frequency:
-                        Log.logger.debug('Saving to graph record {}'.format(new_record))
+                        L.l.debug('Saving to graph record {}'.format(new_record))
                         current_record.save_to_graph = save_to_graph
                         current_record.save_to_history = save_to_graph
                     else:
@@ -159,7 +161,7 @@ class DbBase:
                     new_value = getattr(new_record, column_name)
                     old_value = getattr(current_record, column_name)
                     if debug:
-                        Log.logger.info('DEBUG process Col={} New={} Old={} Saveall={}'.format(
+                        L.l.info('DEBUG process Col={} New={} Old={} Saveall={}'.format(
                             column_name, new_value, old_value, save_all_fields))
                     # todo: comparison not working for float, because str appends .0
                     if ((new_value is not None) and (str(old_value) != str(new_value))) \
@@ -177,10 +179,10 @@ class DbBase:
                             setattr(current_record, column_name, new_value)
                             current_record.last_commit_field_changed_list.append(column_name)
                             if debug:
-                                Log.logger.info('DEBUG change COL={} to VAL={}'.format(column_name, new_value))
+                                L.l.info('DEBUG CHANGE COL={} to VAL={}'.format(column_name, new_value))
                     else:
                         if debug:
-                            Log.logger.info('DEBUG not changing current column={}'.format(column_name))
+                            L.l.info('DEBUG NOT change col={}'.format(column_name))
                 if len(current_record.last_commit_field_changed_list) == 0:
                     current_record.notify_transport_enabled = False
                 # fixme: remove hardcoded field name
@@ -195,24 +197,28 @@ class DbBase:
                     if new_value:
                         new_record.last_commit_field_changed_list.append(column_name)
                 if debug:
-                    Log.logger.info('DEBUG new record={}'.format(new_record))
+                    L.l.info('DEBUG new record={}'.format(new_record))
                 db.session.add(new_record)
             # fixme: remove hardcoded field name
             if hasattr(new_record, 'last_save_to_graph'):
                 if current_record is not None:
                     current_record.last_save_to_graph = utils.get_base_location_now_date()
                 new_record.last_save_to_graph = utils.get_base_location_now_date()
+            # signal other modules we have a new record to process (i.e. upload to cloud)
+            if save_to_graph:
+                dispatcher.send(signal=Constant.SIGNAL_STORABLE_RECORD,
+                                new_record=new_record, current_record=current_record)
             commit()
         except Exception, ex:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             ex_trace = traceback.format_exception(exc_type, exc_value, exc_traceback)
-            Log.logger.error('Error when saving db changes [{}], err={}, trace=\n{}'.format(new_record, ex, ex_trace),
-                             exc_info=True)
+            L.l.error('Error when saving db changes [{}], err={}, trace=\n{}'.format(new_record, ex, ex_trace),
+                      exc_info=True)
             if len(db.session.dirty) > 0:
-                Log.logger.info('Session dirty records={}, rolling back'.format(len(db.session.dirty)))
+                L.l.info('Session dirty records={}, rolling back'.format(len(db.session.dirty)))
                 db.session.rollback()
             else:
-                Log.logger.info('No session dirty records to rollback for error {}'.format(ex))
+                L.l.info('No session dirty records to rollback for error {}'.format(ex))
             raise ex
             # else:
             #    Log.logger.warning('Incorrect parameters received on save changed fields to db')
@@ -280,6 +286,10 @@ class Zone(db.Model, DbBase):
     heat_is_on = db.Column(db.Boolean, default=False)
     last_heat_status_update = db.Column(db.DateTime(), default=None)
     heat_target_temperature = db.Column(db.Integer)
+    is_indoor_heated = db.Column(db.Boolean)
+    is_indoor = db.Column(db.Boolean)
+    is_outdoor = db.Column(db.Boolean)
+    is_outdoor_heated = db.Column(db.Boolean)
 
     def __init__(self, id='', name=''):
         super(Zone, self).__init__()
@@ -494,7 +504,7 @@ class ZoneSensor(db.Model, DbBase):
     zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'))
     # zone = db.relationship('Zone', backref=db.backref('ZoneSensor(zone)', lazy='dynamic'))
     sensor_address = db.Column(db.String(50), db.ForeignKey('sensor.address'))
-
+    target_material = db.Column(db.String(50))  # what material is being measured, water, air, etc
     # sensor = db.relationship('Sensor', backref=db.backref('ZoneSensor(sensor)', lazy='dynamic'))
 
     def __init__(self, zone_id='', sensor_address='', sensor_name=''):
@@ -571,6 +581,27 @@ class Ups(db.Model, graphs.UpsGraph, DbEvent, DbBase):
     beeper_on = db.Column(db.Boolean(), default=False)
     test_in_progress = db.Column(db.Boolean(), default=False)
     other_status = db.Column(db.String(50))
+    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
+
+    def __repr__(self):
+        return '{} {} {}'.format(self.id, self.name, self.updated_on)
+
+
+class PowerMonitor(db.Model, graphs.UpsGraph, DbEvent, DbBase):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True)
+    type = db.Column(db.String(50))  # INA, etc
+    host_name = db.Column(db.String(50))
+    voltage = db.Column(db.Float)  # volts
+    current = db.Column(db.Float)  # miliamps
+    power = db.Column(db.Float)
+    max_voltage = db.Column(db.Float)
+    warn_voltage = db.Column(db.Float)
+    critical_voltage = db.Column(db.Float)
+    min_voltage = db.Column(db.Float)
+    warn_current = db.Column(db.Integer)
+    critical_current = db.Column(db.Integer)
+    i2c_addr = db.Column(db.String(50))
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
 
     def __repr__(self):

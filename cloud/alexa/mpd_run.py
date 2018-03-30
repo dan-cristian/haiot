@@ -1,12 +1,12 @@
 from mpd import MPDClient
-from main.logger_helper import Log
+from main.logger_helper import L
 from main.admin.model_helper import get_param
 from common import Constant
 
 
 def mpd(request):
     if request.json is not None:
-        Log.logger.info('ALEXA request request={}'.format(request.json['request']))
+        L.l.info('ALEXA request request={}'.format(request.json['request']))
         if 'intent' in request.json['request']:
             intent = request.json['request']['intent']
             if intent is not None:
@@ -50,7 +50,7 @@ def mpd(request):
                         alt_port = port_list_play[0]
                         zone = alt_zone
                 if cmd is not None and zone is not None:
-                    Log.logger.info('ALEXA executes {} in {}'.format(cmd, zone))
+                    L.l.info('ALEXA executes {} in {}'.format(cmd, zone))
                     port = None
                     for pair in port_config:
                         if zone in pair:

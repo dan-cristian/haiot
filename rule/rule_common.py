@@ -1,10 +1,10 @@
 import subprocess
 from webui.api import api_v1
-from main.logger_helper import Log
-from main import app
+from main.logger_helper import L
 from main.admin import models
 from common import Constant
 from pydispatch import dispatcher
+
 # import mpd
 from main.admin.model_helper import get_param
 
@@ -18,7 +18,7 @@ def update_custom_relay(relay_pin_name, power_is_on):
     #    msg = c.get('/apiv1/db_update/model_name=ZoneCustomRelay&'
     #                'filter_name=relay_pin_name&field_name=relay_is_on&filter_value={}&field_value={}'.
     #                format(relay_pin_name, power_is_on)).data
-    Log.logger.info(msg)
+    L.l.info(msg)
 
 
 def update_command_override_relay(relay_pin_name, is_rule, is_gui):
@@ -34,7 +34,7 @@ def play_bell_local(sound_file):
     # client.connect(get_param(Constant.P_MPD_SERVER), 6600)
     #result = subprocess.check_output(['aplay', 'scripts/audio/{}'.format(sound_file)], stderr=subprocess.STDOUT)
     result = subprocess.check_output(['aplay', 'scripts/static/sounds/{}'.format(sound_file)], stderr=subprocess.STDOUT)
-    Log.logger.info("Play bell returned: {}".format(result))
+    L.l.info("Play bell returned: {}".format(result))
 
 
 def send_notification(title, message=None, url=None, priority=None, deviceid=None, image_url=None):
@@ -54,3 +54,4 @@ def notify_via_all(title=None, message=None, priority=None):
     send_notification(title=title, message=message, priority=priority)
     send_chat(message=message)
     send_email(subject=title, body=message)
+

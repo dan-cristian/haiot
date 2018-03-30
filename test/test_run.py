@@ -1,6 +1,6 @@
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
-from main import Log
+from main import L
 import plotly.plotly as py
 from plotly.graph_objs import *
 import plotly.tools as tls
@@ -68,7 +68,7 @@ def test5():
                          world_readable=True, # public or private
                          auto_open=True)      # open the grid in the browser
 def thread_run():
-    Log.logger.info('Processing TEST_run')
+    L.l.info('Processing TEST_run')
     #py.sign_in("dancri77", "lw2w6fz9xk")
     #test5()
     #test2()

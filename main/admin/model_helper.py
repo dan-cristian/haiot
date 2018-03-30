@@ -1,7 +1,7 @@
 import sys
 import uuid
 from sqlalchemy.exc import IntegrityError, OperationalError, InvalidRequestError
-from main.logger_helper import Log
+from main.logger_helper import L
 from common import Constant, utils, performance
 from main import db
 import models
@@ -39,10 +39,10 @@ def model_row_to_json(obj, operation=''):
                 if value is not None and not hasattr(value, '_sa_class_manager'):
                     safe_obj[attr] = value
                 else:
-                    Log.logger.debug('Ignoring obj to json, not simple primitive {}'.format(value))
+                    L.l.debug('Ignoring obj to json, not simple primitive {}'.format(value))
         return utils.safeobj2json(safe_obj)
     except Exception, ex:
-        Log.logger.critical('Error convert model obj to json, err {}'.format(ex))
+        L.l.critical('Error convert model obj to json, err {}'.format(ex))
 
 
 def get_param(name):
@@ -51,10 +51,10 @@ def get_param(name):
         val = models.Parameter().query_filter_first(models.Parameter.name.in_([name])).value
         return val
     except ValueError, ex:
-        Log.logger.warning('Unable to get parameter {} error {}'.format(name, ex))
+        L.l.warning('Unable to get parameter {} error {}'.format(name, ex))
         raise ValueError
     except Exception, ex:
-        Log.logger.critical('Exception when getting param {}, err={}'.format(name, ex))
+        L.l.critical('Exception when getting param {}, err={}'.format(name, ex))
         # db.session.rollback()
         raise ex
 
@@ -67,12 +67,12 @@ def commit():
         performance.add_query(time_start, query_details=query_details)
         return True
     except IntegrityError, ex:
-        Log.logger.error('Unable to commit DB session={}, ignored, err={}'.format(db.session, ex), exc_info=True)
+        L.l.error('Unable to commit DB session={}, ignored, err={}'.format(db.session, ex), exc_info=True)
         db.session.rollback()
     except InvalidRequestError, ex:
-        Log.logger.error('Error on commit, session={}, ignoring, err={}'.format(db.session, ex), exc_info=1)
+        L.l.error('Error on commit, session={}, ignoring, err={}'.format(db.session, ex), exc_info=1)
     except Exception, ex:
-        Log.logger.warning('Exception on commit, session={} err={}'.format(db.session, ex))
+        L.l.warning('Exception on commit, session={} err={}'.format(db.session, ex))
         db.session.remove()
     return False
 
@@ -82,9 +82,9 @@ def get_mod_name(module):
 
 
 def save_db_log(entry_name, entry_value):
-    record = models.Log.query.filter_by(entry_name=entry_name).first()
+    record = models.L.query.filter_by(entry_name=entry_name).first()
     if record is None:
-        record = models.Log(entry_name = entry_name)
+        record = models.L(entry_name = entry_name)
     record.entry_value = entry_value
     commit()
 
@@ -99,16 +99,16 @@ def check_table_schema(table, model_auto_update=False):
         recreate_table = True
         ex_msg = str(oex)
     except InvalidRequestError:
-        Log.logger.warning('Error on check table schema {}, ignoring'.format(table))
+        L.l.warning('Error on check table schema {}, ignoring'.format(table))
     except Exception, ex:
         if "ProgrammingError" in str(ex) or "pymysql.err.InternalError" in str(ex):
             recreate_table = True
             ex_msg = str(ex)
         else:
-            Log.logger.warning('Unexpected error on check table {}, err={}'.format(table, ex))
+            L.l.warning('Unexpected error on check table {}, err={}'.format(table, ex))
     if recreate_table:
-        Log.logger.critical('Table {} schema in DB seems outdated, err {}, DROP it and recreate (y/n)?'.format(ex_msg,
-                                                                                                               table))
+        L.l.critical('Table {} schema in DB seems outdated, err {}, DROP it and recreate (y/n)?'.format(ex_msg,
+                                                                                                        table))
         read_drop_table(table, ex_msg, drop_without_user_ask=model_auto_update)
 
 
@@ -119,16 +119,16 @@ def read_drop_table(table, original_exception, drop_without_user_ask=False):
     else:
         x = 'y'
     if x == 'y':
-        Log.logger.info('Dropping table {}'.format(table))
+        L.l.info('Dropping table {}'.format(table))
         try:
             table_name = table.query._primary_entity.entity_zero._with_polymorphic_selectable.description
             # fixme: does not work with multiple db sources
             result = db.engine.execute('DROP TABLE ' + table_name)
             commit()
         except Exception, ex:
-            Log.logger.info('Something went wrong on drop, ignoring err {}'.format(ex))
+            L.l.info('Something went wrong on drop, ignoring err {}'.format(ex))
             db.session.rollback()
-        Log.logger.info('Creating missing schema object after table drop')
+        L.l.info('Creating missing schema object after table drop')
         db.create_all()
     else:
         raise original_exception
@@ -159,7 +159,8 @@ def populate_tables(model_auto_update=False):
                         models.Sensor, models.Ups, models.Rule,
                         models.CommandOverrideRelay, models.PlotlyCache, models.Utility, models.Presence,
                         models.SensorError, models.State, models.People,
-                        models.Device, models.PeopleDevice, models.Position]
+                        models.Device, models.PeopleDevice, models.Position,
+                        models.PowerMonitor]
     # tables that will be cleaned on every app start
     table_force_clean = [models.Parameter, models.Zone, models.Presence, models.Module, models.Node, models.Rule,
                          models.ZoneHeatRelay]
@@ -174,7 +175,7 @@ def populate_tables(model_auto_update=False):
         if table_str in Constant.db_values_json:
             default_values = Constant.db_values_json[table_str]
             if len(table().query_all()) != len(default_values):
-                Log.logger.info(
+                L.l.info(
                     'Populating {} with default values as config record count != db count'.format(table_str))
                 table().delete()
                 commit()
@@ -219,7 +220,7 @@ def populate_tables(model_auto_update=False):
                                                   host_name=node.name).all()) != 46 * 2:  # P8_ & P9_ rows have 46 pins
                 models.GpioPin.query.filter_by(pin_type=Constant.GPIO_PIN_TYPE_BBB, host_name=node.name).delete()
                 commit()
-                Log.logger.info('Populating default {} GpioPins on {} '.format(node.machine_type, node.name))
+                L.l.info('Populating default {} GpioPins on {} '.format(node.machine_type, node.name))
                 for rail in range(8, 10):  # last range is not part of the loop
                     for pin in range(01, 47):
                         gpio = models.GpioPin()
@@ -239,7 +240,7 @@ def populate_tables(model_auto_update=False):
                     pin_type=Constant.GPIO_PIN_TYPE_PI_STDGPIO, host_name=node.name).all()) != 40:
                 models.GpioPin.query.filter_by(pin_type=Constant.GPIO_PIN_TYPE_PI_STDGPIO, host_name=node.name).delete()
                 commit()
-                Log.logger.info('Populating standard {} GpioPins on {} '.format(node.machine_type, node.name))
+                L.l.info('Populating standard {} GpioPins on {} '.format(node.machine_type, node.name))
                 for pin in range(0, 40):
                     gpio = models.GpioPin()
                     gpio.pin_type = Constant.GPIO_PIN_TYPE_PI_STDGPIO
@@ -253,7 +254,7 @@ def populate_tables(model_auto_update=False):
                 models.GpioPin.query.filter_by(pin_type=Constant.GPIO_PIN_TYPE_PI_FACE_SPI,
                                                host_name=node.name).delete()
                 commit()
-                Log.logger.info('Populating piface {} pins on {} '.format(node.machine_type, node.name))
+                L.l.info('Populating piface {} pins on {} '.format(node.machine_type, node.name))
             for board in range(0, 4):
                 for pin_dir in (Constant.GPIO_PIN_DIRECTION_IN, Constant.GPIO_PIN_DIRECTION_OUT):
                     for pin in range(0, 8):  # -1
@@ -266,4 +267,4 @@ def populate_tables(model_auto_update=False):
                         db.session.add(gpio)
             commit()
         else:
-            Log.logger.warning("Unknown machine type {} for node {}".format(node.machine_type, node))
+            L.l.warning("Unknown machine type {} for node {}".format(node.machine_type, node))
