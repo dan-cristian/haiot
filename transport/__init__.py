@@ -1,5 +1,5 @@
 import threading
-from main.logger_helper import Log
+from main.logger_helper import L
 import transport_run
 from transport import mqtt_io
 
@@ -25,19 +25,19 @@ def thread_run():
     __mqtt_lock.acquire()
     try:
         # FIXME: complete this, will potentially accumulate too many requests
-        for json in __send_json_queue:
+        for json in list(__send_json_queue):
             #  Log.logger.info("Sending mqtt {}".format(json))
             if mqtt_io.sender.send_message(json):
                 __send_json_queue.remove(json)
         if len(__send_json_queue) > 20:
-            Log.logger.warning("{} messages are pending in transport send queue".format(len(__send_json_queue)))
+            L.l.warning("{} messages are pending in transport send queue".format(len(__send_json_queue)))
     finally:
         __mqtt_lock.release()
 
 
 def unload():
     from main import thread_pool
-    Log.logger.info('Transport unloading')
+    L.l.info('Transport unloading')
     # ...
     thread_pool.remove_callable(thread_run)
     global initialised
@@ -46,7 +46,7 @@ def unload():
 
 def init():
     from main import thread_pool
-    Log.logger.info('Transport initialising')
+    L.l.info('Transport initialising')
     thread_pool.add_interval_callable(thread_run, run_interval_second=1)
     mqtt_io.init()
     global initialised

@@ -1,6 +1,6 @@
 import transport.mqtt_io
 from common import utils
-from main.logger_helper import Log
+from main.logger_helper import L
 
 __author__ = 'dcristian'
 
@@ -18,5 +18,5 @@ def send_message(txt):
                 transport.mqtt_io.init()
             return False
     except Exception, ex:
-        Log.logger.error('Error sending mqtt message, {}'.format(ex), exc_info=True)
+        L.l.error('Error sending mqtt message, {}'.format(ex), exc_info=True)
         return False

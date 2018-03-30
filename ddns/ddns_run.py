@@ -1,11 +1,11 @@
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
-from main.logger_helper import Log
+from main.logger_helper import L
 
 try:
     import dateutil.parser
 except ImportError:
-    Log.logger.info('Module dateutil.parser cannot be imported')
+    L.l.info('Module dateutil.parser cannot be imported')
 import pytz
 import json
 import socket
@@ -42,7 +42,7 @@ def __update_ddns_rackspace():
             public_ip = ip_json_obj['ip']
             public_isp = ip_json_obj['org']
         except Exception, ex:
-            Log.logger.warning('Unable to get my ip, err={} text={}'.format(ex, ip_json_test ))
+            L.l.warning('Unable to get my ip, err={} text={}'.format(ex, ip_json_test))
             return
 
         for config in config_list.values():
@@ -56,13 +56,13 @@ def __update_ddns_rackspace():
                 cache['ip:'+isp] = socket.gethostbyname(config['record_name'])
             except Exception, ex:
                 cache['ip:'+isp] = None
-                Log.logger.warning('Unable to get ip for host {}, err={}'.format(config['record_name'], ex))
+                L.l.warning('Unable to get ip for host {}, err={}'.format(config['record_name'], ex))
 
             if public_ip == '' or public_ip is None or public_ip == cache['ip:'+isp]:
-                Log.logger.debug('IP address for '+isp + ' is still ' + public_ip + '; nothing to update.')
+                L.l.debug('IP address for ' + isp + ' is still ' + public_ip + '; nothing to update.')
                 return
             else:
-                Log.logger.info('IP address was changed for {}, old was {} new is {}'.format(
+                L.l.info('IP address was changed for {}, old was {} new is {}'.format(
                     isp, cache['ip:'+isp], public_ip))
 
             cache['ip:'+isp] = public_ip
@@ -71,7 +71,7 @@ def __update_ddns_rackspace():
             now = pytz.utc.localize(now)
             expires = pytz.utc.localize(expires)
             if expires <= now:
-                Log.logger.info('Expired rackspace authentication token; reauthenticating...')
+                L.l.info('Expired rackspace authentication token; reauthenticating...')
                 # authenticate with Rackspace
                 authUrl = 'https://identity.api.rackspacecloud.com/v2.0/tokens'
                 authData = {'auth': {'RAX-KSKEY:apiKeyCredentials': {'username': config['username'],
@@ -90,14 +90,14 @@ def __update_ddns_rackspace():
                        'X-Auth-Token': cache['auth']['token']}
             result = requests.put(url, data=json.dumps(data), headers=headers)
             if result.ok:
-                Log.logger.info('Updated IP address for {} to {}'.format(config['record_name'], public_ip))
+                L.l.info('Updated IP address for {} to {}'.format(config['record_name'], public_ip))
             else:
-                Log.logger.warning('Unable to update IP, response={}'.format(result))
+                L.l.warning('Unable to update IP, response={}'.format(result))
     except Exception, ex:
-        Log.logger.warning('Unable to check and update dns, err={}'.format(ex))
+        L.l.warning('Unable to check and update dns, err={}'.format(ex))
 
 
 def thread_run():
-    Log.logger.debug('Processing ddns_run')
+    L.l.debug('Processing ddns_run')
     __update_ddns_rackspace()
     return 'Processed ddns_run'

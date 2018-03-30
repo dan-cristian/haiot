@@ -27,6 +27,10 @@ class Constant:
     SIGNAL_CHAT_NOTIFICATION = 'signal-chat-notification'
     SIGNAL_EMAIL_NOTIFICATION = 'signal-email-notification'
     SIGNAL_PRESENCE = 'signal-presence'
+    SIGNAL_ALARM='signal-alarm'
+    SIGNAL_GPS = 'signal-gps'
+    SIGNAL_STORABLE_RECORD = 'signal-storable-record'
+    SIGNAL_BATTERY_STAT = 'signal-battery-stat'
 
     PRESENCE_TYPE_CAM = 'cam'
     
@@ -106,6 +110,7 @@ class Constant:
     P_HEAT_STATE_REFRESH_PERIOD = 'HEAT_STATE_REFRESH_PERIOD'
     P_GMAIL_NOTIFY_FROM_EMAIL = 'GMAIL_NOTIFY_FROM_EMAIL'
     P_GMAIL_CREDENTIAL_FILE = 'GMAIL_CREDENTIAL_FILE'
+    P_THINGSPEAK_API_FILE = 'THINGSPEAK_API_FILE'
     P_NOTIFY_EMAIL_RECIPIENT = 'NOTIFY_EMAIL_RECIPIENT'
     P_SOLAR_APS_LOCAL_URL = 'SOLAR_APS_LOCAL_URL'
     P_SOLAR_UTILITY_NAME = 'SOLAR_UTILITY_NAME'
@@ -168,14 +173,14 @@ class Constant:
 
 
 def load_config_json():
-    from main.logger_helper import Log
+    from main.logger_helper import L
     try:
         var_path = utils.get_app_root_path() + 'scripts/config/default_db_values.json'
-        Log.logger.info('Loading variables from config file [{}]'.format(var_path))
+        L.l.info('Loading variables from config file [{}]'.format(var_path))
         with open(var_path, 'r') as f:
             Constant.db_values_json = json.load(f)
     except Exception, ex:
-        Log.logger.error('Cannot load config json, ex={}'.format(ex))
+        L.l.error('Cannot load config json, ex={}'.format(ex))
         exit(2)
 
 
@@ -191,28 +196,28 @@ def get_json_param(name):
 
 
 def init():
-    from main.logger_helper import Log
+    from main.logger_helper import L
     try:
         mac = get_mac()
         # call it twice as get_mac might fake mac: http://stackoverflow.com/questions/159137/getting-mac-address
         if mac == get_mac():
             Constant.HOST_MAC = ':'.join(("%012X" % mac)[i:i + 2] for i in range(0, 12, 2))
         else:
-            Log.logger.warning('Cannot get mac address')
+            L.l.warning('Cannot get mac address')
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("gmail.com", 80))
         Constant.HOST_MAIN_IP = s.getsockname()[0]
         s.close()
     except Exception, ex:
-        Log.logger.warning('Cannot obtain main IP accurately, not connected to Internet?, retry, ex={}'.format(ex))
+        L.l.warning('Cannot obtain main IP accurately, not connected to Internet?, retry, ex={}'.format(ex))
         try:
             Constant.HOST_MAIN_IP = socket.gethostbyname(socket.gethostname())
         except Exception, ex2:
-            Log.logger.warning('Cannot obtain main IP, no DNS available?, ex={}'.format(ex2))
+            L.l.warning('Cannot obtain main IP, no DNS available?, ex={}'.format(ex2))
             Constant.HOST_MAIN_IP = '127.0.0.1'
-    Log.logger.info('Running on OS={} HOST={} IP={} MACHINE={}'.format(Constant.OS, Constant.HOST_NAME,
-                                                                       Constant.HOST_MAIN_IP,
-                                                                       Constant.HOST_MACHINE_TYPE))
+    L.l.info('Running on OS={} HOST={} IP={} MACHINE={}'.format(Constant.OS, Constant.HOST_NAME,
+                                                                Constant.HOST_MAIN_IP,
+                                                                Constant.HOST_MACHINE_TYPE))
 
 
 def init_simple():

@@ -1,6 +1,6 @@
 from main import db
 from main import thread_pool
-from main.logger_helper import Log
+from main.logger_helper import L
 from main.admin import model_helper
 from common import utils, Constant
 import owsensor_loop
@@ -13,7 +13,6 @@ from main.admin.model_helper import commit
 
 __author__ = 'dcristian'
 
-
 initialised = False
 
 
@@ -21,17 +20,19 @@ def record_update(obj):
     # save sensor state to db, except for current node
     try:
         sensor_host_name = utils.get_object_field_value(obj, 'name')
-        Log.logger.debug('Received sensor state update from {}'.format(sensor_host_name))
+        L.l.debug('Received sensor state update from {}'.format(sensor_host_name))
         # avoid node to update itself in infinite recursion
         if sensor_host_name != Constant.HOST_NAME:
             address = utils.get_object_field_value(obj, 'address')
+            n_address = utils.get_object_field_value(obj, 'n_address')
+            sensor_type = utils.get_object_field_value(obj, 'type')
             record = models.Sensor(address=address)
             assert isinstance(record, models.Sensor)
             zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=address).first()
             if zone_sensor:
                 record.sensor_name = zone_sensor.sensor_name
             else:
-                record.sensor_name = '(not defined) {}'.format(address)
+                record.sensor_name = '(n/a) {} {} {}'.format(address, n_address, sensor_type)
             record.type = utils.get_object_field_value(obj, 'type')
             record.updated_on = utils.get_base_location_now_date()
             if obj.has_key('counters_a'): record.counters_a = utils.get_object_field_value(obj, 'counters_a')
@@ -67,7 +68,7 @@ def record_update(obj):
                                 total_units_b=record.counters_b,
                                 sampling_period_seconds=owsensor_loop.sampling_period_seconds)
     except Exception, ex:
-        Log.logger.error('Error on sensor update, err {}'.format(ex), exc_info=True)
+        L.l.error('Error on sensor update, err {}'.format(ex), exc_info=True)
         db.session.rollback()
 
 
@@ -81,18 +82,14 @@ def unload():
 
 
 def init():
-    Log.logger.debug('Sensor module initialising')
-    if owsensor_loop.init():
-        thread_pool.add_interval_callable(owsensor_loop.thread_run,
-                                          run_interval_second=owsensor_loop.sampling_period_seconds)
+    L.l.debug('Sensor module initialising')
+    thread_pool.add_interval_callable(owsensor_loop.thread_run, owsensor_loop.P.check_period)
     if rfxcom_run.init():
         thread_pool.add_interval_callable(rfxcom_run.thread_run, run_interval_second=60)
     # init ups only on host specified in config
     if model_helper.get_param(Constant.P_UPS_ON_HOST) == Constant.HOST_NAME:
-        if ups_legrand_run.init():
-            thread_pool.add_interval_callable(ups_legrand_run.thread_run, run_interval_second=30)
+        thread_pool.add_interval_callable(ups_legrand_run.thread_run, run_interval_second=30)
     if model_helper.get_param(Constant.P_SOLAR_PARSER_ON_HOST) == Constant.HOST_NAME:
-        if http_parser_run.init_solar_aps():
-            thread_pool.add_interval_callable(http_parser_run.thread_solar_aps_run, run_interval_second=60)
+        thread_pool.add_interval_callable(http_parser_run.thread_solar_aps_run, run_interval_second=60)
     global initialised
     initialised = True

@@ -4,7 +4,7 @@ import socket
 import time
 import binascii
 from main.admin import models
-from main.logger_helper import Log
+from main.logger_helper import L
 from pydispatch import dispatcher
 
 _AMP_ON = "\x0207A1D\x03"
@@ -31,11 +31,11 @@ def connect_socket():
     host = get_param(Constant.P_AMP_SERIAL_HOST)
     port = int(get_param(Constant.P_AMP_SERIAL_PORT))
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    Log.logger.info("Connecting socket")
+    L.l.info("Connecting socket")
     s.settimeout(2)
     s.connect((host, port))
     s.settimeout(None)
-    Log.logger.info("Connected socket")
+    L.l.info("Connected socket")
     return s
 
 
@@ -52,7 +52,7 @@ def _amp_bi_set_yamaha(on, sock):
     data = sock.recv(1024)
     if "already in use" in data:
         msg = "Error, {}\n".format(data)
-        Log.logger.warning(msg)
+        L.l.warning(msg)
         return msg
     else:
         AMP_YMH.BI_AMP_ON = on
@@ -66,7 +66,7 @@ def _amp_bi_set_yamaha(on, sock):
 
 
 def amp_zone_power(on, zone_index):
-    Log.logger.info("Setting amp power for zone {}".format(zone_index))
+    L.l.info("Setting amp power for zone {}".format(zone_index))
     global _AMP_ZONE3_POWER_OFF, _AMP_ZONE3_POWER_ON
     sock = connect_socket()
     msg = "socket cmd ok, "
@@ -94,7 +94,7 @@ def amp_zone_power(on, zone_index):
     msg = "{} {}".format(msg, result)
     sock.close()
     result = "Set done amp zone {} to state {}, result={}\n".format(zone_index, on, msg)
-    Log.logger.info(result)
+    L.l.info(result)
     return result
 
 
@@ -111,12 +111,12 @@ def set_amp_power(power_state, relay_name, amp_zone_index):
                 # dispatch as UI action otherwise change actions are not triggered
                 dispatcher.send(signal=Constant.SIGNAL_UI_DB_POST, model=models.ZoneCustomRelay, row=relay)
                 msg = "Set relay {} to state {} zone_index={}\n".format(relay_name, power_state, amp_zone_index)
-                Log.logger.info(msg)
+                L.l.info(msg)
             else:
                 msg = "Not changed relay state for {}\n".format(relay_name)
         else:
             msg = "Could not find relay name {}\n".format(relay_name)
-            Log.logger.warning(msg)
+            L.l.warning(msg)
             return msg
 
         # change amp zone power
@@ -131,5 +131,5 @@ def set_amp_power(power_state, relay_name, amp_zone_index):
             result_amp = amp_zone_power(power_state, amp_zone_index)
             return msg + result_amp
     except Exception, ex:
-        Log.logger.error("Error set_amp_power {}".format(ex))
+        L.l.error("Error set_amp_power {}".format(ex))
         return "Error set_amp_power {}".format(ex)

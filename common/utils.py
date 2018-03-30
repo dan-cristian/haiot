@@ -8,7 +8,7 @@ import importlib
 from collections import namedtuple
 import pytz
 import urllib2
-from main.logger_helper import Log
+from main.logger_helper import L
 
 __author__ = 'dcristian'
 
@@ -78,7 +78,7 @@ def get_model_field_name(field_obj):
     if len(words) > 1:
         return words[1]
     else:
-        Log.logger.critical('Unexpected words count in get_model_field_name={}'.format(field_obj))
+        L.l.critical('Unexpected words count in get_model_field_name={}'.format(field_obj))
         return None
 
 
@@ -88,7 +88,7 @@ def parse_to_date(strdate):
             strdate = strdate.replace('T', ' ')
             strdate = datetime.datetime.strptime(strdate, "%Y-%m-%d %H:%M:%S.%f")
     else:
-        Log.logger.warning('Warning, unexpected date format in parse []'.format(strdate))
+        L.l.warning('Warning, unexpected date format in parse []'.format(strdate))
     return strdate
 
 
