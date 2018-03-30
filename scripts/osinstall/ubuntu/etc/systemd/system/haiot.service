@@ -1,0 +1,15 @@
+[Unit]
+After=network.service
+
+[Service]
+User=haiot
+Group=haiot
+ExecStart=/home/scripts/../start.sh
+StandardOutput=syslog
+StandardError=syslog
+Restart=always
+RestartSec=1min
+ExecStop=/home/scripts/../start.sh stop
+
+[Install]
+WantedBy=default.target

@@ -1,5 +1,5 @@
 import subprocess
-from main.logger_helper import Log
+from main.logger_helper import L
 from main.admin import models
 from pydispatch import dispatcher
 from common import utils, Constant
@@ -47,7 +47,7 @@ def _check_wifi(test=False):
 
 
 def thread_run():
-    Log.logger.debug('Processing presence_run')
+    L.l.debug('Processing presence_run')
     _check_wifi()
 
 

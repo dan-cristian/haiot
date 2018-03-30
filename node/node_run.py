@@ -4,7 +4,7 @@ import time
 import datetime
 import random
 
-from main.logger_helper import Log
+from main.logger_helper import L
 from common import Constant, variable, utils
 from main.admin import models
 from main.admin.model_helper import commit
@@ -20,23 +20,23 @@ def node_update(obj=None):
         obj = {}
     try:
         node_host_name = utils.get_object_field_value(obj, 'name')
-        Log.logger.debug('Received node state update from {}'.format(node_host_name))
+        L.l.debug('Received node state update from {}'.format(node_host_name))
         #avoid node to update itself in infinite recursion
         if node_host_name != Constant.HOST_NAME:
             models.Node().save_changed_fields_from_json_object(json_object=obj, unique_key_name='name',
                                                                notify_transport_enabled=False, save_to_graph=False)
         else:
-            Log.logger.debug('Skipping node DB save, this node is master = {}'.format(
+            L.l.debug('Skipping node DB save, this node is master = {}'.format(
                 variable.NODE_THIS_IS_MASTER_OVERALL))
             sent_date = utils.get_object_field_value(obj, 'event_sent_datetime')
             if sent_date is not None:
                 event_sent_date_time = utils.parse_to_date(sent_date)
                 seconds_elapsed = (utils.get_base_location_now_date()-event_sent_date_time).total_seconds()
                 if seconds_elapsed>15:
-                    Log.logger.warning('Very slow mqtt, delay is {} seconds rate msg {}/min'.format(seconds_elapsed,
-                                                                                    mqtt_io.mqtt_msg_count_per_minute))
+                    L.l.warning('Very slow mqtt, delay is {} seconds rate msg {}/min'.format(seconds_elapsed,
+                                                                                             mqtt_io.mqtt_msg_count_per_minute))
     except Exception, ex:
-        Log.logger.warning('Error on node update, err {}'.format(ex))
+        L.l.warning('Error on node update, err {}'.format(ex))
 
 def check_if_no_masters_overall():
     node_masters = models.Node.query.filter_by(is_master_overall=True).all()
@@ -52,10 +52,10 @@ def update_master_state():
             #if recently alive, in order of id prio
             if node.updated_on >= alive_date_time and (not master_overall_selected):
                 if node.is_master_overall:
-                    Log.logger.debug('Node {} is already master, all good we have a master'.format(node.name))
+                    L.l.debug('Node {} is already master, all good we have a master'.format(node.name))
                     master_overall_selected = True
                 else:
-                    Log.logger.info('Node {} will become a master'.format(node.name))
+                    L.l.info('Node {} will become a master'.format(node.name))
                     if node.name == Constant.HOST_NAME:
                         node.is_master_overall = True
                         node.notify_enabled_ = True
@@ -63,7 +63,7 @@ def update_master_state():
                     master_overall_selected = True
             else:
                 if master_overall_selected and node.is_master_overall:
-                    Log.logger.debug('Node {} should lose master status, if alive'.format(node.name))
+                    L.l.debug('Node {} should lose master status, if alive'.format(node.name))
                     if node.name == Constant.HOST_NAME:
                         node.is_master_overall = False
                         node.notify_enabled_ = True
@@ -76,7 +76,7 @@ def update_master_state():
                     if not node.is_master_overall:
                         # disabling local mastership immediately
                         variable.NODE_THIS_IS_MASTER_OVERALL = node.is_master_overall
-                        Log.logger.info('Immediate change in node mastership, local node is master={}'.format(
+                        L.l.info('Immediate change in node mastership, local node is master={}'.format(
                             variable.NODE_THIS_IS_MASTER_OVERALL))
                     else:
                         global since_when_i_should_be_master
@@ -84,22 +84,22 @@ def update_master_state():
                         seconds_elapsed = (utils.get_base_location_now_date() - since_when_i_should_be_master).total_seconds()
                         if check_if_no_masters_overall() or seconds_elapsed > 10:
                             variable.NODE_THIS_IS_MASTER_OVERALL = node.is_master_overall
-                            Log.logger.info('Change in node mastership, local node is master={}'.format(
+                            L.l.info('Change in node mastership, local node is master={}'.format(
                                 variable.NODE_THIS_IS_MASTER_OVERALL))
                             since_when_i_should_be_master = datetime.datetime.max
                         else:
-                            Log.logger.info('Waiting to set master status, sec. lapsed={}'.format(seconds_elapsed))
+                            L.l.info('Waiting to set master status, sec. lapsed={}'.format(seconds_elapsed))
                         if not variable.NODE_THIS_IS_MASTER_OVERALL:
                             # record date when cluster agreed I must be master
                             if since_when_i_should_be_master == datetime.datetime.max:
                                 since_when_i_should_be_master = utils.get_base_location_now_date()
     except Exception, ex:
-        Log.logger.warning('Error try_become_master, err {}'.format(ex))
+        L.l.warning('Error try_become_master, err {}'.format(ex))
 
 
 def announce_node_state():
     try:
-        Log.logger.debug('I tell everyone my node state')
+        L.l.debug('I tell everyone my node state')
         #current_record = models.Node.query.filter_by(name=constant.HOST_NAME).first()
         node = models.Node()
         current_record = models.Node().query_filter_first(models.Node.name.in_([Constant.HOST_NAME, ""]))
@@ -130,7 +130,7 @@ def announce_node_state():
         node.save_changed_fields(current_record=current_record, new_record=node, notify_transport_enabled=True,
                                    save_to_graph=True, graph_save_frequency=120)
     except Exception, ex:
-        Log.logger.error('Unable to announce my state, err={}'.format(ex))
+        L.l.error('Unable to announce my state, err={}'.format(ex))
 
 
 progress_status = None
@@ -142,15 +142,15 @@ def get_progress():
 
 
 def thread_run():
-    Log.logger.debug('Processing node_run')
+    L.l.debug('Processing node_run')
     global first_run
     global progress_status
     if first_run:
         progress_status='Sleep on first run'
-        Log.logger.info('On first node run I will sleep some seconds to get state updates')
+        L.l.info('On first node run I will sleep some seconds to get state updates')
         time.sleep(30)
         first_run = False
-        Log.logger.info('Sleep done on first node run')
+        L.l.info('Sleep done on first node run')
     progress_status='Updating master state'
     update_master_state()
     progress_status='Announcing node state'
