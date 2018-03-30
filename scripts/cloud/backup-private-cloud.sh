@@ -10,7 +10,7 @@ echo [`date +%T.%N`] $1 $2 $3 $4 $5
 
 
 function backup(){
-rsync -avrPe 'ssh -p 222 -T -c arcfour -o Compression=no -x ' $1 haiot@$HOST_DEST:/media/usb/$2
+rsync -avrPe 'ssh -p 222 -T -c aes128-cbc -o Compression=no -x ' $1 haiot@$HOST_DEST:/media/usb/$2
 }
 
 echo2 Starting backup to private cloud

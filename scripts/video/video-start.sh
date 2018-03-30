@@ -36,14 +36,26 @@ if [ $browser_code -eq 0 ]; then
 fi
 }
 
+function gesture-config(){
+	killall easystroke
+	echo2 "Starting easystroke show with HOME=$HOME"
+	if [ -z $HOME ]; then
+        	export HOME="/root"
+	fi
+	/usr/bin/easystroke show >> $LOG
+}
+
 function start_gesture_once(){
-ps ax | grep -q [/]usr/bin/easystroke
+ps ax | grep -q [e]asystroke
 if [ $? -eq 0 ]; then
-        echo2 "Easystroke is running, exit"
+        echo2 "Easystroke is running"
         return
 fi
-echo2 "Starting easystroke"
-/usr/bin/easystroke hide &
+echo2 "Starting easystroke with HOME=$HOME"
+if [ -z $HOME ]; then
+	export HOME="/root"
+fi
+/usr/bin/easystroke hide >> $LOG 2>&1 &
 }
 
 # http://askubuntu.com/questions/371261/display-monitor-info-via-command-line
@@ -164,7 +176,7 @@ function presence(){
 echo2 "Detected presence"
 startx_once
 start_gesture_once
-#xdotool key Shift 
+#xdotool key Shift
 # awake receiver HDMI sound if screen was off
 #xrandr --output HDMI2 --auto
 #xrandr --output HDMI3 --auto
@@ -222,6 +234,7 @@ echo2 "Set favorite file $tmp_current_file"
 exiv2 -M "add Exif.Photo.UserComment $PICTURE_TAG_FAVORITE $tmp_current_file"
 }
 
+
 # http://unix.stackexchange.com/questions/118811/why-cant-i-run-gui-apps-from-root-no-protocol-specified
 # http://kodi.wiki/view/HOW-TO:Autostart_Kodi_for_Linux
 
@@ -256,6 +269,8 @@ elif [ "$1" == "presence" ]; then
         presence
 elif [ "$1" == "touch" ]; then
         presence
+elif [ "$1" == "gesture-config" ]; then
+        gesture-config
 else
 	echo2 "Action not mapped for command=[$1], try to run anyways"
 	$1
