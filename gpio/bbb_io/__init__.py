@@ -3,7 +3,7 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 import random
 from pydispatch import dispatcher
 from main import thread_pool
-from main.logger_helper import Log
+from main.logger_helper import L
 from common import Constant
 from main.admin import models
 from gpio import std_gpio
@@ -19,7 +19,7 @@ try:
 
     import_module_exist = True
 except:
-    Log.logger.info('Module Adafruit_BBIO.GPIO is not installed, module will not be initialised')
+    L.l.info('Module Adafruit_BBIO.GPIO is not installed, module will not be initialised')
     import_module_exist = False
 
 
@@ -31,12 +31,12 @@ def event_detected(channel):
         else:
             # FOR TESTING PURPOSES
             state = random.randint(0, 2)
-        Log.logger.info('IO input detected channel {} status {}'.format(channel, state))
+        L.l.info('IO input detected channel {} status {}'.format(channel, state))
         dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=channel, direction='in',
                         pin_value=state, pin_connected=(state == 0))
     except Exception, ex:
         zonealarm = None
-        Log.logger.warning('Error io event detected, err {}'.format(ex))
+        L.l.warning('Error io event detected, err {}'.format(ex))
 
 
 # check for events on pins not setup with callback event
@@ -53,31 +53,31 @@ def __check_for_events():
 def setup_in_ports(gpio_pin_list):
     for gpio_pin in gpio_pin_list:
         if gpio_pin.pin_type == Constant.GPIO_PIN_TYPE_BBB:
-            Log.logger.info('Set pincode={} type={} index={} as input'.format(gpio_pin.pin_code, gpio_pin.pin_type,
-                                                                              gpio_pin.pin_index_bcm))
+            L.l.info('Set pincode={} type={} index={} as input'.format(gpio_pin.pin_code, gpio_pin.pin_type,
+                                                                       gpio_pin.pin_index_bcm))
             GPIO.setup(gpio_pin.pin_code, GPIO.IN)
             std_gpio.set_pin_edge(gpio_pin.pin_index_bcm, 'both')
             try:
                 GPIO.add_event_detect(gpio_pin.pin_code, GPIO.BOTH)  # , callback=event_detected, bouncetime=300)
                 __pool_pin_codes.append(gpio_pin.pin_code)
-                Log.logger.info('OK callback on gpio'.format(gpio_pin.pin_code))
+                L.l.info('OK callback on gpio'.format(gpio_pin.pin_code))
             except Exception, ex:
-                Log.logger.warning('Unable to add event callback pin={} err={}'.format(gpio_pin.pin_code, ex))
+                L.l.warning('Unable to add event callback pin={} err={}'.format(gpio_pin.pin_code, ex))
                 try:
                     GPIO.add_event_detect(gpio_pin.pin_code, GPIO.FALLING)
-                    Log.logger.info('OK pooling on gpio {} err='.format(gpio_pin.pin_code, ex))
+                    L.l.info('OK pooling on gpio {} err='.format(gpio_pin.pin_code, ex))
                     __pool_pin_codes.append(gpio_pin.pin_code)
                 except Exception, ex:
-                    Log.logger.warning('Unable to add pooling on pin {} err={}'.format(gpio_pin.pin_code, ex))
+                    L.l.warning('Unable to add pooling on pin {} err={}'.format(gpio_pin.pin_code, ex))
 
 
 def thread_run():
     global initialised
     if initialised:
-        Log.logger.debug('Processing Beaglebone IO')
+        L.l.debug('Processing Beaglebone IO')
         global import_module_exist
         if not import_module_exist:
-            Log.logger.info('Simulating motion detection for test purposes')
+            L.l.info('Simulating motion detection for test purposes')
             event_detected('P8_11')
         else:
             __check_for_events()
@@ -92,11 +92,11 @@ def unload():
 
 
 def init():
-    Log.logger.info('Beaglebone IO module initialising')
+    L.l.info('Beaglebone IO module initialising')
     try:
         dispatcher.connect(setup_in_ports, signal=Constant.SIGNAL_GPIO_INPUT_PORT_LIST, sender=dispatcher.Any)
         thread_pool.add_interval_callable(thread_run, run_interval_second=10)
         global initialised
         initialised = True
     except Exception, ex:
-        Log.logger.critical('Module io_bbb not initialised, err={}'.format(ex))
+        L.l.critical('Module io_bbb not initialised, err={}'.format(ex))

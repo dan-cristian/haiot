@@ -1,7 +1,10 @@
 import os
 import subprocess
 import sys
-import fcntl
+try:
+    import fcntl
+except Exception:
+    pass
 
 
 def _get_usb_dev_info(dev_name):
@@ -10,6 +13,8 @@ def _get_usb_dev_info(dev_name):
     for line in rec:
         if dev_name in line:
             #Bus 001 Device 004: ID 046d:0826 Logitech, Inc. HD Webcam C525
+            #Bus 001 Device 049: ID 046d:081b Logitech, Inc. Webcam C310
+            #Bus 001 Device 019: ID 05a3:9520 ARC International
             parts = line.split()
             bus = parts[1]
             device = parts[3][:3]
@@ -20,7 +25,7 @@ def _get_usb_dev_info(dev_name):
                 product = ven_prod[1]
                 print("Vendor:Product for {} is {}:{}".format(dev_name, vendor, product))
                 break
-    return vendor, product, bus, device
+    return vendor, product, bus, device, rec
 
 
 def sudo_send_usb_reset(dev_name):
@@ -33,7 +38,7 @@ def sudo_send_usb_reset(dev_name):
             dev_path - The devfs path to the USB device (under /dev/bus/usb/)
                        See get_teensy for example of how to obtain this.
     """
-    vendor, product, bus, device = _get_usb_dev_info(dev_name)
+    vendor, product, bus, device, output = _get_usb_dev_info(dev_name)
     if bus is not None and device is not None:
         dev_path = '/dev/bus/usb/%s/%s' % (bus, device)
         print('Sending usb reset to {}'.format(dev_path))
@@ -41,10 +46,14 @@ def sudo_send_usb_reset(dev_name):
         try:
             fcntl.ioctl(fd, USBDEVFS_RESET, 0)
             print('Usb reset complete')
+            res = True
         finally:
             os.close(fd)
     else:
-        print('Cannot find usb bus/device for {}, reset failed'.format(dev_name))
+        print('Cannot find usb bus/device for [{}], reset failed'.format(dev_name))
+        print('Ouput was:'.format(output))
+        res = False
+    return res
 
 
 def sudo_reload_uvc_module():
@@ -65,7 +74,7 @@ if __name__ == '__main__':
         print('Script must run as root/sudo for usb & mod actions')
     else:
         if len(sys.argv) == 2:
-            sudo_send_usb_reset(sys.argv[1])
-            sudo_reload_uvc_module()
+            if sudo_send_usb_reset(sys.argv[1]):
+                sudo_reload_uvc_module()
         else:
             print('Unexpected number of arguments, only one needed: <usb dev name>')

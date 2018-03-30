@@ -53,6 +53,7 @@ ENABLE_ROUTER=0
 ENABLE_DASHCAM_PI=1
 ENABLE_DASHCAM_PI_LCD_DF=1
 ENABLE_DASHCAM_MOTION=0
+ENABLE_UPS_PICO=1
 ENABLE_3G_MODEM=1
 ENABLE_LOG_RAM=0
 
@@ -288,7 +289,16 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
     chmod +x /etc/profile.d/haiot.sh
     cp /etc/profile.d/haiot.sh /etc/profile.d/root.sh
 
-    apt-get -y install mosquitto owfs
+    apt-get -y install mosquitto owfs ow-shell
+
+    echo "Installing I2C for owfs"
+    #https://gist.github.com/kmpm/4445289
+    apt install -y i2c-tools libi2c-dev python-smbus
+    #python-smbus is needed for realtime clock
+    if ! grep -q "^i2c[-_]dev" /etc/modules; then printf "i2c-dev\n" >> /etc/modules; fi
+    if ! grep -q "^i2c[-_]bcm2708" /etc/modules; then printf "i2c-bcm2708\n" >> /etc/modules; fi
+    set_config_var dtparam i2c_arm=on /boot/config.txt
+
     echo "Instaling bluetooth modules"
     apt install -y bluez python-bluez
     apt-get -y build-dep python-bluez
@@ -438,6 +448,7 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     rm -r triggerhappy
     ln -s $LOG_ROOT /mnt/log
     ln -s $MUSIC_ROOT /mnt/music
+    ln -s $HAIOT_DIR/scripts /home/scripts
     cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/mpd.conf /etc/
     cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/mpd@.service /lib/systemd/system/
     cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/mpd@*.socket /lib/systemd/system/
@@ -642,6 +653,107 @@ if [ "$ENABLE_CAMERA" == "1" ]; then
     sleep 5
     nano /etc/init.d/motion
     /etc/init.d/motion restart
+
+    echo "Compiling ffmpeg with HW"
+    # https://gist.github.com/Brainiarc7/eb45d2e22afec7534f4a117d15fe6d89
+    apt-get -y install autoconf automake build-essential libass-dev libtool pkg-config texinfo zlib1g-dev libdrm-dev libva-dev vainfo libogg-dev
+    mkdir ffmpeg-hw
+    cd ffmpeg-hw
+    git clone https://github.com/01org/cmrt
+    cd cmrt
+    ./autogen.sh
+    ./configure
+    time make -j$(nproc) VERBOSE=1
+    make -j$(nproc) install
+    ldconfig -vvvv
+
+    cd ..
+    git clone https://github.com/01org/libva
+    cd libva
+    ./autogen.sh
+    ./configure
+    time make -j$(nproc) VERBOSE=1
+    make -j$(nproc) install
+
+
+    cd ..
+    cd intel-hybrid-driver
+    ./autogen.sh
+    ./configure
+    time make -j$(nproc) VERBOSE=1
+    make -j$(nproc) install
+    ldconfig -vvv
+
+    cd ./post-install.shgit clone https://github.com/01org/intel-vaapi-driver
+    cd intel-vaapi-driver
+    ./autogen.sh
+    ./configure --enable-hybrid-codec
+    time make -j$(nproc) VERBOSE=1
+    make -j$(nproc) install
+    ldconfig -vvvv
+
+
+    mkdir -p $HOME/bin
+    chown -Rc $USER:$USER $HOME/bin
+    mkdir -p ~/ffmpeg_sources
+    cd ~/ffmpeg_sources
+    wget wget http://www.nasm.us/pub/nasm/releasebuilds/2.14rc0/nasm-2.14rc0.tar.gz
+    tar xzvf nasm-2.14rc0.tar.gz
+    cd nasm-2.14rc0
+    ./configure --prefix="$HOME/bin" --bindir="$HOME/bin"
+    make -j$(nproc) VERBOSE=1
+    make -j$(nproc) install
+    make -j$(nproc) distclean
+
+    cd ~/ffmpeg_sources
+    wget http://download.videolan.org/pub/x264/snapshots/last_stable_x264.tar.bz2
+    tar xjvf last_stable_x264.tar.bz2
+    cd x264-snapshot*
+    PATH="$HOME/bin:$PATH" ./configure --prefix="$HOME/bin" --bindir="$HOME/bin" --enable-static --disable-opencl
+    PATH="$HOME/bin:$PATH" make -j$(nproc) VERBOSE=1
+    make -j$(nproc) install VERBOSE=1
+    make -j$(nproc) distclean
+
+    apt-get install cmake mercurial
+    cd ~/ffmpeg_sources
+    hg clone https://bitbucket.org/multicoreware/x265
+    cd ~/ffmpeg_sources/x265/build/linux
+    PATH="$HOME/bin:$PATH" cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$HOME/bin" -DENABLE_SHARED:bool=off ../../source
+    make -j$(nproc) VERBOSE=1
+    make -j$(nproc) install VERBOSE=1
+    make -j$(nproc) clean VERBOSE=1
+
+    cd ~/ffmpeg_sources
+    wget -O fdk-aac.tar.gz https://github.com/mstorsjo/fdk-aac/tarball/master
+    tar xzvf fdk-aac.tar.gz
+    cd mstorsjo-fdk-aac*
+    autoreconf -fiv
+    ./configure --prefix="$HOME/bin" --disable-shared
+    make -j$(nproc)
+    make -j$(nproc) install
+    make -j$(nproc) distclean
+
+    cd ~/ffmpeg_sources
+    git clone https://github.com/webmproject/libvpx/
+    cd libvpx
+    ./configure --prefix="$HOME/bin" --enable-runtime-cpu-detect --enable-vp9 --enable-vp8 \
+    --enable-postproc --enable-vp9-postproc --enable-multi-res-encoding --enable-webm-io --enable-vp9-highbitdepth --enable-onthefly-bitpacking --enable-realtime-only \
+    --cpu=native --as=yasm
+    time make -j$(nproc)
+    time make -j$(nproc) install
+    time make clean -j$(nproc)
+    time make distclean
+
+    cd ~/ffmpeg_sources
+    wget -c -v http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.5.tar.xz
+    tar -xvf libvorbis-1.3.5.tar.xz
+    cd libvorbis-1.3.5
+    ./configure --enable-static --prefix="$HOME/bin"
+    time make -j$(nproc)
+    time make -j$(nproc) install
+    time make clean -j$(nproc)
+    time make distclean
+
 fi
 
 if [ "$ENABLE_CAMERA_SHINOBI" == "1" ]; then
@@ -799,6 +911,9 @@ if [ "$ENABLE_SECURE_SSH" == "1" ]; then
     modprobe cryptodev
     echo cryptodev >> /etc/modules
 
+    # http://mgalgs.github.io/2014/10/22/enable-arcfour-and-other-fast-ciphers-on-recent-versions-of-openssh.html
+    echo "ciphers arcfour,arcfour128,arcfour256" >> /etc/ssh/sshd_config
+    # https://www.daveperrett.com/articles/2010/09/14/ssh-authentication-refused/
 
 fi
 
@@ -863,6 +978,12 @@ fi
 
 if [ "$ENABLE_DASHCAM_PI" == "1" ]; then
     cd /home/${USERNAME}
+	ln -s $HAIOT_DIR/scripts /home/scripts
+
+    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/haiot_standalone.service /lib/systemd/system/
+    systemctl enable haiot_standalone.service
+    #systemctl start keep_internet.service
+
 	#http://pidashcam.blogspot.ro/2013/09/install.html#front
     if ! grep -q "gpu_mem" /boot/config.txt; then
         #enable camera
@@ -877,6 +998,9 @@ if [ "$ENABLE_DASHCAM_PI" == "1" ]; then
 		sed /boot/config.txt -i -e "s/^startx/#startx/"
 		sed /boot/config.txt -i -e "s/^fixup_file/#fixup_file/"
 	fi
+	echo "Disabling not needed services"
+	systemctl disable dhcpcd
+
 	#https://raspberrypi.stackexchange.com/questions/169/how-can-i-extend-the-life-of-my-sd-card
 	apt-get remove dphys-swapfile
 	#https://github.com/waveform80/picamera/issues/288#issuecomment-222636171
@@ -925,9 +1049,9 @@ if [ "$ENABLE_DASHCAM_PI" == "1" ]; then
     #https://stackoverflow.com/questions/44347991/how-to-grab-laptop-webcam-video-with-ffmpeg-in-windows
     #ffmpeg -y -f dshow -i video="Integrated Camera" -r 8 -c:v libx264 -b:v 2000k -frag_duration 1000 record1.mp4
 
-    echo "Installing IO/Sensor packages"
-    apt install -y i2c-tools libi2c-dev
-    #python-smbus
+    echo "Installing I2C sensor packages"
+    apt install -y i2c-tools libi2c-dev python-smbus
+    #python-smbus is needed for realtime clock
     if ! grep -q "^i2c[-_]dev" /etc/modules; then printf "i2c-dev\n" >> /etc/modules; fi
     if ! grep -q "^i2c[-_]bcm2708" /etc/modules; then printf "i2c-bcm2708\n" >> /etc/modules; fi
 
@@ -935,7 +1059,7 @@ if [ "$ENABLE_DASHCAM_PI" == "1" ]; then
     #echo "Installing accel + gyro lib"
     #pip install mpu6050-raspberrypi
 
-    echo "Disable UART console"
+    echo "Disable UART console for GPS use"
     sed -i -e "s/console=serial0,115200//g" /boot/cmdline.txt
 
     echo "Installing GPS"
@@ -948,6 +1072,46 @@ if [ "$ENABLE_DASHCAM_PI" == "1" ]; then
     # https://gitlab.com/eneiluj/phonetrack-oc
     echo "gpsd /dev/ttyS0 -F /var/run/gpsd.sock" >> /etc/rc.local
 
+    echo "Configuring fwknop"
+    apt install -y fwknop-client
+
+    echo "Set proper network gw order"
+    # https://unix.stackexchange.com/questions/292940/how-to-set-a-routing-table-that-prefers-wlan-dhcp-interface-as-default-route
+
+    echo "Install USB power control app"
+    sudo apt install -y libusb-dev
+    https://raw.githubusercontent.com/codazoda/hub-ctrl.c/master/hub-ctrl.c
+    gcc -o hub-ctrl hub-ctrl.c -lusb
+
+    echo "Enable RTC"
+    #https://www.raspberrypi-spy.co.uk/2015/05/adding-a-ds3231-real-time-clock-to-the-raspberry-pi/
+    if ! grep -q "^rtc[-_]ds1307" /etc/modules; then printf "rtc-ds1307\n" >> /etc/modules; fi
+    echo 'echo ds1307 0x68 > /sys/class/i2c-adapter/i2c-1/new_device' >> /etc/rc.local
+
+    echo "move exit 0 to the end in rc.local to allow scripts to run"
+    nano /etc/rc.local
+fi
+
+
+if [ "$ENABLE_UPS_PICO" == "1" ]; then
+    # https://github.com/modmypi/PiModules/wiki/UPS-PIco-Installation
+    echo "Installing UPS PICO prereq"
+    apt install -y python-rpi.gpio git python-dev python-serial python-smbus python-jinja2 python-xmltodict python-psutil python-pip
+    pip install xmltodict
+    cd /home/${USERNAME}
+    git clone https://github.com/modmypi/PiModules.git
+    cd PiModules/code/python/package
+    python setup.py install
+    cd /home/${USERNAME}
+    cd PiModules/code/python/upspico/picofssd
+    python setup.py install
+    update-rc.d picofssd defaults
+    update-rc.d picofssd enable
+    apt-get install -y i2c-tools
+    echo "Enable RTC"
+    if ! grep -q "^rtc[-_]ds1307" /etc/modules; then printf "rtc-ds1307\n" >> /etc/modules; fi
+    echo 'echo ds1307 0x68 > /sys/class/i2c-adapter/i2c-1/new_device' >> /etc/rc.local
+fi
 
 if [ "$ENABLE_DASHCAM_MOTION" == "1" ]; then
     apt install -y motion
@@ -1064,7 +1228,14 @@ exit 0
     #echo 'ACTION=="add",SUBSYSTEMS=="usb",ATTRS{manufacturer}=="ZTE,Incorporated",RUN+="/usr/bin/wvdial & disown"' > /etc/udev/rules.d/10-3gstick.rules
 
     # https://unix.stackexchange.com/questions/296347/crontab-never-running-while-in-etc-cron-d
-    cat ${HAIOT_DIR}/apps/dashcam/scripts/cron.d.3gdial >> /etc/crontab
+    #cat ${HAIOT_DIR}/apps/dashcam/scripts/cron.d.3gdial >> /etc/crontab
+
+    ln -s $HAIOT_DIR/scripts /home/scripts
+
+    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/keep_internet.service /lib/systemd/system/
+    systemctl enable keep_internet.service
+    systemctl start keep_internet.service
+
 fi
 
 echo "Optimise for flash and ssd usage"

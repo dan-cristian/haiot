@@ -1,4 +1,4 @@
-from main.logger_helper import Log
+from main.logger_helper import L
 import struct
 import array
 import bluetooth
@@ -101,7 +101,7 @@ def _list_all():
 
 
 def thread_run():
-    Log.logger.debug('Processing presence_run')
+    L.l.debug('Processing presence_run')
     _check_presence()
     return 'Processed presence_run'
 

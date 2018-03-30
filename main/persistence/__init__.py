@@ -1,6 +1,6 @@
 from common import Constant
 from common import utils
-from main import Log
+from main import L
 
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
@@ -8,7 +8,7 @@ __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 # saves record to cloud database
 def save_to_history_cloud(obj):
     try:
-        Log.logger.debug('Trying to save historical record to cloud {}'.format(obj))
+        L.l.debug('Trying to save historical record to cloud {}'.format(obj))
         if Constant.JSON_PUBLISH_GRAPH_X in obj:
             # name of x field
             axis_x_field = obj[Constant.JSON_PUBLISH_GRAPH_X]
@@ -21,10 +21,10 @@ def save_to_history_cloud(obj):
             # intersect lists and get only graphable fields that had values changed
             list_axis_y = list(set(graph_y_fields) & set(changed_fields))
             if len(list_axis_y) == 0:
-                Log.logger.info('Ignoring record save graph={} changed fields={} obj={}'.format(graph_y_fields,
-                                                                                                changed_fields, obj))
+                L.l.info('Ignoring record save graph={} changed fields={} obj={}'.format(graph_y_fields,
+                                                                                         changed_fields, obj))
             else:
-                Log.logger.debug('Trying to save y axis {}'.format(list_axis_y))
+                L.l.debug('Trying to save y axis {}'.format(list_axis_y))
                 if axis_x_field in obj and graph_id_field in obj:
                     table = obj[Constant.JSON_PUBLISH_TABLE]
                     trace_unique_id = obj[graph_id_field]  # unique record/trace identifier
@@ -58,22 +58,22 @@ def save_to_history_cloud(obj):
                             #Log.logger.debug('Skip upload to cloud, plotly not init')
                         index += 1
                 else:
-                    Log.logger.critical('Missing history axis_x [{}], graph_id [{}], in obj {}'.format(
+                    L.l.critical('Missing history axis_x [{}], graph_id [{}], in obj {}'.format(
                         axis_x_field,graph_id_field,obj))
         else:
-            Log.logger.critical('Missing history axis X field {}'.format(Constant.JSON_PUBLISH_GRAPH_X))
+            L.l.critical('Missing history axis X field {}'.format(Constant.JSON_PUBLISH_GRAPH_X))
     except Exception, ex:
-        Log.logger.exception('General error saving historical cloud record, err {} obj={}'.format(ex, obj))
+        L.l.exception('General error saving historical cloud record, err {} obj={}'.format(ex, obj))
 
 
 # saves record to cloud database
 def save_to_history_db(obj):
     try:
         table = obj[Constant.JSON_PUBLISH_TABLE]
-        Log.logger.debug('Trying to save historical record to db={}'.format(table))
+        #L.l.debug('Trying to save historical record to db={}'.format(table))
         # save to local history DB, append history to source table name
         dest_table = str(table) + 'History'
-        Log.logger.debug('Saving to local db table {} obj={}'.format(dest_table, obj))
+        #L.l.debug('Saving to local db table {} obj={}'.format(dest_table, obj))
         from main.admin import models
         # http://stackoverflow.com/questions/4030982/initialise-class-object-by-name
         try:
@@ -83,11 +83,12 @@ def save_to_history_db(obj):
                 if hasattr(new_record, field) and field != "id":
                     setattr(new_record, field, obj[field])
             if new_record.add_commit_record_to_db():
-                Log.logger.debug('Saved OK to local db table {} obj={}'.format(dest_table, new_record))
+                #L.l.debug('Saved OK to local db table {} obj={}'.format(dest_table, new_record))
+                pass
             else:
-                Log.logger.critical("Cannot save history db record={}".format(obj))
+                L.l.critical("Cannot save history db record={}".format(obj))
         except Exception, ex:
-            Log.logger.critical("Cannot save history db err={} record={}".format(ex, obj))
+            L.l.critical("Cannot save history db err={} record={}".format(ex, obj))
     except Exception, ex:
-        Log.logger.exception('General error saving historical db record, err {} obj={}'.format(ex, obj))
+        L.l.exception('General error saving historical db record, err {} obj={}'.format(ex, obj))
 
