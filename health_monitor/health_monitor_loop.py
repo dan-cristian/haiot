@@ -399,6 +399,7 @@ def _read_system_attribs():
         record.name = Constant.HOST_NAME
         record.updated_on = utils.get_base_location_now_date()
         current_record = models.SystemMonitor.query.filter_by(name=record.name).first()
+        progress_status = 'Saving mem cpu before save fields'
         record.save_changed_fields(current_record=current_record, new_record=record,
                                    notify_transport_enabled=False, save_to_graph=True)
     except Exception, ex:
