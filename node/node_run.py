@@ -13,6 +13,8 @@ from transport import mqtt_io
 first_run = True
 since_when_i_should_be_master = datetime.datetime.max
 node_state_uuid = None
+progress_status = None
+
 
 #save node state to db, except for current node. no decisions taken on node election
 def node_update(obj=None):
@@ -98,6 +100,7 @@ def update_master_state():
 
 
 def announce_node_state():
+    global progress_status
     try:
         L.l.debug('I tell everyone my node state')
         #current_record = models.Node.query.filter_by(name=constant.HOST_NAME).first()
@@ -127,13 +130,12 @@ def announce_node_state():
         node.os_type = Constant.OS
         node.machine_type = Constant.HOST_MACHINE_TYPE
         node.notify_transport_enabled = True
+        progress_status = 'Announce node status before save fields'
         node.save_changed_fields(current_record=current_record, new_record=node, notify_transport_enabled=True,
                                    save_to_graph=True, graph_save_frequency=120)
     except Exception, ex:
         L.l.error('Unable to announce my state, err={}'.format(ex))
 
-
-progress_status = None
 
 
 def get_progress():
