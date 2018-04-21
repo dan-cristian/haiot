@@ -282,7 +282,7 @@
     {"zone_id":2, "pattern_week_id":7,  "pattern_weekend_id":8,  "temp_target_code_min_presence":"3", "temp_target_code_max_no_presence":"."},
     {"zone_id":47,"pattern_week_id":11, "pattern_weekend_id":12, "temp_target_code_min_presence":"b", "temp_target_code_max_no_presence":"."},
     {"zone_id":4, "pattern_week_id":15, "pattern_weekend_id":16, "temp_target_code_min_presence":"2", "temp_target_code_max_no_presence":"."},
-    {"zone_id":25,"pattern_week_id":17, "pattern_weekend_id":17, "temp_target_code_min_presence":"h", "temp_target_code_max_no_presence":"."}
+    {"zone_id":52,"pattern_week_id":17, "pattern_weekend_id":17, "temp_target_code_min_presence":"h", "temp_target_code_max_no_presence":"."}
   ],
 
   "ZoneHeatRelay":[
