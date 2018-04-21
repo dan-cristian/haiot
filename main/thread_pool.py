@@ -7,11 +7,11 @@ from main.logger_helper import L
 
 __callable_list = []
 #__callable_args = []
-__callable_progress_list={}
-__exec_interval_list={}
-__exec_last_date_list={}
+__callable_progress_list = {}
+__exec_interval_list = {}
+__exec_last_date_list = {}
 __thread_pool_enabled = True
-__dict_future_func={}
+__dict_future_func = {}
 
 #__immediate_executor = None
 
@@ -67,7 +67,7 @@ def run_thread_pool():
             if len(__callable_list) != len(__dict_future_func):
                 L.l.info('Initialising interval thread processing with {} functions'.format(len(__callable_list)))
                 __dict_future_func = {executor.submit(call_obj): call_obj for call_obj in __callable_list}
-            for future_obj in __dict_future_func:
+            for future_obj in dict(__dict_future_func):
                 func = __dict_future_func[future_obj]
                 print_name = func.func_globals['__name__'] + '.' + func.func_name
                 exec_interval = __exec_interval_list.get(func, None)
