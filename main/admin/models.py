@@ -199,6 +199,7 @@ class DbBase:
                         new_record.last_commit_field_changed_list.append(column_name)
                 if debug:
                     L.l.info('DEBUG new record={}'.format(new_record))
+                _now_time_add = utils.get_base_location_now_date()
                 db.session.add(new_record)
             # fixme: remove hardcoded field name
             if hasattr(new_record, 'last_save_to_graph'):
@@ -227,9 +228,10 @@ class DbBase:
         finally:
             _run_time_sec = (utils.get_base_location_now_date() - _start_time).total_seconds()
             _before_commit_sec = (_now_time_commit - _start_time).total_seconds()
+            _before_add = (_now_time_add - _start_time).total_seconds()
             if _run_time_sec > 3:
-                L.l.warning("Saving changed fields took {} sec (before commit was {}) for record {}".format(
-                    _run_time_sec, _before_commit_sec, new_record))
+                L.l.warning("Saving fields took {} sec (before was {} {}) for record {}".format(
+                    _run_time_sec, _before_add, _before_commit_sec, new_record))
 
 
     # save json to a new or existing record
