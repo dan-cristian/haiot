@@ -130,6 +130,7 @@ class DbBase:
     def save_changed_fields(self, current_record='', new_record='', notify_transport_enabled=False, save_to_graph=False,
                             ignore_only_updated_on_change=True, debug=False, graph_save_frequency=0, query_filter=None,
                             save_all_fields=False):
+        _start_time = utils.get_base_location_now_date()
         try:
             # inherit BaseGraph to enable persistence
             if hasattr(self, 'save_to_graph'):  # not all models inherit graph, used for periodic save
@@ -222,6 +223,11 @@ class DbBase:
             raise ex
             # else:
             #    Log.logger.warning('Incorrect parameters received on save changed fields to db')
+        finally:
+            _run_time_sec = (utils.get_base_location_now_date() - _start_time).total_seconds()
+            if _run_time_sec > 3:
+                L.l.warning("Saving changed fields took {} sec for record {}".format(_run_time_sec, new_record))
+
 
     # save json to a new or existing record
     def json_to_record_query(self, json_obj):
