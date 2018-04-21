@@ -209,6 +209,7 @@ class DbBase:
             if save_to_graph:
                 dispatcher.send(signal=Constant.SIGNAL_STORABLE_RECORD,
                                 new_record=new_record, current_record=current_record)
+            _now_time_commit = utils.get_base_location_now_date()
             commit()
         except Exception, ex:
             exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -225,8 +226,10 @@ class DbBase:
             #    Log.logger.warning('Incorrect parameters received on save changed fields to db')
         finally:
             _run_time_sec = (utils.get_base_location_now_date() - _start_time).total_seconds()
+            _before_commit_sec = (_now_time_commit - _start_time).total_seconds()
             if _run_time_sec > 3:
-                L.l.warning("Saving changed fields took {} sec for record {}".format(_run_time_sec, new_record))
+                L.l.warning("Saving changed fields took {} sec (before commit was {}) for record {}".format(
+                    _run_time_sec, _before_commit_sec, new_record))
 
 
     # save json to a new or existing record
