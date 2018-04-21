@@ -131,6 +131,7 @@ class DbBase:
                             ignore_only_updated_on_change=True, debug=False, graph_save_frequency=0, query_filter=None,
                             save_all_fields=False):
         _start_time = utils.get_base_location_now_date()
+        _now_time_add = None
         try:
             # inherit BaseGraph to enable persistence
             if hasattr(self, 'save_to_graph'):  # not all models inherit graph, used for periodic save
