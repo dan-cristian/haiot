@@ -131,7 +131,6 @@ class DbBase:
                             ignore_only_updated_on_change=True, debug=False, graph_save_frequency=0, query_filter=None,
                             save_all_fields=False):
         _start_time = utils.get_base_location_now_date()
-        _now_time_add = None
         try:
             # inherit BaseGraph to enable persistence
             if hasattr(self, 'save_to_graph'):  # not all models inherit graph, used for periodic save
@@ -153,6 +152,7 @@ class DbBase:
                     new_record.save_to_graph = save_to_graph
             # ensure is set for both new and existing records
             new_record.save_to_history = save_to_graph
+            _now1 = utils.get_base_location_now_date()
             if current_record is not None:
                 # ensure is set for both new and existing records
                 current_record.save_to_history = save_to_graph
@@ -200,8 +200,8 @@ class DbBase:
                         new_record.last_commit_field_changed_list.append(column_name)
                 if debug:
                     L.l.info('DEBUG new record={}'.format(new_record))
-                _now_time_add = utils.get_base_location_now_date()
                 db.session.add(new_record)
+            _now2 = utils.get_base_location_now_date()
             # fixme: remove hardcoded field name
             if hasattr(new_record, 'last_save_to_graph'):
                 if current_record is not None:
@@ -211,7 +211,7 @@ class DbBase:
             if save_to_graph:
                 dispatcher.send(signal=Constant.SIGNAL_STORABLE_RECORD,
                                 new_record=new_record, current_record=current_record)
-            _now_time_commit = utils.get_base_location_now_date()
+            _now3 = utils.get_base_location_now_date()
             commit()
         except Exception, ex:
             exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -228,14 +228,12 @@ class DbBase:
             #    Log.logger.warning('Incorrect parameters received on save changed fields to db')
         finally:
             _run_time_sec = (utils.get_base_location_now_date() - _start_time).total_seconds()
-            _before_commit_sec = (_now_time_commit - _start_time).total_seconds()
-            if _now_time_add is not None:
-                _before_add = (_now_time_add - _start_time).total_seconds()
-            else:
-                _before_add = 0
+            s1 = (_now1 - _start_time).total_seconds()
+            s2 = (_now2 - _start_time).total_seconds()
+            s3 = (_now3 - _start_time).total_seconds()
             if _run_time_sec > 3:
-                L.l.warning("Saving fields took {} sec (before was {} {}) for record {}".format(
-                    _run_time_sec, _before_add, _before_commit_sec, new_record))
+                L.l.warning("Saving fields took {} sec: {}/{}/{} for record {}".format(
+                    _run_time_sec, s1, s2, s3, new_record))
 
 
     # save json to a new or existing record
