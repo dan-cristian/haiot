@@ -215,9 +215,12 @@ def _store_record(new_record=None, current_record=None):
 
 
 def _upload_bulk():
-    for record in list(P.record_list):
-        _handle_record(record[0], record[1])
-        P.record_list.remove(record)
+    try:
+        for record in list(P.record_list):
+            _handle_record(record[0], record[1])
+            P.record_list.remove(record)
+    except Exception, ex:
+        L.l.warning("Unable to upload bulk, itemcount={}, item=P{}, err={}".format(len(P.record_list), record, ex))
 
 
 def thread_run():
