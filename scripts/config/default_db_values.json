@@ -177,6 +177,7 @@
     {"id":49, "name":"soba beci", "is_indoor": 1},
     {"id":50, "name":"puffer heater"},
     {"id":51, "name":"puffer gas valve"},
+    {"id":52, "name":"boiler sus", "is_indoor": 1},
     {"id":200, "name":"car octavia", "is_outdoor": 1}
   ],
 
@@ -290,7 +291,7 @@
     {"zone_id":47,"heat_pin_name":"birou","gpio_pin_code": "24","gpio_host_name":"pi-face"},
     {"zone_id":4, "heat_pin_name":"dormitor","gpio_pin_code":"4","gpio_host_name":"pi-face"},
     {"zone_id":19,"heat_pin_name":"gas heat","gpio_pin_code":"27","gpio_host_name":"pi-face", "is_main_heat_source":"1"},
-    {"zone_id":25,"heat_pin_name":"puffer boiler","gpio_pin_code":"5","gpio_host_name":"pi-face"},
+    {"zone_id":52,"heat_pin_name":"puffer boiler","gpio_pin_code":"5","gpio_host_name":"pi-face"},
     {"zone_id":50,"heat_pin_name":"puffer heat","gpio_pin_code":"22","gpio_host_name":"pi-face", "temp_sensor_name":"puffer sus"},
     {"zone_id":51,"heat_pin_name":"puffer gas valve","gpio_pin_code":"13","gpio_host_name":"pi-face", "is_alternate_source_switch": "1", "temp_sensor_name":"puffer sus"}
   ],
@@ -305,7 +306,7 @@
     {"zone_id":7 , "sensor_address": "01000001CEF4B326", "sensor_name": "curte fata", "target_material": "air", "alt_address": ""},
     {"zone_id":19 , "sensor_address": "4C000003BDD49D28", "sensor_name": "gas heater", "target_material": "water", "alt_address": ""},
     {"zone_id":19 , "sensor_address": "B9000003BE088E28", "sensor_name": "gas boiler", "target_material": "water", "alt_address": ""},
-    {"zone_id":25 , "sensor_address": "96000003BDFE5D28", "sensor_name": "boiler sus", "target_material": "water", "alt_address": ""},
+    {"zone_id":52 , "sensor_address": "96000003BDFE5D28", "sensor_name": "boiler sus", "target_material": "water", "alt_address": ""},
     {"zone_id":25 , "sensor_address": "53000004F296DD28", "sensor_name": "boiler mijloc", "target_material": "water", "alt_address": ""},
     {"zone_id":25 , "sensor_address": "C8000004F28B0728", "sensor_name": "boiler jos", "target_material": "water", "alt_address": ""},
     {"zone_id":2 , "sensor_address": "41000003BE099C28", "sensor_name": "living", "target_material": "air", "alt_address": "28.9C09BE030000"},
