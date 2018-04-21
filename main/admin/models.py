@@ -228,7 +228,10 @@ class DbBase:
         finally:
             _run_time_sec = (utils.get_base_location_now_date() - _start_time).total_seconds()
             _before_commit_sec = (_now_time_commit - _start_time).total_seconds()
-            _before_add = (_now_time_add - _start_time).total_seconds()
+            if _now_time_add is not None:
+                _before_add = (_now_time_add - _start_time).total_seconds()
+            else:
+                _before_add = 0
             if _run_time_sec > 3:
                 L.l.warning("Saving fields took {} sec (before was {} {}) for record {}".format(
                     _run_time_sec, _before_add, _before_commit_sec, new_record))
