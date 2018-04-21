@@ -28,6 +28,7 @@ class P:
     profile_channels = {}  # all channels defined on cloud
     last_upload_ok = datetime.datetime.now()
     timezone = tzlocal.get_localzone().zone
+    record_list = []
 
 
 def _upload_field(model, fields, ch_index):
@@ -209,8 +210,19 @@ def _check_def_change():
         _channel_lock.release()
 
 
+def _store_record(new_record=None, current_record=None):
+    P.record_list.append([new_record, current_record])
+
+
+def _upload_bulk():
+    for record in list(P.record_list):
+        _handle_record(record[0], record[1])
+        P.record_list.remove(record)
+
+
 def thread_run():
     _check_def_change()
+    _upload_bulk()
 
 
 def unload():
@@ -224,7 +236,7 @@ def init():
         logging.getLogger("requests").setLevel(logging.WARNING)
         _check_def_change()
         initialised = True
-        dispatcher.connect(_handle_record, signal=Constant.SIGNAL_STORABLE_RECORD, sender=dispatcher.Any)
+        dispatcher.connect(_store_record, signal=Constant.SIGNAL_STORABLE_RECORD, sender=dispatcher.Any)
         thread_pool.add_interval_callable(thread_run, run_interval_second=60)
     except Exception, ex:
         L.l.warning("Unable to read config or init thingspeak, stack={}".format(traceback.print_exc()))
