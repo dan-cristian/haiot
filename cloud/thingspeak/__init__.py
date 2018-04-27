@@ -215,10 +215,11 @@ def _copy_fields(obj):
     class Empty:
         pass
     res = Empty()
-    for attr, val in obj.__dict__.iteritems():
-        attr_name = str(attr)
-        if not attr_name.startswith('_'):
-            setattr(res, attr_name, val)
+    if obj is not None:
+        for attr, val in obj.__dict__.iteritems():
+            attr_name = str(attr)
+            if not attr_name.startswith('_'):
+                setattr(res, attr_name, val)
     return res
 
 
@@ -226,8 +227,6 @@ def _store_record(new_record=None, current_record=None):
     new_clone = _copy_fields(new_record)
     current_clone = _copy_fields(current_record)
     P.record_list.append([new_clone, current_clone])
-    #P.record_list.append([new_record, current_record])
-
 
 
 def _upload_bulk():
