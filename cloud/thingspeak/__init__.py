@@ -55,7 +55,7 @@ def _upload_field(model, fields, ch_index):
 
 def _handle_record(new_record=None, current_record=None):
     global _channel_lock
-    cls = str(type(new_record))
+    cls = new_record.original_class
     key = 'models.'
     start = cls.find(key)
     model = None
@@ -213,9 +213,10 @@ def _check_def_change():
 
 def _copy_fields(obj):
     class Empty:
-        pass
+        original_class = None
     res = Empty()
     if obj is not None:
+        res.original_class = str(type(obj))
         for attr, val in obj.__dict__.iteritems():
             attr_name = str(attr)
             if not attr_name.startswith('_'):
@@ -231,7 +232,8 @@ def _store_record(new_record=None, current_record=None):
 
 def _upload_bulk():
     try:
-        for record in list(P.record_list):
+        # fixme: I change a list while iterating it
+        for record in P.record_list:
             _handle_record(record[0], record[1])
             P.record_list.remove(record)
     except Exception, ex:

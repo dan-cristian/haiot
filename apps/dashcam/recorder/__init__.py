@@ -102,6 +102,10 @@ def _write_overlay_text():
     f.write(_get_overlay_text())
     f.close()
     # atomic operation
+    try:
+        os.remove(P.overlay_text_file)
+    except OSError:
+        pass
     os.rename(P.overlay_text_file_tmp, P.overlay_text_file)
 
 
