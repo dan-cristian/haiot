@@ -47,9 +47,10 @@
     {"name": "AMP_SERIAL_HOST", "value": "192.168.0.9", "description":"host for serial over net - ser2net, amp control"},
     {"name": "AMP_SERIAL_PORT", "value": "2000", "description":"port for serial over net - ser2net, amp control"},
     {"name": "ALEXA_WEMO_LISTEN_PORT", "value": "50000", "description":"starting port to be used to listen by alexa wemo devices"},
-    {"name": "HEAT_SOURCE_MIN_TEMP", "value": "50", "description":"minimum temperature to consider a heat source usable"},
+    {"name": "HEAT_SOURCE_MIN_TEMP", "value": "60", "description":"minimum temperature to consider a heat source usable"},
     {"name": "HEAT_STATE_REFRESH_PERIOD", "value": "1", "description":"period in minutes to do a heath status & gpio pins refresh"},
     {"name": "SOLAR_APS_LOCAL_URL", "value": "http://192.168.0.10/cgi-bin/home", "description":"link to aps ecu page with day production"},
+    {"name": "SOLAR_APS_LOCAL_REALTIME_URL", "value": "http://192.168.0.10/cgi-bin/parameters", "description":"link to aps ecu page with realtime production"},
     {"name": "SOLAR_UTILITY_NAME", "value": "solar_aps", "description":"utility name from utility table"},
     {"name": "UPS_ON_HOST", "value": "pi-face", "description":"host name on which the ups is connected, to enable UPS search"},
     {"name": "SOLAR_PARSER_ON_HOST", "value": "pi-face", "description":"host name on which the aps solar parser runs"}
