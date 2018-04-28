@@ -201,14 +201,17 @@ def loop_heat_relay():
 def set_main_heat_source():
     heat_source_relay_list = models.ZoneHeatRelay.query.filter(models.ZoneHeatRelay.temp_sensor_name is not None).all()
     temp_limit = float(get_param(Constant.P_HEAT_SOURCE_MIN_TEMP))
+    up_limit = temp_limit + float(get_param(Constant.P_TEMPERATURE_THRESHOLD))
     for heat_source_relay in heat_source_relay_list:
         # is there is a temp sensor defined, consider this source as possible alternate source
         if heat_source_relay.temp_sensor_name is not None:
             temp_rec = models.Sensor().query_filter_first(
                 models.Sensor.sensor_name.in_([heat_source_relay.temp_sensor_name]))
             # if alternate source is valid
-            # fixme: add temp threshold to avoid quick on/offs
-            if temp_rec is not None and temp_rec.temperature >= temp_limit:
+            # fixok: add temp threshold to avoid quick on/offs
+            if temp_rec is not None \
+                    and ((temp_rec.temperature >= up_limit and not heat_source_relay.is_alternate_source_switch)
+                         or (temp_rec.temperature >= temp_limit and heat_source_relay.is_alternate_source_switch)):
                 if heat_source_relay.is_alternate_source_switch:
                     # stop main heat source
                     heatrelay_main_source = models.ZoneHeatRelay.query.filter_by(is_main_heat_source=1).first()
