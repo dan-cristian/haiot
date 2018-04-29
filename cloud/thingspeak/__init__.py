@@ -79,9 +79,6 @@ def _handle_record(new_record=None, current_record=None):
                     for cloud_field in cloud_fields:
                         cloud_field_name = cloud_field[0]
                         # only save changed value fields
-                        if current_record is not None and hasattr(current_record, 'last_commit_field_changed_list'):
-                            L.l.warning("Got a record without changed fields cur={} new={}".format(
-                                current_record, new_record))
                         if hasattr(new_record, cloud_field_name) and (current_record is None or cloud_field_name
                                                                       in current_record.last_commit_field_changed_list):
                             cloud_key_val = cloud_field[1]
