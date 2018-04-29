@@ -361,11 +361,11 @@ def alexawemo_watering_off():
     return True
 
 
-def alexawemo_music_living_on():
+def alexawemo_music_livingroom_on():
     return mpd.play('livingroom', default_dir='/_New/')
 
 
-def alexawemo_music_living_off():
+def alexawemo_music_livingroom_off():
     return mpd.pause('livingroom')
 
 

@@ -42,7 +42,7 @@
     {"name": "P_HIPCHAT_TOKEN", "value": "fqlWeMHD2KxcSBYOt9nxu3t97CcFgljmUJZoBc3d", "description":"room token"},
     {"name": "P_HIPCHAT_ROOM_API_ID", "value": "2941088", "description":"room api id"},
     {"name": "P_MPD_SERVER", "value": "192.168.0.9", "description":"IP of mpd music server"},
-    {"name": "P_MPD_PORT_ZONE","value": "living=6600,headset=6601,basement=6602,bedroom=6603,bathroom=6604,attic=6605", "description":"mpd port for each music zone"},
+    {"name": "P_MPD_PORT_ZONE","value": "livingroom=6600,headset=6601,basement=6602,bedroom=6603,bathroom=6604,attic=6605", "description":"mpd port for each music zone"},
     {"name": "GMUSICPROXY_URL", "value": "http://192.168.0.9:8081", "description":"url for gmusicproxy"},
     {"name": "AMP_SERIAL_HOST", "value": "192.168.0.9", "description":"host for serial over net - ser2net, amp control"},
     {"name": "AMP_SERIAL_PORT", "value": "2000", "description":"port for serial over net - ser2net, amp control"},
