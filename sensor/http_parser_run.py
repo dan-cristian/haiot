@@ -47,11 +47,19 @@ def thread_solar_aps_run():
                                         __start_key_panel, __end_key_panel, end_first=True)
             utility_name = model_helper.get_param(Constant.P_SOLAR_UTILITY_NAME)
             if temperature is not None:
+                zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=panel_id).first()
+                if zone_sensor is None:
+                    L.l.warning('Solar panel id {} is not defined in zone sensor list'.format(panel_id))
                 record = models.Sensor(address=panel_id)
                 current_record = models.Sensor.query.filter_by(address=panel_id).first()
-                record.type = 'solar aps'
+                record.type = 'solar'
                 if current_record is not None:
                     record.sensor_name = current_record.sensor_name
+                else:
+                    if zone_sensor:
+                        record.sensor_name = zone_sensor.sensor_name
+                    else:
+                        record.sensor_name = record.type + panel_id
                 record.temperature = temperature
                 record.updated_on = utils.get_base_location_now_date()
                 record.save_changed_fields(current_record=current_record, new_record=record,
