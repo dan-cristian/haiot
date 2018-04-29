@@ -387,6 +387,8 @@ class SchedulePattern(db.Model, DbBase):
     auto_deactivate_on_away = db.Column(db.Boolean, default=False)
     keep_warm = db.Column(db.Boolean, default=False)  # keep the zone warm, used for cold floors
     keep_warm_pattern = db.Column(db.String(20))  # pattern, 5 minutes increments of on/off: 10000100010000111000
+    activate_on_condition = db.Column(db.Boolean, default=False)  # activate heat only if certain condition is meet
+    activate_condition_relay = db.Column(db.String(50))  # the relay that must be on to activate
 
 
     def __init__(self, id=None, name='', pattern=''):

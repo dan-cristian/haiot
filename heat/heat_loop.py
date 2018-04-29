@@ -10,6 +10,7 @@ import gpio
 __last_main_heat_update = datetime.datetime.min
 __TEMP_NO_HEAT = '.'
 
+
 # save heat status and announce to all nodes.
 def __save_heat_state_db(zone='', heat_is_on=''):
     assert isinstance(zone, models.Zone)
@@ -31,14 +32,17 @@ def __save_heat_state_db(zone='', heat_is_on=''):
 
 
 # triggers heat status update if heat changed
-def __decide_action(zone, current_temperature, target_temperature, force_on=False):
+def __decide_action(zone, current_temperature, target_temperature, force_on=False, force_off=False):
     assert isinstance(zone, models.Zone)
     threshold = float(get_param(Constant.P_TEMPERATURE_THRESHOLD))
     L.l.debug("Asses heat zone={} current={} target={} thresh={}".format(
         zone, current_temperature, target_temperature, threshold))
+    heat_is_on = None
     if force_on:
         heat_is_on = True
-    else:
+    if force_off:
+        heat_is_on = False
+    if heat_is_on is None:
         heat_is_on = zone.heat_is_on
         if heat_is_on is None:
             heat_is_on = False
@@ -72,12 +76,23 @@ def __update_zone_heat(zone, heat_schedule, sensor):
         weekday = datetime.datetime.today().weekday()
         # todo: insert here auto heat change based on presence status
         if weekday <= 4:  # Monday=0
-            schedule_pattern= models.SchedulePattern.query.filter_by(id=heat_schedule.pattern_week_id).first()
+            schedule_pattern = models.SchedulePattern.query.filter_by(id=heat_schedule.pattern_week_id).first()
         else:
-            schedule_pattern= models.SchedulePattern.query.filter_by(id=heat_schedule.pattern_weekend_id).first()
+            schedule_pattern = models.SchedulePattern.query.filter_by(id=heat_schedule.pattern_weekend_id).first()
         if schedule_pattern:
+            force_off = False
+            # set heat to off if condition is met (i.e. do not try to heat water if heat source is cold)
+            if schedule_pattern.deactivate_on_condition:
+                relay_name = schedule_pattern.activate_condition_relay
+                zone_heat_relay = models.ZoneHeatRelay.query.filter_by(heat_pin_name=relay_name).first()
+                if zone_heat_relay is not None:
+                    force_off = zone_heat_relay.heat_is_on is False
+                    if force_off:
+                        L.l.info('Deactivating heat in zone {} due to relay {}'.format(zone, zone_heat_relay))
+                else:
+                    L.l.error('Could not find the heat relay for zone heat {}'.format(zone))
             # strip formatting characters that are not used to represent target temperature
-            pattern = str(schedule_pattern.pattern).replace('-', '').replace(' ','')
+            pattern = str(schedule_pattern.pattern).replace('-', '').replace(' ', '')
             # check pattern validity
             if len(pattern) == 24:
                 temperature_code = pattern[hour]
@@ -99,15 +114,14 @@ def __update_zone_heat(zone, heat_schedule, sensor):
                     zone.heat_target_temperature = temperature_target.target
                     commit()
                     if sensor.temperature is not None:
-                        heat_is_on = __decide_action(
-                            zone, sensor.temperature, temperature_target.target, force_on=force_on)
+                        heat_is_on = __decide_action(zone, sensor.temperature, temperature_target.target,
+                                                     force_on=force_on, force_off=force_off)
                     #else:
                     #    heat_is_on = zone.heat_is_on
                 else:
                     L.l.critical('Unknown temperature pattern code {}'.format(temperature_code))
             else:
-                L.l.warning('Incorrect temp pattern [{}] in zone {}, length is not 24'.format(
-                    pattern, zone.name))
+                L.l.warning('Incorrect temp pattern [{}] in zone {}, length is not 24'.format(pattern, zone.name))
     except Exception, ex:
         L.l.error('Error updatezoneheat, err={}'.format(ex, exc_info=True))
     #Log.logger.info("Temp in {} has target={} and current={}, heat should be={}".format(zone.name,
