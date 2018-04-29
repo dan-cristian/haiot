@@ -361,6 +361,18 @@ def alexawemo_watering_off():
     return True
 
 
+def alexawemo_waterfront_on():
+    """is_async=1"""
+    water_front_3_minute()
+    return True
+
+
+def alexawemo_waterback_on():
+    """is_async=1"""
+    water_back_3_minute()
+    return True
+
+
 def alexawemo_music_livingroom_on():
     return mpd.play('livingroom', default_dir='/_New/')
 
