@@ -79,6 +79,9 @@ def _handle_record(new_record=None, current_record=None):
                     for cloud_field in cloud_fields:
                         cloud_field_name = cloud_field[0]
                         # only save changed value fields
+                        if current_record is not None and hasattr(current_record, 'last_commit_field_changed_list'):
+                            L.l.warning("Got a record without changed fields cur={} new={}".format(
+                                current_record, new_record))
                         if hasattr(new_record, cloud_field_name) and (current_record is None or cloud_field_name
                                                                       in current_record.last_commit_field_changed_list):
                             cloud_key_val = cloud_field[1]
@@ -231,6 +234,10 @@ def _store_record(new_record=None, current_record=None):
 
 
 def _upload_bulk():
+    global initialised
+    if not initialised:
+        _check_def_change()
+        initialised = True
     try:
         # fixme: I change a list while iterating it
         for record in P.record_list:
@@ -250,12 +257,9 @@ def unload():
 
 
 def init():
-    global initialised
     try:
         # https://stackoverflow.com/questions/11029717/how-do-i-disable-log-messages-from-the-requests-library
         logging.getLogger("requests").setLevel(logging.WARNING)
-        _check_def_change()
-        initialised = True
         dispatcher.connect(_store_record, signal=Constant.SIGNAL_STORABLE_RECORD, sender=dispatcher.Any)
         thread_pool.add_interval_callable(thread_run, run_interval_second=60)
     except Exception, ex:
