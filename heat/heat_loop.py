@@ -82,7 +82,7 @@ def __update_zone_heat(zone, heat_schedule, sensor):
         if schedule_pattern:
             force_off = False
             # set heat to off if condition is met (i.e. do not try to heat water if heat source is cold)
-            if schedule_pattern.deactivate_on_condition:
+            if schedule_pattern.activate_on_condition:
                 relay_name = schedule_pattern.activate_condition_relay
                 zone_heat_relay = models.ZoneHeatRelay.query.filter_by(heat_pin_name=relay_name).first()
                 if zone_heat_relay is not None:

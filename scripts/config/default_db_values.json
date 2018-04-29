@@ -276,7 +276,7 @@
     {"id":14, "name":"weekend-dormitor-winter",  "pattern":"2222 2222 .... .222 ...2 2222"},
     {"id":15, "name":"week-dormitor-summer",     "pattern":"bbbb bbbb .... .... ...b bbbb"},
     {"id":16, "name":"weekend-dormitor-summer",  "pattern":"bbbb bbbb .... .bbb ...b bbbb"},
-    {"id":17, "name":"week-boiler-summer",       "pattern":"hh.. .hhh hhhh hhhh hhhh hhhh"}
+    {"id":17, "name":"week-boiler-summer",       "pattern":"hh.. .hhh hhhh hhhh hhhh hhhh", "activate_on_condition":"1", "activate_condition_relay":"puffer gas valve"}
   ],
 
   "HeatSchedule": [
