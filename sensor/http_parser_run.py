@@ -50,7 +50,8 @@ def thread_solar_aps_run():
                 record = models.Sensor(address=panel_id)
                 current_record = models.Sensor.query.filter_by(address=panel_id).first()
                 record.type = 'solar aps'
-                record.sensor_name = current_record.sensor_name
+                if current_record is not None:
+                    record.sensor_name = current_record.sensor_name
                 record.temperature = temperature
                 record.updated_on = utils.get_base_location_now_date()
                 record.save_changed_fields(current_record=current_record, new_record=record,
