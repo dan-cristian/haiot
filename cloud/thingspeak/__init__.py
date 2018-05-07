@@ -225,12 +225,16 @@ def _copy_fields(obj):
 
 
 def _store_record(new_record=None, current_record=None):
+    #fixme: cpu issue
+    return
     new_clone = _copy_fields(new_record)
     current_clone = _copy_fields(current_record)
     P.record_list.append([new_clone, current_clone])
 
 
 def _upload_bulk():
+    # fixme: cpu issue
+    return
     global initialised
     if not initialised:
         _check_def_change()
