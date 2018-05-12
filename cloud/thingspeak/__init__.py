@@ -236,8 +236,7 @@ def _upload_bulk():
     # fixme: cpu issue
     #return
     try:
-        # fixme: I change a list while iterating it
-        for i in range(0, 100):
+        while True:
             if len(P.record_list) == 0:
                 break
             record = P.record_list[0]
@@ -245,8 +244,7 @@ def _upload_bulk():
             del P.record_list[0]
     except Exception, ex:
         L.l.warning("Unable to upload bulk, itemcount={}, item=P{}, err={}".format(len(P.record_list), record, ex))
-    if len(P.record_list) == 0:
-        L.l.info("Thingspeak buffer empty!")
+    L.l.info("Thingspeak buffer size={}".format(len(P.record_list)))
 
 
 def thread_run():
