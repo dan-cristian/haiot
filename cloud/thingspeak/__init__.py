@@ -235,6 +235,7 @@ def _store_record(new_record=None, current_record=None):
 def _upload_bulk():
     # fixme: cpu issue
     #return
+    uploaded = 0
     try:
         while True:
             if len(P.record_list) == 0:
@@ -242,9 +243,12 @@ def _upload_bulk():
             record = P.record_list[0]
             _handle_record(record[0], record[1])
             del P.record_list[0]
+            uploaded += 1
+            if uploaded > 100:
+                L.l.warning("Thingspeak large buffer size={}, uploaded={}".format(len(P.record_list), uploaded))
     except Exception, ex:
         L.l.warning("Unable to upload bulk, itemcount={}, item=P{}, err={}".format(len(P.record_list), record, ex))
-    L.l.info("Thingspeak buffer size={}".format(len(P.record_list)))
+    L.l.info("Thingspeak buffer size={}, uploaded={}".format(len(P.record_list), uploaded))
 
 
 def thread_run():
