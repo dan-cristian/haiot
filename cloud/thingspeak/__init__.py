@@ -31,6 +31,7 @@ class P:
     last_upload_ok = datetime.datetime.now()
     timezone = tzlocal.get_localzone().zone
     record_list = []
+    max_buffer_size = 50  # drop new records if buffer is larger than this
 
 
 def _upload_field(model, fields, ch_index):
@@ -226,16 +227,13 @@ def _copy_fields(obj):
 
 
 def _store_record(new_record=None, current_record=None):
-    #fixme: cpu issue
-    #return
-    new_clone = _copy_fields(new_record)
-    current_clone = _copy_fields(current_record)
-    P.record_list.append([new_clone, current_clone])
+    if len(P.record_list) < P.max_buffer_size:
+        new_clone = _copy_fields(new_record)
+        current_clone = _copy_fields(current_record)
+        P.record_list.append([new_clone, current_clone])
 
 
 def _upload_bulk():
-    # fixme: cpu issue
-    #return
     if P.is_uploading:
         L.l.warning("Trying to upload thingspeak in parallel thread, ignoring!")
         return
@@ -250,7 +248,7 @@ def _upload_bulk():
             _handle_record(record[0], record[1])
             del P.record_list[0]
             uploaded += 1
-            if uploaded > 50:
+            if uploaded > P.max_buffer_size:
                 L.l.warning("Thingspeak large buffer size={}, uploaded={}".format(len(P.record_list), uploaded))
     except Exception, ex:
         L.l.warning("Unable to upload bulk, itemcount={}, item=P{}, err={}".format(len(P.record_list), record, ex))
