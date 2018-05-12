@@ -248,7 +248,7 @@ def _upload_bulk():
             _handle_record(record[0], record[1])
             del P.record_list[0]
             uploaded += 1
-            if uploaded > P.max_buffer_size:
+            if len(P.record_list) > P.max_buffer_size:
                 L.l.warning("Thingspeak large buffer size={}, uploaded={}".format(len(P.record_list), uploaded))
     except Exception, ex:
         L.l.warning("Unable to upload bulk, itemcount={}, item=P{}, err={}".format(len(P.record_list), record, ex))
