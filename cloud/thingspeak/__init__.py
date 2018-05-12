@@ -17,6 +17,7 @@ _channel_lock = threading.Lock()
 
 
 class P:
+    is_uploading = False
     key_separator = ':'
     key_model = 'model'  # meta should contain: model=Tablename,key=fieldname
     key_key = 'key'
@@ -235,6 +236,11 @@ def _store_record(new_record=None, current_record=None):
 def _upload_bulk():
     # fixme: cpu issue
     #return
+    if P.is_uploading:
+        L.l.warning("Trying to upload thingspeak in parallel thread, ignoring!")
+        return
+    else:
+        P.is_uploading = True
     uploaded = 0
     try:
         while True:
@@ -244,10 +250,12 @@ def _upload_bulk():
             _handle_record(record[0], record[1])
             del P.record_list[0]
             uploaded += 1
-            if uploaded > 100:
+            if uploaded > 50:
                 L.l.warning("Thingspeak large buffer size={}, uploaded={}".format(len(P.record_list), uploaded))
     except Exception, ex:
         L.l.warning("Unable to upload bulk, itemcount={}, item=P{}, err={}".format(len(P.record_list), record, ex))
+    finally:
+        P.is_uploading = False
     L.l.info("Thingspeak buffer size={}, uploaded={}".format(len(P.record_list), uploaded))
 
 
