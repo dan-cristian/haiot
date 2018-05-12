@@ -226,7 +226,7 @@ def _copy_fields(obj):
 
 def _store_record(new_record=None, current_record=None):
     #fixme: cpu issue
-    return
+    #return
     new_clone = _copy_fields(new_record)
     current_clone = _copy_fields(current_record)
     P.record_list.append([new_clone, current_clone])
@@ -234,14 +234,10 @@ def _store_record(new_record=None, current_record=None):
 
 def _upload_bulk():
     # fixme: cpu issue
-    return
-    global initialised
-    if not initialised:
-        _check_def_change()
-        initialised = True
+    #return
     try:
         # fixme: I change a list while iterating it
-        for record in P.record_list:
+        for record in list(P.record_list):
             _handle_record(record[0], record[1])
             P.record_list.remove(record)
     except Exception, ex:
@@ -249,8 +245,14 @@ def _upload_bulk():
 
 
 def thread_run():
-    _check_def_change()
-    _upload_bulk()
+    global initialised
+    try:
+        if not initialised:
+            _check_def_change()
+            initialised = True
+        _upload_bulk()
+    except Exception, ex:
+        L.l.error("Error on thingspeak thread_run, ex={}".format(ex))
 
 
 def unload():
