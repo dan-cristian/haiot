@@ -239,9 +239,15 @@ def _upload_bulk():
         # fixme: I change a list while iterating it
         for record in list(P.record_list):
             _handle_record(record[0], record[1])
-            P.record_list.remove(record)
+            if record in P.record_list:
+                P.record_list.remove(record)
+            else:
+                L.l.warning("Item {} not in thingspeak buffer with len={} so can't be removed!".format(
+                    record, len(P.record_list)))
     except Exception, ex:
         L.l.warning("Unable to upload bulk, itemcount={}, item=P{}, err={}".format(len(P.record_list), record, ex))
+    if len(P.record_list) == 0:
+        L.l.info("Thingspeak buffer empty!")
 
 
 def thread_run():
