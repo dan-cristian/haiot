@@ -237,13 +237,12 @@ def _upload_bulk():
     #return
     try:
         # fixme: I change a list while iterating it
-        for record in list(P.record_list):
+        for i in range(0, 100):
+            if len(P.record_list) == 0:
+                break
+            record = P.record_list[0]
             _handle_record(record[0], record[1])
-            if record in P.record_list:
-                P.record_list.remove(record)
-            else:
-                L.l.warning("Item {} not in thingspeak buffer with len={} so can't be removed!".format(
-                    record, len(P.record_list)))
+            del P.record_list[0]
     except Exception, ex:
         L.l.warning("Unable to upload bulk, itemcount={}, item=P{}, err={}".format(len(P.record_list), record, ex))
     if len(P.record_list) == 0:
