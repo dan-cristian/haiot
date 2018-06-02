@@ -102,10 +102,10 @@ def rule_sensor_temp_target(obj=models.Sensor(), field_changed_list=None):
 
 
 class TempStore:
-    max_temp = {'indoor':           {'air': 30, 'water': 80, 'glicol': 90},
-                'indoor_heated':    {'air': 30, 'water': 80, 'glicol': 90},
-                'outdoor':          {'air': 39, 'water': 80, 'glicol': 90},
-                'outdoor_heated':   {'air': 95, 'water': 80, 'glicol': 90}}
+    max_temp = {'indoor':           {'air': 30, 'water': 85, 'glicol': 90},
+                'indoor_heated':    {'air': 30, 'water': 85, 'glicol': 90},
+                'outdoor':          {'air': 39, 'water': 85, 'glicol': 90},
+                'outdoor_heated':   {'air': 95, 'water': 85, 'glicol': 90}}
     min_temp = {'indoor':           {'air': 5, 'water': 5, 'glicol': 5},
                 'indoor_heated':    {'air': 15, 'water': 5, 'glicol': 5},
                 'outdoor':          {'air': -15, 'water': 1, 'glicol': 1},
