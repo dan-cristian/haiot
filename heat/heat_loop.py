@@ -67,9 +67,11 @@ def __decide_action(zone, current_temperature, target_temperature, force_on=Fals
     return heat_is_on
 
 
-# return the required heat state in a zone (True - on, False - off)
+# set and return the required heat state in a zone (True - on, False - off).
+# Also return if main source is needed, usefull if you only heat a boiler from alternate heat source
 def __update_zone_heat(zone, heat_schedule, sensor):
     heat_is_on = False
+    main_source_needed = True
     try:
         minute = utils.get_base_location_now_date().minute
         hour = utils.get_base_location_now_date().hour
@@ -80,6 +82,9 @@ def __update_zone_heat(zone, heat_schedule, sensor):
         else:
             schedule_pattern = models.SchedulePattern.query.filter_by(id=heat_schedule.pattern_weekend_id).first()
         if schedule_pattern:
+            main_source_needed = schedule_pattern.main_source_needed
+            if main_source_needed is False:
+                L.l.info("Main heat source is not needed for zone {}".format(zone))
             force_off = False
             # set heat to off if condition is met (i.e. do not try to heat water if heat source is cold)
             if schedule_pattern.activate_on_condition:
@@ -97,7 +102,7 @@ def __update_zone_heat(zone, heat_schedule, sensor):
             if len(pattern) == 24:
                 temperature_code = pattern[hour]
                 temperature_target = models.TemperatureTarget.query.filter_by(code=temperature_code).first()
-                # check if we need forced heat on, if for this hour temp has a upper target tan min
+                # check if we need forced heat on, if for this hour temp has a upper target than min
                 force_on = False
                 if schedule_pattern.keep_warm:
                     if len(schedule_pattern.keep_warm_pattern) == 20:
@@ -127,7 +132,7 @@ def __update_zone_heat(zone, heat_schedule, sensor):
     #Log.logger.info("Temp in {} has target={} and current={}, heat should be={}".format(zone.name,
     #                                                                            zone.heat_target_temperature,
     #                                                                             sensor.temperature, heat_is_on))
-    return heat_is_on
+    return heat_is_on, main_source_needed
 
 
 # iterate zones and decide heat state for each zone and also for master zone (main heat system)
@@ -149,8 +154,8 @@ def loop_zones():
                         # if sensor_last_update_seconds > 120 * 60:
                         #    Log.logger.warning('Sensor {} not updated in last 120 minutes, unusual'.format(
                         # sensor.sensor_name))
-                        if __update_zone_heat(zone, heat_schedule, sensor):
-                            heat_is_on = True
+                        heat_state, main_source_needed = __update_zone_heat(zone, heat_schedule, sensor)
+                        heat_is_on = main_source_needed and heat_state
         # turn on/off the main heating system based on zone heat needs
         # check first to find alternate valid heat sources
         heatrelay_main_source = models.ZoneHeatRelay.query.filter_by(is_alternate_heat_source=1).first()
