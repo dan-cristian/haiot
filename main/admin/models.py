@@ -363,7 +363,7 @@ class Presence(db.Model, DbBase, DbEvent):
     zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'), nullable=False)
     zone_name = db.Column(db.String(50))
     sensor_name = db.Column(db.String(50))
-    event_type = db.Column(db.String(25)) # cam, pir, contact, wifi, bt
+    event_type = db.Column(db.String(25))  # cam, pir, contact, wifi, bt
     event_camera_date = db.Column(db.DateTime(), default=None)
     event_alarm_date = db.Column(db.DateTime(), default=None)
     event_io_date = db.Column(db.DateTime(), default=None)
@@ -376,7 +376,8 @@ class Presence(db.Model, DbBase, DbEvent):
         super(Presence, self).__init__()
 
     def __repr__(self):
-        return 'Presence id {} zone_id {} sensor {} connected {}'.format(self.id, self.zone_id, self.sensor_name, self.is_connected)
+        return 'Presence id {} zone_id {} sensor {} connected {}'.format(
+            self.id, self.zone_id, self.sensor_name, self.is_connected)
 
 
 class SchedulePattern(db.Model, DbBase):
@@ -387,9 +388,9 @@ class SchedulePattern(db.Model, DbBase):
     auto_deactivate_on_away = db.Column(db.Boolean, default=False)
     keep_warm = db.Column(db.Boolean, default=False)  # keep the zone warm, used for cold floors
     keep_warm_pattern = db.Column(db.String(20))  # pattern, 5 minutes increments of on/off: 10000100010000111000
-    activate_on_condition = db.Column(db.Boolean, default=False)  # activate heat only if certain condition is meet
-    activate_condition_relay = db.Column(db.String(50))  # the relay that must be on to activate
-
+    activate_on_condition = db.Column(db.Boolean, default=False)  # activate heat only if relay state condition is meet
+    activate_condition_relay = db.Column(db.String(50))  # the relay that must be on to activate this schedule pattern
+    main_source_needed = db.Column(db.Boolean, default=True)  # main source must be on as well (i.e. gas heater)
 
     def __init__(self, id=None, name='', pattern=''):
         super(SchedulePattern, self).__init__()
