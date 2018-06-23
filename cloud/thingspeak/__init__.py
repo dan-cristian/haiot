@@ -81,8 +81,10 @@ def _handle_record(new_record=None, current_record=None):
                     for cloud_field in cloud_fields:
                         cloud_field_name = cloud_field[0]
                         # only save changed value fields
-                        if hasattr(new_record, cloud_field_name) and (current_record is None or cloud_field_name
-                                                                      in current_record.last_commit_field_changed_list):
+                        if hasattr(new_record, cloud_field_name) \
+                                and hasattr(current_record, "last_commit_field_changed_list") \
+                                and (current_record is None or cloud_field_name
+                                     in current_record.last_commit_field_changed_list):
                             cloud_key_val = cloud_field[1]
                             if cloud_key_val is not None:
                                 record_key_name = getattr(new_record, cloud_field[2])
