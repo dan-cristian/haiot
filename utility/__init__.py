@@ -3,7 +3,7 @@ from main.logger_helper import L
 from main import thread_pool
 from common import Constant
 from pydispatch import dispatcher
-from main.admin import models
+from main.admin import models, model_helper
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
@@ -35,7 +35,9 @@ def __utility_update_ex(sensor_name, value):
             else:
                 L.l.critical("Utility ex sensor [{}] is not defined in Utility table".format(sensor_name))
     except Exception, ex:
-        L.l.error("Error saving utility ex update {}".format(ex))
+        L.l.error("Error saving utility ex update {}, try to connect to reporting DB".format(ex))
+        if "Bind '" + Constant.DB_REPORTING_ID + "' is not specified" in ex.message:
+            model_helper.init_reporting()
 
 
 def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, total_units_b, sampling_period_seconds):
