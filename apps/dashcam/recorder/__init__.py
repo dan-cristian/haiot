@@ -98,15 +98,16 @@ def _get_overlay_text():
 
 
 def _write_overlay_text():
-    f = open(P.overlay_text_file_tmp, 'w')
+    # f = open(P.overlay_text_file_tmp, 'w')
+    f = open(P.overlay_text_file, 'w+')
     f.write(_get_overlay_text())
     f.close()
     # atomic operation
-    try:
-        os.remove(P.overlay_text_file)
-    except OSError:
-        pass
-    os.rename(P.overlay_text_file_tmp, P.overlay_text_file)
+    #try:
+    #    os.remove(P.overlay_text_file)
+    #except OSError:
+    #    pass
+    #os.rename(P.overlay_text_file_tmp, P.overlay_text_file)
 
 
 def _run_ffmpeg_pi():
