@@ -224,13 +224,17 @@ def init():
             #, 'appmeta':      'sqlite:////path/to/appmeta.db'
         }
         app.config['SQLALCHEMY_BINDS'] = SQLALCHEMY_BINDS
-        try:
-            db.create_all(bind='reporting')
-            Constant.HAS_LOCAL_DB_REPORTING_CAPABILITY = True
-            admin.model_helper.check_history_tables()
-        except Exception, ex:
-            L.l.critical("Local DB reporting capability is not available, err={}".format(ex))
-            app.config['SQLALCHEMY_BINDS'] = None
+        # try several times to connect to reporting DB
+        for i in range(10):
+            try:
+                db.create_all(bind='reporting')
+                Constant.HAS_LOCAL_DB_REPORTING_CAPABILITY = True
+                admin.model_helper.check_history_tables()
+                break
+            except Exception, ex:
+                L.l.critical("Local DB reporting capability is not available, err={}".format(ex))
+                app.config['SQLALCHEMY_BINDS'] = None
+            time.sleep(10)
     elif IS_STANDALONE_MODE:
         L.l.info('Skipping reporting feature initialising, standalone mode')
 

@@ -58,6 +58,7 @@ ENABLE_3G_MODEM=1
 ENABLE_LOG_RAM=0
 
 ENABLE_THINGSBOARD=0
+ENABLE_OPENHAB=0
 
 set_config_var() {
   lua - "$1" "$2" "$3" <<EOF > "$3.bak"
@@ -1262,6 +1263,21 @@ if [ "$ENABLE_THINGSBOARD" == "1" ]; then
     chmod +x /usr/local/bin/docker-compose
     docker-compose --version
     ADD_SCHEMA_AND_SYSTEM_DATA=true ADD_DEMO_DATA=true bash -c 'docker-compose up -d tb'
+fi
+
+if [ "$ENABLE_OPENHAB" == "1" ]; then
+    # https://docs.openhab.org/installation/linux.html#package-repository-installation
+    wget -qO - 'https://bintray.com/user/downloadSubjectPublicKey?username=openhab' | apt-key add -
+    apt-get install -y apt-transport-https
+    echo 'deb https://dl.bintray.com/openhab/apt-repo2 stable main' | tee /etc/apt/sources.list.d/openhab2.list
+    apt-get update
+    apt-get install -y openhab2 openhab2-addons
+    echo "Edit default ports"
+    nano /etc/default/openhab2
+    systemctl start openhab2.service
+    systemctl status openhab2.service
+    systemctl daemon-reload
+    systemctl enable openhab2.service
 fi
 
 echo "Optimise for flash and ssd usage"
