@@ -214,16 +214,6 @@ def init():
     reporting_enabled = admin.model_helper.get_param(Constant.DB_REPORTING_LOCATION_ENABLED)
     if reporting_enabled == "1" and not IS_STANDALONE_MODE:
         L.l.info('Checking history db tables')
-        # http://docs.sqlalchemy.org/en/rel_0_9/dialects/mysql.html#module-sqlalchemy.dialects.mysql.mysqlconnector
-        user = admin.model_helper.get_param(Constant.DB_REPORTING_USER)
-        passwd = admin.model_helper.get_param(Constant.DB_REPORTING_PASS)
-        uri = str(admin.model_helper.get_param(Constant.DB_REPORTING_LOCATION))
-        uri_final = uri.replace('<user>', user).replace('<passwd>', passwd)
-        SQLALCHEMY_BINDS = {
-            Constant.DB_REPORTING_ID: uri_final
-            #, 'appmeta':      'sqlite:////path/to/appmeta.db'
-        }
-        app.config['SQLALCHEMY_BINDS'] = SQLALCHEMY_BINDS
         # try several times to connect to reporting DB
         for i in range(10):
             try:

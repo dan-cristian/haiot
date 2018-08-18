@@ -3,7 +3,7 @@ import uuid
 from sqlalchemy.exc import IntegrityError, OperationalError, InvalidRequestError
 from main.logger_helper import L
 from common import Constant, utils, performance
-from main import db
+from main import db, app
 import models
 
 __author__ = 'dcristian'
@@ -90,6 +90,16 @@ def save_db_log(entry_name, entry_value):
 
 
 def init_reporting():
+    # http://docs.sqlalchemy.org/en/rel_0_9/dialects/mysql.html#module-sqlalchemy.dialects.mysql.mysqlconnector
+    user = get_param(Constant.DB_REPORTING_USER)
+    passwd = get_param(Constant.DB_REPORTING_PASS)
+    uri = str(get_param(Constant.DB_REPORTING_LOCATION))
+    uri_final = uri.replace('<user>', user).replace('<passwd>', passwd)
+    SQLALCHEMY_BINDS = {
+        Constant.DB_REPORTING_ID: uri_final
+        # , 'appmeta':      'sqlite:////path/to/appmeta.db'
+    }
+    app.config['SQLALCHEMY_BINDS'] = SQLALCHEMY_BINDS
     db.create_all(bind=Constant.DB_REPORTING_ID)
     Constant.HAS_LOCAL_DB_REPORTING_CAPABILITY = True
     check_history_tables()
