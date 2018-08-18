@@ -94,12 +94,13 @@ def _get_overlay_text():
     speed = int(round(float(P.gps_hspeed), 0))
     alt = int(round(float(P.gps_alt), 0))
     time_txt = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    # http://maps.googleapis.com/maps/api/geocode/json?latlng=46.75208797,23.620720156&sensor=true
     return '{} {}kph {}m {},{} '.format(time_txt, speed, alt, P.gps_lat, P.gps_lon)
 
 
 def _write_overlay_text():
     # f = open(P.overlay_text_file_tmp, 'w')
-    f = open(P.overlay_text_file, 'w+')
+    f = open(P.overlay_text_file, 'w+r')
     f.write(_get_overlay_text())
     f.close()
     # atomic operation
