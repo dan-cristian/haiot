@@ -172,6 +172,7 @@ class Constant:
 
     LOG_SENSOR_INACTIVE = ''
 
+    DB_REPORTING_ID = 'reporting'
 
 def load_config_json():
     from main.logger_helper import L

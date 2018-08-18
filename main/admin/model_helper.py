@@ -89,6 +89,12 @@ def save_db_log(entry_name, entry_value):
     commit()
 
 
+def init_reporting():
+    db.create_all(bind=Constant.DB_REPORTING_ID)
+    Constant.HAS_LOCAL_DB_REPORTING_CAPABILITY = True
+    check_history_tables()
+
+
 def check_table_schema(table, model_auto_update=False):
     recreate_table = False
     ex_msg = None
