@@ -86,8 +86,12 @@ def init():
     if not network.is_ready:
         L.l.info("Can't start network! Look at the logs in OZW_Log.log")
         return False
+    else:
+        L.l.info("Network is started!")
 
     try:
         pass
     except Exception as ex:
         pass
+
+    return True
