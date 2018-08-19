@@ -1,4 +1,5 @@
 from main.logger_helper import L
+from common import Constant
 import six
 if six.PY3:
     from pydispatch import dispatcher
@@ -53,8 +54,10 @@ def louie_node_update(network, node):
 
 
 def louie_value(network, node, value):
-    L.l.info('Louie signal: Value for {}={} {}'.format(value.label, value.data, value.units))
-
+    L.l.info('Louie signal: Value {} for {}={} {}'.format(node.name, value.label, value.data, value.units))
+    if value.label == "Power":
+        #dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=record.sensor_name, value=value.data, units=value.units)
+        pass
 
 def louie_value_update(network, node, value):
     L.l.info('Louie signal: Value update: {} = {}.'.format(node, value))
