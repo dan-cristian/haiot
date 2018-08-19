@@ -19,35 +19,32 @@ except Exception, e:
 
 
 def louie_network_started(network):
-    print('//////////// ZWave network is started ////////////')
-    print(
-        'Louie signal : OpenZWave network is started : homeid {:08x} - {} nodes were found.'.format(network.home_id,
-                                                                                                    network.nodes_count))
+    print('Louie signal: OpenZWave network started: homeid {:08x} - {} nodes found.'.format(
+        network.home_id, network.nodes_count))
 
 
 def louie_network_failed(network):
-    L.l.info('Louie signal : OpenZWave network failed.')
+    L.l.info('Louie signal: OpenZWave network failed.')
 
 
 def louie_network_resetted(network):
-    L.l.info('Louie signal : OpenZWave network is resetted.')
+    L.l.info('Louie signal: OpenZWave network is resetted.')
 
 
 def louie_network_ready(network):
-    L.l.info('//////////// ZWave network is ready ////////////')
-    L.l.info('Louie signal : ZWave network is ready : {} nodes were found.'.format(network.nodes_count))
-    L.l.info('Louie signal : Controller : {}'.format(network.controller))
+    L.l.info('Louie signal: ZWave network is ready : {} nodes were found.'.format(network.nodes_count))
+    L.l.info('Louie signal: Controller : {}'.format(network.controller))
     dispatcher.connect(louie_node_update, signal=ZWaveNetwork.SIGNAL_NODE, sender=dispatcher.Any)
     dispatcher.connect(louie_value_update, signal=ZWaveNetwork.SIGNAL_VALUE, sender=dispatcher.Any)
     dispatcher.connect(louie_ctrl_message, signal=ZWaveController.SIGNAL_CONTROLLER, sender=dispatcher.Any)
 
 
 def louie_node_update(network, node):
-    L.l.info('Louie signal : Node update : {}.'.format(node))
+    L.l.info('Louie signal: Node update : {}.'.format(node))
 
 
 def louie_value_update(network, node, value):
-    L.l.info('Louie signal : Value update : {}.'.format(value))
+    L.l.info('Louie signal: Value update : {}.'.format(value))
 
 
 def louie_ctrl_message(state, message, network, controller):
@@ -55,8 +52,8 @@ def louie_ctrl_message(state, message, network, controller):
 
 
 def init():
-    L.l.debug('Zwave initialising')
     device = "/dev/ttyACM0"
+    L.l.info('Zwave initialising on {}'.format(device))
     # Define some manager options
     options = ZWaveOption(device, config_path="../openzwave/config", user_path=".", cmd_line="")
     options.set_log_file("OZW_Log.log")
