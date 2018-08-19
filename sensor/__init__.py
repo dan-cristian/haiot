@@ -79,6 +79,7 @@ def unload():
     thread_pool.remove_callable(owsensor_loop.thread_run)
     thread_pool.remove_callable(rfxcom_run.thread_run)
     rfxcom_run.unload()
+    zwave.unload()
     initialised = False
 
 
