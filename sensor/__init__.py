@@ -68,7 +68,7 @@ def record_update(obj):
                                 units_delta_b=record.delta_counters_b, total_units_a=record.counters_a,
                                 total_units_b=record.counters_b,
                                 sampling_period_seconds=owsensor_loop.sampling_period_seconds)
-    except Exception, ex:
+    except Exception as ex:
         L.l.error('Error on sensor update, err {}'.format(ex), exc_info=True)
         db.session.rollback()
 
