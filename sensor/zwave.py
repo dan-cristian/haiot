@@ -1,5 +1,9 @@
 from main.logger_helper import L
-from pydispatch import dispatcher
+import six
+if six.PY3:
+    from pydispatch import dispatcher
+else:
+    from louie import dispatcher
 import time
 
 try:
