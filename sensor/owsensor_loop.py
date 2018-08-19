@@ -76,7 +76,7 @@ def do_device(ow, path):
             #L.l.info("Sensor {} read took {} seconds".format(dev['address'], delta))
     all_delta = (datetime.datetime.now() - all_start).total_seconds()
     if count > 0 and all_delta > 1:
-        L.l.info("All {} sensors read in bus {} took {} seconds, last was {}".format(
+        L.l.debug("All {} sensors read in bus {} took {} seconds, last was {}".format(
             count, path, all_delta, last_sensor))
     return sensor_dict
 
