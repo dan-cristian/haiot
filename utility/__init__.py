@@ -23,7 +23,8 @@ def __utility_update_ex(sensor_name, value, unit=None):
                     record.units_total = value / (current_record.ticks_per_unit * 1.0)
                     L.l.info("Saving utility water level value={} depth={}".format(value, record.units_total))
                 elif current_record.utility_type == Constant.UTILITY_TYPE_ELECTRICITY:
-                    record.units_total = value
+                    record.units_2_delta = value
+                    L.l.info("Saving power level value={} depth={}".format(value, record.units_2_delta))
                 if current_record.units_total is None:
                     current_record.units_total = 0.0
                 else:
