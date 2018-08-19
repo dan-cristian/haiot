@@ -64,6 +64,7 @@ def unload():
         P.network.stop()
 
 
+# http://openzwave.github.io/python-openzwave/network.html
 def init():
     device = "/dev/ttyACM0"
     L.l.info('Zwave initialising on {}'.format(device))
@@ -124,6 +125,6 @@ def init():
 
 def thread_run():
     L.l.info("State is {}".format(P.network.state))
-    for node in P.network.nodes():
+    for node in P.network.nodes:
         L.l.info("Node {}".format(node))
         node.request_state()
