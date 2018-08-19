@@ -66,7 +66,7 @@ def init():
     dispatcher.connect(louie_network_ready, ZWaveNetwork.SIGNAL_NETWORK_READY)
 
     L.l.info("Waiting for zwave driver")
-    for i in range(0, 300):
+    for i in range(0, 60):
         if network.state >= network.STATE_STARTED:
             L.l.info("Zwave driver started")
             break
@@ -77,11 +77,12 @@ def init():
         return False
     L.l.info("Home id : {}, Nodes in network : {}".format(network.home_id_str, network.nodes_count))
     L.l.info("Waiting for network to become ready")
-    for i in range(0, 300):
+    for i in range(0, 60):
         if network.state >= network.STATE_READY:
             break
         else:
             time.sleep(1.0)
+            L.l.info("state = {}".format(network.state))
     if not network.is_ready:
         L.l.info("Can't start network! Look at the logs in OZW_Log.log")
         return False
