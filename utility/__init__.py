@@ -12,7 +12,7 @@ initialised = False
 
 
 # water utility
-def __utility_update_ex(sensor_name, value):
+def __utility_update_ex(sensor_name, value, unit=None):
     try:
         if value is not None:
             record = models.Utility(sensor_name=sensor_name)
@@ -22,6 +22,8 @@ def __utility_update_ex(sensor_name, value):
                 if current_record.utility_type == Constant.UTILITY_TYPE_WATER_LEVEL:
                     record.units_total = value / (current_record.ticks_per_unit * 1.0)
                     L.l.info("Saving utility water level value={} depth={}".format(value, record.units_total))
+                elif current_record.utility_type == Constant.UTILITY_TYPE_ELECTRICITY:
+                    record.units_total = value
                 if current_record.units_total is None:
                     current_record.units_total = 0.0
                 else:
