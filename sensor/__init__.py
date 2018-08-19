@@ -94,6 +94,6 @@ def init():
     if model_helper.get_param(Constant.P_SOLAR_PARSER_ON_HOST) == Constant.HOST_NAME:
         thread_pool.add_interval_callable(http_parser_run.thread_solar_aps_run, run_interval_second=60)
     if zwave.init():
-        thread_pool.add_interval_callable(zwave.thread_run, run_interval_second=2)
+        thread_pool.add_interval_callable(zwave.thread_run, run_interval_second=5)
     global initialised
     initialised = True
