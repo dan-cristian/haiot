@@ -57,8 +57,8 @@ def louie_value(network, node, value):
     L.l.info('Louie signal: Value {} for {}={} {}'.format(node.product_name, value.label, value.data, value.units))
     if value.label == "Power":
         L.l.info("Saving power utility")
-        haiot_dispatch.send(
-            Constant.SIGNAL_UTILITY_EX, sensor_name=node.product_name, value=value.data, unit=value.units)
+        haiot_dispatch.send(Constant.SIGNAL_UTILITY_EX, sensor_name=node.product_name,
+                            value=value.data, unit=value.units)
 
 
 def louie_value_update(network, node, value):
@@ -98,7 +98,8 @@ def init():
     #options.set_save_log_level("Debug")
     options.set_poll_interval(5)
     options.set_save_log_level('Info')
-    options.set_logging(True)
+    #options.set_logging(True)
+    options.set_logging(False)
     options.set_save_configuration(True)
     options.lock()
 
