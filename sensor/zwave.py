@@ -33,9 +33,9 @@ def louie_network_ready(network):
     L.l.info('//////////// ZWave network is ready ////////////')
     L.l.info('Louie signal : ZWave network is ready : {} nodes were found.'.format(network.nodes_count))
     L.l.info('Louie signal : Controller : {}'.format(network.controller))
-    dispatcher.connect(louie_node_update, ZWaveNetwork.SIGNAL_NODE)
-    dispatcher.connect(louie_value_update, ZWaveNetwork.SIGNAL_VALUE)
-    dispatcher.connect(louie_ctrl_message, ZWaveController.SIGNAL_CONTROLLER)
+    dispatcher.connect(louie_node_update, signal=ZWaveNetwork.SIGNAL_NODE, sender=dispatcher.Any)
+    dispatcher.connect(louie_value_update, signal=ZWaveNetwork.SIGNAL_VALUE, sender=dispatcher.Any)
+    dispatcher.connect(louie_ctrl_message, signal=ZWaveController.SIGNAL_CONTROLLER, sender=dispatcher.Any)
 
 
 def louie_node_update(network, node):

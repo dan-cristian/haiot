@@ -19,7 +19,7 @@ __author__ = 'dcristian'
 try:
     import psutil
     import_module_psutil_exist = True
-except Exception, ex:
+except Exception as ex:
     #Log.logger.info('PSUtil module not available')
     import_module_psutil_exist = False
 
@@ -27,7 +27,7 @@ try:
     import wmi
     import pythoncom
     import_module_wmi_ok = True
-except Exception, ex:
+except Exception as ex:
     #Log.logger.info('pywin / wmi module not available')
     import_module_wmi_ok = False
 
@@ -71,7 +71,7 @@ def _read_all_hdd_smart():
                 L.l.debug('Processing disk {}'.format(record.hdd_disk_dev))
                 try:
                     record.power_status = __read_hddparm(disk_dev=record.hdd_disk_dev)
-                except Exception, ex1:
+                except Exception as ex1:
                     record.power_status = None
                 try:
                     use_sudo = bool(model_helper.get_param(Constant.P_USESUDO_DISKTOOLS))
@@ -81,11 +81,11 @@ def _read_all_hdd_smart():
                     else:  # in windows
                         smart_out = subprocess.check_output(['smartctl', '-a', record.hdd_disk_dev, '-n', 'sleep'],
                                                             stderr=subprocess.STDOUT)
-                except subprocess.CalledProcessError, exc:
+                except subprocess.CalledProcessError as exc:
                     smart_out = exc.output
                     if ERR_TEXT_NO_DEV in smart_out or ERR_TEXT_NO_DEV_3 in smart_out:
                         raise exc
-                except Exception, ex:
+                except Exception as ex:
                     smart_out = None
                     current_disk_valid = False
                     L.l.warning("Error checking smart status {}".format(ex))
@@ -144,7 +144,7 @@ def _read_all_hdd_smart():
                                                notify_transport_enabled=True, save_to_graph=True)
                 disk_letter = chr(ord(disk_letter) + 1)
                 disk_count += 1
-            except subprocess.CalledProcessError, ex1:
+            except subprocess.CalledProcessError as ex1:
                 L.l.debug('Invalid disk {} err {}'.format(record.hdd_disk_dev, ex1))
                 current_disk_valid = False
             except Exception as exc:
@@ -177,11 +177,11 @@ def __read_hddparm(disk_dev=''):
                     hddparm_out = subprocess.check_output(['sudo', 'hdparm', '-C', disk_dev], stderr=subprocess.STDOUT)
                 else:
                     hddparm_out = subprocess.check_output(['hdparm', '-C', disk_dev], stderr=subprocess.STDOUT)
-            except subprocess.CalledProcessError, ex1:
+            except subprocess.CalledProcessError as ex1:
                 hddparm_out = ex1.output
                 if ERR_TEXT_NO_DEV in hddparm_out or ERR_TEXT_NO_DEV_2 in hddparm_out:
                     raise ex1
-            except Exception, ex:
+            except Exception as ex:
                 L.l.warning("Error running process, err={}".format(ex))
                 hddparm_out = None
             if hddparm_out:
@@ -205,7 +205,7 @@ def __read_hddparm(disk_dev=''):
         else:
             power_status = 'not available'
             return power_status
-    except subprocess.CalledProcessError, ex:
+    except subprocess.CalledProcessError as ex:
         L.l.debug('Invalid disk {} err {}'.format(disk_dev, ex))
     except Exception as exc:
         L.l.exception('Disk read error disk was {} err {}'.format(disk_dev, exc))
@@ -220,7 +220,7 @@ def __get_mem_avail_percent_linux():
             try:
                 # MemTotal:        8087892 kB
                 meminfo[line.split(':')[0]] = line.split(':')[1].split()[0].strip()
-            except Exception, ex:
+            except Exception as ex:
                 L.l.warning('get mem line split error {} line {}'.format(ex, line))
         total = int(meminfo['MemTotal'])
         free = int(meminfo['MemFree'])
@@ -238,7 +238,7 @@ def __get_uptime_linux_days():
         line = f.readline()
         uptime_seconds = float(line.split()[0])
         f.close()
-    except Exception, ex:
+    except Exception as ex:
         L.l.warning('Unable to read uptime err {}'.format(ex))
     return uptime_seconds / (60 * 60 * 24)
 
@@ -270,7 +270,7 @@ def __get_uptime_win_days():
         then = datetime.datetime(int(y), int(m), int(d), H, M)
         diff = now - then
         return diff.days
-    except Exception, ex:
+    except Exception as ex:
         L.l.warning("Unable to get uptime windows, err={}".format(ex))
         return 0
 
@@ -318,7 +318,7 @@ def __get_cpu_utilisation_linux():
                 previous_procstat_list = words
             else:
                 L.l.warning('proc/stat returned unexpected number of words on line {}'.format(line))
-        except Exception, ex:
+        except Exception as ex:
             L.l.warning('get cpu line split error {} line {}'.format(ex, line))
         # sampling CPU usage for 1 second
         time.sleep(1)
@@ -336,7 +336,7 @@ def __get_cpu_temperature():
                 w = wmi.WMI(namespace="root\wmi")
                 temperature_info = w.MSAcpi_ThermalZoneTemperature()[0]
                 temp = (temperature_info.CurrentTemperature / 10) - 273
-            except Exception, ex:
+            except Exception as ex:
                 L.l.error('Unable to get temperature using wmi, err={}'.format(ex))
         else:
             L.l.warning('Unable to get CPU temp, no function available')
@@ -355,7 +355,7 @@ def __get_cpu_temperature():
             try:
                 file = open(path)
                 line = file.readline()
-            except Exception, ex:
+            except Exception as ex:
                 L.l.error('Unable to open cpu_temp_read file {}'.format(path))
             if file:
                 file.close()
@@ -402,7 +402,7 @@ def _read_system_attribs():
         progress_status = 'Saving mem cpu before save fields'
         record.save_changed_fields(current_record=current_record, new_record=record,
                                    notify_transport_enabled=False, save_to_graph=True)
-    except Exception, ex:
+    except Exception as ex:
         L.l.exception('Error saving system to DB err={}'.format(ex))
 
 
@@ -417,7 +417,7 @@ def __check_log_file_size():
                 file.truncate()
                 file.seek(0)
                 file.close()
-        except Exception, ex:
+        except Exception as ex:
             L.l.warning('Cannot retrieve or truncate log file {} err={}'.format(logger_helper.L.LOG_FILE, ex))
 
 
@@ -534,12 +534,12 @@ def _read_battery_power():
                 power = round(ina.power(), 0)
                 dispatcher.send(signal=Constant.SIGNAL_BATTERY_STAT, battery_name=addr[0],
                                 voltage=voltage, current=current, power=power)
-            except ImportError, imp:
+            except ImportError as imp:
                 L.l.info("INA module not available on this system, ex={}".format(imp))
                 _import_ina_failed = True
-            except DeviceRangeError, ex:
+            except DeviceRangeError as ex:
                 L.l.error("Current out of device range with specified shunt resister, ex={}".format(ex))
-            except Exception, ex:
+            except Exception as ex:
                 L.l.info("INA board not available on this system, ex={}".format(ex))
                 _import_ina_failed = True
 
