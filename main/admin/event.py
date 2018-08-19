@@ -87,7 +87,7 @@ def on_models_committed(sender, changes):
                     pass
             # send object to rule parser, if connected
             dispatcher.send(Constant.SIGNAL_DB_CHANGE_FOR_RULES, obj=obj, change=change)
-    except Exception, ex:
+    except Exception as ex:
         L.l.exception('Error in DB commit hook, {}'.format(ex))
 
 
@@ -201,9 +201,9 @@ def mqtt_thread_run():
                 #    L.l.info("Dropping message from {}, not matching {}".format(source_host, Constant.HOST_NAME))
                 if len(__mqtt_event_list) > last_count:
                     L.l.debug('Not keeping up with {} mqtt events'.format(len(__mqtt_event_list)))
-            except Exception, ex:
+            except Exception as ex:
                 L.l.critical("Error processing event err={}, mqtt={}".format(ex, obj))
-    except Exception, ex:
+    except Exception as ex:
         L.l.critical("General error processing mqtt: {}".format(ex))
     finally:
         __mqtt_lock.release()
