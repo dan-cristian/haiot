@@ -73,8 +73,10 @@ def init():
     options.set_append_log_file(False)
     options.set_console_output(False)
     options.set_save_log_level("Debug")
+    options.set_poll_interval(10)
     # options.set_save_log_level('Info')
     options.set_logging(True)
+    options.set_save_configuration(True)
     options.lock()
 
     # Create a network object
@@ -113,9 +115,6 @@ def init():
     #P.network.set_poll_interval(milliseconds=3000, bIntervalBetweenPolls=False)
     #P.network.test(1)
 
-    for i in range(0, 60):
-        time.sleep(1.0)
-
     try:
         pass
     except Exception as ex:
@@ -124,4 +123,7 @@ def init():
 
 
 def thread_run():
-    P.network.test(1)
+    L.l.info("State is {}".format(P.network.state))
+    for node in P.network.nodes():
+        L.l.info("Node {}".format(node))
+        node.request_state()
