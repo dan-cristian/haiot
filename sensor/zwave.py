@@ -90,7 +90,7 @@ def init():
     options.set_append_log_file(False)
     options.set_console_output(False)
     #options.set_save_log_level("Debug")
-    #options.set_poll_interval(10)
+    options.set_poll_interval(5)
     options.set_save_log_level('Info')
     options.set_logging(True)
     options.set_save_configuration(True)
