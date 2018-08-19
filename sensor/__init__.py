@@ -7,6 +7,7 @@ import owsensor_loop
 import rfxcom_run
 import ups_legrand_run
 import http_parser_run
+import zwave
 from main.admin import models
 from pydispatch import dispatcher
 from main.admin.model_helper import commit
@@ -91,5 +92,6 @@ def init():
         thread_pool.add_interval_callable(ups_legrand_run.thread_run, run_interval_second=30)
     if model_helper.get_param(Constant.P_SOLAR_PARSER_ON_HOST) == Constant.HOST_NAME:
         thread_pool.add_interval_callable(http_parser_run.thread_solar_aps_run, run_interval_second=60)
+    zwave.init()
     global initialised
     initialised = True
