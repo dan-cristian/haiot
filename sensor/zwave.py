@@ -35,6 +35,7 @@ def louie_network_resetted(network):
     L.l.info('Louie signal: OpenZWave network is resetted.')
 
 
+# https://raw.githubusercontent.com/OpenZWave/python-openzwave/master/examples/api_demo.py
 def louie_network_ready(network):
     L.l.info('Louie signal: ZWave network is ready : {} nodes were found.'.format(network.nodes_count))
     L.l.info('Louie signal: Controller : {}'.format(network.controller))
@@ -143,6 +144,7 @@ def init():
 def thread_run():
     #L.l.info("State is {}".format(P.network.state))
     for node_id in P.network.nodes:
-        node = P.network.nodes[node_id]
-        #L.l.info("Node {}".format(node))
-        node.request_state()
+        if id > 1:
+            node = P.network.nodes[node_id]
+            #L.l.info("Node {}".format(node))
+            node.request_state()
