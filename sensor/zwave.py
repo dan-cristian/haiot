@@ -60,7 +60,7 @@ def louie_value_update(network, node, value):
 
 
 def louie_value_changed(network, node, value):
-    L.l.info('Louie signal: Value changed for {}, {}={}.'.format(node, value.label, value.data))
+    L.l.info('Louie signal: Value changed for {}={} {}'.format(value.label, value.data, value.units))
 
 
 def louie_value_added(network, node, value):
@@ -129,7 +129,7 @@ def init():
     else:
         L.l.info("Network is started!")
 
-    #P.network.set_poll_interval(milliseconds=3000, bIntervalBetweenPolls=False)
+    P.network.set_poll_interval(milliseconds=3000, bIntervalBetweenPolls=False)
     #P.network.test(1)
 
     try:
@@ -144,4 +144,4 @@ def thread_run():
     for node_id in P.network.nodes:
         node = P.network.nodes[node_id]
         L.l.info("Node {}".format(node))
-        node.request_state()
+        #node.request_state()
