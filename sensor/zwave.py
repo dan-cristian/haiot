@@ -110,8 +110,8 @@ def init():
     else:
         L.l.info("Network is started!")
 
-    P.network.set_poll_interval(milliseconds=3000, bIntervalBetweenPolls=False)
-    P.network.test(1)
+    #P.network.set_poll_interval(milliseconds=3000, bIntervalBetweenPolls=False)
+    #P.network.test(1)
 
     for i in range(0, 60):
         time.sleep(1.0)
@@ -120,5 +120,8 @@ def init():
         pass
     except Exception as ex:
         pass
-
     return True
+
+
+def thread_run():
+    P.network.test(1)
