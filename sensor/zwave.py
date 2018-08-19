@@ -60,7 +60,7 @@ def louie_value_update(network, node, value):
 
 
 def louie_value_changed(network, node, value):
-    L.l.info('Louie signal: Value changed: {} = {}.'.format(node, value))
+    L.l.info('Louie signal: Value changed for {}, {}={}.'.format(node.model, value.label, value.data))
 
 
 def louie_value_added(network, node, value):
