@@ -125,6 +125,7 @@ def init():
 
 def thread_run():
     L.l.info("State is {}".format(P.network.state))
-    for node in P.network.nodes:
+    for node_id in P.network.nodes:
+        node = P.network.nodes[node_id]
         L.l.info("Node {}".format(node))
         node.request_state()
