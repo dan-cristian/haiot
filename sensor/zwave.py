@@ -89,6 +89,9 @@ def init():
     else:
         L.l.info("Network is started!")
 
+    for i in range(0, 60):
+        time.sleep(1.0)
+
     try:
         pass
     except Exception as ex:
