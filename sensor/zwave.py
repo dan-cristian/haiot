@@ -42,7 +42,7 @@ def louie_network_ready(network):
     dispatcher.connect(louie_value, ZWaveNetwork.SIGNAL_VALUE)
     dispatcher.connect(louie_value_update, ZWaveNetwork.SIGNAL_VALUE_REFRESHED)
     dispatcher.connect(louie_value_added, ZWaveNetwork.SIGNAL_VALUE_ADDED)
-    dispatcher.connect(louie_value_changed, ZWaveNetwork.SIGNAL_VALUE_CHANGED)
+    #dispatcher.connect(louie_value_changed, ZWaveNetwork.SIGNAL_VALUE_CHANGED)
     dispatcher.connect(louie_value_removed, ZWaveNetwork.SIGNAL_VALUE_REMOVED)
     dispatcher.connect(louie_ctrl_message, ZWaveController.SIGNAL_CONTROLLER)
 
@@ -52,7 +52,7 @@ def louie_node_update(network, node):
 
 
 def louie_value(network, node, value):
-    L.l.info('Louie signal: Value : {} = {}.'.format(node, value))
+    L.l.info('Louie signal: Value for {}={} {}'.format(value.label, value.data, value.units))
 
 
 def louie_value_update(network, node, value):
