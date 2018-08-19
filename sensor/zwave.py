@@ -1,6 +1,6 @@
 from main.logger_helper import L
 from pydispatch import dispatcher
-import datetime
+import time
 
 try:
     import openzwave
@@ -71,7 +71,7 @@ def init():
             L.l.info("Zwave driver started")
             break
         else:
-            datetime.time.sleep(1.0)
+            time.sleep(1.0)
     if network.state < network.STATE_STARTED:
         L.l.info("Can't initialise zwave driver. Look at the logs in OZW_Log.log")
         return False
@@ -81,7 +81,7 @@ def init():
         if network.state >= network.STATE_READY:
             break
         else:
-            datetime.time.sleep(1.0)
+            time.sleep(1.0)
     if not network.is_ready:
         L.l.info("Can't start network! Look at the logs in OZW_Log.log")
         return False
