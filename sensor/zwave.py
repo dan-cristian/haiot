@@ -129,7 +129,8 @@ def init():
     else:
         L.l.info("Network is started!")
 
-    P.network.set_poll_interval(milliseconds=3000, bIntervalBetweenPolls=False)
+    # not working
+    #P.network.set_poll_interval(milliseconds=3000, bIntervalBetweenPolls=False)
     #P.network.test(1)
 
     try:
@@ -140,8 +141,8 @@ def init():
 
 
 def thread_run():
-    L.l.info("State is {}".format(P.network.state))
+    #L.l.info("State is {}".format(P.network.state))
     for node_id in P.network.nodes:
         node = P.network.nodes[node_id]
-        L.l.info("Node {}".format(node))
-        #node.request_state()
+        #L.l.info("Node {}".format(node))
+        node.request_state()
