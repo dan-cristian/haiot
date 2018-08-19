@@ -18,6 +18,10 @@ except Exception, e:
     L.l.info("Cannot import openzwave")
 
 
+class P:
+    network = None
+
+
 def louie_network_started(network):
     print('Louie signal: OpenZWave network started: homeid {:08x} - {} nodes found.'.format(
         network.home_id, network.nodes_count))
@@ -34,9 +38,13 @@ def louie_network_resetted(network):
 def louie_network_ready(network):
     L.l.info('Louie signal: ZWave network is ready : {} nodes were found.'.format(network.nodes_count))
     L.l.info('Louie signal: Controller : {}'.format(network.controller))
-    dispatcher.connect(louie_node_update, signal=ZWaveNetwork.SIGNAL_NODE, sender=dispatcher.Any)
-    dispatcher.connect(louie_value_update, signal=ZWaveNetwork.SIGNAL_VALUE, sender=dispatcher.Any)
-    dispatcher.connect(louie_ctrl_message, signal=ZWaveController.SIGNAL_CONTROLLER, sender=dispatcher.Any)
+    dispatcher.connect(louie_node_update, ZWaveNetwork.SIGNAL_NODE)
+    dispatcher.connect(louie_value_update,ZWaveNetwork.SIGNAL_VALUE)
+    dispatcher.connect(louie_value_update, ZWaveNetwork.SIGNAL_VALUE_REFRESHED)
+    dispatcher.connect(louie_value_update, ZWaveNetwork.SIGNAL_VALUE_ADDED)
+    dispatcher.connect(louie_value_update, ZWaveNetwork.SIGNAL_VALUE_CHANGED)
+    dispatcher.connect(louie_value_update, ZWaveNetwork.SIGNAL_VALUE_REMOVED)
+    dispatcher.connect(louie_ctrl_message, ZWaveController.SIGNAL_CONTROLLER)
 
 
 def louie_node_update(network, node):
@@ -44,11 +52,16 @@ def louie_node_update(network, node):
 
 
 def louie_value_update(network, node, value):
-    L.l.info('Louie signal: Value update : {}.'.format(value))
+    L.l.info('Louie signal: Value update: {} = {}.'.format(node, value))
 
 
 def louie_ctrl_message(state, message, network, controller):
     L.l.info('Louie signal : Controller message : {}.'.format(message))
+
+
+def unload():
+    if P.network is not None:
+        P.network.stop()
 
 
 def init():
@@ -65,37 +78,40 @@ def init():
     options.lock()
 
     # Create a network object
-    network = ZWaveNetwork(options, log=None, autostart=False)
+    P.network = ZWaveNetwork(options, log=None, autostart=False)
     dispatcher.connect(louie_network_started, ZWaveNetwork.SIGNAL_NETWORK_STARTED)
     dispatcher.connect(louie_network_failed, ZWaveNetwork.SIGNAL_NETWORK_FAILED)
     dispatcher.connect(louie_network_resetted, ZWaveNetwork.SIGNAL_NETWORK_RESETTED)
     dispatcher.connect(louie_network_ready, ZWaveNetwork.SIGNAL_NETWORK_READY)
 
-    network.start()
+    P.network.start()
 
     L.l.info("Waiting for zwave driver")
     for i in range(0, 60):
-        if network.state >= network.STATE_STARTED:
+        if P.network.state >= P.network.STATE_STARTED:
             L.l.info("Zwave driver started")
             break
         else:
             time.sleep(1.0)
-    if network.state < network.STATE_STARTED:
+    if P.network.state < P.network.STATE_STARTED:
         L.l.info("Can't initialise zwave driver. Look at the logs in OZW_Log.log")
         return False
-    L.l.info("Home id : {}, Nodes in network : {}".format(network.home_id_str, network.nodes_count))
+    L.l.info("Home id : {}, Nodes in network : {}".format(P.network.home_id_str, P.network.nodes_count))
     L.l.info("Waiting for network to become ready")
     for i in range(0, 60):
-        if network.state >= network.STATE_READY:
+        if P.network.state >= P.network.STATE_READY:
             break
         else:
             time.sleep(1.0)
-            L.l.info("state = {}".format(network.state))
-    if not network.is_ready:
+            L.l.info("state = {}".format(P.network.state))
+    if not P.network.is_ready:
         L.l.info("Can't start network! Look at the logs in OZW_Log.log")
         return False
     else:
         L.l.info("Network is started!")
+
+    P.network.set_poll_interval(milliseconds=3000, bIntervalBetweenPolls=False)
+    P.network.test(1)
 
     for i in range(0, 60):
         time.sleep(1.0)
