@@ -28,13 +28,12 @@ def __utility_update_ex(sensor_name, value):
                     # force save
                     if current_record is not None:
                         current_record.units_total = -1
-
                 L.l.debug("Saving utility ex record {} name={}".format(current_record, record.utility_name))
                 record.save_changed_fields(current_record=current_record, new_record=record, debug=False,
                                            notify_transport_enabled=True, save_to_graph=True, save_all_fields=True)
             else:
                 L.l.critical("Utility ex sensor [{}] is not defined in Utility table".format(sensor_name))
-    except Exception, ex:
+    except Exception as ex:
         L.l.error("Error saving utility ex update {}, try to connect to reporting DB".format(ex))
         if "Bind '" + Constant.DB_REPORTING_ID + "' is not specified" in ex.message:
             model_helper.init_reporting()
@@ -104,7 +103,7 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
                     L.l.critical("Counter sensor [{}] index {} is not defined in Utility table".format(
                         sensor_name, index))
             index += 1
-    except Exception, ex:
+    except Exception as ex:
         L.l.error("Error saving utility update {}".format(ex))
 
 
