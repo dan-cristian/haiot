@@ -56,8 +56,8 @@ def louie_node_update(network, node):
 def louie_value(network, node, value):
     L.l.info('Louie signal: Value {} for {}={} {}'.format(node.product_name, value.label, value.data, value.units))
     if value.label == "Power":
-        #dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=record.sensor_name, value=value.data, units=value.units)
-        pass
+        dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=node.product_name, value=value.data, unit=value.units)
+
 
 def louie_value_update(network, node, value):
     L.l.info('Louie signal: Value update: {} = {}.'.format(node, value))
