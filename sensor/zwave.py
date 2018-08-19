@@ -50,7 +50,8 @@ def louie_network_ready(network):
 
 
 def louie_node_update(network, node):
-    L.l.info('Louie signal: Node update : {}.'.format(node))
+    #L.l.info('Louie signal: Node update : {}.'.format(node))
+    pass
 
 
 def louie_value(network, node, value):
