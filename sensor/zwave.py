@@ -21,6 +21,10 @@ def louie_network_started(network):
                                                                                                     network.nodes_count))
 
 
+def louie_network_failed(network):
+    L.l.info('Louie signal : OpenZWave network failed.')
+
+
 def louie_network_resetted(network):
     L.l.info('Louie signal : OpenZWave network is resetted.')
 
@@ -60,10 +64,13 @@ def init():
     options.lock()
 
     # Create a network object
-    network = ZWaveNetwork(options, log=None)
+    network = ZWaveNetwork(options, log=None, autostart=False)
     dispatcher.connect(louie_network_started, ZWaveNetwork.SIGNAL_NETWORK_STARTED)
+    dispatcher.connect(louie_network_failed, ZWaveNetwork.SIGNAL_NETWORK_FAILED)
     dispatcher.connect(louie_network_resetted, ZWaveNetwork.SIGNAL_NETWORK_RESETTED)
     dispatcher.connect(louie_network_ready, ZWaveNetwork.SIGNAL_NETWORK_READY)
+
+    network.start()
 
     L.l.info("Waiting for zwave driver")
     for i in range(0, 60):
