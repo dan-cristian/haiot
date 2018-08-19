@@ -7,7 +7,7 @@ try:
     from main.logger_helper import L
     from main.admin import model_helper, models
     from main import thread_pool
-except Exception, ex:
+except Exception as ex:
     print "Exception importing key modules, probably started via main"
     class L:
         class l:
@@ -65,11 +65,11 @@ def do_device(ow, path):
                     save_to_db(dev)
                     last_sensor = dev['address']
                     count += 1
-            except pyownet.protocol.ConnError, er:
+            except pyownet.protocol.ConnError as er:
                 L.l.warning('Connection error owserver: {}'.format(er))
-            except pyownet.Error, ex:
+            except pyownet.Error as ex:
                 L.l.warning('Error reading sensor type={}, sensor={}, ex={}'.format(sensortype, sensor, ex))
-            except Exception, ex:
+            except Exception as ex:
                 L.l.warning('Other error reading sensors: {}'.format(ex))
                 traceback.print_exc()
             #delta = (datetime.datetime.now() - start).total_seconds()
@@ -147,7 +147,7 @@ def save_to_db(dev):
                             sampling_period_seconds=delta_time_counters)
         if record.vad is not None:
             dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=record.sensor_name, value=record.vad)
-    except Exception, ex:
+    except Exception as ex:
         L.l.error('Error saving sensor to DB, err {}'.format(ex), exc_info=True)
         # finally:
         #    db_lock.release()
@@ -264,7 +264,7 @@ def init():
         _get_bus_list(host, port)
         initialised = True
         P.warning_issued = False
-    except Exception, ex:
+    except Exception as ex:
         if not P.warning_issued:
             L.l.info('1-wire owserver not initialised on host {} port {}, ex={}'.format(host, port, ex))
             initialised = False
@@ -291,5 +291,5 @@ if __name__ == "__main__":
             P.ow_conn_list[item] = ow_new
             try:
                 do_device(ow=ow_new, path=item)
-            except Exception, ex:
+            except Exception as ex:
                 print ex
