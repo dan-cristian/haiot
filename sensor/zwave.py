@@ -39,11 +39,11 @@ def louie_network_ready(network):
     L.l.info('Louie signal: ZWave network is ready : {} nodes were found.'.format(network.nodes_count))
     L.l.info('Louie signal: Controller : {}'.format(network.controller))
     dispatcher.connect(louie_node_update, ZWaveNetwork.SIGNAL_NODE)
-    dispatcher.connect(louie_value_update,ZWaveNetwork.SIGNAL_VALUE)
+    dispatcher.connect(louie_value, ZWaveNetwork.SIGNAL_VALUE)
     dispatcher.connect(louie_value_update, ZWaveNetwork.SIGNAL_VALUE_REFRESHED)
-    dispatcher.connect(louie_value_update, ZWaveNetwork.SIGNAL_VALUE_ADDED)
-    dispatcher.connect(louie_value_update, ZWaveNetwork.SIGNAL_VALUE_CHANGED)
-    dispatcher.connect(louie_value_update, ZWaveNetwork.SIGNAL_VALUE_REMOVED)
+    dispatcher.connect(louie_value_added, ZWaveNetwork.SIGNAL_VALUE_ADDED)
+    dispatcher.connect(louie_value_changed, ZWaveNetwork.SIGNAL_VALUE_CHANGED)
+    dispatcher.connect(louie_value_removed, ZWaveNetwork.SIGNAL_VALUE_REMOVED)
     dispatcher.connect(louie_ctrl_message, ZWaveController.SIGNAL_CONTROLLER)
 
 
@@ -51,8 +51,24 @@ def louie_node_update(network, node):
     L.l.info('Louie signal: Node update : {}.'.format(node))
 
 
+def louie_value(network, node, value):
+    L.l.info('Louie signal: Value : {} = {}.'.format(node, value))
+
+
 def louie_value_update(network, node, value):
     L.l.info('Louie signal: Value update: {} = {}.'.format(node, value))
+
+
+def louie_value_changed(network, node, value):
+    L.l.info('Louie signal: Value changed: {} = {}.'.format(node, value))
+
+
+def louie_value_added(network, node, value):
+    L.l.info('Louie signal: Value added: {} = {}.'.format(node, value))
+
+
+def louie_value_removed(network, node, value):
+    L.l.info('Louie signal: Value removed: {} = {}.'.format(node, value))
 
 
 def louie_ctrl_message(state, message, network, controller):
