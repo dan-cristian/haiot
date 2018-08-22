@@ -31,6 +31,7 @@ def __utility_update_ex(sensor_name, value, unit=None):
                 elif current_record.utility_type == Constant.UTILITY_TYPE_ELECTRICITY:
                     if unit == current_record.unit_2_name:
                         record.units_2_delta = value
+                        record.units_delta = 0
                     elif unit == current_record.unit_name:
                         record.units_total = value
                         record.units_delta = value - current_record.units_total
