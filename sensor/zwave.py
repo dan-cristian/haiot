@@ -98,9 +98,9 @@ def init():
     options.set_console_output(False)
     options.set_save_log_level("Debug")
     #options.set_save_log_level('Info')
+    #options.set_logging(False)
     options.set_logging(True)
     options.set_poll_interval(5)
-    options.set_logging(False)
     options.set_save_configuration(True)
     options.lock()
 
