@@ -66,18 +66,20 @@ def louie_value(network, node, value):
             units_adjusted = value.units
         haiot_dispatch.send(Constant.SIGNAL_UTILITY_EX, sensor_name=node.product_name,
                             value=value.data, unit=units_adjusted)
-    if value.label == "Voltage":
-        record = models.Sensor(sensor_name=node.product_name)
+    else:
         current_record = models.Sensor.query.filter_by(sensor_name=node.product_name).first()
-        record.vad = value.data
-        record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
-                                   save_to_graph=True, debug=False)
-    if value.label == "Current":
+        current_record.vad = None
+        current_record.iad = None
         record = models.Sensor(sensor_name=node.product_name)
-        current_record = models.Sensor.query.filter_by(sensor_name=node.product_name).first()
-        record.iad = value.data
-        record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
-                                   save_to_graph=True, debug=False)
+        if value.label == "Voltage":
+            record.vad = value.data
+            record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
+                                       save_to_graph=True, debug=False)
+        elif value.label == "Current":
+            record.iad = value.data
+            record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
+                                       save_to_graph=True, debug=False)
+        current_record.commit_record_to_db()
 
 
 def louie_value_update(network, node, value):
