@@ -461,9 +461,9 @@ class Sensor(db.Model, graphs.SensorGraph, DbEvent, DbBase):
     counters_b = db.Column(db.BigInteger)
     delta_counters_a = db.Column(db.BigInteger)
     delta_counters_b = db.Column(db.BigInteger)
-    iad = db.Column(db.Float)
+    iad = db.Column(db.Float)  # current in Amper for qubino sensors
     vdd = db.Column(db.Float)
-    vad = db.Column(db.Float)
+    vad = db.Column(db.Float)  # voltage in Volts for qubino sensors
     pio_a = db.Column(db.Integer)
     pio_b = db.Column(db.Integer)
     sensed_a = db.Column(db.Integer)
@@ -477,9 +477,10 @@ class Sensor(db.Model, graphs.SensorGraph, DbEvent, DbBase):
     sensor_name = db.Column(db.String(50))
     alt_address = db.Column(db.String(50)) # alternate address format, use for 1-wire, better readability
 
-    def __init__(self, address=''):
+    def __init__(self, address='', sensor_name=''):
         super(Sensor, self).__init__()
         self.address = address
+        self.sensor_name = sensor_name
 
     def __repr__(self):
         return '{}, {}, {}, {}'.format(self.type, self.sensor_name, self.address, self.temperature)
