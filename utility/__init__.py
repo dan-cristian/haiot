@@ -35,6 +35,7 @@ def __utility_update_ex(sensor_name, value, unit=None):
                         record.units_total = value
                         record.units_delta = value - current_record.units_total
                         current_record.units_total = value
+                        current_record.commit_record_to_db()
                     #L.l.info("Saving power level value={} depth={}".format(value, record.units_2_delta))
                 L.l.debug("Saving utility ex record {} name={}".format(current_record, record.utility_name))
                 record.save_changed_fields(current_record=current_record, new_record=record, debug=False,
