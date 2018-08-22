@@ -11,29 +11,35 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 initialised = False
 
 
-# water utility
+# water & electricity utility from specialised sensors
 def __utility_update_ex(sensor_name, value, unit=None):
     try:
         if value is not None:
             record = models.Utility(sensor_name=sensor_name)
             current_record = models.Utility.query.filter_by(sensor_name=sensor_name).first()
             if current_record is not None:
+                if current_record.units_total is None:
+                    current_record.units_total = 0.0
+                #else: - should not be needed
+                #    # force save
+                #    if current_record is not None:
+                #        current_record.units_total = -1
                 record.utility_name = current_record.utility_name
                 if current_record.utility_type == Constant.UTILITY_TYPE_WATER_LEVEL:
                     record.units_total = value / (current_record.ticks_per_unit * 1.0)
                     L.l.info("Saving utility water level value={} depth={}".format(value, record.units_total))
                 elif current_record.utility_type == Constant.UTILITY_TYPE_ELECTRICITY:
-                    record.units_2_delta = value
+                    if unit == current_record.unit_2_name:
+                        record.units_2_delta = value
+                    elif unit == current_record.unit_name:
+                        record.units_total = value
+                        record.units_delta = value - current_record.units_total
+                        current_record.units_total = value
                     #L.l.info("Saving power level value={} depth={}".format(value, record.units_2_delta))
-                if current_record.units_total is None:
-                    current_record.units_total = 0.0
-                else:
-                    # force save
-                    if current_record is not None:
-                        current_record.units_total = -1
                 L.l.debug("Saving utility ex record {} name={}".format(current_record, record.utility_name))
                 record.save_changed_fields(current_record=current_record, new_record=record, debug=False,
                                            notify_transport_enabled=True, save_to_graph=True, save_all_fields=True)
+
             else:
                 L.l.critical("Utility ex sensor [{}] is not defined in Utility table".format(sensor_name))
     except Exception as ex:

@@ -1,5 +1,6 @@
 from main.logger_helper import L
 from common import Constant
+from main.admin import models
 import six
 if six.PY3:
     from pydispatch import dispatcher
@@ -56,10 +57,27 @@ def louie_node_update(network, node):
 
 def louie_value(network, node, value):
     #L.l.info('Louie signal: Value {} for {}={} {}'.format(node.product_name, value.label, value.data, value.units))
-    if value.label == "Power":
+    #PowerLevel (Normal), Energy (kWh),  Energy (kVAh), Power (W), Voltage (V), Current (A), Power Factor, Unknown
+    if value.label == "Power" or (value.label == "Energy" and value.units == "kWh"):
         #L.l.info("Saving power utility")
+        if value.units == "W":
+            units_adjusted = "watt"  # this should match Utility unit name in models definition
+        else:
+            units_adjusted = value.units
         haiot_dispatch.send(Constant.SIGNAL_UTILITY_EX, sensor_name=node.product_name,
-                            value=value.data, unit=value.units)
+                            value=value.data, unit=units_adjusted)
+    if value.label == "Voltage":
+        record = models.Sensor(sensor_name=node.product_name)
+        current_record = models.Sensor.query.filter_by(sensor_name=node.product_name).first()
+        record.vad = value.data
+        record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
+                                   save_to_graph=True, debug=False)
+    if value.label == "Current":
+        record = models.Sensor(sensor_name=node.product_name)
+        current_record = models.Sensor.query.filter_by(sensor_name=node.product_name).first()
+        record.iad = value.data
+        record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
+                                   save_to_graph=True, debug=False)
 
 
 def louie_value_update(network, node, value):
