@@ -12,5 +12,11 @@ Frame label="demo" {
 	Text item=temperature_solar_jos
 	Text item=temperature_curte_fata
 	Text item=temperature_living
+	Text item=temperature_dormitor
+	Text item=temperature_dormitor_spate
+	Text item=temperature_pod_fata
+	Text item=temperature_horn
+	Text item=temperature_gas_heater
+	Text item=temperature_gas_boiler
 }
 }
