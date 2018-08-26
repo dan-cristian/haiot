@@ -1,4 +1,5 @@
-Switch Presence_Mobile_Dan "Dan Mobile" <network> { channel="network:device:192_168_0_117:online" }
+Group   Home       "Our Home"   <house>
+Switch presence_mobile_dan "Dan Mobile" <network> { channel="network:device:192_168_0_117:online" }
 Number temperature_boiler_sus "Boiler sus [%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_boiler sus:state:default]"}
 Number temperature_boiler_mijloc "Boiler mijloc [%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_boiler mijloc:state:default]"}
 Number temperature_boiler_jos "Boiler jos [%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_boiler jos:state:default]"}
