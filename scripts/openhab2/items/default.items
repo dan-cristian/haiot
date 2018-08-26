@@ -1,7 +1,7 @@
 Group   Property       "Our Home"   <house>
-Group   House           "Our House"   <house>
-Group   Cellar           "Cellar"   <cellar>
-Group   Puffer           "Puffer"   <heating>
+Group   House           "Our House"   <house>    (Property)
+Group   Cellar           "Cellar"   <cellar>     (House)
+Group   Puffer           "Puffer"   <heating>    (Cellar)
 Switch presence_mobile_dan "Dan Mobile" <network> { channel="network:device:192_168_0_117:online" }
 Number temperature_boiler_sus "Boiler sus [%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_boiler sus:state:default]"}
 Number temperature_boiler_mijloc "Boiler mijloc [%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_boiler mijloc:state:default]"}
