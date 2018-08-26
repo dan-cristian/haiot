@@ -22,6 +22,7 @@ Frame label="Temperature" {
 	Default item=temperature_gas_boiler
 
 	Default item=electricity_power_main_mono
+	Default item=gas_gas
     Default item=water_main
     Default item=water_hot
 
