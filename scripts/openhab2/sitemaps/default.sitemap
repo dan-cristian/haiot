@@ -20,6 +20,8 @@ Frame label="Temperature" {
 	Default item=temperature_horn
 	Default item=temperature_gas_heater
 	Default item=temperature_gas_boiler
+	Default item=temperature_solar_back
+	Default item=temperature_soba_beci
 
 	Default item=electricity_power_main_mono
 	Default item=gas_gas
@@ -54,6 +56,15 @@ Frame label="Charts" {
         Chart item=electricity_power_main_mono service="mysql" period=M refresh=10000 visibility=[t_switch_2==3]
         Chart item=electricity_power_main_mono service="mysql" period=3M refresh=10000 visibility=[t_switch_2==4]
         Chart item=electricity_power_main_mono service="mysql" period=Y refresh=10000 visibility=[t_switch_2==5]
+        }
+    Text label="Water main" {
+        Switch item=t_switch_3 label="Power mono" mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
+        Chart item=water_main service="mysql" period=h refresh=10000 visibility=[t_switch_3==0, t_switch_3=="Uninitialized"]
+        Chart item=water_main service="mysql" period=D refresh=10000 visibility=[t_switch_3==1]
+        Chart item=water_main service="mysql" period=W refresh=10000 visibility=[t_switch_3==2]
+        Chart item=water_main service="mysql" period=M refresh=10000 visibility=[t_switch_3==3]
+        Chart item=water_main service="mysql" period=3M refresh=10000 visibility=[t_switch_3==4]
+        Chart item=water_main service="mysql" period=Y refresh=10000 visibility=[t_switch_3==5]
         }
     }
 
