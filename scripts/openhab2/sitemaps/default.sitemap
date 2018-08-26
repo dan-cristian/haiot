@@ -23,7 +23,7 @@ Frame label="demo" {
 }
 
 Frame label="Temperature_Chart_curte_fata" {
-		Chart item=temperature_curte_fata period=4h refresh=60
+		Chart item=temperature_curte_fata service="mysql" period=h refresh=60
 }
 
 }
