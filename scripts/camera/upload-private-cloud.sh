@@ -42,9 +42,9 @@ if [ $# -ne 0 ]; then
   
   #/usr/sbin/rclone copy $source $dest_parent >> $LOG 2>&1
   echo2 "Creating remote parent folder $dest_parent"
-  ssh -T -p 222 -c arcfour -o Compression=no $SSH_SERVER "mkdir -p $dest_parent" >> $LOG 2>&1
+  ssh -T -p 222 -c aes128-cbc -o Compression=no $SSH_SERVER "mkdir -p $dest_parent" >> $LOG 2>&1
   echo2 "Now uploading"
-  rsync -avPe 'ssh -T -p 222 -c arcfour -o Compression=no -x' $source $SSH_SERVER:$dest_parent/ >> $LOG 2>&1
+  rsync -avPe 'ssh -T -p 222 -c aes128-cbc -o Compression=no -x' $source $SSH_SERVER:$dest_parent/ >> $LOG 2>&1
   
   #cp -f $source $dest >> $LOG 2>&1
   result=$?
