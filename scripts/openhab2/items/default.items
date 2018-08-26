@@ -32,6 +32,7 @@ Number humidity_living "Living [%.1f %]" <moisture>                         {mqt
 Number humidity_curte_fata "Curte fata [%.1f %]" <moisture>                 {mqtt="<[mosquitto:iot/openhab/humidity_curte fata:state:default]"}
 
 Number electricity_power_main_mono "Power main mono [%.0f watt]" <energy>   {mqtt="<[mosquitto:iot/openhab/electricity_power main mono:state:default]"}
+Number electricity_solar_aps "Power solar [%.0f watt]" <energy>             {mqtt="<[mosquitto:iot/openhab/electricity_solar_aps:state:default]"}
 Number gas_gas "Gas [%.1f mc]" <gas>                                        {mqtt="<[mosquitto:iot/openhab/gas_gas:state:default]"}
 Number water_main "Water main [%.0f l]" <water>                             {mqtt="<[mosquitto:iot/openhab/water_water main:state:default]"}
 Number water_hot "Water hot [%.0f l]" <water>                               {mqtt="<[mosquitto:iot/openhab/water_water hot:state:default]"}
@@ -46,9 +47,9 @@ Contact alarm_etaj_hol "Alarm etaj hol [%s]" <door>                         (CON
 Contact contact_sonerie "Sonerie [%s]" <door>                               (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_sonerie:state:default]"}
 
 
-Number t_switch_1
-Number t_switch_2
-Number t_switch_3
-Number t_switch_4
-Number t_switch_5
-Number t_switch_6
+Number t_switch_1 ""
+Number t_switch_2 ""
+Number t_switch_3 ""
+Number t_switch_4 ""
+Number t_switch_5 ""
+Number t_switch_6 ""
