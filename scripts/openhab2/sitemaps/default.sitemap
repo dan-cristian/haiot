@@ -12,7 +12,7 @@ Frame {
         }
 }
 
-Frame label="Puffer" {
+Frame {
 	Group item=TEMP_PUF {
         Default item=temperature_puffer_sus
         Default item=temperature_puffer_mijloc
@@ -20,33 +20,41 @@ Frame label="Puffer" {
         }
 }
 
-Frame label="Temperature" {
+Frame {
 	Default item=temperature_solar_jos
-	Default item=temperature_curte_fata
-	Default item=temperature_living
-	Default item=temperature_dormitor
-	Default item=temperature_dormitor_spate
-	Default item=temperature_pod_fata
 	Default item=temperature_horn
 	Default item=temperature_gas_heater
 	Default item=temperature_gas_boiler
 	Default item=temperature_solar_back
 	Default item=temperature_soba_beci
+}
 
+Frame {
+	Default item=temperature_curte_fata
+	Default item=temperature_living
+	Default item=temperature_dormitor
+	Default item=temperature_dormitor_spate
+	Default item=temperature_pod_fata
+}
+Frame {
 	Default item=electricity_power_main_mono
 	Default item=gas_gas
     Default item=water_main
     Default item=water_hot
+}
 
-	Default item=alarm_living
-	Default item=alarm_bucatarie
-	Default item=alarm_birou
-	Default item=alarm_scari_beci
-	Default item=alarm_beci_mare
-	Default item=alarm_beci_mic
-	Default item=alarm_etaj_hol
-	Default item=contact_sonerie
-    }
+Frame {
+    Group item=CON_PIR {
+        Default item=alarm_living
+        Default item=alarm_bucatarie
+        Default item=alarm_birou
+        Default item=alarm_scari_beci
+        Default item=alarm_beci_mare
+        Default item=alarm_beci_mic
+        Default item=alarm_etaj_hol
+        Default item=contact_sonerie
+        }
+}
 
 Frame label="Charts" {
     Text item=temperature_curte_fata {
