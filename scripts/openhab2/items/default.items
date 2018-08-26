@@ -4,7 +4,7 @@ Group   CEL     "Cellar"   <cellar>     (HOU)
 Group   PUF     "Puffer"   <heating>    (CEL)
 Group   BOI     "Boiler"   <heating>    (CEL)
 
-Group:Number:MIN TEMP_PUF "Min Puffer temperature [%.1f °C]" <temperature>
+Group:Number:AVG TEMP_PUF "Min Puffer temperature [%.1f °C]" <temperature>
 Group:Number:MIN TEMP_BOI "Min Boiler temperature [%.1f °C]" <temperature>
 
 Switch presence_mobile_dan "Dan Mobile" <network>                           {channel="network:device:192_168_0_117:online"}
