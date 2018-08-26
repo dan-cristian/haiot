@@ -1,0 +1,12 @@
+sitemap gaudi label="Gaudi" {
+
+Switch item=Presence_Mobile_Dan label="Dan Mobile"
+
+Frame label="demo" {
+	Text item=temperature_boiler_mijloc
+	Text item=temperature_boiler_sus
+	Text item=temperature_boiler_jos
+	Text item=temperature_horn
+}
+
+}
