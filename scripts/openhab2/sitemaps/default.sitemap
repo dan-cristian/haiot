@@ -21,4 +21,9 @@ Frame label="demo" {
 	Default item=temperature_gas_heater
 	Default item=temperature_gas_boiler
 }
+
+Frame label="Temperature_Chart_curte_fata" {
+		Chart item=temperature_curte_fata period=4h refresh=60
+}
+
 }
