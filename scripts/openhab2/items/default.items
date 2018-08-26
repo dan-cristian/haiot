@@ -24,10 +24,12 @@ Switch heat_puffer_boiler "Heat puffer boiler" <switch>                     {mqt
 Switch heat_puffer_heat "Heat puffer heat" <switch>                         {mqtt="<[mosquitto:iot/openhab/heat_puffer heat:state:default]"}
 Switch heat_puffer_gas_valve "Heat puffer gas valve" <switch>               {mqtt="<[mosquitto:iot/openhab/heat_puffer gas valve:state:default]"}
 
-Switch relay_back_pump_relay "Back pump" <switch>                           {mqtt="<[mosquitto:iot/openhab/relay_back_pump_relay:state:default]"}
-Switch relay_back_valve_relay "Back valve" <switch>                         {mqtt="<[mosquitto:iot/openhab/relay_back_valve_relay:state:default]"}
-Switch relay_front_valve_relay "Front valve" <switch>                       {mqtt="<[mosquitto:iot/openhab/relay_front_valve_relay:state:default]"}
-Switch relay_front_main_valve_relay "Front main valve" <switch>             {mqtt="<[mosquitto:iot/openhab/relay_front_main_valve_relay:state:default]"}
+Group:Switch:OR(ON, OFF)    RELAY_BACK_WATER "Back watering [(%d)]"  <switch>
+Group:Switch:OR(ON, OFF)    RELAY_FRONT_WATER "Back watering [(%d)]"  <switch>
+Switch relay_back_pump_relay "Back pump" <switch>                          (RELAY_BACK_WATER) {mqtt="<[mosquitto:iot/openhab/relay_back_pump_relay:state:default]"}
+Switch relay_back_valve_relay "Back valve" <switch>                        (RELAY_BACK_WATER) {mqtt="<[mosquitto:iot/openhab/relay_back_valve_relay:state:default]"}
+Switch relay_front_valve_relay "Front valve" <switch>                      (RELAY_FRONT_WATER) {mqtt="<[mosquitto:iot/openhab/relay_front_valve_relay:state:default]"}
+Switch relay_front_main_valve_relay "Front main valve" <switch>            (RELAY_FRONT_WATER) {mqtt="<[mosquitto:iot/openhab/relay_front_main_valve_relay:state:default]"}
 
 Number temperature_boiler_sus "Boiler sus [%.1f °C]" <temperature>          (BOI, TEMP_BOI) {mqtt="<[mosquitto:iot/openhab/temperature_boiler sus:state:default]"}
 Number temperature_boiler_mijloc "Boiler mijloc [%.1f °C]" <temperature>    (BOI, TEMP_BOI) {mqtt="<[mosquitto:iot/openhab/temperature_boiler mijloc:state:default]"}
