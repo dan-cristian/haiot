@@ -58,7 +58,7 @@ def rule_openhab_sensor(obj=models.Sensor(), field_changed_list=None):
 
 def rule_openhab_utility(obj=models.Utility(), field_changed_list=None):
     if hasattr(obj, 'utility_type'):
-        L.l.info("PROCESSING utility {}".format(obj.utility_type))
+        # L.l.info("PROCESSING utility {}".format(obj.utility_type))
         key = 'electricity'
         if obj.utility_type == key and obj.units_2_delta is not None:
             rule_common.send_mqtt_openhab(subtopic=key + "_" + obj.utility_name, payload=obj.units_2_delta)
@@ -69,7 +69,8 @@ def rule_openhab_utility(obj=models.Utility(), field_changed_list=None):
         if obj.utility_type == key and obj.units_delta is not None:
             rule_common.send_mqtt_openhab(subtopic=key + "_" + obj.utility_name, payload=obj.units_delta)
     else:
-        L.l.info("NO UTILITY TYPE in {}".format(obj))
+        # L.l.info("NO UTILITY TYPE in {}".format(obj))
+        pass
 
 
 def rule_openhab_alarm(obj=models.ZoneAlarm(), field_changed_list=None):
