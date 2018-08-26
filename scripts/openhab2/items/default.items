@@ -1,14 +1,15 @@
-Group   Property       "Our Home"   <house>
-Group   House           "Our House"   <house>    (Property)
-Group   Cellar           "Cellar"   <cellar>     (House)
-Group   Puffer           "Puffer"   <heating>    (Cellar)
+Group   PRO     "Our Home"   <house>
+Group   HOU     "Our House"   <house>    (PRO)
+Group   CEL     "Cellar"   <cellar>     (HOU)
+Group   PUF     "Puffer"   <heating>    (CEL)
+Group   BOI     "Boiler"   <heating>    (CEL)
 Switch presence_mobile_dan "Dan Mobile" <network> { channel="network:device:192_168_0_117:online" }
-Number temperature_boiler_sus "Boiler sus [%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_boiler sus:state:default]"}
-Number temperature_boiler_mijloc "Boiler mijloc [%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_boiler mijloc:state:default]"}
-Number temperature_boiler_jos "Boiler jos [%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_boiler jos:state:default]"}
-Number temperature_puffer_sus "Puffer sus [%.1f °C]" <temperature> (Puffer) {mqtt="<[mosquitto:iot/openhab/temperature_puffer sus:state:default]"}
-Number temperature_puffer_mijloc "Puffer mijloc [%.1f °C]" <temperature> (Puffer) {mqtt="<[mosquitto:iot/openhab/temperature_puffer mijloc:state:default]"}
-Number temperature_puffer_jos "Puffer jos [%.1f °C]" <temperature> (Puffer) {mqtt="<[mosquitto:iot/openhab/temperature_puffer jos:state:default]"}
+Number temperature_boiler_sus "Boiler sus [%.1f °C]" <temperature>          (BOI) {mqtt="<[mosquitto:iot/openhab/temperature_boiler sus:state:default]"}
+Number temperature_boiler_mijloc "Boiler mijloc [%.1f °C]" <temperature>    (BOI) {mqtt="<[mosquitto:iot/openhab/temperature_boiler mijloc:state:default]"}
+Number temperature_boiler_jos "Boiler jos [%.1f °C]" <temperature>          (BOI) {mqtt="<[mosquitto:iot/openhab/temperature_boiler jos:state:default]"}
+Number temperature_puffer_sus "Puffer sus [%.1f °C]" <temperature>          (PUF) {mqtt="<[mosquitto:iot/openhab/temperature_puffer sus:state:default]"}
+Number temperature_puffer_mijloc "Puffer mijloc [%.1f °C]" <temperature>    (PUF) {mqtt="<[mosquitto:iot/openhab/temperature_puffer mijloc:state:default]"}
+Number temperature_puffer_jos "Puffer jos [%.1f °C]" <temperature>          (PUF) {mqtt="<[mosquitto:iot/openhab/temperature_puffer jos:state:default]"}
 Number temperature_solar_jos "Solar jos[%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_solar jos:state:default]"}
 Number temperature_curte_fata "Curte fata [%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_curte fata:state:default]"}
 Number temperature_living "Living [%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_living:state:default]"}
@@ -38,6 +39,9 @@ Contact alarm_beci_mare "Alarm beci mare [%s]" <door> {mqtt="<[mosquitto:iot/ope
 Contact alarm_beci_mic "Alarm beci mic [%s]" <door> {mqtt="<[mosquitto:iot/openhab/contact_beci mic:state:default]"}
 Contact alarm_etaj_hol "Alarm etaj hol [%s]" <door> {mqtt="<[mosquitto:iot/openhab/contact_etaj hol:state:default]"}
 Contact contact_sonerie "Sonerie [%s]" <door> {mqtt="<[mosquitto:iot/openhab/contact_sonerie:state:default]"}
+
+Group:Number:AVG g_temperature_puffer "Avg. Puffer temperature [%.1f °C]" <temperature> (PUF)
+Group:Number:AVG g_temperature_boiler "Avg. Boiler temperature [%.1f °C]" <temperature> (BOI)
 
 Number t_switch_1
 Number t_switch_2
