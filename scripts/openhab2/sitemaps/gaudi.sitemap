@@ -1,0 +1,26 @@
+sitemap gaudi label="gaudi" {
+
+Frame label="demo" {
+	Text item=mqtt_string
+	Text item=temperature_boiler_mijloc
+	Text item=temperature_boiler_sus
+	Text item=temperature_boiler_jos
+	Text item=temperature_horn
+}
+    Frame label="Ground Floor" icon="groundfloor" {
+        Group item=GF_Basement
+    }
+
+    Frame label="First Floor" icon="firstfloor" {
+        Group item=FF_Downstairs
+    }
+
+    Frame label="Second Floor" icon="attic" {
+        Group item=F2_Upstairs
+    }
+
+    Frame label="Third Floor" icon="attic" {
+        Group item=F3_Attic
+    }
+
+}
