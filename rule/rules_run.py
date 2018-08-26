@@ -45,6 +45,36 @@ def execute_macro(obj=models.Rule(), field_changed_list=None, force_exec=False):
     return result
 
 
+def rule_openhab(obj=models.Sensor(), field_changed_list=None):
+    key = 'temperature'
+    if hasattr(obj, key) and obj.temperature is not None:
+        rule_common.send_mqtt_openhab(subtopic=key + "_" + obj.sensor_name, payload=obj.temperature)
+    key = 'humidity'
+    if hasattr(obj, key) and obj.humidity is not None:
+        rule_common.send_mqtt_openhab(subtopic=key + "_" + obj.sensor_name, payload=obj.humidity)
+
+
+def rule_openhab(obj=models.Utility(), field_changed_list=None):
+    key = 'electricity'
+    if hasattr(obj, key) and obj.units_2_delta is not None:
+        rule_common.send_mqtt_openhab(subtopic=key + "_" + obj.utility_name, payload=obj.units_2_delta)
+    key = 'water'
+    if hasattr(obj, key) and obj.units_delta is not None:
+        rule_common.send_mqtt_openhab(subtopic=key + "_" + obj.utility_name, payload=obj.units_delta)
+    key = 'gas'
+    if hasattr(obj, key) and obj.units_delta is not None:
+        rule_common.send_mqtt_openhab(subtopic=key + "_" + obj.utility_name, payload=obj.units_delta)
+
+
+def rule_openhab(obj=models.ZoneAlarm(), field_changed_list=None):
+    key = 'contact'
+    if obj.alarm_pin_triggered:
+        state = "OPEN"
+    else:
+        state = "CLOSED"
+    rule_common.send_mqtt_openhab(subtopic=key + "_" + obj.alarm_pin_name, payload=state)
+
+
 def rule_node(obj=models.Node(), field_changed_list=None):
     if not field_changed_list:
         field_changed_list = []
@@ -116,7 +146,6 @@ class TempStore:
 # catch sudden changes or extremes (fire or cold)
 def rule_sensor_temp_extreme(obj=models.Sensor(), field_changed_list=None):
     if hasattr(obj, 'temperature') and obj.temperature is not None:
-        rule_common.send_mqtt_openhab(subtopic="temperature_"+obj.sensor_name, payload=obj.temperature)
         m = models.ZoneSensor
         zonesensor = m().query_filter_first(m.sensor_name == obj.sensor_name)
         if zonesensor is not None and zonesensor.target_material is not None:

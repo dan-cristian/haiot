@@ -20,10 +20,11 @@ Frame label="Temperature" {
 	Default item=temperature_horn
 	Default item=temperature_gas_heater
 	Default item=temperature_gas_boiler
+	Default item=electricity_power_main_mono
     }
 
-Frame label="Curte fata" {
-    Text label="Temperature chart" {
+Frame label="Charts" {
+    Text label="Temperature curte fata" {
         Switch item=t_switch_1 label="curte fata" mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
         Chart item=temperature_curte_fata service="mysql" period=h refresh=10000 visibility=[t_switch_1==0, t_switch_1=="Uninitialized"]
         Chart item=temperature_curte_fata service="mysql" period=D refresh=10000 visibility=[t_switch_1==1]
