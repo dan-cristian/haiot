@@ -96,7 +96,7 @@ def rule_openhab_ups(obj=models.Ups(), field_changed_list=None):
             rule_common.send_mqtt_openhab(subtopic="ups_" + key, payload=obj.load_percent)
 
 
-def rule_openhab_ups(obj=models.ZoneCustomRelay(), field_changed_list=None):
+def rule_openhab_custom_relay(obj=models.ZoneCustomRelay(), field_changed_list=None):
     if field_changed_list is not None:
         if obj.relay_is_on:
             state = "ON"
@@ -104,6 +104,14 @@ def rule_openhab_ups(obj=models.ZoneCustomRelay(), field_changed_list=None):
             state = "OFF"
         rule_common.send_mqtt_openhab(subtopic="relay_" + obj.relay_pin_name, payload=state)
 
+
+def rule_openhab_heat_relay(obj=models.ZoneHeatRelay(), field_changed_list=None):
+    if field_changed_list is not None:
+        if obj.heat_is_on:
+            state = "ON"
+        else:
+            state = "OFF"
+        rule_common.send_mqtt_openhab(subtopic="heat_" + obj.relay_pin_name, payload=state)
 
 # OPENHAB RULES --- END
 
