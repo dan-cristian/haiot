@@ -112,15 +112,14 @@ Frame {
 }
 
 Frame {
-    Switch item=RELAY_BACK_WATER mappings=[OFF="All Off", ON="All On"] {
+    Switch item=RELAY_BACK_WATER mappings=[OFF="All Off", ON="All On"]
         Default item=relay_back_pump_relay
         Default item=relay_back_valve_relay
-    }
 
-    Switch item=RELAY_FRONT_WATER mappings=[OFF="All Off", ON="All On"] {
+
+    Switch item=RELAY_FRONT_WATER mappings=[OFF="All Off", ON="All On"]
         Default item=relay_back_pump_relay
         Default item=relay_front_valve_relay
-    }
 }
 
 Frame label="Charts" {
