@@ -28,8 +28,8 @@ Number temperature_solar_back "Solar back [%.1f °C]" <temperature>          {mq
 Number temperature_soba_beci "Soba beci [%.1f °C]" <temperature>            {mqtt="<[mosquitto:iot/openhab/temperature_soba beci:state:default]"}
 
 
-Number humidity_living "Living [%.1f %]" <moisture>                         {mqtt="<[mosquitto:iot/openhab/humidity_living:state:default]"}
-Number humidity_curte_fata "Curte fata [%.1f %]" <moisture>                 {mqtt="<[mosquitto:iot/openhab/humidity_curte fata:state:default]"}
+Number humidity_living "Living [%.1f %]" <humidity>                         {mqtt="<[mosquitto:iot/openhab/humidity_living:state:default]"}
+Number humidity_curte_fata "Curte fata [%.1f %]" <humidity>                 {mqtt="<[mosquitto:iot/openhab/humidity_curte fata:state:default]"}
 
 Number electricity_power_main_mono "Power main mono [%.0f watt]" <energy>   {mqtt="<[mosquitto:iot/openhab/electricity_power main mono:state:default]"}
 Number electricity_solar_aps "Power solar [%.0f watt]" <solarplant>             {mqtt="<[mosquitto:iot/openhab/electricity_solar_aps:state:default]"}
