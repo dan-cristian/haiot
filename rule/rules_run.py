@@ -55,15 +55,16 @@ def rule_openhab(obj=models.Sensor(), field_changed_list=None):
 
 
 def rule_openhab(obj=models.Utility(), field_changed_list=None):
-    key = 'electricity'
-    if hasattr(obj, key) and obj.units_2_delta is not None:
-        rule_common.send_mqtt_openhab(subtopic=key + "_" + obj.utility_name, payload=obj.units_2_delta)
-    key = 'water'
-    if hasattr(obj, key) and obj.units_delta is not None:
-        rule_common.send_mqtt_openhab(subtopic=key + "_" + obj.utility_name, payload=obj.units_delta)
-    key = 'gas'
-    if hasattr(obj, key) and obj.units_delta is not None:
-        rule_common.send_mqtt_openhab(subtopic=key + "_" + obj.utility_name, payload=obj.units_delta)
+    if hasattr(obj, 'utility_type'):
+        key = 'electricity'
+        if obj.utility_type == key and obj.units_2_delta is not None:
+            rule_common.send_mqtt_openhab(subtopic=key + "_" + obj.utility_name, payload=obj.units_2_delta)
+        key = 'water'
+        if obj.utility_type == key and obj.units_delta is not None:
+            rule_common.send_mqtt_openhab(subtopic=key + "_" + obj.utility_name, payload=obj.units_delta)
+        key = 'gas'
+        if obj.utility_type == key and obj.units_delta is not None:
+            rule_common.send_mqtt_openhab(subtopic=key + "_" + obj.utility_name, payload=obj.units_delta)
 
 
 def rule_openhab(obj=models.ZoneAlarm(), field_changed_list=None):
