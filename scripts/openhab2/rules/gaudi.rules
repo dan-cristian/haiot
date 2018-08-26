@@ -1,0 +1,16 @@
+rule "Convert JSON"
+  when
+    Item mqtt_string changed
+ then
+	// 
+	val attrib = transform("JSONPATH", ".$.last_commit_field_changed_list[0]", mqtt_string.state.toString)
+	logDebug("haiot", "ATTRIB=" + attrib)
+	if (attrib == "temperature")
+	{
+		val newval = transform("JSONPATH", ".$.temperature", mqtt_string.state.toString)
+		val sensor_name = transform("JSONPATH", ".$.sensor_name", mqtt_string.state.toString)
+    		// post the new value to the Number Item
+		postUpdate(attrib + "_" + sensor_name.replace(" ", "_"), newval)
+    		//Temperature.postUpdate( newval )
+	}
+ end
