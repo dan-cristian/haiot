@@ -118,8 +118,8 @@ def init():
     options.set_console_output(False)
     options.set_save_log_level("Debug")
     #options.set_save_log_level('Info')
-    #options.set_logging(False)
-    options.set_logging(True)
+    options.set_logging(False)
+    #options.set_logging(True)
     options.set_poll_interval(5)
     options.set_save_configuration(True)
     options.lock()
@@ -134,23 +134,23 @@ def init():
     P.network.start()
 
     L.l.info("Waiting for zwave driver")
-    for i in range(0, 60):
+    for i in range(0, 120):
         if P.network.state >= P.network.STATE_STARTED:
             L.l.info("Zwave driver started")
             break
         else:
-            time.sleep(1.0)
+            time.sleep(0.1)
     if P.network.state < P.network.STATE_STARTED:
         L.l.info("Can't initialise zwave driver. Look at the logs in OZW_Log.log")
         return False
     L.l.info("Home id : {}, Nodes in network : {}".format(P.network.home_id_str, P.network.nodes_count))
     L.l.info("Waiting for network to become ready")
-    for i in range(0, 60):
+    for i in range(0, 120):
         if P.network.state >= P.network.STATE_READY:
             break
         else:
-            time.sleep(1.0)
-            L.l.info("state = {}".format(P.network.state))
+            time.sleep(0.1)
+            #L.l.info("state = {}".format(P.network.state))
     if not P.network.is_ready:
         L.l.info("Can't start network! Look at the logs in OZW_Log.log")
         return False
