@@ -2,9 +2,9 @@ Switch Presence_Mobile_Dan "Dan Mobile" <network> { channel="network:device:192_
 Number temperature_boiler_sus "Boiler sus [%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_boiler sus:state:default]"}
 Number temperature_boiler_mijloc "Boiler mijloc [%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_boiler mijloc:state:default]"}
 Number temperature_boiler_jos "Boiler jos [%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_boiler jos:state:default]"}
-Number temperature_puffer_sus "Puffer sus [%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_puffer sus:state:default]"}   (PUF)
-Number temperature_puffer_mijloc "Puffer mijloc [%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_puffer mijloc:state:default]"}  (PUF)
-Number temperature_puffer_jos "Puffer jos [%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_puffer jos:state:default]"}   (PUF)
+Number temperature_puffer_sus "Puffer sus [%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_puffer sus:state:default]"}
+Number temperature_puffer_mijloc "Puffer mijloc [%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_puffer mijloc:state:default]"}
+Number temperature_puffer_jos "Puffer jos [%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_puffer jos:state:default]"}
 Number temperature_solar_jos "Solar jos[%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_solar jos:state:default]"}
 Number temperature_curte_fata "Curte fata [%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_curte fata:state:default]"}
 Number temperature_living "Living [%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_living:state:default]"}
@@ -17,7 +17,6 @@ Number temperature_gas_heater "Gas heater [%.1f °C]" <temperature> {mqtt="<[mos
 Number temperature_solar_back "Solar back [%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_solar back:state:default]"}
 Number temperature_soba_beci "Soba beci [%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_soba beci:state:default]"}
 
-Group:Number:AVG g_temperature_puffer "Avg. Puffer temperature [%.1f °C]" <temperature> (PUF)
 
 Number humidity_living "Living [%.1f %]" <moisture> {mqtt="<[mosquitto:iot/openhab/humidity_living:state:default]"}
 Number humidity_curte_fata "Curte fata [%.1f %]" <moisture> {mqtt="<[mosquitto:iot/openhab/humidity_curte fata:state:default]"}
