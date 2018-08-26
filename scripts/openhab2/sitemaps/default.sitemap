@@ -8,12 +8,14 @@ Frame label="Boiler" {
     Default item=temperature_boiler_sus
 	Default item=temperature_boiler_mijloc
 	Default item=temperature_boiler_jos
+	Group item=g_temperature_boiler
 }
 
 Frame label="Puffer" {
 	Default item=temperature_puffer_sus
 	Default item=temperature_puffer_mijloc
 	Default item=temperature_puffer_jos
+	Group item=g_temperature_puffer
 }
 
 Frame label="Temperature" {
