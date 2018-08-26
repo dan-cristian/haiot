@@ -8,5 +8,4 @@ Frame label="demo" {
 	Text item=temperature_boiler_jos
 	Text item=temperature_curte_fata
 }
-
 }
