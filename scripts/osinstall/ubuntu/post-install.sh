@@ -57,6 +57,9 @@ ENABLE_UPS_PICO=1
 ENABLE_3G_MODEM=1
 ENABLE_LOG_RAM=0
 
+ENABLE_THINGSBOARD=0
+ENABLE_OPENHAB=0
+
 set_config_var() {
   lua - "$1" "$2" "$3" <<EOF > "$3.bak"
 local key=assert(arg[1])
@@ -1236,6 +1239,45 @@ exit 0
     systemctl enable keep_internet.service
     systemctl start keep_internet.service
 
+fi
+
+if [ "$ENABLE_THINGSBOARD" == "1" ]; then
+    cd /home/${USERNAME}
+    mkdir docker
+    cd docker
+    curl -L https://raw.githubusercontent.com/thingsboard/thingsboard/release-1.4/docker/docker-compose.yml > docker-compose.yml
+    curl -L https://raw.githubusercontent.com/thingsboard/thingsboard/release-1.4/docker/.env > .env
+    curl -L https://raw.githubusercontent.com/thingsboard/thingsboard/release-1.4/docker/tb.env > tb.env
+
+    #https://docs.docker.com/install/linux/docker-ce/ubuntu/#install-using-the-repository
+    apt-get install apt-transport-https ca-certificates curl software-properties-common
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+    add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+    apt-get update
+    apt-get install docker-ce
+    docker run hello-world
+
+    #https://github.com/docker/compose/releases
+    echo "check https://github.com/docker/compose/releases to ensure you get the latest version"
+    curl -L https://github.com/docker/compose/releases/download/1.21.2/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+    chmod +x /usr/local/bin/docker-compose
+    docker-compose --version
+    ADD_SCHEMA_AND_SYSTEM_DATA=true ADD_DEMO_DATA=true bash -c 'docker-compose up -d tb'
+fi
+
+if [ "$ENABLE_OPENHAB" == "1" ]; then
+    # https://docs.openhab.org/installation/linux.html#package-repository-installation
+    wget -qO - 'https://bintray.com/user/downloadSubjectPublicKey?username=openhab' | apt-key add -
+    apt-get install -y apt-transport-https
+    echo 'deb https://dl.bintray.com/openhab/apt-repo2 stable main' | tee /etc/apt/sources.list.d/openhab2.list
+    apt-get update
+    apt-get install -y openhab2 openhab2-addons
+    echo "Edit default ports"
+    nano /etc/default/openhab2
+    systemctl start openhab2.service
+    systemctl status openhab2.service
+    systemctl daemon-reload
+    systemctl enable openhab2.service
 fi
 
 echo "Optimise for flash and ssd usage"

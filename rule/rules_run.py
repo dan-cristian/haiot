@@ -102,10 +102,10 @@ def rule_sensor_temp_target(obj=models.Sensor(), field_changed_list=None):
 
 
 class TempStore:
-    max_temp = {'indoor':           {'air': 30, 'water': 80, 'glicol': 90},
-                'indoor_heated':    {'air': 30, 'water': 80, 'glicol': 90},
-                'outdoor':          {'air': 39, 'water': 80, 'glicol': 90},
-                'outdoor_heated':   {'air': 95, 'water': 80, 'glicol': 90}}
+    max_temp = {'indoor':           {'air': 30, 'water': 85, 'glicol': 90},
+                'indoor_heated':    {'air': 30, 'water': 85, 'glicol': 90},
+                'outdoor':          {'air': 39, 'water': 85, 'glicol': 90},
+                'outdoor_heated':   {'air': 95, 'water': 85, 'glicol': 90}}
     min_temp = {'indoor':           {'air': 5, 'water': 5, 'glicol': 5},
                 'indoor_heated':    {'air': 15, 'water': 5, 'glicol': 5},
                 'outdoor':          {'air': -15, 'water': 1, 'glicol': 1},
@@ -361,12 +361,24 @@ def alexawemo_watering_off():
     return True
 
 
-def alexawemo_music_living_on():
-    return mpd.play('living', default_dir='/_New/')
+def alexawemo_waterfront_on():
+    """is_async=1"""
+    water_front_3_minute()
+    return True
 
 
-def alexawemo_music_living_off():
-    return mpd.pause('living')
+def alexawemo_waterback_on():
+    """is_async=1"""
+    water_back_3_minute()
+    return True
+
+
+def alexawemo_music_livingroom_on():
+    return mpd.play('livingroom', default_dir='/_New/')
+
+
+def alexawemo_music_livingroom_off():
+    return mpd.pause('livingroom')
 
 
 def alexawemo_music_bedroom_on():
