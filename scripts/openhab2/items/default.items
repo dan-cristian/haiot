@@ -1,6 +1,12 @@
 Switch Presence_Mobile_Dan "Dan Mobile" <network> { channel="network:device:192_168_0_117:online" }
 
+String temperature_boiler_sus "Boiler sus [%s]" {mqtt="<[mosquitto:iot/openhab/temperature_boiler sus:state:default]"}
 String temperature_boiler_mijloc "Boiler mijloc [%s]" {mqtt="<[mosquitto:iot/openhab/temperature_boiler mijloc:state:default]"}
 String temperature_boiler_jos "Boiler jos [%s]" {mqtt="<[mosquitto:iot/openhab/temperature_boiler jos:state:default]"}
-String temperature_boiler_mijloc "Curte fata [%s]" {mqtt="<[mosquitto:iot/openhab/temperature_curte fata:state:default]"}
+String temperature_puffer_sus "Puffer sus [%s]" {mqtt="<[mosquitto:iot/openhab/temperature_puffer sus:state:default]"}
+String temperature_puffer_mijloc "Puffer mijloc [%s]" {mqtt="<[mosquitto:iot/openhab/temperature_puffer mijloc:state:default]"}
+String temperature_puffer_jos "Puffer jos [%s]" {mqtt="<[mosquitto:iot/openhab/temperature_puffer jos:state:default]"}
+String temperature_solar_jos "Solar jos[%s]" {mqtt="<[mosquitto:iot/openhab/temperature_solar jos:state:default]"}
+String temperature_curte_fata "Curte fata [%s]" {mqtt="<[mosquitto:iot/openhab/temperature_curte fata:state:default]"}
+String temperature_living "Living [%s]" {mqtt="<[mosquitto:iot/openhab/temperature_living:state:default]"}
 String horn "horn [%s]"
