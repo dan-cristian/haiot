@@ -354,7 +354,7 @@
     {"utility_name":"unavailable", "sensor_name":"power rack", "sensor_index":1, "ticks_per_unit":1, "unit_name":"", "utility_type":"none", "unit_cost":0},
 
     {"utility_name":"dirty water", "sensor_name":"voltage-water", "sensor_index":0, "ticks_per_unit":0.6666, "unit_name":"meter", "utility_type":"water level", "unit_cost":0},
-    {"utility_name":"solar_aps", "sensor_name":"none", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"solar", "unit_cost":0.5259}
+    {"utility_name":"solar_aps", "sensor_name":"none", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259}
   ],
 
   "ZoneAlarm": [
