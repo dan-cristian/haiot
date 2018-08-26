@@ -82,6 +82,29 @@ def rule_openhab_alarm(obj=models.ZoneAlarm(), field_changed_list=None):
     rule_common.send_mqtt_openhab(subtopic=key + "_" + obj.alarm_pin_name, payload=state)
 
 
+def rule_openhab_ups(obj=models.Ups(), field_changed_list=None):
+    if field_changed_list is not None:
+        key = 'power_failed'
+        if key in field_changed_list:
+            if obj.power_failed:
+                state = "OFF"
+            else:
+                state = "ON"
+            rule_common.send_mqtt_openhab(subtopic="ups_" + key, payload=state)
+        key = 'load_percent'
+        if key in field_changed_list:
+            rule_common.send_mqtt_openhab(subtopic="ups_" + key, payload=obj.load_percent)
+
+
+def rule_openhab_ups(obj=models.ZoneCustomRelay(), field_changed_list=None):
+    if field_changed_list is not None:
+        if obj.relay_is_on:
+            state = "ON"
+        else:
+            state = "OFF"
+        rule_common.send_mqtt_openhab(subtopic="relay_" + obj.relay_pin_name, payload=state)
+
+
 # OPENHAB RULES --- END
 
 
