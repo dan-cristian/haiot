@@ -22,8 +22,8 @@ Number temperature_dormitor "Dormitor [%.1f °C]" <temperature>              {mq
 Number temperature_dormitor_spate "Dormitor spate [%.1f °C]" <temperature>  {mqtt="<[mosquitto:iot/openhab/temperature_dormitor spate:state:default]"}
 Number temperature_pod_fata "Pod fata [%.1f °C]" <temperature>              {mqtt="<[mosquitto:iot/openhab/temperature_pod fata:state:default]"}
 Number temperature_horn "Horn [%.1f °C]" <temperature>                      {mqtt="<[mosquitto:iot/openhab/temperature_horn:state:default]"}
-Number temperature_gas_boiler "Gas boiler [%.1f °C]" <temperature>          {mqtt="<[mosquitto:iot/openhab/temperature_gas boiler:state:default]"}
-Number temperature_gas_heater "Gas heater [%.1f °C]" <temperature>          {mqtt="<[mosquitto:iot/openhab/temperature_gas heater:state:default]"}
+Number temperature_gas_boiler "Gas boiler [%.1f °C]" <heating>          {mqtt="<[mosquitto:iot/openhab/temperature_gas boiler:state:default]"}
+Number temperature_gas_heater "Gas heater [%.1f °C]" <heating>          {mqtt="<[mosquitto:iot/openhab/temperature_gas heater:state:default]"}
 Number temperature_solar_back "Solar back [%.1f °C]" <temperature>          {mqtt="<[mosquitto:iot/openhab/temperature_solar back:state:default]"}
 Number temperature_soba_beci "Soba beci [%.1f °C]" <temperature>            {mqtt="<[mosquitto:iot/openhab/temperature_soba beci:state:default]"}
 
@@ -32,10 +32,10 @@ Number humidity_living "Living [%.1f %]" <moisture>                         {mqt
 Number humidity_curte_fata "Curte fata [%.1f %]" <moisture>                 {mqtt="<[mosquitto:iot/openhab/humidity_curte fata:state:default]"}
 
 Number electricity_power_main_mono "Power main mono [%.0f watt]" <energy>   {mqtt="<[mosquitto:iot/openhab/electricity_power main mono:state:default]"}
-Number electricity_solar_aps "Power solar [%.0f watt]" <sun>             {mqtt="<[mosquitto:iot/openhab/electricity_solar_aps:state:default]"}
+Number electricity_solar_aps "Power solar [%.0f watt]" <solarplant>             {mqtt="<[mosquitto:iot/openhab/electricity_solar_aps:state:default]"}
 Number gas_gas "Gas [%.1f mc]" <gas>                                        {mqtt="<[mosquitto:iot/openhab/gas_gas:state:default]"}
 Number water_main "Water main [%.0f l]" <water>                             {mqtt="<[mosquitto:iot/openhab/water_water main:state:default]"}
-Number water_hot "Water hot [%.0f l]" <water>                               {mqtt="<[mosquitto:iot/openhab/water_water hot:state:default]"}
+Number water_hot "Water hot [%.0f l]" <faucet>                               {mqtt="<[mosquitto:iot/openhab/water_water hot:state:default]"}
 
 Contact alarm_birou "Alarm birou [%s]" <door>                               (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_birou:state:default]"}
 Contact alarm_scari_beci "Alarm scari beci [%s]" <door>                     (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_scari beci:state:default]"}
