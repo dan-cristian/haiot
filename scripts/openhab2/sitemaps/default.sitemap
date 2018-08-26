@@ -48,12 +48,13 @@ Frame {
         Default item=alarm_beci_mic
         Default item=alarm_etaj_hol
         Default item=contact_sonerie
+
         }
 }
 
 Frame label="Charts" {
     Text item=temperature_curte_fata {
-        Switch item=t_switch_1 label="Curte fata" mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
+        Switch item=t_switch_1 mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
         Chart item=temperature_curte_fata service="mysql" period=h refresh=10000 visibility=[t_switch_1==0, t_switch_1=="Uninitialized"]
         Chart item=temperature_curte_fata service="mysql" period=D refresh=10000 visibility=[t_switch_1==1]
         Chart item=temperature_curte_fata service="mysql" period=W refresh=10000 visibility=[t_switch_1==2]
@@ -62,7 +63,7 @@ Frame label="Charts" {
         Chart item=temperature_curte_fata service="mysql" period=Y refresh=10000 visibility=[t_switch_1==5]
         }
     Text item=electricity_power_main_mono {
-        Switch item=t_switch_2 label="Power mono" mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
+        Switch item=t_switch_2 mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
         Chart item=electricity_power_main_mono service="mysql" period=h refresh=10000 visibility=[t_switch_2==0, t_switch_2=="Uninitialized"]
         Chart item=electricity_power_main_mono service="mysql" period=D refresh=10000 visibility=[t_switch_2==1]
         Chart item=electricity_power_main_mono service="mysql" period=W refresh=10000 visibility=[t_switch_2==2]
@@ -71,7 +72,7 @@ Frame label="Charts" {
         Chart item=electricity_power_main_mono service="mysql" period=Y refresh=10000 visibility=[t_switch_2==5]
         }
     Text item=water_main {
-        Switch item=t_switch_3 label="Power mono" mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
+        Switch item=t_switch_3 mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
         Chart item=water_main service="mysql" period=h refresh=10000 visibility=[t_switch_3==0, t_switch_3=="Uninitialized"]
         Chart item=water_main service="mysql" period=D refresh=10000 visibility=[t_switch_3==1]
         Chart item=water_main service="mysql" period=W refresh=10000 visibility=[t_switch_3==2]
