@@ -71,6 +71,15 @@ Frame label="Charts" {
         Chart item=electricity_power_main_mono service="mysql" period=3M refresh=10000 visibility=[t_switch_2==4]
         Chart item=electricity_power_main_mono service="mysql" period=Y refresh=10000 visibility=[t_switch_2==5]
         }
+    Text item=electricity_solar_aps {
+        Switch item=t_switch_5 mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
+        Chart item=electricity_solar_aps service="mysql" period=h refresh=10000 visibility=[t_switch_5==0, t_switch_5=="Uninitialized"]
+        Chart item=electricity_solar_aps service="mysql" period=D refresh=10000 visibility=[t_switch_5==1]
+        Chart item=electricity_solar_aps service="mysql" period=W refresh=10000 visibility=[t_switch_5==2]
+        Chart item=electricity_solar_aps service="mysql" period=M refresh=10000 visibility=[t_switch_5==3]
+        Chart item=electricity_solar_aps service="mysql" period=3M refresh=10000 visibility=[t_switch_5==4]
+        Chart item=electricity_solar_aps service="mysql" period=Y refresh=10000 visibility=[t_switch_5==5]
+    }
     Text item=water_main {
         Switch item=t_switch_3 mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
         Chart item=water_main service="mysql" period=h refresh=10000 visibility=[t_switch_3==0, t_switch_3=="Uninitialized"]
