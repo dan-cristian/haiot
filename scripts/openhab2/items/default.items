@@ -4,8 +4,9 @@ Group   CEL     "Cellar"   <cellar>     (HOU)
 Group   PUF     "Puffer"   <heating>    (CEL)
 Group   BOI     "Boiler"   <heating>    (CEL)
 
-Group:Number:AVG TEMP_PUF "Min Puffer temperature [%.1f °C]" <temperature>
+Group:Number:AVG TEMP_PUF "Avg Puffer temperature [%.1f °C]" <temperature>
 Group:Number:MIN TEMP_BOI "Min Boiler temperature [%.1f °C]" <temperature>
+Group:Contact:OR(Open, Closed) CON_PIR "PIR Contact [%s]" <door>
 
 Switch presence_mobile_dan "Dan Mobile" <network>                           {channel="network:device:192_168_0_117:online"}
 Number temperature_boiler_sus "Boiler sus [%.1f °C]" <temperature>          (BOI, TEMP_BOI) {mqtt="<[mosquitto:iot/openhab/temperature_boiler sus:state:default]"}
@@ -35,14 +36,14 @@ Number gas_gas "Gas [%.1f mc]" <gas>                                        {mqt
 Number water_main "Water main [%.0f l]" <water>                             {mqtt="<[mosquitto:iot/openhab/water_water main:state:default]"}
 Number water_hot "Water hot [%.0f l]" <water>                               {mqtt="<[mosquitto:iot/openhab/water_water hot:state:default]"}
 
-Contact alarm_birou "Alarm birou [%s]" <door>                               {mqtt="<[mosquitto:iot/openhab/contact_birou:state:default]"}
-Contact alarm_scari_beci "Alarm scari beci [%s]" <door>                     {mqtt="<[mosquitto:iot/openhab/contact_scari beci:state:default]"}
-Contact alarm_living "Alarm living [%s]" <door>                             {mqtt="<[mosquitto:iot/openhab/contact_living:state:default]"}
-Contact alarm_bucatarie "Alarm bucatarie [%s]" <door>                       {mqtt="<[mosquitto:iot/openhab/contact_bucatarie:state:default]"}
-Contact alarm_beci_mare "Alarm beci mare [%s]" <door>                       {mqtt="<[mosquitto:iot/openhab/contact_beci mare:state:default]"}
-Contact alarm_beci_mic "Alarm beci mic [%s]" <door>                         {mqtt="<[mosquitto:iot/openhab/contact_beci mic:state:default]"}
-Contact alarm_etaj_hol "Alarm etaj hol [%s]" <door>                         {mqtt="<[mosquitto:iot/openhab/contact_etaj hol:state:default]"}
-Contact contact_sonerie "Sonerie [%s]" <door>                               {mqtt="<[mosquitto:iot/openhab/contact_sonerie:state:default]"}
+Contact alarm_birou "Alarm birou [%s]" <door>                               (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_birou:state:default]"}
+Contact alarm_scari_beci "Alarm scari beci [%s]" <door>                     (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_scari beci:state:default]"}
+Contact alarm_living "Alarm living [%s]" <door>                             (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_living:state:default]"}
+Contact alarm_bucatarie "Alarm bucatarie [%s]" <door>                       (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_bucatarie:state:default]"}
+Contact alarm_beci_mare "Alarm beci mare [%s]" <door>                       (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_beci mare:state:default]"}
+Contact alarm_beci_mic "Alarm beci mic [%s]" <door>                         (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_beci mic:state:default]"}
+Contact alarm_etaj_hol "Alarm etaj hol [%s]" <door>                         (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_etaj hol:state:default]"}
+Contact contact_sonerie "Sonerie [%s]" <door>                               (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_sonerie:state:default]"}
 
 
 Number t_switch_1
