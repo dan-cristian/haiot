@@ -42,14 +42,15 @@
     {"name": "P_HIPCHAT_TOKEN", "value": "fqlWeMHD2KxcSBYOt9nxu3t97CcFgljmUJZoBc3d", "description":"room token"},
     {"name": "P_HIPCHAT_ROOM_API_ID", "value": "2941088", "description":"room api id"},
     {"name": "P_MPD_SERVER", "value": "192.168.0.9", "description":"IP of mpd music server"},
-    {"name": "P_MPD_PORT_ZONE","value": "living=6600,headset=6601,basement=6602,bedroom=6603,bathroom=6604,attic=6605", "description":"mpd port for each music zone"},
+    {"name": "P_MPD_PORT_ZONE","value": "livingroom=6600,headset=6601,basement=6602,bedroom=6603,bathroom=6604,attic=6605", "description":"mpd port for each music zone"},
     {"name": "GMUSICPROXY_URL", "value": "http://192.168.0.9:8081", "description":"url for gmusicproxy"},
     {"name": "AMP_SERIAL_HOST", "value": "192.168.0.9", "description":"host for serial over net - ser2net, amp control"},
     {"name": "AMP_SERIAL_PORT", "value": "2000", "description":"port for serial over net - ser2net, amp control"},
     {"name": "ALEXA_WEMO_LISTEN_PORT", "value": "50000", "description":"starting port to be used to listen by alexa wemo devices"},
-    {"name": "HEAT_SOURCE_MIN_TEMP", "value": "35", "description":"minimum temperature to consider a heat source usable"},
+    {"name": "HEAT_SOURCE_MIN_TEMP", "value": "60", "description":"minimum temperature to consider a heat source usable"},
     {"name": "HEAT_STATE_REFRESH_PERIOD", "value": "1", "description":"period in minutes to do a heath status & gpio pins refresh"},
     {"name": "SOLAR_APS_LOCAL_URL", "value": "http://192.168.0.10/cgi-bin/home", "description":"link to aps ecu page with day production"},
+    {"name": "SOLAR_APS_LOCAL_REALTIME_URL", "value": "http://192.168.0.10/cgi-bin/parameters", "description":"link to aps ecu page with realtime production"},
     {"name": "SOLAR_UTILITY_NAME", "value": "solar_aps", "description":"utility name from utility table"},
     {"name": "UPS_ON_HOST", "value": "pi-face", "description":"host name on which the ups is connected, to enable UPS search"},
     {"name": "SOLAR_PARSER_ON_HOST", "value": "pi-face", "description":"host name on which the aps solar parser runs"}
@@ -177,6 +178,8 @@
     {"id":49, "name":"soba beci", "is_indoor": 1},
     {"id":50, "name":"puffer heater"},
     {"id":51, "name":"puffer gas valve"},
+    {"id":52, "name":"boiler sus", "is_indoor": 1},
+    {"id":53, "name":"solar panel", "is_outdoor": 1},
     {"id":200, "name":"car octavia", "is_outdoor": 1}
   ],
 
@@ -219,11 +222,11 @@
     {"relay_pin_name": "dormitor_heat_relay", "zone_id": "4", "gpio_pin_code": "4", "gpio_host_name": "pi-face"},
     {"relay_pin_name": "living_sub_relay", "zone_id": "2", "gpio_pin_code": "17", "gpio_host_name": "pi-face"},
     {"relay_pin_name": "test_relay", "zone_id": "1", "gpio_pin_code": "66", "gpio_host_name": "pi-face"},
-    {"relay_pin_name": "puffer_pump_heat_relay", "zone_id": "14", "gpio_pin_code": "22", "gpio_host_name": "pi-face"},
-    {"relay_pin_name": "puffer_pump_water_relay", "zone_id": "19", "gpio_pin_code": "5", "gpio_host_name": "pi-face"},
+    {"relay_pin_name": "puffer_pump_heat_relay", "zone_id": "38", "gpio_pin_code": "22", "gpio_host_name": "pi-face"},
+    {"relay_pin_name": "puffer_pump_water_relay", "zone_id": "38", "gpio_pin_code": "5", "gpio_host_name": "pi-face"},
     {"relay_pin_name": "gas_heat_relay", "zone_id": "19", "gpio_pin_code": "27", "gpio_host_name": "pi-face"},
     {"relay_pin_name": "front_lights_relay", "zone_id": "14", "gpio_pin_code": "6", "gpio_host_name": "pi-face"},
-    {"relay_pin_name": "puffer_gas_valve_relay", "zone_id": "14", "gpio_pin_code": "13", "gpio_host_name": "pi-face"},
+    {"relay_pin_name": "puffer_gas_valve_relay", "zone_id": "38", "gpio_pin_code": "13", "gpio_host_name": "pi-face"},
     {"relay_pin_name": "unused_beci_relay", "zone_id": "14", "gpio_pin_code": "19", "gpio_host_name": "pi-face"},
     {"relay_pin_name": "test_relay_netbook", "zone_id": "1", "gpio_pin_code": "1", "gpio_host_name": "netbook"},
     {"relay_pin_name": "unused-formerheat", "zone_id": "19", "gpio_pin_code": "24", "gpio_host_name": "pi-power"},
@@ -252,41 +255,45 @@
     {"code":"3", "target":"23"},
     {"code":"d", "target":"23.5"},
     {"code":"4", "target":"24"},
-    {"code":"e", "target":"24.5"}
+    {"code":"e", "target":"24.5"},
+    {"code":"h", "target":"45"}
   ],
 
   "SchedulePattern": [
-    {"id":1, "name":"week-bucatarie-winter",      "pattern":".... ..22 .... .... ..22 2222", "keep_warm":"1", "keep_warm_pattern":"10000000001000000000"},
-    {"id":2, "name":"weekend-bucatarie-winter",   "pattern":".... ..22 2222 2222 2222 2222", "keep_warm":"1", "keep_warm_pattern":"10000000001000000000"},
-    {"id":3, "name":"week-bucatarie-summer",      "pattern":".... ..22 2222 2222 2222 2222"},
-    {"id":4, "name":"weekend-bucatarie-summer",   "pattern":".... .... bbbb bbbb bbbb bbbb"},
+    {"id":1, "name":"week-bucatarie-winter",     "pattern":".... ..22 .... .... ..22 2222", "keep_warm":"1", "keep_warm_pattern":"10000000001000000000"},
+    {"id":2, "name":"weekend-bucatarie-winter",  "pattern":".... ..22 2222 2222 2222 2222", "keep_warm":"1", "keep_warm_pattern":"10000000001000000000"},
+    {"id":3, "name":"week-bucatarie-summer",     "pattern":".... ..22 2222 2222 2222 2222"},
+    {"id":4, "name":"weekend-bucatarie-summer",  "pattern":".... .... bbbb bbbb bbbb bbbb"},
     {"id":5, "name":"week-living-winter",        "pattern":".... ..22 .... .... 3333 3333"},
     {"id":6, "name":"weekend-living-winter",     "pattern":".... .... cccc cccc cccc cccc"},
     {"id":7, "name":"week-living-summer",        "pattern":".... ..22 .... .... 2222 2222"},
     {"id":8, "name":"weekend-living-summer",     "pattern":".... .... 2222 2222 2222 2222"},
     {"id":9, "name":"week-birou-winter",         "pattern":".... .... .... .... ..22 2222"},
     {"id":10, "name":"weekend-birou-winter",     "pattern":".... .... .... bbbb bbbb bbbb"},
-    {"id":11, "name":"week-birou-summer",         "pattern":".... .... .... .... ..bb bbbb"},
+    {"id":11, "name":"week-birou-summer",        "pattern":".... .... .... .... ..bb bbbb"},
     {"id":12, "name":"weekend-birou-summer",     "pattern":".... .... .bbb bbbb bbbb bbbb"},
     {"id":13, "name":"week-dormitor-winter",     "pattern":"2222 2222 .... .... ...2 2222"},
     {"id":14, "name":"weekend-dormitor-winter",  "pattern":"2222 2222 .... .222 ...2 2222"},
     {"id":15, "name":"week-dormitor-summer",     "pattern":"bbbb bbbb .... .... ...b bbbb"},
-    {"id":16, "name":"weekend-dormitor-summer",  "pattern":"bbbb bbbb .... .bbb ...b bbbb"}
+    {"id":16, "name":"weekend-dormitor-summer",  "pattern":"bbbb bbbb .... .bbb ...b bbbb"},
+    {"id":17, "name":"week-boiler-summer",       "pattern":"hh.. .hhh hhhh hhhh hhhh hhhh", "activate_on_condition":"1", "activate_condition_relay":"puffer gas valve", "main_source_needed":"0"}
   ],
 
   "HeatSchedule": [
-    {"zone_id":1, "pattern_week_id":2, "pattern_weekend_id":2, "temp_target_code_min_presence":"b", "temp_target_code_max_no_presence":"."},
-    {"zone_id":2, "pattern_week_id":6, "pattern_weekend_id":6, "temp_target_code_min_presence":"3", "temp_target_code_max_no_presence":"."},
-    {"zone_id":47, "pattern_week_id":10, "pattern_weekend_id":10, "temp_target_code_min_presence":"b", "temp_target_code_max_no_presence":"."},
-    {"zone_id":4, "pattern_week_id":14, "pattern_weekend_id":14, "temp_target_code_min_presence":"2", "temp_target_code_max_no_presence":"."}
+    {"zone_id":1, "pattern_week_id":3,  "pattern_weekend_id":4,  "temp_target_code_min_presence":"b", "temp_target_code_max_no_presence":"."},
+    {"zone_id":2, "pattern_week_id":7,  "pattern_weekend_id":8,  "temp_target_code_min_presence":"3", "temp_target_code_max_no_presence":"."},
+    {"zone_id":47,"pattern_week_id":11, "pattern_weekend_id":12, "temp_target_code_min_presence":"b", "temp_target_code_max_no_presence":"."},
+    {"zone_id":4, "pattern_week_id":15, "pattern_weekend_id":16, "temp_target_code_min_presence":"2", "temp_target_code_max_no_presence":"."},
+    {"zone_id":52,"pattern_week_id":17, "pattern_weekend_id":17, "temp_target_code_min_presence":"h", "temp_target_code_max_no_presence":"."}
   ],
 
   "ZoneHeatRelay":[
-    {"zone_id":1,"heat_pin_name":"bucatarie","gpio_pin_code":"18","gpio_host_name":"pi-face"},
-    {"zone_id":2,"heat_pin_name":"living","gpio_pin_code":"23","gpio_host_name":"pi-face"},
+    {"zone_id":1, "heat_pin_name":"bucatarie","gpio_pin_code":"18","gpio_host_name":"pi-face"},
+    {"zone_id":2, "heat_pin_name":"living","gpio_pin_code":"23","gpio_host_name":"pi-face"},
     {"zone_id":47,"heat_pin_name":"birou","gpio_pin_code": "24","gpio_host_name":"pi-face"},
-    {"zone_id":4,"heat_pin_name":"dormitor","gpio_pin_code":"4","gpio_host_name":"pi-face"},
+    {"zone_id":4, "heat_pin_name":"dormitor","gpio_pin_code":"4","gpio_host_name":"pi-face"},
     {"zone_id":19,"heat_pin_name":"gas heat","gpio_pin_code":"27","gpio_host_name":"pi-face", "is_main_heat_source":"1"},
+    {"zone_id":52,"heat_pin_name":"puffer boiler","gpio_pin_code":"5","gpio_host_name":"pi-face"},
     {"zone_id":50,"heat_pin_name":"puffer heat","gpio_pin_code":"22","gpio_host_name":"pi-face", "temp_sensor_name":"puffer sus"},
     {"zone_id":51,"heat_pin_name":"puffer gas valve","gpio_pin_code":"13","gpio_host_name":"pi-face", "is_alternate_source_switch": "1", "temp_sensor_name":"puffer sus"}
   ],
@@ -301,7 +308,7 @@
     {"zone_id":7 , "sensor_address": "01000001CEF4B326", "sensor_name": "curte fata", "target_material": "air", "alt_address": ""},
     {"zone_id":19 , "sensor_address": "4C000003BDD49D28", "sensor_name": "gas heater", "target_material": "water", "alt_address": ""},
     {"zone_id":19 , "sensor_address": "B9000003BE088E28", "sensor_name": "gas boiler", "target_material": "water", "alt_address": ""},
-    {"zone_id":25 , "sensor_address": "96000003BDFE5D28", "sensor_name": "boiler sus", "target_material": "water", "alt_address": ""},
+    {"zone_id":52 , "sensor_address": "96000003BDFE5D28", "sensor_name": "boiler sus", "target_material": "water", "alt_address": ""},
     {"zone_id":25 , "sensor_address": "53000004F296DD28", "sensor_name": "boiler mijloc", "target_material": "water", "alt_address": ""},
     {"zone_id":25 , "sensor_address": "C8000004F28B0728", "sensor_name": "boiler jos", "target_material": "water", "alt_address": ""},
     {"zone_id":2 , "sensor_address": "41000003BE099C28", "sensor_name": "living", "target_material": "air", "alt_address": "28.9C09BE030000"},
@@ -323,7 +330,9 @@
     {"zone_id":29 , "sensor_address": "AB0000000F60491D", "sensor_name": "water beci", "alt_address": "1D.49600F000000"},
     {"zone_id":4 , "sensor_address": "FB00000017413E3A", "sensor_name": "dormitor bedroom", "target_material": "air"},
     {"zone_id":7 , "sensor_address": "C8000004F3495728", "sensor_name": "curte fata", "target_material": "air"},
-    {"zone_id":27 , "sensor_address": "02000004F31C1C28", "sensor_name": "pod fata", "target_material": "air", "alt_address": ""}
+    {"zone_id":27 , "sensor_address": "02000004F31C1C28", "sensor_name": "pod fata", "target_material": "air", "alt_address": ""},
+    {"zone_id":53 , "sensor_address": "404000225631", "sensor_name": "solar back", "alt_address": ""},
+    {"zone_id":8 , "sensor_address": "", "sensor_name": "ZMNHTDx Smart meter S4 S5 S6"}
   ],
 
   "Utility": [
@@ -333,6 +342,8 @@
     {"utility_name":"power main 3", "sensor_name":"power main 1", "sensor_index":1, "ticks_per_unit":2000, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
     {"utility_name":"power main 1", "sensor_name":"power main 2", "sensor_index":0, "ticks_per_unit":2000, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
     {"utility_name":"power main 2", "sensor_name":"power main 2", "sensor_index":1, "ticks_per_unit":2000, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
+    {"utility_name":"power main mono", "sensor_name":"ZMNHTDx Smart meter S4 S5 S6", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
+
     {"utility_name":"power rack", "sensor_name":"power rack", "sensor_index":0, "ticks_per_unit":2000, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
     {"utility_name":"power beci", "sensor_name":"utility beci", "sensor_index":0, "ticks_per_unit":1600, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
     {"utility_name":"gas", "sensor_name":"utility beci", "sensor_index":1, "ticks_per_unit":100, "unit_name":"mc", "utility_type":"gas", "unit_cost":1.5675},
@@ -365,9 +376,10 @@
 
     {"zone_id":7 , "gpio_pin_code":"1", "gpio_host_name": "pi-face", "alarm_pin_name": "portita", "sensor_type": "contact"},
     {"zone_id":29 , "gpio_pin_code":"18", "gpio_host_name": "pi-face", "alarm_pin_name": "beci test"},
-    {"zone_id":200 , "gpio_pin_code":"16", "gpio_host_name": "pidash", "alarm_pin_name": "car vibrate", "sensor_type": "contact"},
+    {"zone_id":200 , "gpio_pin_code":"23", "gpio_host_name": "pidash", "alarm_pin_name": "car vibrate", "sensor_type": "contact"},
     {"zone_id":200 , "gpio_pin_code":"17", "gpio_host_name": "pidash", "alarm_pin_name": "pidash battery low", "sensor_type": "contact"},
-    {"zone_id":200 , "gpio_pin_code":"26", "gpio_host_name": "pidash", "alarm_pin_name": "car sound", "sensor_type": "contact"}
+    {"zone_id":200 , "gpio_pin_code":"24", "gpio_host_name": "pidash", "alarm_pin_name": "car sound", "sensor_type": "contact"},
+    {"zone_id":200 , "gpio_pin_code":"25", "gpio_host_name": "pidash", "alarm_pin_name": "switch", "sensor_type": "contact"}
   ],
 
   "_ZoneAlarmComments": [

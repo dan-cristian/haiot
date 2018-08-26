@@ -148,10 +148,13 @@ def json_to_record(table, json_object):
     return table
 
 
-def parse_http(url, start_key, end_key):
+def parse_http(url, start_key, end_key, end_first=False):
     text = urllib2.urlopen(url).read()
-    start = text.find(start_key)
     end = text.find(end_key)
+    if end_first:
+        start = text.rfind(start_key, 0, end)
+    else:
+        start = text.find(start_key)
     if start != -1 and end != -1:
         val_start = start + len(start_key)
         value_str = text[val_start:end]
