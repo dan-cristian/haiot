@@ -15,3 +15,4 @@ Number temperature_pod_fata "Dormitor [%.1f °C]" <temperature> {mqtt="<[mosquit
 Number temperature_horn "Horn [%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_horn:state:default]"}
 Number temperature_gas_boiler "Gas boiler [%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_gas boiler:state:default]"}
 Number temperature_gas_heater "Gas heater [%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_gas heater:state:default]"}
+Number t_switch_1
