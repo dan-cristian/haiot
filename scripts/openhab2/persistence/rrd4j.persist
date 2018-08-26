@@ -11,4 +11,5 @@ Strategies {
 Items {
     // additionally persist Items
     Temperature_Chart* : strategy = everyUpdate, everyMinute
+    temperature_* : strategy = everyUpdate, everyMinute
 }
