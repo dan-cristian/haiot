@@ -9,4 +9,9 @@ String temperature_puffer_jos "Puffer jos [%s]" {mqtt="<[mosquitto:iot/openhab/t
 String temperature_solar_jos "Solar jos[%s]" {mqtt="<[mosquitto:iot/openhab/temperature_solar jos:state:default]"}
 String temperature_curte_fata "Curte fata [%s]" {mqtt="<[mosquitto:iot/openhab/temperature_curte fata:state:default]"}
 String temperature_living "Living [%s]" {mqtt="<[mosquitto:iot/openhab/temperature_living:state:default]"}
-String horn "horn [%s]"
+String temperature_dormitor "Dormitor [%s]" {mqtt="<[mosquitto:iot/openhab/temperature_dormitor:state:default]"}
+String temperature_dormitor_spate "Dormitor spate [%s]" {mqtt="<[mosquitto:iot/openhab/temperature_dormitor spate:state:default]"}
+String temperature_pod_fata "Dormitor [%s]" {mqtt="<[mosquitto:iot/openhab/temperature_pod fata:state:default]"}
+String temperature_horn "Horn [%s]" {mqtt="<[mosquitto:iot/openhab/temperature_horn:state:default]"}
+String temperature_gas_boiler "Gas boiler [%s]" {mqtt="<[mosquitto:iot/openhab/temperature_gas boiler:state:default]"}
+String temperature_gas_heater "Gas heater [%s]" {mqtt="<[mosquitto:iot/openhab/temperature_gas heater:state:default]"}
