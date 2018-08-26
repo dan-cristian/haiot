@@ -40,8 +40,8 @@ Contact alarm_beci_mic "Alarm beci mic [%s]" <door> {mqtt="<[mosquitto:iot/openh
 Contact alarm_etaj_hol "Alarm etaj hol [%s]" <door> {mqtt="<[mosquitto:iot/openhab/contact_etaj hol:state:default]"}
 Contact contact_sonerie "Sonerie [%s]" <door> {mqtt="<[mosquitto:iot/openhab/contact_sonerie:state:default]"}
 
-Group:Number:AVG g_temperature_puffer "Avg. Puffer temperature [%.1f °C]" <temperature> (PUF)
-Group:Number:AVG g_temperature_boiler "Avg. Boiler temperature [%.1f °C]" <temperature> (BOI)
+Group:Number:MIN g_temperature_puffer "Min Puffer temperature [%.1f °C]" <temperature> (PUF)
+Group:Number:MIN g_temperature_boiler "Min Boiler temperature [%.1f °C]" <temperature> (BOI)
 
 Number t_switch_1
 Number t_switch_2
