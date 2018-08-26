@@ -46,9 +46,9 @@ Contact alarm_etaj_hol "Alarm etaj hol [%s]" <door>                         (CON
 Contact contact_sonerie "Sonerie [%s]" <door>                               (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_sonerie:state:default]"}
 
 
-Number t_switch_1
-Number t_switch_2
-Number t_switch_3
-Number t_switch_4
-Number t_switch_5
-Number t_switch_6
+Number t_switch_1 ""
+Number t_switch_2 ""
+Number t_switch_3 ""
+Number t_switch_4 ""
+Number t_switch_5 ""
+Number t_switch_6 ""
