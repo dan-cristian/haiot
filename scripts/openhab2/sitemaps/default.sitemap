@@ -1,4 +1,4 @@
-sitemap gaudi label="Default" {
+sitemap default label="Home" {
 
 Switch item=Presence_Mobile_Dan label="Dan Mobile"
 
