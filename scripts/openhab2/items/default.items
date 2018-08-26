@@ -16,9 +16,10 @@ Number temperature_horn "Horn [%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/o
 Number temperature_gas_boiler "Gas boiler [%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_gas boiler:state:default]"}
 Number temperature_gas_heater "Gas heater [%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_gas heater:state:default]"}
 Number temperature_solar_back "Solar back [%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_solar back:state:default]"}
+Number temperature_soba_beci "Soba beci [%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_soba beci:state:default]"}
 
-Number humidity_living "Living [%.1f %]" <humidity> {mqtt="<[mosquitto:iot/openhab/humidity_living:state:default]"}
-Number humidity_curte_fata "Curte fata [%.1f %]" <humidity> {mqtt="<[mosquitto:iot/openhab/humidity_curte fata:state:default]"}
+Number humidity_living "Living [%.1f %]" <moisture> {mqtt="<[mosquitto:iot/openhab/humidity_living:state:default]"}
+Number humidity_curte_fata "Curte fata [%.1f %]" <moisture> {mqtt="<[mosquitto:iot/openhab/humidity_curte fata:state:default]"}
 
 Number electricity_power_main_mono "Power main mono [%.0f watt]" <energy> {mqtt="<[mosquitto:iot/openhab/electricity_power main mono:state:default]"}
 Number gas_gas "Gas [%.1f mc]" <gas> {mqtt="<[mosquitto:iot/openhab/gas_gas:state:default]"}
@@ -27,7 +28,7 @@ Number water_hot "Water hot [%.0f l]" <water> {mqtt="<[mosquitto:iot/openhab/wat
 
 Contact alarm_birou "Alarm birou [%s]" <door> {mqtt="<[mosquitto:iot/openhab/contact_birou:state:default]"}
 Contact alarm_scari_beci "Alarm scari beci [%s]" <door> {mqtt="<[mosquitto:iot/openhab/contact_scari beci:state:default]"}
-Contact alarm_living "Alarm living [%s]" <door> {mqtt="<[mosquitto:iot/openhab/contact_living:state:default]"}
+Contact alarm_living "Alarm living [%s]" <motion> {mqtt="<[mosquitto:iot/openhab/contact_living:state:default]"}
 Contact alarm_bucatarie "Alarm bucatarie [%s]" <door> {mqtt="<[mosquitto:iot/openhab/contact_bucatarie:state:default]"}
 Contact alarm_beci_mare "Alarm beci mare [%s]" <door> {mqtt="<[mosquitto:iot/openhab/contact_beci mare:state:default]"}
 Contact alarm_beci_mic "Alarm beci mic [%s]" <door> {mqtt="<[mosquitto:iot/openhab/contact_beci mic:state:default]"}
@@ -36,3 +37,5 @@ Contact contact_sonerie "Sonerie [%s]" <door> {mqtt="<[mosquitto:iot/openhab/con
 
 Number t_switch_1
 Number t_switch_2
+Number t_switch_3
+Number t_switch_4
