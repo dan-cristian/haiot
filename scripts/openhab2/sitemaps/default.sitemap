@@ -10,9 +10,7 @@ Frame {
         Default item=temperature_boiler_mijloc
         Default item=temperature_boiler_jos
         }
-}
 
-Frame {
 	Group item=TEMP_PUF {
         Default item=temperature_puffer_sus
         Default item=temperature_puffer_mijloc
@@ -37,10 +35,7 @@ Frame {
 	Default item=temperature_pod_fata
 }
 Frame {
-	Default item=electricity_power_main_mono
 	Default item=gas_gas
-    Default item=water_main
-    Default item=water_hot
 }
 
 Frame {
@@ -83,6 +78,15 @@ Frame label="Charts" {
         Chart item=water_main service="mysql" period=M refresh=10000 visibility=[t_switch_3==3]
         Chart item=water_main service="mysql" period=3M refresh=10000 visibility=[t_switch_3==4]
         Chart item=water_main service="mysql" period=Y refresh=10000 visibility=[t_switch_3==5]
+        }
+    Text item=water_hot {
+        Switch item=t_switch_4 mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
+        Chart item=water_hot service="mysql" period=h refresh=10000 visibility=[t_switch_4==0, t_switch_4=="Uninitialized"]
+        Chart item=water_hot service="mysql" period=D refresh=10000 visibility=[t_switch_4==1]
+        Chart item=water_hot service="mysql" period=W refresh=10000 visibility=[t_switch_4==2]
+        Chart item=water_hot service="mysql" period=M refresh=10000 visibility=[t_switch_4==3]
+        Chart item=water_hot service="mysql" period=3M refresh=10000 visibility=[t_switch_4==4]
+        Chart item=water_hot service="mysql" period=Y refresh=10000 visibility=[t_switch_4==5]
         }
     }
 
