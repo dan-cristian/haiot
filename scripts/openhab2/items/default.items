@@ -6,7 +6,7 @@ Group   BOI     "Boiler"   <heating>    (CEL)
 
 Group:Number:AVG TEMP_PUF "Avg Puffer temperature [%.1f °C]" <temperature>
 Group:Number:MIN TEMP_BOI "Min Boiler temperature [%.1f °C]" <temperature>
-Group:Contact:OR(OPEN, CLOSED) CON_PIR "PIR Contact [%s]" <door>
+Group:Contact:OR(OPEN, CLOSED) CON_PIR "PIR Contact [%s %d]" <door>
 
 Switch presence_mobile_dan "Dan Mobile" <network>                           {channel="network:device:192_168_0_117:online"}
 Number temperature_boiler_sus "Boiler sus [%.1f °C]" <temperature>          (BOI, TEMP_BOI) {mqtt="<[mosquitto:iot/openhab/temperature_boiler sus:state:default]"}
