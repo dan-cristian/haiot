@@ -15,12 +15,12 @@ try:
     # fixme: this does not currently work on BusyBox/openwrt routers
     # http://flexget.com/ticket/2741
     scheduler = BackgroundScheduler()
-except Exception, ex:
+except Exception as ex:
     scheduler = None
     L.l.warning('Cannot initialise apscheduler er={}'.format(ex))
 
 if scheduler:
-    import rules_run
+    import rules_run, rule_common
 
 initialised = False
 __func_list = None
@@ -74,7 +74,7 @@ def process_events():
             result = getattr(rules_run, obj[1])(obj=obj[0], field_changed_list=obj[2])
             L.l.debug('Rule returned {}'.format(result))
             P.event_list.remove(obj)
-        except Exception, ex:
+        except Exception as ex:
             L.l.critical("Error processing rule event err={}".format(ex), exc_info=1)
 
 
@@ -120,7 +120,7 @@ def __load_rules_from_db():
                                   day_of_week=day_of_week, hour=hour, minute=minute, second=second)
             else:
                 L.l.info("Rule {} is marked as inactive, skipping".format(rule.command))
-    except Exception, ex1:
+    except Exception as ex1:
         L.l.error("Unable to load rules from db, err={}".format(ex1, exc_info=True))
 
 
@@ -226,11 +226,10 @@ def __add_rules_into_db():
                             scheduler.add_job(func[1], trigger='cron', year=record.year, month=record.month,
                                               day=record.day, week=record.week, day_of_week=record.day_of_week,
                                               second=record.second, hour=record.hour, minute=record.minute,
-                                              max_instances=1,
-                                              misfire_grace_time=None)
+                                              max_instances=1, misfire_grace_time=None)
                             L.l.info("Adding rule {}:{} to scheduler ".format(record.name, record.command))
                     record.add_commit_record_to_db()
-    except Exception, ex:
+    except Exception as ex:
         L.l.exception('Error adding rules into db {}'.format(ex), exc_info=1)
 
 
@@ -263,6 +262,7 @@ def init():
         L.l.info('Scheduler started')
         global __rules_timestamp
         __rules_timestamp = _get_stamp()
+        rule_common.init()
     else:
         L.l.warning('Rules not initialised as scheduler is not available')
     thread_pool.add_interval_callable(thread_run, run_interval_second=1)

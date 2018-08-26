@@ -14,6 +14,7 @@
     {"name": "MQTT_HOST_1", "value": "192.168.0.12"},
     {"name": "MQTT_PORT_1", "value": "1883"},
     {"name": "MQTT_TOPIC", "value": "iot/main"},
+    {"name": "MQTT_TOPIC_OPENHAB", "value": "iot/openhab", "description": "openhab integration mqtt channel"},
     {"name": "MQTT_HOST_2", "value": "192.168.0.1"},
     {"name": "MQTT_PORT_2", "value": "1883"},
     {"name": "DDNS_RACKSPACE_CONFIG_FILE", "value": ".credentials/.rackspace.ddnsupdate.config.json",

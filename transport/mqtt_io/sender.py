@@ -5,11 +5,13 @@ from main.logger_helper import L
 __author__ = 'dcristian'
 
 
-def send_message(txt):
+def send_message(txt, topic=None):
     try:
+        if topic is None:
+            topic = transport.mqtt_io.topic
         # Log.logger.debug('Sending message at {} [{}] '.format(utils.get_base_location_now_date(), txt))
         if transport.mqtt_io.client_connected:
-            transport.mqtt_io.mqtt_client.publish(transport.mqtt_io.topic, txt)
+            transport.mqtt_io.mqtt_client.publish(topic, txt)
             return True
         else:
             # Log.logger.debug('MQTT client not connected, retrying connect, message to be discarded: {}'.format(txt))
@@ -17,6 +19,6 @@ def send_message(txt):
             if elapsed > 10:
                 transport.mqtt_io.init()
             return False
-    except Exception, ex:
+    except Exception as ex:
         L.l.error('Error sending mqtt message, {}'.format(ex), exc_info=True)
         return False
