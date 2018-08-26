@@ -28,11 +28,51 @@ Frame {
 }
 
 Frame {
-	Default item=temperature_curte_fata
-	Default item=temperature_living
-	Default item=temperature_dormitor
-	Default item=temperature_dormitor_spate
-	Default item=temperature_pod_fata
+	Text item=temperature_curte_fata {
+        Switch item=t_switch_1 mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
+        Chart item=temperature_curte_fata service="mysql" period=h refresh=10000 visibility=[t_switch_1==0, t_switch_1=="Uninitialized"]
+        Chart item=temperature_curte_fata service="mysql" period=D refresh=10000 visibility=[t_switch_1==1]
+        Chart item=temperature_curte_fata service="mysql" period=W refresh=10000 visibility=[t_switch_1==2]
+        Chart item=temperature_curte_fata service="mysql" period=M refresh=10000 visibility=[t_switch_1==3]
+        Chart item=temperature_curte_fata service="mysql" period=3M refresh=10000 visibility=[t_switch_1==4]
+        Chart item=temperature_curte_fata service="mysql" period=Y refresh=10000 visibility=[t_switch_1==5]
+        }
+    Text item=temperature_living {
+        Switch item=t_switch_1 mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
+        Chart item=temperature_living service="mysql" period=h refresh=10000 visibility=[t_switch_1==0, t_switch_1=="Uninitialized"]
+        Chart item=temperature_living service="mysql" period=D refresh=10000 visibility=[t_switch_1==1]
+        Chart item=temperature_living service="mysql" period=W refresh=10000 visibility=[t_switch_1==2]
+        Chart item=temperature_living service="mysql" period=M refresh=10000 visibility=[t_switch_1==3]
+        Chart item=temperature_living service="mysql" period=3M refresh=10000 visibility=[t_switch_1==4]
+        Chart item=temperature_living service="mysql" period=Y refresh=10000 visibility=[t_switch_1==5]
+        }
+	Text item=temperature_dormitor {
+        Switch item=t_switch_1 mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
+        Chart item=temperature_dormitor service="mysql" period=h refresh=10000 visibility=[t_switch_1==0, t_switch_1=="Uninitialized"]
+        Chart item=temperature_dormitor service="mysql" period=D refresh=10000 visibility=[t_switch_1==1]
+        Chart item=temperature_dormitor service="mysql" period=W refresh=10000 visibility=[t_switch_1==2]
+        Chart item=temperature_dormitor service="mysql" period=M refresh=10000 visibility=[t_switch_1==3]
+        Chart item=temperature_dormitor service="mysql" period=3M refresh=10000 visibility=[t_switch_1==4]
+        Chart item=temperature_dormitor service="mysql" period=Y refresh=10000 visibility=[t_switch_1==5]
+        }
+	Text item=temperature_dormitor_spate {
+        Switch item=t_switch_1 mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
+        Chart item=temperature_dormitor_spate service="mysql" period=h refresh=10000 visibility=[t_switch_1==0, t_switch_1=="Uninitialized"]
+        Chart item=temperature_dormitor_spate service="mysql" period=D refresh=10000 visibility=[t_switch_1==1]
+        Chart item=temperature_dormitor_spate service="mysql" period=W refresh=10000 visibility=[t_switch_1==2]
+        Chart item=temperature_dormitor_spate service="mysql" period=M refresh=10000 visibility=[t_switch_1==3]
+        Chart item=temperature_dormitor_spate service="mysql" period=3M refresh=10000 visibility=[t_switch_1==4]
+        Chart item=temperature_dormitor_spate service="mysql" period=Y refresh=10000 visibility=[t_switch_1==5]
+        }
+	Text item=temperature_pod_fata {
+        Switch item=t_switch_1 mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
+        Chart item=temperature_pod_fata service="mysql" period=h refresh=10000 visibility=[t_switch_1==0, t_switch_1=="Uninitialized"]
+        Chart item=temperature_pod_fata service="mysql" period=D refresh=10000 visibility=[t_switch_1==1]
+        Chart item=temperature_pod_fata service="mysql" period=W refresh=10000 visibility=[t_switch_1==2]
+        Chart item=temperature_pod_fata service="mysql" period=M refresh=10000 visibility=[t_switch_1==3]
+        Chart item=temperature_pod_fata service="mysql" period=3M refresh=10000 visibility=[t_switch_1==4]
+        Chart item=temperature_pod_fata service="mysql" period=Y refresh=10000 visibility=[t_switch_1==5]
+        }
 }
 Frame {
 	Default item=gas_gas
@@ -53,15 +93,7 @@ Frame {
 }
 
 Frame label="Charts" {
-    Text item=temperature_curte_fata {
-        Switch item=t_switch_1 mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
-        Chart item=temperature_curte_fata service="mysql" period=h refresh=10000 visibility=[t_switch_1==0, t_switch_1=="Uninitialized"]
-        Chart item=temperature_curte_fata service="mysql" period=D refresh=10000 visibility=[t_switch_1==1]
-        Chart item=temperature_curte_fata service="mysql" period=W refresh=10000 visibility=[t_switch_1==2]
-        Chart item=temperature_curte_fata service="mysql" period=M refresh=10000 visibility=[t_switch_1==3]
-        Chart item=temperature_curte_fata service="mysql" period=3M refresh=10000 visibility=[t_switch_1==4]
-        Chart item=temperature_curte_fata service="mysql" period=Y refresh=10000 visibility=[t_switch_1==5]
-        }
+
     Text item=electricity_power_main_mono {
         Switch item=t_switch_2 mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
         Chart item=electricity_power_main_mono service="mysql" period=h refresh=10000 visibility=[t_switch_2==0, t_switch_2=="Uninitialized"]
