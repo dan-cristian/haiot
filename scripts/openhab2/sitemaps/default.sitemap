@@ -108,8 +108,19 @@ Frame {
         Default item=alarm_beci_mic
         Default item=alarm_etaj_hol
         Default item=contact_sonerie
-
         }
+}
+
+Frame {
+    Group label="Back watering" {
+        Default item=relay_back_pump_relay
+        Default item=relay_back_valve_relay
+    }
+
+    Group label="Front watering" {
+        Default item=relay_back_pump_relay
+        Default item=relay_front_valve_relay
+    }
 }
 
 Frame label="Charts" {
