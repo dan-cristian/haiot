@@ -1,7 +1,7 @@
 sitemap default label="Home" {
 
 Frame label="presence" {
-    Switch item=Presence_Mobile_Dan label="Dan Mobile"
+    Switch item=presence_mobile_dan label="Dan Mobile"
 }
 
 Frame label="Boiler" {
