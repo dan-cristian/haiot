@@ -6,7 +6,7 @@ Frame label="demo" {
 	Text item=temperature_boiler_mijloc
 	Text item=temperature_boiler_sus
 	Text item=temperature_boiler_jos
-	Text item=temperature_horn
+	Text item=temperature_curte_fata
 }
 
 }

@@ -166,6 +166,7 @@ def init():
         #P.network.test(1)
         return True
     else:
+        L.l.info("Zwave init skipped")
         return False
 
 
