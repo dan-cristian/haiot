@@ -10,7 +10,11 @@ Group:Contact:OR(OPEN, CLOSED) CON_PIR "PIR Contact [%s]" <door>
 
 Switch presence_mobile_dan "Dan Mobile" <network>                           {channel="network:device:192_168_0_117:online"}
 Switch ups_power_failed "UPS Power" <switch>                                {mqtt="<[mosquitto:iot/openhab/ups_power_failed:state:default]"}
-Number ups_load_percent "UPS Load" <battery>                                {mqtt="<[mosquitto:iot/openhab/ups_load_percent:state:default]"}
+Number ups_load_percent "UPS Load [%.0f]" <battery>                         {mqtt="<[mosquitto:iot/openhab/ups_load_percent:state:default]"}
+Switch relay_front_lights_relay "Front lights" <switch>                     {mqtt="<[mosquitto:iot/openhab/relay_front_lights_relay:state:default]"}
+Switch relay_living_music_relay "Living amp" <switch>                       {mqtt="<[mosquitto:iot/openhab/relay_living_music_relay:state:default]"}
+Switch relay_living_sub_relay "Living subwoofer" <switch>                   {mqtt="<[mosquitto:iot/openhab/relay_living_sub_relay:state:default]"}
+
 Number temperature_boiler_sus "Boiler sus [%.1f °C]" <temperature>          (BOI, TEMP_BOI) {mqtt="<[mosquitto:iot/openhab/temperature_boiler sus:state:default]"}
 Number temperature_boiler_mijloc "Boiler mijloc [%.1f °C]" <temperature>    (BOI, TEMP_BOI) {mqtt="<[mosquitto:iot/openhab/temperature_boiler mijloc:state:default]"}
 Number temperature_boiler_jos "Boiler jos [%.1f °C]" <temperature>          (BOI, TEMP_BOI) {mqtt="<[mosquitto:iot/openhab/temperature_boiler jos:state:default]"}
@@ -29,7 +33,6 @@ Number temperature_gas_heater "Gas heater [%.1f °C]" <heating>          {mqtt="
 Number temperature_solar_back "Solar back [%.1f °C]" <temperature>          {mqtt="<[mosquitto:iot/openhab/temperature_solar back:state:default]"}
 Number temperature_soba_beci "Soba beci [%.1f °C]" <temperature>            {mqtt="<[mosquitto:iot/openhab/temperature_soba beci:state:default]"}
 
-
 Number humidity_living "Living [%.1f %]" <humidity>                         {mqtt="<[mosquitto:iot/openhab/humidity_living:state:default]"}
 Number humidity_curte_fata "Curte fata [%.1f %]" <humidity>                 {mqtt="<[mosquitto:iot/openhab/humidity_curte fata:state:default]"}
 
@@ -47,6 +50,5 @@ Contact alarm_beci_mare "Alarm beci mare [%s]" <door>                       (CON
 Contact alarm_beci_mic "Alarm beci mic [%s]" <door>                         (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_beci mic:state:default]"}
 Contact alarm_etaj_hol "Alarm etaj hol [%s]" <door>                         (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_etaj hol:state:default]"}
 Contact contact_sonerie "Sonerie [%s]" <door>                               (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_sonerie:state:default]"}
-
 
 Number p_switch ""
