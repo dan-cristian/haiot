@@ -10,10 +10,16 @@ Group:Contact:OR(OPEN, CLOSED) CON_PIR "PIR Contact [%s]" <door>
 
 Switch presence_mobile_dan "Dan Mobile" <network>                           {channel="network:device:192_168_0_117:online"}
 Switch ups_power_failed "UPS Power" <switch>                                {mqtt="<[mosquitto:iot/openhab/ups_power_failed:state:default]"}
-Number ups_load_percent "UPS Load [%.0f]" <light>                         {mqtt="<[mosquitto:iot/openhab/ups_load_percent:state:default]"}
+Number ups_load_percent "UPS Load [%.0f]" <light>                           {mqtt="<[mosquitto:iot/openhab/ups_load_percent:state:default]"}
 Switch relay_front_lights_relay "Front lights" <switch>                     {mqtt="<[mosquitto:iot/openhab/relay_front_lights_relay:state:default]"}
-Switch relay_living_music_relay "Living amp" <switch>                       {mqtt="<[mosquitto:iot/openhab/relay_living_music_relay:state:default]"}
-Switch relay_living_sub_relay "Living subwoofer" <switch>                   {mqtt="<[mosquitto:iot/openhab/relay_living_sub_relay:state:default]"}
+
+Group:Switch:OR(ON, OFF)    RELAY_AMP   "Music amp [(%d)]"  <switch>
+Switch relay_living_music_relay "Living amp" <switch>                      (RELAY_AMP) {mqtt="<[mosquitto:iot/openhab/relay_living_music_relay:state:default]"}
+Switch relay_living_sub_relay "Living subwoofer" <switch>                  (RELAY_AMP) {mqtt="<[mosquitto:iot/openhab/relay_living_sub_relay:state:default]"}
+Switch relay_dormitor_music_relay "Dormitor amp" <switch>                  (RELAY_AMP) {mqtt="<[mosquitto:iot/openhab/relay_dormitor_music_relay:state:default]"}
+Switch relay_baie_mare_music_relay "Baie amp" <switch>                     (RELAY_AMP) {mqtt="<[mosquitto:iot/openhab/relay_baie_mare_music_relay:state:default]"}
+Switch relay_beci_music_relay "Beci amp" <switch>                          (RELAY_AMP) {mqtt="<[mosquitto:iot/openhab/relay_beci_music_relay:state:default]"}
+Switch relay_pod_music_relay "Pod amp" <switch>                            (RELAY_AMP) {mqtt="<[mosquitto:iot/openhab/relay_pod_music_relay:state:default]"}
 
 Switch heat_bucatarie "Heat bucatarie" <fire>                               {mqtt="<[mosquitto:iot/openhab/heat_bucatarie:state:default]"}
 Switch heat_living "Heat living" <fire>                                     {mqtt="<[mosquitto:iot/openhab/heat_living:state:default]"}
