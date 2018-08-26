@@ -8,28 +8,30 @@ Frame label="Temperature" {
 	Default item=temperature_boiler_sus
 	Default item=temperature_boiler_mijloc
 	Default item=temperature_boiler_jos
-	Default item=temperature_puffer_sus icon="temperature"
-	Default item=temperature_puffer_mijloc icon="temperature"
-	Default item=temperature_puffer_jos icon="temperature"
-	Default item=temperature_solar_jos icon="temperature"
-	Default item=temperature_curte_fata icon="temperature"
-	Default item=temperature_living icon="temperature"
-	Default item=temperature_dormitor icon="temperature"
-	Default item=temperature_dormitor_spate icon="temperature"
-	Default item=temperature_pod_fata icon="temperature"
-	Default item=temperature_horn icon="temperature"
-	Default item=temperature_gas_heater icon="temperature"
-	Default item=temperature_gas_boiler icon="temperature"
+	Default item=temperature_puffer_sus
+	Default item=temperature_puffer_mijloc
+	Default item=temperature_puffer_jos
+	Default item=temperature_solar_jos
+	Default item=temperature_curte_fata
+	Default item=temperature_living
+	Default item=temperature_dormitor
+	Default item=temperature_dormitor_spate
+	Default item=temperature_pod_fata
+	Default item=temperature_horn
+	Default item=temperature_gas_heater
+	Default item=temperature_gas_boiler
     }
 
 Frame label="Curte fata" {
-    Switch item=t_switch_1 mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
-	Chart item=temperature_curte_fata service="mysql" period=h refresh=10000 visibility=[t_switch_1==0, t_switch_1=="Uninitialized"]
-	Chart item=temperature_curte_fata service="mysql" period=D refresh=10000 visibility=[t_switch_1==1]
-	Chart item=temperature_curte_fata service="mysql" period=W refresh=10000 visibility=[t_switch_1==2]
-	Chart item=temperature_curte_fata service="mysql" period=M refresh=10000 visibility=[t_switch_1==3]
-	Chart item=temperature_curte_fata service="mysql" period=3M refresh=10000 visibility=[t_switch_1==4]
-	Chart item=temperature_curte_fata service="mysql" period=Y refresh=10000 visibility=[t_switch_1==5]
+    Text label="Temp. " {
+        Switch item=t_switch_1 label="curte fata" mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
+        Chart item=temperature_curte_fata service="mysql" period=h refresh=10000 visibility=[t_switch_1==0, t_switch_1=="Uninitialized"]
+        Chart item=temperature_curte_fata service="mysql" period=D refresh=10000 visibility=[t_switch_1==1]
+        Chart item=temperature_curte_fata service="mysql" period=W refresh=10000 visibility=[t_switch_1==2]
+        Chart item=temperature_curte_fata service="mysql" period=M refresh=10000 visibility=[t_switch_1==3]
+        Chart item=temperature_curte_fata service="mysql" period=3M refresh=10000 visibility=[t_switch_1==4]
+        Chart item=temperature_curte_fata service="mysql" period=Y refresh=10000 visibility=[t_switch_1==5]
+        }
     }
 
 }
