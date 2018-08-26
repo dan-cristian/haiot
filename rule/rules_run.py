@@ -45,7 +45,9 @@ def execute_macro(obj=models.Rule(), field_changed_list=None, force_exec=False):
     return result
 
 
-def rule_openhab(obj=models.Sensor(), field_changed_list=None):
+# OPENHAB RULES -- START
+
+def rule_openhab_sensor(obj=models.Sensor(), field_changed_list=None):
     key = 'temperature'
     if hasattr(obj, key) and obj.temperature is not None:
         rule_common.send_mqtt_openhab(subtopic=key + "_" + obj.sensor_name, payload=obj.temperature)
@@ -54,25 +56,32 @@ def rule_openhab(obj=models.Sensor(), field_changed_list=None):
         rule_common.send_mqtt_openhab(subtopic=key + "_" + obj.sensor_name, payload=obj.humidity)
 
 
-def rule_openhab(obj=models.Utility(), field_changed_list=None):
-    key = 'electricity'
-    if hasattr(obj, key) and obj.units_2_delta is not None:
-        rule_common.send_mqtt_openhab(subtopic=key + "_" + obj.utility_name, payload=obj.units_2_delta)
-    key = 'water'
-    if hasattr(obj, key) and obj.units_delta is not None:
-        rule_common.send_mqtt_openhab(subtopic=key + "_" + obj.utility_name, payload=obj.units_delta)
-    key = 'gas'
-    if hasattr(obj, key) and obj.units_delta is not None:
-        rule_common.send_mqtt_openhab(subtopic=key + "_" + obj.utility_name, payload=obj.units_delta)
+def rule_openhab_utility(obj=models.Utility(), field_changed_list=None):
+    if hasattr(obj, 'utility_type'):
+        L.l.info("PROCESSING utility {}".format(obj.utility_type))
+        key = 'electricity'
+        if obj.utility_type == key and obj.units_2_delta is not None:
+            rule_common.send_mqtt_openhab(subtopic=key + "_" + obj.utility_name, payload=obj.units_2_delta)
+        key = 'water'
+        if obj.utility_type == key and obj.units_delta is not None:
+            rule_common.send_mqtt_openhab(subtopic=key + "_" + obj.utility_name, payload=obj.units_delta)
+        key = 'gas'
+        if obj.utility_type == key and obj.units_delta is not None:
+            rule_common.send_mqtt_openhab(subtopic=key + "_" + obj.utility_name, payload=obj.units_delta)
+    else:
+        L.l.info("NO UTILITY TYPE in {}".format(obj))
 
 
-def rule_openhab(obj=models.ZoneAlarm(), field_changed_list=None):
+def rule_openhab_alarm(obj=models.ZoneAlarm(), field_changed_list=None):
     key = 'contact'
     if obj.alarm_pin_triggered:
         state = "OPEN"
     else:
         state = "CLOSED"
     rule_common.send_mqtt_openhab(subtopic=key + "_" + obj.alarm_pin_name, payload=state)
+
+
+# OPENHAB RULES --- END
 
 
 def rule_node(obj=models.Node(), field_changed_list=None):

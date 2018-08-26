@@ -64,8 +64,8 @@ def parse_rules(obj, change):
                         #    from main import db
                         #    L.l.error("Unable to execute rule {}, ex={}".format(func[0], ex))
                         #L.l.debug('Rule returned {}'.format(result))
-    except Exception:
-        L.l.exception('Error parsing rules')
+    except Exception as ex:
+        L.l.exception('Error parsing rules, ex={}'.format(ex))
 
 
 def process_events():
