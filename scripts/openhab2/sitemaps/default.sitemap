@@ -1,6 +1,8 @@
 sitemap default label="Home" {
 
-Switch item=Presence_Mobile_Dan label="Dan Mobile"
+Frame label="presence" {
+    Switch item=Presence_Mobile_Dan label="Dan Mobile"
+}
 
 Frame label="demo" {
 	Default item=temperature_boiler_sus
