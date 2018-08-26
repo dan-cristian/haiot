@@ -1,6 +1,6 @@
 sitemap default label="Home" {
 
-Frame label="presence" {
+Frame {
     Switch item=presence_mobile_dan label="Dan Mobile"
 }
 
