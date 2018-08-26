@@ -4,7 +4,7 @@ Frame label="presence" {
     Switch item=presence_mobile_dan label="Dan Mobile"
 }
 
-Frame label="Boiler" {
+Frame {
     Group item=TEMP_BOI {
         Default item=temperature_boiler_sus
         Default item=temperature_boiler_mijloc
