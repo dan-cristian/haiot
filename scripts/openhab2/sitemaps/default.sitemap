@@ -39,7 +39,7 @@ Frame label="Temperature" {
     }
 
 Frame label="Charts" {
-    Default item=temperature_curte_fata {
+    Text item=temperature_curte_fata {
         Switch item=t_switch_1 label="Curte fata" mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
         Chart item=temperature_curte_fata service="mysql" period=h refresh=10000 visibility=[t_switch_1==0, t_switch_1=="Uninitialized"]
         Chart item=temperature_curte_fata service="mysql" period=D refresh=10000 visibility=[t_switch_1==1]
