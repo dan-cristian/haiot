@@ -10,6 +10,7 @@ import gpio
 __last_main_heat_update = datetime.datetime.min
 __TEMP_NO_HEAT = '.'
 
+
 # save heat status and announce to all nodes.
 def __save_heat_state_db(zone='', heat_is_on=''):
     assert isinstance(zone, models.Zone)
@@ -31,14 +32,17 @@ def __save_heat_state_db(zone='', heat_is_on=''):
 
 
 # triggers heat status update if heat changed
-def __decide_action(zone, current_temperature, target_temperature, force_on=False):
+def __decide_action(zone, current_temperature, target_temperature, force_on=False, force_off=False):
     assert isinstance(zone, models.Zone)
     threshold = float(get_param(Constant.P_TEMPERATURE_THRESHOLD))
     L.l.debug("Asses heat zone={} current={} target={} thresh={}".format(
         zone, current_temperature, target_temperature, threshold))
+    heat_is_on = None
     if force_on:
         heat_is_on = True
-    else:
+    if force_off:
+        heat_is_on = False
+    if heat_is_on is None:
         heat_is_on = zone.heat_is_on
         if heat_is_on is None:
             heat_is_on = False
@@ -63,26 +67,42 @@ def __decide_action(zone, current_temperature, target_temperature, force_on=Fals
     return heat_is_on
 
 
-# return the required heat state in a zone (True - on, False - off)
+# set and return the required heat state in a zone (True - on, False - off).
+# Also return if main source is needed, usefull if you only heat a boiler from alternate heat source
 def __update_zone_heat(zone, heat_schedule, sensor):
     heat_is_on = False
+    main_source_needed = True
     try:
         minute = utils.get_base_location_now_date().minute
         hour = utils.get_base_location_now_date().hour
         weekday = datetime.datetime.today().weekday()
         # todo: insert here auto heat change based on presence status
         if weekday <= 4:  # Monday=0
-            schedule_pattern= models.SchedulePattern.query.filter_by(id=heat_schedule.pattern_week_id).first()
+            schedule_pattern = models.SchedulePattern.query.filter_by(id=heat_schedule.pattern_week_id).first()
         else:
-            schedule_pattern= models.SchedulePattern.query.filter_by(id=heat_schedule.pattern_weekend_id).first()
+            schedule_pattern = models.SchedulePattern.query.filter_by(id=heat_schedule.pattern_weekend_id).first()
         if schedule_pattern:
+            main_source_needed = schedule_pattern.main_source_needed
+            if main_source_needed is False:
+                L.l.info("Main heat source is not needed for zone {}".format(zone))
+            force_off = False
+            # set heat to off if condition is met (i.e. do not try to heat water if heat source is cold)
+            if schedule_pattern.activate_on_condition:
+                relay_name = schedule_pattern.activate_condition_relay
+                zone_heat_relay = models.ZoneHeatRelay.query.filter_by(heat_pin_name=relay_name).first()
+                if zone_heat_relay is not None:
+                    force_off = zone_heat_relay.heat_is_on is False
+                    if force_off:
+                        L.l.info('Deactivating heat in zone {} due to relay {}'.format(zone, zone_heat_relay))
+                else:
+                    L.l.error('Could not find the heat relay for zone heat {}'.format(zone))
             # strip formatting characters that are not used to represent target temperature
-            pattern = str(schedule_pattern.pattern).replace('-', '').replace(' ','')
+            pattern = str(schedule_pattern.pattern).replace('-', '').replace(' ', '')
             # check pattern validity
             if len(pattern) == 24:
                 temperature_code = pattern[hour]
                 temperature_target = models.TemperatureTarget.query.filter_by(code=temperature_code).first()
-                # check if we need forced heat on, if for this hour temp has a upper target tan min
+                # check if we need forced heat on, if for this hour temp has a upper target than min
                 force_on = False
                 if schedule_pattern.keep_warm:
                     if len(schedule_pattern.keep_warm_pattern) == 20:
@@ -99,21 +119,20 @@ def __update_zone_heat(zone, heat_schedule, sensor):
                     zone.heat_target_temperature = temperature_target.target
                     commit()
                     if sensor.temperature is not None:
-                        heat_is_on = __decide_action(
-                            zone, sensor.temperature, temperature_target.target, force_on=force_on)
+                        heat_is_on = __decide_action(zone, sensor.temperature, temperature_target.target,
+                                                     force_on=force_on, force_off=force_off)
                     #else:
                     #    heat_is_on = zone.heat_is_on
                 else:
                     L.l.critical('Unknown temperature pattern code {}'.format(temperature_code))
             else:
-                L.l.warning('Incorrect temp pattern [{}] in zone {}, length is not 24'.format(
-                    pattern, zone.name))
+                L.l.warning('Incorrect temp pattern [{}] in zone {}, length is not 24'.format(pattern, zone.name))
     except Exception, ex:
         L.l.error('Error updatezoneheat, err={}'.format(ex, exc_info=True))
     #Log.logger.info("Temp in {} has target={} and current={}, heat should be={}".format(zone.name,
     #                                                                            zone.heat_target_temperature,
     #                                                                             sensor.temperature, heat_is_on))
-    return heat_is_on
+    return heat_is_on, main_source_needed
 
 
 # iterate zones and decide heat state for each zone and also for master zone (main heat system)
@@ -135,8 +154,8 @@ def loop_zones():
                         # if sensor_last_update_seconds > 120 * 60:
                         #    Log.logger.warning('Sensor {} not updated in last 120 minutes, unusual'.format(
                         # sensor.sensor_name))
-                        if __update_zone_heat(zone, heat_schedule, sensor):
-                            heat_is_on = True
+                        heat_state, main_source_needed = __update_zone_heat(zone, heat_schedule, sensor)
+                        heat_is_on = main_source_needed and heat_state
         # turn on/off the main heating system based on zone heat needs
         # check first to find alternate valid heat sources
         heatrelay_main_source = models.ZoneHeatRelay.query.filter_by(is_alternate_heat_source=1).first()
@@ -201,14 +220,17 @@ def loop_heat_relay():
 def set_main_heat_source():
     heat_source_relay_list = models.ZoneHeatRelay.query.filter(models.ZoneHeatRelay.temp_sensor_name is not None).all()
     temp_limit = float(get_param(Constant.P_HEAT_SOURCE_MIN_TEMP))
+    up_limit = temp_limit + float(get_param(Constant.P_TEMPERATURE_THRESHOLD))
     for heat_source_relay in heat_source_relay_list:
         # is there is a temp sensor defined, consider this source as possible alternate source
         if heat_source_relay.temp_sensor_name is not None:
             temp_rec = models.Sensor().query_filter_first(
                 models.Sensor.sensor_name.in_([heat_source_relay.temp_sensor_name]))
             # if alternate source is valid
-            # fixme: add temp threshold to avoid quick on/offs
-            if temp_rec is not None and temp_rec.temperature >= temp_limit:
+            # fixok: add temp threshold to avoid quick on/offs
+            if temp_rec is not None \
+                    and ((temp_rec.temperature >= up_limit and not heat_source_relay.is_alternate_source_switch)
+                         or (temp_rec.temperature >= temp_limit and heat_source_relay.is_alternate_source_switch)):
                 if heat_source_relay.is_alternate_source_switch:
                     # stop main heat source
                     heatrelay_main_source = models.ZoneHeatRelay.query.filter_by(is_main_heat_source=1).first()
