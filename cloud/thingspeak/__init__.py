@@ -15,11 +15,13 @@ import logging
 initialised = False
 _channel_lock = threading.Lock()
 
+
 class P:
+    is_uploading = False
     key_separator = ':'
-    key_model = 'model' #  meta should contain: model=Tablename,key=fieldname
+    key_model = 'model'  # meta should contain: model=Tablename,key=fieldname
     key_key = 'key'
-    fields = {} #  key = model name
+    fields = {}  # key = model name
     keys = {}
     channels = {}  # channel cloud object list for uploads, key = model name
     # fields definition as unique id to detect settings changes in cloud and reload
@@ -28,6 +30,8 @@ class P:
     profile_channels = {}  # all channels defined on cloud
     last_upload_ok = datetime.datetime.now()
     timezone = tzlocal.get_localzone().zone
+    record_list = []
+    max_buffer_size = 50  # drop new records if buffer is larger than this
 
 
 def _upload_field(model, fields, ch_index):
@@ -53,7 +57,7 @@ def _upload_field(model, fields, ch_index):
 
 def _handle_record(new_record=None, current_record=None):
     global _channel_lock
-    cls = str(type(new_record))
+    cls = new_record.original_class
     key = 'models.'
     start = cls.find(key)
     model = None
@@ -77,8 +81,10 @@ def _handle_record(new_record=None, current_record=None):
                     for cloud_field in cloud_fields:
                         cloud_field_name = cloud_field[0]
                         # only save changed value fields
-                        if hasattr(new_record, cloud_field_name) and (current_record is None or cloud_field_name
-                                                                      in current_record.last_commit_field_changed_list):
+                        if hasattr(new_record, cloud_field_name) \
+                                and hasattr(current_record, "last_commit_field_changed_list") \
+                                and (current_record is None or cloud_field_name
+                                     in current_record.last_commit_field_changed_list):
                             cloud_key_val = cloud_field[1]
                             if cloud_key_val is not None:
                                 record_key_name = getattr(new_record, cloud_field[2])
@@ -209,8 +215,59 @@ def _check_def_change():
         _channel_lock.release()
 
 
+def _copy_fields(obj):
+    class Empty:
+        original_class = None
+    res = Empty()
+    if obj is not None:
+        res.original_class = str(type(obj))
+        for attr, val in obj.__dict__.iteritems():
+            attr_name = str(attr)
+            if not attr_name.startswith('_'):
+                setattr(res, attr_name, val)
+    return res
+
+
+def _store_record(new_record=None, current_record=None):
+    if len(P.record_list) < P.max_buffer_size:
+        new_clone = _copy_fields(new_record)
+        current_clone = _copy_fields(current_record)
+        P.record_list.append([new_clone, current_clone])
+
+
+def _upload_bulk():
+    if P.is_uploading:
+        L.l.warning("Trying to upload thingspeak in parallel thread, ignoring!")
+        return
+    else:
+        P.is_uploading = True
+    uploaded = 0
+    try:
+        while True:
+            if len(P.record_list) == 0:
+                break
+            record = P.record_list[0]
+            _handle_record(record[0], record[1])
+            del P.record_list[0]
+            uploaded += 1
+            if len(P.record_list) > P.max_buffer_size:
+                L.l.warning("Thingspeak large buffer size={}, uploaded={}".format(len(P.record_list), uploaded))
+    except Exception, ex:
+        L.l.warning("Unable to upload bulk, itemcount={}, item=P{}, err={}".format(len(P.record_list), record, ex))
+    finally:
+        P.is_uploading = False
+    L.l.info("Thingspeak buffer size={}, uploaded={}".format(len(P.record_list), uploaded))
+
+
 def thread_run():
-    _check_def_change()
+    global initialised
+    try:
+        if not initialised:
+            _check_def_change()
+            initialised = True
+        _upload_bulk()
+    except Exception, ex:
+        L.l.error("Error on thingspeak thread_run, ex={}".format(ex))
 
 
 def unload():
@@ -218,13 +275,10 @@ def unload():
 
 
 def init():
-    global initialised
     try:
         # https://stackoverflow.com/questions/11029717/how-do-i-disable-log-messages-from-the-requests-library
         logging.getLogger("requests").setLevel(logging.WARNING)
-        _check_def_change()
-        initialised = True
-        dispatcher.connect(_handle_record, signal=Constant.SIGNAL_STORABLE_RECORD, sender=dispatcher.Any)
+        dispatcher.connect(_store_record, signal=Constant.SIGNAL_STORABLE_RECORD, sender=dispatcher.Any)
         thread_pool.add_interval_callable(thread_run, run_interval_second=60)
     except Exception, ex:
         L.l.warning("Unable to read config or init thingspeak, stack={}".format(traceback.print_exc()))

@@ -130,6 +130,7 @@ class DbBase:
     def save_changed_fields(self, current_record='', new_record='', notify_transport_enabled=False, save_to_graph=False,
                             ignore_only_updated_on_change=True, debug=False, graph_save_frequency=0, query_filter=None,
                             save_all_fields=False):
+        _start_time = utils.get_base_location_now_date()
         try:
             # inherit BaseGraph to enable persistence
             if hasattr(self, 'save_to_graph'):  # not all models inherit graph, used for periodic save
@@ -151,6 +152,7 @@ class DbBase:
                     new_record.save_to_graph = save_to_graph
             # ensure is set for both new and existing records
             new_record.save_to_history = save_to_graph
+            _now1 = utils.get_base_location_now_date()
             if current_record is not None:
                 # ensure is set for both new and existing records
                 current_record.save_to_history = save_to_graph
@@ -199,6 +201,7 @@ class DbBase:
                 if debug:
                     L.l.info('DEBUG new record={}'.format(new_record))
                 db.session.add(new_record)
+            _now2 = utils.get_base_location_now_date()
             # fixme: remove hardcoded field name
             if hasattr(new_record, 'last_save_to_graph'):
                 if current_record is not None:
@@ -208,6 +211,7 @@ class DbBase:
             if save_to_graph:
                 dispatcher.send(signal=Constant.SIGNAL_STORABLE_RECORD,
                                 new_record=new_record, current_record=current_record)
+            _now3 = utils.get_base_location_now_date()
             commit()
         except Exception, ex:
             exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -222,6 +226,15 @@ class DbBase:
             raise ex
             # else:
             #    Log.logger.warning('Incorrect parameters received on save changed fields to db')
+        finally:
+            _run_time_sec = (utils.get_base_location_now_date() - _start_time).total_seconds()
+            s1 = (_now1 - _start_time).total_seconds()
+            s2 = (_now2 - _start_time).total_seconds()
+            s3 = (_now3 - _start_time).total_seconds()
+            if _run_time_sec > 3:
+                L.l.warning("Saving fields took {} sec: {}/{}/{} for record {}".format(
+                    _run_time_sec, s1, s2, s3, new_record))
+
 
     # save json to a new or existing record
     def json_to_record_query(self, json_obj):
@@ -350,7 +363,7 @@ class Presence(db.Model, DbBase, DbEvent):
     zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'), nullable=False)
     zone_name = db.Column(db.String(50))
     sensor_name = db.Column(db.String(50))
-    event_type = db.Column(db.String(25)) # cam, pir, contact, wifi, bt
+    event_type = db.Column(db.String(25))  # cam, pir, contact, wifi, bt
     event_camera_date = db.Column(db.DateTime(), default=None)
     event_alarm_date = db.Column(db.DateTime(), default=None)
     event_io_date = db.Column(db.DateTime(), default=None)
@@ -363,7 +376,8 @@ class Presence(db.Model, DbBase, DbEvent):
         super(Presence, self).__init__()
 
     def __repr__(self):
-        return 'Presence id {} zone_id {} sensor {} connected {}'.format(self.id, self.zone_id, self.sensor_name, self.is_connected)
+        return 'Presence id {} zone_id {} sensor {} connected {}'.format(
+            self.id, self.zone_id, self.sensor_name, self.is_connected)
 
 
 class SchedulePattern(db.Model, DbBase):
@@ -374,7 +388,9 @@ class SchedulePattern(db.Model, DbBase):
     auto_deactivate_on_away = db.Column(db.Boolean, default=False)
     keep_warm = db.Column(db.Boolean, default=False)  # keep the zone warm, used for cold floors
     keep_warm_pattern = db.Column(db.String(20))  # pattern, 5 minutes increments of on/off: 10000100010000111000
-
+    activate_on_condition = db.Column(db.Boolean, default=False)  # activate heat only if relay state condition is meet
+    activate_condition_relay = db.Column(db.String(50))  # the relay that must be on to activate this schedule pattern
+    main_source_needed = db.Column(db.Boolean, default=True)  # main source must be on as well (i.e. gas heater)
 
     def __init__(self, id=None, name='', pattern=''):
         super(SchedulePattern, self).__init__()
@@ -445,9 +461,9 @@ class Sensor(db.Model, graphs.SensorGraph, DbEvent, DbBase):
     counters_b = db.Column(db.BigInteger)
     delta_counters_a = db.Column(db.BigInteger)
     delta_counters_b = db.Column(db.BigInteger)
-    iad = db.Column(db.Float)
+    iad = db.Column(db.Float)  # current in Amper for qubino sensors
     vdd = db.Column(db.Float)
-    vad = db.Column(db.Float)
+    vad = db.Column(db.Float)  # voltage in Volts for qubino sensors
     pio_a = db.Column(db.Integer)
     pio_b = db.Column(db.Integer)
     sensed_a = db.Column(db.Integer)
@@ -461,9 +477,10 @@ class Sensor(db.Model, graphs.SensorGraph, DbEvent, DbBase):
     sensor_name = db.Column(db.String(50))
     alt_address = db.Column(db.String(50)) # alternate address format, use for 1-wire, better readability
 
-    def __init__(self, address=''):
+    def __init__(self, address='', sensor_name=''):
         super(Sensor, self).__init__()
         self.address = address
+        self.sensor_name = sensor_name
 
     def __repr__(self):
         return '{}, {}, {}, {}'.format(self.type, self.sensor_name, self.address, self.temperature)
