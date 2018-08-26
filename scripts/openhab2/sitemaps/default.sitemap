@@ -14,7 +14,7 @@ Frame label="Puffer" {
 	Default item=temperature_puffer_sus
 	Default item=temperature_puffer_mijloc
 	Default item=temperature_puffer_jos
-	Default item=g_temperature_puffer
+	Group item=g_temperature_puffer
 }
 
 Frame label="Temperature" {
