@@ -113,17 +113,25 @@ Frame {
 
 Frame {
     Switch item=RELAY_BACK_WATER mappings=[OFF="All Off", ON="All On"]
-        Default item=relay_back_pump_relay
-        Default item=relay_back_valve_relay
-
-
     Switch item=RELAY_FRONT_WATER mappings=[OFF="All Off", ON="All On"]
-        Default item=relay_back_pump_relay
-        Default item=relay_front_valve_relay
+    Default item=relay_back_pump_relay
+    Default item=relay_front_valve_relay
+    Default item=relay_back_valve_relay
+}
+
+Frame {
+    Switch item=RELAY_AMP mappings=[OFF="All Off", ON="All On"]
+    Group item=RELAY_AMP {
+        Default item=relay_living_music_relay
+        Default item=relay_living_sub_relay
+        Default item=relay_dormitor_music_relay
+        Default item=relay_baie_mare_music_relay
+        Default item=relay_beci_music_relay
+        Default item=relay_pod_music_relay
+    }
 }
 
 Frame label="Charts" {
-
     Text item=electricity_power_main_mono {
         Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
         Chart item=electricity_power_main_mono service="mysql" period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
@@ -161,5 +169,4 @@ Frame label="Charts" {
         Chart item=water_hot service="mysql" period=Y refresh=10000 visibility=[p_switch==5]
         }
     }
-
 }
