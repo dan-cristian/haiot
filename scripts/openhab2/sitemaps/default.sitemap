@@ -5,7 +5,7 @@ Frame label="presence" {
 }
 
 Frame label="Boiler" {
-    Group item=g_temperature_boiler {
+    Group item=TEMP_BOI {
         Default item=temperature_boiler_sus
         Default item=temperature_boiler_mijloc
         Default item=temperature_boiler_jos
@@ -13,7 +13,7 @@ Frame label="Boiler" {
 }
 
 Frame label="Puffer" {
-	Group item=g_temperature_puffer {
+	Group item=TEMP_PUF {
         Default item=temperature_puffer_sus
         Default item=temperature_puffer_mijloc
         Default item=temperature_puffer_jos
