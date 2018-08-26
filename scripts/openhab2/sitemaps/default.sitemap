@@ -4,13 +4,20 @@ Frame label="presence" {
     Switch item=Presence_Mobile_Dan label="Dan Mobile"
 }
 
-Frame label="Temperature" {
-	Default item=temperature_boiler_sus
+Frame label="Boiler" {
+    Default item=temperature_boiler_sus
 	Default item=temperature_boiler_mijloc
 	Default item=temperature_boiler_jos
+}
+
+Frame label="Puffer" {
 	Default item=temperature_puffer_sus
 	Default item=temperature_puffer_mijloc
 	Default item=temperature_puffer_jos
+	Default item=g_temperature_puffer
+}
+
+Frame label="Temperature" {
 	Default item=temperature_solar_jos
 	Default item=temperature_curte_fata
 	Default item=temperature_living
