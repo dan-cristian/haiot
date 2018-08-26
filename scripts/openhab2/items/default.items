@@ -1,0 +1,6 @@
+Switch Presence_Mobile_Dan "Dan Mobile" <network> { channel="network:device:192_168_0_117:online" }
+
+String temperature_boiler_mijloc "boiler mijloc [%s]" {mqtt="<[mosquitto:iot/openhab/temperature_boiler_mijloc:state:default]"}
+String horn "horn [%s]"
+String temperature_boiler_sus "boiler sus [%s]"
+String temperature_boiler_jos "boiler jos [%s]"
