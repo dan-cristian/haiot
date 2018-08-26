@@ -5,21 +5,21 @@ Frame label="presence" {
 }
 
 Frame label="demo" {
-	Default item=temperature_boiler_sus
-	Default item=temperature_boiler_mijloc
-	Default item=temperature_boiler_jos
-	Default item=temperature_puffer_sus
-	Default item=temperature_puffer_mijloc
-	Default item=temperature_puffer_jos
-	Default item=temperature_solar_jos
-	Default item=temperature_curte_fata
-	Default item=temperature_living
-	Default item=temperature_dormitor
-	Default item=temperature_dormitor_spate
-	Default item=temperature_pod_fata
-	Default item=temperature_horn
-	Default item=temperature_gas_heater
-	Default item=temperature_gas_boiler
+	Default item=temperature_boiler_sus icon="temperature"
+	Default item=temperature_boiler_mijloc icon="temperature"
+	Default item=temperature_boiler_jos icon="temperature"
+	Default item=temperature_puffer_sus icon="temperature"
+	Default item=temperature_puffer_mijloc icon="temperature"
+	Default item=temperature_puffer_jos icon="temperature"
+	Default item=temperature_solar_jos icon="temperature"
+	Default item=temperature_curte_fata icon="temperature"
+	Default item=temperature_living icon="temperature"
+	Default item=temperature_dormitor icon="temperature"
+	Default item=temperature_dormitor_spate icon="temperature"
+	Default item=temperature_pod_fata icon="temperature"
+	Default item=temperature_horn icon="temperature"
+	Default item=temperature_gas_heater icon="temperature"
+	Default item=temperature_gas_boiler icon="temperature"
 }
 
 Frame label="Temperature_Chart_curte_fata" {
