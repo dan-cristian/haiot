@@ -15,10 +15,14 @@ Number temperature_pod_fata "Dormitor [%.1f °C]" <temperature> {mqtt="<[mosquit
 Number temperature_horn "Horn [%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_horn:state:default]"}
 Number temperature_gas_boiler "Gas boiler [%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_gas boiler:state:default]"}
 Number temperature_gas_heater "Gas heater [%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_gas heater:state:default]"}
+Number temperature_solar_back "Solar back [%.1f °C]" <temperature> {mqtt="<[mosquitto:iot/openhab/temperature_solar back:state:default]"}
 
 Number humidity_living "Living [%.1f %]" <humidity> {mqtt="<[mosquitto:iot/openhab/humidity_living:state:default]"}
 Number humidity_curte_fata "Curte fata [%.1f %]" <humidity> {mqtt="<[mosquitto:iot/openhab/humidity_curte fata:state:default]"}
 
 Number electricity_power_main_mono "Power main mono [%.0f watt]" <electricity> {mqtt="<[mosquitto:iot/openhab/electricity_power main mono:state:default]"}
+
+Contact alarm_living "Alarm living [%s]" <door> {mqtt="<[mosquitto:iot/openhab/contact_living:state:default]"}
+Contact alarm_bucatarie "Alarm bucatarie [%s]" <door> {mqtt="<[mosquitto:iot/openhab/contact_bucatarie:state:default]"}
 
 Number t_switch_1

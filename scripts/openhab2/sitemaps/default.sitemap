@@ -21,6 +21,8 @@ Frame label="Temperature" {
 	Default item=temperature_gas_heater
 	Default item=temperature_gas_boiler
 	Default item=electricity_power_main_mono
+	Default item=alarm_living
+	Default item=alarm_bucatarie
     }
 
 Frame label="Charts" {
