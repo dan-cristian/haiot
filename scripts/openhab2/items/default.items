@@ -10,7 +10,7 @@ Group:Contact:OR(OPEN, CLOSED) CON_PIR "PIR Contact [%s]" <door>
 
 Switch presence_mobile_dan "Dan Mobile" <network>                           {channel="network:device:192_168_0_117:online"}
 Switch ups_power_failed "UPS Power" <switch>                                {mqtt="<[mosquitto:iot/openhab/ups_power_failed:state:default]"}
-Number ups_load_percent "UPS Load [%.0f]" <battery>                         {mqtt="<[mosquitto:iot/openhab/ups_load_percent:state:default]"}
+Number ups_load_percent "UPS Load [%.0f]" <light>                         {mqtt="<[mosquitto:iot/openhab/ups_load_percent:state:default]"}
 Switch relay_front_lights_relay "Front lights" <switch>                     {mqtt="<[mosquitto:iot/openhab/relay_front_lights_relay:state:default]"}
 Switch relay_living_music_relay "Living amp" <switch>                       {mqtt="<[mosquitto:iot/openhab/relay_living_music_relay:state:default]"}
 Switch relay_living_sub_relay "Living subwoofer" <switch>                   {mqtt="<[mosquitto:iot/openhab/relay_living_sub_relay:state:default]"}
@@ -25,8 +25,8 @@ Switch heat_puffer_heat "Heat puffer heat" <switch>                         {mqt
 Switch heat_puffer_gas_valve "Heat puffer gas valve" <switch>               {mqtt="<[mosquitto:iot/openhab/heat_puffer gas valve:state:default]"}
 
 Group:Switch:OR(ON, OFF)    RELAY_BACK_WATER "Back watering [(%d)]"  <switch>
-Group:Switch:OR(ON, OFF)    RELAY_FRONT_WATER "Back watering [(%d)]"  <switch>
-Switch relay_back_pump_relay "Back pump" <switch>                          (RELAY_BACK_WATER) {mqtt="<[mosquitto:iot/openhab/relay_back_pump_relay:state:default]"}
+Group:Switch:OR(ON, OFF)    RELAY_FRONT_WATER "Front watering [(%d)]"  <switch>
+Switch relay_back_pump_relay "Back pump" <switch>                          (RELAY_BACK_WATER, RELAY_FRONT_WATER) {mqtt="<[mosquitto:iot/openhab/relay_back_pump_relay:state:default]"}
 Switch relay_back_valve_relay "Back valve" <switch>                        (RELAY_BACK_WATER) {mqtt="<[mosquitto:iot/openhab/relay_back_valve_relay:state:default]"}
 Switch relay_front_valve_relay "Front valve" <switch>                      (RELAY_FRONT_WATER) {mqtt="<[mosquitto:iot/openhab/relay_front_valve_relay:state:default]"}
 Switch relay_front_main_valve_relay "Front main valve" <switch>            (RELAY_FRONT_WATER) {mqtt="<[mosquitto:iot/openhab/relay_front_main_valve_relay:state:default]"}
