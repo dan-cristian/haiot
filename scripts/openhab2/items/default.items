@@ -4,9 +4,9 @@ Group   CEL     "Cellar"   <cellar>     (HOU)
 Group   PUF     "Puffer"   <heating>    (CEL)
 Group   BOI     "Boiler"   <heating>    (CEL)
 
-Group:Number:AVG TEMP_PUF "Avg Puffer temperature [%.1f °C]" <temperature>
-Group:Number:MIN TEMP_BOI "Min Boiler temperature [%.1f °C]" <temperature>
-Group:Contact:OR(OPEN, CLOSED) CON_PIR "PIR Contact [%s %d]" <door>
+Group:Number:MAX TEMP_PUF "Max Puffer [%.1f °C]" <temperature>
+Group:Number:MAX TEMP_BOI "Max Boiler [%.1f °C]" <temperature>
+Group:Contact:OR(OPEN, CLOSED) CON_PIR "PIR Contact [%s]" <door>
 
 Switch presence_mobile_dan "Dan Mobile" <network>                           {channel="network:device:192_168_0_117:online"}
 Number temperature_boiler_sus "Boiler sus [%.1f °C]" <temperature>          (BOI, TEMP_BOI) {mqtt="<[mosquitto:iot/openhab/temperature_boiler sus:state:default]"}
@@ -16,7 +16,7 @@ Number temperature_puffer_sus "Puffer sus [%.1f °C]" <temperature>          (PU
 Number temperature_puffer_mijloc "Puffer mijloc [%.1f °C]" <temperature>    (PUF, TEMP_PUF) {mqtt="<[mosquitto:iot/openhab/temperature_puffer mijloc:state:default]"}
 Number temperature_puffer_jos "Puffer jos [%.1f °C]" <temperature>          (PUF, TEMP_PUF) {mqtt="<[mosquitto:iot/openhab/temperature_puffer jos:state:default]"}
 Number temperature_solar_jos "Solar jos[%.1f °C]" <temperature>             {mqtt="<[mosquitto:iot/openhab/temperature_solar jos:state:default]"}
-Number temperature_curte_fata "Curte fata [%.1f °C]" <temperature>          {mqtt="<[mosquitto:iot/openhab/temperature_curte fata:state:default]"}
+Number temperature_curte_fata "Curte fata [%.1f °C]" <garden>               {mqtt="<[mosquitto:iot/openhab/temperature_curte fata:state:default]"}
 Number temperature_living "Living [%.1f °C]" <temperature>                  {mqtt="<[mosquitto:iot/openhab/temperature_living:state:default]"}
 Number temperature_dormitor "Dormitor [%.1f °C]" <temperature>              {mqtt="<[mosquitto:iot/openhab/temperature_dormitor:state:default]"}
 Number temperature_dormitor_spate "Dormitor spate [%.1f °C]" <temperature>  {mqtt="<[mosquitto:iot/openhab/temperature_dormitor spate:state:default]"}
@@ -50,3 +50,5 @@ Number t_switch_1
 Number t_switch_2
 Number t_switch_3
 Number t_switch_4
+Number t_switch_5
+Number t_switch_6
