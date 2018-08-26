@@ -10,6 +10,11 @@ __start_keyword = 'Lifetime generation</td><td align=center>'
 __end_keyword = ' kWh</td>'
 __start_keyword_now = 'Last System Power</td><td align=center>'
 __end_keyword_now = ' W</td>'
+# APS Temperature params: 192.168.0.10/cgi-bin/parameters
+__start_key_temp = '<td align=center> '
+__end_key_temp = '&nbsp;<sup>o</sup>C'
+__start_key_panel = '<td align=center>'
+__end_key_panel = '-A</td>'
 
 
 def init_solar_aps():
@@ -30,16 +35,37 @@ def thread_solar_aps_run():
     global __start_keyword, __end_keyword, _initialised_solar_aps
     if not _initialised_solar_aps:
         init_solar_aps()
-
     if variable.NODE_THIS_IS_MASTER_OVERALL and _initialised_solar_aps:
         try:
             production = utils.parse_http(model_helper.get_param(Constant.P_SOLAR_APS_LOCAL_URL),
                                           __start_keyword, __end_keyword)
             last_power = utils.parse_http(model_helper.get_param(Constant.P_SOLAR_APS_LOCAL_URL),
                                           __start_keyword_now, __end_keyword_now)
+            temperature = utils.parse_http(model_helper.get_param(Constant.P_SOLAR_APS_LOCAL_REALTIME_URL),
+                                           __start_key_temp, __end_key_temp, end_first=True)
+            panel_id = utils.parse_http(model_helper.get_param(Constant.P_SOLAR_APS_LOCAL_REALTIME_URL),
+                                        __start_key_panel, __end_key_panel, end_first=True)
+            utility_name = model_helper.get_param(Constant.P_SOLAR_UTILITY_NAME)
+            if temperature is not None:
+                zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=panel_id).first()
+                if zone_sensor is None:
+                    L.l.warning('Solar panel id {} is not defined in zone sensor list'.format(panel_id))
+                record = models.Sensor(address=panel_id)
+                current_record = models.Sensor.query.filter_by(address=panel_id).first()
+                record.type = 'solar'
+                if current_record is not None:
+                    record.sensor_name = current_record.sensor_name
+                else:
+                    if zone_sensor:
+                        record.sensor_name = zone_sensor.sensor_name
+                    else:
+                        record.sensor_name = record.type + panel_id
+                record.temperature = temperature
+                record.updated_on = utils.get_base_location_now_date()
+                record.save_changed_fields(current_record=current_record, new_record=record,
+                                           notify_transport_enabled=True, save_to_graph=True, debug=False)
             if production is not None:
                 production = float(production)
-                utility_name = model_helper.get_param(Constant.P_SOLAR_UTILITY_NAME)
                 record = models.Utility()
                 record.utility_name = utility_name
                 current_record = models.Utility.query.filter_by(utility_name=utility_name).first()

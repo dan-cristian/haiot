@@ -7,7 +7,7 @@ try:
     from main.logger_helper import L
     from main.admin import model_helper, models
     from main import thread_pool
-except Exception, ex:
+except Exception as ex:
     print "Exception importing key modules, probably started via main"
     class L:
         class l:
@@ -27,8 +27,8 @@ initialised = False
 
 class P:
     last_warning = datetime.datetime.min
-    check_period = 30
-    sampling_period_seconds = 15
+    check_period = 60  # how often I check for new sensors
+    sampling_period_seconds = 10  # how often I read them
     ow_conn_list = {}  # key is busname, value is ow connection
     warning_issued = False
 
@@ -65,18 +65,18 @@ def do_device(ow, path):
                     save_to_db(dev)
                     last_sensor = dev['address']
                     count += 1
-            except pyownet.protocol.ConnError, er:
+            except pyownet.protocol.ConnError as er:
                 L.l.warning('Connection error owserver: {}'.format(er))
-            except pyownet.Error, ex:
+            except pyownet.Error as ex:
                 L.l.warning('Error reading sensor type={}, sensor={}, ex={}'.format(sensortype, sensor, ex))
-            except Exception, ex:
+            except Exception as ex:
                 L.l.warning('Other error reading sensors: {}'.format(ex))
                 traceback.print_exc()
             #delta = (datetime.datetime.now() - start).total_seconds()
             #L.l.info("Sensor {} read took {} seconds".format(dev['address'], delta))
     all_delta = (datetime.datetime.now() - all_start).total_seconds()
     if count > 0 and all_delta > 1:
-        L.l.info("All {} sensors read in bus {} took {} seconds, last was {}".format(
+        L.l.debug("All {} sensors read in bus {} took {} seconds, last was {}".format(
             count, path, all_delta, last_sensor))
     return sensor_dict
 
@@ -147,7 +147,7 @@ def save_to_db(dev):
                             sampling_period_seconds=delta_time_counters)
         if record.vad is not None:
             dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=record.sensor_name, value=record.vad)
-    except Exception, ex:
+    except Exception as ex:
         L.l.error('Error saving sensor to DB, err {}'.format(ex), exc_info=True)
         # finally:
         #    db_lock.release()
@@ -215,17 +215,17 @@ def check_inactive():
     for sensor in sensor_list:
         elapsed = round((utils.get_base_location_now_date() - sensor.updated_on).total_seconds() / 60, 0)
         if sensor.address not in ref_list:
-            L.l.warning('Sensor {} {} not found ever'.format(sensor.address, sensor.sensor_name))
-            current_record = models.SensorError.query.filter_by(sensor_address=sensor.address).first()
-            record = models.SensorError()
-            record.sensor_name = sensor.sensor_name
-            if current_record is not None:
-                record.error_count = current_record.error_count
-            else:
-                record.error_count = 0
-            record.error_count += 1
-            record.error_type = 0
-            record.save_changed_fields(current_record=None, new_record=record, save_to_graph=True, save_all_fields=True)
+            L.l.warning('Sensor {} {} not defined'.format(sensor.address, sensor.sensor_name))
+            #current_record = models.SensorError.query.filter_by(sensor_address=sensor.address).first()
+            #record = models.SensorError()
+            #record.sensor_name = sensor.sensor_name
+            #if current_record is not None:
+            #    record.error_count = current_record.error_count
+            #else:
+            #    record.error_count = 0
+            #record.error_count += 1
+            #record.error_type = 0
+            #record.save_changed_fields(current_record=None, new_record=record, save_to_graph=True, save_all_fields=True)
         if log_warn and elapsed > 2 * P.sampling_period_seconds:
             L.l.warning('Sensor {} type {} not updated since {} min'.format(sensor.sensor_name, sensor.type, elapsed))
             P.last_warning = datetime.datetime.now()
@@ -264,7 +264,7 @@ def init():
         _get_bus_list(host, port)
         initialised = True
         P.warning_issued = False
-    except Exception, ex:
+    except Exception as ex:
         if not P.warning_issued:
             L.l.info('1-wire owserver not initialised on host {} port {}, ex={}'.format(host, port, ex))
             initialised = False
@@ -291,5 +291,5 @@ if __name__ == "__main__":
             P.ow_conn_list[item] = ow_new
             try:
                 do_device(ow=ow_new, path=item)
-            except Exception, ex:
+            except Exception as ex:
                 print ex

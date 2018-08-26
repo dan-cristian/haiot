@@ -52,7 +52,7 @@ def __write_read_port(ser, command):
             ser.flushInput()
             ser.flushOutput()
             ser.write(command)
-            time.sleep(0.3)
+            time.sleep(0.5)
             response = str(ser.readline()).replace('\n', '')
         except Exception, ex:
             L.l.warning('Error writing to serial {}, err={}'.format(ser.port, ex))
