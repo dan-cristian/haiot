@@ -111,7 +111,7 @@ def rule_openhab_heat_relay(obj=models.ZoneHeatRelay(), field_changed_list=None)
             state = "ON"
         else:
             state = "OFF"
-        rule_common.send_mqtt_openhab(subtopic="heat_" + obj.relay_pin_name, payload=state)
+        rule_common.send_mqtt_openhab(subtopic="heat_" + obj.heat_pin_name, payload=state)
 
 # OPENHAB RULES --- END
 
