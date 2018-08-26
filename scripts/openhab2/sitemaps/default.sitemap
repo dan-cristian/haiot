@@ -88,6 +88,17 @@ Frame {
 }
 
 Frame {
+    Default item=heat_bucatarie
+    Default item=heat_living
+    Default item=heat_birou
+    Default item=heat_dormitor
+    Default item=heat_gas_heat
+    Default item=heat_puffer_boiler
+    Default item=heat_puffer_heat
+    Default item=heat_puffer_gas_valve
+}
+
+Frame {
     Group item=CON_PIR {
         Default item=alarm_living
         Default item=alarm_bucatarie
