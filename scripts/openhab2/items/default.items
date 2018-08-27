@@ -46,6 +46,7 @@ Number temperature_puffer_jos "Puffer jos [%.1f °C]" <temperature>          (PU
 Number temperature_solar_jos "Solar jos[%.1f °C]" <temperature>             {mqtt="<[mosquitto:iot/openhab/temperature_solar jos:state:default]"}
 Number temperature_curte_fata "Curte fata [%.1f °C]" <garden>               {mqtt="<[mosquitto:iot/openhab/temperature_curte fata:state:default]"}
 Number temperature_living "Living [%.1f °C]" <temperature>                  {mqtt="<[mosquitto:iot/openhab/temperature_living:state:default]"}
+Number temperature_living "Birou [%.1f °C]" <temperature>                  {mqtt="<[mosquitto:iot/openhab/temperature_birou:state:default]"}
 Number temperature_dormitor "Dormitor [%.1f °C]" <temperature>              {mqtt="<[mosquitto:iot/openhab/temperature_dormitor:state:default]"}
 Number temperature_dormitor_spate "Dormitor spate [%.1f °C]" <temperature>  {mqtt="<[mosquitto:iot/openhab/temperature_dormitor spate:state:default]"}
 Number temperature_pod_fata "Pod fata [%.1f °C]" <temperature>              {mqtt="<[mosquitto:iot/openhab/temperature_pod fata:state:default]"}
