@@ -127,9 +127,9 @@ class DbBase:
             L.l.error('Exception save json to db {}'.format(ex))
 
     # graph_save_frequency in seconds
-    def save_changed_fields(self, current_record='', new_record='', notify_transport_enabled=False, save_to_graph=False,
-                            ignore_only_updated_on_change=True, debug=False, graph_save_frequency=0, query_filter=None,
-                            save_all_fields=False):
+    def save_changed_fields(self, current_record=None, new_record='', notify_transport_enabled=False,
+                            save_to_graph=False, ignore_only_updated_on_change=True, debug=False,
+                            graph_save_frequency=0, query_filter=None, save_all_fields=False):
         _start_time = utils.get_base_location_now_date()
         try:
             # inherit BaseGraph to enable persistence

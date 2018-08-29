@@ -40,7 +40,7 @@ def __open_port(ser):
     try:
         ser.open()
         return True
-    except Exception, ex:
+    except Exception as ex:
         L.l.warning('Unable to open serial port {}'.format(ser.port))
         return False
 
@@ -52,9 +52,9 @@ def __write_read_port(ser, command):
             ser.flushInput()
             ser.flushOutput()
             ser.write(command)
-            time.sleep(0.5)
+            time.sleep(0.7)
             response = str(ser.readline()).replace('\n', '')
-        except Exception, ex:
+        except Exception as ex:
             L.l.warning('Error writing to serial {}, err={}'.format(ser.port, ex))
     else:
         L.l.warning('Error writing to closed serial {}'.format(ser.port))
@@ -173,7 +173,7 @@ def init():
             initialised = True
         else:
             L.l.info('No standard open serial ports detected on this system')
-    except Exception, ex:
+    except Exception as ex:
         L.l.warning('Unable to open ups port, err {}'.format(ex))
     if not initialised:
         _create_dummy_entry()
