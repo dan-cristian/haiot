@@ -123,7 +123,7 @@ class DbBase:
                 db.session.commit()
             else:
                 L.l.warning('Unique key not found in json record, save aborted')
-        except Exception, ex:
+        except Exception as ex:
             L.l.error('Exception save json to db {}'.format(ex))
 
     # graph_save_frequency in seconds
@@ -173,7 +173,7 @@ class DbBase:
                                 obj_type = str(type(self)).split('\'')[1]
                                 obj_type_words = obj_type.split('.')
                                 obj_type = obj_type_words[len(obj_type_words) - 1]
-                            except Exception, ex:
+                            except Exception as ex:
                                 obj_type = str(type(self))
                         else:
                             pass
@@ -213,7 +213,7 @@ class DbBase:
                                 new_record=new_record, current_record=current_record)
             _now3 = utils.get_base_location_now_date()
             commit()
-        except Exception, ex:
+        except Exception as ex:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             ex_trace = traceback.format_exception(exc_type, exc_value, exc_traceback)
             L.l.error('Error when saving db changes [{}], err={}, trace=\n{}'.format(new_record, ex, ex_trace),
