@@ -8,7 +8,7 @@ __author__ = 'dcristian'
 def send_message(txt, topic=None):
     try:
         if topic is None:
-            topic = transport.mqtt_io.P.topic
+            topic = transport.mqtt_io.P.topic_main
         # Log.logger.debug('Sending message at {} [{}] '.format(utils.get_base_location_now_date(), txt))
         if transport.mqtt_io.client_connected:
             transport.mqtt_io.P.mqtt_client.publish(topic, txt)
@@ -20,5 +20,5 @@ def send_message(txt, topic=None):
                 transport.mqtt_io.init()
             return False
     except Exception as ex:
-        L.l.error('Error sending mqtt message, {}'.format(ex), exc_info=True)
+        L.l.error('Error sending mqtt message, topic={}, err={}'.format(topic, ex), exc_info=True)
         return False
