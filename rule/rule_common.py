@@ -4,13 +4,8 @@ from main.logger_helper import L
 from main.admin import models, model_helper
 from common import Constant
 from pydispatch import dispatcher
-from transport.mqtt_io import sender
 # import mpd
 from main.admin.model_helper import get_param
-
-
-class P:
-    openhab_topic = None
 
 
 def update_custom_relay(relay_pin_name, power_is_on):
@@ -61,8 +56,4 @@ def notify_via_all(title=None, message=None, priority=None):
 
 
 def init():
-    P.openhab_topic = str(model_helper.get_param(Constant.P_MQTT_TOPIC_OPENHAB))
-
-
-def send_mqtt_openhab(subtopic, payload):
-    sender.send_message(payload, P.openhab_topic + "/" + subtopic)
+    pass
