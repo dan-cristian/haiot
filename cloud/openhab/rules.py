@@ -90,7 +90,7 @@ def custom_relay(name, value):
         if relay.gpio_host_name == Constant.HOST_NAME:
             L.l.info("OK setting custom relay {} to {}".format(name, value))
             relay.relay_is_on = value
-            relay.save_changed_fields(notify_transport_enabled=True)
+            relay.save_changed_fields(new_record=relay, notify_transport_enabled=True, save_all_fields=True)
 
 
 def heat_relay(name, value):
