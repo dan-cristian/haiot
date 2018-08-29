@@ -15,7 +15,7 @@ Switch relay_front_lights_relay "Front lights" <switch>                     {mqt
 
 Group:Switch:OR(ON, OFF)    RELAY_AMP   "Music amp [(%d)]"  <switch>
 Switch relay_living_music_relay "Living amp" <switch>                      (RELAY_AMP) {mqtt="<[mosquitto:iot/openhab/relay_living_music_relay:state:default]"}
-Switch relay_living_sub_relay "Living subwoofer" <switch>                  (RELAY_AMP) {mqtt="<[mosquitto:iot/openhab/relay_living_sub_relay:state:default]"}
+Switch relay_living_sub_relay "Living subwoofer" <switch>                  (RELAY_AMP) {mqtt="<[mosquitto:iot/openhab/relay_living_sub_relay:state:default],>[mosquitto:iot/openhab:command:ON:relay_living_sub_relay=1]",>[mosquitto:iot/openhab:command:OFF:relay_living_sub_relay=0]", autoupdate="false"}
 Switch relay_dormitor_music_relay "Dormitor amp" <switch>                  (RELAY_AMP) {mqtt="<[mosquitto:iot/openhab/relay_dormitor_music_relay:state:default]"}
 Switch relay_baie_mare_music_relay "Baie amp" <switch>                     (RELAY_AMP) {mqtt="<[mosquitto:iot/openhab/relay_baie_mare_music_relay:state:default]"}
 Switch relay_beci_music_relay "Beci amp" <switch>                          (RELAY_AMP) {mqtt="<[mosquitto:iot/openhab/relay_beci_music_relay:state:default]"}
