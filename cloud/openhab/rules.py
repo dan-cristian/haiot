@@ -1,6 +1,7 @@
 from main.logger_helper import L
 from main.admin import models
 from transport.mqtt_io import sender
+from common import Constant
 
 
 class P:
@@ -10,6 +11,7 @@ class P:
 def send_mqtt_openhab(subtopic, payload):
     sender.send_message(payload, P.openhab_topic + "/" + subtopic)
 
+#  OUTBOUND RULES START
 
 def rule_openhab_sensor(obj=models.Sensor(), field_changed_list=None):
     key = 'temperature'
@@ -76,3 +78,18 @@ def rule_openhab_heat_relay(obj=models.ZoneHeatRelay(), field_changed_list=None)
         else:
             state = "OFF"
         send_mqtt_openhab(subtopic="heat_" + obj.heat_pin_name, payload=state)
+
+
+#  INBOUD RULES START
+
+def custom_relay(name, value):
+    t = models.ZoneCustomRelay
+    relay = t().query_filter_first(t.relay_pin_name == name)
+    if relay is not None:
+        if relay.gpio_host_name == Constant.HOST_NAME:
+            relay.relay_is_on = value
+            relay.commit_record_to_db()
+
+
+def heat_relay(name, value):
+    pass
