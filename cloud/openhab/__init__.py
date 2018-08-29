@@ -53,6 +53,12 @@ def mqtt_on_message(client, userdata, msg):
         name = vals[0]
         value = vals[1]
         L.l.info("Got openhab event {}={}".format(name, value))
+        if name.startswith("relay_"):
+            vals = name.split("relay_")
+            rules.custom_relay(name, vals[1])
+        elif name.startswith("heat_"):
+            vals = name.split("heat_")
+            rules.heat_relay(name, vals[1])
     else:
         L.l.warning("Openhab payload does not contain = character, invalid payload={}".format(msg.payload))
 
