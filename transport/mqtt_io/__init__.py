@@ -26,12 +26,16 @@ except Exception:
 
 __author__ = 'dcristian'
 initialised=False
-mqtt_client = None
 client_connected = False
-topic='no_topic_defined'
 client_connecting = False
 mqtt_msg_count_per_minute = 0
 last_connect_attempt = None
+
+
+class P:
+    topic = 'no_topic_defined'
+    topic_main = 'no_topic_defined'
+    mqtt_client = None
 
 
 # The callback for when the client receives a CONNACK response from the server.
@@ -58,7 +62,7 @@ def on_disconnect(client, userdata, rc):
 def on_subscribe(client, userdata, mid, granted_qos):
     global client_connected
     client_connected = True
-    #print 'MQTT subscribed'
+
 
 #def on_subscribe(client, userdata, mid, granted_qos):
 #    Log.logger.info('Subscribed as user {} mid {} qos {}'.format(str(userdata), str(mid), str(granted_qos)))
@@ -70,22 +74,21 @@ def on_unsubscribe(client, userdata, mid):
 
 
 def subscribe():
-    global topic
-    L.l.info('Subscribing to mqtt topic={}'.format(topic))
-    mqtt_client.username_pw_set(Constant.HOST_NAME)
-    mqtt_client.user_data_set(Constant.HOST_NAME + " userdata")
-    mqtt_client.will_set(Constant.HOST_NAME + " DIE")
-    mqtt_client.subscribe(topic=topic, qos=0)
+    L.l.info('Subscribing to mqtt topic={}'.format(P.topic))
+    P.mqtt_client.username_pw_set(Constant.HOST_NAME)
+    P.mqtt_client.user_data_set(Constant.HOST_NAME + " userdata")
+    P.mqtt_client.will_set(Constant.HOST_NAME + " DIE")
+    P.mqtt_client.subscribe(topic=P.topic, qos=0)
 
 
 def unload():
-    global mqtt_client, topic, mqtt_paho_exists, mqtt_mosquitto_exists
-    mqtt_client.unsubscribe(topic)
+    global mqtt_paho_exists, mqtt_mosquitto_exists
+    P.mqtt_client.unsubscribe(P.topic)
     try:
-        mqtt_client.loop_stop()
+        P.mqtt_client.loop_stop()
     except Exception as ex:
         L.l.warning('Unable to stop mqtt loop, err {}'.format(ex))
-    mqtt_client.disconnect()
+    P.mqtt_client.disconnect()
 
 
 def init():
@@ -110,13 +113,12 @@ def init():
             #[model_helper.get_param(Constant.P_MQTT_HOST_2), int(model_helper.get_param(Constant.P_MQTT_PORT_2))]
             #[model_helper.get_param(constant.P_MQTT_HOST_3), int(model_helper.get_param(constant.P_MQTT_PORT_3))]
             ]
-        global topic
-        topic = str(model_helper.get_param(Constant.P_MQTT_TOPIC))
-        global mqtt_client
+        P.topic = str(model_helper.get_param(Constant.P_MQTT_TOPIC))
+        P.topic_main = str(model_helper.get_param(Constant.P_MQTT_TOPIC_MAIN))
         if mqtt_paho_exists:
-            mqtt_client = mqtt.Client()
+            P.mqtt_client = mqtt.Client()
         elif mqtt_mosquitto_exists:
-            mqtt_client = mqtt.Mosquitto()
+            P.mqtt_client = mqtt.Mosquitto()
 
         global client_connected
         global initialised
@@ -130,21 +132,22 @@ def init():
             while (not client_connected) and (retry_count < Constant.ERROR_CONNECT_MAX_RETRY_COUNT):
                 try:
                     if mqtt_mosquitto_exists:
-                        mqtt_client.on_connect = on_connect_mosquitto
+                        P.mqtt_client.on_connect = on_connect_mosquitto
                     if mqtt_paho_exists:
-                        mqtt_client.on_connect = on_connect_paho
-                    mqtt_client.on_subscribe = on_subscribe
-                    mqtt_client.on_unsubscribe = on_unsubscribe
+                        P.mqtt_client.on_connect = on_connect_paho
+                    P.mqtt_client.on_subscribe = on_subscribe
+                    P.mqtt_client.on_unsubscribe = on_unsubscribe
                     # mqtt_client.username_pw_set('user', 'pass')
-                    mqtt_client.loop_start()
-                    mqtt_client.connect(host=host, port=port, keepalive=60)
+                    P.mqtt_client.loop_start()
+                    P.mqtt_client.connect(host=host, port=port, keepalive=60)
                     seconds_lapsed = 0
                     while not client_connected and seconds_lapsed < 10:
                         time.sleep(1)
                         seconds_lapsed += 1
                     if client_connected:
-                        mqtt_client.on_message = receiver.on_message
-                        mqtt_client.on_disconnect = on_disconnect
+                        # mqtt_client.on_message = receiver.on_message
+                        P.mqtt_client.message_callback_add(P.topic_main, receiver.on_message)
+                        P.mqtt_client.on_disconnect = on_disconnect
                         thread_pool.add_interval_callable(receiver.thread_run, run_interval_second=10)
                         # mqtt_client.loop_start()
                         initialised = True
