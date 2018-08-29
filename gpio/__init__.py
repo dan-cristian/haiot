@@ -28,7 +28,7 @@ def relay_update(gpio_pin_code=None, pin_value=None, from_web=False):
             commit()
         else:
             L.l.warning('Pin {} does not exists locally, is db data correct?'.format(gpio_pin_code))
-    except Exception, ex:
+    except Exception as ex:
         L.l.warning('Error updating relay state err={}'.format(ex))
     return result
 
@@ -93,7 +93,7 @@ def gpio_record_update(json_object):
         if host_name != Constant.HOST_NAME:
             models.GpioPin().save_changed_fields_from_json_object(json_object=json_object,
                                                                   notify_transport_enabled=False, save_to_graph=False)
-    except Exception, ex:
+    except Exception as ex:
         L.l.warning('Error on gpio state update, err {}'.format(ex))
 
 
@@ -118,7 +118,7 @@ def zone_custom_relay_record_update(json_object):
         #else:
         models.ZoneCustomRelay().save_changed_fields_from_json_object(
             json_object=json_object, notify_transport_enabled=False, save_to_graph=False)
-    except Exception, ex:
+    except Exception as ex:
         L.l.warning('Error on zone custom relay update, err {}'.format(ex))
 
 
