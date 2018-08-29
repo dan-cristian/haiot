@@ -34,7 +34,7 @@ last_connect_attempt = None
 
 class P:
     topic = 'no_topic_defined'
-    topic_main = 'no_topic_defined'
+    topic_main = 'no_main_topic_defined'
     mqtt_client = None
 
 
