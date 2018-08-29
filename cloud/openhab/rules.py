@@ -83,12 +83,14 @@ def rule_openhab_heat_relay(obj=models.ZoneHeatRelay(), field_changed_list=None)
 #  INBOUD RULES START
 
 def custom_relay(name, value):
+    L.l.info("Try to set custom relay {} to {}".format(name, value))
     t = models.ZoneCustomRelay
     relay = t().query_filter_first(t.relay_pin_name == name)
     if relay is not None:
         if relay.gpio_host_name == Constant.HOST_NAME:
+            L.l.info("OK setting custom relay {} to {}".format(name, value))
             relay.relay_is_on = value
-            relay.commit_record_to_db()
+
 
 
 def heat_relay(name, value):
