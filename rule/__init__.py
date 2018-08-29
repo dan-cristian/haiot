@@ -57,6 +57,8 @@ def parse_rules(obj, change):
                         for attr, value in obj.__dict__.iteritems():
                             setattr(record, attr, value)
                         P.event_list.append([record, func[0], field_changed_list])
+                        # optimises CPU, but ensure each function name is unique in rule file
+                        break
     except Exception as ex:
         L.l.exception('Error parsing rules, ex={}'.format(ex))
 
@@ -91,6 +93,7 @@ def record_update(record):
 
 
 # load rules definition from database into the scheduler object list
+# NOT USED ANYMORE!
 def __load_rules_from_db():
     L.l.info("Loading scheduled rules definition from db")
     # keep host name default to '' rather than None (which does not work on filter in_)
