@@ -111,6 +111,15 @@ Frame {
         Chart item=temperature_birou service="mysql" period=3M refresh=10000 visibility=[p_switch==4]
         Chart item=temperature_birou service="mysql" period=Y refresh=10000 visibility=[p_switch==5]
         }
+    Text item=temperature_bucatarie {
+        Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
+        Chart item=temperature_bucatarie service="mysql" period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
+        Chart item=temperature_bucatarie service="mysql" period=D refresh=10000 visibility=[p_switch==1]
+        Chart item=temperature_bucatarie service="mysql" period=W refresh=10000 visibility=[p_switch==2]
+        Chart item=temperature_bucatarie service="mysql" period=M refresh=10000 visibility=[p_switch==3]
+        Chart item=temperature_bucatarie service="mysql" period=3M refresh=10000 visibility=[p_switch==4]
+        Chart item=temperature_bucatarie service="mysql" period=Y refresh=10000 visibility=[p_switch==5]
+        }
 	Text item=temperature_dormitor {
         Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
         Chart item=temperature_dormitor service="mysql" period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
@@ -150,8 +159,6 @@ Frame {
 	Default item=relay_front_lights_relay
 	Default item=relay_living_music_relay
 	Default item=relay_living_sub_relay
-}
-
 Frame {
     Default item=heat_bucatarie
     Default item=heat_living
