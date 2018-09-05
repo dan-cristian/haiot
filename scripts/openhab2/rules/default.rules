@@ -10,6 +10,7 @@ rule "power mono"
 when
     Item electricity_kWh_power_main_mono changed
 then
+    electricity_kWh_power_main_mono.postUpdate(electricity_kWh_power_main_mono.state as Number)
     p_energy_today_main_mono.postUpdate(electricity_kWh_power_main_mono.sumSince(now.minusDays(1)))
     logInfo('logEnergy', 'Rule Update p_energy_today_main_mono = {}', p_energy_today_main_mono.state)
 end
