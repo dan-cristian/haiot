@@ -1,6 +1,7 @@
 rule "power mono"
 when
-    Time cron "0 0/1 * 1/1 * ? *"
+    //Time cron "0 0/1 * 1/1 * ? *"
+    Item electricity_kWh_power_main_mono received update
 then
     p_energy_today_main_mono.postUpdate(electricity_kWh_power_main_mono.sumSince(now.minusDays(1)) as Number)
 end
