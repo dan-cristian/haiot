@@ -3,8 +3,6 @@ when
     Item electricity_kWh_power_main_1 changed
 then
     logInfo('logEnergy', 'Rule Update electricity_kWh_power_main_1 = {}', electricity_kWh_power_main_1.state)
-    // electricity_kWh_power_main_1.postUpdate(electricity_kWh_power_main_1.state as Number)
     p_energy_today_main_1.postUpdate(electricity_kWh_power_main_1.sumSince(now.minusDays(1)))
     logInfo('logEnergy', 'Rule Update p_energy_today_main_1 = {}', p_energy_today_main_1.state)
 end
-
