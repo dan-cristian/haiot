@@ -26,8 +26,12 @@ def rule_openhab_utility(obj=models.Utility(), field_changed_list=None):
     if hasattr(obj, 'utility_type'):
         # L.l.info("PROCESSING utility {}".format(obj.utility_type))
         key = 'electricity'
-        if obj.utility_type == key and obj.units_2_delta is not None:
-            send_mqtt_openhab(subtopic=key + "_" + obj.utility_name, payload=obj.units_2_delta)
+        if obj.utility_type == key:
+                if obj.units_2_delta is not None:
+                    send_mqtt_openhab(subtopic=key + "_" + obj.utility_name, payload=obj.units_2_delta)
+                elif obj.units_delta is not None:
+                    send_mqtt_openhab(subtopic=key + "_" + obj.unit_name + "_" + obj.utility_name,
+                                      payload=obj.units_delta)
         key = 'water'
         if obj.utility_type == key and obj.units_delta is not None:
             send_mqtt_openhab(subtopic=key + "_" + obj.utility_name, payload=obj.units_delta)
