@@ -2,7 +2,7 @@ rule "power 1"
 when
     Item electricity_kWh_power_main_1 changed
 then
-    p_energy_today_main_1.postUpdate(electricity_kWh_power_main_1.sumSince(now.minusDays(1)))
+    p_energy_today_main_1.postUpdate(electricity_kWh_power_main_1.sumSince(now.minusDays(1)) as Number)
     logInfo('logEnergy', 'Rule Update p_energy_today_main_1 = {}', p_energy_today_main_1.state)
 end
 
@@ -11,6 +11,6 @@ when
     Item electricity_kWh_power_main_mono changed
 then
     electricity_kWh_power_main_mono.postUpdate(electricity_kWh_power_main_mono.state as Number)
-    p_energy_today_main_mono.postUpdate(electricity_kWh_power_main_mono.sumSince(now.minusDays(1)))
+    p_energy_today_main_mono.postUpdate(electricity_kWh_power_main_mono.sumSince(now.minusDays(1)) as Number)
     logInfo('logEnergy', 'Rule Update p_energy_today_main_mono = {}', p_energy_today_main_mono.state)
 end
