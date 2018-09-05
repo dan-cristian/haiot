@@ -81,5 +81,5 @@ Contact alarm_etaj_hol "Alarm etaj hol [%s]" <door>                         (CON
 Contact contact_sonerie "Sonerie [%s]" <door>                               (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_sonerie:state:default]"}
 
 Number p_switch                         ""
-Number p_energy_today_main_mono         "Energy main mono today [%.1f kWh]"
-Number p_energy_today_main_1            "Energy main 1 today [%.1f kWh]"
+Number p_energy_today_main_mono         "Energy main mono today [%.2f kWh]"
+Number p_energy_today_main_1            "Energy main 1 today [%.2f kWh]"
