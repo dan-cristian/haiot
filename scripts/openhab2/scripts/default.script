@@ -1,0 +1,12 @@
+import org.openhab.core.library.types.*
+import org.openhab.core.persistence.*
+import org.openhab.model.script.actions.*
+import org.joda.time.*
+
+rule "power 1"
+when
+    Item electricity_kWh_power_main_1 received update
+then
+    p_energy_today_main_1.postUpdate(electricity_kWh_power_main_1.sumSince(now.toDateMidnight))
+end
+
