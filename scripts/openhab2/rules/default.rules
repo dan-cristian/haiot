@@ -12,3 +12,10 @@ when
 then
     p_energy_today_main_1.postUpdate(electricity_kWh_power_main_1.sumSince(now.minusDays(1)) as Number)
 end
+
+rule "solar aps"
+when
+    Item electricity_kWh_solar_aps received update
+then
+    p_energy_today_solar_aps.postUpdate(electricity_kWh_solar_aps.sumSince(now.minusDays(1)) as Number)
+end
