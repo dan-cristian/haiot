@@ -159,8 +159,6 @@ Frame {
 
 Frame {
 	Default item=relay_front_lights_relay
-	Default item=relay_living_music_relay
-	Default item=relay_living_sub_relay
 }
 
 Frame {
