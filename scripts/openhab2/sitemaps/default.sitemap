@@ -155,6 +155,7 @@ Frame {
 	Default item=ups_load_percent
 	Default item=p_energy_today_main_mono
 	Default item=p_energy_today_main_1
+	Default item=p_energy_today_solar_aps
 }
 
 Frame {
