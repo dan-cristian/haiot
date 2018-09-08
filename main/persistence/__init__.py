@@ -62,7 +62,7 @@ def save_to_history_cloud(obj):
                         axis_x_field,graph_id_field,obj))
         else:
             L.l.critical('Missing history axis X field {}'.format(Constant.JSON_PUBLISH_GRAPH_X))
-    except Exception, ex:
+    except Exception as ex:
         L.l.exception('General error saving historical cloud record, err {} obj={}'.format(ex, obj))
 
 
@@ -87,8 +87,8 @@ def save_to_history_db(obj):
                 pass
             else:
                 L.l.critical("Cannot save history db record={}".format(obj))
-        except Exception, ex:
+        except Exception as ex:
             L.l.critical("Cannot save history db err={} record={}".format(ex, obj))
-    except Exception, ex:
+    except Exception as ex:
         L.l.exception('General error saving historical db record, err {} obj={}'.format(ex, obj))
 
