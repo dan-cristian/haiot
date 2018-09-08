@@ -13,6 +13,7 @@ def send_mqtt_openhab(subtopic, payload):
 
 #  OUTBOUND RULES START
 
+
 def rule_openhab_sensor(obj=models.Sensor(), field_changed_list=None):
     key = 'temperature'
     if hasattr(obj, key) and obj.temperature is not None:
