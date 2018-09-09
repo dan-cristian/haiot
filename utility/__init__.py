@@ -99,13 +99,15 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
                             L.l.warning("Could not find last history record for {}".format(record.utility_name))
                             current_record.units_total = 0.0
                     # force save for history recording, use negative values to enable recording 0
+                    # no need to record 0 as it brokes graphana display
                     if current_record is not None:
-                        current_record.units_delta = -1
-                        current_record.units_2_delta = -1
-                        current_record.ticks_delta = -1
-                        current_record.cost = -1
+                        #current_record.units_delta = -1
+                        #current_record.units_2_delta = -1
+                        #current_record.ticks_delta = -1
+                        #current_record.cost = -1
                         #current_record.utility_name = ""
-                        current_record.sensor_index = -1
+                        #current_record.sensor_index = -1
+                        pass
                     record.units_total = 0.0 + current_record.units_total + record.units_delta
                     L.l.debug("Saving utility record {} name={}".format(current_record, record.utility_name))
                     record.save_changed_fields(current_record=current_record, new_record=record, debug=False,
