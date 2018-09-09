@@ -166,7 +166,7 @@ class DbBase:
                     if debug:
                         L.l.info('DEBUG process Col={} New={} Old={} Saveall={}'.format(
                             column_name, new_value, old_value, save_all_fields))
-                    # todo: comparison not working for float, because str appends .0
+                    # fixme: comparison not working for float, because str appends .0
                     if ((new_value is not None) and (str(old_value) != str(new_value))) \
                             or (save_all_fields and (new_value is not None)):
                         if column_name != Constant.DB_FIELD_UPDATE:
@@ -182,7 +182,7 @@ class DbBase:
                             setattr(current_record, column_name, new_value)
                             current_record.last_commit_field_changed_list.append(column_name)
                             if debug:
-                                L.l.info('DEBUG CHANGE COL={} to VAL={}'.format(column_name, new_value))
+                                L.l.info('DEBUG CHANGE COL={} old={} new={}'.format(column_name, old_value, new_value))
                     else:
                         if debug:
                             L.l.info('DEBUG NOT change col={}'.format(column_name))

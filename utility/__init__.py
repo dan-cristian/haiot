@@ -70,20 +70,20 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
                     elif current_record.utility_type == Constant.UTILITY_TYPE_WATER:
                             record.unit_name = current_record.unit_name  # Constant.UTILITY_TYPE_WATER_MEASURE
                             record.units_delta = delta / (current_record.ticks_per_unit * 1.0)
-                            record.units_2_delta = 0
+                            record.units_2_delta = 0.0  # to match comparison in field changed
                             is_debug = True
                             L.l.debug("Saving utility water delta={}".format(record.units_delta))
                     elif current_record.utility_type == Constant.UTILITY_TYPE_GAS:
                         record.unit_name = current_record.unit_name  # Constant.UTILITY_TYPE_GAS_MEASURE
                         record.units_delta = delta / (current_record.ticks_per_unit * 1.0)
-                        record.units_2_delta = 0
+                        record.units_2_delta = 0.0  # to match comparison in field changed
                         L.l.debug("Saving utility gas delta={}".format(record.units_delta))
                     else:
                         L.l.debug("Saving unknown utility type={} sensor={}".format(
                             current_record.utility_type, sensor_name))
                         if current_record.ticks_per_unit is not None:
                             record.units_delta = delta / (current_record.ticks_per_unit * 1.0)  # force float operation
-                            record.units_2_delta = 0
+                            record.units_2_delta = 0.0
                         else:
                             L.l.warning("Null ticks per unit")
                     record.ticks_delta = delta
