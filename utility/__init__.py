@@ -69,15 +69,14 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
                         L.l.debug("Watts usage in {} is {}".format(record.utility_name, record.units_2_delta))
                         record.unit_2_name = current_record.unit_2_name
                     elif current_record.utility_type == Constant.UTILITY_TYPE_WATER:
-                            L.l.info("Delta={}".format(delta))
-                            if delta == 0:
-                                ignore_save = True  # no need to save the 0 mark, make graphs prety
-                                L.l.debug("Not saving utility water delta={}".format(record.units_delta))
-                            else:
-                                record.unit_name = current_record.unit_name  # Constant.UTILITY_TYPE_WATER_MEASURE
-                                record.units_delta = delta / (current_record.ticks_per_unit * 1.0)
-                                record.units_2_delta = 0.0  # to match comparison in field changed
-                                L.l.debug("Saving utility water delta={}".format(record.units_delta))
+                        if delta == 0:
+                            ignore_save = True  # no need to save the 0 mark, make graphs prety
+                            L.l.debug("Not saving utility water delta={}".format(record.units_delta))
+                        else:
+                            record.unit_name = current_record.unit_name  # Constant.UTILITY_TYPE_WATER_MEASURE
+                            record.units_delta = delta / (current_record.ticks_per_unit * 1.0)
+                            record.units_2_delta = 0.0  # to match comparison in field changed
+                            L.l.debug("Saving utility water delta={}".format(record.units_delta))
                     elif current_record.utility_type == Constant.UTILITY_TYPE_GAS:
                         record.unit_name = current_record.unit_name  # Constant.UTILITY_TYPE_GAS_MEASURE
                         record.units_delta = delta / (current_record.ticks_per_unit * 1.0)
@@ -91,31 +90,21 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
                             record.units_2_delta = 0.0
                         else:
                             L.l.warning("Null ticks per unit")
-                    record.ticks_delta = delta
-                    if current_record.unit_cost is None:
-                        current_record.unit_cost = 0.0
-                    record.cost = 1.0 * record.units_delta * current_record.unit_cost
-                    # todo: read previous value from history
-                    if current_record.units_total is None:
-                        # get val from history db
-                        last_rec = models.UtilityHistory.query.filter_by(
-                            utility_name=record.utility_name).order_by(desc(models.UtilityHistory.id)).first()
-                        if last_rec is not None:
-                            current_record.units_total = last_rec.units_total
-                        else:
-                            L.l.warning("Could not find last history record for {}".format(record.utility_name))
-                            current_record.units_total = 0.0
-                    # force save for history recording, use negative values to enable recording 0
-                    # no need to record 0 as it brokes graphana display
-                    # if current_record is not None:
-                        #current_record.units_delta = -1
-                        #current_record.units_2_delta = -1
-                        #current_record.ticks_delta = -1
-                        #current_record.cost = -1
-                        #current_record.utility_name = ""
-                        #current_record.sensor_index = -1
-                        #pass
                     if not ignore_save:
+                        record.ticks_delta = delta
+                        if current_record.unit_cost is None:
+                            current_record.unit_cost = 0.0
+                        record.cost = 1.0 * record.units_delta * current_record.unit_cost
+                        # todo: read previous value from history
+                        if current_record.units_total is None:
+                            # get val from history db
+                            last_rec = models.UtilityHistory.query.filter_by(
+                                utility_name=record.utility_name).order_by(desc(models.UtilityHistory.id)).first()
+                            if last_rec is not None:
+                                current_record.units_total = last_rec.units_total
+                            else:
+                                L.l.warning("Could not find last history record for {}".format(record.utility_name))
+                                current_record.units_total = 0.0
                         record.units_total = 0.0 + current_record.units_total + record.units_delta
                         L.l.debug("Saving utility record {} name={}".format(current_record, record.utility_name))
                         record.save_changed_fields(current_record=current_record, new_record=record, debug=is_debug,
