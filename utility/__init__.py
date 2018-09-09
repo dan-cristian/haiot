@@ -69,6 +69,7 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
                         L.l.debug("Watts usage in {} is {}".format(record.utility_name, record.units_2_delta))
                         record.unit_2_name = current_record.unit_2_name
                     elif current_record.utility_type == Constant.UTILITY_TYPE_WATER:
+                            L.l.info("Delta={}".format(delta))
                             if delta == 0:
                                 ignore_save = True  # no need to save the 0 mark, make graphs prety
                                 L.l.debug("Not saving utility water delta={}".format(record.units_delta))
@@ -127,7 +128,7 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
                         sensor_name, index))
             index += 1
     except Exception as ex:
-        L.l.error("Error saving utility update {}".format(ex))
+        L.l.error("Error saving utility update {}".format(ex), exc_info=True)
 
 
 def unload():
