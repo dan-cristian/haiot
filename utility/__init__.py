@@ -53,7 +53,8 @@ def __utility_update_ex(sensor_name, value, unit=None):
 def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, total_units_b, sampling_period_seconds):
     try:
         index = 0
-        is_debug=False
+        is_debug = False
+        ignore_save = False
         for delta in [units_delta_a, units_delta_b]:
             if delta is not None:
                 record = models.Utility(sensor_name=sensor_name)
@@ -68,11 +69,14 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
                         L.l.debug("Watts usage in {} is {}".format(record.utility_name, record.units_2_delta))
                         record.unit_2_name = current_record.unit_2_name
                     elif current_record.utility_type == Constant.UTILITY_TYPE_WATER:
-                            record.unit_name = current_record.unit_name  # Constant.UTILITY_TYPE_WATER_MEASURE
-                            record.units_delta = delta / (current_record.ticks_per_unit * 1.0)
-                            record.units_2_delta = 0.0  # to match comparison in field changed
-                            is_debug = True
-                            L.l.debug("Saving utility water delta={}".format(record.units_delta))
+                            if delta == 0:
+                                ignore_save = True  # no need to save the 0 mark, make graphs prety
+                                L.l.debug("Not saving utility water delta={}".format(record.units_delta))
+                            else:
+                                record.unit_name = current_record.unit_name  # Constant.UTILITY_TYPE_WATER_MEASURE
+                                record.units_delta = delta / (current_record.ticks_per_unit * 1.0)
+                                record.units_2_delta = 0.0  # to match comparison in field changed
+                                L.l.debug("Saving utility water delta={}".format(record.units_delta))
                     elif current_record.utility_type == Constant.UTILITY_TYPE_GAS:
                         record.unit_name = current_record.unit_name  # Constant.UTILITY_TYPE_GAS_MEASURE
                         record.units_delta = delta / (current_record.ticks_per_unit * 1.0)
@@ -102,18 +106,22 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
                             current_record.units_total = 0.0
                     # force save for history recording, use negative values to enable recording 0
                     # no need to record 0 as it brokes graphana display
-                    if current_record is not None:
+                    # if current_record is not None:
                         #current_record.units_delta = -1
                         #current_record.units_2_delta = -1
                         #current_record.ticks_delta = -1
                         #current_record.cost = -1
                         #current_record.utility_name = ""
                         #current_record.sensor_index = -1
-                        pass
-                    record.units_total = 0.0 + current_record.units_total + record.units_delta
-                    L.l.debug("Saving utility record {} name={}".format(current_record, record.utility_name))
-                    record.save_changed_fields(current_record=current_record, new_record=record, debug=is_debug,
-                                               notify_transport_enabled=True, save_to_graph=True, save_all_fields=False)
+                        #pass
+                    if not ignore_save:
+                        record.units_total = 0.0 + current_record.units_total + record.units_delta
+                        L.l.debug("Saving utility record {} name={}".format(current_record, record.utility_name))
+                        record.save_changed_fields(current_record=current_record, new_record=record, debug=is_debug,
+                                                   notify_transport_enabled=True, save_to_graph=True,
+                                                   save_all_fields=False)
+                    else:
+                        L.l.info("Ignored saving utility {} name={}".format(current_record, record.utility_name))
                 else:
                     L.l.critical("Counter sensor [{}] index {} is not defined in Utility table".format(
                         sensor_name, index))
