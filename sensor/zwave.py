@@ -83,6 +83,10 @@ def louie_value(network, node, value):
             record.iad = value.data
             record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
                                        save_to_graph=True, debug=False)
+        elif value.label == "Power Factor":
+            record.vdd = value.data
+            record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
+                                       save_to_graph=True, debug=False)
         if current_record is not None:
             current_record.commit_record_to_db()
 

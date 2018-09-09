@@ -21,6 +21,15 @@ def rule_openhab_sensor(obj=models.Sensor(), field_changed_list=None):
     key = 'humidity'
     if hasattr(obj, key) and obj.humidity is not None:
         send_mqtt_openhab(subtopic=key + "_" + obj.sensor_name, payload=obj.humidity)
+    key = 'vad'
+    if hasattr(obj, key) and obj.vad is not None:
+        send_mqtt_openhab(subtopic=key + "_" + obj.sensor_name, payload=obj.vad)
+    key = 'vdd'
+    if hasattr(obj, key) and obj.vdd is not None:
+        send_mqtt_openhab(subtopic=key + "_" + obj.sensor_name, payload=obj.vdd)
+    key = 'iad'
+    if hasattr(obj, key) and obj.iad is not None:
+        send_mqtt_openhab(subtopic=key + "_" + obj.sensor_name, payload=obj.iad)
 
 
 def rule_openhab_utility(obj=models.Utility(), field_changed_list=None):
@@ -65,6 +74,13 @@ def rule_openhab_ups(obj=models.Ups(), field_changed_list=None):
         key = 'load_percent'
         if key in field_changed_list:
             send_mqtt_openhab(subtopic="ups_" + key, payload=obj.load_percent)
+        key = 'battery_voltage'
+        if key in field_changed_list:
+            send_mqtt_openhab(subtopic="ups_" + key, payload=obj.battery_voltage)
+        key = 'input_voltage'
+        if key in field_changed_list:
+            send_mqtt_openhab(subtopic="ups_" + key, payload=obj.input_voltage)
+
 
 
 def rule_openhab_custom_relay(obj=models.ZoneCustomRelay(), field_changed_list=None):
