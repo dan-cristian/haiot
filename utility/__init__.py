@@ -56,7 +56,7 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
         is_debug = False
         ignore_save = False
         for delta in [units_delta_a, units_delta_b]:
-            if delta is not None and delta != 0:
+            if delta is not None: # and delta != 0:
                 record = models.Utility(sensor_name=sensor_name)
                 current_record = models.Utility.query.filter_by(sensor_name=sensor_name, sensor_index=index).first()
                 if current_record is not None:
@@ -86,7 +86,6 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
                             record.units_2_delta = 0.0
                         else:
                             L.l.warning("Null ticks per unit")
-
                     record.ticks_delta = delta
                     if current_record.unit_cost is None:
                         current_record.unit_cost = 0.0
