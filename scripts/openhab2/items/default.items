@@ -10,7 +10,7 @@ Group:Contact:OR(OPEN, CLOSED) CON_PIR "PIR Contact [%s]" <door>
 
 Switch presence_mobile_dan "Dan Mobile" <network>                           {channel="network:device:192_168_0_117:online"}
 Switch ups_power_failed "UPS Power" <switch>                                {mqtt="<[mosquitto:iot/openhab/ups_power_failed:state:default]"}
-Number ups_load_percent "UPS Load [%.0f %]" <light>                           {mqtt="<[mosquitto:iot/openhab/ups_load_percent:state:default]"}
+Number ups_load_percent "UPS Load [%.0f %%]" <light>                           {mqtt="<[mosquitto:iot/openhab/ups_load_percent:state:default]"}
 Number ups_battery_voltage "UPS Battery [%.1f V]" <batterylevel>            {mqtt="<[mosquitto:iot/openhab/ups_battery_voltage:state:default]"}
 Number ups_input_voltage "UPS Input [%.0f V]" <poweroutlet_us>              {mqtt="<[mosquitto:iot/openhab/ups_input_voltage:state:default]"}
 
