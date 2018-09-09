@@ -153,9 +153,14 @@ Frame {
 	Default item=gas_gas
 	Default item=ups_power_failed
 	Default item=ups_load_percent
+	Default item=ups_input_voltage
+	Default item=ups_battery_voltage
 	Default item=p_energy_today_main_mono
 	Default item=p_energy_today_main_1
 	Default item=p_energy_today_solar_aps
+	Default item=electricity_power_factor_mono
+	Default item=electricity_voltage_mono
+	Default item=electricity_current_mono
 }
 
 Frame {
