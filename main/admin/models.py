@@ -465,7 +465,7 @@ class Sensor(db.Model, graphs.SensorGraph, DbEvent, DbBase):
     delta_counters_a = db.Column(db.BigInteger)
     delta_counters_b = db.Column(db.BigInteger)
     iad = db.Column(db.Float)  # current in Amper for qubino sensors
-    vdd = db.Column(db.Float)
+    vdd = db.Column(db.Float)  # power factor for qubino sensors
     vad = db.Column(db.Float)  # voltage in Volts for qubino sensors
     pio_a = db.Column(db.Integer)
     pio_b = db.Column(db.Integer)
