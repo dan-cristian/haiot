@@ -141,7 +141,8 @@ class DbBase:
                     save_to_graph_elapsed = (utils.get_base_location_now_date() -
                                              current_record.last_save_to_graph).total_seconds()
                     if save_to_graph_elapsed > graph_save_frequency:
-                        L.l.debug('Saving to graph record {}'.format(new_record))
+                        if debug:
+                            L.l.info('Saving to graph record {}'.format(new_record))
                         current_record.save_to_graph = save_to_graph
                         current_record.save_to_history = save_to_graph
                     else:
@@ -185,6 +186,8 @@ class DbBase:
                     else:
                         if debug:
                             L.l.info('DEBUG NOT change col={}'.format(column_name))
+                if debug:
+                    L.l.info('DEBUG len changed fields={}'.format(len(current_record.last_commit_field_changed_list)))
                 if len(current_record.last_commit_field_changed_list) == 0:
                     current_record.notify_transport_enabled = False
                 # fixme: remove hardcoded field name
@@ -209,8 +212,8 @@ class DbBase:
                 new_record.last_save_to_graph = utils.get_base_location_now_date()
             # signal other modules we have a new record to process (i.e. upload to cloud)
             if save_to_graph:
-                dispatcher.send(signal=Constant.SIGNAL_STORABLE_RECORD,
-                                new_record=new_record, current_record=current_record)
+                dispatcher.send(signal=Constant.SIGNAL_STORABLE_RECORD, new_record=new_record,
+                                current_record=current_record)
             _now3 = utils.get_base_location_now_date()
             commit()
         except Exception as ex:
