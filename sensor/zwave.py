@@ -59,36 +59,39 @@ def louie_node_update(network, node):
 
 
 def louie_value(network, node, value):
-    #L.l.info('Louie signal: Value {} for {}={} {}'.format(node.product_name, value.label, value.data, value.units))
-    #PowerLevel (Normal), Energy (kWh),  Energy (kVAh), Power (W), Voltage (V), Current (A), Power Factor, Unknown
-    if value.label == "Power" or (value.label == "Energy" and value.units == "kWh"):
-        #L.l.info("Saving power utility")
-        if value.units == "W":
-            units_adjusted = "watt"  # this should match Utility unit name in models definition
+    try:
+        #L.l.info('Louie signal: Value {} for {}={} {}'.format(node.product_name, value.label, value.data, value.units))
+        #PowerLevel (Normal), Energy (kWh),  Energy (kVAh), Power (W), Voltage (V), Current (A), Power Factor, Unknown
+        if value.label == "Power" or (value.label == "Energy" and value.units == "kWh"):
+            #L.l.info("Saving power utility")
+            if value.units == "W":
+                units_adjusted = "watt"  # this should match Utility unit name in models definition
+            else:
+                units_adjusted = value.units
+            haiot_dispatch.send(Constant.SIGNAL_UTILITY_EX, sensor_name=node.product_name,
+                                value=value.data, unit=units_adjusted)
         else:
-            units_adjusted = value.units
-        haiot_dispatch.send(Constant.SIGNAL_UTILITY_EX, sensor_name=node.product_name,
-                            value=value.data, unit=units_adjusted)
-    else:
-        current_record = models.Sensor.query.filter_by(sensor_name=node.product_name).first()
-        if current_record is not None:
-            current_record.vad = None
-            current_record.iad = None
-        record = models.Sensor(sensor_name=node.product_name)
-        if value.label == "Voltage":
-            record.vad = value.data
-            record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
-                                       save_to_graph=True, debug=False)
-        elif value.label == "Current":
-            record.iad = value.data
-            record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
-                                       save_to_graph=True, debug=False)
-        elif value.label == "Power Factor":
-            record.vdd = value.data
-            record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
-                                       save_to_graph=True, debug=False)
-        if current_record is not None:
-            current_record.commit_record_to_db()
+            current_record = models.Sensor.query.filter_by(sensor_name=node.product_name).first()
+            if current_record is not None:
+                current_record.vad = None
+                current_record.iad = None
+            record = models.Sensor(sensor_name=node.product_name)
+            if value.label == "Voltage":
+                record.vad = value.data
+                record.save_changed_fields(current_record=current_record, new_record=record,
+                                           notify_transport_enabled=True, save_to_graph=True, debug=False)
+            elif value.label == "Current":
+                record.iad = value.data
+                record.save_changed_fields(current_record=current_record, new_record=record,
+                                           notify_transport_enabled=True, save_to_graph=True, debug=False)
+            elif value.label == "Power Factor":
+                record.vdd = value.data
+                record.save_changed_fields(current_record=current_record, new_record=record,
+                                           notify_transport_enabled=True, save_to_graph=True, debug=False)
+            if current_record is not None:
+                current_record.commit_record_to_db()
+    except Exception as ex:
+        L.l.error("Error in zwave value={}".format(ex), exc_info=True)
 
 
 def louie_value_update(network, node, value):
@@ -178,8 +181,11 @@ def init():
 
 def thread_run():
     #L.l.info("State is {}".format(P.network.state))
-    for node_id in P.network.nodes:
-        if id > 1:
-            node = P.network.nodes[node_id]
-            #L.l.info("Node {}".format(node))
-            node.request_state()
+    try:
+        for node_id in P.network.nodes:
+            if id > 1:
+                node = P.network.nodes[node_id]
+                #L.l.info("Node {}".format(node))
+                node.request_state()
+    except Exception as ex:
+        L.l.error("Error in zwave thread run={}".format(ex), exc_info=True)
