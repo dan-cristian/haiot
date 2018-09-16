@@ -1,7 +1,7 @@
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
 from main.logger_helper import L
-from RFXtrx.pyserial import PySerialTransport
+from RFXtrx import PySerialTransport
 import RFXtrx
 from main.admin import models
 from common import Constant, utils
@@ -39,10 +39,14 @@ def __save_sensor_db(p_id='', p_type='', value_list=None):
         record.sensor_name = '(not defined) ' + p_id
     record.updated_on = utils.get_base_location_now_date()
     record.type = p_type
-    if 'Humidity' in value_list: record.humidity = utils.round_sensor_value(value_list['Humidity'])
-    if 'Temperature' in value_list: record.temperature = utils.round_sensor_value(value_list['Temperature'])
-    if 'Battery numeric' in value_list: record.battery_level = value_list['Battery numeric']
-    if 'Rssi numeric' in value_list: record.rssi = value_list['Rssi numeric']
+    if 'Humidity' in value_list:
+        record.humidity = utils.round_sensor_value(value_list['Humidity'])
+    if 'Temperature' in value_list:
+        record.temperature = utils.round_sensor_value(value_list['Temperature'])
+    if 'Battery numeric' in value_list:
+        record.battery_level = value_list['Battery numeric']
+    if 'Rssi numeric' in value_list:
+        record.rssi = value_list['Rssi numeric']
     current_record = models.Sensor.query.filter_by(address=p_id).first()
     record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
                                save_to_graph=True, ignore_only_updated_on_change=True)
