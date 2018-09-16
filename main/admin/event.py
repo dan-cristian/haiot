@@ -48,9 +48,9 @@ def handle_local_event_db_post(model, row):
         processed = True
 
     if processed:
-        L.l.info('Detected {} record change, row={}, trigger executed'.format(model, row))
+        L.l.debug('Detected {} record change, row={}, trigger executed'.format(model, row))
     else:
-        L.l.info('Detected {} record change, row={}, but change processing ignored'.format(model, row))
+        L.l.debug('Detected {} record change, row={}, but change processing ignored'.format(model, row))
 
 
 # executed on every mqqt message received (except those sent by this host)

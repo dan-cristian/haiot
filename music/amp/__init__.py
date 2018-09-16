@@ -21,6 +21,7 @@ _AMP_ZONE2_POWER_OFF = "\x0207EBB\x03"
 _AMP_ZONE3_POWER_ON = "\x0207AED\x03"
 _AMP_ZONE3_POWER_OFF = "\x0207AEE\x03"
 
+
 class AMP_YMH:
     BI_AMP_ON = None
     ZONE2_ON = None
@@ -31,11 +32,11 @@ def connect_socket():
     host = get_param(Constant.P_AMP_SERIAL_HOST)
     port = int(get_param(Constant.P_AMP_SERIAL_PORT))
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    L.l.info("Connecting socket")
+    L.l.debug("Connecting socket")
     s.settimeout(2)
     s.connect((host, port))
     s.settimeout(None)
-    L.l.info("Connected socket")
+    L.l.debug("Connected socket")
     return s
 
 
@@ -66,7 +67,7 @@ def _amp_bi_set_yamaha(on, sock):
 
 
 def amp_zone_power(on, zone_index):
-    L.l.info("Setting amp power for zone {}".format(zone_index))
+    L.l.debug("Setting amp power for zone {}".format(zone_index))
     global _AMP_ZONE3_POWER_OFF, _AMP_ZONE3_POWER_ON
     sock = connect_socket()
     msg = "socket cmd ok, "
@@ -94,7 +95,7 @@ def amp_zone_power(on, zone_index):
     msg = "{} {}".format(msg, result)
     sock.close()
     result = "Set done amp zone {} to state {}, result={}\n".format(zone_index, on, msg)
-    L.l.info(result)
+    L.l.debug(result)
     return result
 
 
@@ -111,7 +112,7 @@ def set_amp_power(power_state, relay_name, amp_zone_index):
                 # dispatch as UI action otherwise change actions are not triggered
                 dispatcher.send(signal=Constant.SIGNAL_UI_DB_POST, model=models.ZoneCustomRelay, row=relay)
                 msg = "Set relay {} to state {} zone_index={}\n".format(relay_name, power_state, amp_zone_index)
-                L.l.info(msg)
+                L.l.debug(msg)
             else:
                 msg = "Not changed relay state for {}\n".format(relay_name)
         else:
@@ -130,6 +131,6 @@ def set_amp_power(power_state, relay_name, amp_zone_index):
                 time.sleep(5)
             result_amp = amp_zone_power(power_state, amp_zone_index)
             return msg + result_amp
-    except Exception, ex:
+    except Exception as ex:
         L.l.error("Error set_amp_power {}".format(ex))
         return "Error set_amp_power {}".format(ex)
