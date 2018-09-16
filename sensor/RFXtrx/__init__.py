@@ -754,7 +754,8 @@ class Connect:
         self._status = self.send_get_status()
 
         if self._modes is not None:
-            self.set_recmodes(self._modes)
+            # fixme: set proper modes
+            #self.set_recmodes(self._modes)
             self._status = self.send_get_status()
 
         if self._debug:
