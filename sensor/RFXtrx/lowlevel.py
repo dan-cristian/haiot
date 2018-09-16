@@ -697,7 +697,8 @@ class Lighting4(Packet):
 
     def __init__(self):
         """Constructor"""
-        super(Lighting4, self).__init__()
+        # super(Lighting4, self).__init__()
+        Packet.__init__(self)
         self.cmd1 = None
         self.cmd2 = None
         self.cmd3 = None

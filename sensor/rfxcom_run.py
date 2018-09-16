@@ -19,6 +19,7 @@ def __rfx_reading(packet):
     if packet:
         try:
             assert isinstance(packet, RFXtrx.SensorEvent)
+            L.l.info("Received RFX packet={}".format(packet))
             p_id = packet.device.id_string
             p_type = packet.device.type_string
             __save_sensor_db(p_id=p_id, p_type=p_type, value_list=packet.values)
@@ -30,6 +31,7 @@ def __rfx_reading(packet):
 def __save_sensor_db(p_id='', p_type='', value_list=None):
     if not value_list:
         value_list = []
+    L.l.info("Received RFX value list={}".format(value_list))
     record = models.Sensor(address=p_id)
     assert isinstance(record, models.Sensor)
     zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=p_id).first()
@@ -50,6 +52,33 @@ def __save_sensor_db(p_id='', p_type='', value_list=None):
     current_record = models.Sensor.query.filter_by(address=p_id).first()
     record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
                                save_to_graph=True, ignore_only_updated_on_change=True)
+
+
+# ON COMMAND
+#Packettype    = Lighting4
+#subtype       = PT2262
+#Sequence nbr  = 20
+#Code          = 451451 decimal:4527185
+#S1- S24  = 0100 0101 0001 0100 0101 0001
+#Pulse         = 325 usec
+#Signal level  = 6  -72dBm
+
+
+# OFF COMMAND
+# Code          = 451454 decimal:4527188
+
+# CLOSE COMMAND
+#Code          = 45155F decimal:4527455
+#S1- S24  = 0100 0101 0001 0101 0101 1111
+
+def elro_relay_on():
+    pkt = None
+    pkt.packettype = RFXtrx.lowlevel.Lighting4
+    pkt.subtype = 'PT2262'
+    pkt.cmd = 451451
+    #pkt.type_string = 1
+    #pkt.id_string = 1
+    #event = RFXtrx.LightingDevice()
 
 
 def unload():
@@ -85,6 +114,7 @@ def thread_run():
         if time_elapsed_minutes > P.MAX_MINUTES_SILENCE:
             L.l.warning('RFX event not received since {} minutes, device error?'.format(time_elapsed_minutes))
         if P.initialised:
-            __rfx_reading(P.transport.receive_blocking())
+            event = P.transport.receive_blocking()
+            __rfx_reading(event)
     except Exception as ex:
         L.l.error('Error read RFX tty port, err={}'.format(ex), exc_info=True)
