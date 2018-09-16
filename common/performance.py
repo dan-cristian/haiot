@@ -21,8 +21,8 @@ def add_query(start_time, query_details=None):
 
         if max_query_time_miliseconds < elapsed:
             max_query_time_miliseconds = elapsed
-            L.l.info("Longest query details:{}".format(str(query_details)[:50]))
-            L.l.info("Count={} avg={} min={} max={}".format(query_count,
+            L.l.debug("Longest query details:{}".format(str(query_details)[:50]))
+            L.l.debug("Count={} avg={} min={} max={}".format(query_count,
                                                             query_cumulative_time_miliseconds / query_count,
                                                             min_query_time_miliseconds, max_query_time_miliseconds))
 
