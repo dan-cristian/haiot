@@ -78,12 +78,12 @@ Frame {
         }
     Text item=temperature_fridge {
         Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
-        Chart item=temperature_fridge service="mysql" period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
-        Chart item=temperature_fridge service="mysql" period=D refresh=10000 visibility=[p_switch==1]
-        Chart item=temperature_fridge service="mysql" period=W refresh=10000 visibility=[p_switch==2]
-        Chart item=temperature_fridge service="mysql" period=M refresh=10000 visibility=[p_switch==3]
-        Chart item=temperature_fridge service="mysql" period=3M refresh=10000 visibility=[p_switch==4]
-        Chart item=temperature_fridge service="mysql" period=Y refresh=10000 visibility=[p_switch==5]
+        Chart item=temperature_fridge period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
+        Chart item=temperature_fridge period=D refresh=10000 visibility=[p_switch==1]
+        Chart item=temperature_fridge period=W refresh=10000 visibility=[p_switch==2]
+        Chart item=temperature_fridge period=M refresh=10000 visibility=[p_switch==3]
+        Chart item=temperature_fridge period=3M refresh=10000 visibility=[p_switch==4]
+        Chart item=temperature_fridge period=Y refresh=10000 visibility=[p_switch==5]
         }
     Default item=humidity_fridge
 	Default item=temperature_horn
