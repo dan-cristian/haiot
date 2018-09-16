@@ -18,7 +18,7 @@ def __save_heat_state_db(zone='', heat_is_on=''):
     if zone_heat_relay is not None:
         zone_heat_relay.heat_is_on = heat_is_on
         zone_heat_relay.updated_on = utils.get_base_location_now_date()
-        L.l.info('Heat state changed to is-on={} via pin={} in zone={}'.format(
+        L.l.debug('Heat state changed to is-on={} via pin={} in zone={}'.format(
             heat_is_on, zone_heat_relay.heat_pin_name, zone.name))
         zone_heat_relay.notify_transport_enabled = True
         zone_heat_relay.save_to_graph = True
@@ -127,7 +127,7 @@ def __update_zone_heat(zone, heat_schedule, sensor):
                     L.l.critical('Unknown temperature pattern code {}'.format(temperature_code))
             else:
                 L.l.warning('Incorrect temp pattern [{}] in zone {}, length is not 24'.format(pattern, zone.name))
-    except Exception, ex:
+    except Exception as ex:
         L.l.error('Error updatezoneheat, err={}'.format(ex, exc_info=True))
     #Log.logger.info("Temp in {} has target={} and current={}, heat should be={}".format(zone.name,
     #                                                                            zone.heat_target_temperature,
@@ -177,7 +177,7 @@ def loop_zones():
                 L.l.critical('No heat main_src found using zone id {}'.format(heatrelay_main_source.zone_id))
         else:
             L.l.critical('No heat main source is defined in db')
-    except Exception, ex:
+    except Exception as ex:
         L.l.error('Error loop_zones, err={}'.format(ex, exc_info=True))
 
 
@@ -212,7 +212,7 @@ def loop_heat_relay():
             else:
                 L.l.warning("Cannot find gpiopin_bcm for heat relay={} zone={}".format(heat_relay.gpio_pin_code,
                                                                                        heat_relay.heat_pin_name))
-        except Exception, ex:
+        except Exception as ex:
             L.l.exception('Error processing heat relay=[{}] pin=[{}] err={}'.format(heat_relay, gpio_pin, ex))
 
 
