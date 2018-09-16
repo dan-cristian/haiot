@@ -192,7 +192,7 @@ class LightingDevice(RFXtrxDevice):
     # pylint: disable=too-many-instance-attributes
     def __init__(self, pkt):
         #super(LightingDevice, self).__init__(pkt)
-        LightingDevice.__init__(self, pkt)
+        RFXtrxDevice.__init__(self, pkt)
         if isinstance(pkt, lowlevel.Lighting1):
             self.housecode = pkt.housecode
             self.unitcode = pkt.unitcode
