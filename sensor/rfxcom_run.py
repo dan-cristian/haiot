@@ -82,4 +82,4 @@ def thread_run():
         if P.initialised:
             __rfx_reading(P.transport.receive_blocking())
     except Exception as ex:
-        L.l.warning('Error read RFX tty port, err {}'.format(ex))
+        L.l.error('Error read RFX tty port, err {}'.format(ex), exc_info=True)
