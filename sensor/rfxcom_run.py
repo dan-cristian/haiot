@@ -85,6 +85,8 @@ def elro_relay_on():
     #pkt.type_string = 1
     #pkt.id_string = 1
     #event = RFXtrx.LightingDevice()
+    event = RFXtrx.lowlevel.Lighting4()
+    event.set_transmit()
 
 
 def unload():
@@ -118,7 +120,8 @@ def thread_run():
         L.l.debug('Waiting for RFX event')
         time_elapsed_minutes = (utils.get_base_location_now_date() - P.last_packet_received).seconds / 60
         if time_elapsed_minutes > P.MAX_MINUTES_SILENCE:
-            L.l.warning('RFX event not received since {} minutes, device error?'.format(time_elapsed_minutes))
+            L.l.warning('RFX event not received since {} mins, device error? Reseting!'.format(time_elapsed_minutes))
+            P.transport.reset()
         if P.initialised:
             event = P.transport.receive_blocking()
             __rfx_reading(event)
