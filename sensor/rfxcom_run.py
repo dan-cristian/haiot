@@ -56,6 +56,7 @@ def unload():
     pass
 
 
+# https://github.com/Danielhiversen/pyRFXtrx/
 def init():
     P.initialised = False
     P.last_packet_received = utils.get_base_location_now_date()
@@ -86,4 +87,4 @@ def thread_run():
         if P.initialised:
             __rfx_reading(P.transport.receive_blocking())
     except Exception as ex:
-        L.l.error('Error read RFX tty port, err {}'.format(ex), exc_info=True)
+        L.l.error('Error read RFX tty port, err={}'.format(ex), exc_info=True)
