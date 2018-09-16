@@ -18,20 +18,26 @@ class P:
 def __rfx_reading(packet):
     if packet:
         try:
-            assert isinstance(packet, RFXtrx.SensorEvent)
             L.l.info("Received RFX packet={}".format(packet))
-            p_id = packet.device.id_string
-            p_type = packet.device.type_string
-            __save_sensor_db(p_id=p_id, p_type=p_type, value_list=packet.values)
-            P.last_packet_received = utils.get_base_location_now_date()
+            if isinstance(packet, RFXtrx.SensorEvent):
+                __save_sensor_db(p_id=packet.device.id_string, p_type=packet.device.type_string,
+                                 value_list=packet.values)
+                P.last_packet_received = utils.get_base_location_now_date()
+            elif isinstance(packet, RFXtrx.LightingDevice):
+                __save_relay_db(p_id=packet.device.id_string, p_type=packet.device.type_string,
+                                value_list=packet.values)
         except Exception as ex:
             L.l.info('Unknown rfx packet type {} err={}'.format(packet, ex))
+
+
+def __save_relay_db(p_id='', p_type='', value_list=None):
+    # todo: add save to relay db
+    pass
 
 
 def __save_sensor_db(p_id='', p_type='', value_list=None):
     if not value_list:
         value_list = []
-    #L.l.info("Received RFX value list={}".format(value_list))
     record = models.Sensor(address=p_id)
     assert isinstance(record, models.Sensor)
     zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=p_id).first()
