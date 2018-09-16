@@ -395,8 +395,8 @@ class SensorEvent(RFXtrxEvent):
     def __init__(self, pkt):
         #  pylint: disable=too-many-branches, too-many-statements
         device = RFXtrxDevice(pkt)
-        super(SensorEvent, self).__init__(device)
-
+        #super(SensorEvent, self).__init__(device)
+        RFXtrxEvent.__init__(self)
         self.values = {}
         self.pkt = pkt
         if isinstance(pkt, lowlevel.RfxMeter):
