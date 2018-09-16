@@ -9,7 +9,7 @@ from main.logger_helper import L
 
 try:
     import pymysql
-except ImportError, ex:
+except ImportError as ex:
     print "Unable to import pymysql, err={}".format(ex)
 
 # location for main db - sqlite db
@@ -35,7 +35,7 @@ def my_import(name):
         for comp in components[1:]:
             mod = getattr(mod, comp)
         return mod
-    except Exception, ex:
+    except Exception as ex:
         L.l.warning("Unable to import module {}, err={}".format(name, ex))
         return None
 
@@ -143,8 +143,8 @@ def unload_modules():
         if mod.name != 'main':
             try:
                 unload_module(mod.name)
-            except Exception, ex:
-                print "Error unloading module {}: {}".format(mod.name, ex)
+            except Exception as ex:
+                print("Error unloading module {}: {}".format(mod.name, ex))
 
 #  --------------------------------------------------------------------------  #
 
@@ -219,7 +219,7 @@ def init():
             try:
                 admin.model_helper.init_reporting()
                 break
-            except Exception, ex:
+            except Exception as ex:
                 L.l.critical("Local DB reporting capability is not available, err={}".format(ex))
                 app.config['SQLALCHEMY_BINDS'] = None
             time.sleep(10)
@@ -293,7 +293,7 @@ def init():
     except KeyboardInterrupt:
         print('CTRL+C was pressed, exiting')
         exit_code = 1
-    except Exception, ex:
+    except Exception as ex:
         print('Main exit with exception {}'.format(ex))
     finally:
         unload()
@@ -307,10 +307,10 @@ def run(arg_list):
         try:
             import ptvsd
             ptvsd.enable_attach(secret='secret', address=('0.0.0.0', 5678))
-            print 'Enabled remote debugging, waiting 15 seconds for client to attach'
+            print('Enabled remote debugging, waiting 15 seconds for client to attach')
             ptvsd.wait_for_attach(timeout=15)
-        except Exception, ex:
-            print "Error in remote debug: {}".format(ex)
+        except Exception as ex:
+            print("Error in remote debug: {}".format(ex))
     import logging
     from main import logger_helper
     if 'debug' in arg_list:
@@ -348,6 +348,6 @@ def run(arg_list):
     MODEL_AUTO_UPDATE = 'model_auto_update' in arg_list
     IS_STANDALONE_MODE = 'standalone' in arg_list
     init()  # will block here until app is closed
-    print 'App EXIT'
+    print('App EXIT')
     global exit_code
     sys.exit(exit_code)
