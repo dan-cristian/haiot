@@ -25,7 +25,7 @@ def record_update(obj_dict=None):
         is_on = utils.get_object_field_value(obj_dict,utils.get_model_field_name(models.ZoneHeatRelay.heat_is_on))
         # fixme: remove hard reference to object field
         sent_on = utils.get_object_field_value(obj_dict, "event_sent_datetime")
-        L.l.info('Received heat relay update from {} zoneid={} pin={} is_on={} sent={}'.format(
+        L.l.debug('Received heat relay update from {} zoneid={} pin={} is_on={} sent={}'.format(
             source_host_name, zone_id, pin_name, is_on, sent_on))
         zone_heat_relay = models.ZoneHeatRelay.query.filter_by(zone_id=zone_id).first()
         if zone_heat_relay:
@@ -53,7 +53,7 @@ def record_update(obj_dict=None):
                     'Heat state zone_id {} unexpected val={} after setval={}'.format(zone_id, pin_state, pin_value))
         else:
             L.l.warning('No heat relay defined for zone {}, db data issue?'.format(zone_id))
-    except Exception, ex:
+    except Exception as ex:
         L.l.warning('Error updating heat relay state, err {}'.format(ex))
 
 
