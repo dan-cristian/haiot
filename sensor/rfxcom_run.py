@@ -7,9 +7,12 @@ from main.admin import models
 from common import Constant, utils
 import serial_common
 
-initialised = False
-transport = None
-last_packet_received = None
+
+class P:
+    initialised = False
+    transport = None
+    last_packet_received = None
+    MAX_MINUTES_SILENCE = 10
 
 
 def __rfx_reading(packet):
@@ -19,9 +22,8 @@ def __rfx_reading(packet):
             p_id = packet.device.id_string
             p_type = packet.device.type_string
             __save_sensor_db(p_id=p_id, p_type=p_type, value_list=packet.values)
-            global last_packet_received
-            last_packet_received = utils.get_base_location_now_date()
-        except Exception, ex:
+            P.last_packet_received = utils.get_base_location_now_date()
+        except Exception as ex:
             L.l.info('Unknown rfx packet type {} err={}'.format(packet, ex))
 
 
@@ -51,9 +53,8 @@ def unload():
 
 
 def init():
-    global transport, initialised, last_packet_received
-    initialised = False
-    last_packet_received = utils.get_base_location_now_date()
+    P.initialised = False
+    P.last_packet_received = utils.get_base_location_now_date()
     try:
         if Constant.OS in Constant.OS_LINUX:
             portpath = serial_common.get_portpath_linux('RFXtrx433')
@@ -62,24 +63,23 @@ def init():
             # fixme windows autodetect version
         if portpath:
             L.l.info('Initialising RFXCOM on port {}'.format(portpath))
-            transport = PySerialTransport(portpath, debug=True)
-            transport.reset()
-            initialised = True
+            P.transport = PySerialTransport(portpath, debug=True)
+            P.transport.reset()
+            P.initialised = True
         else:
             L.l.info('No RFX device detected on this system')
-    except Exception, ex:
+    except Exception as ex:
         L.l.warning('Unable to open RFX tty port, err {}'.format(ex))
-    return initialised
+    return P.initialised
 
 
 def thread_run():
-    global transport, initialised, last_packet_received
     try:
         L.l.debug('Waiting for RFX event')
-        time_elapsed_minutes = (utils.get_base_location_now_date() - last_packet_received).seconds / 60
-        if time_elapsed_minutes > 10:
+        time_elapsed_minutes = (utils.get_base_location_now_date() - P.last_packet_received).seconds / 60
+        if time_elapsed_minutes > P.MAX_MINUTES_SILENCE:
             L.l.warning('RFX event not received since {} minutes, device error?'.format(time_elapsed_minutes))
-        if initialised:
-            __rfx_reading(transport.receive_blocking())
-    except Exception, ex:
+        if P.initialised:
+            __rfx_reading(P.transport.receive_blocking())
+    except Exception as ex:
         L.l.warning('Error read RFX tty port, err {}'.format(ex))
