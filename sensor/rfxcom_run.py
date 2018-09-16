@@ -31,7 +31,7 @@ def __rfx_reading(packet):
 def __save_sensor_db(p_id='', p_type='', value_list=None):
     if not value_list:
         value_list = []
-    L.l.info("Received RFX value list={}".format(value_list))
+    #L.l.info("Received RFX value list={}".format(value_list))
     record = models.Sensor(address=p_id)
     assert isinstance(record, models.Sensor)
     zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=p_id).first()
