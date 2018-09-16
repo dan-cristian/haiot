@@ -3,6 +3,7 @@ __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 import sys
 import glob
 import serial
+import os
 from main.logger_helper import L
 
 
@@ -17,12 +18,14 @@ def get_portpath_linux(product_name):
         root_path = ''
         for index in range(0, len(words) - 5):
             root_path = root_path + '/' + words[index]
-        f = open(root_path + '/product')
-        product = f.readline()
-        f.close()
-        if product_name in product:
-            L.l.info('Found {} device at {}'.format(product_name, dev_path))
-            return dev_path
+        file_product = root_path + '/product'
+        if os.path.isfile(file_product):
+            f = open(file_product)
+            product = f.readline()
+            f.close()
+            if product_name in product:
+                L.l.info('Found {} device at {}'.format(product_name, dev_path))
+                return dev_path
     return None
 
 
@@ -41,7 +44,7 @@ def get_standard_serial_device_list_old():
             ser.close()
             L.l.info('Found and opened serial port {}'.format(port_no))
             valid_list.append(port_no)
-        except Exception, ex:
+        except Exception as ex:
             L.l.info('Cannot open serial port, ex='.format(ex))
     return valid_list
 
@@ -79,6 +82,6 @@ def get_standard_serial_device_list():
             s.close()
             L.l.info('Found and opened serial port {}'.format(port))
             result.append(port)
-        except Exception, ex:
+        except Exception as ex:
             L.l.info('Cannot open serial port {}, ex='.format(port, ex))
     return result
