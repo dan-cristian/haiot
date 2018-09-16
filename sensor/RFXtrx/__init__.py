@@ -486,7 +486,8 @@ class ControlEvent(RFXtrxEvent):
             device = RfyDevice(pkt)
         else:
             device = RFXtrxDevice(pkt)
-        super(ControlEvent, self).__init__(device)
+        RFXtrxEvent.__init__(self, device)
+        #super(ControlEvent, self).__init__(device)
 
         self.values = {}
         self.values['Command'] = pkt.value('cmnd_string')
