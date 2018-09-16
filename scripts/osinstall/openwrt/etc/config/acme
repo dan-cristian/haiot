@@ -1,0 +1,14 @@
+config acme
+        option state_dir '/etc/acme'
+        option account_email 'dan.cristian@gmail.com'
+        option debug '1'
+
+config cert 'dancristianro'
+        option keylength '2048'
+        option update_uhttpd '1'
+        option webroot '/www/freessl'
+        list domains 'www.dancristian.ro'
+        option use_staging '0'
+        option reloadcmd '/etc/init.d/nginx restart'
+        option enabled '1'
+        option dns 'none'
