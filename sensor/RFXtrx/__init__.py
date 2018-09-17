@@ -700,8 +700,7 @@ class DummyTransport(RFXtrxTransport):
             return None
         pkt = bytearray(data)
         if self.debug:
-            print("RFXTRX: Recv: " +
-                  " ".join("0x{0:02x}".format(x) for x in pkt))
+            print("RFXTRX: Recv: " + " ".join("0x{0:02x}".format(x) for x in pkt))
         return self.parse(pkt)
 
     def receive_blocking(self, data=None):
@@ -713,8 +712,7 @@ class DummyTransport(RFXtrxTransport):
             requested) """
         pkt = bytearray(data)
         if self.debug:
-            print("RFXTRX: Send: " +
-                  " ".join("0x{0:02x}".format(x) for x in pkt))
+            print("RFXTRX: Send: " + " ".join("0x{0:02x}".format(x) for x in pkt))
 
 
 class DummyTransport2(PySerialTransport):
@@ -758,8 +756,8 @@ class Connect:
             #self.set_recmodes(self._modes)
             self._status = self.send_get_status()
 
-        if self._debug:
-            print("RFXTRX: ", self._status.device)
+        #if self._debug:
+        print("RFXTRX: ", self._status)
 
         self.send_start()
 

@@ -117,13 +117,17 @@ def init():
 
 def thread_run():
     try:
-        L.l.debug('Waiting for RFX event')
-        time_elapsed_minutes = (utils.get_base_location_now_date() - P.last_packet_received).seconds / 60
-        if time_elapsed_minutes > P.MAX_MINUTES_SILENCE:
-            L.l.warning('RFX event not received since {} mins, device error? Reseting!'.format(time_elapsed_minutes))
-            P.transport.reset()
+        if not P.initialised:
+            init()
         if P.initialised:
+            L.l.debug('Waiting for RFX event')
+            time_elapsed_minutes = (utils.get_base_location_now_date() - P.last_packet_received).seconds / 60
+            if time_elapsed_minutes > P.MAX_MINUTES_SILENCE:
+                L.l.warning('RFX event not received since {} mins, device error? Reseting!'.format(time_elapsed_minutes))
+                P.transport.reset()
             event = P.transport.receive_blocking()
             __rfx_reading(event)
     except Exception as ex:
         L.l.error('Error read RFX tty port, err={}'.format(ex), exc_info=True)
+        P.initialised = False
+        utils.sleep(10)
