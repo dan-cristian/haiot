@@ -4,7 +4,7 @@ from main.logger_helper import L
 from RFXtrx import PySerialTransport
 import RFXtrx
 from main.admin import models
-from common import Constant, utils
+from common import Constant, utils, variable
 import serial_common
 
 
@@ -108,6 +108,7 @@ def init():
             P.transport = PySerialTransport(portpath, debug=True)
             P.transport.reset()
             P.initialised = True
+            variable.USB_PORTS_IN_USE.append(portpath)
         else:
             L.l.info('No RFX device detected on this system')
     except Exception as ex:
