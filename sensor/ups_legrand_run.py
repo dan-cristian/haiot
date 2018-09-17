@@ -14,7 +14,7 @@ class P:
     initialised = False
     serial = None
     ups = None
-
+    initialising = False
 
 class LegrandUps:
     def __init__(self):
@@ -74,7 +74,7 @@ def __search_ups(port_name):
         for i in range(0, 2):
             response = __write_read_port(ser, 'I\r')
             # [#                           JP00106G  #015]
-            if "JP00106G" in response:
+            if response is not None and "JP00106G" in response:
                 L.l.info('Got serial response [{}] on ups init port {}'.format(response, port_name))
                 P.serial = ser
                 P.ups = LegrandUps()
@@ -156,6 +156,9 @@ def unload():
 
 
 def init():
+    if P.initialising:
+        return
+    P.initialising = True
     P.initialised = False
     try:
         # if constant.OS in constant.OS_LINUX:
@@ -182,6 +185,7 @@ def init():
         L.l.error('Unable to open ups port, err {}'.format(ex), exc_info=True)
     if not P.initialised:
         _create_dummy_entry()
+    P.initialising = False
     return P.initialised
 
 
