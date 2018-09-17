@@ -1,7 +1,7 @@
 import os
 import json
 import re
-import datetime
+import datetime, time
 import calendar
 import math
 import importlib
@@ -161,3 +161,7 @@ def parse_http(url, start_key, end_key, end_first=False):
         return value_str
     else:
         return None
+
+
+def sleep(secs):
+    time.sleep(secs)
