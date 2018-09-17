@@ -179,7 +179,7 @@ def init():
         else:
             L.l.info('No standard open serial ports detected on this system')
     except Exception as ex:
-        L.l.warning('Unable to open ups port, err {}'.format(ex))
+        L.l.error('Unable to open ups port, err {}'.format(ex), exc_info=True)
     if not P.initialised:
         _create_dummy_entry()
     return P.initialised
