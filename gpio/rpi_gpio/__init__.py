@@ -103,8 +103,8 @@ def setup_in_ports(gpio_pin_list):
                 gpio_pin.pin_code, gpio_pin.pin_type, gpio_pin.pin_index_bcm))
             try:
                 # http://razzpisampler.oreilly.com/ch07.html
-                # one wire connected to GPIO, another to 3.3v
-                GPIO.setup(int(gpio_pin.pin_code), GPIO.IN, pull_up_down=GPIO.PUD_DOWN)  # PUD_DOWN:no contact detection
+                # one wire connected to GPIO, another to GROUND
+                GPIO.setup(int(gpio_pin.pin_code), GPIO.IN, pull_up_down=GPIO.PUD_UP)  # PUD_DOWN:no contact detection
                 GPIO.remove_event_detect(int(gpio_pin.pin_code))
                 # GPIO.add_event_detect(int(gpio_pin.pin_code), GPIO.RISING, callback=_event_detected_rising,
                 #                      bouncetime=500)
