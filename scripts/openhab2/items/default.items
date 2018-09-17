@@ -87,6 +87,7 @@ Contact alarm_beci_mare "Alarm beci mare [%s]" <door>                       (CON
 Contact alarm_beci_mic "Alarm beci mic [%s]" <door>                         (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_beci mic:state:default]"}
 Contact alarm_etaj_hol "Alarm etaj hol [%s]" <door>                         (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_etaj hol:state:default]"}
 Contact contact_sonerie "Sonerie [%s]" <door>                               (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_sonerie:state:default]"}
+Contact contact_usa_intrare "Usa intrare [%s]" <door>                       (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_usa intrare:state:default]"}
 
 Number p_switch                         ""
 Number p_energy_today_main_mono         "Energy main mono today [%.2f kWh]"
