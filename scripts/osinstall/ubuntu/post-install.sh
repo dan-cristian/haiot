@@ -60,6 +60,8 @@ ENABLE_LOG_RAM=0
 ENABLE_THINGSBOARD=0
 ENABLE_OPENHAB=0
 
+ENABLE_UPS_APC=0
+
 set_config_var() {
   lua - "$1" "$2" "$3" <<EOF > "$3.bak"
 local key=assert(arg[1])
@@ -1278,6 +1280,11 @@ if [ "$ENABLE_OPENHAB" == "1" ]; then
     systemctl status openhab2.service
     systemctl daemon-reload
     systemctl enable openhab2.service
+fi
+
+if [ "$ENABLE_UPS_APC" == "1" ]; then
+    apt-get install -y apcupsd
+
 fi
 
 echo "Optimise for flash and ssd usage"
