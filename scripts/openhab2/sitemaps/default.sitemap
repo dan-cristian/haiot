@@ -239,21 +239,30 @@ Frame label="Charts" {
     }
     Text item=water_main {
         Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
-        Chart item=water_main service="mysql" period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
-        Chart item=water_main service="mysql" period=D refresh=10000 visibility=[p_switch==1]
-        Chart item=water_main service="mysql" period=W refresh=10000 visibility=[p_switch==2]
-        Chart item=water_main service="mysql" period=M refresh=10000 visibility=[p_switch==3]
-        Chart item=water_main service="mysql" period=3M refresh=10000 visibility=[p_switch==4]
-        Chart item=water_main service="mysql" period=Y refresh=10000 visibility=[p_switch==5]
+        Chart item=water_main period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
+        Chart item=water_main period=D refresh=10000 visibility=[p_switch==1]
+        Chart item=water_main period=W refresh=10000 visibility=[p_switch==2]
+        Chart item=water_main period=M refresh=10000 visibility=[p_switch==3]
+        Chart item=water_main period=3M refresh=10000 visibility=[p_switch==4]
+        Chart item=water_main period=Y refresh=10000 visibility=[p_switch==5]
+        }
+    Text item=water_house {
+        Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
+        Chart item=water_main period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
+        Chart item=water_main period=D refresh=10000 visibility=[p_switch==1]
+        Chart item=water_main period=W refresh=10000 visibility=[p_switch==2]
+        Chart item=water_main period=M refresh=10000 visibility=[p_switch==3]
+        Chart item=water_main period=3M refresh=10000 visibility=[p_switch==4]
+        Chart item=water_main period=Y refresh=10000 visibility=[p_switch==5]
         }
     Text item=water_hot {
         Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
-        Chart item=water_hot service="mysql" period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
-        Chart item=water_hot service="mysql" period=D refresh=10000 visibility=[p_switch==1]
-        Chart item=water_hot service="mysql" period=W refresh=10000 visibility=[p_switch==2]
-        Chart item=water_hot service="mysql" period=M refresh=10000 visibility=[p_switch==3]
-        Chart item=water_hot service="mysql" period=3M refresh=10000 visibility=[p_switch==4]
-        Chart item=water_hot service="mysql" period=Y refresh=10000 visibility=[p_switch==5]
+        Chart item=water_hot period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
+        Chart item=water_hot period=D refresh=10000 visibility=[p_switch==1]
+        Chart item=water_hot period=W refresh=10000 visibility=[p_switch==2]
+        Chart item=water_hot period=M refresh=10000 visibility=[p_switch==3]
+        Chart item=water_hot period=3M refresh=10000 visibility=[p_switch==4]
+        Chart item=water_hot period=Y refresh=10000 visibility=[p_switch==5]
         }
     }
 }
