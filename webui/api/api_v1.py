@@ -48,7 +48,7 @@ def generic_db_update(model_name, filter_name, filter_value, field_name, field_v
             msg = 'No records returned for filter_name={} and filter_value={}'.format(filter_name, filter_value)
             L.l.warning(msg)
             return '%s: %s' % (Constant.SCRIPT_RESPONSE_NOTOK, msg)
-    except Exception, ex:
+    except Exception as ex:
         msg = 'Exception on /apiv1/db_update: {}'.format(ex)
         L.l.error(msg, exc_info=1)
         return '%s: %s' % (Constant.SCRIPT_RESPONSE_NOTOK, msg)
@@ -65,9 +65,9 @@ def camera_alert(zone_name, cam_name, has_move):
 
 @app.route('/apiv1/amp_power/state=<power_state>&relay_name=<relay_name>&amp_zone_index=<amp_zone_index>')
 def amp_power(power_state, relay_name, amp_zone_index=None):
-    L.l.info("Started amp_power api request")
+    # L.l.info("Started amp_power api request")
     result = amp.set_amp_power(int(power_state), relay_name, int(amp_zone_index))
-    L.l.info("Done amp_power api request result={}".format(result))
+    # L.l.info("Done amp_power api request result={}".format(result))
     return result
 
 
@@ -98,7 +98,7 @@ def test_lastfm_love():
 def lastfm_love():
     try:
         result = lastfm.love(request)
-    except Exception, e:
+    except Exception as e:
         result = "{}".format(e)
     return result
 
@@ -107,7 +107,7 @@ def lastfm_love():
 def test_lastfm_current():
     try:
         result = lastfm.current()
-    except Exception, e:
+    except Exception as e:
         result = "{}".format(e)
     return result
 
@@ -116,7 +116,7 @@ def test_lastfm_current():
 def lastfm_current():
     try:
         result = lastfm.current()
-    except Exception, e:
+    except Exception as e:
         result = "{}".format(e)
     return result
 
