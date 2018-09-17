@@ -77,6 +77,7 @@ Number electricity_current_mono "Main current [%.1f A]" <poweroutlet_eu>        
 Number gas_gas "Gas [%.1f mc]" <gas>                                        {mqtt="<[mosquitto:iot/openhab/gas_gas:state:default]"}
 Number water_main "Water main [%.0f l]" <water>                             {mqtt="<[mosquitto:iot/openhab/water_water main:state:default]"}
 Number water_hot "Water hot [%.0f l]" <faucet>                              {mqtt="<[mosquitto:iot/openhab/water_water hot:state:default]"}
+Number water_house "Water house [%.0f l]" <water>                           {mqtt="<[mosquitto:iot/openhab/water_water house:state:default]"}
 
 Contact alarm_birou "Alarm birou [%s]" <door>                               (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_birou:state:default]"}
 Contact alarm_scari_beci "Alarm scari beci [%s]" <door>                     (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_scari beci:state:default]"}
