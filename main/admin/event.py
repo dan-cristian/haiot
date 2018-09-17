@@ -13,7 +13,6 @@ import heat
 import gpio
 import rule
 import presence
-import alarm
 import main.persistence
 
 
