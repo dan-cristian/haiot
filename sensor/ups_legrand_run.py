@@ -168,7 +168,7 @@ def init():
         #    #fixme windows autodetect version
         if len(serial_list) > 0:
             L.l.info('Looking for Legrand UPS on {} serial ports'.format(len(serial_list)))
-            traceback.print_stack(file=sys.stdout)
+            #traceback.print_stack(file=sys.stdout)
             for port in serial_list:
                 if port not in variable.USB_PORTS_IN_USE:
                     __search_ups(port)
