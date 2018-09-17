@@ -195,6 +195,7 @@ Frame {
         Default item=alarm_beci_mic
         Default item=alarm_etaj_hol
         Default item=contact_sonerie
+        Default item=contact_usa_intrare
         }
 }
 
