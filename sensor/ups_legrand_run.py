@@ -75,7 +75,7 @@ def __search_ups(port_name):
             response = __write_read_port(ser, 'I\r')
             # [#                           JP00106G  #015]
             if response is not None and "JP00106G" in response:
-                L.l.info('Got serial response [{}] on ups init port {}'.format(response, port_name))
+                L.l.info('Found UPS [{}] on port {}'.format(response, port_name))
                 P.serial = ser
                 P.ups = LegrandUps()
                 P.ups.Id = str(response).replace(' ', '').replace('\r', '')
