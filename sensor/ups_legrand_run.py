@@ -157,22 +157,22 @@ def init():
     P.initialised = False
     try:
         # if constant.OS in constant.OS_LINUX:
-        L.l.info('Looking for serial ports')
+        L.l.debug('Looking for UPS serial ports')
         serial_list = serial_common.get_standard_serial_device_list()
         # else:
         #    portpath = None
         #    #fixme windows autodetect version
         if len(serial_list) > 0:
             L.l.info('Looking for Legrand UPS on {} serial ports'.format(len(serial_list)))
-            for device in serial_list:
-                if device not in variable.USB_PORTS_IN_USE:
-                    __search_ups(device)
+            for port in serial_list:
+                if port not in variable.USB_PORTS_IN_USE:
+                    __search_ups(port)
                     if P.serial is not None:
-                        variable.USB_PORTS_IN_USE.append(device)
+                        variable.USB_PORTS_IN_USE.append(port)
                         P.initialised = True
                         break
                 else:
-                    L.l.info("Skip UPS search on port {}".format(device))
+                    L.l.info("Skip UPS search on port {}".format(port))
         else:
             L.l.info('No standard open serial ports detected on this system')
     except Exception as ex:
