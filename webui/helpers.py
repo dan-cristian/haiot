@@ -35,7 +35,7 @@ class FlaskInThread(threading.Thread):
                 self._app.run(host=self._host, port=self._port, debug=self._debug, use_reloader=self._use_reloader)
             except IOError as e:
                 if e.errno == errno.EPIPE:
-                    pass
+                    L.l.info('Flask broken pipe, {}'.format(e))
                 else:
                     L.l.error('IO error init flask on host {} port {}, err={}'.format(self._host, self._port, ex),
                               exc_info=1)
