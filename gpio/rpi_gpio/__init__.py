@@ -38,14 +38,14 @@ def set_pin_bcm(bcm_id=None, pin_value=None):
             return set_val
         else:
             L.l.warning('Unable to setup rpi.gpio pin {} as OUT '.format(bcm_id))
-    except Exception, ex:
+    except Exception as ex:
         L.l.error("Error set_pin_bcm: {}".format(ex), exc_info=1)
 
 
 def get_pin_bcm(bcm_id):
     try:
         res = GPIO.input(bcm_id)
-    except RuntimeError, rex:
+    except RuntimeError as rex:
         L.l.warning('Error reading input rpi.gpio pin {} err={}. Setting as OUT and retry.'.format(bcm_id, rex))
         GPIO.setup(bcm_id, GPIO.OUT)
         # retry read
@@ -61,7 +61,7 @@ def _do_event(channel, state):
             L.l.debug('Event rpi.gpio input detected channel={} state={}'.format(channel, state))
             dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=channel, direction='in',
                             pin_value=state, pin_connected=(state == 0))
-    except Exception, ex:
+    except Exception as ex:
         L.l.warning('Error rpi.gpio event detected, err {}'.format(ex))
 
 
@@ -103,7 +103,8 @@ def setup_in_ports(gpio_pin_list):
                 gpio_pin.pin_code, gpio_pin.pin_type, gpio_pin.pin_index_bcm))
             try:
                 # http://razzpisampler.oreilly.com/ch07.html
-                GPIO.setup(int(gpio_pin.pin_code), GPIO.IN, pull_up_down=GPIO.PUD_UP)  # PUD_DOWN:no contact detection
+                # one wire connected to GPIO, another to 3.3v
+                GPIO.setup(int(gpio_pin.pin_code), GPIO.IN, pull_up_down=GPIO.PUD_DOWN)  # PUD_DOWN:no contact detection
                 GPIO.remove_event_detect(int(gpio_pin.pin_code))
                 # GPIO.add_event_detect(int(gpio_pin.pin_code), GPIO.RISING, callback=_event_detected_rising,
                 #                      bouncetime=500)
