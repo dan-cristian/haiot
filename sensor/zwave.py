@@ -138,9 +138,9 @@ def init():
         #options.set_save_log_level('Info')
         #options.set_logging(False)
         options.set_logging(True)
-        options.set_poll_interval(5)
+        #options.set_poll_interval(5)
         options.set_save_configuration(True)
-        #options.lock()
+        options.lock()
 
         # Create a network object
         P.network = ZWaveNetwork(options, log=None, autostart=False)
