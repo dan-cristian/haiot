@@ -208,11 +208,12 @@ def thread_run():
             P.did_inclusion = True
             L.l.info("!!!!!!!!!!! Node inclusion done".format(res))
 
-        if False:
-            for node_id in P.network.nodes:
-                if node_id > 1:
-                    node = P.network.nodes[node_id]
-                    #L.l.info("Node {}".format(node))
-                    node.request_state()
+        for node_id in P.network.nodes:
+            node = P.network.nodes[node_id]
+            if node.is_failed():
+                L.l.info("Node failed: {}".format(node))
+            if node_id > 1:
+                pass
+                #node.request_state()
     except Exception as ex:
         L.l.error("Error in zwave thread run={}".format(ex), exc_info=True)
