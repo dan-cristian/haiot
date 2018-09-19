@@ -204,13 +204,13 @@ def thread_run():
             L.l.info("!!!!!!!!!!! Listening for new node inclusion")
             res = P.network.controller.add_node()
             L.l.info("!!!!!!!!!!!! Node inclusion returned {}, waiting for 30 seconds".format(res))
-            time.sleep(30)
+            time.sleep(10)
             P.did_inclusion = True
             L.l.info("!!!!!!!!!!! Node inclusion done".format(res))
 
         for node_id in P.network.nodes:
             node = P.network.nodes[node_id]
-            if node.is_failed():
+            if node.is_failed:
                 L.l.info("Node failed: {}".format(node))
             if node_id > 1:
                 pass
