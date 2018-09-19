@@ -13,6 +13,7 @@ from pydispatch import dispatcher as haiot_dispatch
 class P:
     network = None
     module_imported = False
+    did_inclusion = False
 
 try:
     import openzwave
@@ -173,9 +174,8 @@ def init():
             L.l.info("Network is started!")
         # print nodes
         for node_id in P.network.nodes:
-            if node_id > 1:
-                node = P.network.nodes[node_id]
-                L.l.info("Node {}={}".format(node_id, node))
+            node = P.network.nodes[node_id]
+            L.l.info("Node {}={}".format(node_id, node))
 
         # not working
         #P.network.set_poll_interval(milliseconds=3000, bIntervalBetweenPolls=False)
@@ -189,6 +189,12 @@ def init():
 def thread_run():
     #L.l.info("State is {}".format(P.network.state))
     try:
+        if not P.did_inclusion and P.network is not None:
+            L.l.info("Listening for new node inclusion")
+            res = P.network.controller.add_node()
+            L.l.info("Node inclusion returned {}".format(res))
+            P.did_inclusion = True
+
         for node_id in P.network.nodes:
             if node_id > 1:
                 node = P.network.nodes[node_id]
