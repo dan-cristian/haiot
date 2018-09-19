@@ -92,8 +92,7 @@ def run_thread_pool():
                     P.eldl[func] = datetime.now()
             elif future_obj.running():
                 if elapsed_seconds > 1*20:
-                    L.l.info('Threaded function {} is long running for {} seconds'.format(
-                        print_name, elapsed_seconds))
+                    # L.l.info('Threaded func{} is long running for {} seconds'.format(print_name, elapsed_seconds))
                     if P.cpl.has_key(func):
                         progress_status = P.cpl[func].func_globals['progress_status']
                         L.l.warning('Progress Status since {} sec is [{}]'.format(elapsed_seconds, progress_status))
