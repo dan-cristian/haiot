@@ -66,8 +66,6 @@ def run_thread_pool():
                 # print_name = func.func_globals['__name__'] + '.' + func.func_name
                 print_name = __get_print_name_callable(func)
                 exec_interval = P.eil.get(func, None)
-                L.l.info("Starting thread #{} {},{}".format(i, print_name, exec_interval))
-                i += 1
                 if not exec_interval:
                     L.l.error('No exec interval set for thread function ' + print_name)
                     exec_interval = 60  # set a default exec interval
@@ -77,13 +75,14 @@ def run_thread_pool():
                 if future_obj.done():
                     try:
                         result = future_obj.result()
-                        L.l.debug('Thread result={}'.format(result))
+                        L.l.info('Thread end {}={}'.format(print_name, result))
                     except Exception as exc:
                         L.l.error('Exception {} in {}'.format(exc, print_name, exc_info=True))
                     # print('%s=%s' % (print_name, future_obj.result()))
                     # run the function again at given interval
                     if elapsed_seconds and elapsed_seconds > exec_interval:
                         del P.ff[future_obj]
+                        L.l.info("Starting thread {},{}".format(print_name, exec_interval))
                         P.ff[executor.submit(func)] = func
                         P.eldl[func] = datetime.now()
                 elif future_obj.running():
