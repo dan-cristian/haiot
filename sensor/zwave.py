@@ -158,6 +158,7 @@ def init():
             L.l.info("Can't initialise zwave driver. Look at the logs in OZW_Log.log")
             return False
         L.l.info("Home id : {}, Nodes in network : {}".format(P.network.home_id_str, P.network.nodes_count))
+
         L.l.info("Waiting for network to become ready")
         for i in range(0, 120):
             if P.network.state >= P.network.STATE_READY:
@@ -170,6 +171,11 @@ def init():
             return False
         else:
             L.l.info("Network is started!")
+        # print nodes
+        for node_id in P.network.nodes:
+            if node_id > 1:
+                node = P.network.nodes[node_id]
+                L.l.info("Node {}={}".format(node_id, node))
 
         # not working
         #P.network.set_poll_interval(milliseconds=3000, bIntervalBetweenPolls=False)
@@ -184,7 +190,7 @@ def thread_run():
     #L.l.info("State is {}".format(P.network.state))
     try:
         for node_id in P.network.nodes:
-            if id > 1:
+            if node_id > 1:
                 node = P.network.nodes[node_id]
                 #L.l.info("Node {}".format(node))
                 node.request_state()
