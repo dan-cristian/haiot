@@ -28,7 +28,7 @@ def add_interval_callable(func, run_interval_second):  # , *args):
         # __callable_args.append(*args)
         P.eldl[func] = datetime.now()
         P.eil[func] = run_interval_second
-        if P.tpool:  # run the function already is thread pool is started
+        if len(P.ff) > 0 and P.executor is not None:  # run the function already is thread pool is started
             L.l.info('Initialising additional thread {}'.format(print_name))
             P.ff[P.executor.submit(func)] = func
     else:
