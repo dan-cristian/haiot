@@ -192,14 +192,16 @@ def thread_run():
         if not P.did_inclusion and P.network is not None:
             L.l.info("Listening for new node inclusion")
             res = P.network.controller.add_node()
-            L.l.info("Node inclusion returned {}, waiting for 15 seconds".format(res))
-            time.sleep(15)
+            L.l.info("!!!!!!!!!!!! Node inclusion returned {}, waiting for 30 seconds".format(res))
+            time.sleep(30)
             P.did_inclusion = True
+            L.l.info("!!!!!!!!!!! Node inclusion done".format(res))
 
-        for node_id in P.network.nodes:
-            if node_id > 1:
-                node = P.network.nodes[node_id]
-                #L.l.info("Node {}".format(node))
-                node.request_state()
+        if False:
+            for node_id in P.network.nodes:
+                if node_id > 1:
+                    node = P.network.nodes[node_id]
+                    #L.l.info("Node {}".format(node))
+                    node.request_state()
     except Exception as ex:
         L.l.error("Error in zwave thread run={}".format(ex), exc_info=True)
