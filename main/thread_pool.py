@@ -59,10 +59,13 @@ def run_thread_pool():
             if len(P.cl) != len(P.ff):
                 L.l.info('Initialising interval thread processing with {} functions'.format(len(P.cl)))
                 P.ff = {executor.submit(call_obj): call_obj for call_obj in P.cl}
+            i = 1
             for future_obj in dict(P.ff):
                 func = P.ff[future_obj]
                 print_name = func.func_globals['__name__'] + '.' + func.func_name
                 exec_interval = P.eil.get(func, None)
+                L.l.info("Starting thread #{} {},{}".format(i, print_name, exec_interval))
+                i += 1
                 if not exec_interval:
                     L.l.error('No exec interval set for thread function ' + print_name)
                     exec_interval = 60  # set a default exec interval
