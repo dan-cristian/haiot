@@ -64,7 +64,7 @@ def relay_set(gpio_pin=None, value=None, from_web=False):
     pin_value = None
     value = int(value)
     message = 'Set relay state [{}] for pin [{}] from web=[{}]'.format(value, gpio_pin.pin_index_bcm, from_web)
-    L.l.info(message)
+    # L.l.info(message)
     if Constant.HOST_MACHINE_TYPE in [Constant.MACHINE_TYPE_RASPBERRY, Constant.MACHINE_TYPE_BEAGLEBONE]:
         if gpio_pin.pin_type in [Constant.GPIO_PIN_TYPE_PI_STDGPIO, Constant.GPIO_PIN_TYPE_BBB]:
             if rpi_gpio.initialised:
@@ -89,7 +89,7 @@ def relay_set(gpio_pin=None, value=None, from_web=False):
 def gpio_record_update(json_object):
     try:
         host_name = utils.get_object_field_value(json_object, 'name')
-        L.l.info('Received gpio state update from {}'.format(host_name))
+        # L.l.info('Received gpio state update from {}'.format(host_name))
         if host_name != Constant.HOST_NAME:
             models.GpioPin().save_changed_fields_from_json_object(json_object=json_object,
                                                                   notify_transport_enabled=False, save_to_graph=False)
@@ -102,7 +102,7 @@ def zone_custom_relay_record_update(json_object):
     # carefull not to trigger infinite recursion updates
     try:
         host_name = utils.get_object_field_value(json_object, 'gpio_host_name')
-        L.l.info('Received custom relay state update for host {}'.format(host_name))
+        # L.l.info('Received custom relay state update for host {}'.format(host_name))
         if host_name == Constant.HOST_NAME:
             # execute local pin change related actions like turn on/off a relay
             global initialised
