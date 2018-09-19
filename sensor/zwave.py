@@ -55,7 +55,7 @@ def louie_network_ready(network):
 
 
 def louie_node_update(network, node):
-    #L.l.info('Louie signal: Node update : {}.'.format(node))
+    L.l.info('Louie signal: Node update : {}.'.format(node))
     pass
 
 
@@ -133,8 +133,8 @@ def init():
         options.set_console_output(False)
         options.set_save_log_level("Debug")
         #options.set_save_log_level('Info')
-        options.set_logging(False)
-        #options.set_logging(True)
+        #options.set_logging(False)
+        options.set_logging(True)
         options.set_poll_interval(5)
         options.set_save_configuration(True)
         options.lock()
