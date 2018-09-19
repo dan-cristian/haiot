@@ -20,14 +20,15 @@ def __get_print_name_callable(func):
 
 
 def add_interval_callable(func, run_interval_second):  # , *args):
-    # print_name = __get_print_name_callable(func)
+    print_name = __get_print_name_callable(func)
     if func not in P.cl:
+        L.l.info("Added callable {},{}".format(print_name, run_interval_second))
         P.cl.append(func)
         # __callable_args.append(*args)
         P.eldl[func] = datetime.now()
         P.eil[func] = run_interval_second
     else:
-        L.l.info('Callable not added, already there')
+        L.l.warning('Callable {} not added, already there'.format(print_name))
 
 
 def add_interval_callable_progress(func, run_interval_second=60, progress_func=None):
@@ -62,7 +63,8 @@ def run_thread_pool():
             i = 1
             for future_obj in dict(P.ff):
                 func = P.ff[future_obj]
-                print_name = func.func_globals['__name__'] + '.' + func.func_name
+                # print_name = func.func_globals['__name__'] + '.' + func.func_name
+                print_name = __get_print_name_callable(func)
                 exec_interval = P.eil.get(func, None)
                 L.l.info("Starting thread #{} {},{}".format(i, print_name, exec_interval))
                 i += 1
