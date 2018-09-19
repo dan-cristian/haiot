@@ -14,6 +14,9 @@ class P:
     network = None
     module_imported = False
     did_inclusion = False
+    initialised = False
+    init_fail_count = 0
+
 
 try:
     import openzwave
@@ -165,10 +168,11 @@ def init():
             if P.network.state >= P.network.STATE_READY:
                 break
             else:
-                time.sleep(0.1)
+                time.sleep(0.3)
                 #L.l.info("state = {}".format(P.network.state))
         if not P.network.is_ready:
             L.l.info("Can't start network! Look at the logs in OZW_Log.log")
+            P.network.stop()
             return False
         else:
             L.l.info("Network is started!")
@@ -176,7 +180,6 @@ def init():
         for node_id in P.network.nodes:
             node = P.network.nodes[node_id]
             L.l.info("Node {}={}".format(node_id, node))
-
         # not working
         #P.network.set_poll_interval(milliseconds=3000, bIntervalBetweenPolls=False)
         #P.network.test(1)
@@ -189,6 +192,14 @@ def init():
 def thread_run():
     #L.l.info("State is {}".format(P.network.state))
     try:
+        if not P.initialised:
+            P.initialised = init()
+            if not P.initialised:
+                P.init_fail_count += 1
+                if P.init_fail_count > 10:
+                    unload()
+                return
+
         if not P.did_inclusion and P.network is not None:
             L.l.info("!!!!!!!!!!! Listening for new node inclusion")
             res = P.network.controller.add_node()
