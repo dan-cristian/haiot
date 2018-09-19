@@ -134,8 +134,8 @@ def init():
         options.set_log_file("OZW_Log.log")
         options.set_append_log_file(False)
         options.set_console_output(False)
-        options.set_save_log_level("Debug")
-        #options.set_save_log_level('Info')
+        #options.set_save_log_level("Debug")
+        options.set_save_log_level('Info')
         #options.set_logging(False)
         options.set_logging(True)
         #options.set_poll_interval(5)
@@ -215,7 +215,6 @@ def thread_run():
                 res = P.network.controller.remove_failed_node(node_id)
                 L.l.info("Removing failed node {} returned {}".format(node, res))
             if node_id > 1:
-                pass
-                #node.request_state()
+                node.request_state()
     except Exception as ex:
         L.l.error("Error in zwave thread run={}".format(ex), exc_info=True)
