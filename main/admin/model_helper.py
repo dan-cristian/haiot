@@ -66,12 +66,12 @@ def commit():
         db.session.commit()
         performance.add_query(time_start, query_details=query_details)
         return True
-    except IntegrityError, ex:
+    except IntegrityError as ex:
         L.l.error('Unable to commit DB session={}, ignored, err={}'.format(db.session, ex), exc_info=True)
         db.session.rollback()
-    except InvalidRequestError, ex:
+    except InvalidRequestError as ex:
         L.l.error('Error on commit, session={}, ignoring, err={}'.format(db.session, ex), exc_info=1)
-    except Exception, ex:
+    except Exception as ex:
         L.l.warning('Exception on commit, session={} err={}'.format(db.session, ex))
         db.session.remove()
     return False
