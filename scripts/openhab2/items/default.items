@@ -70,9 +70,12 @@ Number electricity_solar_aps "Power solar [%.0f watt]" <solarplant>         {mqt
 Number electricity_kWh_power_main_1 "KWh main 1 [%.2f kWh]" <energy>        {mqtt="<[mosquitto:iot/openhab/electricity_kWh_power main 1:state:default]"}
 Number electricity_kWh_power_main_mono "KWh main mono [%.2f kWh]" <energy>  {mqtt="<[mosquitto:iot/openhab/electricity_kWh_power main mono:state:default]"}
 Number electricity_kWh_solar_aps "KWh solar [%.2f kWh]" <solarplant>        {mqtt="<[mosquitto:iot/openhab/electricity_kWh_solar_aps:state:default]"}
-Number electricity_power_factor_mono "Main power factor [%.2f]" <flow>           {mqtt="<[mosquitto:iot/openhab/vdd_ZMNHTDx Smart meter S4 S5 S6:state:default]"}
+Number electricity_power_factor_mono "Main power factor [%.2f]" <flow>      {mqtt="<[mosquitto:iot/openhab/vdd_ZMNHTDx Smart meter S4 S5 S6:state:default]"}
 Number electricity_voltage_mono "Main voltage [%.0f V]" <energy>            {mqtt="<[mosquitto:iot/openhab/vad_ZMNHTDx Smart meter S4 S5 S6:state:default]"}
-Number electricity_current_mono "Main current [%.1f A]" <poweroutlet_eu>         {mqtt="<[mosquitto:iot/openhab/iad_ZMNHTDx Smart meter S4 S5 S6:state:default]"}
+Number electricity_current_mono "Main current [%.1f A]" <poweroutlet_eu>    {mqtt="<[mosquitto:iot/openhab/iad_ZMNHTDx Smart meter S4 S5 S6:state:default]"}
+Number electricity_power_factor_plug_1 "Plug 1 power factor [%.2f]" <flow>      {mqtt="<[mosquitto:iot/openhab/vdd_TZ69 Smart energy plug in switch:state:default]"}
+Number electricity_voltage_plug_1 "Plug 1 voltage [%.0f V]" <energy>            {mqtt="<[mosquitto:iot/openhab/vad_TZ69 Smart energy plug in switch:state:default]"}
+Number electricity_current_plug_1 "Plug 1 current [%.1f A]" <poweroutlet_eu>    {mqtt="<[mosquitto:iot/openhab/iad_TZ69 Smart energy plug in switch:state:default]"}
 
 Number gas_gas "Gas [%.1f mc]" <gas>                                        {mqtt="<[mosquitto:iot/openhab/gas_gas:state:default]"}
 Number water_main "Water main [%.0f l]" <water>                             {mqtt="<[mosquitto:iot/openhab/water_water main:state:default]"}
@@ -90,6 +93,3 @@ Contact contact_sonerie "Sonerie [%s]" <door>                               (CON
 Contact contact_usa_intrare "Usa intrare [%s]" <door>                       (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_usa intrare:state:default]"}
 
 Number p_switch                         ""
-Number p_energy_today_main_mono         "Energy main mono today [%.2f kWh]"
-Number p_energy_today_main_1            "Energy main 1 today [%.2f kWh]"
-Number p_energy_today_solar_aps         "Energy solar today [%.2f kWh]"
