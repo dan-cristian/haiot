@@ -168,6 +168,7 @@ Frame {
 	Default item=electricity_power_factor_mono
 	Default item=electricity_voltage_mono
 	Default item=electricity_current_mono
+	Default item=electricity_power_plug_1
 	Default item=electricity_power_factor_plug_1
 	Default item=electricity_voltage_plug_1
 	Default item=electricity_current_plug_1
