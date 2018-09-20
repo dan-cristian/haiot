@@ -338,7 +338,7 @@
     {"zone_id":27 , "sensor_address": "02000004F31C1C28", "sensor_name": "pod fata", "target_material": "air", "alt_address": ""},
     {"zone_id":53 , "sensor_address": "404000225631", "sensor_name": "solar back", "alt_address": ""},
     {"zone_id":8 , "sensor_address": "", "sensor_name": "ZMNHTDx Smart meter S4 S5 S6"},
-    {"zone_id":29 , "sensor_address": "", "sensor_name": "Unknown: type=0004, id=0002"}
+    {"zone_id":29 , "sensor_address": "", "sensor_name": "TZ69 Smart energy plug in switch"}
   ],
 
   "Utility": [
@@ -349,7 +349,7 @@
     {"utility_name":"power main 1", "sensor_name":"power main 2", "sensor_index":0, "ticks_per_unit":2000, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
     {"utility_name":"power main 2", "sensor_name":"power main 2", "sensor_index":1, "ticks_per_unit":2000, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
     {"utility_name":"power main mono", "sensor_name":"ZMNHTDx Smart meter S4 S5 S6", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
-    {"utility_name":"power plug 1", "sensor_name":"Unknown: type=0004, id=0002", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
+    {"utility_name":"power plug 1", "sensor_name":"TZ69 Smart energy plug in switch", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
 
     {"utility_name":"power rack", "sensor_name":"power rack", "sensor_index":0, "ticks_per_unit":2000, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
     {"utility_name":"power beci", "sensor_name":"utility beci", "sensor_index":0, "ticks_per_unit":1600, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
