@@ -211,9 +211,9 @@ def thread_run():
         for node_id in P.network.nodes:
             node = P.network.nodes[node_id]
             if node.is_failed:
-                L.l.info("Node failed: {}, removing".format(node))
-                res = P.network.controller.remove_failed_node(node_id)
-                L.l.info("Removing failed node {} returned {}".format(node, res))
+                L.l.info("Node failed: {}".format(node))
+                #res = P.network.controller.remove_failed_node(node_id)
+                #L.l.info("Removing failed node {} returned {}".format(node, res))
             if node_id > 1:
                 #node.request_state()
                 pass
