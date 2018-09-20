@@ -201,10 +201,10 @@ def thread_run():
                 return
 
         if not P.did_inclusion and P.network is not None:
-            L.l.info("!!!!!!!!!!! Listening for new node inclusion")
-            res = P.network.controller.add_node()
+            #L.l.info("!!!!!!!!!!! Listening for new node inclusion")
+            #res = P.network.controller.add_node()
             #L.l.info("!!!!!!!!!!!! Node inclusion returned {}, waiting for 30 seconds".format(res))
-            time.sleep(20)
+            #time.sleep(20)
             P.did_inclusion = True
             #L.l.info("!!!!!!!!!!! Node inclusion done".format(res))
 
