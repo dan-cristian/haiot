@@ -75,13 +75,15 @@ def louie_value(network, node, value):
             haiot_dispatch.send(Constant.SIGNAL_UTILITY_EX, sensor_name=node.product_name,
                                 value=value.data, unit=units_adjusted)
         else:
+            L.l.info("Received node={}, value={}".format(node, value))
             current_record = models.Sensor.query.filter_by(sensor_name=node.product_name).first()
             if current_record is not None:
                 current_record.vad = None
                 current_record.iad = None
+                current_record.vdd = None
                 address = current_record.address
             else:
-                L.l.info("Cannot find sensor definition in db, name={}".format(node.product_name))
+                L.l.info("Cannot find sensor definition in db, name=[{}]".format(node.product_name))
                 address = 'unique-' + node.product_name
             record = models.Sensor(sensor_name=node.product_name, address=address)
             if value.label == "Voltage":
