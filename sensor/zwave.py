@@ -79,7 +79,7 @@ def louie_value(network, node, value):
             if current_record is not None:
                 current_record.vad = None
                 current_record.iad = None
-            record = models.Sensor(sensor_name=node.product_name)
+            record = models.Sensor(sensor_name=node.product_name, address=current_record.address)
             if value.label == "Voltage":
                 record.vad = value.data
                 record.save_changed_fields(current_record=current_record, new_record=record,
