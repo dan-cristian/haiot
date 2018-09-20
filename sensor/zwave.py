@@ -75,7 +75,7 @@ def louie_value(network, node, value):
             haiot_dispatch.send(Constant.SIGNAL_UTILITY_EX, sensor_name=node.product_name,
                                 value=value.data, unit=units_adjusted)
         else:
-            L.l.info("Received node={}, value={}".format(node, value))
+            # L.l.info("Received node={}, value={}".format(node, value))
             current_record = models.Sensor.query.filter_by(sensor_name=node.product_name).first()
             if current_record is not None:
                 current_record.vad = None
@@ -142,8 +142,8 @@ def init():
         options.set_console_output(False)
         #options.set_save_log_level("Debug")
         options.set_save_log_level('Info')
-        #options.set_logging(False)
-        options.set_logging(True)
+        options.set_logging(False)
+        #options.set_logging(True)
         #options.set_poll_interval(5)
         options.set_save_configuration(True)
         options.lock()
