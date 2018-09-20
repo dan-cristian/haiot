@@ -327,18 +327,18 @@
     {"zone_id":27 , "sensor_address": "b8:01", "sensor_name": "desk"},
     {"zone_id":49 , "sensor_address": "AC000003BE024F28", "sensor_name": "soba beci", "target_material": "water"},
     {"zone_id":10 , "sensor_address": "4E000001CEF07926", "sensor_name": "voltage-water"},
-    {"zone_id":8 , "sensor_address": "A80000000F86B81D", "sensor_name": "power main 1"},
-    {"zone_id":7 , "sensor_address": "BE0000000F870C1D", "sensor_name": "water main"},
+    {"zone_id":8 ,  "sensor_address": "A80000000F86B81D", "sensor_name": "power main 1"},
+    {"zone_id":7 ,  "sensor_address": "BE0000000F870C1D", "sensor_name": "water main"},
     {"zone_id":29 , "sensor_address": "EF0000000F97CA1D", "sensor_name": "power main 2"},
     {"zone_id":29 , "sensor_address": "F90000000FFEAB1D", "sensor_name": "power rack"},
     {"zone_id":10 , "sensor_address": "1C0000000F99851D", "sensor_name": "utility beci", "alt_address": "1D.85990F000000"},
     {"zone_id":29 , "sensor_address": "AB0000000F60491D", "sensor_name": "water beci", "alt_address": "1D.49600F000000"},
-    {"zone_id":4 , "sensor_address": "FB00000017413E3A", "sensor_name": "dormitor bedroom", "target_material": "air"},
-    {"zone_id":7 , "sensor_address": "C8000004F3495728", "sensor_name": "curte fata", "target_material": "air"},
+    {"zone_id":4 ,  "sensor_address": "FB00000017413E3A", "sensor_name": "dormitor bedroom", "target_material": "air"},
+    {"zone_id":7 ,  "sensor_address": "C8000004F3495728", "sensor_name": "curte fata", "target_material": "air"},
     {"zone_id":27 , "sensor_address": "02000004F31C1C28", "sensor_name": "pod fata", "target_material": "air", "alt_address": ""},
-    {"zone_id":53 , "sensor_address": "404000225631", "sensor_name": "solar back", "alt_address": ""},
-    {"zone_id":8 , "sensor_address": "unique-1", "sensor_name": "ZMNHTDx Smart meter S4 S5 S6"},
-    {"zone_id":29 , "sensor_address": "unique-2", "sensor_name": "TZ69 Smart energy plug in switch"}
+    {"zone_id":53 , "sensor_address": "404000225631",     "sensor_name": "solar back", "alt_address": ""},
+    {"zone_id":8 ,  "sensor_address": "ZMNHTDx Smart meter S4 S5 S6",             "sensor_name": "ZMNHTDx Smart meter S4 S5 S6"},
+    {"zone_id":29 , "sensor_address": "TZ69 Smart energy plug in switch",         "sensor_name": "TZ69 Smart energy plug in switch"}
   ],
 
   "Utility": [

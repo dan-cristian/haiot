@@ -30,7 +30,7 @@ def record_update(obj):
             record = models.Sensor(address=address)
             assert isinstance(record, models.Sensor)
             zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=address).first()
-            if zone_sensor:
+            if zone_sensor is not None:
                 record.sensor_name = zone_sensor.sensor_name
             else:
                 record.sensor_name = '(n/a) {} {} {}'.format(address, n_address, sensor_type)

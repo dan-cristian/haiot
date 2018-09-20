@@ -41,7 +41,7 @@ def model_row_to_json(obj, operation=''):
                 else:
                     L.l.debug('Ignoring obj to json, not simple primitive {}'.format(value))
         return utils.safeobj2json(safe_obj)
-    except Exception, ex:
+    except Exception as ex:
         L.l.critical('Error convert model obj to json, err {}'.format(ex))
 
 
@@ -50,10 +50,10 @@ def get_param(name):
     try:
         val = models.Parameter().query_filter_first(models.Parameter.name.in_([name])).value
         return val
-    except ValueError, ex:
+    except ValueError as ex:
         L.l.warning('Unable to get parameter {} error {}'.format(name, ex))
         raise ValueError
-    except Exception, ex:
+    except Exception as ex:
         L.l.critical('Exception when getting param {}, err={}'.format(name, ex))
         # db.session.rollback()
         raise ex
@@ -111,12 +111,12 @@ def check_table_schema(table, model_auto_update=False):
     try:
         # count = table.query.all()
         rec = table().query_filter_first()
-    except OperationalError, oex:
+    except OperationalError as oex:
         recreate_table = True
         ex_msg = str(oex)
     except InvalidRequestError:
         L.l.warning('Error on check table schema {}, ignoring'.format(table))
-    except Exception, ex:
+    except Exception as ex:
         if "ProgrammingError" in str(ex) or "pymysql.err.InternalError" in str(ex):
             recreate_table = True
             ex_msg = str(ex)
@@ -131,7 +131,7 @@ def check_table_schema(table, model_auto_update=False):
 def read_drop_table(table, original_exception, drop_without_user_ask=False):
     if not drop_without_user_ask:
         raise Exception("Database model for table {} is not matching app tables definition".format(table))
-        x = sys.stdin.readline(1)
+        # x = sys.stdin.readline(1)
     else:
         x = 'y'
     if x == 'y':
@@ -141,7 +141,7 @@ def read_drop_table(table, original_exception, drop_without_user_ask=False):
             # fixme: does not work with multiple db sources
             result = db.engine.execute('DROP TABLE ' + table_name)
             commit()
-        except Exception, ex:
+        except Exception as ex:
             L.l.info('Something went wrong on drop, ignoring err {}'.format(ex))
             db.session.rollback()
         L.l.info('Creating missing schema object after table drop')
