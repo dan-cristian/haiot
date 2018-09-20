@@ -84,7 +84,7 @@ def louie_value(network, node, value):
                 address = current_record.address
             else:
                 L.l.info("Cannot find sensor definition in db, name=[{}]".format(node.product_name))
-                address = 'unique-' + node.product_name
+                address = node.product_name
             record = models.Sensor(sensor_name=node.product_name, address=address)
             if value.label == "Voltage":
                 record.vad = value.data
