@@ -185,7 +185,7 @@ def init():
         #P.network.test(1)
         return True
     else:
-        L.l.info("Zwave init skipped")
+        #L.l.info("Zwave init skipped")
         return False
 
 
@@ -201,12 +201,12 @@ def thread_run():
                 return
 
         if not P.did_inclusion and P.network is not None:
-            L.l.info("!!!!!!!!!!! Listening for new node inclusion")
-            res = P.network.controller.add_node()
-            L.l.info("!!!!!!!!!!!! Node inclusion returned {}, waiting for 30 seconds".format(res))
-            time.sleep(10)
+            #L.l.info("!!!!!!!!!!! Listening for new node inclusion")
+            #res = P.network.controller.add_node()
+            #L.l.info("!!!!!!!!!!!! Node inclusion returned {}, waiting for 30 seconds".format(res))
+            #time.sleep(10)
             P.did_inclusion = True
-            L.l.info("!!!!!!!!!!! Node inclusion done".format(res))
+            #L.l.info("!!!!!!!!!!! Node inclusion done".format(res))
 
         for node_id in P.network.nodes:
             node = P.network.nodes[node_id]
