@@ -323,7 +323,7 @@
     {"zone_id":47 , "sensor_address": "EF000003BDE17928", "sensor_name": "birou", "target_material": "air", "alt_address": "28.79E1BD030000"},
     {"zone_id":6 , "sensor_address": "1C000004F34A3428", "sensor_name": "dormitor spate", "target_material": "air", "alt_address": "28.344AF3040000"},
     {"zone_id":23 , "sensor_address": "cc:01", "sensor_name": "fridge"},
-    {"zone_id":26 , "sensor_address": "f9:01", "sensor_name": "congelator"},
+    {"zone_id":26 , "sensor_address": "f9:02", "sensor_name": "congelator"},
     {"zone_id":27 , "sensor_address": "b8:01", "sensor_name": "desk"},
     {"zone_id":49 , "sensor_address": "AC000003BE024F28", "sensor_name": "soba beci", "target_material": "water"},
     {"zone_id":10 , "sensor_address": "4E000001CEF07926", "sensor_name": "voltage-water"},
@@ -337,7 +337,8 @@
     {"zone_id":7 , "sensor_address": "C8000004F3495728", "sensor_name": "curte fata", "target_material": "air"},
     {"zone_id":27 , "sensor_address": "02000004F31C1C28", "sensor_name": "pod fata", "target_material": "air", "alt_address": ""},
     {"zone_id":53 , "sensor_address": "404000225631", "sensor_name": "solar back", "alt_address": ""},
-    {"zone_id":8 , "sensor_address": "", "sensor_name": "ZMNHTDx Smart meter S4 S5 S6"}
+    {"zone_id":8 , "sensor_address": "", "sensor_name": "ZMNHTDx Smart meter S4 S5 S6"},
+    {"zone_id":29 , "sensor_address": "", "sensor_name": "Unknown: type=0004, id=0002"}
   ],
 
   "Utility": [
@@ -348,6 +349,7 @@
     {"utility_name":"power main 1", "sensor_name":"power main 2", "sensor_index":0, "ticks_per_unit":2000, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
     {"utility_name":"power main 2", "sensor_name":"power main 2", "sensor_index":1, "ticks_per_unit":2000, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
     {"utility_name":"power main mono", "sensor_name":"ZMNHTDx Smart meter S4 S5 S6", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
+    {"utility_name":"power plug 1", "sensor_name":"Unknown: type=0004, id=0002", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
 
     {"utility_name":"power rack", "sensor_name":"power rack", "sensor_index":0, "ticks_per_unit":2000, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
     {"utility_name":"power beci", "sensor_name":"utility beci", "sensor_index":0, "ticks_per_unit":1600, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
