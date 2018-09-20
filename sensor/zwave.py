@@ -211,11 +211,12 @@ def thread_run():
         for node_id in P.network.nodes:
             node = P.network.nodes[node_id]
             if node.is_failed:
-                L.l.info("Node failed: {}".format(node))
+                #L.l.info("Node failed: {}".format(node))
                 #res = P.network.controller.remove_failed_node(node_id)
                 #L.l.info("Removing failed node {} returned {}".format(node, res))
+                pass
             if node_id > 1:
-                #node.request_state()
+                node.request_state()
                 pass
     except Exception as ex:
         L.l.error("Error in zwave thread run={}".format(ex), exc_info=True)
