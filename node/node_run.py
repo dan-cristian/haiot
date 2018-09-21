@@ -143,7 +143,7 @@ def get_progress():
 
 
 def thread_run():
-    prctl.set_name("node_run")
+    prctl.NAME="node_run"
     threading.current_thread().name = "node_run"
     L.l.debug('Processing node_run')
     global first_run
