@@ -1,4 +1,5 @@
 import subprocess
+import threading
 from main.logger_helper import L
 from main.admin import models
 from pydispatch import dispatcher
@@ -47,6 +48,7 @@ def _check_wifi(test=False):
 
 
 def thread_run():
+    threading.current_thread().name = "presence_wifi"
     L.l.debug('Processing presence_run')
     _check_wifi()
 

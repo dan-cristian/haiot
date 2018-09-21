@@ -2,6 +2,8 @@ import gpsd
 import urllib2
 import ssl
 import time
+import threading
+import gps
 import datetime
 import json
 import os
@@ -11,7 +13,7 @@ from pydispatch import dispatcher
 try:
     from common import Constant
     from main.admin import models
-except Exception, ex:
+except Exception as ex:
     print "Exception {} on gps import".format(ex)
 
 initialised = False
@@ -42,7 +44,7 @@ def _save_position():
         try:
             json.dump(State.pos_buffer, outfile)
             L.l.info("Saved {} positions to disk".format(len(State.pos_buffer)))
-        except Exception, ex:
+        except Exception as ex:
             L.l.error("Cannot save gps positions to {}, err={}".format(State.disk_pos_buffer_file, ex))
 
 
@@ -57,7 +59,7 @@ def _load_positions():
                         State.pos_buffer[i] = Position(*pos)
                         i += 1
                     L.l.info("Loaded {} positions from disk".format(len(State.pos_buffer)))
-        except Exception, ex:
+        except Exception as ex:
             L.l.error("Cannot load gps positions from {}, err={}".format(State.disk_pos_buffer_file, ex))
 
 
@@ -77,7 +79,7 @@ def _upload_pos_buffer():
                     State.pos_buffer.remove(p)
                 else:
                     L.l.warning("Unexpected response {}".format(resp[:100]))
-            except Exception, ex:
+            except Exception as ex:
                 L.l.warning("Unable to upload position, buffer={} err={}".format(len(State.pos_buffer), ex))
                 #L.l.info("Buffer has {} elements".format(len(State.pos_buffer)))
                 # L.l.info("URL WAS:{}".format(url))
@@ -165,12 +167,13 @@ def init():
         gpsd.connect()
         _read_gps()
         initialised = True
-    except Exception, ex:
+    except Exception as ex:
         L.l.info("Unable to connect to gps daemon or read gps, ex={}".format(ex))
         initialised = False
 
 
 def thread_run():
+    threading.current_thread().name = "gps"
     if initialised:
         _read_gps()
     else:
@@ -180,5 +183,5 @@ def thread_run():
 
 if __name__ == "__main__":
     p = Position(lat=1.22,lon=2.45,alt=10,sats_valid=3,acc=2,bat=5,timestamp=1000)
-    print json.dumps(p)
+    print(json.dumps(p))
     pass

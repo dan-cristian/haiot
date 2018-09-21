@@ -29,6 +29,7 @@ class FlaskInThread(threading.Thread):
         """
         start the server
         """
+        threading.current_thread().name = "flask"
         while not main.shutting_down:
             try:
                 L.l.info('Starting flask web ui on host {} port {}'.format(self._host, self._port))

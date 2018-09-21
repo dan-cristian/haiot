@@ -1,4 +1,5 @@
 import subprocess
+import threading
 from stat import S_ISREG, ST_CTIME, ST_MODE, ST_MTIME
 import os, sys, time, datetime
 import shutil
@@ -150,7 +151,7 @@ def _upload():
                 count += 1
                 if count == P.upload_batch:
                     break
-            except Exception, ex:
+            except Exception as ex:
                 L.l.info('Exception uploading file {}, ex={}'.format(f[0], ex))
 
 
@@ -163,7 +164,7 @@ def _clean_old(days_to_keep, folder):
             if delta_days > days_to_keep:
                 os.remove(file[0])
                 L.l.info('Old {} days file deleted {}'.format(delta_days, file[0]))
-        except Exception, ex:
+        except Exception as ex:
             pass
 
 
@@ -219,6 +220,7 @@ def unload():
 
 
 def thread_run():
+    threading.current_thread().name = "uploader"
     _upload()
     _clean_space()
 

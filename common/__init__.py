@@ -119,6 +119,7 @@ class Constant:
     P_SOLAR_UTILITY_NAME = 'SOLAR_UTILITY_NAME'
     P_UPS_ON_HOST = 'UPS_ON_HOST'
     P_SOLAR_PARSER_ON_HOST = 'SOLAR_PARSER_ON_HOST'
+    P_PERF_FILE_PATH = 'PERF_FILE_PATH'
 
     SMARTCTL_MODEL_FAMILY = 'Model Family:'
     SMARTCTL_MODEL_DEVICE = 'Device Model:'
@@ -183,7 +184,7 @@ def load_config_json():
         L.l.info('Loading variables from config file [{}]'.format(var_path))
         with open(var_path, 'r') as f:
             Constant.db_values_json = json.load(f)
-    except Exception, ex:
+    except Exception as ex:
         L.l.error('Cannot load config json, ex={}'.format(ex))
         exit(2)
 
@@ -212,11 +213,11 @@ def init():
         s.connect(("gmail.com", 80))
         Constant.HOST_MAIN_IP = s.getsockname()[0]
         s.close()
-    except Exception, ex:
+    except Exception as ex:
         L.l.warning('Cannot obtain main IP accurately, not connected to Internet?, retry, ex={}'.format(ex))
         try:
             Constant.HOST_MAIN_IP = socket.gethostbyname(socket.gethostname())
-        except Exception, ex2:
+        except Exception as ex2:
             L.l.warning('Cannot obtain main IP, no DNS available?, ex={}'.format(ex2))
             Constant.HOST_MAIN_IP = '127.0.0.1'
     L.l.info('Running on OS={} HOST={} IP={} MACHINE={}'.format(Constant.OS, Constant.HOST_NAME,

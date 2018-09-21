@@ -2,9 +2,10 @@ import sys
 import uuid
 from sqlalchemy.exc import IntegrityError, OperationalError, InvalidRequestError
 from main.logger_helper import L
-from common import Constant, utils, performance
+from common import Constant, utils
 from main import db, app
 import models
+from common import performance
 
 __author__ = 'dcristian'
 
