@@ -260,6 +260,7 @@ def _upload_bulk():
 
 
 def thread_run():
+    threading.current_thread().name = "thingspeak"
     global initialised
     try:
         if not initialised:

@@ -2,6 +2,7 @@ __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
 import time
 import serial
+import threading
 import sys
 from main.logger_helper import L
 from common import Constant, utils, variable
@@ -189,6 +190,7 @@ def init():
 
 
 def thread_run():
+    threading.current_thread().name = "ups_legrand"
     if not P.initialised:
         init()
     if P.initialised and P.serial is not None:

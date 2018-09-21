@@ -21,6 +21,7 @@ def send_message_obj(obj=''):
 
 
 def thread_run():
+    threading.current_thread().name = "transport"
     global __mqtt_lock
     __mqtt_lock.acquire()
     try:

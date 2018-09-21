@@ -1,6 +1,7 @@
 from inspect import getmembers, isfunction
 import imp
 import os
+import threading
 from pydispatch import dispatcher
 from apscheduler.schedulers.background import BackgroundScheduler
 from main.logger_helper import L
@@ -74,6 +75,7 @@ def process_events():
 
 
 def thread_run():
+    threading.current_thread().name = "rule_run"
     process_events()
     return 'Processed rules thread_run'
 
@@ -236,6 +238,7 @@ def _get_stamp():
 
 
 def reload_rules():
+    threading.current_thread().name = "rule_reload"
     global __rules_timestamp
     new_stamp = _get_stamp()
     if new_stamp != __rules_timestamp:

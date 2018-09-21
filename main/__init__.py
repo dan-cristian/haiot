@@ -274,6 +274,9 @@ def init():
     from main import cron
     cron.init()
 
+    from common import performance
+    performance.init(admin.model_helper.get_param(Constant.P_PERF_FILE_PATH))
+
     global initialised, shutting_down
     initialised = True
 
