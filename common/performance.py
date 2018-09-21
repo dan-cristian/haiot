@@ -51,15 +51,17 @@ def _save_threads_cpu_percent(p, interval=0.1):
     total_time = sum(p.cpu_times())
     list = []
     with open(P.log_file, "w") as log:
+        total = 0
         for t in p.threads():
             load = round(total_percent * ((t.system_time + t.user_time)/total_time), 2)
+            total += load
             th = _thread_for_ident(t.id)
             if th is None:
                 tname = "None"
             else:
                 tname = th.name
             log.write("{} % \t {} \t\t\t\t {}\n".format(load, tname, t))
-
+        log.write("Total={} %\n".format(total))
 
 def _cpu_profiling():
     p = psutil.Process(os.getpid())
