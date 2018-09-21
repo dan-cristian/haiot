@@ -233,3 +233,5 @@ def thread_run():
                 pass
     except Exception as ex:
         L.l.error("Error in zwave thread run={}".format(ex), exc_info=True)
+    prctl.set_name("idle")
+    threading.current_thread().name = "idle"
