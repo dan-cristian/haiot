@@ -1,6 +1,7 @@
 import subprocess
 import os
 import threading
+import prctl
 import cStringIO
 import shutil
 import time
@@ -565,6 +566,7 @@ def get_progress():
 
 
 def thread_run():
+    prctl.set_name("health_monitor")
     threading.current_thread().name = "health_monitor"
     global progress_status, import_module_psutil_exist
     progress_status = 'reading hdd smart attribs'

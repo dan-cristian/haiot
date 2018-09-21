@@ -1,4 +1,5 @@
 import threading
+import prctl
 from main.logger_helper import L
 from common import Constant
 from main.admin import models
@@ -197,6 +198,7 @@ def init():
 
 
 def thread_run():
+    prctl.set_name("zwave")
     threading.current_thread().name = "zwave"
     #L.l.info("State is {}".format(P.network.state))
     try:

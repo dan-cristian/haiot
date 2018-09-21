@@ -3,6 +3,7 @@ import urllib2
 import ssl
 import time
 import threading
+import prctl
 import gps
 import datetime
 import json
@@ -173,6 +174,7 @@ def init():
 
 
 def thread_run():
+    prctl.set_name("gps")
     threading.current_thread().name = "gps"
     if initialised:
         _read_gps()

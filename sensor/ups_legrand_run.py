@@ -3,6 +3,7 @@ __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 import time
 import serial
 import threading
+import prctl
 import sys
 from main.logger_helper import L
 from common import Constant, utils, variable
@@ -190,6 +191,7 @@ def init():
 
 
 def thread_run():
+    prctl.set_name("ups_legrand")
     threading.current_thread().name = "ups_legrand"
     if not P.initialised:
         init()
