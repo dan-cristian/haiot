@@ -36,6 +36,8 @@ def thread_run():
             L.l.warning("{} messages are pending in transport send queue".format(len(__send_json_queue)))
     finally:
         __mqtt_lock.release()
+    prctl.set_name("idle")
+    threading.current_thread().name = "idle"
 
 
 def unload():

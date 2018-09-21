@@ -132,6 +132,8 @@ def thread_run():
     #bbb_io.thread_run()
     std_gpio.thread_run()
     rpi_gpio.thread_run()
+    prctl.set_name("idle")
+    threading.current_thread().name = "idle"
 
 
 def unload():

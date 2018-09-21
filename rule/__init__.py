@@ -79,6 +79,8 @@ def thread_run():
     prctl.set_name("rule_run")
     threading.current_thread().name = "rule_run"
     process_events()
+    prctl.set_name("idle")
+    threading.current_thread().name = "idle"
     return 'Processed rules thread_run'
 
 
