@@ -27,7 +27,7 @@ from time import sleep
 import threading
 import serial
 from . import lowlevel
-
+import prctl
 
 ###############################################################################
 # RFXtrxDevice class
@@ -748,6 +748,7 @@ class Connect:
 
     def _connect(self):
         """Connect """
+        prctl.set_name("rfxcom_listener")
         self.transport.reset()
         self._status = self.send_get_status()
 
