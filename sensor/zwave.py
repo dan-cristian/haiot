@@ -72,10 +72,12 @@ def louie_value(network, node, value):
             #L.l.info("Saving power utility")
             if value.units == "W":
                 units_adjusted = "watt"  # this should match Utility unit name in models definition
+                value_adjusted = round(value.data, 0)
             else:
                 units_adjusted = value.units
+
             haiot_dispatch.send(Constant.SIGNAL_UTILITY_EX, sensor_name=node.product_name,
-                                value=value.data, unit=units_adjusted)
+                                value=value_adjusted, unit=units_adjusted)
         else:
             # L.l.info("Received node={}, value={}".format(node, value))
             current_record = models.Sensor.query.filter_by(sensor_name=node.product_name).first()
@@ -89,15 +91,15 @@ def louie_value(network, node, value):
                 address = node.product_name
             record = models.Sensor(sensor_name=node.product_name, address=address)
             if value.label == "Voltage":
-                record.vad = value.data
+                record.vad = round(value.data, 0)
                 record.save_changed_fields(current_record=current_record, new_record=record,
                                            notify_transport_enabled=True, save_to_graph=True, debug=False)
             elif value.label == "Current":
-                record.iad = value.data
+                record.iad = round(value.data, 1)
                 record.save_changed_fields(current_record=current_record, new_record=record,
                                            notify_transport_enabled=True, save_to_graph=True, debug=False)
             elif value.label == "Power Factor":
-                record.vdd = value.data
+                record.vdd = round(value.data, 1)
                 record.save_changed_fields(current_record=current_record, new_record=record,
                                            notify_transport_enabled=True, save_to_graph=True, debug=False)
             if current_record is not None:
