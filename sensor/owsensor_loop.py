@@ -246,6 +246,8 @@ def _dynamic_thread_run(ow_conn, ow_bus):
         prctl.set_name("owsensor-bus")
         threading.current_thread().name = "owsensor-bus"
         do_device(ow=ow_conn, path=ow_bus)
+        prctl.set_name("idle")
+        threading.current_thread().name = "idle"
     return _function
 
 
@@ -287,6 +289,8 @@ def thread_run():
         check_inactive()
     else:
         init()
+    prctl.set_name("idle")
+    threading.current_thread().name = "idle"
 
 
 if __name__ == "__main__":
