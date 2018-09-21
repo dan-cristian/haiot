@@ -6,4 +6,4 @@ pygame
 smbus2
 pi-ina219
 psutil
-prctl
+python-prctl
