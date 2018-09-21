@@ -580,3 +580,5 @@ def thread_run():
     # __check_log_file_size()
     _read_battery_power()
     progress_status = 'completed'
+    prctl.set_name("idle")
+    threading.current_thread().name = "idle"

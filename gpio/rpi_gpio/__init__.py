@@ -114,7 +114,7 @@ def setup_in_ports(gpio_pin_list):
                 # Log.logger.info('Added falling on rpi.gpio'.format(gpio_pin.pin_code))
                 GPIO.add_event_detect(int(gpio_pin.pin_code), GPIO.BOTH, callback=_event_detected_both, bouncetime=500)
                 L.l.info('OK callback set on rpi.gpio'.format(gpio_pin.pin_code))
-            except Exception, ex:
+            except Exception as ex:
                 L.l.critical('Unable to setup rpi.gpio callback pin={} err={}'.format(gpio_pin.pin_code, ex))
             __pool_pin_codes.append(gpio_pin.pin_code)
 
