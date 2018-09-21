@@ -135,3 +135,5 @@ def thread_run():
         L.l.error('Error read RFX tty port, err={}'.format(ex), exc_info=True)
         P.initialised = False
         utils.sleep(10)
+    prctl.set_name("idle")
+    threading.current_thread().name = "idle"
