@@ -3,6 +3,7 @@ __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 import httplib
 import os
 import threading
+import prctl
 import random
 import time
 import httplib2
@@ -261,6 +262,7 @@ if __name__ == '__main__':
 
 
 def thread_run():
+    prctl.set_name("youtube")
     threading.current_thread().name = "youtube"
     global __file_list_last_change, __uploaded_file_list_date
     try:

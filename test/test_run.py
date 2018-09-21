@@ -2,6 +2,7 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 from main import L
 import threading
+import prctl
 import plotly.plotly as py
 from plotly.graph_objs import *
 import plotly.tools as tls
@@ -69,6 +70,7 @@ def test5():
                          world_readable=True, # public or private
                          auto_open=True)      # open the grid in the browser
 def thread_run():
+    prctl.set_name("test")
     threading.current_thread().name = "test"
     L.l.info('Processing TEST_run')
     #py.sign_in("dancri77", "lw2w6fz9xk")

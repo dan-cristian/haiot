@@ -2,7 +2,7 @@ __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
 import datetime
 import threading
-
+import prctl
 from plotly import graph_objs
 import plotly.plotly as py
 from plotly.exceptions import PlotlyError, PlotlyAccountError, PlotlyListEntryError, PlotlyRequestError
@@ -260,6 +260,7 @@ def __announce_grid_cache():
                                    save_to_graph=False)
 
 def thread_run():
+    prctl.set_name("plotly")
     threading.current_thread().name = "plotly"
     L.l.debug('Processing graph_plotly_run')
     __upload_cached_plotly_data()

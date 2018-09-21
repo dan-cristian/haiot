@@ -33,6 +33,7 @@ from pydispatch import dispatcher
 from main import thread_pool
 import threading
 import datetime
+import prctl
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
@@ -46,6 +47,7 @@ _last_send_date = datetime.datetime.min
 
 
 def _send_queue():
+    prctl.set_name("newtifry")
     threading.current_thread().name = 'newtifry'
     global _source_key, _last_send_date, _message_queue
 
