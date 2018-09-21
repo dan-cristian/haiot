@@ -1,6 +1,7 @@
 from main.logger_helper import L
 import struct
 import array
+import threading
 import bluetooth
 from pydispatch import dispatcher
 from common import utils, Constant
@@ -101,6 +102,7 @@ def _list_all():
 
 
 def thread_run():
+    threading.current_thread().name = "presence_bt"
     L.l.debug('Processing presence_run')
     _check_presence()
     return 'Processed presence_run'

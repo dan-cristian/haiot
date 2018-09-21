@@ -46,6 +46,7 @@ _last_send_date = datetime.datetime.min
 
 
 def _send_queue():
+    threading.current_thread().name = 'newtifry'
     global _source_key, _last_send_date, _message_queue
 
     if len(_message_queue) == 0:

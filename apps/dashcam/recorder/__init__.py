@@ -1,5 +1,6 @@
 import subprocess
 import os
+import threading
 import time
 import datetime
 import traceback
@@ -30,7 +31,7 @@ _has_picamera_module = False
 try:
     import picamera
     _has_picamera_module = True
-except Exception, ex:
+except Exception as ex:
     pass
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
@@ -536,6 +537,7 @@ def init():
 
 
 def thread_run():
+    threading.current_thread().name = "recorder"
     try:
         _write_overlay_text()
         # detect ntp time drift, if clock changed adjust last move to avoid sudden recording stop

@@ -3,7 +3,7 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 import time
 import datetime
 import random
-
+import threading
 from main.logger_helper import L
 from common import Constant, variable, utils
 from main.admin import models
@@ -133,29 +133,28 @@ def announce_node_state():
         progress_status = 'Announce node status before save fields'
         node.save_changed_fields(current_record=current_record, new_record=node, notify_transport_enabled=True,
                                    save_to_graph=True, graph_save_frequency=120)
-    except Exception, ex:
+    except Exception as ex:
         L.l.error('Unable to announce my state, err={}'.format(ex))
 
 
-
 def get_progress():
-    global progress_status
     return progress_status
 
 
 def thread_run():
+    threading.current_thread().name = "node_run"
     L.l.debug('Processing node_run')
     global first_run
     global progress_status
     if first_run:
-        progress_status='Sleep on first run'
+        progress_status = 'Sleep on first run'
         L.l.info('On first node run I will sleep some seconds to get state updates')
         time.sleep(30)
         first_run = False
         L.l.info('Sleep done on first node run')
-    progress_status='Updating master state'
+    progress_status = 'Updating master state'
     update_master_state()
-    progress_status='Announcing node state'
+    progress_status = 'Announcing node state'
     announce_node_state()
-    progress_status='Completed'
+    progress_status = 'Completed'
     return 'Processed node_run'

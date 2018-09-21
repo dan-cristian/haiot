@@ -260,6 +260,7 @@ def __announce_grid_cache():
                                    save_to_graph=False)
 
 def thread_run():
+    threading.current_thread().name = "plotly"
     L.l.debug('Processing graph_plotly_run')
     __upload_cached_plotly_data()
     __announce_grid_cache()
