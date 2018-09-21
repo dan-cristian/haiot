@@ -279,7 +279,7 @@ def init():
 
 
 def thread_run():
-    prctl.set_name("owsensor")
+    prctl.NAME="owsensor"
     threading.current_thread().name = "owsensor"
     global initialised
     if initialised:
