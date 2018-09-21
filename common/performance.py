@@ -1,6 +1,7 @@
 __author__ = 'dcristian'
 import threading
 import utils
+import prctl
 from main.logger_helper import L
 from main import thread_pool
 import psutil
@@ -42,6 +43,7 @@ def add_query(start_time, query_details=None):
         return elapsed
 
 
+# https://stackoverflow.com/questions/34361035/python-thread-name-doesnt-show-up-on-ps-or-htop
 def _thread_for_ident(ident):
     return threading._active.get(ident)
 
@@ -76,10 +78,11 @@ def _cpu_profiling():
 
 
 def thread_run():
+    prctl.set_name = "performance"
     threading.current_thread().name = "performance"
     _cpu_profiling()
 
 
 def init(log_file):
     P.log_file = log_file
-    thread_pool.add_interval_callable_progress(thread_run, run_interval_second=10)
+    thread_pool.add_interval_callable_progress(thread_run, run_interval_second=5)
