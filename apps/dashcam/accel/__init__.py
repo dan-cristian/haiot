@@ -92,7 +92,7 @@ def _run_web_server():
     try:
         P.web_app = web.application(P.urls, globals())
         web.httpserver.runsimple(P.web_app.wsgifunc(), ("0.0.0.0", P.WEB_PORT))
-    except Exception, ex:
+    except Exception as ex:
         L.l.error("Start accel raw data webserver failed, ex={}".format(ex))
 
 
@@ -107,7 +107,7 @@ def unload():
 def init():
     try:
         Raw.init()
-    except Exception, ex:
+    except Exception as ex:
         L.l.error("Unable to init accel, ex={}".format(ex))
 
     if P.WEB_PORT != 0:
@@ -124,7 +124,7 @@ def read_sensor():
 
             sensor_all = [{'y': accel_scaled_y, 'x': accel_scaled_x, 'z': accel_scaled_z},
                           {'y': gyro_scaled_y, 'x': gyro_scaled_x, 'z': gyro_scaled_z}, temp]
-        except Exception, ex:
+        except Exception as ex:
             L.l.error("Unable to read accel, ex={}".format(ex))
         P.lastrecord = sensor_all
         return sensor_all
