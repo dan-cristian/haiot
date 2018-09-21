@@ -14,9 +14,9 @@ except Exception as ex:
     class L:
         class l:
             @staticmethod
-            def info(msg): print msg
+            def info(msg): print(msg)
             @staticmethod
-            def warning(msg): print msg
+            def warning(msg): print(msg)
 
 '''
 Created on Mar 9, 2015
@@ -171,7 +171,7 @@ def get_bus(sensor, dev, ow):
 def get_temperature(sensor, dev, ow):
     dev = get_prefix(sensor, dev, ow)
     # 2 digits round
-    val = utils.round_sensor_value(ow.read(sensor + 'temperature'))
+    val = utils.round_sensor_value(ow.read(sensor + 'fasttemp'))
     if val != P.IGNORED_TEMPERATURE:
         dev['temperature'] = val
     return dev
