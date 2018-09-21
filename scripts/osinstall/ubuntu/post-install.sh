@@ -358,7 +358,10 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
     echo Install optional requirements, you can ignore errors
     res=`cat /etc/os-release | grep raspbian -q ; echo $?`
     if [ "$res" == "0" ]; then
+        # needed for python-prctl
+        apt install -y libcap2-dev
         pip install --no-cache-dir -r requirements-rpi.txt
+        apt remove -y libcap2-dev
     else
         pip install --no-cache-dir -r requirements-beaglebone.txt
     fi
