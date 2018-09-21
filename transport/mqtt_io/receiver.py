@@ -29,20 +29,21 @@ def on_message(client, userdata, msg):
         start = msg.payload.find('{')
         end = msg.payload.find('}')
         json = msg.payload[start:end + 1]
-        x = json2obj(json)
-        #L.l.debug('Message received is {}'.format(json))
-        # ignore messages send by this host
-        if x[Constant.JSON_PUBLISH_SOURCE_HOST] != str(Constant.HOST_NAME):
+        if '"source_host_": "{}"'.format(Constant.HOST_NAME) not in json:
+            # ignore messages send by this host
+            x = json2obj(json)
+            #if x[Constant.JSON_PUBLISH_SOURCE_HOST] != str(Constant.HOST_NAME):
             start = utils.get_base_location_now_date()
             dispatcher.send(signal=Constant.SIGNAL_MQTT_RECEIVED, client=client, userdata=userdata, topic=msg.topic, obj=x)
             elapsed = (utils.get_base_location_now_date() - start).total_seconds()
             if elapsed > 5:
                 L.l.warning('Command received took {} seconds'.format(elapsed))
-            if hasattr(x, 'command') and hasattr(x, 'command_id') and hasattr(x, 'host_target'):
-                if x.host_target == socket.gethostname():
-                    L.l.info('Executing command {}'.format(x.command))
-                else:
-                    L.l.info("Received command {} for other host {}".format(x, x.host_target))
+            if False:
+                if hasattr(x, 'command') and hasattr(x, 'command_id') and hasattr(x, 'host_target'):
+                    if x.host_target == Constant.HOST_NAME:
+                        L.l.info('Executing command {}'.format(x.command))
+                    else:
+                        L.l.info("Received command {} for other host {}".format(x, x.host_target))
     except AttributeError as ex:
         L.l.warning('Unknown attribute error in msg {} err {}'.format(json, ex))
     except ValueError as e:
