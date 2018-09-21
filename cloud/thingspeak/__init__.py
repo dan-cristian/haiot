@@ -10,6 +10,7 @@ import traceback
 import tzlocal
 import urllib2
 import threading
+import prctl
 import logging
 
 initialised = False
@@ -260,6 +261,7 @@ def _upload_bulk():
 
 
 def thread_run():
+    prctl.set_name("thingspeak")
     threading.current_thread().name = "thingspeak"
     global initialised
     try:

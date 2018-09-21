@@ -2,6 +2,7 @@ __author__ = 'dcristian'
 
 import datetime
 import threading
+import prctl
 from main.logger_helper import L
 from main.admin import models
 from main.admin.model_helper import commit, get_param
@@ -275,6 +276,7 @@ def get_progress():
 
 
 def thread_run():
+    prctl.set_name("heat")
     threading.current_thread().name = "heat"
     global progress_status
     L.l.debug('Processing heat')
