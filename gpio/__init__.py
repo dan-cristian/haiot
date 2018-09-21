@@ -6,6 +6,7 @@ from main.admin.model_helper import commit
 from main import thread_pool
 import std_gpio
 import piface
+import threading
 #import bbb_io
 #import pigpio_gpio
 import rpi_gpio
@@ -123,6 +124,7 @@ def zone_custom_relay_record_update(json_object):
 
 
 def thread_run():
+    threading.current_thread().name = "gpio"
     #pigpio_gpio.thread_run()
     piface.thread_run()
     #bbb_io.thread_run()

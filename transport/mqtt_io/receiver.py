@@ -1,5 +1,6 @@
 __author__ = 'dcristian'
 import socket
+import threading
 from pydispatch import dispatcher
 from main.logger_helper import L
 from common.utils import json2obj
@@ -49,6 +50,7 @@ def on_message(client, userdata, msg):
 
 
 def thread_run():
+    threading.current_thread().name = "mqtt_receiver"
     L.l.debug('Processing mqtt_io receiver')
     global __last_message_received
     seconds_elapsed = (utils.get_base_location_now_date() - __last_message_received).total_seconds()

@@ -1,3 +1,4 @@
+import threading
 from main.logger_helper import L
 from common import Constant
 from main.admin import models
@@ -58,7 +59,7 @@ def louie_network_ready(network):
 
 
 def louie_node_update(network, node):
-    L.l.info('Louie signal: Node update : {}.'.format(node))
+    # L.l.info('Louie signal: Node update : {}.'.format(node))
     pass
 
 
@@ -196,6 +197,7 @@ def init():
 
 
 def thread_run():
+    threading.current_thread().name = "zwave"
     #L.l.info("State is {}".format(P.network.state))
     try:
         if not P.initialised:
