@@ -97,9 +97,9 @@ def __read_ups_status():
         status = status.replace('(', '')
         atoms = status.split()
         if len(atoms) >= 8:
-            P.ups.InputVoltage = utils.round_sensor_value(atoms[0])
+            P.ups.InputVoltage = round(utils.round_sensor_value(atoms[0]), 0)
             P.ups.RemainingMinutes = utils.round_sensor_value(atoms[1])
-            P.ups.OutputVoltage = atoms[2]
+            P.ups.OutputVoltage = round(atoms[2], 0)
             P.ups.LoadPercent = utils.round_sensor_value(atoms[3])
             P.ups.PowerFrequency = atoms[4]
             P.ups.BatteryVoltage = atoms[5]

@@ -59,4 +59,6 @@ def thread_run():
         L.l.warning('Last mqtt message received {} seconds ago, unusually long'.format(seconds_elapsed))
         transport.mqtt_io.init()
     # mqtt_io.mqtt_client.loop(timeout=1)
+    prctl.set_name("idle")
+    threading.current_thread().name = "idle"
     return 'Processed template_run'
