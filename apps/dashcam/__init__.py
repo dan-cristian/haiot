@@ -3,6 +3,7 @@ from main import thread_pool
 from common import Constant
 import ui
 import threading
+import prctl
 from pydispatch import dispatcher
 #import rpusbdisp
 import recorder
@@ -59,6 +60,7 @@ def _battery_init():
 
 
 def thread_run():
+    prctl.set_name("dashcam")
     threading.current_thread().name = "dashcam"
     uploader.thread_run()
     gps.thread_run()

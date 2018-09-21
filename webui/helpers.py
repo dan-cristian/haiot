@@ -3,7 +3,7 @@ from main.logger_helper import L
 import main
 import time
 import errno
-
+import prctl
 __author__ = 'dcristian'
 
 
@@ -29,6 +29,7 @@ class FlaskInThread(threading.Thread):
         """
         start the server
         """
+        prctl.set_name("flask")
         threading.current_thread().name = "flask"
         while not main.shutting_down:
             try:

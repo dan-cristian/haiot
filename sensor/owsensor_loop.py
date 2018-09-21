@@ -243,6 +243,7 @@ def get_unknown(sensor, dev, ow):
 
 def _dynamic_thread_run(ow_conn, ow_bus):
     def _function():
+        prctl.set_name("owsensor-bus")
         threading.current_thread().name = "owsensor-bus"
         do_device(ow=ow_conn, path=ow_bus)
     return _function

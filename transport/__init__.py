@@ -1,4 +1,5 @@
 import threading
+import prctl
 from main.logger_helper import L
 import transport_run
 from transport import mqtt_io
@@ -21,6 +22,7 @@ def send_message_obj(obj=''):
 
 
 def thread_run():
+    prctl.set_name("transport")
     threading.current_thread().name = "transport"
     global __mqtt_lock
     __mqtt_lock.acquire()

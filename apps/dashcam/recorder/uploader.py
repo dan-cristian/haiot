@@ -1,5 +1,6 @@
 import subprocess
 import threading
+import prctl
 from stat import S_ISREG, ST_CTIME, ST_MODE, ST_MTIME
 import os, sys, time, datetime
 import shutil
@@ -220,6 +221,7 @@ def unload():
 
 
 def thread_run():
+    prctl.set_name("uploader")
     threading.current_thread().name = "uploader"
     _upload()
     _clean_space()

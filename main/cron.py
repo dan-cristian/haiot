@@ -3,6 +3,7 @@ __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 import requests
 import schedule
 import threading
+import prctl
 from main.logger_helper import L
 from main import thread_pool
 
@@ -24,6 +25,7 @@ def setup_tasks():
 
 
 def thread_run():
+    prctl.set_name("cron")
     threading.current_thread().name = "cron"
     schedule.run_pending()
 

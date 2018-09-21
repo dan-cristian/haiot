@@ -7,6 +7,7 @@ from inspect import getmembers, isfunction
 from transport import mqtt_io
 import rules
 import threading
+import prctl
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
@@ -73,6 +74,7 @@ def __load_rules():
 
 
 def thread_run():
+    prctl.set_name("openhab")
     threading.current_thread().name = "openhab"
     for obj in list(P.event_list):
         try:
