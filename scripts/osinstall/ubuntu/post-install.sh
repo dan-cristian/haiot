@@ -359,9 +359,9 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
     res=`cat /etc/os-release | grep raspbian -q ; echo $?`
     if [ "$res" == "0" ]; then
         # needed for python-prctl
-        apt install -y libcap2-dev
+        apt-get install -y libcap2-dev
         pip install --no-cache-dir -r requirements-rpi.txt
-        apt remove -y libcap2-dev
+        apt-get remove -y libcap2-dev
     else
         pip install --no-cache-dir -r requirements-beaglebone.txt
     fi
