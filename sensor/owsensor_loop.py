@@ -1,5 +1,6 @@
 import traceback
 import threading
+import prctl
 import pyownet.protocol
 from pydispatch import dispatcher
 import datetime
@@ -278,6 +279,7 @@ def init():
 
 
 def thread_run():
+    prctl.set_name = "owsensor"
     threading.current_thread().name = "owsensor"
     global initialised
     if initialised:
