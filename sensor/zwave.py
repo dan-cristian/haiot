@@ -75,6 +75,7 @@ def louie_value(network, node, value):
                 value_adjusted = round(value.data, 0)
             else:
                 units_adjusted = value.units
+                value_adjusted = value.data
 
             haiot_dispatch.send(Constant.SIGNAL_UTILITY_EX, sensor_name=node.product_name,
                                 value=value_adjusted, unit=units_adjusted)
