@@ -1,5 +1,6 @@
 from pydispatch import dispatcher
 import threading
+import prctl
 from main.logger_helper import L
 from main import thread_pool, persistence
 from common import Constant, variable, utils
@@ -92,6 +93,7 @@ def on_models_committed(sender, changes):
 
 # runs periodically and executes received mqqt messages from queue
 def mqtt_thread_run():
+    prctl.set_name("mqtt_thread_run")
     threading.current_thread().name = "mqtt_thread_run"
     global __mqtt_lock
     __mqtt_lock.acquire()

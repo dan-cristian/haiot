@@ -2,6 +2,7 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 import random
 import threading
+import prctl
 from pydispatch import dispatcher
 from main import thread_pool
 from main.logger_helper import L
@@ -73,6 +74,7 @@ def setup_in_ports(gpio_pin_list):
 
 
 def thread_run():
+    prctl.set_name("bbbio")
     threading.current_thread().name = "bbbio"
     global initialised
     if initialised:

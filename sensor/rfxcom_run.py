@@ -7,6 +7,7 @@ from main.admin import models
 from common import Constant, utils, variable
 import serial_common
 import threading
+import prctl
 
 class P:
     initialised = False
@@ -117,6 +118,7 @@ def init():
 
 
 def thread_run():
+    prctl.set_name("rfxcom")
     threading.current_thread().name = "rfxcom"
     try:
         if not P.initialised:

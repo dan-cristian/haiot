@@ -4,6 +4,7 @@ import json
 import web
 import time
 import threading
+import prctl
 from main.logger_helper import L
 try:
     from smbus2 import SMBus
@@ -132,6 +133,7 @@ def read_sensor():
 
 
 def thread_run():
+    prctl.set_name("accel")
     threading.current_thread().name = "accel"
     read_sensor()
     return 'Processed accel'

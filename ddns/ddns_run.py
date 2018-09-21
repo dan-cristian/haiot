@@ -8,6 +8,7 @@ except ImportError:
     L.l.info('Module dateutil.parser cannot be imported')
 import pytz
 import threading
+import prctl
 import json
 import socket
 import requests
@@ -99,6 +100,7 @@ def __update_ddns_rackspace():
 
 
 def thread_run():
+    prctl.set_name("ddns")
     threading.current_thread().name = "ddns"
     L.l.debug('Processing ddns_run')
     __update_ddns_rackspace()

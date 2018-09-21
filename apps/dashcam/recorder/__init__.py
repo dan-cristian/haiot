@@ -1,6 +1,7 @@
 import subprocess
 import os
 import threading
+import prctl
 import time
 import datetime
 import traceback
@@ -537,6 +538,7 @@ def init():
 
 
 def thread_run():
+    prctl.set_name("recorder")
     threading.current_thread().name = "recorder"
     try:
         _write_overlay_text()
