@@ -209,7 +209,8 @@ def mqtt_thread_run():
         L.l.critical("General error processing mqtt: {}".format(ex))
     finally:
         __mqtt_lock.release()
-        pass
+        prctl.set_name("idle")
+        threading.current_thread().name = "idle"
 
 
 # http://pydispatcher.sourceforge.net/
