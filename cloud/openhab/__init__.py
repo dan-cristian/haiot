@@ -83,6 +83,8 @@ def thread_run():
             P.event_list.remove(obj)
         except Exception as ex:
             L.l.critical("Error processing openhab rule err={}".format(ex), exc_info=1)
+    prctl.set_name("idle")
+    threading.current_thread().name = "idle"
 
 
 def unload():
