@@ -78,7 +78,7 @@ def _cpu_profiling():
 
 
 def thread_run():
-    prctl.NAME="performance"
+    prctl.set_name("performance")
     threading.current_thread().name = "performance"
     _cpu_profiling()
 
