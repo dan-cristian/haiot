@@ -92,6 +92,7 @@ def on_models_committed(sender, changes):
 
 # runs periodically and executes received mqqt messages from queue
 def mqtt_thread_run():
+    threading.current_thread().name = "mqtt_thread_run"
     global __mqtt_lock
     __mqtt_lock.acquire()
     #from cloud import graph_plotly

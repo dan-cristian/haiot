@@ -1,6 +1,7 @@
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 import random
+import threading
 from pydispatch import dispatcher
 from main import thread_pool
 from main.logger_helper import L
@@ -72,6 +73,7 @@ def setup_in_ports(gpio_pin_list):
 
 
 def thread_run():
+    threading.current_thread().name = "bbbio"
     global initialised
     if initialised:
         L.l.debug('Processing Beaglebone IO')

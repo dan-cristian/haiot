@@ -132,6 +132,7 @@ def read_sensor():
 
 
 def thread_run():
+    threading.current_thread().name = "accel"
     read_sensor()
     return 'Processed accel'
 

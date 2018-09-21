@@ -2,6 +2,7 @@ from main.logger_helper import L
 from main import thread_pool
 from common import Constant
 import ui
+import threading
 from pydispatch import dispatcher
 #import rpusbdisp
 import recorder
@@ -58,6 +59,7 @@ def _battery_init():
 
 
 def thread_run():
+    threading.current_thread().name = "dashcam"
     uploader.thread_run()
     gps.thread_run()
 

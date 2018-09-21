@@ -6,6 +6,7 @@ from main.admin import model_helper
 from inspect import getmembers, isfunction
 from transport import mqtt_io
 import rules
+import threading
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
@@ -72,6 +73,7 @@ def __load_rules():
 
 
 def thread_run():
+    threading.current_thread().name = "openhab"
     for obj in list(P.event_list):
         try:
             result = getattr(rules, obj[1])(obj=obj[0], field_changed_list=obj[2])

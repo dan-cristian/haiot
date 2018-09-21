@@ -77,7 +77,7 @@ def init():
         # hipchat_notify(message='Module initialising', notify=True, color='red')
         # send_message(title="Initialised", message="Module initialised")
         # send_message(title="Initialised 2", message="Module initialised 2")
-    except Exception, ex:
+    except Exception as ex:
         L.l.error("Unable tp init hipchat %s" % ex)
     # thread_pool.add_interval_callable(_send_queue, run_interval_second=60)
     global initialised

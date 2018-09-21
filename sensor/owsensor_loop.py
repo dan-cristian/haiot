@@ -1,4 +1,5 @@
 import traceback
+import threading
 import pyownet.protocol
 from pydispatch import dispatcher
 import datetime
@@ -8,7 +9,7 @@ try:
     from main.admin import model_helper, models
     from main import thread_pool
 except Exception as ex:
-    print "Exception importing key modules, probably started via main"
+    print("Exception importing key modules, probably started via main")
     class L:
         class l:
             @staticmethod
@@ -241,6 +242,7 @@ def get_unknown(sensor, dev, ow):
 
 def _dynamic_thread_run(ow_conn, ow_bus):
     def _function():
+        threading.current_thread().name = "owsensor-bus"
         do_device(ow=ow_conn, path=ow_bus)
     return _function
 
@@ -276,6 +278,7 @@ def init():
 
 
 def thread_run():
+    threading.current_thread().name = "owsensor"
     global initialised
     if initialised:
         check_inactive()
