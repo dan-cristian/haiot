@@ -4,6 +4,7 @@ import time
 import datetime
 import random
 import threading
+import prctl
 from main.logger_helper import L
 from common import Constant, variable, utils
 from main.admin import models
@@ -142,6 +143,7 @@ def get_progress():
 
 
 def thread_run():
+    prctl.set_name = "node_run"
     threading.current_thread().name = "node_run"
     L.l.debug('Processing node_run')
     global first_run
