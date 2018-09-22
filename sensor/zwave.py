@@ -273,7 +273,7 @@ def thread_run():
                 node = P.network.nodes[node_id]
                 if node_id > 1:
                     node.request_state()
-        switch_all_on()
+            switch_all_on()
 
     except Exception as ex:
         L.l.error("Error in zwave thread run={}".format(ex), exc_info=True)
