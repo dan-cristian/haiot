@@ -155,7 +155,8 @@ def check_history_tables():
     """Add below all history tables you want to be initialised"""
     table_collection_list = [
         models.NodeHistory, models.SensorHistory, models.SystemDiskHistory, models.SystemMonitorHistory,
-        models.UpsHistory, models.PresenceHistory, models.SensorErrorHistory, models.ZoneHeatRelayHistory]
+        models.UpsHistory, models.PresenceHistory, models.SensorErrorHistory, models.ZoneHeatRelayHistory,
+        models.ZoneCustomRelayHistory]
     for table in table_collection_list:
         table_str = utils.get_table_name(table)
         # do not drop and recreate historic ones
