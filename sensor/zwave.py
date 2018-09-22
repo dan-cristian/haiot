@@ -78,17 +78,18 @@ def louie_node_update(network, node):
 
 
 # Qubino Meter Values
-# PowerLevel (Normal), Energy (kWh),  Energy (kVAh), Power (W), Voltage (V), Current (A), Power Factor, Unknown
+# Powerlevel (Normal), Energy (kWh),  Energy (kVAh), Power (W), Voltage (V), Current (A), Power Factor, Unknown
+# Exporting=False, Unknown=-70.5
 
 # TMBK Switch values
-# On and Off Enabled, PowerLevel=Normal, level=255, level=On, Energy=0.483kWh, Power=109.6W, Voltage=222.7V,
-# Current=0.912A, Power Factor=0.54
+# Switch All=On and Off Enabled, Powerlevel=Normal, Switch=True, Exporting=False, Energy=0.483kWh, Power=109.6W,
+# Voltage=222.7V, Current=0.912A, Power Factor=0.54, Timeout=0
 def louie_value(network, node, value):
     try:
-        L.l.info('Louie signal: Node={} Value={}'.format(node, value))
-        if value.label == "level":
-            #if value.data == 'On':
-            L.l.info("Switch {} value is {}".format(node, value))
+        # L.l.info('Louie signal: Node={} Value={}'.format(node, value))
+        if value.label == "Switch":
+            if value.data == 'True':
+                L.l.info("Switch is ON".format(node, value))
 
         elif value.label == "Power" or (value.label == "Energy" and value.units == "kWh"):
             #L.l.info("Saving power utility")
