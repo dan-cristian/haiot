@@ -86,8 +86,8 @@ def louie_value(network, node, value):
     try:
         #L.l.info('Louie signal: Value {} for {}={} {}'.format(node.product_name, value.label, value.data, value.units))
         if value.label == "level":
-            if value.data == 'On':
-                pass
+            #if value.data == 'On':
+            L.l.info("Switch {} value is {}".format(node, value))
 
         elif value.label == "Power" or (value.label == "Energy" and value.units == "kWh"):
             #L.l.info("Saving power utility")
