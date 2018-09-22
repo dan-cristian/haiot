@@ -78,7 +78,7 @@ def louie_node_update(network, node):
 
 def _set_custom_relay_state(sensor_name, node_id, state):
     pin_code = '{}:{}'.format(sensor_name, node_id)
-    current_relay = models.ZoneCustomRelay.query.filter_by(pin_code=pin_code, host_name=Constant.HOST_NAME).first()
+    current_relay = models.ZoneCustomRelay.query.filter_by(pin_code=pin_code).first()
     if current_relay is not None:
         new_relay = models.ZoneCustomRelay(gpio_pin_code=pin_code, host_name=Constant.HOST_NAME)
         new_relay.relay_is_on = state
@@ -101,7 +101,7 @@ def louie_value(network, node, value):
     try:
         # L.l.info('Louie signal: Node={} Value={}'.format(node, value))
         if value.label == "Switch":
-            _set_custom_relay_state(node.product_name, node.node_id, value.data)
+            _set_custom_relay_state(sensor_name=node.product_name, node_id=node.node_id, state=value.data)
         elif value.label == "Power" or (value.label == "Energy" and value.units == "kWh"):
             #L.l.info("Saving power utility")
             if value.units == "W":
