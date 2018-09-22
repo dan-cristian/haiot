@@ -76,6 +76,18 @@ def louie_node_update(network, node):
     pass
 
 
+def _set_custom_relay_state(sensor_name, node_id, state):
+    pin_code = sensor_name + ':' + node_id
+    current_relay = models.ZoneCustomRelay.query.filter_by(pin_code=pin_code, host_name=Constant.HOST_NAME).first()
+    if current_relay is not None:
+        new_relay = models.ZoneCustomRelay(gpio_pin_code=pin_code, host_name=Constant.HOST_NAME)
+        new_relay.relay_is_on = state
+        models.ZoneCustomRelay().save_changed_fields(
+            current_record=current_relay, new_record=new_relay, notify_transport_enabled=True, save_to_graph=True)
+    else:
+        L.l.error("ZoneCustomRelay with code {} does not exist in database".format(pin_code))
+
+
 # Qubino Meter Values
 # Powerlevel (Normal), Energy (kWh),  Energy (kVAh), Power (W), Voltage (V), Current (A), Power Factor, Unknown
 # Exporting=False, Unknown=-70.5
@@ -89,11 +101,7 @@ def louie_value(network, node, value):
     try:
         # L.l.info('Louie signal: Node={} Value={}'.format(node, value))
         if value.label == "Switch":
-            if value.data is True:
-                L.l.info("Switch is ON".format(node, value))
-                #relay = models.ZoneCustomRelay.query.filter_by(pin_code=gpio_pin_code, host_name=Constant.HOST_NAME).first()
-            else:
-                L.l.info("Switch is OFF".format(node, value))
+            _set_custom_relay_state(node.product, node.id, value.data)
         elif value.label == "Power" or (value.label == "Energy" and value.units == "kWh"):
             #L.l.info("Saving power utility")
             if value.units == "W":
@@ -264,9 +272,10 @@ def switch_all_on():
             P.network.nodes[node].set_switch(val,False)
 
 
-def set_switch_state(name, id, state):
-    for node_id in P.network.nodes:
-        node = P.network.nodes[node_id]
+def set_switch_state(node_id, state):
+    node = P.network.nodes[node_id]
+    for switch in node.get_switches():
+        node.set_switch(switch, state)
 
 
 def thread_run():
@@ -289,4 +298,3 @@ def thread_run():
         L.l.error("Error in zwave thread run={}".format(ex), exc_info=True)
     prctl.set_name("idle")
     threading.current_thread().name = "idle"
-

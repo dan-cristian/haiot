@@ -743,7 +743,7 @@ class ZoneCustomRelay(db.Model, DbEvent, DbBase):
     relay_type = db.Column(db.String(20))
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
 
-    def __init__(self, id=None, zone_id='', gpio_pin_code='', host_name='', relay_pin_name=''):
+    def __init__(self, id=None, zone_id=None, gpio_pin_code=None, host_name=None, relay_pin_name=None):
         super(ZoneCustomRelay, self).__init__()
         if id:
             self.id = id

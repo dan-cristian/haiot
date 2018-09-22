@@ -142,5 +142,5 @@ def init():
         thread_pool.add_interval_callable(thread_run, run_interval_second=10)
         global initialised
         initialised = True
-    except Exception, ex:
+    except Exception as ex:
         L.l.critical('Module rpi.gpio not initialised, err={}'.format(ex))
