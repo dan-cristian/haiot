@@ -42,11 +42,15 @@ def my_import(name):
 
 def init_module(module_name, module_is_active):
     if module_is_active:
-        L.l.info("Importing module {}".format(module_name))
+        #L.l.info("Importing module {}".format(module_name))
         dynclass = my_import(module_name)
         if dynclass:
             # Log.logger.info('Module {} is marked as active'.format(module_name))
-            if not dynclass.initialised:
+            if hasattr(dynclass, 'initialised'):
+                inited = dynclass.initialised
+            else:
+                inited = dynclass.P.initialised
+            if not inited:
                 L.l.info('Module {} initialising'.format(module_name))
                 dynclass.init()
             else:
@@ -67,11 +71,14 @@ def init_module(module_name, module_is_active):
 def unload_module(module_name):
     dynclass = my_import(module_name)
     if dynclass:
-        if dynclass.initialised:
-            L.l.info('Module {} unloading'.format(module_name))
-            dynclass.unload()
-        else:
-            L.l.info('Module {} is not initialised, skipping unload'.format(module_name))
+        try:
+            if dynclass.initialised:
+                L.l.info('Module {} unloading'.format(module_name))
+                dynclass.unload()
+            else:
+                L.l.info('Module {} is not initialised, skipping unload'.format(module_name))
+        except Exception as ex:
+            L.l.info("Error unloading module {}, ex={}".format(module_name, ex))
 
 
 def init_modules():

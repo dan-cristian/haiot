@@ -282,8 +282,10 @@ def thread_run():
                             __uploaded_file_list_date.clear()
                         # force upload on fifo principles to maintain movie time order when uploaded
                         break
-    except Exception, ex:
+    except Exception as ex:
         L.l.warning('Exception on youtube thread run, err={}'.format(ex))
+    prctl.set_name("idle")
+    threading.current_thread().name = "idle"
 
 
 def init():
@@ -296,5 +298,5 @@ def init():
         thread_pool.add_interval_callable(thread_run, run_interval_second=10)
         initialised = True
         # upload_file('c:\\temp\\01-20150512215655-alert.avi')
-    except Exception, ex:
+    except Exception as ex:
         L.l.warning('Unable to initialise youtube uploader, err={}'.format(ex))

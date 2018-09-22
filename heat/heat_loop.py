@@ -284,4 +284,6 @@ def thread_run():
     set_main_heat_source()
     loop_zones()
     # loop_heat_relay()
+    prctl.set_name("idle")
+    threading.current_thread().name = "idle"
     return 'Heat ok'

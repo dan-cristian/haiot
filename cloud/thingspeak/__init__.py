@@ -269,9 +269,10 @@ def thread_run():
             _check_def_change()
             initialised = True
         _upload_bulk()
-    except Exception, ex:
+    except Exception as ex:
         L.l.error("Error on thingspeak thread_run, ex={}".format(ex))
-
+    prctl.set_name("idle")
+    threading.current_thread().name = "idle"
 
 def unload():
     thread_pool.remove_callable(thread_run)
@@ -283,5 +284,5 @@ def init():
         logging.getLogger("requests").setLevel(logging.WARNING)
         dispatcher.connect(_store_record, signal=Constant.SIGNAL_STORABLE_RECORD, sender=dispatcher.Any)
         thread_pool.add_interval_callable(thread_run, run_interval_second=60)
-    except Exception, ex:
+    except Exception as ex:
         L.l.warning("Unable to read config or init thingspeak, stack={}".format(traceback.print_exc()))
