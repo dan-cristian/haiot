@@ -254,6 +254,8 @@ def reload_rules():
         rules_run.test_code()
     # else:
     #    Log.logger.info('Reloading {} skip timestamp {} != {}'.format(path, __rules_timestamp, new_stamp))
+    prctl.set_name("idle")
+    threading.current_thread().name = "idle"
 
 
 def init():
@@ -270,7 +272,7 @@ def init():
     else:
         L.l.warning('Rules not initialised as scheduler is not available')
     thread_pool.add_interval_callable(thread_run, run_interval_second=1)
-    thread_pool.add_interval_callable(reload_rules, run_interval_second=10)
+    thread_pool.add_interval_callable(reload_rules, run_interval_second=30)
     # connect rules processor for all db chages trigger
     dispatcher.connect(parse_rules, signal=Constant.SIGNAL_DB_CHANGE_FOR_RULES, sender=dispatcher.Any)
     global initialised
