@@ -1,6 +1,7 @@
 import traceback
 import threading
 import prctl
+import time
 import pyownet.protocol
 from pydispatch import dispatcher
 import datetime
@@ -253,29 +254,31 @@ def _dynamic_thread_run(ow_conn, ow_bus):
 
 def _get_bus_list(host, port):
     ow = pyownet.protocol.proxy(host=host, port=port)
-    items = ow.dir('/', slash=False, bus=True)
-    for item in items:
-        if 'bus' in item:
-            ow_new = pyownet.protocol.proxy(host=host, port=port, flags=pyownet.protocol.FLG_UNCACHED)
-            P.ow_conn_list[item] = ow_new
-            func = _dynamic_thread_run(ow_conn=ow_new, ow_bus=item)
+    owitems = ow.dir('/', slash=False, bus=True)
+    for owitem in owitems:
+        if 'bus' in owitem:
+            ow_proxy = pyownet.protocol.proxy(host=host, port=port, flags=pyownet.protocol.FLG_UNCACHED)
+            P.ow_conn_list[owitem] = ow_proxy
+            func = _dynamic_thread_run(ow_conn=ow_proxy, ow_bus=owitem)
             thread_pool.add_interval_callable(func, P.sampling_period_seconds)
+            # start all threads sequentially to avoid peak cpu usage
+            time.sleep(P.sampling_period_seconds / 2)
     L.l.info("Found {} owfs busses and initialised threads".format(len(P.ow_conn_list)))
 
 
 def init():
     global initialised
-    host = "none"
-    port = "none"
+    ohost = "none"
+    oport = "none"
     try:
-        host = model_helper.get_param(Constant.P_OWSERVER_HOST_1)
-        port = str(model_helper.get_param(Constant.P_OWSERVER_PORT_1))
-        _get_bus_list(host, port)
+        ohost = model_helper.get_param(Constant.P_OWSERVER_HOST_1)
+        oport = str(model_helper.get_param(Constant.P_OWSERVER_PORT_1))
+        _get_bus_list(ohost, oport)
         initialised = True
         P.warning_issued = False
     except Exception as ex:
         if not P.warning_issued:
-            L.l.info('1-wire owserver not initialised on host {} port {}, ex={}'.format(host, port, ex))
+            L.l.info('1-wire owserver not initialised on host {} port {}, ex={}'.format(ohost, oport, ex))
             initialised = False
             P.warning_issued = True
     return initialised
