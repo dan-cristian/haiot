@@ -86,11 +86,12 @@ def louie_node_update(network, node):
 # Voltage=222.7V, Current=0.912A, Power Factor=0.54, Timeout=0
 def louie_value(network, node, value):
     try:
-        L.l.info('Louie signal: Node={} Value={}'.format(node, value))
+        # L.l.info('Louie signal: Node={} Value={}'.format(node, value))
         if value.label == "Switch":
             if value.data is True:
                 L.l.info("Switch is ON".format(node, value))
-
+            else:
+                L.l.info("Switch is OFF".format(node, value))
         elif value.label == "Power" or (value.label == "Energy" and value.units == "kWh"):
             #L.l.info("Saving power utility")
             if value.units == "W":
@@ -245,6 +246,17 @@ def remove_node(node_id):
         L.l.info("Removing failed node {} returned {}".format(node, res))
 
 
+def switch_all_on():
+    for node in P.network.nodes:
+        for val in P.network.nodes[node].get_switches():
+            L.l.info("Activate switch {} on node {}".format(P.network.nodes[node].values[val].label,node))
+            P.network.nodes[node].set_switch(val, True)
+            L.l.info("Sleep 10 seconds")
+            time.sleep(10.0)
+            L.l.info("Dectivate switch {} on node {}".format(P.network.nodes[node].values[val].label,node))
+            P.network.nodes[node].set_switch(val,False)
+
+
 def thread_run():
     prctl.set_name("zwave")
     threading.current_thread().name = "zwave"
@@ -261,6 +273,8 @@ def thread_run():
                 node = P.network.nodes[node_id]
                 if node_id > 1:
                     node.request_state()
+        switch_all_on()
+
     except Exception as ex:
         L.l.error("Error in zwave thread run={}".format(ex), exc_info=True)
     prctl.set_name("idle")
