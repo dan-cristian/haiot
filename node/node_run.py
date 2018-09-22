@@ -38,7 +38,7 @@ def node_update(obj=None):
                 if seconds_elapsed>15:
                     L.l.warning('Very slow mqtt, delay is {} seconds rate msg {}/min'.format(seconds_elapsed,
                                                                                              mqtt_io.mqtt_msg_count_per_minute))
-    except Exception, ex:
+    except Exception as ex:
         L.l.warning('Error on node update, err {}'.format(ex))
 
 def check_if_no_masters_overall():
@@ -96,7 +96,7 @@ def update_master_state():
                             # record date when cluster agreed I must be master
                             if since_when_i_should_be_master == datetime.datetime.max:
                                 since_when_i_should_be_master = utils.get_base_location_now_date()
-    except Exception, ex:
+    except Exception as ex:
         L.l.warning('Error try_become_master, err {}'.format(ex))
 
 
@@ -159,4 +159,6 @@ def thread_run():
     progress_status = 'Announcing node state'
     announce_node_state()
     progress_status = 'Completed'
+    prctl.set_name("idle")
+    threading.current_thread().name = "idle"
     return 'Processed node_run'
