@@ -22,7 +22,7 @@ def update_custom_relay(relay_pin_name, power_is_on):
         relay_pin_name=relay_pin_name, gpio_host_name=Constant.HOST_NAME).first()
     if current_relay is not None:
         current_relay.relay_is_on = power_is_on
-        current_relay.commit_record_to_db()
+        current_relay.commit_record_to_db_notify()
 
 
 def update_command_override_relay(relay_pin_name, is_rule, is_gui):
