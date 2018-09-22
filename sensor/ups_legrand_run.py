@@ -197,3 +197,5 @@ def thread_run():
         init()
     if P.initialised and P.serial is not None:
         __read_ups_status()
+    prctl.set_name("idle")
+    threading.current_thread().name = "idle"
