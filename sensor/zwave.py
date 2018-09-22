@@ -76,10 +76,16 @@ def louie_node_update(network, node):
     pass
 
 
+# Qubino Meter Values
+# PowerLevel (Normal), Energy (kWh),  Energy (kVAh), Power (W), Voltage (V), Current (A), Power Factor, Unknown
+
+# TMBK Switch values
+# On and Off Enabled, PowerLevel=Normal, level=255, level=On, Energy=0.483kWh, Power=109.6W, Voltage=222.7V,
+# Current=0.912A, Power Factor=0.54
 def louie_value(network, node, value):
     try:
         #L.l.info('Louie signal: Value {} for {}={} {}'.format(node.product_name, value.label, value.data, value.units))
-        #PowerLevel (Normal), Energy (kWh),  Energy (kVAh), Power (W), Voltage (V), Current (A), Power Factor, Unknown
+
         if value.label == "Power" or (value.label == "Energy" and value.units == "kWh"):
             #L.l.info("Saving power utility")
             if value.units == "W":
@@ -143,6 +149,7 @@ def louie_ctrl_message(state, message, network, controller):
 
 
 def unload():
+    L.l.info("Unloading zwave")
     if P.network is not None:
         P.network.stop()
     thread_pool.remove_callable(thread_run)
@@ -215,6 +222,24 @@ def init():
         return False
 
 
+def include_node():
+    if not P.did_inclusion and P.network is not None:
+        L.l.info("!!!!!!!!!!! Listening for new node inclusion")
+        res = P.network.controller.add_node()
+        L.l.info("!!!!!!!!!!!! Node inclusion returned {}, waiting for 30 seconds".format(res))
+        time.sleep(20)
+        P.did_inclusion = True
+        L.l.info("!!!!!!!!!!! Node inclusion done".format(res))
+
+
+def remove_node(node_id):
+    node = P.network.nodes[node_id]
+    if node.is_failed:
+        L.l.info("Node failed: {}".format(node))
+        res = P.network.controller.remove_failed_node(node_id)
+        L.l.info("Removing failed node {} returned {}".format(node, res))
+
+
 def thread_run():
     prctl.set_name("zwave")
     threading.current_thread().name = "zwave"
@@ -227,24 +252,11 @@ def thread_run():
                 if P.init_fail_count > 10:
                     unload()
             else:
-                if not P.did_inclusion and P.network is not None:
-                    #L.l.info("!!!!!!!!!!! Listening for new node inclusion")
-                    #res = P.network.controller.add_node()
-                    #L.l.info("!!!!!!!!!!!! Node inclusion returned {}, waiting for 30 seconds".format(res))
-                    #time.sleep(20)
-                    P.did_inclusion = True
-                    #L.l.info("!!!!!!!!!!! Node inclusion done".format(res))
-
                 for node_id in P.network.nodes:
                     node = P.network.nodes[node_id]
-                    if node.is_failed:
-                        #L.l.info("Node failed: {}".format(node))
-                        #res = P.network.controller.remove_failed_node(node_id)
-                        #L.l.info("Removing failed node {} returned {}".format(node, res))
-                        pass
                     if node_id > 1:
+                        L.l.info("Requesting node {} state".format(node))
                         node.request_state()
-                        pass
     except Exception as ex:
         L.l.error("Error in zwave thread run={}".format(ex), exc_info=True)
     prctl.set_name("idle")
