@@ -269,7 +269,7 @@ class DbEvent:
 
     def commit_record_to_db_notify(self):
         self.notify_transport_enabled = True
-        return self.commit()
+        return commit()
 
     # def json_to_record(self, json_object):
     #    return utils.json_to_record(self, json_object)
