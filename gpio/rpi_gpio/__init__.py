@@ -99,8 +99,8 @@ def _event_detected_both(channel):
 def setup_in_ports(gpio_pin_list):
     for gpio_pin in gpio_pin_list:
         if gpio_pin.pin_type == Constant.GPIO_PIN_TYPE_PI_STDGPIO:
-            L.l.info('Set rpi.gpio pincode={} type={} index={} as input'.format(
-                gpio_pin.pin_code, gpio_pin.pin_type, gpio_pin.pin_index_bcm))
+            #L.l.info('Set rpi.gpio pincode={} type={} index={} as input'.format(
+            #    gpio_pin.pin_code, gpio_pin.pin_type, gpio_pin.pin_index_bcm))
             try:
                 # http://razzpisampler.oreilly.com/ch07.html
                 # one wire connected to GPIO, another to GROUND. Use relays next to PI for long wires.
@@ -113,7 +113,7 @@ def setup_in_ports(gpio_pin_list):
                 #                      bouncetime=500)
                 # Log.logger.info('Added falling on rpi.gpio'.format(gpio_pin.pin_code))
                 GPIO.add_event_detect(int(gpio_pin.pin_code), GPIO.BOTH, callback=_event_detected_both, bouncetime=500)
-                L.l.info('OK callback set on rpi.gpio'.format(gpio_pin.pin_code))
+                #L.l.info('OK callback set on rpi.gpio'.format(gpio_pin.pin_code))
             except Exception as ex:
                 L.l.critical('Unable to setup rpi.gpio callback pin={} err={}'.format(gpio_pin.pin_code, ex))
             __pool_pin_codes.append(gpio_pin.pin_code)

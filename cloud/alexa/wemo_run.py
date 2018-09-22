@@ -32,12 +32,15 @@ import socket
 import struct
 import time
 import uuid
+import threading
+import prctl
+from inspect import getmembers, isfunction
 from main.logger_helper import L
 from main import thread_pool
 from main.admin.model_helper import get_param
 from common import Constant
 import rule
-
+import rule.alexa
 
 _FAUXMOS = []
 _pooler = None
@@ -86,6 +89,8 @@ class poller:
         del (self.targets[fileno])
 
     def poll(self):
+        prctl.set_name("alexa_wemo")
+        threading.current_thread().name = "alexa_wemo"
         try:
             timeout = 100
             if self.use_poll:
@@ -101,6 +106,8 @@ class poller:
                     target.do_read(one_ready[0])
         except Exception as ex:
             L.l.error("Error in wemo poll: {}".format(ex))
+        prctl.set_name("idle")
+        threading.current_thread().name = "idle"
 
 
 # Base class for a generic UPnP device. This is far from complete
@@ -244,12 +251,14 @@ class fauxmo(upnp_device):
             if data.find('<BinaryState>1</BinaryState>') != -1:
                 # on
                 L.l.info("Responding to ON for %s" % self.name)
-                success = rule.execute_rule(self.action_handler_on)
+                # success = rule.execute_rule(self.action_handler_on)
+                success = getattr(rule.alexa, self.action_handler_on)
                 # success = self.action_handler_on()
             elif data.find('<BinaryState>0</BinaryState>') != -1:
                 # off
                 L.l.info("Responding to OFF for %s" % self.name)
-                success = rule.execute_rule(self.action_handler_off)
+                # success = rule.execute_rule(self.action_handler_off)
+                success = getattr(rule.alexa, self.action_handler_off)
                 # success = self.action_handler_off()
             else:
                 L.l.info("Unknown Binary State request:")
@@ -361,6 +370,40 @@ class upnp_broadcast_responder(object):
         L.l.info("UPnP broadcast listener: new device registered")
 
 
+def get_alexawemo_rules():
+    ALEXA_RULE_PREFIX = 'alexawemo_'
+    alexa_rules = {}
+    # parse rules to find alexawemo specific ones
+    func_list = getmembers(rule.alexa, isfunction)
+    if func_list:
+        for func in func_list:
+            if not func[1].func_defaults and not func[1].func_name.startswith('_'):
+                # add this to DB
+                func_name = func[0]
+                if func_name.startswith(ALEXA_RULE_PREFIX):
+                    # cmd = func_name.split(ALEXA_RULE_PREFIX)[1]
+                    name_list = func_name.split('_on')
+                    if len(name_list) == 2:
+                        dev_name = name_list[0].split(ALEXA_RULE_PREFIX)[1]
+                        if dev_name in alexa_rules.keys():
+                            # alexa_rules[dev_name][0] = func[1]
+                            alexa_rules[dev_name][0] = func_name
+                        else:
+                            # alexa_rules[dev_name] = [func[1], 0]
+                            alexa_rules[dev_name] = [func_name, None]
+                    else:
+                        name_list = func_name.split('_off')
+                        if len(name_list) == 2:
+                            dev_name = name_list[0].split(ALEXA_RULE_PREFIX)[1]
+                            if dev_name in alexa_rules.keys():
+                                # alexa_rules[dev_name][1] = func[1]
+                                alexa_rules[dev_name][1] = func_name
+                            else:
+                                # alexa_rules[dev_name] = [None, func[1]]
+                                alexa_rules[dev_name] = [None, func_name]
+    return alexa_rules
+
+
 def unload():
     global _pooler
     thread_pool.remove_callable(_pooler.poll)
@@ -384,7 +427,7 @@ def init():
     # NOTE: As of 2015-08-17, the Echo appears to have a hard-coded limit of
     # 16 switches it can control. Only the first 16 elements of the FAUXMOS
     # list will be used.
-    alexa_list = rule.get_alexawemo_rules()
+    alexa_list = get_alexawemo_rules()
     index = 0
     for rule_entry in alexa_list.keys():
         # a fixed port wasn't specified, use a dynamic one

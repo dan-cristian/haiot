@@ -91,7 +91,8 @@ def update_master_state():
                                 variable.NODE_THIS_IS_MASTER_OVERALL))
                             since_when_i_should_be_master = datetime.datetime.max
                         else:
-                            L.l.info('Waiting to set master status, sec. lapsed={}'.format(seconds_elapsed))
+                            # L.l.info('Waiting to set master status, sec. lapsed={}'.format(seconds_elapsed))
+                            pass
                         if not variable.NODE_THIS_IS_MASTER_OVERALL:
                             # record date when cluster agreed I must be master
                             if since_when_i_should_be_master == datetime.datetime.max:
