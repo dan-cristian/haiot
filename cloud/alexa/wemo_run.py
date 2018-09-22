@@ -252,13 +252,13 @@ class fauxmo(upnp_device):
                 # on
                 L.l.info("Responding to ON for {} function={}".format(self.name, self.action_handler_on))
                 # success = rule.execute_rule(self.action_handler_on)
-                success = getattr(rule.alexa, self.action_handler_on)
+                success = getattr(rule.alexa, self.action_handler_on)()
                 # success = self.action_handler_on()
             elif data.find('<BinaryState>0</BinaryState>') != -1:
                 # off
                 L.l.info("Responding to OFF for {} function={}".format(self.name, self.action_handler_off))
                 # success = rule.execute_rule(self.action_handler_off)
-                success = getattr(rule.alexa, self.action_handler_off)
+                success = getattr(rule.alexa, self.action_handler_off)()
                 # success = self.action_handler_off()
             else:
                 L.l.info("Unknown Binary State request:")
