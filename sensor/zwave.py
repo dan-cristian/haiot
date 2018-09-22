@@ -101,7 +101,7 @@ def louie_value(network, node, value):
     try:
         # L.l.info('Louie signal: Node={} Value={}'.format(node, value))
         if value.label == "Switch":
-            _set_custom_relay_state(node.product, node.id, value.data)
+            _set_custom_relay_state(node.model, node.id, value.data)
         elif value.label == "Power" or (value.label == "Energy" and value.units == "kWh"):
             #L.l.info("Saving power utility")
             if value.units == "W":
