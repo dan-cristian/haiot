@@ -76,7 +76,6 @@ def louie_node_update(network, node):
     pass
 
 
-
 # Qubino Meter Values
 # Powerlevel (Normal), Energy (kWh),  Energy (kVAh), Power (W), Voltage (V), Current (A), Power Factor, Unknown
 # Exporting=False, Unknown=-70.5
@@ -84,12 +83,15 @@ def louie_node_update(network, node):
 # TMBK Switch values
 # Switch All=On and Off Enabled, Powerlevel=Normal, Switch=True, Exporting=False, Energy=0.483kWh, Power=109.6W,
 # Voltage=222.7V, Current=0.912A, Power Factor=0.54, Timeout=0
+
+# https://github.com/OpenZWave/python-openzwave/blob/master/examples/api_demo.py
 def louie_value(network, node, value):
     try:
         # L.l.info('Louie signal: Node={} Value={}'.format(node, value))
         if value.label == "Switch":
             if value.data is True:
                 L.l.info("Switch is ON".format(node, value))
+                #relay = models.ZoneCustomRelay.query.filter_by(pin_code=gpio_pin_code, host_name=Constant.HOST_NAME).first()
             else:
                 L.l.info("Switch is OFF".format(node, value))
         elif value.label == "Power" or (value.label == "Energy" and value.units == "kWh"):
@@ -218,7 +220,12 @@ def init():
         # print nodes
         for node_id in P.network.nodes:
             node = P.network.nodes[node_id]
-            L.l.info("Node {}={}".format(node_id, node))
+            try:
+                L.l.info("Node {}={}".format(node_id, node))
+                L.l.info("Node {} attrib: model={} man={} prod_name={} prod_id={}".format(
+                    node_id, node.manufacturer_name, node.product_name, node.product_id))
+            except Exception as ex:
+                pass
         # not working
         # P.network.set_poll_interval(milliseconds=3000, bIntervalBetweenPolls=False)
         # P.network.test(1)
@@ -249,12 +256,17 @@ def remove_node(node_id):
 def switch_all_on():
     for node in P.network.nodes:
         for val in P.network.nodes[node].get_switches():
-            L.l.info("Activate switch {} on node {}".format(P.network.nodes[node].values[val].label,node))
+            L.l.info("Activate switch {} on node {}".format(P.network.nodes[node].values[val].label, node))
             P.network.nodes[node].set_switch(val, True)
             L.l.info("Sleep 10 seconds")
             time.sleep(10.0)
-            L.l.info("Dectivate switch {} on node {}".format(P.network.nodes[node].values[val].label,node))
+            L.l.info("Dectivate switch {} on node {}".format(P.network.nodes[node].values[val].label, node))
             P.network.nodes[node].set_switch(val,False)
+
+
+def set_switch_state(name, id, state):
+    for node_id in P.network.nodes:
+        node = P.network.nodes[node_id]
 
 
 def thread_run():
@@ -273,8 +285,6 @@ def thread_run():
                 node = P.network.nodes[node_id]
                 if node_id > 1:
                     node.request_state()
-            switch_all_on()
-
     except Exception as ex:
         L.l.error("Error in zwave thread run={}".format(ex), exc_info=True)
     prctl.set_name("idle")

@@ -161,6 +161,7 @@ class Constant:
     GPIO_PIN_TYPE_BBB = 'bbb'
     GPIO_PIN_TYPE_PI_STDGPIO = 'pi-stdgpio'
     GPIO_PIN_TYPE_PI_FACE_SPI = 'pi-face-spi'
+    GPIO_PIN_TYPE_ZWAVE = 'zwave'
     GPIO_PIN_DIRECTION_IN = 'in'
     GPIO_PIN_DIRECTION_OUT = 'out'
 
