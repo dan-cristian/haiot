@@ -114,7 +114,12 @@ def zone_custom_relay_record_update(json_object):
                 relay_type = utils.get_object_field_value(json_object, 'relay_type')
                 relay_is_on = utils.get_object_field_value(json_object, 'relay_is_on')
                 if relay_type == Constant.GPIO_PIN_TYPE_ZWAVE:
-                    zwave.set_switch_state(node_id=gpio_pin_code, state=relay_is_on)
+                    vals = gpio_pin_code.split(':')
+                    if len(vals) == 2:
+                        # zwave switch name is not needed, identify device only by node_id
+                        zwave.set_switch_state(node_id=vals[1], state=relay_is_on)
+                    else:
+                        L.l.error("Incorrect zwave switch format {}, must be <name>:<node_id>".format(gpio_pin_code))
                 else:
                     gpio_record = models.GpioPin.query.filter_by(
                         pin_code=gpio_pin_code, host_name=Constant.HOST_NAME).first()
