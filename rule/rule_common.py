@@ -1,5 +1,5 @@
 import subprocess
-from webui.api import api_v1
+#from webui.api import api_v1
 from main.logger_helper import L
 from main.admin import models, model_helper
 from common import Constant
@@ -9,15 +9,20 @@ from main.admin.model_helper import get_param
 
 
 def update_custom_relay(relay_pin_name, power_is_on):
-    msg = api_v1.generic_db_update(model_name="ZoneCustomRelay", filter_name="relay_pin_name",
-                                   field_name="relay_is_on", filter_value=relay_pin_name, field_value=power_is_on)
-    """carefull with API fields order to match app.route definition """
+    #msg = api_v1.generic_db_update(model_name="ZoneCustomRelay", filter_name="relay_pin_name",
+    #                               field_name="relay_is_on", filter_value=relay_pin_name, field_value=power_is_on)
+    #"""carefull with API fields order to match app.route definition """
     # with app.test_client() as c:
 
     #    msg = c.get('/apiv1/db_update/model_name=ZoneCustomRelay&'
     #                'filter_name=relay_pin_name&field_name=relay_is_on&filter_value={}&field_value={}'.
     #                format(relay_pin_name, power_is_on)).data
-    L.l.info(msg)
+    #L.l.info(msg)
+    current_relay = models.ZoneCustomRelay.query.filter_by(
+        relay_pin_name=relay_pin_name, gpio_host_name=Constant.HOST_NAME).first()
+    if current_relay is not None:
+        current_relay.relay_is_on = power_is_on
+        current_relay.commit_record_to_db()
 
 
 def update_command_override_relay(relay_pin_name, is_rule, is_gui):
