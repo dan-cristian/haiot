@@ -53,6 +53,8 @@ def thread_run():
     threading.current_thread().name = "presence_wifi"
     L.l.debug('Processing presence_run')
     _check_wifi()
+    prctl.set_name("idle")
+    threading.current_thread().name = "idle"
 
 
 if __name__ == '__main__':

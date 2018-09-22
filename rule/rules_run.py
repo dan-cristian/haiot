@@ -5,7 +5,6 @@ import datetime
 from main.logger_helper import L
 from main.admin import models
 import rule_common
-from music import mpd
 
 try:
     # sometimes I get "ImportError: cannot import name scheduler" so trying two import methods
@@ -177,6 +176,10 @@ def rule_ups_power(obj=models.Ups(), field_changed_list=None):
                 rule_common.notify_via_all("Grid low at {} volts".format(obj.input_voltage), "Low grid voltage")
     return 'ups rule ok'
 
+
+
+
+
 # VALUE TRIGGER RULES END ###########
 
 
@@ -337,64 +340,7 @@ def front_lights_on():
     rule_common.update_custom_relay('front_lights_relay', True)
 
 
-# special format needed: alexawemo_<wemo device name, substitute space with _>_<operation: on or off>
-def alexawemo_front_lights_on():
-    rule_common.update_custom_relay('front_lights_relay', True)
-    return True
 
-
-def alexawemo_front_lights_off():
-    rule_common.update_custom_relay('front_lights_relay', False)
-    return True
-
-
-def alexawemo_watering_on():
-    """is_async=1"""
-    water_all_3_minute()
-    return True
-
-
-def alexawemo_watering_off():
-    """is_async=1"""
-    water_front_off()
-    water_back_off()
-    return True
-
-
-def alexawemo_waterfront_on():
-    """is_async=1"""
-    water_front_3_minute()
-    return True
-
-
-def alexawemo_waterback_on():
-    """is_async=1"""
-    water_back_3_minute()
-    return True
-
-
-def alexawemo_music_livingroom_on():
-    return mpd.play('livingroom', default_dir='/_New/')
-
-
-def alexawemo_music_livingroom_off():
-    return mpd.pause('livingroom')
-
-
-def alexawemo_music_bedroom_on():
-    return mpd.play('bedroom', default_dir='/_New/')
-
-
-def alexawemo_music_bedroom_off():
-    return mpd.pause('bedroom')
-
-
-def alexawemo_music_bathroom_on():
-    return mpd.play('bedroom', default_dir='/_New/')
-
-
-def alexawemo_music_bathroom_off():
-    return mpd.pause('bedroom')
 
 
 # ##### MACROS END ##############
