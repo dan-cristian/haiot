@@ -3,6 +3,7 @@ import prctl
 from main.logger_helper import L
 from common import Constant
 from main.admin import models
+from main import thread_pool
 import six
 if six.PY3:
     from pydispatch import dispatcher
@@ -133,6 +134,7 @@ def louie_ctrl_message(state, message, network, controller):
 def unload():
     if P.network is not None:
         P.network.stop()
+    thread_pool.remove_callable(thread_run)
 
 
 # http://openzwave.github.io/python-openzwave/network.html
@@ -145,11 +147,11 @@ def init():
         options.set_log_file("OZW_Log.log")
         options.set_append_log_file(False)
         options.set_console_output(False)
-        #options.set_save_log_level("Debug")
+        # options.set_save_log_level("Debug")
         options.set_save_log_level('Info')
         options.set_logging(False)
-        #options.set_logging(True)
-        #options.set_poll_interval(5)
+        # options.set_logging(True)
+        # options.set_poll_interval(5)
         options.set_save_configuration(True)
         options.lock()
 
@@ -180,7 +182,7 @@ def init():
                 break
             else:
                 time.sleep(0.3)
-                #L.l.info("state = {}".format(P.network.state))
+                # L.l.info("state = {}".format(P.network.state))
         if not P.network.is_ready:
             L.l.info("Can't start network! Look at the logs in OZW_Log.log")
             P.network.stop()
@@ -192,11 +194,11 @@ def init():
             node = P.network.nodes[node_id]
             L.l.info("Node {}={}".format(node_id, node))
         # not working
-        #P.network.set_poll_interval(milliseconds=3000, bIntervalBetweenPolls=False)
-        #P.network.test(1)
+        # P.network.set_poll_interval(milliseconds=3000, bIntervalBetweenPolls=False)
+        # P.network.test(1)
         return True
     else:
-        #L.l.info("Zwave init skipped")
+        # L.l.info("Zwave init skipped")
         return False
 
 
@@ -211,27 +213,27 @@ def thread_run():
                 P.init_fail_count += 1
                 if P.init_fail_count > 10:
                     unload()
-                return
+            else:
+                if not P.did_inclusion and P.network is not None:
+                    #L.l.info("!!!!!!!!!!! Listening for new node inclusion")
+                    #res = P.network.controller.add_node()
+                    #L.l.info("!!!!!!!!!!!! Node inclusion returned {}, waiting for 30 seconds".format(res))
+                    #time.sleep(20)
+                    P.did_inclusion = True
+                    #L.l.info("!!!!!!!!!!! Node inclusion done".format(res))
 
-        if not P.did_inclusion and P.network is not None:
-            #L.l.info("!!!!!!!!!!! Listening for new node inclusion")
-            #res = P.network.controller.add_node()
-            #L.l.info("!!!!!!!!!!!! Node inclusion returned {}, waiting for 30 seconds".format(res))
-            #time.sleep(20)
-            P.did_inclusion = True
-            #L.l.info("!!!!!!!!!!! Node inclusion done".format(res))
-
-        for node_id in P.network.nodes:
-            node = P.network.nodes[node_id]
-            if node.is_failed:
-                #L.l.info("Node failed: {}".format(node))
-                #res = P.network.controller.remove_failed_node(node_id)
-                #L.l.info("Removing failed node {} returned {}".format(node, res))
-                pass
-            if node_id > 1:
-                node.request_state()
-                pass
+                for node_id in P.network.nodes:
+                    node = P.network.nodes[node_id]
+                    if node.is_failed:
+                        #L.l.info("Node failed: {}".format(node))
+                        #res = P.network.controller.remove_failed_node(node_id)
+                        #L.l.info("Removing failed node {} returned {}".format(node, res))
+                        pass
+                    if node_id > 1:
+                        node.request_state()
+                        pass
     except Exception as ex:
         L.l.error("Error in zwave thread run={}".format(ex), exc_info=True)
     prctl.set_name("idle")
     threading.current_thread().name = "idle"
+
