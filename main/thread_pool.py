@@ -23,13 +23,13 @@ def __get_print_name_callable(func):
 def add_interval_callable(func, run_interval_second):  # , *args):
     print_name = __get_print_name_callable(func)
     if func not in P.cl:
-        L.l.info("Added callable {},{}".format(print_name, run_interval_second))
+        # L.l.info("Added callable {},{}".format(print_name, run_interval_second))
         P.cl.append(func)
         # __callable_args.append(*args)
         P.eldl[func] = datetime.now()
         P.eil[func] = run_interval_second
         if len(P.ff) > 0 and P.executor is not None:  # run the function already is thread pool is started
-            L.l.info('Initialising additional thread {}'.format(print_name))
+            # L.l.info('Initialising additional thread {}'.format(print_name))
             P.ff[P.executor.submit(func)] = func
     else:
         L.l.warning('Callable {} not added, already there'.format(print_name))
@@ -63,7 +63,7 @@ def run_thread_pool():
     #with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
     while P.tpool:
         if len(P.cl) != len(P.ff):
-            L.l.info('Initialising threads up to {} functions'.format(len(P.cl)))
+            # L.l.info('Initialising threads up to {} functions'.format(len(P.cl)))
             P.ff = {P.executor.submit(call_obj): call_obj for call_obj in P.cl}
         i = 1
         for future_obj in dict(P.ff):
