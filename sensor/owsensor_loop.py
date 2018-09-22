@@ -36,6 +36,7 @@ class P:
     warning_issued = False
     IGNORED_TEMPERATURE = 85  # ignore this temp value, usually is an error
     failed_temp = False
+    failed_temp_count = 0
 
 
 def do_device(ow, path):
@@ -174,15 +175,17 @@ def get_temperature(sensor, dev, ow):
     try:
         dev = get_prefix(sensor, dev, ow)
         # 2 digits round
-        if P.failed_temp:
+        if P.failed_temp and P.failed_temp_count < 100:
             val = utils.round_sensor_value(ow.read(sensor + 'fasttemp'))
         else:
             val = utils.round_sensor_value(ow.read(sensor + 'temperature'))
+            P.failed_temp_count = 0
         if val != P.IGNORED_TEMPERATURE:
             dev['temperature'] = val
     except Exception as ex:
         L.l.warning("Read temp failed with {}".format(ex))
         P.failed_temp = True
+        P.failed_temp_count += 1
     return dev
 
 
@@ -260,12 +263,12 @@ def _dynamic_thread_run(ow_conn, ow_bus):
     return _function
 
 
-def _get_bus_list(host, port):
-    ow = pyownet.protocol.proxy(host=host, port=port)
+def _get_bus_list(ohost, oport):
+    ow = pyownet.protocol.proxy(host=ohost, port=oport)
     owitems = ow.dir('/', slash=False, bus=True)
     for owitem in owitems:
         if 'bus' in owitem:
-            ow_proxy = pyownet.protocol.proxy(host=host, port=port, flags=pyownet.protocol.FLG_UNCACHED)
+            ow_proxy = pyownet.protocol.proxy(host=ohost, port=oport, flags=pyownet.protocol.FLG_UNCACHED)
             P.ow_conn_list[owitem] = ow_proxy
             func = _dynamic_thread_run(ow_conn=ow_proxy, ow_bus=owitem)
             thread_pool.add_interval_callable(func, P.sampling_period_seconds)
@@ -316,4 +319,4 @@ if __name__ == "__main__":
             try:
                 do_device(ow=ow_new, path=item)
             except Exception as ex:
-                print ex
+                print(ex)
