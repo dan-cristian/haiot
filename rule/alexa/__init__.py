@@ -7,11 +7,13 @@ from rule.rules_run import water_all_3_minute, water_front_off, water_back_off, 
 
 # special format needed: alexawemo_<wemo device name, substitute space with _>_<operation: on or off>
 def alexawemo_front_lights_on():
+    L.l.info('front_lights_relay on')
     rule_common.update_custom_relay('front_lights_relay', True)
     return True
 
 
 def alexawemo_front_lights_off():
+    L.l.info('front_lights_relay off')
     rule_common.update_custom_relay('front_lights_relay', False)
     return True
 
