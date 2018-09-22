@@ -19,6 +19,8 @@ class P:
     did_inclusion = False
     initialised = False
     init_fail_count = 0
+    device = "/dev/ttyACM0"
+    log_file = "/tmp/OZW_Log.log"
 
 
 try:
@@ -34,6 +36,7 @@ except Exception as e:
     L.l.info("Cannot import openzwave")
 
 
+# http://openzwave.github.io/python-openzwave/network.html
 def louie_network_started(network):
     print('Louie signal: OpenZWave network started: homeid {:08x} - {} nodes found.'.format(
         network.home_id, network.nodes_count))
@@ -58,6 +61,14 @@ def louie_network_ready(network):
     #dispatcher.connect(louie_value_changed, ZWaveNetwork.SIGNAL_VALUE_CHANGED)
     dispatcher.connect(louie_value_removed, ZWaveNetwork.SIGNAL_VALUE_REMOVED)
     dispatcher.connect(louie_ctrl_message, ZWaveController.SIGNAL_CONTROLLER)
+
+
+def louie_network_stopped(network):
+    L.l.info('Louie signal: OpenZWave network stopped.')
+
+
+def louie_network_awaked(network):
+    L.l.info('Louie signal: OpenZWave network awaked.')
 
 
 def louie_node_update(network, node):
@@ -140,17 +151,17 @@ def unload():
 # http://openzwave.github.io/python-openzwave/network.html
 def init():
     if P.module_imported:
-        device = "/dev/ttyACM0"
-        L.l.info('Zwave initialising on {}'.format(device))
+        L.l.info('Zwave initialising on {}'.format(P.device))
         # Define some manager options
-        options = ZWaveOption(device, config_path="../openzwave/config", user_path=".", cmd_line="")
-        options.set_log_file("OZW_Log.log")
-        options.set_append_log_file(False)
+        options = ZWaveOption(P.device, config_path="../openzwave/config", user_path=".", cmd_line="")
+        options.set_log_file(P.log_file)
+        options.set_append_log_file(True)
         options.set_console_output(False)
         # options.set_save_log_level("Debug")
-        options.set_save_log_level('Info')
-        options.set_logging(False)
-        # options.set_logging(True)
+        # options.set_save_log_level('Info')
+        options.set_save_log_level('Error')
+        # options.set_logging(False)
+        options.set_logging(True)
         # options.set_poll_interval(5)
         options.set_save_configuration(True)
         options.lock()
@@ -161,6 +172,8 @@ def init():
         dispatcher.connect(louie_network_failed, ZWaveNetwork.SIGNAL_NETWORK_FAILED)
         dispatcher.connect(louie_network_resetted, ZWaveNetwork.SIGNAL_NETWORK_RESETTED)
         dispatcher.connect(louie_network_ready, ZWaveNetwork.SIGNAL_NETWORK_READY)
+        dispatcher.connect(louie_network_stopped, ZWaveNetwork.SIGNAL_NETWORK_STOPPED)
+        dispatcher.connect(louie_network_awaked, ZWaveNetwork.SIGNAL_NETWORK_AWAKED)
 
         P.network.start()
 
@@ -172,7 +185,7 @@ def init():
             else:
                 time.sleep(0.1)
         if P.network.state < P.network.STATE_STARTED:
-            L.l.info("Can't initialise zwave driver. Look at the logs in OZW_Log.log")
+            L.l.info("Can't initialise zwave driver. Look at the logs in {}".format(P.log_file))
             return False
         L.l.info("Home id : {}, Nodes in network : {}".format(P.network.home_id_str, P.network.nodes_count))
 
@@ -188,7 +201,7 @@ def init():
             P.network.stop()
             return False
         else:
-            L.l.info("Network is started!")
+            L.l.info("Zwave network is started!")
         # print nodes
         for node_id in P.network.nodes:
             node = P.network.nodes[node_id]
