@@ -85,8 +85,11 @@ def louie_node_update(network, node):
 def louie_value(network, node, value):
     try:
         #L.l.info('Louie signal: Value {} for {}={} {}'.format(node.product_name, value.label, value.data, value.units))
+        if value.label == "level":
+            if value.data == 'On':
+                pass
 
-        if value.label == "Power" or (value.label == "Energy" and value.units == "kWh"):
+        elif value.label == "Power" or (value.label == "Energy" and value.units == "kWh"):
             #L.l.info("Saving power utility")
             if value.units == "W":
                 units_adjusted = "watt"  # this should match Utility unit name in models definition
@@ -251,12 +254,11 @@ def thread_run():
                 P.init_fail_count += 1
                 if P.init_fail_count > 10:
                     unload()
-            else:
-                for node_id in P.network.nodes:
-                    node = P.network.nodes[node_id]
-                    if node_id > 1:
-                        L.l.info("Requesting node {} state".format(node))
-                        node.request_state()
+        if P.initialised:
+            for node_id in P.network.nodes:
+                node = P.network.nodes[node_id]
+                if node_id > 1:
+                    node.request_state()
     except Exception as ex:
         L.l.error("Error in zwave thread run={}".format(ex), exc_info=True)
     prctl.set_name("idle")
