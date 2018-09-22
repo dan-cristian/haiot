@@ -262,7 +262,7 @@ def _get_bus_list(host, port):
             func = _dynamic_thread_run(ow_conn=ow_proxy, ow_bus=owitem)
             thread_pool.add_interval_callable(func, P.sampling_period_seconds)
             # start all threads sequentially to avoid peak cpu usage
-            time.sleep(P.sampling_period_seconds / 2)
+            time.sleep(P.sampling_period_seconds / len(owitems))
     L.l.info("Found {} owfs busses and initialised threads".format(len(P.ow_conn_list)))
 
 
