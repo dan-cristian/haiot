@@ -132,7 +132,7 @@ def zone_custom_relay_record_update(json_object):
         models.ZoneCustomRelay().save_changed_fields_from_json_object(
             json_object=json_object, notify_transport_enabled=False, save_to_graph=False)
     except Exception as ex:
-        L.l.warning('Error on zone custom relay update, err {}'.format(ex))
+        L.l.error('Error on zone custom relay update, err={}'.format(ex), exc_info=True)
 
 
 def thread_run():
