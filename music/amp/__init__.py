@@ -112,7 +112,7 @@ def set_amp_power(power_state, relay_name, amp_zone_index):
                 # dispatch as UI action otherwise change actions are not triggered
                 dispatcher.send(signal=Constant.SIGNAL_UI_DB_POST, model=models.ZoneCustomRelay, row=relay)
                 msg = "Set relay {} to state {} zone_index={}\n".format(relay_name, power_state, amp_zone_index)
-                L.l.debug(msg)
+                #L.l.debug(msg)
             else:
                 msg = "Not changed relay state for {}\n".format(relay_name)
         else:
