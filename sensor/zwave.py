@@ -86,7 +86,7 @@ def louie_node_update(network, node):
 # Voltage=222.7V, Current=0.912A, Power Factor=0.54, Timeout=0
 def louie_value(network, node, value):
     try:
-        # L.l.info('Louie signal: Node={} Value={}'.format(node, value))
+        L.l.info('Louie signal: Node={} Value={}'.format(node, value))
         if value.label == "Switch":
             if value.data is True:
                 L.l.info("Switch is ON".format(node, value))
