@@ -274,8 +274,10 @@ def switch_all_on():
 
 
 def set_switch_state(node_id, state):
+    L.l.info("Setting switch node_id={} to {}".format(node_id, state))
     found = False
-    for node in P.network.nodes:
+    for nid in P.network.nodes:
+        node = P.network.nodes[nid]
         if node.node_id == node_id:
             for switch in node.get_switches():
                 node.set_switch(switch, state)
