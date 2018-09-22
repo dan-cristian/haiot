@@ -243,7 +243,7 @@
     {"relay_pin_name": "portita_relay", "zone_id": "7", "gpio_pin_code": "25", "gpio_host_name": "pi-power"},
     {"relay_pin_name": "front_valve_relay", "zone_id": "7", "gpio_pin_code": "4", "gpio_host_name": "pi-power"},
 
-    {"relay_pin_name": "plug_1", "zone_id": "29", "gpio_pin_code": "TZ69 Smart energy plug in switch:4", "relay_type": "zwave", "gpio_host_name": "pi-face"}
+    {"relay_pin_name": "plug_1", "zone_id": "29", "gpio_pin_code": "4", "relay_type": "zwave", "gpio_host_name": "pi-face"}
 
   ],
 
