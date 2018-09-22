@@ -29,7 +29,7 @@ initialised = False
 
 class P:
     last_warning = datetime.datetime.min
-    check_period = 60  # how often I check for new sensors
+    check_period = 120  # how often I check for new sensors
     sampling_period_seconds = 30  # how often I read them
     ow_conn_list = {}  # key is busname, value is ow connection
     warning_issued = False
