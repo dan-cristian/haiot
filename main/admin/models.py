@@ -102,6 +102,7 @@ class DbBase:
     def commit_record_to_db(self):
         return commit()
 
+
     # copies fields from a json object to an existing or new db record
     def save_changed_fields_from_json_object(self, json_object=None, unique_key_name=None,
                                              notify_transport_enabled=False, save_to_graph=False,
@@ -265,6 +266,10 @@ class DbEvent:
 
     def get_deepcopy(self):
         return deepcopy(self)
+
+    def commit_record_to_db_notify(self):
+        self.notify_transport_enabled = True
+        return self.commit()
 
     # def json_to_record(self, json_object):
     #    return utils.json_to_record(self, json_object)
