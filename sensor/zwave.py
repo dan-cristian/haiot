@@ -76,6 +76,7 @@ def louie_node_update(network, node):
     pass
 
 
+
 # Qubino Meter Values
 # PowerLevel (Normal), Energy (kWh),  Energy (kVAh), Power (W), Voltage (V), Current (A), Power Factor, Unknown
 
@@ -84,7 +85,7 @@ def louie_node_update(network, node):
 # Current=0.912A, Power Factor=0.54
 def louie_value(network, node, value):
     try:
-        #L.l.info('Louie signal: Value {} for {}={} {}'.format(node.product_name, value.label, value.data, value.units))
+        L.l.info('Louie signal: Node={} Value={}'.format(node, value))
         if value.label == "level":
             #if value.data == 'On':
             L.l.info("Switch {} value is {}".format(node, value))
