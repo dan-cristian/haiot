@@ -78,7 +78,8 @@ def louie_node_update(network, node):
 
 def _set_custom_relay_state(sensor_name, node_id, state):
     pin_code = '{}:{}'.format(sensor_name, node_id)
-    current_relay = models.ZoneCustomRelay.query.filter_by(pin_code=pin_code, host_name=Constant.HOST_NAME).first()
+    current_relay = models.ZoneCustomRelay.query.filter_by(
+        gpio_pin_code=pin_code, gpio_host_name=Constant.HOST_NAME).first()
     if current_relay is not None:
         new_relay = models.ZoneCustomRelay(gpio_pin_code=pin_code, gpio_host_name=Constant.HOST_NAME)
         new_relay.relay_is_on = state
