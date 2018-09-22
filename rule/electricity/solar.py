@@ -9,6 +9,6 @@ def rule_energy_plug_1(obj=models.Utility(), field_changed_list=None):
         if 'utility_name' in field_changed_list:
             if obj.utility_name == 'power main mono':
                 if obj.units_2_delta < 0:
-                    L.l.info("Exporting power")
+                    L.l.info("Exporting power {}w".format(obj.units_2_delta))
                 else:
-                    L.l.info("Importing power")
+                    L.l.info("Importing power {}w".format(obj.units_2_delta))
