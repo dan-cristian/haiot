@@ -1091,3 +1091,14 @@ class ZoneHeatRelayHistory(db.Model, DbBase):
     gpio_host_name = db.Column(db.String(50))
     heat_is_on = db.Column(db.Boolean, default=False)
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
+
+
+class ZoneCustomRelayHistory(db.Model, DbBase):
+    __bind_key__ = 'reporting'
+    __tablename__ = 'zonecustomrelay_history'  # convention: append '_history' -> 'History' to source table name
+    id = db.Column(db.Integer, primary_key=True)
+    relay_pin_name = db.Column(db.String(50))
+    gpio_host_name = db.Column(db.String(50))
+    relay_is_on = db.Column(db.Boolean, default=False)
+    relay_type = db.Column(db.String(20))
+    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
