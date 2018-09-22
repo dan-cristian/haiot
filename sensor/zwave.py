@@ -274,9 +274,15 @@ def switch_all_on():
 
 
 def set_switch_state(node_id, state):
-    node = P.network.nodes[node_id]
-    for switch in node.get_switches():
-        node.set_switch(switch, state)
+    found = False
+    for node in P.network.nodes:
+        if node.node_id == node_id:
+            for switch in node.get_switches():
+                node.set_switch(switch, state)
+                found = True
+            break
+    if not found:
+        L.l.error("Switch with id={} not found in zwave network".format(node_id))
 
 
 def thread_run():
