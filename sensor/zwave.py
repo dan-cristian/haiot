@@ -20,7 +20,7 @@ class P:
     initialised = False
     init_fail_count = 0
     device = "/dev/ttyACM0"
-    log_file = "/tmp/OZW_Log.log"
+    log_file = "OZW_Log.log"
 
 
 try:
@@ -155,7 +155,7 @@ def init():
         # Define some manager options
         options = ZWaveOption(P.device, config_path="../openzwave/config", user_path=".", cmd_line="")
         options.set_log_file(P.log_file)
-        options.set_append_log_file(False)
+        options.set_append_log_file(True)
         options.set_console_output(False)
         # options.set_save_log_level("Debug")
         options.set_save_log_level('Info')
