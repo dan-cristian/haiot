@@ -35,6 +35,7 @@ class P:
     ow_conn_list = {}  # key is busname, value is ow connection
     warning_issued = False
     IGNORED_TEMPERATURE = 85  # ignore this temp value, usually is an error
+    failed_temp = False
 
 
 def do_device(ow, path):
@@ -170,11 +171,18 @@ def get_bus(sensor, dev, ow):
 
 
 def get_temperature(sensor, dev, ow):
-    dev = get_prefix(sensor, dev, ow)
-    # 2 digits round
-    val = utils.round_sensor_value(ow.read(sensor + 'fasttemp'))
-    if val != P.IGNORED_TEMPERATURE:
-        dev['temperature'] = val
+    try:
+        dev = get_prefix(sensor, dev, ow)
+        # 2 digits round
+        if P.failed_temp:
+            val = utils.round_sensor_value(ow.read(sensor + 'fasttemp'))
+        else:
+            val = utils.round_sensor_value(ow.read(sensor + 'temperature'))
+        if val != P.IGNORED_TEMPERATURE:
+            dev['temperature'] = val
+    except Exception as ex:
+        L.l.warning("Read temp failed with {}".format(ex))
+        P.failed_temp = True
     return dev
 
 
