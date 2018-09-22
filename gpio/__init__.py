@@ -4,6 +4,7 @@ from common import Constant, utils
 from main.admin import models
 from main.admin.model_helper import commit
 from main import thread_pool
+from sensor import zwave
 import std_gpio
 import piface
 import threading
@@ -93,8 +94,8 @@ def gpio_record_update(json_object):
         host_name = utils.get_object_field_value(json_object, 'name')
         # L.l.info('Received gpio state update from {}'.format(host_name))
         if host_name != Constant.HOST_NAME:
-            models.GpioPin().save_changed_fields_from_json_object(json_object=json_object,
-                                                                  notify_transport_enabled=False, save_to_graph=False)
+            models.GpioPin().save_changed_fields_from_json_object(
+                json_object=json_object, notify_transport_enabled=False, save_to_graph=False)
     except Exception as ex:
         L.l.warning('Error on gpio state update, err {}'.format(ex))
 
@@ -110,14 +111,22 @@ def zone_custom_relay_record_update(json_object):
             global initialised
             if initialised:
                 gpio_pin_code = utils.get_object_field_value(json_object, 'gpio_pin_code')
-                gpio_record = models.GpioPin.query.filter_by(pin_code=gpio_pin_code,
-                                                             host_name=Constant.HOST_NAME).first()
-                if gpio_record:
-                    value = 1 if utils.get_object_field_value(json_object, 'relay_is_on') else 0
-                    relay_set(gpio_pin=gpio_record, value=value, from_web=False)
+                relay_type = utils.get_object_field_value(json_object, 'relay_type')
+                relay_is_on = utils.get_object_field_value(json_object, 'relay_is_on')
+                if relay_type == Constant.GPIO_PIN_TYPE_ZWAVE:
+                    vals = gpio_pin_code.split(':')
+                    if len(vals) == 2:
+                        zwave.set_switch_state(name=gpio_pin_code[0], id=gpio_pin_code[1], state=relay_is_on)
+                    else:
+                        L.l.error('Zwave relay name format is incorrect, must be <sensor_name>:<node_id>')
                 else:
-                    L.l.warning('Could not find gpio record for custom relay pin code={}'.format(gpio_pin_code))
-        #else:
+                    gpio_record = models.GpioPin.query.filter_by(
+                        pin_code=gpio_pin_code, host_name=Constant.HOST_NAME).first()
+                    if gpio_record:
+                        value = 1 if relay_is_on else 0
+                        relay_set(gpio_pin=gpio_record, value=value, from_web=False)
+                    else:
+                        L.l.warning('Could not find gpio record for custom relay pin code={}'.format(gpio_pin_code))
         models.ZoneCustomRelay().save_changed_fields_from_json_object(
             json_object=json_object, notify_transport_enabled=False, save_to_graph=False)
     except Exception as ex:
