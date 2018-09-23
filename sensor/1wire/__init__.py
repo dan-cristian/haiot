@@ -25,14 +25,14 @@ Created on Mar 9, 2015
 @author: dcristian
 '''
 
-initialised = False
-
 
 class P:
+    initialised = False
     last_warning = datetime.datetime.min
     check_period = 120  # how often I check for new sensors
     sampling_period_seconds = 30  # how often I read them
     ow_conn_list = {}  # key is busname, value is ow connection
+    func_list = []  # callable functions
     warning_issued = False
     IGNORED_TEMPERATURE = 85  # ignore this temp value, usually is an error
     failed_temp = False
@@ -78,12 +78,13 @@ def do_device(ow, path):
             except Exception as ex:
                 L.l.warning('Other error reading sensors: {}'.format(ex))
                 traceback.print_exc()
-            #delta = (datetime.datetime.now() - start).total_seconds()
-            #L.l.info("Sensor {} read took {} seconds".format(dev['address'], delta))
+            # delta = (datetime.datetime.now() - start).total_seconds()
+            # L.l.info("Sensor {} read took {} seconds".format(dev['address'], delta))
     all_delta = (datetime.datetime.now() - all_start).total_seconds()
     if count > 0 and all_delta > 1:
-        L.l.debug("All {} sensors read in bus {} took {} seconds, last was {}".format(
-            count, path, all_delta, last_sensor))
+        # L.l.debug("All {} sensors read in bus {} took {} seconds, last was {}".format(
+        #     count, path, all_delta, last_sensor))
+        pass
     return sensor_dict
 
 
@@ -272,51 +273,49 @@ def _get_bus_list(ohost, oport):
             P.ow_conn_list[owitem] = ow_proxy
             func = _dynamic_thread_run(ow_conn=ow_proxy, ow_bus=owitem)
             thread_pool.add_interval_callable(func, P.sampling_period_seconds)
+            P.func_list.append(func)
             # start all threads sequentially to avoid peak cpu usage
             time.sleep(P.sampling_period_seconds / len(owitems))
     L.l.info("Found {} owfs busses and initialised threads".format(len(P.ow_conn_list)))
 
 
-def init():
-    global initialised
+def _init_comm():
     ohost = "none"
     oport = "none"
     try:
         ohost = model_helper.get_param(Constant.P_OWSERVER_HOST_1)
         oport = str(model_helper.get_param(Constant.P_OWSERVER_PORT_1))
         _get_bus_list(ohost, oport)
-        initialised = True
+        P.initialised = True
         P.warning_issued = False
     except Exception as ex:
         if not P.warning_issued:
             L.l.info('1-wire owserver not initialised on host {} port {}, ex={}'.format(ohost, oport, ex))
-            initialised = False
+            P.initialised = False
             P.warning_issued = True
-    return initialised
+    return P.initialised
 
 
 def thread_run():
     prctl.set_name("owsensor")
     threading.current_thread().name = "owsensor"
-    global initialised
-    if initialised:
+    if P.initialised:
         check_inactive()
     else:
-        init()
+        _init_comm()
     prctl.set_name("idle")
     threading.current_thread().name = "idle"
 
 
-if __name__ == "__main__":
-    host = '127.0.0.1'
-    port = 4304
-    ow1 = pyownet.protocol.proxy(host=host, port=port)
-    items = ow1.dir('/', slash=False, bus=True)
-    for item in items:
-        if 'bus' in item:
-            ow_new = pyownet.protocol.proxy(host=host, port=port, flags=pyownet.protocol.FLG_UNCACHED)
-            P.ow_conn_list[item] = ow_new
-            try:
-                do_device(ow=ow_new, path=item)
-            except Exception as ex:
-                print(ex)
+def unload():
+    thread_pool.remove_callable(thread_run)
+    for func in P.func_list:
+        thread_pool.remove_callable(func)
+    for ow in P.ow_conn_list:
+        ow.close_connection()
+    P.initialised = False
+
+
+def init():
+    L.l.info('1wire module initialising')
+    thread_pool.add_interval_callable(thread_run, P.check_period)

@@ -1,5 +1,6 @@
 import threading
 import prctl
+from datetime import datetime
 from main.logger_helper import L
 from common import Constant
 from main.admin import models
@@ -18,9 +19,12 @@ class P:
     module_imported = False
     did_inclusion = False
     initialised = False
+    interval = 10
     init_fail_count = 0
     device = "/dev/ttyACM0"
     log_file = "OZW_Log.log"
+    last_value_received = datetime.min
+    MAX_SILENCE_SEC = 1
 
 
 try:
@@ -101,6 +105,7 @@ def _set_custom_relay_state(sensor_name, node_id, state):
 def louie_value(network, node, value):
     try:
         # L.l.info('Louie signal: Node={} Value={}'.format(node, value))
+        P.last_value_received = datetime.now()
         if value.label == "Switch":
             _set_custom_relay_state(sensor_name=node.product_name, node_id=node.node_id, state=value.data)
         elif value.label == "Power" or (value.label == "Energy" and value.units == "kWh"):
@@ -165,17 +170,28 @@ def louie_ctrl_message(state, message, network, controller):
     L.l.info('Louie signal : Controller message : {}.'.format(message))
 
 
-def unload():
-    L.l.info("Unloading zwave")
+def _stop_net():
     if P.network is not None:
+        L.l.info('Stopping network')
         P.network.stop()
-    thread_pool.remove_callable(thread_run)
+        count = 0
+        while P.network.state != ZWaveNetwork.STATE_STOPPED or count < 50:
+            time.sleep(0.2)
+            count += 1
+        if P.network.state == ZWaveNetwork.STATE_STOPPED:
+            L.l.info("Stop network successfull")
+        else:
+            L.l.info("Stop network failed, state={}".format(P.network.state))
+        P.network = None
+    else:
+        L.l.info("Zwave network already stopped (none)")
 
 
 # http://openzwave.github.io/python-openzwave/network.html
-def init():
+def _init_controller():
     if P.module_imported:
         L.l.info('Zwave initialising on {}'.format(P.device))
+        _stop_net()
         # Define some manager options
         options = ZWaveOption(P.device, config_path="../openzwave/config", user_path=".", cmd_line="")
         options.set_log_file(P.log_file)
@@ -290,10 +306,10 @@ def set_switch_state(node_id, state):
 def thread_run():
     prctl.set_name("zwave")
     threading.current_thread().name = "zwave"
-    #L.l.info("State is {}".format(P.network.state))
+    # L.l.info("State is {}".format(P.network.state))
     try:
         if not P.initialised:
-            P.initialised = init()
+            P.initialised = _init_controller()
             if not P.initialised:
                 P.init_fail_count += 1
                 if P.init_fail_count > 10:
@@ -303,7 +319,23 @@ def thread_run():
                 node = P.network.nodes[node_id]
                 if node_id > 1:
                     node.request_state()
+            sec = (datetime.now() - P.last_value_received).total_seconds()
+            if sec > P.MAX_SILENCE_SEC:
+                L.l.info("Zwave seems inactive, no value received since {} sec, reset now".format(sec))
+                P.initialised = _init_controller()
     except Exception as ex:
         L.l.error("Error in zwave thread run={}".format(ex), exc_info=True)
     prctl.set_name("idle")
     threading.current_thread().name = "idle"
+
+
+def unload():
+    L.l.info("Unloading zwave")
+    if P.network is not None:
+        P.network.stop()
+    thread_pool.remove_callable(thread_run)
+    P.initialised = False
+
+
+def init():
+    thread_pool.add_interval_callable(thread_run, run_interval_second=P.interval)

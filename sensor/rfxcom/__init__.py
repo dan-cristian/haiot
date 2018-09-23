@@ -5,15 +5,22 @@ from RFXtrx import PySerialTransport
 import RFXtrx
 from main.admin import models
 from common import Constant, utils, variable
-import serial_common
 import threading
 import prctl
+from main import thread_pool
+from sensor import serial_common
+
 
 class P:
     initialised = False
     transport = None
     last_packet_received = None
+    INTERVAL_NORMAL = 5
+    INTERVAL_ERROR = 120
+    interval = INTERVAL_NORMAL
     MAX_MINUTES_SILENCE = 10
+    init_failed_count = 0
+    MAX_FAILED_RETRY = 10
 
 
 def __rfx_reading(packet):
@@ -90,12 +97,8 @@ def elro_relay_on():
     event.set_transmit()
 
 
-def unload():
-    pass
-
-
 # https://github.com/Danielhiversen/pyRFXtrx/
-def init():
+def _init_board():
     P.initialised = False
     P.last_packet_received = utils.get_base_location_now_date()
     try:
@@ -122,7 +125,7 @@ def thread_run():
     threading.current_thread().name = "rfxcom"
     try:
         if not P.initialised:
-            init()
+            _init_board()
         if P.initialised:
             L.l.debug('Waiting for RFX event')
             time_elapsed_minutes = (utils.get_base_location_now_date() - P.last_packet_received).seconds / 60
@@ -131,9 +134,26 @@ def thread_run():
                 P.transport.reset()
             event = P.transport.receive_blocking()
             __rfx_reading(event)
+        else:
+            if P.init_failed_count > P.MAX_FAILED_RETRY:
+                unload()
+    except IndexError as iex:
+        P.initialised = False
+        P.init_failed_count += 1
+        utils.sleep(10)
     except Exception as ex:
         L.l.error('Error read RFX tty port, err={}'.format(ex), exc_info=True)
         P.initialised = False
+        P.init_failed_count += 1
         utils.sleep(10)
     prctl.set_name("idle")
     threading.current_thread().name = "idle"
+
+
+def unload():
+    thread_pool.remove_callable(thread_run)
+    P.initialised = False
+
+
+def init():
+    thread_pool.add_interval_callable(thread_run, run_interval_second=P.interval)

@@ -33,26 +33,6 @@ def get_portpath_linux(product_name):
     return None
 
 
-# does not work anymore
-def get_standard_serial_device_list_old():
-    valid_list = []
-    ser = serial.Serial()
-    ser.baudrate = 9600
-    ser.timeout = 3
-    ser.writeTimeout = 3
-    for port_no in range(0, 5):
-        try:
-            L.l.info('Trying to open serial port {}'.format(port_no))
-            ser.port = port_no
-            ser.open()
-            ser.close()
-            L.l.info('Found and opened serial port {}'.format(port_no))
-            valid_list.append(port_no)
-        except Exception as ex:
-            L.l.info('Cannot open serial port, ex='.format(ex))
-    return valid_list
-
-
 # https://stackoverflow.com/questions/12090503/listing-available-com-ports-with-python
 def get_standard_serial_device_list():
     """ Lists serial port names
