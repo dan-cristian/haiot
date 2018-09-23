@@ -1,8 +1,8 @@
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
 from main.logger_helper import L
-from RFXtrx import PySerialTransport
-import RFXtrx
+from sensor.rfxcom import RFXtrx
+from sensor.rfxcom.RFXtrx import PySerialTransport
 from main.admin import models
 from common import Constant, utils, variable
 import threading
