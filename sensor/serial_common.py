@@ -10,6 +10,9 @@ from main.logger_helper import L
 class P:
     PORT_EXCLUSION = ['/dev/ttyprintk']
 
+    def __init__(self):
+        pass
+
 
 def get_portpath_linux(product_name):
     # /sys/bus/usb/devices/2-1.2/2-1.2:1.0/ttyUSB0/tty/ttyUSB0/dev
@@ -56,16 +59,17 @@ def get_standard_serial_device_list():
     L.l.info("Found {} serial ports".format(len(ports)))
     result = []
     for port in ports:
-        try:
-            s = serial.Serial()
-            s.baudrate = 9600
-            s.timeout = 3
-            s.writeTimeout = 3
-            s.port = port
-            s.open()
-            s.close()
-            L.l.debug('Found and opened serial port {}'.format(port))
-            result.append(port)
-        except Exception as ex:
-            L.l.info('Cannot open serial port {}, ex='.format(port, ex))
+        if port not in P.PORT_EXCLUSION:
+            try:
+                s = serial.Serial()
+                s.baudrate = 9600
+                s.timeout = 3
+                s.writeTimeout = 3
+                s.port = port
+                s.open()
+                s.close()
+                L.l.debug('Found and opened serial port {}'.format(port))
+                result.append(port)
+            except Exception as ex:
+                L.l.info('Cannot open serial port {}, ex='.format(port, ex))
     return result
