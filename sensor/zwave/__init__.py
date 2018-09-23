@@ -352,7 +352,7 @@ def thread_run():
         if P.initialised:
             for node_id in P.network.nodes:
                 node = P.network.nodes[node_id]
-                if node_id > 1:
+                if node_id == 2:
                     node.request_state()
             sec = (datetime.now() - P.last_value_received).total_seconds()
             if sec > P.MAX_SILENCE_SEC:
