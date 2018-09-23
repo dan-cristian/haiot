@@ -4,7 +4,7 @@ import time
 import serial
 import threading
 import prctl
-import sys
+from pydispatch import dispatcher
 from main.logger_helper import L
 from common import Constant, utils, variable
 from sensor import serial_common
@@ -17,7 +17,6 @@ class P:
     initialised = False
     serial = None
     ups = None
-    #initialising = False
     interval = 30
 
 
@@ -153,15 +152,7 @@ def _create_dummy_entry():
                                    save_to_graph=True)
 
 
-def unload():
-    if P.serial is not None and P.serial.isOpen():
-        P.serial.close()
-    P.initialised = False
-
-
 def _init_comm():
-    #if P.initialising:
-    #    return
     P.initialised = False
     try:
         # if constant.OS in constant.OS_LINUX:
@@ -172,7 +163,7 @@ def _init_comm():
         #    #fixme windows autodetect version
         if len(serial_list) > 0:
             L.l.info('Looking for Legrand UPS on {} serial ports'.format(len(serial_list)))
-            #traceback.print_stack(file=sys.stdout)
+            # traceback.print_stack(file=sys.stdout)
             for port in serial_list:
                 if port not in variable.USB_PORTS_IN_USE:
                     __search_ups(port)
@@ -186,9 +177,8 @@ def _init_comm():
             L.l.info('No standard open serial ports detected on this system')
     except Exception as ex:
         L.l.error('Unable to open ups port, err {}'.format(ex), exc_info=True)
-    #if not P.initialised:
+    # if not P.initialised:
     #    _create_dummy_entry()
-    #P.initialising = False
     return P.initialised
 
 
@@ -205,8 +195,17 @@ def thread_run():
 
 def unload():
     thread_pool.remove_callable(thread_run)
+    if P.serial is not None and P.serial.isOpen():
+        P.serial.close()
     P.initialised = False
+
+
+# called once a usb change is detected
+def _init_recovery():
+    if not P.initialised:
+        thread_pool.add_interval_callable(thread_run, run_interval_second=P.interval)
 
 
 def init():
     thread_pool.add_interval_callable(thread_run, run_interval_second=P.interval)
+    dispatcher.connect(_init_recovery, signal=Constant.SIGNAL_USB_DEVICE_CHANGE, sender=dispatcher.Any)
