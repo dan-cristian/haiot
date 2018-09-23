@@ -2,7 +2,7 @@ import threading
 import prctl
 from datetime import datetime
 from main.logger_helper import L
-from common import Constant
+from common import Constant, variable
 from main.admin import models
 from main import thread_pool
 import six
@@ -263,6 +263,7 @@ def _init_controller():
             # not working
             # P.network.set_poll_interval(milliseconds=3000, bIntervalBetweenPolls=False)
             # P.network.test(1)
+            variable.USB_PORTS_IN_USE.append(device)
             return True
         except ZWaveException as ze:
             L.l.error('Unable to init zwave, exception={}'.format(ze))

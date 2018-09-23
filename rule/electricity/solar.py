@@ -14,7 +14,7 @@ class P:
     PLUG1_MIN_WATTS_OFF = 5  # min consumption to be considered OFF
     EXPORT_MIN_WATTS = -50
     RELAY_1_NAME = 'plug_1'
-    STATE_CHANGE_INTERVAL = 60  # how often can change state
+    STATE_CHANGE_INTERVAL = 300  # how often can change state
 
     def __init__(self):
         pass
