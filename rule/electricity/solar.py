@@ -5,8 +5,8 @@ from rule import rule_common
 
 
 class P:
-    grid_watts = 0
-    plug1_watts = 0
+    grid_watts = None
+    plug1_watts = None
     last_state_change = datetime.min
     PLUG1_MIN_WATTS = 20
     EXPORT_MIN_WATTS = -50
@@ -30,7 +30,7 @@ def rule_energy_export(obj=models.Utility(), field_changed_list=None):
                 P.grid_watts = obj.units_2_delta
             elif obj.utility_name == 'power plug 1':
                 P.plug1_watts = obj.units_2_delta
-            if P.grid_watts < 0:
+            if P.grid_watts is not None and P.grid_watts < 0:
                 if P.grid_importing is True:
                     L.l.info("Exporting power {}w".format(P.grid_watts))
                     P.grid_importing = False
@@ -42,7 +42,7 @@ def rule_energy_export(obj=models.Utility(), field_changed_list=None):
                 if P.grid_importing is False:
                     L.l.info("Importing power {}w".format(P.grid_watts))
                     P.grid_importing = True
-                if P.plug1_watts > P.PLUG1_MIN_WATTS and _can_state_change():
+                if P.plug1_watts is not None and P.plug1_watts > P.PLUG1_MIN_WATTS and _can_state_change():
                     L.l.info("Stopping plug 1 to cut import, plug {}w, grid {}w".format(P.plug1_watts, P.grid_watts))
                     rule_common.update_custom_relay(relay_pin_name=P.RELAY_1_NAME, power_is_on=False)
                     P.last_state_change = datetime.now()
