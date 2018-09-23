@@ -23,7 +23,7 @@ class P:
     init_fail_count = 0
     device = "/dev/ttyACM0"
     log_file = "OZW_Log.log"
-    last_value_received = datetime.min
+    last_value_received = datetime.max
     MAX_SILENCE_SEC = 1
 
 
@@ -185,7 +185,8 @@ def _stop_net():
             L.l.info("Stop network failed, state={}".format(P.network.state))
         P.network = None
     else:
-        L.l.info("Zwave network already stopped (none)")
+        # L.l.info("Zwave network already stopped (none)")
+        pass
 
 
 # http://openzwave.github.io/python-openzwave/network.html
