@@ -238,12 +238,12 @@ def _init_controller():
                 return False
             L.l.info("Home id : {}, Nodes in network : {}".format(P.network.home_id_str, P.network.nodes_count))
 
-            L.l.info("Waiting for network to become ready")
-            for i in range(0, 120):
+            L.l.info("Waiting 60 sec for network to become ready")
+            for i in range(0, 240):
                 if P.network.state >= P.network.STATE_READY:
                     break
                 else:
-                    time.sleep(0.3)
+                    time.sleep(0.5)
                     # L.l.info("state = {}".format(P.network.state))
             if not P.network.is_ready:
                 L.l.info("Can't start network! Look at the logs in OZW_Log.log")
@@ -297,7 +297,7 @@ def switch_all_on():
             L.l.info("Activate switch {} on node {}".format(P.network.nodes[node].values[val].label, node))
             P.network.nodes[node].set_switch(val, True)
             L.l.info("Sleep 10 seconds")
-            time.sleep(10.0)
+            time.sleep(10)
             L.l.info("Dectivate switch {} on node {}".format(P.network.nodes[node].values[val].label, node))
             P.network.nodes[node].set_switch(val,False)
 
