@@ -120,31 +120,32 @@ def louie_value(network, node, value):
             haiot_dispatch.send(Constant.SIGNAL_UTILITY_EX, sensor_name=node.product_name,
                                 value=value_adjusted, unit=units_adjusted)
         else:
-            # L.l.info("Received node={}, value={}".format(node, value))
-            current_record = models.Sensor.query.filter_by(sensor_name=node.product_name).first()
-            if current_record is not None:
-                current_record.vad = None
-                current_record.iad = None
-                current_record.vdd = None
-                address = current_record.address
-            else:
-                L.l.info("Cannot find sensor definition in db, name=[{}]".format(node.product_name))
-                address = node.product_name
-            record = models.Sensor(sensor_name=node.product_name, address=address)
-            if value.label == "Voltage":
-                record.vad = round(value.data, 0)
-                record.save_changed_fields(current_record=current_record, new_record=record,
-                                           notify_transport_enabled=True, save_to_graph=True, debug=False)
-            elif value.label == "Current":
-                record.iad = round(value.data, 1)
-                record.save_changed_fields(current_record=current_record, new_record=record,
-                                           notify_transport_enabled=True, save_to_graph=True, debug=False)
-            elif value.label == "Power Factor":
-                record.vdd = round(value.data, 1)
-                record.save_changed_fields(current_record=current_record, new_record=record,
-                                           notify_transport_enabled=True, save_to_graph=True, debug=False)
-            if current_record is not None:
-                current_record.commit_record_to_db()
+            if node.node_id > 1:
+                # L.l.info("Received node={}, value={}".format(node, value))
+                current_record = models.Sensor.query.filter_by(sensor_name=node.product_name).first()
+                if current_record is not None:
+                    current_record.vad = None
+                    current_record.iad = None
+                    current_record.vdd = None
+                    address = current_record.address
+                else:
+                    L.l.info("Cannot find sensor definition in db, name=[{}]".format(node.product_name))
+                    address = node.product_name
+                record = models.Sensor(sensor_name=node.product_name, address=address)
+                if value.label == "Voltage":
+                    record.vad = round(value.data, 0)
+                    record.save_changed_fields(current_record=current_record, new_record=record,
+                                               notify_transport_enabled=True, save_to_graph=True, debug=False)
+                elif value.label == "Current":
+                    record.iad = round(value.data, 1)
+                    record.save_changed_fields(current_record=current_record, new_record=record,
+                                               notify_transport_enabled=True, save_to_graph=True, debug=False)
+                elif value.label == "Power Factor":
+                    record.vdd = round(value.data, 1)
+                    record.save_changed_fields(current_record=current_record, new_record=record,
+                                               notify_transport_enabled=True, save_to_graph=True, debug=False)
+                if current_record is not None:
+                    current_record.commit_record_to_db()
     except Exception as ex:
         L.l.error("Error in zwave value={}".format(ex), exc_info=True)
 
