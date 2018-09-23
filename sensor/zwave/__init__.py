@@ -258,12 +258,10 @@ def _init_controller():
             # not working
             # P.network.set_poll_interval(milliseconds=3000, bIntervalBetweenPolls=False)
             # P.network.test(1)
+            return True
         except ZWaveException as ze:
             L.l.error('Unable to init zwave, exception={}'.format(ze))
-        return True
-    else:
-        # L.l.info("Zwave init skipped")
-        return False
+    return False
 
 
 def include_node():
