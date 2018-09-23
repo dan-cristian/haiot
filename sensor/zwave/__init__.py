@@ -310,6 +310,7 @@ def set_switch_state(node_id, state):
         if node.node_id == node_id:
             for switch in node.get_switches():
                 node.set_switch(switch, state)
+                L.l.info("Switch set, switch={} state={}".format(switch, state))
                 found = True
             break
     if not found:
