@@ -10,8 +10,8 @@ import threading
 import prctl
 from main import thread_pool
 from sensor import serial_common
-from sensor.lib import RFXtrx
-from sensor.lib.RFXtrx import PySerialTransport
+from sensor.rfxcom import RFXtrx
+from sensor.rfxcom.RFXtrx import PySerialTransport
 
 
 class P:

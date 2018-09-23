@@ -632,11 +632,13 @@ class PySerialTransport(RFXtrxTransport):
     def connect(self):
         """ Open a serial connexion """
         try:
-            self.serial = serial.Serial(self.port, 38400, timeout=0.1)
+            # self.serial = serial.Serial(self.port, 38400, timeout=0.1)
+            self.serial = serial.Serial(self.port, 9600, timeout=0.3)
         except serial.serialutil.SerialException:
             import glob
             port = glob.glob('/dev/serial/by-id/usb-RFXCOM_*-port0')[0]
-            self.serial = serial.Serial(port, 38400, timeout=0.1)
+            # self.serial = serial.Serial(port, 38400, timeout=0.1)
+            self.serial = serial.Serial(port, 9600, timeout=0.3)
 
     def receive_blocking(self):
         """ Wait until a packet is received and return with an RFXtrxEvent """
@@ -659,8 +661,7 @@ class PySerialTransport(RFXtrxTransport):
             data = self.serial.read(pkt[0])
             pkt.extend(bytearray(data))
             if self.debug:
-                print("RFXTRX: Recv: " +
-                      " ".join("0x{0:02x}".format(x) for x in pkt))
+                print("RFXTRX: Recv: " + " ".join("0x{0:02x}".format(x) for x in pkt))
             return self.parse(pkt)
 
     def send(self, data):
@@ -672,8 +673,7 @@ class PySerialTransport(RFXtrxTransport):
         else:
             raise ValueError("Invalid type")
         if self.debug:
-            print("RFXTRX: Send: " +
-                  " ".join("0x{0:02x}".format(x) for x in pkt))
+            print("RFXTRX: Send: " + " ".join("0x{0:02x}".format(x) for x in pkt))
         self.serial.write(pkt)
 
     def reset(self):
@@ -758,7 +758,7 @@ class Connect:
             #self.set_recmodes(self._modes)
             self._status = self.send_get_status()
 
-        #if self._debug:
+        # if self._debug:
         print("RFXTRX: ", self._status)
 
         self.send_start()
