@@ -209,56 +209,57 @@ def _init_controller():
             # options.set_poll_interval(5)
             options.set_save_configuration(True)
             options.lock()
+
+            # Create a network object
+            P.network = ZWaveNetwork(options, log=None, autostart=False)
+            dispatcher.connect(louie_network_started, ZWaveNetwork.SIGNAL_NETWORK_STARTED)
+            dispatcher.connect(louie_network_failed, ZWaveNetwork.SIGNAL_NETWORK_FAILED)
+            dispatcher.connect(louie_network_resetted, ZWaveNetwork.SIGNAL_NETWORK_RESETTED)
+            dispatcher.connect(louie_network_ready, ZWaveNetwork.SIGNAL_NETWORK_READY)
+            dispatcher.connect(louie_network_stopped, ZWaveNetwork.SIGNAL_NETWORK_STOPPED)
+            dispatcher.connect(louie_network_awaked, ZWaveNetwork.SIGNAL_NETWORK_AWAKED)
+
+            P.network.start()
+
+            L.l.info("Waiting for zwave driver")
+            for i in range(0, 120):
+                if P.network.state >= P.network.STATE_STARTED:
+                    L.l.info("Zwave driver started")
+                    break
+                else:
+                    time.sleep(0.1)
+            if P.network.state < P.network.STATE_STARTED:
+                L.l.info("Can't initialise zwave driver. Look at the logs in {}".format(P.log_file))
+                return False
+            L.l.info("Home id : {}, Nodes in network : {}".format(P.network.home_id_str, P.network.nodes_count))
+
+            L.l.info("Waiting for network to become ready")
+            for i in range(0, 120):
+                if P.network.state >= P.network.STATE_READY:
+                    break
+                else:
+                    time.sleep(0.3)
+                    # L.l.info("state = {}".format(P.network.state))
+            if not P.network.is_ready:
+                L.l.info("Can't start network! Look at the logs in OZW_Log.log")
+                P.network.stop()
+                return False
+            else:
+                L.l.info("Zwave network is started!")
+            # print nodes
+            for node_id in P.network.nodes:
+                node = P.network.nodes[node_id]
+                try:
+                    L.l.info("Node {}={}".format(node_id, node))
+                    L.l.info("Node {} attrib: model={} man={} prod_name={} prod_id={}".format(
+                        node_id, node.manufacturer_name, node.product_name, node.product_id))
+                except Exception as ex:
+                    pass
+            # not working
+            # P.network.set_poll_interval(milliseconds=3000, bIntervalBetweenPolls=False)
+            # P.network.test(1)
         except ZWaveException as ze:
             L.l.error('Unable to init zwave, exception={}'.format(ze))
-        # Create a network object
-        P.network = ZWaveNetwork(options, log=None, autostart=False)
-        dispatcher.connect(louie_network_started, ZWaveNetwork.SIGNAL_NETWORK_STARTED)
-        dispatcher.connect(louie_network_failed, ZWaveNetwork.SIGNAL_NETWORK_FAILED)
-        dispatcher.connect(louie_network_resetted, ZWaveNetwork.SIGNAL_NETWORK_RESETTED)
-        dispatcher.connect(louie_network_ready, ZWaveNetwork.SIGNAL_NETWORK_READY)
-        dispatcher.connect(louie_network_stopped, ZWaveNetwork.SIGNAL_NETWORK_STOPPED)
-        dispatcher.connect(louie_network_awaked, ZWaveNetwork.SIGNAL_NETWORK_AWAKED)
-
-        P.network.start()
-
-        L.l.info("Waiting for zwave driver")
-        for i in range(0, 120):
-            if P.network.state >= P.network.STATE_STARTED:
-                L.l.info("Zwave driver started")
-                break
-            else:
-                time.sleep(0.1)
-        if P.network.state < P.network.STATE_STARTED:
-            L.l.info("Can't initialise zwave driver. Look at the logs in {}".format(P.log_file))
-            return False
-        L.l.info("Home id : {}, Nodes in network : {}".format(P.network.home_id_str, P.network.nodes_count))
-
-        L.l.info("Waiting for network to become ready")
-        for i in range(0, 120):
-            if P.network.state >= P.network.STATE_READY:
-                break
-            else:
-                time.sleep(0.3)
-                # L.l.info("state = {}".format(P.network.state))
-        if not P.network.is_ready:
-            L.l.info("Can't start network! Look at the logs in OZW_Log.log")
-            P.network.stop()
-            return False
-        else:
-            L.l.info("Zwave network is started!")
-        # print nodes
-        for node_id in P.network.nodes:
-            node = P.network.nodes[node_id]
-            try:
-                L.l.info("Node {}={}".format(node_id, node))
-                L.l.info("Node {} attrib: model={} man={} prod_name={} prod_id={}".format(
-                    node_id, node.manufacturer_name, node.product_name, node.product_id))
-            except Exception as ex:
-                pass
-        # not working
-        # P.network.set_poll_interval(milliseconds=3000, bIntervalBetweenPolls=False)
-        # P.network.test(1)
         return True
     else:
         # L.l.info("Zwave init skipped")
