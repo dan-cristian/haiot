@@ -7,7 +7,14 @@ import os
 try:
     from main.logger_helper import L
 except ImportError as ie:
-    print(ie)
+    class L:
+        class l:
+            @staticmethod
+            def info(msg): print(msg)
+            @staticmethod
+            def warning(msg): print(msg)
+            @staticmethod
+            def error(msg): print(msg)
 
 
 class P:
