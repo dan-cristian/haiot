@@ -72,7 +72,11 @@ def unload_module(module_name):
     dynclass = my_import(module_name)
     if dynclass:
         try:
-            if dynclass.initialised:
+            if hasattr(dynclass, 'initialised'):
+                inited = dynclass.initialised
+            else:
+                inited = dynclass.P.initialised
+            if inited:
                 L.l.info('Module {} unloading'.format(module_name))
                 dynclass.unload()
             else:
@@ -104,7 +108,7 @@ def init_modules():
                 #    mod_host_specific.name, mod_host_specific.active))
                 init_module(mod_host_specific.name, mod_host_specific.active == 1)
             else:
-                # Log.logger.info("Initialising generic module definition name={} active={}".format(mod.name, mod.active))
+                # Log.logger.info("Initialising generic mod definition name={} active={}".format(mod.name, mod.active))
                 init_module(mod.name, mod.active == 1)
 
 
