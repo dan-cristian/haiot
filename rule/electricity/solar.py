@@ -34,35 +34,36 @@ def rule_energy_export(obj=models.Utility(), field_changed_list=None):
             elif obj.utility_name == 'power plug 1':
                 P.plug1_watts = obj.units_2_delta
             # if exporting
-            if P.grid_watts is not None and P.grid_watts < 0:
-                if P.grid_importing is True or P.grid_importing is None:
-                    L.l.info("Exporting power {}w".format(P.grid_watts))
-                    P.grid_importing = False
-                if P.grid_watts < P.EXPORT_MIN_WATTS and _can_state_change():
-                    L.l.info("Starting plug 1 to reduce export, grid={}".format(P.grid_watts))
-                    rule_common.update_custom_relay(relay_pin_name=P.RELAY_1_NAME, power_is_on=True)
-                    P.last_state_change = datetime.now()
-                    P.plug1_stopped = False
-            else:
-                if P.grid_importing is False or P.grid_importing is None:
-                    L.l.info("Importing power {}w".format(P.grid_watts))
-                    P.grid_importing = True
-                if P.plug1_watts is not None and P.plug1_watts > P.PLUG1_MIN_WATTS_ON and _can_state_change():
-                    power_is_on = rule_common.get_custom_relay(P.RELAY_1_NAME)
-                    if P.plug1_stopped:
-                        if power_is_on:
-                            L.l.info("Plug1 was stopped, now on, probably overriden by user, plug {}w, grid {}w".format(
-                                P.plug1_watts, P.grid_watts))
-                        else:
-                            # all ok, plug is stopped
-                            pass
-                    else:
-                        L.l.info("Stopping plug1 to cut import, plug {}w, grid {}w".format(
-                            P.plug1_watts, P.grid_watts))
-                        time.sleep(10)
-                        rule_common.update_custom_relay(relay_pin_name=P.RELAY_1_NAME, power_is_on=False)
-                        P.plug1_stopped = True
+            if P.grid_watts is not None:
+                if P.grid_watts <= 0:
+                    if P.grid_importing is True or P.grid_importing is None:
+                        L.l.info("Exporting power {}w".format(P.grid_watts))
+                        P.grid_importing = False
+                    if P.grid_watts < P.EXPORT_MIN_WATTS and _can_state_change():
+                        L.l.info("Starting plug 1 to reduce export, grid={}".format(P.grid_watts))
+                        rule_common.update_custom_relay(relay_pin_name=P.RELAY_1_NAME, power_is_on=True)
                         P.last_state_change = datetime.now()
+                        P.plug1_stopped = False
+                else:
+                    if P.grid_importing is False or P.grid_importing is None:
+                        L.l.info("Importing power {}w".format(P.grid_watts))
+                        P.grid_importing = True
+                    if P.plug1_watts is not None and P.plug1_watts > P.PLUG1_MIN_WATTS_ON and _can_state_change():
+                        power_is_on = rule_common.get_custom_relay(P.RELAY_1_NAME)
+                        if P.plug1_stopped:
+                            if power_is_on:
+                                L.l.info("Plug1 started, probably overriden by user, plug {}w, grid {}w".format(
+                                    P.plug1_watts, P.grid_watts))
+                            else:
+                                # all ok, plug is stopped
+                                pass
+                        else:
+                            L.l.info("Stopping plug1 to cut import, plug {}w, grid {}w".format(
+                                P.plug1_watts, P.grid_watts))
+                            time.sleep(10)
+                            rule_common.update_custom_relay(relay_pin_name=P.RELAY_1_NAME, power_is_on=False)
+                            P.plug1_stopped = True
+                            P.last_state_change = datetime.now()
             # reset user override to enable automatic switch
             if P.plug1_watts is not None and P.plug1_watts <= P.PLUG1_MIN_WATTS_OFF:
                 P.plug1_stopped = False
