@@ -1,4 +1,5 @@
 from datetime import datetime
+import time
 from main.logger_helper import L
 from main.admin import models
 from rule import rule_common
@@ -58,6 +59,7 @@ def rule_energy_export(obj=models.Utility(), field_changed_list=None):
                     else:
                         L.l.info("Stopping plug1 to cut import, plug {}w, grid {}w".format(
                             P.plug1_watts, P.grid_watts))
+                        time.sleep(10)
                         rule_common.update_custom_relay(relay_pin_name=P.RELAY_1_NAME, power_is_on=False)
                         P.plug1_stopped = True
                         P.last_state_change = datetime.now()
