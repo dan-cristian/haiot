@@ -54,15 +54,12 @@
     {"name": "HEAT_STATE_REFRESH_PERIOD", "value": "1", "description":"period in minutes to do a heath status & gpio pins refresh"},
     {"name": "SOLAR_APS_LOCAL_URL", "value": "http://192.168.0.10/cgi-bin/home", "description":"link to aps ecu page with day production"},
     {"name": "SOLAR_APS_LOCAL_REALTIME_URL", "value": "http://192.168.0.10/cgi-bin/parameters", "description":"link to aps ecu page with realtime production"},
-    {"name": "SOLAR_UTILITY_NAME", "value": "solar_aps", "description":"utility name from utility table"},
-    {"name": "UPS_ON_HOST", "value": "pi-face", "description":"host name on which the ups is connected, to enable UPS search"},
-    {"name": "SOLAR_PARSER_ON_HOST", "value": "pi-face", "description":"host name on which the aps solar parser runs"}
+    {"name": "SOLAR_UTILITY_NAME", "value": "solar_aps", "description":"utility name from utility table"}
   ],
   "Module": [
     {"id":1,  "active":"1", "start_order":"1", "name":"main"},
     {"id":2,  "active":"1", "start_order":"2", "name":"cloud.email"},
     {"id":3,  "active":"1", "start_order":"3", "name":"health_monitor"},
-    {"id":5,  "active":"1", "start_order":"5", "name":"sensor"},
     {"id":7,  "active":"1", "start_order":"7", "name":"gpio"},
     {"id":9,  "active":"0", "start_order":"9", "name":"heat"},
     {"id":11, "active":"0", "start_order":"11", "name":"alarm"},
@@ -79,6 +76,11 @@
     {"id":41, "active":"0", "start_order":"41", "name":"cloud.alexa"},
     {"id":43, "active":"0", "start_order":"43", "name":"cloud.thingspeak"},
     {"id":45, "active":"1", "start_order":"45", "name":"cloud.openhab"},
+    {"id":47, "active":"0", "start_order":"47", "name":"sensor.rfxcom"},
+    {"id":49, "active":"0", "start_order":"49", "name":"sensor.ups_legrand"},
+    {"id":51, "active":"0", "start_order":"51", "name":"sensor.solar_aps"},
+    {"id":53, "active":"0", "start_order":"53", "name":"sensor.zwave"},
+    {"id":55, "active":"0", "start_order":"55", "name":"sensor.1wire"},
     {"id":105, "active":"0", "start_order":"50", "name":"apps.dashcam"},
     {"id":101, "active":"0", "start_order":"101", "name":"webui.chart"},
     {"id":102, "active":"1", "start_order":"102", "name":"webui.api"},
@@ -88,6 +90,7 @@
     {"id":123, "active":"0", "start_order":"23", "name":"sysutils.filewatch", "host_name":"nas"},
 
     {"id":209, "active":"0", "start_order":"9", "name":"heat", "host_name":"pi-power"},
+    {"id":255, "active":"1", "start_order":"55", "name":"sensor.1wire", "host_name":"pi-power"},
 
     {"id":401, "active":"1", "start_order":"50", "name":"apps.dashcam", "host_name":"pidash"},
     {"id":411, "active":"1", "start_order":"11", "name":"alarm", "host_name":"pidash"},
@@ -103,7 +106,13 @@
     {"id":609, "active":"1", "start_order":"9", "name":"heat", "host_name":"pi-face"},
     {"id":611, "active":"1", "start_order":"11", "name":"alarm", "host_name":"pi-face"},
     {"id":619, "active":"1", "start_order":"19", "name":"ddns", "host_name":"pi-face"},
-    {"id":641, "active":"1", "start_order":"41", "name":"cloud.alexa", "host_name":"pi-face"}
+    {"id":641, "active":"1", "start_order":"41", "name":"cloud.alexa", "host_name":"pi-face"},
+    {"id":647, "active":"1", "start_order":"47", "name":"sensor.rfxcom", "host_name":"pi-face"},
+    {"id":649, "active":"1", "start_order":"49", "name":"sensor.ups_legrand", "host_name":"pi-face"},
+    {"id":651, "active":"1", "start_order":"51", "name":"sensor.solar_aps", "host_name":"pi-face"},
+    {"id":653, "active":"1", "start_order":"53", "name":"sensor.zwave", "host_name":"pi-face"},
+    {"id":655, "active":"1", "start_order":"55", "name":"sensor.1wire", "host_name":"pi-face"}
+
   ],
 
   "People": [

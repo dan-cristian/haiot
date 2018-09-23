@@ -4,22 +4,25 @@ import template_run
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
-initialised = False
+
+class P:
+    initialised = False
+
+    def __init__(self):
+        pass
 
 
 def unload():
     L.l.info('Template module unloading')
     # ...
     thread_pool.remove_callable(template_run.thread_run)
-    global initialised
-    initialised = False
+    P.initialised = False
 
 
 def init():
     L.l.info('Template module initialising')
     thread_pool.add_interval_callable(template_run.thread_run, run_interval_second=60)
-    global initialised
-    initialised = True
+    P.initialised = True
 
 
 if __name__ == '__main__':

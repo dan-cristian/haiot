@@ -3,48 +3,50 @@ __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 from main.logger_helper import L
 from common import Constant, utils, variable
 from main.admin import models, model_helper
+from main import thread_pool
 
-# APS SOLAR ECU LINK: http://192.168.0.10/cgi-bin/home
-_initialised_solar_aps = False
-__start_keyword = 'Lifetime generation</td><td align=center>'
-__end_keyword = ' kWh</td>'
-__start_keyword_now = 'Last System Power</td><td align=center>'
-__end_keyword_now = ' W</td>'
-# APS Temperature params: 192.168.0.10/cgi-bin/parameters
-__start_key_temp = '<td align=center> '
-__end_key_temp = '&nbsp;<sup>o</sup>C'
-__start_key_panel = '<td align=center>'
-__end_key_panel = '-A</td>'
+
+class P:
+    initialised = False
+    interval = 60
+    # APS SOLAR ECU LINK: http://192.168.0.10/cgi-bin/home
+    start_keyword = 'Lifetime generation</td><td align=center>'
+    end_keyword = ' kWh</td>'
+    start_keyword_now = 'Last System Power</td><td align=center>'
+    end_keyword_now = ' W</td>'
+    # APS Temperature params: 192.168.0.10/cgi-bin/parameters
+    start_key_temp = '<td align=center> '
+    end_key_temp = '&nbsp;<sup>o</sup>C'
+    start_key_panel = '<td align=center>'
+    end_key_panel = '-A</td>'
 
 
 def init_solar_aps():
-    global __start_keyword, __end_keyword, _initialised_solar_aps
     try:
         production = utils.parse_http(model_helper.get_param(Constant.P_SOLAR_APS_LOCAL_URL),
-                                      __start_keyword, __end_keyword)
+                                      P.start_keyword, P.end_keyword)
         if production is not None and production is not '':
-            _initialised_solar_aps = True
+            P.initialised = True
         else:
-            _initialised_solar_aps = False
-        return _initialised_solar_aps
-    except Exception, ex:
+            P.initialised = False
+        return P.initialised
+    except Exception as ex:
         L.l.warning("Unable to connect to aps solar server, ex={}".format(ex))
 
 
-def thread_solar_aps_run():
-    global __start_keyword, __end_keyword, _initialised_solar_aps
-    if not _initialised_solar_aps:
+def thread_run():
+    if not P.initialised:
         init_solar_aps()
-    if variable.NODE_THIS_IS_MASTER_OVERALL and _initialised_solar_aps:
+    if P.initialised:
         try:
             production = utils.parse_http(model_helper.get_param(Constant.P_SOLAR_APS_LOCAL_URL),
-                                          __start_keyword, __end_keyword)
+                                          P.start_keyword, P.end_keyword)
             last_power = utils.parse_http(model_helper.get_param(Constant.P_SOLAR_APS_LOCAL_URL),
-                                          __start_keyword_now, __end_keyword_now)
+                                          P.start_keyword_now, P.end_keyword_now)
             temperature = utils.parse_http(model_helper.get_param(Constant.P_SOLAR_APS_LOCAL_REALTIME_URL),
-                                           __start_key_temp, __end_key_temp, end_first=True)
+                                           P.start_key_temp, P.end_key_temp, end_first=True)
             panel_id = utils.parse_http(model_helper.get_param(Constant.P_SOLAR_APS_LOCAL_REALTIME_URL),
-                                        __start_key_panel, __end_key_panel, end_first=True)
+                                        P.start_key_panel, P.end_key_panel, end_first=True)
             utility_name = model_helper.get_param(Constant.P_SOLAR_UTILITY_NAME)
             if temperature is not None:
                 zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=panel_id).first()
@@ -89,7 +91,14 @@ def thread_solar_aps_run():
                 record.cost = 1.0 * record.units_delta * current_record.unit_cost
                 record.save_changed_fields(current_record=current_record, new_record=record, debug=False,
                                            notify_transport_enabled=True, save_to_graph=True, save_all_fields=True)
-        except Exception, ex:
+        except Exception as ex:
             L.l.warning("Got exception on solar thread run, ex={}".format(ex))
 
 
+def unload():
+    thread_pool.remove_callable(thread_run)
+    P.initialised = False
+
+
+def init():
+    thread_pool.add_interval_callable(thread_run, run_interval_second=P.interval)
