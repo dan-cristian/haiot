@@ -69,11 +69,11 @@ class L:
                 handler = logging.handlers.SysLogHandler(address='/dev/log')
                 L.l.addHandler(handler)
                 L.l.info('Syslog program started at {}'.format(socket.gethostname()))
-            except Exception, ex:
+            except Exception as ex:
                 try:
                     ntl = logging.handlers.NTEventLogHandler(appname='haiot')
                     L.l.addHandler(ntl)
-                except Exception, ex:
+                except Exception as ex:
                     print 'Unable to init syslog handler err={}'.format(ex)
         else:
             if L.LOG_FILE is not None:
