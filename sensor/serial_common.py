@@ -4,7 +4,10 @@ import sys
 import glob
 import serial
 import os
-from main.logger_helper import L
+try:
+    from main.logger_helper import L
+except ImportError as ie:
+    print(ie)
 
 
 class P:

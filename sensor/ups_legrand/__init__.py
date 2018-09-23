@@ -18,6 +18,7 @@ class P:
     serial = None
     ups = None
     interval = 30
+    port_pattern = 'ttyUSB'
 
 
 class LegrandUps:
@@ -164,15 +165,15 @@ def _init_comm():
         if len(serial_list) > 0:
             L.l.info('Looking for Legrand UPS on {} serial ports'.format(len(serial_list)))
             # traceback.print_stack(file=sys.stdout)
-            for port in serial_list:
-                if port not in variable.USB_PORTS_IN_USE:
-                    __search_ups(port)
+            for port_name in serial_list:
+                if port_name not in variable.USB_PORTS_IN_USE and P.port_pattern in port_name:
+                    __search_ups(port_name)
                     if P.serial is not None:
-                        variable.USB_PORTS_IN_USE.append(port)
+                        variable.USB_PORTS_IN_USE.append(port_name)
                         P.initialised = True
                         break
                 else:
-                    L.l.info("Skip UPS search on port {}".format(port))
+                    L.l.info("Skip UPS search on port {}".format(port_name))
         else:
             L.l.info('No standard open serial ports detected on this system')
     except Exception as ex:
