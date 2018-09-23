@@ -1,8 +1,11 @@
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
 from main.logger_helper import L
-from sensor.rfxcom import RFXtrx
-from sensor.rfxcom.RFXtrx import PySerialTransport
+try:
+    from sensor.rfxcom import RFXtrx
+    from sensor.rfxcom.RFXtrx import PySerialTransport
+except Exception as ex:
+    L.l.error("Unable to import package, err={}".format(ex), exc_info=True)
 from main.admin import models
 from common import Constant, utils, variable
 import threading
