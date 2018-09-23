@@ -67,10 +67,10 @@ def louie_network_ready(network):
     dispatcher.connect(louie_value_changed, ZWaveNetwork.SIGNAL_VALUE_CHANGED)
     dispatcher.connect(louie_value_removed, ZWaveNetwork.SIGNAL_VALUE_REMOVED)
     dispatcher.connect(louie_ctrl_message, ZWaveController.SIGNAL_CONTROLLER)
-    dispatcher.connect(louie_button_on, ZWaveController.SIGNAL_BUTTON_ON)
-    dispatcher.connect(louie_button_off, ZWaveController.SIGNAL_BUTTON_OFF)
-    dispatcher.connect(louie_node_event, ZWaveController.SIGNAL_NODE_EVENT)
-    dispatcher.connect(louie_scene_event, ZWaveController.SIGNAL_SCENE_EVENT)
+    dispatcher.connect(louie_button_on, ZWaveNetwork.SIGNAL_BUTTON_ON)
+    dispatcher.connect(louie_button_off, ZWaveNetwork.SIGNAL_BUTTON_OFF)
+    dispatcher.connect(louie_node_event, ZWaveNetwork.SIGNAL_NODE_EVENT)
+    dispatcher.connect(louie_scene_event, ZWaveNetwork.SIGNAL_SCENE_EVENT)
 
 
 def louie_network_stopped(network):
