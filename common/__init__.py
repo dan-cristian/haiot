@@ -31,6 +31,7 @@ class Constant:
     SIGNAL_GPS = 'signal-gps'
     SIGNAL_STORABLE_RECORD = 'signal-storable-record'
     SIGNAL_BATTERY_STAT = 'signal-battery-stat'
+    SIGNAL_USB_DEVICE_CHANGE = 'signal-usb-device-change'
 
     PRESENCE_TYPE_CAM = 'cam'
     

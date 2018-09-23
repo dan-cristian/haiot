@@ -67,6 +67,7 @@
     {"id":19, "active":"0", "start_order":"19", "name":"ddns"},
     {"id":21, "active":"0", "start_order":"21", "name":"cloud.youtube"},
     {"id":23, "active":"0", "start_order":"23", "name":"sysutils.filewatch"},
+    {"id":24, "active":"1", "start_order":"24", "name":"sysutils.usb"},
     {"id":25, "active":"1", "start_order":"25", "name":"rule"},
     {"id":27, "active":"1", "start_order":"27", "name":"node"},
     {"id":33, "active":"1", "start_order":"33", "name":"utility"},
