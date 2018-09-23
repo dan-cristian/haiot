@@ -61,7 +61,7 @@ def louie_network_ready(network):
     L.l.info('Louie signal: ZWave network is ready : {} nodes were found.'.format(network.nodes_count))
     L.l.info('Louie signal: Controller : {}'.format(network.controller))
     dispatcher.connect(louie_node_update, ZWaveNetwork.SIGNAL_NODE)
-    dispatcher.connect(louie_value, ZWaveNetwork.SIGNAL_VALUE)
+    # dispatcher.connect(louie_value, ZWaveNetwork.SIGNAL_VALUE)
     dispatcher.connect(louie_value_refreshed, ZWaveNetwork.SIGNAL_VALUE_REFRESHED)
     dispatcher.connect(louie_value_added, ZWaveNetwork.SIGNAL_VALUE_ADDED)
     dispatcher.connect(louie_value_changed, ZWaveNetwork.SIGNAL_VALUE_CHANGED)
@@ -108,7 +108,7 @@ def _set_custom_relay_state(sensor_name, node_id, state):
 # Voltage=222.7V, Current=0.912A, Power Factor=0.54, Timeout=0
 
 # https://github.com/OpenZWave/python-openzwave/blob/master/examples/api_demo.py
-def louie_value(network, node, value):
+def set_value(network, node, value):
     try:
         # L.l.info('Louie signal: Node={} Value={}'.format(node, value))
         P.last_value_received = datetime.now()
@@ -181,11 +181,12 @@ def louie_value_refreshed(network, node, value):
 
 def louie_value_changed(network, node, value):
     L.l.info('Louie signal: Value changed for {}={} {}'.format(value.label, value.data, value.units))
+    set_value(network, node, value)
 
 
 def louie_value_added(network, node, value):
-    # L.l.info('Louie signal: Value added: {} = {}.'.format(node, value))
-    louie_value(network, node, value)
+    L.l.info('Louie signal: Value added: {} = {}.'.format(node, value))
+    set_value(network, node, value)
 
 
 def louie_value_removed(network, node, value):
