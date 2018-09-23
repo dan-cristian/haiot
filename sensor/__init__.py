@@ -1,20 +1,9 @@
 from main import db
-from main import thread_pool
 from main.logger_helper import L
-from main.admin import model_helper
 from common import utils, Constant
-import owsensor_loop
-import rfxcom_run
-import ups_legrand_run
-import http_parser_run
-import zwave
 from main.admin import models
-from pydispatch import dispatcher
-from main.admin.model_helper import commit
 
 __author__ = 'dcristian'
-
-initialised = False
 
 
 def record_update(obj):
@@ -62,37 +51,12 @@ def record_update(obj):
             # commit() # not needed?
 
             # enable below only for testing on netbook
-            if Constant.HOST_NAME == 'xxxnetbook' and (record.delta_counters_a or record.delta_counters_b):
-                dispatcher.send(Constant.SIGNAL_UTILITY, sensor_name=record.sensor_name,
-                                units_delta_a=record.delta_counters_a,
-                                units_delta_b=record.delta_counters_b, total_units_a=record.counters_a,
-                                total_units_b=record.counters_b,
-                                sampling_period_seconds=owsensor_loop.sampling_period_seconds)
+            # if Constant.HOST_NAME == 'xxxnetbook' and (record.delta_counters_a or record.delta_counters_b):
+            #    dispatcher.send(Constant.SIGNAL_UTILITY, sensor_name=record.sensor_name,
+            #                    units_delta_a=record.delta_counters_a,
+            #                    units_delta_b=record.delta_counters_b, total_units_a=record.counters_a,
+            #                    total_units_b=record.counters_b,
+            #                    sampling_period_seconds=owsensor_loop.sampling_period_seconds)
     except Exception as ex:
         L.l.error('Error on sensor update, err {}'.format(ex), exc_info=True)
         db.session.rollback()
-
-
-def unload():
-    # ...
-    global initialised
-    thread_pool.remove_callable(owsensor_loop.thread_run)
-    thread_pool.remove_callable(rfxcom_run.thread_run)
-    rfxcom_run.unload()
-    zwave.unload()
-    initialised = False
-
-
-def init():
-    L.l.info('Sensor module initialising')
-    thread_pool.add_interval_callable(owsensor_loop.thread_run, owsensor_loop.P.check_period)
-    if rfxcom_run.init():
-        thread_pool.add_interval_callable(rfxcom_run.thread_run, run_interval_second=60)
-    # init ups only on host specified in config
-    if model_helper.get_param(Constant.P_UPS_ON_HOST) == Constant.HOST_NAME:
-        thread_pool.add_interval_callable(ups_legrand_run.thread_run, run_interval_second=30)
-    if model_helper.get_param(Constant.P_SOLAR_PARSER_ON_HOST) == Constant.HOST_NAME:
-        thread_pool.add_interval_callable(http_parser_run.thread_solar_aps_run, run_interval_second=60)
-    thread_pool.add_interval_callable(zwave.thread_run, run_interval_second=10)
-    global initialised
-    initialised = True
