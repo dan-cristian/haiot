@@ -7,9 +7,9 @@ class P:
     grid_watts = 0
     plug1_watts = 0
     PLUG1_MIN_WATTS = 20
-    EXPORT_MIN_WATTS = -100
+    EXPORT_MIN_WATTS = -50
     RELAY_1_NAME = 'plug_1'
-    grid_importing = False
+    grid_importing = None
     def __init__(self):
         pass
 
@@ -23,14 +23,14 @@ def rule_energy_export(obj=models.Utility(), field_changed_list=None):
             elif obj.utility_name == 'power plug 1':
                 P.plug1_watts = obj.units_2_delta
             if P.grid_watts < 0:
-                if P.grid_importing:
+                if P.grid_importing is True:
                     L.l.info("Exporting power {}w".format(P.grid_watts))
                     P.grid_importing = False
                 if P.grid_watts < P.EXPORT_MIN_WATTS:
                     L.l.info("Starting plug 1 to reduce export")
                     rule_common.update_custom_relay(relay_pin_name=P.RELAY_1_NAME, power_is_on=True)
             else:
-                if not P.grid_importing:
+                if P.grid_importing is False:
                     L.l.info("Importing power {}w".format(P.grid_watts))
                     P.grid_importing = True
                 if P.plug1_watts > P.PLUG1_MIN_WATTS:
