@@ -10,7 +10,8 @@ class P:
     last_state_change = datetime.min
     grid_importing = None
     plug1_stopped = False
-    PLUG1_MIN_WATTS = 20
+    PLUG1_MIN_WATTS_ON = 20  # min consumption to be considered ON
+    PLUG1_MIN_WATTS_OFF = 5  # min consumption to be considered OFF
     EXPORT_MIN_WATTS = -50
     RELAY_1_NAME = 'plug_1'
     STATE_CHANGE_INTERVAL = 60  # how often can change state
@@ -31,6 +32,7 @@ def rule_energy_export(obj=models.Utility(), field_changed_list=None):
                 P.grid_watts = obj.units_2_delta
             elif obj.utility_name == 'power plug 1':
                 P.plug1_watts = obj.units_2_delta
+            # if exporting
             if P.grid_watts is not None and P.grid_watts < 0:
                 if P.grid_importing is True or P.grid_importing is None:
                     L.l.info("Exporting power {}w".format(P.grid_watts))
@@ -44,14 +46,14 @@ def rule_energy_export(obj=models.Utility(), field_changed_list=None):
                 if P.grid_importing is False or P.grid_importing is None:
                     L.l.info("Importing power {}w".format(P.grid_watts))
                     P.grid_importing = True
-                if P.plug1_watts is not None and P.plug1_watts > P.PLUG1_MIN_WATTS and _can_state_change():
+                if P.plug1_watts is not None and P.plug1_watts > P.PLUG1_MIN_WATTS_ON and _can_state_change():
                     power_is_on = rule_common.get_custom_relay(P.RELAY_1_NAME)
                     if P.plug1_stopped:
                         if power_is_on:
                             L.l.info("Plug1 was stopped, now on, probably overriden by user, plug {}w, grid {}w".format(
                                 P.plug1_watts, P.grid_watts))
                         else:
-                            # all ok
+                            # all ok, plug is stopped
                             pass
                     else:
                         L.l.info("Stopping plug1 to cut import, plug {}w, grid {}w".format(
@@ -59,3 +61,6 @@ def rule_energy_export(obj=models.Utility(), field_changed_list=None):
                         rule_common.update_custom_relay(relay_pin_name=P.RELAY_1_NAME, power_is_on=False)
                         P.plug1_stopped = True
                         P.last_state_change = datetime.now()
+            # reset user override to enable automatic switch
+            if P.plug1_watts is not None and P.plug1_watts <= P.PLUG1_MIN_WATTS_OFF:
+                P.plug1_stopped = False

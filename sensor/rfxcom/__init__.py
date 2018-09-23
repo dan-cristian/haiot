@@ -1,5 +1,6 @@
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
+from pydispatch import dispatcher
 from main.logger_helper import L
 import sensor.rfxcom
 # from sensor.rfxcom.RFXtrx import PySerialTransport
@@ -158,5 +159,12 @@ def unload():
     P.initialised = False
 
 
+# called once a usb change is detected
+def _init_recovery():
+    if not P.initialised:
+        thread_pool.add_interval_callable(thread_run, run_interval_second=P.interval)
+
+
 def init():
     thread_pool.add_interval_callable(thread_run, run_interval_second=P.interval)
+    dispatcher.connect(_init_recovery, signal=Constant.SIGNAL_USB_DEVICE_CHANGE, sender=dispatcher.Any)
