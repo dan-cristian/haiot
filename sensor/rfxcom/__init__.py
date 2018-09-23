@@ -10,8 +10,8 @@ import threading
 import prctl
 from main import thread_pool
 from sensor import serial_common
-from sensor.rfxcom import RFXtrx
-from sensor.rfxcom.RFXtrx import PySerialTransport
+from sensor.lib import RFXtrx
+from sensor.lib.RFXtrx import PySerialTransport
 
 
 class P:
@@ -90,13 +90,13 @@ def __save_sensor_db(p_id='', p_type='', value_list=None):
 
 def elro_relay_on():
     pkt = None
-    pkt.packettype = RFXtrx.lowlevel.Lighting4
+    pkt.packettype = sensor.lib.RFXtrx.lowlevel.Lighting4
     pkt.subtype = 'PT2262'
     pkt.cmd = 451451
     #pkt.type_string = 1
     #pkt.id_string = 1
     #event = RFXtrx.LightingDevice()
-    event = RFXtrx.lowlevel.Lighting4()
+    event = sensor.lib.RFXtrx.lowlevel.Lighting4()
     event.set_transmit()
 
 
