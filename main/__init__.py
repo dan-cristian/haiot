@@ -36,7 +36,7 @@ def my_import(name):
             mod = getattr(mod, comp)
         return mod
     except Exception as ex:
-        L.l.warning("Unable to import module {}, err={}".format(name, ex))
+        L.l.error("Unable to import module {}, err={}".format(name, ex), exc_info=True)
         return None
 
 
