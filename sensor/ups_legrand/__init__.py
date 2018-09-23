@@ -7,8 +7,9 @@ import prctl
 import sys
 from main.logger_helper import L
 from common import Constant, utils, variable
-import serial_common
+from sensor import serial_common
 from main.admin import models
+from main import thread_pool
 import traceback
 
 
@@ -16,7 +17,9 @@ class P:
     initialised = False
     serial = None
     ups = None
-    initialising = False
+    #initialising = False
+    interval = 30
+
 
 class LegrandUps:
     def __init__(self):
@@ -156,10 +159,9 @@ def unload():
     P.initialised = False
 
 
-def init():
-    if P.initialising:
-        return
-    P.initialising = True
+def _init_comm():
+    #if P.initialising:
+    #    return
     P.initialised = False
     try:
         # if constant.OS in constant.OS_LINUX:
@@ -186,7 +188,7 @@ def init():
         L.l.error('Unable to open ups port, err {}'.format(ex), exc_info=True)
     #if not P.initialised:
     #    _create_dummy_entry()
-    P.initialising = False
+    #P.initialising = False
     return P.initialised
 
 
@@ -194,8 +196,17 @@ def thread_run():
     prctl.set_name("ups_legrand")
     threading.current_thread().name = "ups_legrand"
     if not P.initialised:
-        init()
+        _init_comm()
     if P.initialised and P.serial is not None:
         __read_ups_status()
     prctl.set_name("idle")
     threading.current_thread().name = "idle"
+
+
+def unload():
+    thread_pool.remove_callable(thread_run)
+    P.initialised = False
+
+
+def init():
+    thread_pool.add_interval_callable(thread_run, run_interval_second=P.interval)
