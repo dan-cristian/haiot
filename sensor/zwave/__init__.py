@@ -24,7 +24,7 @@ class P:
     device = "/dev/ttyACM0"
     log_file = "OZW_Log.log"
     last_value_received = datetime.max
-    MAX_SILENCE_SEC = 1
+    MAX_SILENCE_SEC = 120
 
 
 try:
