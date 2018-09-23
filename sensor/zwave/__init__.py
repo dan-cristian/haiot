@@ -21,7 +21,8 @@ class P:
     initialised = False
     interval = 10
     init_fail_count = 0
-    device = "/dev/ttyACM0"
+    device = "/dev/ttyACM"
+    device_index = 0
     log_file = "OZW_Log.log"
     last_value_received = datetime.max
     MAX_SILENCE_SEC = 120
@@ -193,11 +194,12 @@ def _stop_net():
 # http://openzwave.github.io/python-openzwave/network.html
 def _init_controller():
     if P.module_imported:
-        L.l.info('Zwave initialising on {}'.format(P.device))
+        device = '{}{}'.format(P.device, P.device_index)
+        L.l.info('Zwave initialising on {}'.format(device))
         _stop_net()
         # Define some manager options
         try:
-            options = ZWaveOption(P.device, config_path="../openzwave/config", user_path=".", cmd_line="")
+            options = ZWaveOption(device, config_path="../openzwave/config", user_path=".", cmd_line="")
             options.set_log_file(P.log_file)
             options.set_append_log_file(True)
             options.set_console_output(False)
@@ -251,8 +253,8 @@ def _init_controller():
                 node = P.network.nodes[node_id]
                 try:
                     L.l.info("Node {}={}".format(node_id, node))
-                    L.l.info("Node {} attrib: model={} man={} prod_name={} prod_id={}".format(
-                        node_id, node.manufacturer_name, node.product_name, node.product_id))
+                    # L.l.info("Node {} attrib: model={} man={} prod_name={} prod_id={}".format(
+                    #     node_id, node.manufacturer_name, node.product_name, node.product_id))
                 except Exception as ex:
                     pass
             # not working
@@ -261,6 +263,9 @@ def _init_controller():
             return True
         except ZWaveException as ze:
             L.l.error('Unable to init zwave, exception={}'.format(ze))
+            P.device_index += 1
+            if P.device_index > 3:
+                P.device_index = 0
     return False
 
 
