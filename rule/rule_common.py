@@ -25,7 +25,18 @@ def update_custom_relay(relay_pin_name, power_is_on):
         current_relay.relay_is_on = power_is_on
         current_relay.commit_record_to_db_notify()
     else:
-        L.l.info("Cannot find relay {} on rule common".format(relay_pin_name))
+        L.l.info("Cannot find relay {} on rule common update relay".format(relay_pin_name))
+
+
+def get_custom_relay(relay_pin_name):
+    current_relay = models.ZoneCustomRelay.query.filter_by(
+        relay_pin_name=relay_pin_name, gpio_host_name=Constant.HOST_NAME).first()
+    if current_relay is not None:
+        state = current_relay.relay_is_on
+    else:
+        L.l.info("Cannot find relay {} on rule common get custom relay".format(relay_pin_name))
+        state = None
+    return state
 
 
 def update_command_override_relay(relay_pin_name, is_rule, is_gui):
