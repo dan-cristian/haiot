@@ -62,11 +62,15 @@ def louie_network_ready(network):
     L.l.info('Louie signal: Controller : {}'.format(network.controller))
     dispatcher.connect(louie_node_update, ZWaveNetwork.SIGNAL_NODE)
     dispatcher.connect(louie_value, ZWaveNetwork.SIGNAL_VALUE)
-    dispatcher.connect(louie_value_update, ZWaveNetwork.SIGNAL_VALUE_REFRESHED)
+    dispatcher.connect(louie_value_refreshed, ZWaveNetwork.SIGNAL_VALUE_REFRESHED)
     dispatcher.connect(louie_value_added, ZWaveNetwork.SIGNAL_VALUE_ADDED)
-    #dispatcher.connect(louie_value_changed, ZWaveNetwork.SIGNAL_VALUE_CHANGED)
+    dispatcher.connect(louie_value_changed, ZWaveNetwork.SIGNAL_VALUE_CHANGED)
     dispatcher.connect(louie_value_removed, ZWaveNetwork.SIGNAL_VALUE_REMOVED)
     dispatcher.connect(louie_ctrl_message, ZWaveController.SIGNAL_CONTROLLER)
+    dispatcher.connect(louie_button_on, ZWaveController.SIGNAL_BUTTON_ON)
+    dispatcher.connect(louie_button_off, ZWaveController.SIGNAL_BUTTON_OFF)
+    dispatcher.connect(louie_node_event, ZWaveController.SIGNAL_NODE_EVENT)
+    dispatcher.connect(louie_scene_event, ZWaveController.SIGNAL_SCENE_EVENT)
 
 
 def louie_network_stopped(network):
@@ -155,8 +159,24 @@ def louie_value(network, node, value):
         L.l.error("Error in zwave value={}".format(ex), exc_info=True)
 
 
-def louie_value_update(network, node, value):
-    L.l.info('Louie signal: Value update: {} = {}.'.format(node, value))
+def louie_button_on(network, node):
+    L.l.info('Louie signal: Button on: {}.'.format(node))
+
+
+def louie_button_off(network, node):
+    L.l.info('Louie signal: Button off: {}.'.format(node))
+
+
+def louie_node_event(network, node, value):
+    L.l.info('Louie signal: Node event: {} = {}.'.format(node, value))
+
+
+def louie_scene_event(network, node, scene_id):
+    L.l.info('Louie signal: Scene event: {} = {}.'.format(node, scene_id))
+
+
+def louie_value_refreshed(network, node, value):
+    L.l.info('Louie signal: Value refreshed: {} = {}.'.format(node, value))
 
 
 def louie_value_changed(network, node, value):
@@ -238,7 +258,7 @@ def _init_controller():
                 return False
             L.l.info("Home id : {}, Nodes in network : {}".format(P.network.home_id_str, P.network.nodes_count))
 
-            L.l.info("Waiting 60 sec for network to become ready")
+            L.l.info("Waiting 120 sec for network to become ready")
             for i in range(0, 240):
                 if P.network.state >= P.network.STATE_READY:
                     break
