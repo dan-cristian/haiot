@@ -131,7 +131,8 @@ def louie_value(network, node, value):
                     current_record.vdd = None
                     address = current_record.address
                 else:
-                    L.l.info("Cannot find sensor definition in db, name=[{}]".format(node.product_name))
+                    # first sensor read, nothing in DB
+                    # L.l.info("Cannot find sensor definition in db, name=[{}]".format(node.product_name))
                     address = node.product_name
                 record = models.Sensor(sensor_name=node.product_name, address=address)
                 if value.label == "Voltage":
@@ -148,6 +149,8 @@ def louie_value(network, node, value):
                                                notify_transport_enabled=True, save_to_graph=True, debug=False)
                 if current_record is not None:
                     current_record.commit_record_to_db()
+                else:
+                    record.add_commit_record_to_db()
     except Exception as ex:
         L.l.error("Error in zwave value={}".format(ex), exc_info=True)
 
