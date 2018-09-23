@@ -24,7 +24,7 @@ class P:
         pass
 
 
-def get_portpath_linux(product_name):
+def get_portpath_linux(product_name=None, manufacturer_name=None):
     # /sys/bus/usb/devices/2-1.2/2-1.2:1.0/ttyUSB0/tty/ttyUSB0/dev
     # /sys/bus/usb/devices/2-1.2/product
     L.l.info('Searching for {} devices on linux'.format(product_name))
@@ -36,13 +36,17 @@ def get_portpath_linux(product_name):
         for index in range(0, len(words) - 5):
             root_path = root_path + '/' + words[index]
         file_product = root_path + '/product'
-        if os.path.isfile(file_product):
-            f = open(file_product)
-            product = f.readline()
-            f.close()
-            if product_name in product:
-                L.l.info('Found {} device at {}'.format(product_name, dev_path))
-                return dev_path
+        file_manufacturer = root_path + '/manufacturer'
+        search_list = [file_product, file_manufacturer]
+        search_values = [product_name, manufacturer_name]
+        for i in [0, 1]:
+            if os.path.isfile(search_list[i]):
+                f = open(search_list[i])
+                val = f.readline()
+                f.close()
+                if search_values[i] is not None and search_values[i] in val:
+                    L.l.info('Found {} device at {}'.format(search_values[i], dev_path))
+                    return dev_path
     return None
 
 
