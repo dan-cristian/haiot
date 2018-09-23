@@ -35,6 +35,7 @@ try:
     from openzwave.controller import ZWaveController
     from openzwave.network import ZWaveNetwork
     from openzwave.option import ZWaveOption
+    from openzwave.object import ZWaveException
     P.module_imported = True
 except Exception as e:
     L.l.info("Cannot import openzwave")
@@ -195,19 +196,21 @@ def _init_controller():
         L.l.info('Zwave initialising on {}'.format(P.device))
         _stop_net()
         # Define some manager options
-        options = ZWaveOption(P.device, config_path="../openzwave/config", user_path=".", cmd_line="")
-        options.set_log_file(P.log_file)
-        options.set_append_log_file(True)
-        options.set_console_output(False)
-        options.set_save_log_level('Debug')
-        # options.set_save_log_level('Info')
-        #options.set_save_log_level('Error')
-        # options.set_logging(False)
-        options.set_logging(True)
-        # options.set_poll_interval(5)
-        options.set_save_configuration(True)
-        options.lock()
-
+        try:
+            options = ZWaveOption(P.device, config_path="../openzwave/config", user_path=".", cmd_line="")
+            options.set_log_file(P.log_file)
+            options.set_append_log_file(True)
+            options.set_console_output(False)
+            options.set_save_log_level('Debug')
+            # options.set_save_log_level('Info')
+            #options.set_save_log_level('Error')
+            # options.set_logging(False)
+            options.set_logging(True)
+            # options.set_poll_interval(5)
+            options.set_save_configuration(True)
+            options.lock()
+        except ZWaveException as ze:
+            L.l.error('Unable to init zwave, exception={}'.format(ze))
         # Create a network object
         P.network = ZWaveNetwork(options, log=None, autostart=False)
         dispatcher.connect(louie_network_started, ZWaveNetwork.SIGNAL_NETWORK_STARTED)
