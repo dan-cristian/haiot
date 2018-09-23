@@ -61,7 +61,7 @@ def __write_read_port(ser, command):
             ser.flushInput()
             ser.flushOutput()
             ser.write(command)
-            time.sleep(0.7)
+            time.sleep(1)
             response = str(ser.readline()).replace('\n', '')
         except Exception as ex:
             L.l.warning('Error writing to serial {}, err={}'.format(ser.port, ex))
@@ -76,7 +76,7 @@ def __search_ups(port_name):
     __open_port(ser)
     if ser.isOpen():
         # first read returns unknown response, second works
-        for i in range(0, 2):
+        for i in range(0, 3):
             response = __write_read_port(ser, 'I\r')
             # [#                           JP00106G  #015]
             if response is not None and "JP00106G" in response:
@@ -158,24 +158,27 @@ def _init_comm():
     try:
         # if constant.OS in constant.OS_LINUX:
         L.l.debug('Looking for UPS serial ports')
-        serial_list = serial_common.get_standard_serial_device_list()
-        # else:
-        #    portpath = None
-        #    #fixme windows autodetect version
-        if len(serial_list) > 0:
-            L.l.info('Looking for Legrand UPS on {} serial ports'.format(len(serial_list)))
-            # traceback.print_stack(file=sys.stdout)
-            for port_name in serial_list:
-                if port_name not in variable.USB_PORTS_IN_USE and P.port_pattern in port_name:
-                    __search_ups(port_name)
-                    if P.serial is not None:
-                        variable.USB_PORTS_IN_USE.append(port_name)
-                        P.initialised = True
-                        break
-                else:
-                    L.l.info("Skip UPS search on port {}".format(port_name))
-        else:
-            L.l.info('No standard open serial ports detected on this system')
+        portpath = serial_common.get_portpath_linux(product_name='USB-Serial Controller D')
+        if portpath is not None:
+            __search_ups(portpath)
+            if P.serial is not None:
+                variable.USB_PORTS_IN_USE.append(portpath)
+                P.initialised = True
+        if not P.initialised:
+            serial_list = serial_common.get_standard_serial_device_list()
+            if len(serial_list) > 0:
+                L.l.info('Looking for Legrand UPS on {} serial ports'.format(len(serial_list)))
+                for port_name in serial_list:
+                    if port_name not in variable.USB_PORTS_IN_USE and P.port_pattern in port_name:
+                        __search_ups(port_name)
+                        if P.serial is not None:
+                            variable.USB_PORTS_IN_USE.append(port_name)
+                            P.initialised = True
+                            break
+                    else:
+                        L.l.info("Skip UPS search on port {}".format(port_name))
+            else:
+                L.l.info('No standard open serial ports detected on this system')
     except Exception as ex:
         L.l.error('Unable to open ups port, err {}'.format(ex), exc_info=True)
     # if not P.initialised:

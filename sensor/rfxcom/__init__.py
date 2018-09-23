@@ -106,7 +106,7 @@ def _init_board():
     P.last_packet_received = utils.get_base_location_now_date()
     try:
         if Constant.OS in Constant.OS_LINUX:
-            portpath = serial_common.get_portpath_linux('RFXtrx433')
+            portpath = serial_common.get_portpath_linux(product_name='RFXtrx433')
         else:
             portpath = None
             # fixme windows autodetect version
