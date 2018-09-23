@@ -1,11 +1,9 @@
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
 from main.logger_helper import L
-try:
-    from sensor.rfxcom import RFXtrx
-    from sensor.rfxcom.RFXtrx import PySerialTransport
-except Exception as ex:
-    L.l.error("Unable to import package, err={}".format(ex), exc_info=True)
+import sensor.rfxcom
+# from sensor.rfxcom.RFXtrx import PySerialTransport
+# L.l.error("Unable to import package, err={}".format(ex), exc_info=True)
 from main.admin import models
 from common import Constant, utils, variable
 import threading
@@ -30,11 +28,11 @@ def __rfx_reading(packet):
     if packet:
         try:
             L.l.info("Received RFX packet={}".format(packet))
-            if isinstance(packet, RFXtrx.SensorEvent):
+            if isinstance(packet, sensor.rfxcom.RFXtrx.SensorEvent):
                 __save_sensor_db(p_id=packet.device.id_string, p_type=packet.device.type_string,
                                  value_list=packet.values)
                 P.last_packet_received = utils.get_base_location_now_date()
-            elif isinstance(packet, RFXtrx.LightingDevice):
+            elif isinstance(packet, sensor.rfxcom.RFXtrx.LightingDevice):
                 __save_relay_db(p_id=packet.device.id_string, p_type=packet.device.type_string,
                                 value_list=packet.values)
         except Exception as ex:
@@ -90,13 +88,13 @@ def __save_sensor_db(p_id='', p_type='', value_list=None):
 
 def elro_relay_on():
     pkt = None
-    pkt.packettype = RFXtrx.lowlevel.Lighting4
+    pkt.packettype = sensor.rfxcom.RFXtrx.lowlevel.Lighting4
     pkt.subtype = 'PT2262'
     pkt.cmd = 451451
     #pkt.type_string = 1
     #pkt.id_string = 1
     #event = RFXtrx.LightingDevice()
-    event = RFXtrx.lowlevel.Lighting4()
+    event = sensor.rfxcom.RFXtrx.lowlevel.Lighting4()
     event.set_transmit()
 
 
@@ -112,7 +110,7 @@ def _init_board():
             # fixme windows autodetect version
         if portpath:
             L.l.info('Initialising RFXCOM on port {}'.format(portpath))
-            P.transport = PySerialTransport(portpath, debug=True)
+            P.transport = sensor.rfxcom.RFXtrx.PySerialTransport(portpath, debug=True)
             P.transport.reset()
             P.initialised = True
             variable.USB_PORTS_IN_USE.append(portpath)
@@ -120,6 +118,7 @@ def _init_board():
             L.l.info('No RFX device detected on this system')
     except Exception as ex:
         L.l.warning('Unable to open RFX tty port, err {}'.format(ex))
+        P.init_failed_count += 1
     return P.initialised
 
 
