@@ -10,7 +10,7 @@ class P:
     plug1_watts = None
     last_state_change = datetime.min
     grid_importing = None
-    plug1_stopped = False
+    plug1_stopped = None
     PLUG1_MIN_WATTS_ON = 20  # min consumption to be considered ON
     PLUG1_MIN_WATTS_OFF = 5  # min consumption to be considered OFF
     EXPORT_MIN_WATTS = -50
