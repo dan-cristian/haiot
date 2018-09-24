@@ -50,12 +50,12 @@ def rule_energy_export(obj=models.Utility(), field_changed_list=None):
                         P.grid_importing = True
                     if P.plug1_watts is not None and P.plug1_watts > P.PLUG1_MIN_WATTS_ON and _can_state_change():
                         power_is_on = rule_common.get_custom_relay(P.RELAY_1_NAME)
-                        if P.plug1_stopped:
+                        if P.plug1_stopped is True:
                             if power_is_on:
                                 L.l.info("Plug1 started, probably overriden by user, plug {}w, grid {}w".format(
                                     P.plug1_watts, P.grid_watts))
                             else:
-                                # all ok, plug is stopped
+                                # all ok, plug is stopped, power is off, saving!
                                 pass
                         else:
                             L.l.info("Stopping plug1 to cut import, plug {}w, grid {}w".format(
@@ -67,3 +67,4 @@ def rule_energy_export(obj=models.Utility(), field_changed_list=None):
             # reset user override to enable automatic switch
             if P.plug1_watts is not None and P.plug1_watts <= P.PLUG1_MIN_WATTS_OFF:
                 P.plug1_stopped = False
+                L.l.info("Plug1 no more consumption, job done, plug {}w, grid {}w".format(P.plug1_watts, P.grid_watts))
