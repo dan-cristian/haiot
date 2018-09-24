@@ -65,6 +65,6 @@ def rule_energy_export(obj=models.Utility(), field_changed_list=None):
                             P.plug1_stopped = True
                             P.last_state_change = datetime.now()
             # reset user override to enable automatic switch
-            if P.plug1_watts is not None and P.plug1_watts <= P.PLUG1_MIN_WATTS_OFF:
+            if P.plug1_stopped and P.plug1_watts is not None and P.plug1_watts <= P.PLUG1_MIN_WATTS_OFF:
                 P.plug1_stopped = False
                 L.l.info("Plug1 no more consumption, job done, plug {}w, grid {}w".format(P.plug1_watts, P.grid_watts))
