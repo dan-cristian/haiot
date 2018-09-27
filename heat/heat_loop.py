@@ -14,7 +14,7 @@ __TEMP_NO_HEAT = '.'
 
 
 # save heat status and announce to all nodes.
-def __save_heat_state_db(zone='', heat_is_on=''):
+def __save_heat_state_db(zone, heat_is_on):
     assert isinstance(zone, models.Zone)
     zone_heat_relay = models.ZoneHeatRelay.query.filter_by(zone_id=zone.id).first()
     if zone_heat_relay is not None:
@@ -149,7 +149,7 @@ def loop_zones():
             heat_schedule = models.HeatSchedule.query.filter_by(zone_id=zone.id).first()
             zonesensor_list = models.ZoneSensor.query.filter_by(zone_id=zone.id).all()
             for zonesensor in zonesensor_list:
-                if heat_schedule and zonesensor:
+                if heat_schedule is not None and zonesensor is not None:
                     sensor = models.Sensor.query.filter_by(address=zonesensor.sensor_address).first()
                     if heat_schedule.active and sensor is not None:
                         # sensor_last_update_seconds = (utils.get_base_location_now_date() - sensor.updated_on).total_seconds()
@@ -158,6 +158,12 @@ def loop_zones():
                         # sensor.sensor_name))
                         heat_state, main_source_needed = __update_zone_heat(zone, heat_schedule, sensor)
                         heat_is_on = main_source_needed and heat_state
+                        if heat_is_on:
+                            break
+                if heat_is_on:
+                    break
+            if heat_is_on:
+                break
         # turn on/off the main heating system based on zone heat needs
         # check first to find alternate valid heat sources
         heatrelay_main_source = models.ZoneHeatRelay.query.filter_by(is_alternate_heat_source=1).first()

@@ -18,11 +18,15 @@ class P:
 
 
 def _check_usb_change():
-    out = subprocess.check_output(['lsusb']).split('\n')
-    if P.last_usb_out is not None and P.last_usb_out != out:
-        P.last_usb_out = out
-        return True
+    if Constant.IS_OS_LINUX():
+        out = subprocess.check_output(['lsusb']).split('\n')
+        if P.last_usb_out is not None and P.last_usb_out != out:
+            P.last_usb_out = out
+            return True
+        else:
+            return False
     else:
+        # todo: implement a Windows version
         return False
 
 
