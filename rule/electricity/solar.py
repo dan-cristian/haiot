@@ -12,7 +12,7 @@ class P:
     grid_importing = None
     plug1_stopped = None
     PLUG1_MIN_WATTS_ON = 20  # min consumption to be considered ON
-    PLUG1_MIN_WATTS_OFF = 5  # min consumption to be considered OFF
+    PLUG1_MIN_WATTS_OFF = 2  # min consumption to be considered OFF
     EXPORT_MIN_WATTS = -50
     RELAY_1_NAME = 'plug_1'
     STATE_CHANGE_INTERVAL = 300  # how often can change state
@@ -54,6 +54,8 @@ def rule_energy_export(obj=models.Utility(), field_changed_list=None):
                             if power_is_on:
                                 L.l.info("Plug1 started, probably overriden by user, plug {}w, grid {}w".format(
                                     P.plug1_watts, P.grid_watts))
+                                # to supress above info messages
+                                P.last_state_change = datetime.now()
                             else:
                                 # all ok, plug is stopped, power is off, saving!
                                 pass
@@ -64,7 +66,8 @@ def rule_energy_export(obj=models.Utility(), field_changed_list=None):
                             rule_common.update_custom_relay(relay_pin_name=P.RELAY_1_NAME, power_is_on=False)
                             P.plug1_stopped = True
                             P.last_state_change = datetime.now()
-            # reset user override to enable automatic switch
+            # reset user override when done to enable automatic switch
+            # fixme: min watts might go below in the process, check multiple values
             if P.plug1_stopped is False and P.plug1_watts is not None and P.plug1_watts <= P.PLUG1_MIN_WATTS_OFF:
                 P.plug1_stopped = False
                 L.l.info("Plug1 no more consumption, job done, plug {}w, grid {}w".format(P.plug1_watts, P.grid_watts))
