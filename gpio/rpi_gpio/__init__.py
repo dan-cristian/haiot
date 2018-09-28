@@ -123,9 +123,11 @@ def setup_in_ports(gpio_pin_list):
                     L.l.info("Added input with reverse contact (NO) on pin {}".format(gpio_pin))
                     GPIO.add_event_detect(int(gpio_pin.pin_code), GPIO.BOTH, callback=_event_detected_reversed_both,
                                           bouncetime=500)
+                    _event_detected_both(int(gpio_pin.pin_code))
                 else:
                     GPIO.add_event_detect(int(gpio_pin.pin_code), GPIO.BOTH, callback=_event_detected_both,
                                           bouncetime=500)
+                    _event_detected_both(int(gpio_pin.pin_code))
                 # L.l.info('OK callback set on rpi.gpio'.format(gpio_pin.pin_code))
             except Exception as ex:
                 L.l.critical('Unable to setup rpi.gpio callback pin={} err={}'.format(gpio_pin.pin_code, ex))
