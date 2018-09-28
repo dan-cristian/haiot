@@ -100,9 +100,9 @@ def _event_detected_reversed_both(channel):
     new_state = GPIO.input(channel)
     # reverse state for normal open contacts
     # L.l.info("State pin before reverse={}".format(new_state))
-    # rev_state = int(not new_state)
-    L.l.info("State pin after reverse={}".format(new_state))
-    _do_event(channel, new_state)
+    rev_state = int(not new_state)
+    L.l.info("State pin after reverse={}".format(rev_state))
+    _do_event(channel, rev_state)
 
 
 #  define all ports that are used as read/input, BCM format
