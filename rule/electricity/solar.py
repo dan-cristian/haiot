@@ -10,7 +10,7 @@ class P:
     plug1_watts = None
     last_state_change = datetime.min
     grid_importing = None
-    plug1_stopped = None
+    plug1_auto_stopped = None
     PLUG1_MIN_WATTS_ON = 20  # min consumption to be considered ON
     PLUG1_MIN_WATTS_OFF = 2  # min consumption to be considered OFF
     EXPORT_MIN_WATTS = -50
@@ -43,14 +43,14 @@ def rule_energy_export(obj=models.Utility(), field_changed_list=None):
                         L.l.info("Starting plug 1 to reduce export, grid={}".format(P.grid_watts))
                         rule_common.update_custom_relay(relay_pin_name=P.RELAY_1_NAME, power_is_on=True)
                         P.last_state_change = datetime.now()
-                        P.plug1_stopped = False
+                        P.plug1_auto_stopped = False
                 else:
                     if P.grid_importing is False or P.grid_importing is None:
                         L.l.info("Importing power {}w".format(P.grid_watts))
                         P.grid_importing = True
                     if P.plug1_watts is not None and P.plug1_watts > P.PLUG1_MIN_WATTS_ON and _can_state_change():
                         power_is_on = rule_common.get_custom_relay(P.RELAY_1_NAME)
-                        if P.plug1_stopped is True:
+                        if P.plug1_auto_stopped is True:
                             if power_is_on:
                                 L.l.info("Plug1 started, probably overriden by user, plug {}w, grid {}w".format(
                                     P.plug1_watts, P.grid_watts))
@@ -64,10 +64,10 @@ def rule_energy_export(obj=models.Utility(), field_changed_list=None):
                                 P.plug1_watts, P.grid_watts))
                             time.sleep(10)
                             rule_common.update_custom_relay(relay_pin_name=P.RELAY_1_NAME, power_is_on=False)
-                            P.plug1_stopped = True
+                            P.plug1_auto_stopped = True
                             P.last_state_change = datetime.now()
             # reset user override when done to enable automatic switch
             # fixme: min watts might go below in the process, check multiple values
-            if P.plug1_stopped is False and P.plug1_watts is not None and P.plug1_watts <= P.PLUG1_MIN_WATTS_OFF:
-                P.plug1_stopped = False
+            if P.plug1_auto_stopped is False and P.plug1_watts is not None and P.plug1_watts <= P.PLUG1_MIN_WATTS_OFF:
+                P.plug1_auto_stopped = False
                 L.l.info("Plug1 no more consumption, job done, plug {}w, grid {}w".format(P.plug1_watts, P.grid_watts))
