@@ -176,6 +176,7 @@ Frame {
 
 Frame {
 	Default item=relay_front_lights_relay
+	Default item=relay_plug_1
 }
 
 Frame {

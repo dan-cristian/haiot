@@ -15,6 +15,7 @@ Number ups_battery_voltage "UPS Battery [%.1f V]" <batterylevel>            {mqt
 Number ups_input_voltage "UPS Input [%.0f V]" <poweroutlet_us>              {mqtt="<[mosquitto:iot/openhab/ups_input_voltage:state:default]"}
 
 Switch relay_front_lights_relay "Front lights" <switch>                     {mqtt="<[mosquitto:iot/openhab/relay_front_lights_relay:state:default],>[mosquitto:iot/openhab:command:ON:relay_front_lights_relay=1],>[mosquitto:iot/openhab:command:OFF:relay_front_lights_relay=0]", autoupdate="false"}
+Switch relay_plug_1 "Plug 1" <switch>                                       {mqtt="<[mosquitto:iot/openhab/relay_plug_1:state:default],>[mosquitto:iot/openhab:command:ON:relay_plug_1=1],>[mosquitto:iot/openhab:command:OFF:relay_plug_1=0]", autoupdate="false"}
 
 Group:Switch:OR(ON, OFF)    RELAY_AMP   "Music amp [(%d)]"  <switch>
 Switch relay_living_music_relay "Living amp" <switch>                       (RELAY_AMP) {mqtt="<[mosquitto:iot/openhab/relay_living_music_relay:state:default]"}
