@@ -55,12 +55,12 @@ def get_pin_bcm(bcm_id):
 
 def _do_event(channel, state):
     try:
-        global import_module_exist
-        if import_module_exist:
-            state = GPIO.input(channel)
+        # global import_module_exist
+        # if import_module_exist:
+        #    state = GPIO.input(channel)
             # L.l.debug('Event rpi.gpio input detected channel={} state={}'.format(channel, state))
-            dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=channel, direction='in',
-                            pin_value=state, pin_connected=(state == 0))
+        dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=channel, direction='in',
+                        pin_value=state, pin_connected=(state == 0))
     except Exception as ex:
         L.l.warning('Error rpi.gpio event detected, err {}'.format(ex))
 
@@ -101,7 +101,7 @@ def _event_detected_reversed_both(channel):
     # reverse state for normal open contacts
     # L.l.info("State pin before reverse={}".format(new_state))
     rev_state = int(not new_state)
-    L.l.info("State pin after reverse={}".format(rev_state))
+    # L.l.info("State pin after reverse={}".format(rev_state))
     _do_event(channel, rev_state)
 
 
