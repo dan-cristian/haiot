@@ -74,7 +74,7 @@ def _check_event(channel, target_state):
         _do_event(channel, state)
 
 
-#  https://sourceforge.net/p/raspberry-gpio-python/wiki/Inputs/,  LOW=0, HIGH=1
+# https://sourceforge.net/p/raspberry-gpio-python/wiki/Inputs/,  LOW=0, HIGH=1
 def _event_detected_rising(channel):
     L.l.info("Rising event, channel {}, expect state {}".format(channel, GPIO.HIGH))
     _check_event(channel, GPIO.HIGH)
@@ -87,11 +87,18 @@ def _event_detected_falling(channel):
 
 def _event_detected_both(channel):
     now_state = GPIO.input(channel)
-    #L.l.info("Both event, channel {}, now_state={}".format(channel, now_state))
+    # L.l.info("Both event, channel {}, now_state={}".format(channel, now_state))
     time.sleep(0.1)
     new_state = GPIO.input(channel)
-    #L.l.info("Both event, channel {}, NEW_state={}".format(channel, new_state))
+    # L.l.info("Both event, channel {}, NEW_state={}".format(channel, new_state))
     _do_event(channel, new_state)
+
+
+def _event_detected_reversed_both(channel):
+    time.sleep(0.1)
+    new_state = GPIO.input(channel)
+    # reverse state for normal open contacts
+    _do_event(channel, not new_state)
 
 
 #  define all ports that are used as read/input, BCM format
@@ -99,7 +106,7 @@ def _event_detected_both(channel):
 def setup_in_ports(gpio_pin_list):
     for gpio_pin in gpio_pin_list:
         if gpio_pin.pin_type == Constant.GPIO_PIN_TYPE_PI_STDGPIO:
-            #L.l.info('Set rpi.gpio pincode={} type={} index={} as input'.format(
+            # L.l.info('Set rpi.gpio pincode={} type={} index={} as input'.format(
             #    gpio_pin.pin_code, gpio_pin.pin_type, gpio_pin.pin_index_bcm))
             try:
                 # http://razzpisampler.oreilly.com/ch07.html
@@ -112,8 +119,13 @@ def setup_in_ports(gpio_pin_list):
                 # GPIO.add_event_detect(int(gpio_pin.pin_code), GPIO.FALLING, callback=_event_detected_falling,
                 #                      bouncetime=500)
                 # Log.logger.info('Added falling on rpi.gpio'.format(gpio_pin.pin_code))
-                GPIO.add_event_detect(int(gpio_pin.pin_code), GPIO.BOTH, callback=_event_detected_both, bouncetime=500)
-                #L.l.info('OK callback set on rpi.gpio'.format(gpio_pin.pin_code))
+                if gpio_pin.contact_type == Constant.CONTACT_TYPE_NO:
+                    GPIO.add_event_detect(int(gpio_pin.pin_code), GPIO.BOTH, callback=_event_detected_reversed_both,
+                                          bouncetime=500)
+                else:
+                    GPIO.add_event_detect(int(gpio_pin.pin_code), GPIO.BOTH, callback=_event_detected_both,
+                                          bouncetime=500)
+                # L.l.info('OK callback set on rpi.gpio'.format(gpio_pin.pin_code))
             except Exception as ex:
                 L.l.critical('Unable to setup rpi.gpio callback pin={} err={}'.format(gpio_pin.pin_code, ex))
             __pool_pin_codes.append(gpio_pin.pin_code)

@@ -34,7 +34,7 @@ class Constant:
     SIGNAL_USB_DEVICE_CHANGE = 'signal-usb-device-change'
 
     PRESENCE_TYPE_CAM = 'cam'
-    
+    CONTACT_TYPE_NO = 'contact-no'  # contact normally open for ZoneAlarm pin type
 
     ERROR_CONNECT_MAX_RETRY_COUNT = 2
     ERROR_CONNECT_PAUSE_SECOND = 1
