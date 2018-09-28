@@ -26,6 +26,16 @@ def _can_state_change():
     return (datetime.now() - P.last_state_change).total_seconds() > P.STATE_CHANGE_INTERVAL
 
 
+# will I have export without this extra load?
+def _exporting(extra_load):
+    if extra_load is None:
+        extra_load = 0
+    if P.grid_watts is not None:
+        return P.grid_watts - extra_load < P.EXPORT_MIN_WATTS
+    else:
+        return False
+
+
 # energy rule
 def rule_energy_export(obj=models.Utility(), field_changed_list=None):
     if field_changed_list is not None:
@@ -36,11 +46,11 @@ def rule_energy_export(obj=models.Utility(), field_changed_list=None):
                 P.plug1_watts = obj.units_2_delta
             # if exporting
             if P.grid_watts is not None:
-                if P.grid_watts <= 0:
+                if _exporting(P.plug1_watts):
                     if P.grid_importing is True or P.grid_importing is None:
                         L.l.info("Exporting power {}w".format(P.grid_watts))
                         P.grid_importing = False
-                    if P.grid_watts < P.EXPORT_MIN_WATTS and _can_state_change():
+                    if _can_state_change() and not P.plug1_job_started:
                         L.l.info("Starting plug 1 to reduce export, grid={}".format(P.grid_watts))
                         rule_common.update_custom_relay(relay_pin_name=P.RELAY_1_NAME, power_is_on=True)
                         P.last_state_change = datetime.now()
