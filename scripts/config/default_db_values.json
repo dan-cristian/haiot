@@ -101,7 +101,7 @@
     {"id":501, "active":"0", "start_order":"50", "name":"apps.dashcam", "host_name":"netbook"},
     {"id":509, "active":"1", "start_order":"9", "name":"heat", "host_name":"netbook"},
     {"id":599, "active":"0", "start_order":"99", "name":"test", "host_name":"netbook"},
-    {"id":511, "active":"0", "start_order":"11", "name":"alarm", "host_name":"netbook"},
+    {"id":511, "active":"1", "start_order":"11", "name":"alarm", "host_name":"netbook"},
     {"id":541, "active":"0", "start_order":"41", "name":"cloud.alexa", "host_name":"netbook"},
 
     {"id":609, "active":"1", "start_order":"9", "name":"heat", "host_name":"pi-face"},
@@ -378,7 +378,7 @@
   ],
 
   "ZoneAlarm": [
-    {"zone_id":47 , "gpio_pin_code":"0:in:0", "gpio_host_name": "netbook", "alarm_pin_name": "birou test"},
+    {"zone_id":47 , "gpio_pin_code":"0:in:0", "gpio_host_name": "netbook", "alarm_pin_name": "birou test", "sensor_type": "contact-no"},
     {"zone_id":1 , "gpio_pin_code":"P8_08", "gpio_host_name": "beaglebone", "alarm_pin_name": "not used"},
 
     {"zone_id":9 , "gpio_pin_code":"0:in:0", "gpio_host_name": "pi-face", "alarm_pin_name": "beci mare", "sensor_type": "pir"},
@@ -388,8 +388,8 @@
     {"zone_id":47 , "gpio_pin_code":"0:in:4", "gpio_host_name": "pi-face", "alarm_pin_name": "birou", "sensor_type": "pir"},
     {"zone_id":10 , "gpio_pin_code":"0:in:5", "gpio_host_name": "pi-face", "alarm_pin_name": "scari beci", "sensor_type": "pir"},
     {"zone_id":11 , "gpio_pin_code":"0:in:6", "gpio_host_name": "pi-face", "alarm_pin_name": "etaj hol", "sensor_type": "pir"},
-    {"zone_id":7 , "gpio_pin_code":"0:in:7", "gpio_host_name": "pi-face", "alarm_pin_name": "sonerie", "sensor_type": "contact"},
-    {"zone_id":8 , "gpio_pin_code":"25", "gpio_host_name": "pi-face", "alarm_pin_name": "usa intrare", "sensor_type": "contact"},
+    {"zone_id":7 , "gpio_pin_code":"0:in:7", "gpio_host_name": "pi-face", "alarm_pin_name": "sonerie", "sensor_type": "contact-no"},
+    {"zone_id":8 , "gpio_pin_code":"25", "gpio_host_name": "pi-face", "alarm_pin_name": "usa intrare", "sensor_type": "contact-no"},
 
     {"zone_id":7 , "gpio_pin_code":"1", "gpio_host_name": "pi-face", "alarm_pin_name": "portita", "sensor_type": "contact"},
     {"zone_id":29 , "gpio_pin_code":"18", "gpio_host_name": "pi-face", "alarm_pin_name": "beci test"},
