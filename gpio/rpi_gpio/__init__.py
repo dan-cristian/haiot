@@ -58,7 +58,7 @@ def _do_event(channel, state):
         global import_module_exist
         if import_module_exist:
             state = GPIO.input(channel)
-            L.l.debug('Event rpi.gpio input detected channel={} state={}'.format(channel, state))
+            # L.l.debug('Event rpi.gpio input detected channel={} state={}'.format(channel, state))
             dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=channel, direction='in',
                             pin_value=state, pin_connected=(state == 0))
     except Exception as ex:
@@ -99,10 +99,10 @@ def _event_detected_reversed_both(channel):
     time.sleep(0.1)
     new_state = GPIO.input(channel)
     # reverse state for normal open contacts
-    L.l.info("State pin before reverse={}".format(new_state))
-    rev_state = int(not new_state)
-    L.l.info("State pin after reverse={}".format(rev_state))
-    _do_event(channel, rev_state)
+    # L.l.info("State pin before reverse={}".format(new_state))
+    # rev_state = int(not new_state)
+    L.l.info("State pin after reverse={}".format(new_state))
+    _do_event(channel, new_state)
 
 
 #  define all ports that are used as read/input, BCM format
