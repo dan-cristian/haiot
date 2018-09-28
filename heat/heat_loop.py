@@ -157,13 +157,8 @@ def loop_zones():
                         #    Log.logger.warning('Sensor {} not updated in last 120 minutes, unusual'.format(
                         # sensor.sensor_name))
                         heat_state, main_source_needed = __update_zone_heat(zone, heat_schedule, sensor)
-                        heat_is_on = main_source_needed and heat_state
-                        if heat_is_on:
-                            break
-                if heat_is_on:
-                    break
-            if heat_is_on:
-                break
+                        if not heat_is_on:
+                            heat_is_on = main_source_needed and heat_state
         # turn on/off the main heating system based on zone heat needs
         # check first to find alternate valid heat sources
         heatrelay_main_source = models.ZoneHeatRelay.query.filter_by(is_alternate_heat_source=1).first()
