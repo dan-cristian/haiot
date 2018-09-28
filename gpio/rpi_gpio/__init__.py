@@ -98,7 +98,7 @@ def _event_detected_reversed_both(channel):
     time.sleep(0.1)
     new_state = GPIO.input(channel)
     # reverse state for normal open contacts
-    _do_event(channel, not new_state)
+    _do_event(channel, int(not new_state))
 
 
 #  define all ports that are used as read/input, BCM format
@@ -120,6 +120,7 @@ def setup_in_ports(gpio_pin_list):
                 #                      bouncetime=500)
                 # Log.logger.info('Added falling on rpi.gpio'.format(gpio_pin.pin_code))
                 if gpio_pin.contact_type == Constant.CONTACT_TYPE_NO:
+                    L.l.info("Added input with reverse contact (NO) on pin {}".format(gpio_pin))
                     GPIO.add_event_detect(int(gpio_pin.pin_code), GPIO.BOTH, callback=_event_detected_reversed_both,
                                           bouncetime=500)
                 else:
