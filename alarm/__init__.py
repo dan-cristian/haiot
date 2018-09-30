@@ -18,22 +18,24 @@ def handle_event_alarm(gpio_pin_code='', direction='', pin_value='', pin_connect
             area = models.Area().query_filter_first(models.Area.id == zonearea.area_id)
             if area is not None:
                 zonealarm.start_alarm = area.is_armed
+                zone = models.Zone.query.filter_by(id=zonealarm.zone_id).first()
+                if zone is not None:
+                    dispatcher.send(signal=Constant.SIGNAL_ALARM, zone_name=zone.name,
+                                    alarm_pin_name=zonealarm.alarm_pin_name,
+                                    pin_connected=pin_connected)
+                    L.l.info('Got alarm {} zone={} pin_conn={} pin_value={} gpio={}'.format(
+                        zone.name, zonealarm.zone_id, pin_connected, pin_value, gpio_pin_code))
+                else:
+                    L.l.error(
+                        "Could not find zone for gpio pin {}, trigger actions could be missed".format(gpio_pin_code))
+                zonealarm.alarm_pin_triggered = pin_value
+                zonealarm.updated_on = utils.get_base_location_now_date()
+                zonealarm.notify_transport_enabled = True
+                commit()
             else:
                 L.l.warning('Zone {} is mapped to missing area' % zonealarm.zone_id)
         else:
             L.l.warning('Zone %s not mapped to an area' % zonealarm.zone_id)
-        zone = models.Zone.query.filter_by(id=zonealarm.zone_id).first()
-        if zone is not None:
-            dispatcher.send(signal=Constant.SIGNAL_ALARM, zone_name=zone.name, alarm_pin_name=zonealarm.alarm_pin_name,
-                            pin_connected=pin_connected)
-            L.l.info('Got alarm {} zone={} pin_conn={} pin_value={} gpio={}'.format(
-                zone.name, zonealarm.zone_id, pin_connected, pin_value, gpio_pin_code))
-        else:
-            L.l.error("Could not find zone for gpio pin {}, trigger actions could be missed".format(gpio_pin_code))
-        zonealarm.alarm_pin_triggered = pin_value
-        zonealarm.updated_on = utils.get_base_location_now_date()
-        zonealarm.notify_transport_enabled = True
-        commit()
     else:
         L.l.warning('Unexpected mising zone alarm for gpio code {}'.format(gpio_pin_code))
 
