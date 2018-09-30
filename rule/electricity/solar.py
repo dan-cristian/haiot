@@ -56,6 +56,7 @@ def rule_energy_export(obj=models.Utility(), field_changed_list=None):
                         P.last_state_change = datetime.now()
                         # P.plug1_auto_stopped = False
                         P.plug1_job_started = True
+                        return
                 else:
                     if P.grid_importing is False or P.grid_importing is None:
                         L.l.info("Importing power {}w".format(P.grid_watts))
@@ -79,7 +80,7 @@ def rule_energy_export(obj=models.Utility(), field_changed_list=None):
                             P.plug1_auto_stopped = True
                             P.last_state_change = datetime.now()
             # reset user override when done to enable automatic switch
-            # fixme: min watts might go below in the process, check multiple values
+            # fixme: min watts might go below in the process, check multiple values. enters here after plug start, avoid!
             if P.plug1_job_started and P.plug1_watts is not None and P.plug1_watts <= P.PLUG1_MIN_WATTS_OFF:
                 P.plug1_auto_stopped = False
                 L.l.info("Plug1 no more consumption, job done, plug {}w, grid {}w".format(P.plug1_watts, P.grid_watts))
