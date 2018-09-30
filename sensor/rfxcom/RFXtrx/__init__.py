@@ -192,7 +192,7 @@ class LightingDevice(RFXtrxDevice):
 
     # pylint: disable=too-many-instance-attributes
     def __init__(self, pkt):
-        #super(LightingDevice, self).__init__(pkt)
+        # super(LightingDevice, self).__init__(pkt)
         RFXtrxDevice.__init__(self, pkt)
         if isinstance(pkt, lowlevel.Lighting1):
             self.housecode = pkt.housecode
@@ -397,7 +397,7 @@ class SensorEvent(RFXtrxEvent):
     def __init__(self, pkt):
         #  pylint: disable=too-many-branches, too-many-statements
         device = RFXtrxDevice(pkt)
-        #super(SensorEvent, self).__init__(device)
+        # super(SensorEvent, self).__init__(device)
         RFXtrxEvent.__init__(self, device)
         self.values = {}
         self.pkt = pkt
@@ -488,7 +488,7 @@ class ControlEvent(RFXtrxEvent):
         else:
             device = RFXtrxDevice(pkt)
         RFXtrxEvent.__init__(self, device)
-        #super(ControlEvent, self).__init__(device)
+        # super(ControlEvent, self).__init__(device)
 
         self.values = {}
         self.values['Command'] = pkt.value('cmnd_string')
@@ -632,13 +632,13 @@ class PySerialTransport(RFXtrxTransport):
     def connect(self):
         """ Open a serial connexion """
         try:
-            # self.serial = serial.Serial(self.port, 38400, timeout=0.1)
-            self.serial = serial.Serial(self.port, 9600, timeout=0.3)
+            self.serial = serial.Serial(self.port, 38400, timeout=0.1)
+            # self.serial = serial.Serial(self.port, 9600, timeout=0.3)
         except serial.serialutil.SerialException:
             import glob
             port = glob.glob('/dev/serial/by-id/usb-RFXCOM_*-port0')[0]
-            # self.serial = serial.Serial(port, 38400, timeout=0.1)
-            self.serial = serial.Serial(port, 9600, timeout=0.3)
+            self.serial = serial.Serial(port, 38400, timeout=0.1)
+            # self.serial = serial.Serial(port, 9600, timeout=0.3)
 
     def receive_blocking(self):
         """ Wait until a packet is received and return with an RFXtrxEvent """
