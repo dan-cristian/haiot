@@ -86,17 +86,17 @@ def _event_detected_falling(channel):
 
 
 def _event_detected_both(channel):
-    now_state = GPIO.input(channel)
+    # now_state = GPIO.input(channel)
     # L.l.info("Both event, channel {}, now_state={}".format(channel, now_state))
-    time.sleep(0.1)
+    # time.sleep(0.1)
     new_state = GPIO.input(channel)
     L.l.info("Both event, channel {}, NEW_state={}".format(channel, new_state))
     _do_event(channel, new_state)
 
 
 def _event_detected_reversed_both(channel):
-    now_state = GPIO.input(channel)
-    time.sleep(0.1)
+    # now_state = GPIO.input(channel)
+    # time.sleep(0.1)
     new_state = GPIO.input(channel)
     # reverse state for normal open contacts
     # L.l.info("State pin before reverse={}".format(new_state))

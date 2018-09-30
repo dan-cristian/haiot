@@ -378,7 +378,6 @@
   ],
 
   "ZoneAlarm": [
-    {"zone_id":47 , "gpio_pin_code":"0:in:0", "gpio_host_name": "netbook", "alarm_pin_name": "birou test", "sensor_type": "contact-no"},
     {"zone_id":1 , "gpio_pin_code":"P8_08", "gpio_host_name": "beaglebone", "alarm_pin_name": "not used"},
 
     {"zone_id":9 , "gpio_pin_code":"0:in:0", "gpio_host_name": "pi-face", "alarm_pin_name": "beci mare", "sensor_type": "pir"},
