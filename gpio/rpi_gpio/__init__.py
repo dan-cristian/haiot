@@ -90,7 +90,7 @@ def _event_detected_both(channel):
     # L.l.info("Both event, channel {}, now_state={}".format(channel, now_state))
     time.sleep(0.1)
     new_state = GPIO.input(channel)
-    # L.l.info("Both event, channel {}, NEW_state={}".format(channel, new_state))
+    L.l.info("Both event, channel {}, NEW_state={}".format(channel, new_state))
     _do_event(channel, new_state)
 
 
@@ -101,7 +101,7 @@ def _event_detected_reversed_both(channel):
     # reverse state for normal open contacts
     # L.l.info("State pin before reverse={}".format(new_state))
     rev_state = int(not new_state)
-    # L.l.info("State pin after reverse={}".format(rev_state))
+    L.l.info("State pin {} after reverse={}".format(channel, rev_state))
     _do_event(channel, rev_state)
 
 
@@ -127,10 +127,12 @@ def setup_in_ports(gpio_pin_list):
                     # L.l.info("Added input with reverse contact (NO) on pin {}".format(gpio_pin))
                     GPIO.add_event_detect(int(gpio_pin.pin_code), GPIO.BOTH, callback=_event_detected_reversed_both,
                                           bouncetime=500)
+                    L.l.info('OK callback set on rpi {} pin {}'.format(gpio_pin.pin_code, gpio_pin.pin_index_bcm))
                     _event_detected_reversed_both(int(gpio_pin.pin_code))
                 else:
                     GPIO.add_event_detect(int(gpio_pin.pin_code), GPIO.BOTH, callback=_event_detected_both,
                                           bouncetime=500)
+                    L.l.info('OK callback rev set on rpi {} pin {}'.format(gpio_pin.pin_code, gpio_pin.pin_index_bcm))
                     _event_detected_both(int(gpio_pin.pin_code))
                 # L.l.info('OK callback set on rpi.gpio'.format(gpio_pin.pin_code))
             except Exception as ex:

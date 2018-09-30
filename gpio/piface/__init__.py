@@ -15,7 +15,7 @@ __pool_pin_codes = []
 try:
     import pifacedigitalio as pfio
     __import_ok = True
-except Exception, ex:
+except Exception as ex:
     __import_ok = False
     L.l.info('Pifacedigitalio module not available')
 
@@ -38,9 +38,10 @@ def input_event(event):
     pin_num = event.pin_num
     board_index = event.chip.hardware_addr
     direction = event.direction  # 0 for press/contact, 1 for release/disconnect
-    gpio_pin_code = format_pin_code(board_index=board_index, pin_direction=Constant.GPIO_PIN_DIRECTION_IN, pin_index=pin_num)
-    #if gpio_pin_code == 7:
-    #L.l.info('Event piface gpio={} direction={}'.format(gpio_pin_code, direction))
+    gpio_pin_code = format_pin_code(board_index=board_index, pin_direction=Constant.GPIO_PIN_DIRECTION_IN,
+                                    pin_index=pin_num)
+    # if gpio_pin_code == 7:
+    # L.l.info('Event piface gpio={} direction={}'.format(gpio_pin_code, direction))
     dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio_pin_code, direction=Constant.GPIO_PIN_DIRECTION_IN,
                     pin_value=direction, pin_connected=(direction == 0))
 
@@ -65,11 +66,11 @@ def setup_in_ports_pif(gpio_pin_list):
                     __listener.register(int(gpio_pin.pin_index_bcm), pfio.IODIR_OFF, input_event)
                     L.l.info('OK callback set on piface {} pin {}'.format(
                         gpio_pin.pin_code, gpio_pin.pin_index_bcm))
-                except Exception, ex:
+                except Exception as ex:
                     L.l.critical('Unable to setup piface listener pin={} err={}'.format(gpio_pin.pin_code, ex))
                 __pool_pin_codes.append(gpio_pin.pin_code)
         __listener.activate()
-    except Exception, ex:
+    except Exception as ex:
         L.l.critical('Piface setup ports failed, err={}'.format(ex))
 
 
@@ -94,7 +95,7 @@ def init():
             global initialised
             initialised = True
             L.l.info('Piface initialised OK')
-        except Exception, ex1:
+        except Exception as ex1:
             L.l.info('Piface not initialised, err={}'.format(ex1))
     else:
         L.l.info('Piface NOT initialised, module pifacedigitalio unavailable on this system')
