@@ -26,7 +26,7 @@ def handle_event_alarm(gpio_pin_code='', direction='', pin_value='', pin_connect
         if zone is not None:
             dispatcher.send(signal=Constant.SIGNAL_ALARM, zone_name=zone.name, alarm_pin_name=zonealarm.alarm_pin_name,
                             pin_connected=pin_connected)
-            L.l.debug('Got alarm event in {} zoneid={} pin_connected={} pin_value={}'.format(
+            L.l.info('Got alarm event in {} zoneid={} pin_connected={} pin_value={}'.format(
                 zone.name, zonealarm.zone_id, pin_connected, pin_value))
         else:
             L.l.error("Could not find zone for gpio pin {}, trigger actions could be missed".format(gpio_pin_code))
