@@ -32,7 +32,7 @@ def relay_update(gpio_pin_code=None, pin_value=None, from_web=False):
         else:
             L.l.warning('Pin {} does not exists locally, is db data correct?'.format(gpio_pin_code))
     except Exception as ex:
-        L.l.warning('Error updating relay state err={}'.format(ex))
+        L.l.error('Error updating relay state err={}'.format(ex), exc_info=True)
     return result
 
 
@@ -75,8 +75,8 @@ def relay_set(gpio_pin=None, value=None, from_web=False):
             else:
                 pin_value = std_gpio.set_pin_bcm(gpio_pin.pin_index_bcm, value)
         elif gpio_pin.pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
-            pin_value = piface.set_pin_value(pin_index=gpio_pin.pin_index_bcm, pin_value=value,
-                                             board_index=gpio_pin.board_index)
+            pin_value = piface.set_pin_value(pin_index=int(gpio_pin.pin_index_bcm), pin_value=int(value),
+                                             board_index=int(gpio_pin.board_index))
     else:
         message += ' error not running on gpio enabled devices'
         L.l.warning(message)
