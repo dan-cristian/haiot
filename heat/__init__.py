@@ -30,8 +30,8 @@ def record_update(obj_dict=None):
         zone_heat_relay = models.ZoneHeatRelay.query.filter_by(zone_id=zone_id).first()
         if zone_heat_relay:
             gpio_host_name = zone_heat_relay.gpio_host_name
-            cmd_heat_is_on = utils.get_object_field_value(obj_dict,
-                                                          utils.get_model_field_name(models.ZoneHeatRelay.heat_is_on))
+            cmd_heat_is_on = utils.get_object_field_value(
+                obj_dict, utils.get_model_field_name(models.ZoneHeatRelay.heat_is_on))
             L.l.debug('Local heat state zone_id {} must be changed to {} on pin {}'.format(
                 zone_id, cmd_heat_is_on, zone_heat_relay.gpio_pin_code))
             if cmd_heat_is_on:
@@ -49,8 +49,8 @@ def record_update(obj_dict=None):
                 zone_heat_relay.notify_transport_enabled = False
                 commit()
             else:
-                L.l.warning(
-                    'Heat state zone_id {} unexpected val={} after setval={}'.format(zone_id, pin_state, pin_value))
+                L.l.warning('Heat state zone_id {} unexpected val={} after setval={}'.format(
+                    zone_id, pin_state, pin_value))
         else:
             L.l.warning('No heat relay defined for zone {}, db data issue?'.format(zone_id))
     except Exception as ex:
