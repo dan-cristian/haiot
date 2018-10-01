@@ -46,6 +46,14 @@ def input_event(event):
                     pin_value=direction, pin_connected=(direction == 0))
 
 
+def _read_default(pin, board_index=0):
+    val = get_pin_value(pin_index=pin)
+    gpio_pin_code = format_pin_code(board_index=board_index, pin_direction=Constant.GPIO_PIN_DIRECTION_IN,
+                                    pin_index=pin)
+    dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio_pin_code, direction=Constant.GPIO_PIN_DIRECTION_IN,
+                    pin_value=val, pin_connected=(val == 0))
+
+
 #  define all ports that are used as read/input
 #  port format is x:direction:y, e.g. 0:in:3, x=board, direction=in/out, y=pin index (0 based)
 # !!! make sure piface listener is enabled in the same thread, and pin index is integer
@@ -62,10 +70,11 @@ def setup_in_ports_pif(gpio_pin_list):
                 try:
                     # i = gpio_pin.pin_code.split(":")[2]
                     # Log.logger.info("Piface registering input pin {}".format(gpio_pin.pin_index_bcm))
-                    __listener.register(int(gpio_pin.pin_index_bcm), pfio.IODIR_ON, input_event)
-                    __listener.register(int(gpio_pin.pin_index_bcm), pfio.IODIR_OFF, input_event)
-                    L.l.info('OK callback set on piface {} pin {}'.format(
-                        gpio_pin.pin_code, gpio_pin.pin_index_bcm))
+                    pin = int(gpio_pin.pin_index_bcm)
+                    __listener.register(pin, pfio.IODIR_ON, input_event)
+                    __listener.register(pin, pfio.IODIR_OFF, input_event)
+                    L.l.info('OK callback set on piface {} pin {}'.format(gpio_pin.pin_code, pin))
+                    _read_default(pin=pin)
                 except Exception as ex:
                     L.l.critical('Unable to setup piface listener pin={} err={}'.format(gpio_pin.pin_code, ex))
                 __pool_pin_codes.append(gpio_pin.pin_code)
