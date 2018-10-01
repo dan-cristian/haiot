@@ -28,9 +28,15 @@ def get_pin_value(pin_index=None, board_index=0):
     return pfio.digital_read(pin_num=pin_index, hardware_addr=board_index)
 
 
+# http://www.farnell.com/datasheets/1881551.pdf
 def set_pin_value(pin_index=None, pin_value=None, board_index=0):
     pfio.digital_write(pin_num=pin_index, value=pin_value, hardware_addr=board_index)
     return get_pin_value(pin_index=pin_index, board_index=board_index)
+
+
+# not used
+def set_relay(index, value):
+    pfio.relays[index].value = value
 
 
 def input_event(event):
