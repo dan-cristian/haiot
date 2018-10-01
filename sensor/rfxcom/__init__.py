@@ -18,7 +18,7 @@ class P:
     initialised = False
     transport = None
     last_packet_received = None
-    INTERVAL_NORMAL = 5
+    INTERVAL_NORMAL = 1
     INTERVAL_ERROR = 120
     interval = INTERVAL_NORMAL
     MAX_MINUTES_SILENCE = 10
@@ -26,6 +26,15 @@ class P:
     MAX_FAILED_RETRY = 10
 
 
+# 0x0a 0x52 0x01 0x00 0xcc 0x01 0x00 0x09 0x27 0x02 0x59
+# type='THGN122/123, THGN132, THGR122/228/238/268' id='cc:01'] values=[
+# ('Battery numeric', 9), ('Humidity', 39), ('Humidity status', 'normal'), ('Humidity status numeric', 2),
+# ('Rssi numeric', 5), ('Temperature', 0.9)
+#
+# 0x0a 0x52 0x01 0x01 0xcc 0x01 0x00 0x0a 0x27 0x02 0x59
+# type='THGN122/123, THGN132, THGR122/228/238/268' id='cc:01'] values=[
+# ('Battery numeric', 9), ('Humidity', 39), ('Humidity status', 'normal'), ('Humidity status numeric', 2),
+# ('Rssi numeric', 5), ('Temperature', 1.0)
 def __rfx_reading(packet):
     if packet:
         try:
