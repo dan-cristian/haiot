@@ -1,5 +1,6 @@
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
+import time
 from pydispatch import dispatcher
 from main import L
 from main import thread_pool
@@ -30,8 +31,16 @@ def get_pin_value(pin_index=None, board_index=0):
 
 # http://www.farnell.com/datasheets/1881551.pdf
 def set_pin_value(pin_index=None, pin_value=None, board_index=0):
+    L.l.info('Set piface pin {} value {} board {}'.format(pin_index, pin_value, board_index))
     pfio.digital_write(pin_num=pin_index, value=pin_value, hardware_addr=board_index)
-    return get_pin_value(pin_index=pin_index, board_index=board_index)
+    for i in range(0, 3):
+        act_value = get_pin_value(pin_index=pin_index, board_index=board_index)
+        if pin_value != act_value:
+            L.l.warning("Piface set pin {} failed, actual value={}".format(pin_index, act_value))
+            time.sleep(1)
+        else:
+            break
+    return act_value
 
 
 # not used
