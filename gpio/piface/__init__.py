@@ -6,18 +6,24 @@ from main import L
 from main import thread_pool
 from common import Constant
 
+
 # https://piface.github.io/pifacedigitalio/example.html
-__import_ok = False
-__pfd = None
-__listener = None
-initialised = False
-__pool_pin_codes = []
+class P:
+    import_ok = False
+    pfd = {}
+    listener = None
+    initialised = False
+    pool_pin_codes = []
+
+    def __init__(self):
+        pass
+
 
 try:
     import pifacedigitalio as pfio
-    __import_ok = True
+    P.import_ok = True
 except Exception as ex:
-    __import_ok = False
+    P.import_ok = False
     L.l.info('Pifacedigitalio module not available')
 
 
@@ -29,17 +35,17 @@ def get_pin_value(pin_index=None, board_index=0):
     return pfio.digital_read(pin_num=pin_index, hardware_addr=board_index)
 
 
+def _get_output_pin_value(pin_index=None, board_index=0):
+    return P.pfd[board_index].output_pins[pin_index].value
+
+
 # http://www.farnell.com/datasheets/1881551.pdf
 def set_pin_value(pin_index=None, pin_value=None, board_index=0):
     L.l.info('Set piface pin {} value {} board {}'.format(pin_index, pin_value, board_index))
     pfio.digital_write(pin_num=pin_index, value=pin_value, hardware_addr=board_index)
-    for i in range(0, 3):
-        act_value = get_pin_value(pin_index=pin_index, board_index=board_index)
-        if pin_value != act_value:
-            L.l.warning("Piface set pin {} failed, actual value={}".format(pin_index, act_value))
-            time.sleep(1)
-        else:
-            break
+    act_value = _get_output_pin_value(pin_index=pin_index, board_index=board_index)
+    if pin_value != act_value:
+        L.l.warning("Piface set pin {} failed, actual value={}".format(pin_index, act_value))
     return act_value
 
 
@@ -73,11 +79,10 @@ def _read_default(pin, board_index=0):
 #  port format is x:direction:y, e.g. 0:in:3, x=board, direction=in/out, y=pin index (0 based)
 # !!! make sure piface listener is enabled in the same thread, and pin index is integer
 def setup_in_ports_pif(gpio_pin_list):
-    global __listener, __pool_pin_codes, __pfd
     try:
         pfio.init()
-        __pfd = pfio.PiFaceDigital()
-        __listener = pfio.InputEventListener(chip=__pfd)
+        P.pfd[0] = pfio.PiFaceDigital(hardware_addr=0)
+        P.listener = pfio.InputEventListener(chip=P.pfd[0])
         for gpio_pin in gpio_pin_list:
             if gpio_pin.pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
                 # Log.logger.info('Set piface code={} type={} index={}'.format(
@@ -86,14 +91,14 @@ def setup_in_ports_pif(gpio_pin_list):
                     # i = gpio_pin.pin_code.split(":")[2]
                     # Log.logger.info("Piface registering input pin {}".format(gpio_pin.pin_index_bcm))
                     pin = int(gpio_pin.pin_index_bcm)
-                    __listener.register(pin, pfio.IODIR_ON, input_event)
-                    __listener.register(pin, pfio.IODIR_OFF, input_event)
+                    P.listener.register(pin, pfio.IODIR_ON, input_event)
+                    P.listener.register(pin, pfio.IODIR_OFF, input_event)
                     L.l.info('OK callback set on piface {} pin {}'.format(gpio_pin.pin_code, pin))
                     _read_default(pin=pin)
                 except Exception as ex:
                     L.l.critical('Unable to setup piface listener pin={} err={}'.format(gpio_pin.pin_code, ex))
-                __pool_pin_codes.append(gpio_pin.pin_code)
-        __listener.activate()
+                P.pool_pin_codes.append(gpio_pin.pin_code)
+        P.listener.activate()
     except Exception as ex:
         L.l.critical('Piface setup ports failed, err={}'.format(ex))
 
@@ -104,20 +109,18 @@ def thread_run():
 
 def unload():
     L.l.info('Piface unloading')
-    if __import_ok:
-        global __listener
-        __listener.deactivate()
+    if P.import_ok:
+        P.listener.deactivate()
         pfio.deinit_board()
 
 
 def init():
     L.l.debug('Piface initialising')
-    if __import_ok:
+    if P.import_ok:
         try:
             dispatcher.connect(setup_in_ports_pif, signal=Constant.SIGNAL_GPIO_INPUT_PORT_LIST, sender=dispatcher.Any)
             thread_pool.add_interval_callable(thread_run, run_interval_second=10)
-            global initialised
-            initialised = True
+            P.initialised = True
             L.l.info('Piface initialised OK')
         except Exception as ex1:
             L.l.info('Piface not initialised, err={}'.format(ex1))
