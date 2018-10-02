@@ -8,9 +8,8 @@ Group:Number:MAX TEMP_PUF "Max Puffer [%.1f °C]" <temperature_hot>
 Group:Number:MAX TEMP_BOI "Max Boiler [%.1f °C]" <temperature_hot>
 Group:Contact:OR(OPEN, CLOSED) CON_PIR "PIR Contact [%s]" <door>
 
-Switch presence_mobile_dan "Dan Mobile" <network>                           {channel="network:device:192_168_0_117:online"}
 Switch ups_power_failed "UPS Power" <switch>                                {mqtt="<[mosquitto:iot/openhab/ups_power_failed:state:default]"}
-Number ups_load_percent "UPS Load [%.0f %%]" <light>                           {mqtt="<[mosquitto:iot/openhab/ups_load_percent:state:default]"}
+Number ups_load_percent "UPS Load [%.0f %%]" <light>                        {mqtt="<[mosquitto:iot/openhab/ups_load_percent:state:default]"}
 Number ups_battery_voltage "UPS Battery [%.1f V]" <batterylevel>            {mqtt="<[mosquitto:iot/openhab/ups_battery_voltage:state:default]"}
 Number ups_input_voltage "UPS Input [%.0f V]" <poweroutlet_us>              {mqtt="<[mosquitto:iot/openhab/ups_input_voltage:state:default]"}
 
@@ -33,6 +32,9 @@ Switch heat_gas_heat "Heat gas" <fire>                                      {mqt
 Switch heat_puffer_boiler "Heat puffer boiler" <switch>                     {mqtt="<[mosquitto:iot/openhab/heat_puffer boiler:state:default],>[mosquitto:iot/openhab:command:ON:heat_puffer boiler=1],>[mosquitto:iot/openhab:command:OFF:heat_puffer boiler=0]", autoupdate="false"}
 Switch heat_puffer_heat "Heat puffer heat" <switch>                         {mqtt="<[mosquitto:iot/openhab/heat_puffer heat:state:default],>[mosquitto:iot/openhab:command:ON:heat_puffer heat=1],>[mosquitto:iot/openhab:command:OFF:heat_puffer heat=0]", autoupdate="false"}
 Switch heat_puffer_gas_valve "Heat puffer gas valve" <switch>               {mqtt="<[mosquitto:iot/openhab/heat_puffer gas valve:state:default],>[mosquitto:iot/openhab:command:ON:heat_puffer gas valve=1],>[mosquitto:iot/openhab:command:OFF:heat_puffer gas valve=0]", autoupdate="false"}
+
+Switch relay_recirculation_pump "Recirculation pump" <switch>               {mqtt="<[mosquitto:iot/openhab/relay_pump_recirculation_relay:state:default],>[mosquitto:iot/openhab:command:ON:relay_pump_recirculation_relay=1],>[mosquitto:iot/openhab:command:OFF:relay_pump_recirculation_relay=0]", autoupdate="false"}
+Switch relay_other_heat "Other heat" <switch>                               {mqtt="<[mosquitto:iot/openhab/relay_other_heat_relay:state:default],>[mosquitto:iot/openhab:command:ON:relay_other_heat_relay=1],>[mosquitto:iot/openhab:command:OFF:relay_other_heat_relay=0]", autoupdate="false"}
 
 Group:Switch:OR(ON, OFF)    RELAY_BACK_WATER "Back watering [(%d)]"  <switch>
 Group:Switch:OR(ON, OFF)    RELAY_FRONT_WATER "Front watering [(%d)]"   <switch>
