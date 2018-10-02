@@ -188,6 +188,8 @@ Frame {
     Default item=heat_puffer_boiler
     Default item=heat_puffer_heat
     Default item=heat_puffer_gas_valve
+    Default item=relay_recirculation_pump
+    Default item=relay_other_heat
 }
 
 Frame {
