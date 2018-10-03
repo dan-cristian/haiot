@@ -398,6 +398,7 @@ class SchedulePattern(db.Model, DbBase):
     keep_warm_pattern = db.Column(db.String(20))  # pattern, 5 minutes increments of on/off: 10000100010000111000
     activate_on_condition = db.Column(db.Boolean, default=False)  # activate heat only if relay state condition is meet
     activate_condition_relay = db.Column(db.String(50))  # the relay that must be on to activate this schedule pattern
+    season_name = db.Column(db.String(50))  # season name when this will apply
     main_source_needed = db.Column(db.Boolean, default=True)  # main source must be on as well (i.e. gas heater)
 
     def __init__(self, id=None, name='', pattern=''):
@@ -441,6 +442,7 @@ class HeatSchedule(db.Model, DbBase):
     #                               backref=db.backref('schedule_pattern_week', lazy='dynamic'))
     # pattern_weekend = db.relationship('SchedulePattern', foreign_keys='[HeatSchedule.pattern_weekend_id]',
     #                                backref=db.backref('schedule_pattern_weekend', lazy='dynamic'))
+    season_name = db.Column(db.String(50))  # season name when this will apply
     active = db.Column(db.Boolean, default=True)
 
     def __init__(self, id=None, zone_id=None, pattern_week_id=None, pattern_weekend_id=None,
