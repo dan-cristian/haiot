@@ -100,5 +100,6 @@ Contact alarm_etaj_hol "Alarm etaj hol [%s]" <door>                         (CON
 Contact contact_sonerie "Sonerie [%s]" <door>                               (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_sonerie:state:default]"}
 Contact contact_usa_intrare "Usa intrare [%s]" <door>                       (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_usa intrare:state:default]"}
 Contact contact_portita "Portita [%s]" <door>                               (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_portita:state:default]"}
+Contact contact_gate "Gate [%s]" <door>                                     (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_gate:state:default]"}
 
 Number p_switch                         ""
