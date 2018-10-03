@@ -21,6 +21,7 @@ class P:
 
 try:
     import pifacedigitalio as pfio
+    from pifacedigitalio.core import NoPiFaceDigitalDetectedError
     P.import_ok = True
 except Exception as ex:
     P.import_ok = False
@@ -93,7 +94,7 @@ def setup_in_ports_pif(gpio_pin_list):
                 P.pfd[board] = pfd
                 P.listener[board] = pfio.InputEventListener(chip=P.pfd[board])
                 L.l.info("Initialised piface listener board {}".format(board))
-            except pifacedigitalio.core.NoPiFaceDigitalDetectedError as ex:
+            except NoPiFaceDigitalDetectedError as ex:
                 pass
 
         for gpio_pin in gpio_pin_list:
