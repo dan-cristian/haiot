@@ -11,9 +11,9 @@ from common import Constant
 class P:
     import_ok = False
     pfd = {}
-    listener = None
+    listener = {}
     initialised = False
-    pool_pin_codes = []
+    # pool_pin_codes = []
 
     def __init__(self):
         pass
@@ -80,9 +80,22 @@ def _read_default(pin, board_index=0):
 # !!! make sure piface listener is enabled in the same thread, and pin index is integer
 def setup_in_ports_pif(gpio_pin_list):
     try:
-        pfio.init()
-        P.pfd[0] = pfio.PiFaceDigital(hardware_addr=0)
-        P.listener = pfio.InputEventListener(chip=P.pfd[0])
+        bus, chip = 0, 0
+        try:
+            for chip in [0, 1]:
+                pfio.init(bus=bus, chip_select=chip)
+                L.l.info("Initialised piface spi spidev{}.{}".format(bus, chip))
+        except Exception as ex:
+            pass
+        for board in [0, 1, 2, 3]:
+            try:
+                pfd = pfio.PiFaceDigital(hardware_addr=board, init_board=True)
+                P.pfd[board] = pfd
+                P.listener[board] = pfio.InputEventListener(chip=P.pfd[board])
+                L.l.info("Initialised piface listener board {}".format(board))
+            except pifacedigitalio.core.NoPiFaceDigitalDetectedError as ex:
+                pass
+
         for gpio_pin in gpio_pin_list:
             if gpio_pin.pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
                 # Log.logger.info('Set piface code={} type={} index={}'.format(
@@ -91,14 +104,18 @@ def setup_in_ports_pif(gpio_pin_list):
                     # i = gpio_pin.pin_code.split(":")[2]
                     # Log.logger.info("Piface registering input pin {}".format(gpio_pin.pin_index_bcm))
                     pin = int(gpio_pin.pin_index_bcm)
-                    P.listener.register(pin, pfio.IODIR_ON, input_event)
-                    P.listener.register(pin, pfio.IODIR_OFF, input_event)
-                    L.l.info('OK callback set on piface {} pin {}'.format(gpio_pin.pin_code, pin))
-                    _read_default(pin=pin)
+                    board = int(gpio_pin.board_index)
+                    if board in P.listener.keys():
+                        P.listener[board].register(pin, pfio.IODIR_ON, input_event)
+                        P.listener[board].register(pin, pfio.IODIR_OFF, input_event)
+                        L.l.info('OK callback set on piface board {}, {} pin {}'.format(board, gpio_pin.pin_code, pin))
+                        _read_default(pin=pin)
+                        P.listener[board].activate()
                 except Exception as ex:
-                    L.l.critical('Unable to setup piface listener pin={} err={}'.format(gpio_pin.pin_code, ex))
-                P.pool_pin_codes.append(gpio_pin.pin_code)
-        P.listener.activate()
+                    L.l.critical('Unable to setup piface listener board={} pin={} err={}'.format(
+                        board, gpio_pin.pin_code, ex))
+                # P.pool_pin_codes.append(gpio_pin.pin_code)
+
     except Exception as ex:
         L.l.critical('Piface setup ports failed, err={}'.format(ex))
 
@@ -110,7 +127,8 @@ def thread_run():
 def unload():
     L.l.info('Piface unloading')
     if P.import_ok:
-        P.listener.deactivate()
+        for listener in P.listener:
+            listener.deactivate()
         pfio.deinit_board()
 
 
@@ -125,4 +143,4 @@ def init():
         except Exception as ex1:
             L.l.info('Piface not initialised, err={}'.format(ex1))
     else:
-        L.l.info('Piface NOT initialised, module pifacedigitalio unavailable on this system')
+        L.l.info('Piface not initialised, module pifacedigitalio unavailable on this system')
