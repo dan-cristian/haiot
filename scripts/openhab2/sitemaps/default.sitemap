@@ -1,10 +1,6 @@
 sitemap default label="Home" {
 
 Frame {
-    Switch item=presence_mobile_dan label="Dan Mobile"
-}
-
-Frame {
     Group item=TEMP_BOI {
         Text item=temperature_boiler_sus {
             Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
