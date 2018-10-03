@@ -382,18 +382,18 @@
   "ZoneAlarm": [
     {"zone_id":1 , "gpio_pin_code":"P8_08", "gpio_host_name": "beaglebone", "alarm_pin_name": "not used"},
 
-    {"zone_id":9 , "gpio_pin_code":"0:in:0", "gpio_host_name": "pi-face", "alarm_pin_name": "beci mare", "sensor_type": "pir"},
-    {"zone_id":1 , "gpio_pin_code":"0:in:1", "gpio_host_name": "pi-face", "alarm_pin_name": "bucatarie", "sensor_type": "pir"},
-    {"zone_id":2 , "gpio_pin_code":"0:in:2", "gpio_host_name": "pi-face", "alarm_pin_name": "living", "sensor_type": "pir"},
-    {"zone_id":3 , "gpio_pin_code":"0:in:3", "gpio_host_name": "pi-face", "alarm_pin_name": "beci mic", "sensor_type": "pir"},
+    {"zone_id":9 ,  "gpio_pin_code":"0:in:0", "gpio_host_name": "pi-face", "alarm_pin_name": "beci mare", "sensor_type": "pir"},
+    {"zone_id":1 ,  "gpio_pin_code":"0:in:1", "gpio_host_name": "pi-face", "alarm_pin_name": "bucatarie", "sensor_type": "pir"},
+    {"zone_id":2 ,  "gpio_pin_code":"0:in:2", "gpio_host_name": "pi-face", "alarm_pin_name": "living", "sensor_type": "pir"},
+    {"zone_id":3 ,  "gpio_pin_code":"0:in:3", "gpio_host_name": "pi-face", "alarm_pin_name": "beci mic", "sensor_type": "pir"},
     {"zone_id":47 , "gpio_pin_code":"0:in:4", "gpio_host_name": "pi-face", "alarm_pin_name": "birou", "sensor_type": "pir"},
     {"zone_id":10 , "gpio_pin_code":"0:in:5", "gpio_host_name": "pi-face", "alarm_pin_name": "scari beci", "sensor_type": "pir"},
     {"zone_id":11 , "gpio_pin_code":"0:in:6", "gpio_host_name": "pi-face", "alarm_pin_name": "etaj hol", "sensor_type": "pir"},
+    {"zone_id":7 ,  "gpio_pin_code":"0:in:7", "gpio_host_name": "pi-face", "alarm_pin_name": "usa intrare", "sensor_type": "contact"},
 
-    {"zone_id":7 , "gpio_pin_code":"0:in:7", "gpio_host_name": "pi-face", "alarm_pin_name": "usa intrare", "sensor_type": "pir"},
-    {"zone_id":7 , "gpio_pin_code":"1", "gpio_host_name": "pi-face", "alarm_pin_name": "portita", "sensor_type": "contact-no"},
-    {"zone_id":7 , "gpio_pin_code":"14", "gpio_host_name": "pi-face", "alarm_pin_name": "sonerie", "sensor_type": "contact"},
-    {"zone_id":7 , "gpio_pin_code":"15", "gpio_host_name": "pi-face", "alarm_pin_name": "free", "sensor_type": "contact-no"},
+    {"zone_id":7 ,  "gpio_pin_code":"2:in:0", "gpio_host_name": "pi-face", "alarm_pin_name": "portita", "sensor_type": "contact"},
+    {"zone_id":7 ,  "gpio_pin_code":"2:in:1", "gpio_host_name": "pi-face", "alarm_pin_name": "gate", "sensor_type": "contact"},
+    {"zone_id":7 ,  "gpio_pin_code":"2:in:2", "gpio_host_name": "pi-face", "alarm_pin_name": "sonerie", "sensor_type": "contact"},
 
     {"zone_id":29 , "gpio_pin_code":"18", "gpio_host_name": "pi-face", "alarm_pin_name": "beci test"},
     {"zone_id":200 , "gpio_pin_code":"23", "gpio_host_name": "pidash", "alarm_pin_name": "car vibrate", "sensor_type": "contact"},
