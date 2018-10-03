@@ -114,7 +114,7 @@ def setup_in_ports_pif(gpio_pin_list):
                 except Exception as ex:
                     L.l.critical('Unable to setup piface listener board={} pin={} err={}'.format(
                         board, gpio_pin.pin_code, ex))
-        for li in P.listener:
+        for li in P.listener.values():
             li.activate()
     except Exception as ex:
         L.l.critical('Piface setup ports failed, err={}'.format(ex))
