@@ -394,6 +394,7 @@
     {"zone_id":7 ,  "gpio_pin_code":"2:in:0", "gpio_host_name": "pi-face", "alarm_pin_name": "portita", "sensor_type": "contact"},
     {"zone_id":7 ,  "gpio_pin_code":"2:in:1", "gpio_host_name": "pi-face", "alarm_pin_name": "gate", "sensor_type": "contact"},
     {"zone_id":7 ,  "gpio_pin_code":"2:in:2", "gpio_host_name": "pi-face", "alarm_pin_name": "sonerie", "sensor_type": "contact"},
+    {"zone_id":9 ,  "gpio_pin_code":"2:in:3", "gpio_host_name": "pi-face", "alarm_pin_name": "usa garaj", "sensor_type": "contact"},
 
     {"zone_id":29 , "gpio_pin_code":"18", "gpio_host_name": "pi-face", "alarm_pin_name": "beci test"},
     {"zone_id":200 , "gpio_pin_code":"23", "gpio_host_name": "pidash", "alarm_pin_name": "car vibrate", "sensor_type": "contact"},
