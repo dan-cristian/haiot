@@ -197,6 +197,7 @@ Frame {
         Default item=alarm_beci_mare
         Default item=alarm_beci_mic
         Default item=alarm_etaj_hol
+        Default item=contact_usa_garaj
         Default item=contact_usa_intrare
         Default item=contact_gate
         Default item=contact_portita
