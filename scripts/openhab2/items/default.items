@@ -35,7 +35,7 @@ Switch heat_puffer_gas_valve "Heat puffer gas valve" <switch>               {mqt
 
 Switch relay_recirculation_pump "Recirculation pump" <switch>               {mqtt="<[mosquitto:iot/openhab/relay_pump_recirculation_relay:state:default],>[mosquitto:iot/openhab:command:ON:relay_pump_recirculation_relay=1],>[mosquitto:iot/openhab:command:OFF:relay_pump_recirculation_relay=0]", autoupdate="false"}
 Switch relay_other_heat "Other heat" <switch>                               {mqtt="<[mosquitto:iot/openhab/relay_other_heat_relay:state:default],>[mosquitto:iot/openhab:command:ON:relay_other_heat_relay=1],>[mosquitto:iot/openhab:command:OFF:relay_other_heat_relay=0]", autoupdate="false"}
-Switch relay_front_gate "Front gate" <switch> [ "Switchable" ]               {mqtt="<[mosquitto:iot/openhab/relay_front_gate_relay:state:default],>[mosquitto:iot/openhab:command:ON:relay_front_gate_relay=1],>[mosquitto:iot/openhab:command:OFF:relay_front_gate_relay=0]", expire="1s,command=OFF", autoupdate="false"}
+Switch relay_front_gate "Front gate" <switch> [ "Switchable" ]               {mqtt="<[mosquitto:iot/openhab/relay_front_gate_relay:state:default],>[mosquitto:iot/openhab:command:ON:relay_front_gate_relay=1],>[mosquitto:iot/openhab:command:OFF:relay_front_gate_relay=0]", expire="3s,command=OFF", autoupdate="false"}
 
 Group:Switch:OR(ON, OFF)    RELAY_BACK_WATER "Back watering [(%d)]"  <switch>
 Group:Switch:OR(ON, OFF)    RELAY_FRONT_WATER "Front watering [(%d)]"   <switch>
