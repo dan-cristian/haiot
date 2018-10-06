@@ -244,6 +244,8 @@
     {"relay_pin_name": "puffer_gas_valve_relay", "zone_id": "38", "gpio_pin_code": "13", "gpio_host_name": "pi-face"},
     {"relay_pin_name": "unused_beci_relay", "zone_id": "14", "gpio_pin_code": "19", "gpio_host_name": "pi-face"},
 
+    {"relay_pin_name": "front_gate_relay", "zone_id": "7", "gpio_pin_code": "0:out:1", "gpio_host_name": "pi-face"},
+
     {"relay_pin_name": "test_relay_netbook", "zone_id": "1", "gpio_pin_code": "1", "gpio_host_name": "netbook"},
     {"relay_pin_name": "unused-formerheat", "zone_id": "19", "gpio_pin_code": "24", "gpio_host_name": "pi-power"},
     {"relay_pin_name": "pod_music_relay", "zone_id": "1", "gpio_pin_code": "23", "gpio_host_name": "pi-power"},
@@ -394,7 +396,7 @@
     {"zone_id":7 ,  "gpio_pin_code":"2:in:0", "gpio_host_name": "pi-face", "alarm_pin_name": "portita", "sensor_type": "contact"},
     {"zone_id":7 ,  "gpio_pin_code":"2:in:1", "gpio_host_name": "pi-face", "alarm_pin_name": "gate", "sensor_type": "contact"},
     {"zone_id":7 ,  "gpio_pin_code":"2:in:2", "gpio_host_name": "pi-face", "alarm_pin_name": "sonerie", "sensor_type": "contact"},
-    {"zone_id":9 ,  "gpio_pin_code":"2:in:3", "gpio_host_name": "pi-face", "alarm_pin_name": "usa garaj", "sensor_type": "contact"},
+    {"zone_id":3 ,  "gpio_pin_code":"2:in:3", "gpio_host_name": "pi-face", "alarm_pin_name": "usa garaj", "sensor_type": "contact"},
 
     {"zone_id":29 , "gpio_pin_code":"18", "gpio_host_name": "pi-face", "alarm_pin_name": "beci test"},
     {"zone_id":200 , "gpio_pin_code":"23", "gpio_host_name": "pidash", "alarm_pin_name": "car vibrate", "sensor_type": "contact"},

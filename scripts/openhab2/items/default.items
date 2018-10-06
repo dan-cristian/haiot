@@ -35,6 +35,7 @@ Switch heat_puffer_gas_valve "Heat puffer gas valve" <switch>               {mqt
 
 Switch relay_recirculation_pump "Recirculation pump" <switch>               {mqtt="<[mosquitto:iot/openhab/relay_pump_recirculation_relay:state:default],>[mosquitto:iot/openhab:command:ON:relay_pump_recirculation_relay=1],>[mosquitto:iot/openhab:command:OFF:relay_pump_recirculation_relay=0]", autoupdate="false"}
 Switch relay_other_heat "Other heat" <switch>                               {mqtt="<[mosquitto:iot/openhab/relay_other_heat_relay:state:default],>[mosquitto:iot/openhab:command:ON:relay_other_heat_relay=1],>[mosquitto:iot/openhab:command:OFF:relay_other_heat_relay=0]", autoupdate="false"}
+Switch relay_front_gate "Front gate" [ "Switchable" ] <switch>              {mqtt="<[mosquitto:iot/openhab/relay_front_gate_relay:state:default],>[mosquitto:iot/openhab:command:ON:relay_front_gate_relay=1],>[mosquitto:iot/openhab:command:OFF:relay_front_gate_relay=0]", expire="1s,command=OFF", autoupdate="false"}
 
 Group:Switch:OR(ON, OFF)    RELAY_BACK_WATER "Back watering [(%d)]"  <switch>
 Group:Switch:OR(ON, OFF)    RELAY_FRONT_WATER "Front watering [(%d)]"   <switch>
@@ -98,9 +99,9 @@ Contact alarm_beci_mare "Alarm beci mare [%s]" <door>                       (CON
 Contact alarm_beci_mic "Alarm beci mic [%s]" <door>                         (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_beci mic:state:default]"}
 Contact alarm_etaj_hol "Alarm etaj hol [%s]" <door>                         (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_etaj hol:state:default]"}
 Contact contact_sonerie "Sonerie [%s]" <door>                               (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_sonerie:state:default]"}
-Contact contact_usa_intrare "Usa intrare [%s]" <door>                       (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_usa intrare:state:default]"}
+Contact contact_usa_intrare "Usa intrare [%s]" <frontdoor>                       (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_usa intrare:state:default]"}
 Contact contact_portita "Portita [%s]" <door>                               (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_portita:state:default]"}
-Contact contact_gate "Gate [%s]" <door>                                     (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_gate:state:default]"}
-Contact contact_usa_garaj "Usa garaj [%s]" <door>                           (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_usa garaj:state:default]"}
+Contact contact_gate "Gate [%s]" <garagedoor>                                     (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_gate:state:default]"}
+Contact contact_usa_garaj "Usa garaj [%s]" <garagedoor>                           (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_usa garaj:state:default]"}
 
 Number p_switch                         ""
