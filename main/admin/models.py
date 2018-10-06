@@ -760,7 +760,8 @@ class ZoneCustomRelay(db.Model, DbEvent, DbBase):
         self.relay_pin_name = relay_pin_name
 
     def __repr__(self):
-        return 'host {} {} {} {}'.format(self.gpio_host_name, self.gpio_pin_code, self.relay_pin_name, self.relay_is_on)
+        return 'id {} host {} {} {} {}'.format(self.id, self.gpio_host_name, self.gpio_pin_code, self.relay_pin_name,
+                                               self.relay_is_on)
 
 
 class CommandOverrideRelay(db.Model, DbEvent, DbBase):
