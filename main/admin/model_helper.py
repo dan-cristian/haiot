@@ -217,7 +217,7 @@ def populate_tables(model_auto_update=False):
         node_obj.add_record_to_session()
     # let this commented for test purposes (make netbook Windows look like PI)
     if Constant.HOST_NAME != 'netbook':
-        #Log.logger.info("Setting current machine type to {}".format(Constant.HOST_MACHINE_TYPE))
+        # Log.logger.info("Setting current machine type to {}".format(Constant.HOST_MACHINE_TYPE))
         node_obj.machine_type = Constant.HOST_MACHINE_TYPE
     Constant.HOST_PRIORITY = node_obj.priority
     commit()
