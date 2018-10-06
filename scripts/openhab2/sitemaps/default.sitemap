@@ -171,6 +171,7 @@ Frame {
 }
 
 Frame {
+    Default item=relay_front_gate
 	Default item=relay_front_lights_relay
 	Default item=relay_plug_1
 }
