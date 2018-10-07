@@ -651,10 +651,11 @@ if [ "$ENABLE_CAMERA" == "1" ]; then
     echo 'Installing latest version from alternate git as default package is very old'
     git clone https://github.com/Motion-Project/motion.git
     cd motion/
-    apt-get install autoconf libjpeg-dev pkgconf libavutil-dev libavformat-dev libavcodec-dev libswscale-dev
+    apt-get -y install autoconf libjpeg-dev pkgconf libavutil-dev libavformat-dev libavcodec-dev libswscale-dev
+    apt-get -y install libavdevice-dev libmicrohttpd-dev
     autoreconf
     ./configure
-    make
+    make -j`nproc`
     make install
     ln -s /etc/motion/motion.conf /usr/local/etc/motion/motion.conf
     echo "Update motion daemon path and paths, usually in /local/bin rather than /bin"
