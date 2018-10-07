@@ -32,3 +32,4 @@ pybluez
 thingspeak
 tzlocal
 recordtype
+enum34
