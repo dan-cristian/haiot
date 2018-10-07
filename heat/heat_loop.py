@@ -9,8 +9,11 @@ from main.admin.model_helper import commit, get_param
 from common import utils, Constant
 import gpio
 
-__last_main_heat_update = datetime.datetime.min
-__TEMP_NO_HEAT = '.'
+
+class P:
+    last_main_heat_update = datetime.datetime.min
+    TEMP_NO_HEAT = '.'
+    MAX_DELTA_TEMP_KEEP_WARM = 0.5  # keep warm a zone with floor heating, check not to go too hot above target temp
 
 
 # save heat status and announce to all nodes.
@@ -109,8 +112,12 @@ def __update_zone_heat(zone, heat_schedule, sensor):
                 if schedule_pattern.keep_warm:
                     if len(schedule_pattern.keep_warm_pattern) == 20:
                         interval = int(minute / 5)
-                        force_on = ((schedule_pattern.keep_warm_pattern[interval] == "1") and
-                                    temperature_code is not __TEMP_NO_HEAT)
+                        delta_warm = sensor.temperature - temperature_target.target
+                        if  delta_warm <= P.MAX_DELTA_TEMP_KEEP_WARM:
+                            force_on = ((schedule_pattern.keep_warm_pattern[interval] == "1") and
+                                        temperature_code is not P.TEMP_NO_HEAT)
+                        else:
+                            L.l.info("Temperature is too high with delta {}, ignoring keep warm".format(delta_warm))
                     else:
                         L.l.critical("Missing keep warm pattern for zone {}".format(zone.name))
                 if temperature_target:
@@ -168,14 +175,13 @@ def loop_zones():
             L.l.info("Main heat relay={}".format(heatrelay_main_source))
             main_source_zone = models.Zone.query.filter_by(id=heatrelay_main_source.zone_id).first()
             if main_source_zone is not None:
-                global __last_main_heat_update
-                update_age_mins = (utils.get_base_location_now_date() - __last_main_heat_update).total_seconds() / 60
+                update_age_mins = (utils.get_base_location_now_date() - P.last_main_heat_update).total_seconds() / 60
                 # # avoid setting relay state too often but do periodic refreshes every x minutes
                 if main_source_zone.heat_is_on != heat_is_on or update_age_mins >= int(get_param(
                         Constant.P_HEAT_STATE_REFRESH_PERIOD)):
                     L.l.info("Setting main heat on={}, zone={}".format(heat_is_on, main_source_zone))
                     __save_heat_state_db(zone=main_source_zone, heat_is_on=heat_is_on)
-                    __last_main_heat_update = utils.get_base_location_now_date()
+                    P.last_main_heat_update = utils.get_base_location_now_date()
             else:
                 L.l.critical('No heat main_src found using zone id {}'.format(heatrelay_main_source.zone_id))
         else:
