@@ -113,7 +113,7 @@ def __update_zone_heat(zone, heat_schedule, sensor):
                     if len(schedule_pattern.keep_warm_pattern) == 20:
                         interval = int(minute / 5)
                         delta_warm = sensor.temperature - temperature_target.target
-                        if  delta_warm <= P.MAX_DELTA_TEMP_KEEP_WARM:
+                        if delta_warm <= P.MAX_DELTA_TEMP_KEEP_WARM:
                             force_on = ((schedule_pattern.keep_warm_pattern[interval] == "1") and
                                         temperature_code is not P.TEMP_NO_HEAT)
                         else:

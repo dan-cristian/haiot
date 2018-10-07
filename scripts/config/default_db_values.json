@@ -245,6 +245,8 @@
     {"relay_pin_name": "unused_beci_relay", "zone_id": "14", "gpio_pin_code": "19", "gpio_host_name": "pi-face"},
 
     {"relay_pin_name": "front_gate_relay", "zone_id": "7", "gpio_pin_code": "0:out:1", "gpio_host_name": "pi-face"},
+    {"relay_pin_name": "beci_contactor_relay", "zone_id": "10", "gpio_pin_code": "0:out:2", "gpio_host_name": "pi-face"},
+    {"relay_pin_name": "beci_upscharge_relay", "zone_id": "10", "gpio_pin_code": "0:out:3", "gpio_host_name": "pi-face"},
 
     {"relay_pin_name": "test_relay_netbook", "zone_id": "1", "gpio_pin_code": "1", "gpio_host_name": "netbook"},
     {"relay_pin_name": "unused-formerheat", "zone_id": "19", "gpio_pin_code": "24", "gpio_host_name": "pi-power"},
