@@ -14,6 +14,8 @@ class P:
     last_main_heat_update = datetime.datetime.min
     TEMP_NO_HEAT = '.'
     MAX_DELTA_TEMP_KEEP_WARM = 0.5  # keep warm a zone with floor heating, check not to go too hot above target temp
+    threshold = None  # delta to avoid quick on/off
+    temp_limit = None  # alternate source min temp
 
 
 # save heat status and announce to all nodes.
@@ -39,9 +41,9 @@ def __save_heat_state_db(zone, heat_is_on):
 # triggers heat status update if heat changed
 def __decide_action(zone, current_temperature, target_temperature, force_on=False, force_off=False):
     assert isinstance(zone, models.Zone)
-    threshold = float(get_param(Constant.P_TEMPERATURE_THRESHOLD))
+
     L.l.debug("Asses heat zone={} current={} target={} thresh={}".format(
-        zone, current_temperature, target_temperature, threshold))
+        zone, current_temperature, target_temperature, P.threshold))
     heat_is_on = None
     if force_on:
         heat_is_on = True
@@ -53,7 +55,7 @@ def __decide_action(zone, current_temperature, target_temperature, force_on=Fals
             heat_is_on = False
         if current_temperature < target_temperature:
             heat_is_on = True
-        if current_temperature > (target_temperature + threshold):
+        if current_temperature > (target_temperature + P.threshold):
             heat_is_on = False
     # trigger if state is different and every 5 minutes (in case other hosts with relays have restarted)
     if zone.last_heat_status_update is not None:
@@ -62,7 +64,7 @@ def __decide_action(zone, current_temperature, target_temperature, force_on=Fals
         last_heat_update_age_sec = 300
     if zone.heat_is_on != heat_is_on or last_heat_update_age_sec >= 300 or zone.last_heat_status_update is None:
         L.l.info('Heat must change, is {} in {} temp={} target+thresh={}, forced={}'.format(
-            heat_is_on, zone.name, current_temperature, target_temperature+ threshold, force_on))
+            heat_is_on, zone.name, current_temperature, target_temperature + P.threshold, force_on))
         L.l.info('Heat change due to: is_on_next={} is_on_db={} age={} last={}'.format(
             heat_is_on, zone.heat_is_on, last_heat_update_age_sec, zone.last_heat_status_update ))
         __save_heat_state_db(zone=zone, heat_is_on=heat_is_on)
@@ -228,8 +230,7 @@ def loop_heat_relay():
 # set which is the main heat source relay that must be set on
 def set_main_heat_source():
     heat_source_relay_list = models.ZoneHeatRelay.query.filter(models.ZoneHeatRelay.temp_sensor_name is not None).all()
-    temp_limit = float(get_param(Constant.P_HEAT_SOURCE_MIN_TEMP))
-    up_limit = temp_limit + float(get_param(Constant.P_TEMPERATURE_THRESHOLD))
+    up_limit = P.temp_limit + P.threshold
     for heat_source_relay in heat_source_relay_list:
         # is there is a temp sensor defined, consider this source as possible alternate source
         if heat_source_relay.temp_sensor_name is not None:
@@ -239,7 +240,7 @@ def set_main_heat_source():
             # fixok: add temp threshold to avoid quick on/offs
             if temp_rec is not None \
                     and ((temp_rec.temperature >= up_limit and not heat_source_relay.is_alternate_source_switch)
-                         or (temp_rec.temperature >= temp_limit and heat_source_relay.is_alternate_source_switch)):
+                         or (temp_rec.temperature >= P.temp_limit and heat_source_relay.is_alternate_source_switch)):
                 if heat_source_relay.is_alternate_source_switch:
                     # stop main heat source
                     heatrelay_main_source = models.ZoneHeatRelay.query.filter_by(is_main_heat_source=1).first()
@@ -250,6 +251,8 @@ def set_main_heat_source():
                     __save_heat_state_db(zone=switch_source_zone, heat_is_on=True)
                 else:
                     # mark this source as active, to be started when there is heat need
+                    if heat_source_relay.is_alternate_heat_source is False:
+                        L.l.info('Alternate heat source is active with temp={}'.format(temp_rec.temperature))
                     heat_source_relay.is_alternate_heat_source = True
                 commit()
             else:
@@ -269,7 +272,9 @@ def set_main_heat_source():
                         # force alt source shutdown if was on
                         alt_source_zone = models.Zone.query.filter_by(id=heat_source_relay.zone_id).first()
                         __save_heat_state_db(zone=alt_source_zone, heat_is_on=False)
-                        #todo: sleep needed to allow for valve return
+                        # todo: sleep needed to allow for valve return
+                    if heat_source_relay.is_alternate_heat_source is True:
+                        L.l.info('Alternate heat source is now inactive, temp source is {}'.format(temp_rec))
                     heat_source_relay.is_alternate_heat_source = False
                 commit()
 
@@ -288,6 +293,10 @@ def thread_run():
     global progress_status
     L.l.debug('Processing heat')
     progress_status = 'Looping zones'
+    if P.threshold is None:
+        P.threshold = float(get_param(Constant.P_TEMPERATURE_THRESHOLD))
+    if P.temp_limit is None:
+        P.temp_limit = float(get_param(Constant.P_HEAT_SOURCE_MIN_TEMP))
     set_main_heat_source()
     loop_zones()
     # loop_heat_relay()
