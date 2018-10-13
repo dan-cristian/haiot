@@ -19,6 +19,7 @@ class P:
     module_imported = False
     inclusion_started = False
     initialised = False
+    thread_run_at_init = False
     interval = 10
     init_fail_count = 0
     device = "/dev/ttyACM"
@@ -378,8 +379,9 @@ def thread_run():
         if P.initialised and not P.inclusion_started:
             for node_id in P.network.nodes:
                 node = P.network.nodes[node_id]
-                if node_id == 2:
+                if node_id == 2 or not P.thread_run_at_init:
                     node.request_state()
+                    P.thread_run_at_init = True
             sec = (datetime.now() - P.last_value_received).total_seconds()
             if sec > P.MAX_SILENCE_SEC:
                 L.l.info("Zwave seems inactive, no value received since {} sec, reset now".format(sec))
