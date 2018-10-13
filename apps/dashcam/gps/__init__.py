@@ -38,6 +38,8 @@ class State:
     #last_move_outside = None
     reported_no_fix = False
 
+    def __init__(self):
+        pass
 
 def _save_position():
     # persist to disk in case of outage
