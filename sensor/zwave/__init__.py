@@ -155,7 +155,10 @@ def set_value(network, node, value):
                         record.vdd = round(value.data, 1)
                         record.save_changed_fields(current_record=current_record, new_record=record,
                                                    notify_transport_enabled=True, save_to_graph=True, debug=False)
-                    current_record.commit_record_to_db()
+                    if current_record is not None:
+                        current_record.commit_record_to_db()
+                    else:
+                        record.add_commit_record_to_db()
         else:
             L.l.info("Cannot find zonesensor definition in db, address={}".format(sensor_address))
             # record = models.Sensor(address=sensor_address, sensor_name="N/A - " + sensor_address)
