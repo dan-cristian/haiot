@@ -273,16 +273,16 @@ def populate_tables(model_auto_update=False):
                                                host_name=node.name).delete()
                 commit()
                 L.l.info('Populating piface {} pins on {} '.format(node.machine_type, node.name))
-            for board in range(0, 4):
-                for pin_dir in (Constant.GPIO_PIN_DIRECTION_IN, Constant.GPIO_PIN_DIRECTION_OUT):
-                    for pin in range(0, 8):  # -1
-                        gpio = models.GpioPin()
-                        gpio.pin_type = Constant.GPIO_PIN_TYPE_PI_FACE_SPI
-                        gpio.host_name = node.name
-                        gpio.pin_code = str(board) + ":" + pin_dir + ":" + str(pin)  # same as piface.format_pin_code()
-                        gpio.pin_index_bcm = pin
-                        gpio.board_index = board
-                        db.session.add(gpio)
-            commit()
+                for board in range(0, 4):
+                    for pin_dir in (Constant.GPIO_PIN_DIRECTION_IN, Constant.GPIO_PIN_DIRECTION_OUT):
+                        for pin in range(0, 8):  # -1
+                            gpio = models.GpioPin()
+                            gpio.pin_type = Constant.GPIO_PIN_TYPE_PI_FACE_SPI
+                            gpio.host_name = node.name
+                            gpio.pin_code = str(board) + ":" + pin_dir + ":" + str(pin)  # same as piface.format_pin_code()
+                            gpio.pin_index_bcm = pin
+                            gpio.board_index = board
+                            db.session.add(gpio)
+                commit()
         else:
             L.l.warning("Unknown machine type {} for node {}".format(node.machine_type, node))
