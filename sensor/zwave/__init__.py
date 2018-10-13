@@ -17,7 +17,7 @@ from pydispatch import dispatcher as haiot_dispatch
 class P:
     network = None
     module_imported = False
-    did_inclusion = False
+    inclusion_started = False
     initialised = False
     interval = 10
     init_fail_count = 0
@@ -70,6 +70,8 @@ def louie_network_ready(network):
     dispatcher.connect(louie_button_on, ZWaveNetwork.SIGNAL_BUTTON_ON)
     dispatcher.connect(louie_button_off, ZWaveNetwork.SIGNAL_BUTTON_OFF)
     dispatcher.connect(louie_node_event, ZWaveNetwork.SIGNAL_NODE_EVENT)
+    dispatcher.connect(louie_node_event, ZWaveNetwork.SIGNAL_NODE_ADDED)
+    dispatcher.connect(louie_node_event, ZWaveNetwork.SIGNAL_NODE_NEW)
     dispatcher.connect(louie_scene_event, ZWaveNetwork.SIGNAL_SCENE_EVENT)
 
 
@@ -260,7 +262,7 @@ def _init_controller():
                 return False
             L.l.info("Home id : {}, Nodes in network : {}".format(P.network.home_id_str, P.network.nodes_count))
 
-            L.l.info("Waiting 120 sec for network to become ready")
+            L.l.info("Waiting 120 sec for zwave network to become ready")
             for i in range(0, 240):
                 if P.network.state >= P.network.STATE_READY:
                     break
@@ -296,13 +298,25 @@ def _init_controller():
 
 
 def include_node():
-    if not P.did_inclusion and P.network is not None:
-        L.l.info("!!!!!!!!!!! Listening for new node inclusion")
-        res = P.network.controller.add_node()
-        L.l.info("!!!!!!!!!!!! Node inclusion returned {}, waiting for 30 seconds".format(res))
-        time.sleep(20)
-        P.did_inclusion = True
-        L.l.info("!!!!!!!!!!! Node inclusion done".format(res))
+    if not P.inclusion_started:
+        if P.network is not None:
+            L.l.info("Starting node inclusion")
+            res = P.network.controller.add_node()
+            L.l.info("Node inclusion returned {}".format(res))
+            P.inclusion_started = True
+    else:
+        L.l.info("Zwave inclusion already started")
+
+
+def stop_include_node():
+    if P.inclusion_started:
+        if P.network is not None:
+            L.l.info("Stopping node inclusion by cancel command")
+            res = P.network.controller.cancel_command()
+            L.l.info("Cancel command returned {}".format(res))
+            P.inclusion_started = False
+    else:
+        L.l.info("Zwave inclusion not started")
 
 
 def remove_node(node_id):
@@ -350,7 +364,8 @@ def thread_run():
                 P.init_fail_count += 1
                 if P.init_fail_count > 10:
                     unload()
-        if P.initialised:
+        # iterate if inclusion is not started
+        if P.initialised and not P.inclusion_started:
             for node_id in P.network.nodes:
                 node = P.network.nodes[node_id]
                 if node_id == 2:
