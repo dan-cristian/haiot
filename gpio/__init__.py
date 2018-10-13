@@ -36,7 +36,8 @@ def relay_update(gpio_pin_code=None, pin_value=None, from_web=False):
                 L.l.warning("Multiple records with same pin code {} len {}".format(gpio_pin_code, lenpin))
             for gpiopin in gpiopin_list:
                 L.l.info("Update relay {} value={}".format(gpiopin, pin_value))
-                pin_value = relay_set(gpio_pin=gpiopin, value=pin_value, from_web=from_web)
+                pin_value = relay_set(gpio_pin_index_bcm=gpiopin.pin_index_bcm, gpio_pin_type=gpiopin.pin_type,
+                                      gpio_board_index=gpiopin.board_index, value=pin_value, from_web=from_web)
                 result = pin_value
                 gpiopin.pin_value = pin_value
                 gpiopin.notify_transport_enabled = False
@@ -75,22 +76,22 @@ def relay_get(gpio_pin_obj=None, from_web=False):
 
 
 # set gpio pin without updating DB, so make sure it's used only after DB update trigger
-def relay_set(gpio_pin=None, value=None, from_web=False):
+def relay_set(gpio_pin_index_bcm=None, gpio_pin_type=None, gpio_board_index=None, value=None, from_web=False):
     pin_value = None
     value = int(value)
-    message = 'Set relay state [{}] for pin [{}] from web=[{}]'.format(value, gpio_pin.pin_index_bcm, from_web)
+    message = 'Set relay state [{}] for pin [{}] from web=[{}]'.format(value, gpio_pin_index_bcm, from_web)
     # L.l.info(message)
     if Constant.HOST_MACHINE_TYPE in [Constant.MACHINE_TYPE_RASPBERRY, Constant.MACHINE_TYPE_BEAGLEBONE]:
-        if gpio_pin.pin_type in [Constant.GPIO_PIN_TYPE_PI_STDGPIO, Constant.GPIO_PIN_TYPE_BBB]:
+        if gpio_pin_type in [Constant.GPIO_PIN_TYPE_PI_STDGPIO, Constant.GPIO_PIN_TYPE_BBB]:
             if rpi_gpio.initialised:
-                pin_value = rpi_gpio.set_pin_bcm(bcm_id=int(gpio_pin.pin_index_bcm), pin_value=int(value))
+                pin_value = rpi_gpio.set_pin_bcm(bcm_id=int(gpio_pin_index_bcm), pin_value=int(value))
             else:
-                pin_value = std_gpio.set_pin_bcm(gpio_pin.pin_index_bcm, value)
-        elif gpio_pin.pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
-            pin_value = piface.set_pin_value(pin_index=int(gpio_pin.pin_index_bcm), pin_value=int(value),
-                                             board_index=int(gpio_pin.board_index))
+                pin_value = std_gpio.set_pin_bcm(gpio_pin_index_bcm, value)
+        elif gpio_pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
+            pin_value = piface.set_pin_value(pin_index=int(gpio_pin_index_bcm), pin_value=int(value),
+                                             board_index=int(gpio_board_index))
         else:
-            L.l.warning("Unknown pin type {}".format(gpio_pin.pin_type))
+            L.l.warning("Unknown pin type {}".format(gpio_pin_type))
     else:
         message += ' error not running on gpio enabled devices'
         L.l.warning(message)
@@ -150,11 +151,15 @@ def zone_custom_relay_record_update(json_object):
                                                                  host_name=Constant.HOST_NAME).first()
                     if gpio_record:
                         value = 1 if relay_is_on else 0
-                        relay_set(gpio_pin=gpio_record, value=value, from_web=False)
+                        pin_code = gpio_record.pin_index_bcm
+                        pin_type = gpio_record.pin_type
+                        board = gpio_record.board_index
+                        relay_set(gpio_pin_index_bcm=pin_code, gpio_pin_type=pin_type, gpio_board_index=board,
+                                  value=value, from_web=False)
                         if expire is not None:
                             # revert back to initial state in x seconds
                             expire_time = datetime.now() + timedelta(seconds=expire)
-                            func = (relay_set, gpio_record, not (bool(relay_is_on)), False)
+                            func = (relay_set, pin_code, pin_type, board, not (bool(relay_is_on)), False)
                             if expire_time not in P.expire_func_list.keys():
                                 P.expire_func_list[expire_time] = func
                             else:
