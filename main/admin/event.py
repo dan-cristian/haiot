@@ -97,7 +97,7 @@ def mqtt_thread_run():
     threading.current_thread().name = "event_thread_run"
     global __mqtt_lock
     __mqtt_lock.acquire()
-    #from cloud import graph_plotly
+    # from cloud import graph_plotly
     try:
         last_count = len(__mqtt_event_list)
         for obj in list(__mqtt_event_list):
