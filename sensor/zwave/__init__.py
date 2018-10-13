@@ -128,8 +128,8 @@ def set_value(network, node, value):
                 else:
                     units_adjusted = value.units
                     value_adjusted = value.data
-                haiot_dispatch.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name,
-                                    value=value_adjusted, unit=units_adjusted)
+                haiot_dispatch.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=value_adjusted,
+                                    unit=units_adjusted)
             else:
                 # skip controller node
                 if node.node_id > 1:
@@ -153,7 +153,7 @@ def set_value(network, node, value):
                                                    notify_transport_enabled=True, save_to_graph=True, debug=False)
                     current_record.commit_record_to_db()
         else:
-            L.l.info("Cannot find sensor definition in db, name=[{}]".format(node.product_name))
+            L.l.info("Cannot find sensor definition in db, address=[{}]".format(sensor_address))
             record = models.Sensor(address=sensor_address, sensor_name="N/A - " + sensor_address)
             record.add_commit_record_to_db()
     except Exception as ex:
