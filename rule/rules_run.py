@@ -5,6 +5,7 @@ import datetime
 from main.logger_helper import L
 from main.admin import models
 import rule_common
+from sensor import zwave
 
 try:
     # sometimes I get "ImportError: cannot import name scheduler" so trying two import methods
@@ -347,8 +348,12 @@ def front_lights_on():
     rule_common.update_custom_relay('front_lights_relay', True)
 
 
+def zwave_start_inclusion():
+    zwave.include_node()
 
 
+def zwave_stop_inclusion():
+    zwave.stop_include_node()
 
 # ##### MACROS END ##############
 
