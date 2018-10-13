@@ -100,7 +100,7 @@
 
     {"id":501, "active":"0", "start_order":"50", "name":"apps.dashcam", "host_name":"netbook"},
     {"id":509, "active":"1", "start_order":"9", "name":"heat", "host_name":"netbook"},
-    {"id":599, "active":"0", "start_order":"99", "name":"test", "host_name":"netbook"},
+    {"id":599, "active":"1", "start_order":"99", "name":"test", "host_name":"netbook"},
     {"id":511, "active":"1", "start_order":"11", "name":"alarm", "host_name":"netbook"},
     {"id":541, "active":"0", "start_order":"41", "name":"cloud.alexa", "host_name":"netbook"},
 
