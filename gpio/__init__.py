@@ -30,15 +30,16 @@ def relay_update(gpio_pin_code=None, pin_value=None, from_web=False):
     try:
         L.l.debug('Received relay state update pin {}'.format(gpio_pin_code))
         gpiopin_list = models.GpioPin.query.filter_by(pin_code=gpio_pin_code, host_name=Constant.HOST_NAME).all()
-        if gpiopin_list:
-            if len(gpiopin_list) > 1:
-                L.l.warning("Multiple records with same pin code {}".format(gpio_pin_code))
+        if gpiopin_list is not None:
+            lenpin = len(gpiopin_list)
+            if lenpin > 1:
+                L.l.warning("Multiple records with same pin code {} len {}".format(gpio_pin_code, lenpin))
             for gpiopin in gpiopin_list:
                 pin_value = relay_set(gpio_pin=gpiopin, value=pin_value, from_web=from_web)
                 result = pin_value
                 gpiopin.pin_value = pin_value
                 gpiopin.notify_transport_enabled = False
-                commit()
+                gpiopin.commit_record_to_db()
         else:
             L.l.warning('Pin {} does not exists locally, is db data correct?'.format(gpio_pin_code))
     except Exception as ex:
