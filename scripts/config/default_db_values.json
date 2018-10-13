@@ -259,8 +259,8 @@
     {"relay_pin_name": "portita_relay", "zone_id": "7", "gpio_pin_code": "25", "gpio_host_name": "pi-power"},
     {"relay_pin_name": "front_valve_relay", "zone_id": "7", "gpio_pin_code": "4", "gpio_host_name": "pi-power"},
 
-    {"relay_pin_name": "plug_1", "zone_id": "29", "gpio_pin_code": "TZ69 Smart energy plug in switch:4", "relay_type": "zwave", "gpio_host_name": "pi-face"}
-
+    {"relay_pin_name": "plug_1", "zone_id": "29", "gpio_pin_code": "TZ69 Smart energy plug in switch:4", "relay_type": "zwave", "gpio_host_name": "pi-face"},
+    {"relay_pin_name": "plug_2", "zone_id": "29", "gpio_pin_code": "TZ69 Smart energy plug in switch:5", "relay_type": "zwave", "gpio_host_name": "pi-face"}
   ],
 
   "PowerMonitor": [
@@ -358,8 +358,9 @@
     {"zone_id":7 ,  "sensor_address": "C8000004F3495728", "sensor_name": "curte fata", "target_material": "air"},
     {"zone_id":27 , "sensor_address": "02000004F31C1C28", "sensor_name": "pod fata", "target_material": "air", "alt_address": ""},
     {"zone_id":53 , "sensor_address": "404000225631",     "sensor_name": "solar back", "alt_address": ""},
-    {"zone_id":8 ,  "sensor_address": "ZMNHTDx Smart meter S4 S5 S6",             "sensor_name": "ZMNHTDx Smart meter S4 S5 S6"},
-    {"zone_id":29 , "sensor_address": "TZ69 Smart energy plug in switch",         "sensor_name": "TZ69 Smart energy plug in switch"}
+    {"zone_id":8 ,  "sensor_address": "ZMNHTDx Smart meter S4 S5 S6:2",             "sensor_name": "ZMNHTDx Smart meter S4 S5 S6"},
+    {"zone_id":29 , "sensor_address": "TZ69 Smart energy plug in switch:4",         "sensor_name": "zwave plug 1"},
+    {"zone_id":29 , "sensor_address": "TZ69 Smart energy plug in switch:5",         "sensor_name": "zwave plug 2"}
   ],
 
   "Utility": [
@@ -369,8 +370,9 @@
     {"utility_name":"power main 3", "sensor_name":"power main 1", "sensor_index":1, "ticks_per_unit":2000, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
     {"utility_name":"power main 1", "sensor_name":"power main 2", "sensor_index":0, "ticks_per_unit":2000, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
     {"utility_name":"power main 2", "sensor_name":"power main 2", "sensor_index":1, "ticks_per_unit":2000, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
-    {"utility_name":"power main mono", "sensor_name":"ZMNHTDx Smart meter S4 S5 S6", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
-    {"utility_name":"power plug 1", "sensor_name":"TZ69 Smart energy plug in switch", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
+    {"utility_name":"power main mono", "sensor_name":"ZMNHTDx Smart meter S4 S5 S6:2", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
+    {"utility_name":"power plug 1", "sensor_name":"TZ69 Smart energy plug in switch:4", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
+    {"utility_name":"power plug 2", "sensor_name":"TZ69 Smart energy plug in switch:5", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
 
     {"utility_name":"power rack", "sensor_name":"power rack", "sensor_index":0, "ticks_per_unit":2000, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
     {"utility_name":"power beci", "sensor_name":"utility beci", "sensor_index":0, "ticks_per_unit":1600, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
