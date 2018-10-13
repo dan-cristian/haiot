@@ -115,6 +115,19 @@ def gpio_record_update(json_object):
         L.l.warning('Error on gpio state update, err {}'.format(ex))
 
 
+def _update_custom_relay(pin_code, pin_value):
+    gpio = models.GpioPin.query.filter_by(pin_code=pin_code, host_name=Constant.HOST_NAME).first()
+    if gpio is not None:
+        gpio.pin_value = int(pin_value)
+        gpio.notify_transport_enabled = False
+        gpio.commit_record_to_db()
+    relay = models.ZoneCustomRelay.query.filter_by(gpio_pin_code=pin_code, host_name=Constant.HOST_NAME).first()
+    if relay is not None:
+        relay.relay_is_on = bool(pin_value)
+        relay.notify_transport_enabled = True
+        relay.commit_record_to_db()
+
+
 def zone_custom_relay_record_update(json_object):
     # save relay state to db, except for current node
     # carefull not to trigger infinite recursion updates
@@ -159,9 +172,12 @@ def zone_custom_relay_record_update(json_object):
                         if expire is not None:
                             # revert back to initial state in x seconds
                             expire_time = datetime.now() + timedelta(seconds=expire)
-                            func = (relay_set, pin_code, pin_type, board, not (bool(relay_is_on)), False)
+                            init_val = not (bool(relay_is_on))
+                            func = (relay_set, pin_code, pin_type, board, init_val, False)
+                            func_update = (_update_custom_relay, pin_code, init_val)
                             if expire_time not in P.expire_func_list.keys():
                                 P.expire_func_list[expire_time] = func
+                                P.expire_func_list[expire_time + timedelta(microseconds=1)] = func_update
                             else:
                                 L.l.error("Duplicate key in gpio list")
                                 exit(999)
@@ -183,7 +199,6 @@ def _process_expire():
             func[0](*func[1:])
             del P.expire_func_list[func_time]
             L.l.info("Function deleted, list={}".format(len(P.expire_func_list)))
-
 
 
 def thread_run():
