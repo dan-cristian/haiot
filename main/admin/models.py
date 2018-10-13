@@ -748,6 +748,7 @@ class ZoneCustomRelay(db.Model, DbEvent, DbBase):
     gpio_host_name = db.Column(db.String(50))
     relay_is_on = db.Column(db.Boolean, default=False)
     relay_type = db.Column(db.String(20))
+    expire = db.Column(db.Integer)  # after how many seconds state goes back to original state
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
 
     def __init__(self, id=None, zone_id=None, gpio_pin_code=None, gpio_host_name=None, relay_pin_name=None):
