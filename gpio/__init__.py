@@ -126,7 +126,7 @@ def zone_custom_relay_record_update(json_object):
                 relay_is_on = utils.get_object_field_value(json_object, 'relay_is_on')
                 expire = utils.get_object_field_value(json_object, 'expire')
                 if relay_type == Constant.GPIO_PIN_TYPE_ZWAVE:
-                    vals = gpio_pin_code.split(':')
+                    vals = gpio_pin_code.split('_')
                     if len(vals) == 2:
                         node_id = int(vals[1])
                         L.l.info('Received relay state update host {}, obj={}'.format(host_name, json_object))
@@ -142,7 +142,7 @@ def zone_custom_relay_record_update(json_object):
                                 L.l.error("Duplicate zwave key in list")
                                 exit(999)
                     else:
-                        L.l.error("Incorrect zwave switch format {}, must be <name>:<node_id>".format(gpio_pin_code))
+                        L.l.error("Incorrect zwave switch format {}, must be <name>_<node_id>".format(gpio_pin_code))
                 else:
                     gpio_record = models.GpioPin.query.filter_by(pin_code=gpio_pin_code,
                                                                  host_name=Constant.HOST_NAME).first()
