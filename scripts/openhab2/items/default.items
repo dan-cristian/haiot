@@ -38,6 +38,9 @@ Switch relay_recirculation_pump "Recirculation pump" <switch>               {mqt
 Switch relay_other_heat "Other heat" <switch>                               {mqtt="<[mosquitto:iot/openhab/relay_other_heat_relay:state:default],>[mosquitto:iot/openhab:command:ON:relay_other_heat_relay=1],>[mosquitto:iot/openhab:command:OFF:relay_other_heat_relay=0]", autoupdate="false"}
 Switch relay_front_gate "Front gate" <switch>                               {mqtt="<[mosquitto:iot/openhab/relay_front_gate_relay:state:default],>[mosquitto:iot/openhab:command:ON:relay_front_gate_relay=1],>[mosquitto:iot/openhab:command:OFF:relay_front_gate_relay=0]", autoupdate="false"}
 
+Switch relay_beci_contactor "Contactor beci" <switch>                       {mqtt="<[mosquitto:iot/openhab/relay_beci_contactor_relay:state:default],>[mosquitto:iot/openhab:command:ON:relay_beci_contactor_relay=1],>[mosquitto:iot/openhab:command:OFF:relay_beci_contactor_relay=0]", autoupdate="false"}
+Switch relay_beci_upscharge "Ups beci charge" <switch>                      {mqtt="<[mosquitto:iot/openhab/relay_beci_upscharge_relay:state:default],>[mosquitto:iot/openhab:command:ON:relay_beci_upscharge_relay=1],>[mosquitto:iot/openhab:command:OFF:relay_beci_upscharge_relay=0]", autoupdate="false"}
+
 Group:Switch:OR(ON, OFF)    RELAY_BACK_WATER "Back watering [(%d)]"  <switch>
 Group:Switch:OR(ON, OFF)    RELAY_FRONT_WATER "Front watering [(%d)]"   <switch>
 Switch relay_back_pump_relay "Back pump" <switch>                           (RELAY_BACK_WATER, RELAY_FRONT_WATER) {mqtt="<[mosquitto:iot/openhab/relay_back_pump_relay:state:default],>[mosquitto:iot/openhab:command:ON:relay_back_pump_relay=1],>[mosquitto:iot/openhab:command:OFF:relay_back_pump_relay=0]", autoupdate="false"}
