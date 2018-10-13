@@ -380,7 +380,7 @@ def thread_run():
             for node_id in P.network.nodes:
                 node = P.network.nodes[node_id]
                 if node_id == 2 or not P.thread_run_at_init:
-                    if P.thread_run_at_init:
+                    if not P.thread_run_at_init:
                         L.l.info("Request state for node {}".format(node))
                     node.request_state()
             if not P.thread_run_at_init:
