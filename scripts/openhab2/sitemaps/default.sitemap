@@ -168,12 +168,17 @@ Frame {
 	Default item=electricity_power_factor_plug_1
 	Default item=electricity_voltage_plug_1
 	Default item=electricity_current_plug_1
+	Default item=electricity_power_plug_2
+	Default item=electricity_power_factor_plug_2
+	Default item=electricity_voltage_plug_2
+	Default item=electricity_current_plug_2
 }
 
 Frame {
     Default item=relay_front_gate
 	Default item=relay_front_lights_relay
 	Default item=relay_plug_1
+	Default item=relay_plug_2
 }
 
 Frame {
