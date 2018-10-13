@@ -151,9 +151,12 @@ def zone_custom_relay_record_update(json_object):
                         if expire is not None:
                             # revert back to initial state
                             expire_time = datetime.now() + timedelta(seconds=expire)
-                            func = (zwave.set_switch_state, node_id, not(bool(relay_is_on)))
+                            init_val = not (bool(relay_is_on))
+                            func = (zwave.set_switch_state, node_id, init_val)
                             if expire_time not in P.expire_func_list.keys():
                                 P.expire_func_list[expire_time] = func
+                                func_update = (_update_custom_relay, gpio_pin_code, init_val)
+                                P.expire_func_list[expire_time + timedelta(microseconds=1)] = func_update
                             else:
                                 L.l.error("Duplicate zwave key in list")
                                 exit(999)
