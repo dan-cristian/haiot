@@ -102,7 +102,6 @@ class DbBase:
     def commit_record_to_db(self):
         return commit()
 
-
     # copies fields from a json object to an existing or new db record
     def save_changed_fields_from_json_object(self, json_object=None, unique_key_name=None,
                                              notify_transport_enabled=False, save_to_graph=False,
@@ -121,7 +120,7 @@ class DbBase:
                 current_record = self.query.filter_by(**kwargs).first()
                 self.save_changed_fields(current_record=current_record, new_record=new_record,
                                          notify_transport_enabled=False, save_to_graph=False)
-                db.session.commit()
+                # db.session.commit()
             else:
                 L.l.warning('Unique key not found in json record, save aborted')
         except Exception as ex:

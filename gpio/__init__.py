@@ -105,7 +105,7 @@ def relay_set(gpio_pin=None, value=None, from_web=False):
 def gpio_record_update(json_object):
     try:
         host_name = utils.get_object_field_value(json_object, 'name')
-        # L.l.info('Received gpio state update from {}'.format(host_name))
+        L.l.info('Received gpio state update from {} json={}'.format(host_name, json_object))
         if host_name != Constant.HOST_NAME:
             models.GpioPin().save_changed_fields_from_json_object(
                 json_object=json_object, notify_transport_enabled=False, save_to_graph=False)
