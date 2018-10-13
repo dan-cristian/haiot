@@ -114,9 +114,9 @@ def set_value(network, node, value):
     try:
         # L.l.info('Louie signal: Node={} Value={}'.format(node, value))
         sensor_address = "{}:{}".format(node.product_name, node.node_id)
-        current_record = models.Sensor.query.filter_by(address=sensor_address).first()
-        if current_record is not None:
-            sensor_name = current_record.sensor_name
+        zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=sensor_address).first()
+        if zone_sensor is not None:
+            sensor_name = zone_sensor.sensor_name
             P.last_value_received = datetime.now()
             if value.label == "Switch":
                 _set_custom_relay_state(sensor_address=sensor_address, state=value.data)
@@ -133,11 +133,15 @@ def set_value(network, node, value):
             else:
                 # skip controller node
                 if node.node_id > 1:
-                    # L.l.info("Received node={}, value={}".format(node, value))
-                    current_record.vad = None
-                    current_record.iad = None
-                    current_record.vdd = None
-                    sensor_name = current_record.sensor_name
+                    current_record = models.Sensor.query.filter_by(address=sensor_address).first()
+                    if current_record is None:
+                        sensor_name = zone_sensor.sensor_name
+                    else:
+                        # L.l.info("Received node={}, value={}".format(node, value))
+                        current_record.vad = None
+                        current_record.iad = None
+                        current_record.vdd = None
+                        sensor_name = current_record.sensor_name
                     record = models.Sensor(address=sensor_address, sensor_name=sensor_name)
                     if value.label == "Voltage":
                         record.vad = round(value.data, 0)
@@ -153,7 +157,7 @@ def set_value(network, node, value):
                                                    notify_transport_enabled=True, save_to_graph=True, debug=False)
                     current_record.commit_record_to_db()
         else:
-            L.l.info("Cannot find sensor definition in db, address={} rec={}".format(sensor_address, current_record))
+            L.l.info("Cannot find zonesensor definition in db, address={}".format(sensor_address))
             # record = models.Sensor(address=sensor_address, sensor_name="N/A - " + sensor_address)
             # record.add_commit_record_to_db()
     except Exception as ex:
