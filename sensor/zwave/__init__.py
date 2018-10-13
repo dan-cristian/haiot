@@ -88,17 +88,17 @@ def louie_node_update(network, node):
     pass
 
 
-def _set_custom_relay_state(sensor_name, node_id, state):
-    pin_code = '{}:{}'.format(sensor_name, node_id)
+def _set_custom_relay_state(sensor_address, state):
+    # pin_code = '{}:{}'.format(sensor_name, node_id)
     current_relay = models.ZoneCustomRelay.query.filter_by(
-        gpio_pin_code=pin_code, gpio_host_name=Constant.HOST_NAME).first()
+        gpio_pin_code=sensor_address, gpio_host_name=Constant.HOST_NAME).first()
     if current_relay is not None:
-        new_relay = models.ZoneCustomRelay(gpio_pin_code=pin_code, gpio_host_name=Constant.HOST_NAME)
+        new_relay = models.ZoneCustomRelay(gpio_pin_code=sensor_address, gpio_host_name=Constant.HOST_NAME)
         new_relay.relay_is_on = state
         models.ZoneCustomRelay().save_changed_fields(
             current_record=current_relay, new_record=new_relay, notify_transport_enabled=True, save_to_graph=True)
     else:
-        L.l.error("ZoneCustomRelay with code {} does not exist in database".format(pin_code))
+        L.l.error("ZoneCustomRelay with code {} does not exist in database".format(sensor_address))
 
 
 # Qubino Meter Values
@@ -113,50 +113,49 @@ def _set_custom_relay_state(sensor_name, node_id, state):
 def set_value(network, node, value):
     try:
         # L.l.info('Louie signal: Node={} Value={}'.format(node, value))
-        P.last_value_received = datetime.now()
-        if value.label == "Switch":
-            _set_custom_relay_state(sensor_name=node.product_name, node_id=node.node_id, state=value.data)
-        elif value.label == "Power" or (value.label == "Energy" and value.units == "kWh"):
-            #L.l.info("Saving power utility")
-            if value.units == "W":
-                units_adjusted = "watt"  # this should match Utility unit name in models definition
-                value_adjusted = round(value.data, 0)
+        sensor_address = "{}:{}".format(node.product_name, node.node_id)
+        current_record = models.Sensor.query.filter_by(sensor_address=sensor_address).first()
+        if current_record is not None:
+            sensor_name = current_record.sensor_name
+            P.last_value_received = datetime.now()
+            if value.label == "Switch":
+                _set_custom_relay_state(sensor_address=sensor_address, state=value.data)
+            elif value.label == "Power" or (value.label == "Energy" and value.units == "kWh"):
+                # L.l.info("Saving power utility")
+                if value.units == "W":
+                    units_adjusted = "watt"  # this should match Utility unit name in models definition
+                    value_adjusted = round(value.data, 0)
+                else:
+                    units_adjusted = value.units
+                    value_adjusted = value.data
+                haiot_dispatch.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name,
+                                    value=value_adjusted, unit=units_adjusted)
             else:
-                units_adjusted = value.units
-                value_adjusted = value.data
-
-            haiot_dispatch.send(Constant.SIGNAL_UTILITY_EX, sensor_name=node.product_name,
-                                value=value_adjusted, unit=units_adjusted)
-        else:
-            if node.node_id > 1:
-                # L.l.info("Received node={}, value={}".format(node, value))
-                current_record = models.Sensor.query.filter_by(sensor_name=node.product_name).first()
-                if current_record is not None:
+                # skip controller node
+                if node.node_id > 1:
+                    # L.l.info("Received node={}, value={}".format(node, value))
                     current_record.vad = None
                     current_record.iad = None
                     current_record.vdd = None
-                    address = current_record.address
-                else:
-                    # first sensor read, nothing in DB
-                    # L.l.info("Cannot find sensor definition in db, name=[{}]".format(node.product_name))
-                    address = node.product_name
-                record = models.Sensor(sensor_name=node.product_name, address=address)
-                if value.label == "Voltage":
-                    record.vad = round(value.data, 0)
-                    record.save_changed_fields(current_record=current_record, new_record=record,
-                                               notify_transport_enabled=True, save_to_graph=True, debug=False)
-                elif value.label == "Current":
-                    record.iad = round(value.data, 1)
-                    record.save_changed_fields(current_record=current_record, new_record=record,
-                                               notify_transport_enabled=True, save_to_graph=True, debug=False)
-                elif value.label == "Power Factor":
-                    record.vdd = round(value.data, 1)
-                    record.save_changed_fields(current_record=current_record, new_record=record,
-                                               notify_transport_enabled=True, save_to_graph=True, debug=False)
-                if current_record is not None:
+                    sensor_name = current_record.sensor_name
+                    record = models.Sensor(address=sensor_address, sensor_name=sensor_name)
+                    if value.label == "Voltage":
+                        record.vad = round(value.data, 0)
+                        record.save_changed_fields(current_record=current_record, new_record=record,
+                                                   notify_transport_enabled=True, save_to_graph=True, debug=False)
+                    elif value.label == "Current":
+                        record.iad = round(value.data, 1)
+                        record.save_changed_fields(current_record=current_record, new_record=record,
+                                                   notify_transport_enabled=True, save_to_graph=True, debug=False)
+                    elif value.label == "Power Factor":
+                        record.vdd = round(value.data, 1)
+                        record.save_changed_fields(current_record=current_record, new_record=record,
+                                                   notify_transport_enabled=True, save_to_graph=True, debug=False)
                     current_record.commit_record_to_db()
-                else:
-                    record.add_commit_record_to_db()
+        else:
+            L.l.info("Cannot find sensor definition in db, name=[{}]".format(node.product_name))
+            record = models.Sensor(address=sensor_address, sensor_name="N/A - " + sensor_address)
+            record.add_commit_record_to_db()
     except Exception as ex:
         L.l.error("Error in zwave value={}".format(ex), exc_info=True)
 
@@ -169,8 +168,12 @@ def louie_button_off(network, node):
     L.l.info('Louie signal: Button off: {}.'.format(node))
 
 
+def louie_node_event(network, node, value, extra=None):
+    L.l.info('Louie signal: Node event: {} = {}, extra={}.'.format(node, value, extra))
+
+
 def louie_node_event(network, node, value):
-    L.l.info('Louie signal: Node event: {} = {}.'.format(node, value))
+    L.l.info('Louie signal: Node event: {} = {}'.format(node, value))
 
 
 def louie_scene_event(network, node, scene_id):
@@ -335,7 +338,7 @@ def switch_all_on():
             L.l.info("Sleep 10 seconds")
             time.sleep(10)
             L.l.info("Dectivate switch {} on node {}".format(P.network.nodes[node].values[val].label, node))
-            P.network.nodes[node].set_switch(val,False)
+            P.network.nodes[node].set_switch(val, False)
 
 
 def set_switch_state(node_id, state):
