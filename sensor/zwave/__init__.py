@@ -114,7 +114,7 @@ def set_value(network, node, value):
     try:
         # L.l.info('Louie signal: Node={} Value={}'.format(node, value))
         sensor_address = "{}:{}".format(node.product_name, node.node_id)
-        current_record = models.Sensor.query.filter_by(sensor_address=sensor_address).first()
+        current_record = models.Sensor.query.filter_by(address=sensor_address).first()
         if current_record is not None:
             sensor_name = current_record.sensor_name
             P.last_value_received = datetime.now()
