@@ -7,6 +7,9 @@ from common import Constant
 class P:
     openhab_topic = None
 
+    def __init__(self):
+        pass
+
 
 def send_mqtt_openhab(subtopic, payload):
     sender.send_message(payload, P.openhab_topic + "/" + subtopic)

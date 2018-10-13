@@ -18,6 +18,9 @@ class P:
     event_list = []
     func_list = None
 
+    def __init__(self):
+        pass
+
 
 class Obj:
     pass
@@ -103,5 +106,3 @@ def init():
     dispatcher.connect(parse_rules, signal=Constant.SIGNAL_DB_CHANGE_FOR_RULES, sender=dispatcher.Any)
     global initialised
     initialised = True
-
-
