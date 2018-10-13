@@ -40,6 +40,7 @@ def record_update(obj_dict=None):
                 pin_value = 0
             # set pin only on pins owned by this host
             if zone_heat_relay and gpio_host_name == Constant.HOST_NAME:
+                L.l.info("Setting heat pin {} to {}".format(zone_heat_relay.gpio_pin_code, pin_value))
                 pin_state = gpio.relay_update(gpio_pin_code=zone_heat_relay.gpio_pin_code, pin_value=pin_value)
             else:
                 pin_state = pin_value
