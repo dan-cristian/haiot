@@ -679,8 +679,8 @@ class GpioPin(db.Model, DbEvent, DbBase):
         super(GpioPin, self).__init__()
 
     def __repr__(self):
-        return 'host={} code={} index={} type={} value={}'.format(self.host_name, self.pin_code, self.pin_index_bcm,
-                                                                  self.pin_type, self.pin_value)
+        return 'id {} host={} code={} index={} type={} value={}'.format(
+            self.id, self.host_name, self.pin_code, self.pin_index_bcm, self.pin_type, self.pin_value)
 
 
 class ZoneAlarm(db.Model, DbEvent, DbBase):
@@ -708,9 +708,8 @@ class ZoneAlarm(db.Model, DbEvent, DbBase):
         self.gpio_host_name = host_name
 
     def __repr__(self):
-        return 'host:{} pin_name:{} host:{} pin:{} triggered:{}'.format(self.gpio_host_name, self.alarm_pin_name,
-                                                                        self.gpio_host_name, self.gpio_pin_code,
-                                                                        self.alarm_pin_triggered)
+        return 'host:{} pin_name:{} host:{} pin:{} triggered:{}'.format(
+            self.gpio_host_name, self.alarm_pin_name, self.gpio_host_name, self.gpio_pin_code, self.alarm_pin_triggered)
 
 
 class ZoneHeatRelay(db.Model, DbEvent, DbBase, graphs.BaseGraph):

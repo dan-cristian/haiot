@@ -200,29 +200,34 @@ def loop_heat_relay():
     for heat_relay in heat_relay_list:
         gpio_pin = None
         try:
-            gpio_pin = models.GpioPin().query_filter_first(models.GpioPin.host_name.in_([Constant.HOST_NAME]),
-                                                           models.GpioPin.pin_code.in_([heat_relay.gpio_pin_code]))
-            if gpio_pin:
-                pin_state_int = gpio.relay_get(gpio_pin_obj=gpio_pin)
-                pin_state = (pin_state_int == 1)
-                zone = models.Zone().query_filter_first(models.Zone.id.in_([heat_relay.zone_id]))
-                relay_inconsistency = heat_relay.heat_is_on != pin_state
-                zone_inconsistency = zone.heat_is_on != heat_relay.heat_is_on
-                if relay_inconsistency:
-                    L.l.warning("Inconsistent heat relay status relay={} db_relay_status={} pin_status={}".format(
-                        heat_relay.heat_pin_name, heat_relay.heat_is_on, pin_state_int))
-                if zone_inconsistency:
-                    L.l.warning("Inconsistent zone heat status zone={} db_heat_status={} db_relay_status={}".format(
-                        zone.name, zone.heat_is_on, heat_relay.heat_is_on))
-                if relay_inconsistency or zone_inconsistency:
-                    # fixme: we got flip of states due to inconsistency messages
-                    # __save_heat_state_db(zone=zone, heat_is_on=pin_state)
-                    __save_heat_state_db(zone=zone, heat_is_on=heat_relay.heat_is_on)
-                #else:
-                #    Log.logger.info("Heat pin {} status equal to gpio status {}".format(heat_relay.heat_is_on, pin_state_int))
-            else:
+            gpiopin_list = models.GpioPin.query.filter_by(pin_code=heat_relay.gpio_pin_code,
+                                                          host_name=Constant.HOST_NAME).all()
+            if len(gpiopin_list) == 0:
                 L.l.warning("Cannot find gpiopin_bcm for heat relay={} zone={}".format(heat_relay.gpio_pin_code,
                                                                                        heat_relay.heat_pin_name))
+            else:
+                if len(gpiopin_list) > 1:
+                    L.l.warning("Multiple unexpected pins on heat loop code {}".format(heat_relay.gpio_pin_code))
+                for gpio_pin in gpiopin_list:
+                    # gpio_pin = models.GpioPin().query_filter_first(models.GpioPin.host_name.in_([Constant.HOST_NAME]),
+                    #                                               models.GpioPin.pin_code.in_([heat_relay.gpio_pin_code]))
+                    pin_state_int = gpio.relay_get(gpio_pin_obj=gpio_pin)
+                    pin_state = (pin_state_int == 1)
+                    zone = models.Zone().query_filter_first(models.Zone.id.in_([heat_relay.zone_id]))
+                    relay_inconsistency = heat_relay.heat_is_on != pin_state
+                    zone_inconsistency = zone.heat_is_on != heat_relay.heat_is_on
+                    if relay_inconsistency:
+                        L.l.warning("Inconsistent heat status relay={} db_relay_status={} pin_status={}".format(
+                            heat_relay.heat_pin_name, heat_relay.heat_is_on, pin_state_int))
+                    if zone_inconsistency:
+                        L.l.warning("Inconsistent zone heat zone={} db_heat_status={} db_relay_status={}".format(
+                            zone.name, zone.heat_is_on, heat_relay.heat_is_on))
+                    if relay_inconsistency or zone_inconsistency:
+                        # fixme: we got flip of states due to inconsistency messages
+                        # __save_heat_state_db(zone=zone, heat_is_on=pin_state)
+                        __save_heat_state_db(zone=zone, heat_is_on=heat_relay.heat_is_on)
+                    #else:
+                    #    Log.logger.info("Heat pin {} status equal to gpio status {}".format(heat_relay.heat_is_on, pin_state_int))
         except Exception as ex:
             L.l.exception('Error processing heat relay=[{}] pin=[{}] err={}'.format(heat_relay, gpio_pin, ex))
 
