@@ -181,7 +181,7 @@ def _process_expire():
             func = P.expire_func_list[func_time]
             L.l.info("Function expired, executing relay action func={}".format(func))
             func[0](*func[1:])
-            del func
+            del P.expire_func_list[func_time]
             L.l.info("Function deleted, list={}".format(len(P.expire_func_list)))
 
 
