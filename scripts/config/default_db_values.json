@@ -238,13 +238,13 @@
     {"relay_pin_name": "test_relay", "zone_id": "1", "gpio_pin_code": "66", "gpio_host_name": "pi-face"},
     {"relay_pin_name": "puffer_pump_heat_relay", "zone_id": "38", "gpio_pin_code": "22", "gpio_host_name": "pi-face"},
     {"relay_pin_name": "puffer_pump_water_relay", "zone_id": "38", "gpio_pin_code": "5", "gpio_host_name": "pi-face"},
-    {"relay_pin_name": "pump_recirculation_relay", "zone_id": "29", "gpio_pin_code": "27", "gpio_host_name": "pi-face"},
+    {"relay_pin_name": "pump_recirculation_relay", "zone_id": "29", "gpio_pin_code": "27", "gpio_host_name": "pi-face", "expire": "60"},
     {"relay_pin_name": "other_heat_relay", "zone_id": "29", "gpio_pin_code": "26", "gpio_host_name": "pi-face"},
     {"relay_pin_name": "front_lights_relay", "zone_id": "14", "gpio_pin_code": "6", "gpio_host_name": "pi-face"},
     {"relay_pin_name": "puffer_gas_valve_relay", "zone_id": "38", "gpio_pin_code": "13", "gpio_host_name": "pi-face"},
     {"relay_pin_name": "unused_beci_relay", "zone_id": "14", "gpio_pin_code": "19", "gpio_host_name": "pi-face"},
 
-    {"relay_pin_name": "front_gate_relay", "zone_id": "7", "gpio_pin_code": "0:out:1", "gpio_host_name": "pi-face"},
+    {"relay_pin_name": "front_gate_relay", "zone_id": "7", "gpio_pin_code": "0:out:1", "gpio_host_name": "pi-face", "expire": "3"},
     {"relay_pin_name": "beci_contactor_relay", "zone_id": "10", "gpio_pin_code": "0:out:2", "gpio_host_name": "pi-face"},
     {"relay_pin_name": "beci_upscharge_relay", "zone_id": "10", "gpio_pin_code": "0:out:3", "gpio_host_name": "pi-face"},
     {"relay_pin_name": "beci_extra_relay", "zone_id": "10", "gpio_pin_code": "0:out:4", "gpio_host_name": "pi-face"},
@@ -358,9 +358,9 @@
     {"zone_id":7 ,  "sensor_address": "C8000004F3495728", "sensor_name": "curte fata", "target_material": "air"},
     {"zone_id":27 , "sensor_address": "02000004F31C1C28", "sensor_name": "pod fata", "target_material": "air", "alt_address": ""},
     {"zone_id":53 , "sensor_address": "404000225631",     "sensor_name": "solar back", "alt_address": ""},
-    {"zone_id":8 ,  "sensor_address": "ZMNHTDx Smart meter S4 S5 S6:2",             "sensor_name": "zwave main power meter"},
-    {"zone_id":29 , "sensor_address": "TZ69 Smart energy plug in switch:4",         "sensor_name": "zwave plug 1"},
-    {"zone_id":29 , "sensor_address": "TZ69 Smart energy plug in switch:5",         "sensor_name": "zwave plug 2"}
+    {"zone_id":8 ,  "sensor_address": "ZMNHTDx Smart meter S4 S5 S6_2",             "sensor_name": "zwave main power meter"},
+    {"zone_id":29 , "sensor_address": "TZ69 Smart energy plug in switch_4",         "sensor_name": "zwave plug 1"},
+    {"zone_id":29 , "sensor_address": "TZ69 Smart energy plug in switch_5",         "sensor_name": "zwave plug 2"}
   ],
 
   "Utility": [

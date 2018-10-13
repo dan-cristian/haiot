@@ -15,6 +15,7 @@ Number ups_input_voltage "UPS Input [%.0f V]" <poweroutlet_us>              {mqt
 
 Switch relay_front_lights_relay "Front lights" <switch>                     {mqtt="<[mosquitto:iot/openhab/relay_front_lights_relay:state:default],>[mosquitto:iot/openhab:command:ON:relay_front_lights_relay=1],>[mosquitto:iot/openhab:command:OFF:relay_front_lights_relay=0]", autoupdate="false"}
 Switch relay_plug_1 "Plug 1" <switch>                                       {mqtt="<[mosquitto:iot/openhab/relay_plug_1:state:default],>[mosquitto:iot/openhab:command:ON:relay_plug_1=1],>[mosquitto:iot/openhab:command:OFF:relay_plug_1=0]", autoupdate="false"}
+Switch relay_plug_2 "Plug 2" <switch>                                       {mqtt="<[mosquitto:iot/openhab/relay_plug_2:state:default],>[mosquitto:iot/openhab:command:ON:relay_plug_2=1],>[mosquitto:iot/openhab:command:OFF:relay_plug_2=0]", autoupdate="false"}
 
 Group:Switch:OR(ON, OFF)    RELAY_AMP   "Music amp [(%d)]"  <switch>
 Switch relay_living_music_relay "Living amp" <switch>                       (RELAY_AMP) {mqtt="<[mosquitto:iot/openhab/relay_living_music_relay:state:default]"}
@@ -35,7 +36,7 @@ Switch heat_puffer_gas_valve "Heat puffer gas valve" <switch>               {mqt
 
 Switch relay_recirculation_pump "Recirculation pump" <switch>               {mqtt="<[mosquitto:iot/openhab/relay_pump_recirculation_relay:state:default],>[mosquitto:iot/openhab:command:ON:relay_pump_recirculation_relay=1],>[mosquitto:iot/openhab:command:OFF:relay_pump_recirculation_relay=0]", autoupdate="false"}
 Switch relay_other_heat "Other heat" <switch>                               {mqtt="<[mosquitto:iot/openhab/relay_other_heat_relay:state:default],>[mosquitto:iot/openhab:command:ON:relay_other_heat_relay=1],>[mosquitto:iot/openhab:command:OFF:relay_other_heat_relay=0]", autoupdate="false"}
-Switch relay_front_gate "Front gate" <switch> [ "Switchable" ]               {mqtt="<[mosquitto:iot/openhab/relay_front_gate_relay:state:default],>[mosquitto:iot/openhab:command:ON:relay_front_gate_relay=1],>[mosquitto:iot/openhab:command:OFF:relay_front_gate_relay=0]", expire="3s,command=OFF", autoupdate="false"}
+Switch relay_front_gate "Front gate" <switch>                               {mqtt="<[mosquitto:iot/openhab/relay_front_gate_relay:state:default],>[mosquitto:iot/openhab:command:ON:relay_front_gate_relay=1],>[mosquitto:iot/openhab:command:OFF:relay_front_gate_relay=0]", autoupdate="false"}
 
 Group:Switch:OR(ON, OFF)    RELAY_BACK_WATER "Back watering [(%d)]"  <switch>
 Group:Switch:OR(ON, OFF)    RELAY_FRONT_WATER "Front watering [(%d)]"   <switch>
@@ -71,9 +72,9 @@ Number humidity_fridge "Fridge [%.0f %%]" <humidity>                         {mq
 
 Number electricity_power_main_mono "Power main mono [%.0f watt]" <energy>   {mqtt="<[mosquitto:iot/openhab/electricity_power main mono:state:default]"}
 Number electricity_kWh_power_main_mono "KWh main mono [%.2f kWh]" <energy>  {mqtt="<[mosquitto:iot/openhab/electricity_kWh_power main mono:state:default]"}
-Number electricity_power_factor_mono "Main power factor [%.2f]" <flow>      {mqtt="<[mosquitto:iot/openhab/vdd_ZMNHTDx Smart meter S4 S5 S6:state:default]"}
-Number electricity_voltage_mono "Main voltage [%.0f V]" <energy>            {mqtt="<[mosquitto:iot/openhab/vad_ZMNHTDx Smart meter S4 S5 S6:state:default]"}
-Number electricity_current_mono "Main current [%.1f A]" <poweroutlet_eu>    {mqtt="<[mosquitto:iot/openhab/iad_ZMNHTDx Smart meter S4 S5 S6:state:default]"}
+Number electricity_power_factor_mono "Main power factor [%.2f]" <flow>      {mqtt="<[mosquitto:iot/openhab/vdd_ZMNHTDx Smart meter S4 S5 S6_2:state:default]"}
+Number electricity_voltage_mono "Main voltage [%.0f V]" <energy>            {mqtt="<[mosquitto:iot/openhab/vad_ZMNHTDx Smart meter S4 S5 S6_2:state:default]"}
+Number electricity_current_mono "Main current [%.1f A]" <poweroutlet_eu>    {mqtt="<[mosquitto:iot/openhab/iad_ZMNHTDx Smart meter S4 S5 S6_2:state:default]"}
 
 Number electricity_kWh_power_main_1 "KWh main 1 [%.2f kWh]" <energy>        {mqtt="<[mosquitto:iot/openhab/electricity_kWh_power main 1:state:default]"}
 
@@ -82,9 +83,15 @@ Number electricity_kWh_solar_aps "KWh solar [%.2f kWh]" <solarplant>        {mqt
 
 Number electricity_power_plug_1 "Power plug 1 [%.0f watt]" <energy>         {mqtt="<[mosquitto:iot/openhab/electricity_power plug 1:state:default]"}
 Number electricity_kWh_power_plug_1 "KWh plug 1 [%.2f kWh]" <energy>        {mqtt="<[mosquitto:iot/openhab/electricity_kWh_power plug 1:state:default]"}
-Number electricity_power_factor_plug_1 "Plug 1 power factor [%.2f]" <flow>  {mqtt="<[mosquitto:iot/openhab/vdd_TZ69 Smart energy plug in switch:state:default]"}
-Number electricity_voltage_plug_1 "Plug 1 voltage [%.0f V]" <energy>        {mqtt="<[mosquitto:iot/openhab/vad_TZ69 Smart energy plug in switch:state:default]"}
-Number electricity_current_plug_1 "Plug 1 current [%.1f A]" <poweroutlet_eu>    {mqtt="<[mosquitto:iot/openhab/iad_TZ69 Smart energy plug in switch:state:default]"}
+Number electricity_power_factor_plug_1 "Plug 1 power factor [%.2f]" <flow>  {mqtt="<[mosquitto:iot/openhab/vdd_TZ69 Smart energy plug in switch_4:state:default]"}
+Number electricity_voltage_plug_1 "Plug 1 voltage [%.0f V]" <energy>        {mqtt="<[mosquitto:iot/openhab/vad_TZ69 Smart energy plug in switch_4:state:default]"}
+Number electricity_current_plug_1 "Plug 1 current [%.1f A]" <poweroutlet_eu>    {mqtt="<[mosquitto:iot/openhab/iad_TZ69 Smart energy plug in switch_4:state:default]"}
+
+Number electricity_power_plug_2 "Power plug 2 [%.0f watt]" <energy>         {mqtt="<[mosquitto:iot/openhab/electricity_power plug 2:state:default]"}
+Number electricity_kWh_power_plug_2 "KWh plug 2 [%.2f kWh]" <energy>        {mqtt="<[mosquitto:iot/openhab/electricity_kWh_power plug 2:state:default]"}
+Number electricity_power_factor_plug_2 "Plug 2 power factor [%.2f]" <flow>  {mqtt="<[mosquitto:iot/openhab/vdd_TZ69 Smart energy plug in switch_5:state:default]"}
+Number electricity_voltage_plug_2 "Plug 2 voltage [%.0f V]" <energy>        {mqtt="<[mosquitto:iot/openhab/vad_TZ69 Smart energy plug in switch_5:state:default]"}
+Number electricity_current_plug_2 "Plug 2 current [%.1f A]" <poweroutlet_eu>    {mqtt="<[mosquitto:iot/openhab/iad_TZ69 Smart energy plug in switch_5:state:default]"}
 
 Number gas_gas "Gas [%.1f mc]" <gas>                                        {mqtt="<[mosquitto:iot/openhab/gas_gas:state:default]"}
 Number water_main "Water main [%.0f l]" <water>                             {mqtt="<[mosquitto:iot/openhab/water_water main:state:default]"}
@@ -99,9 +106,9 @@ Contact alarm_beci_mare "Alarm beci mare [%s]" <door>                       (CON
 Contact alarm_beci_mic "Alarm beci mic [%s]" <door>                         (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_beci mic:state:default]"}
 Contact alarm_etaj_hol "Alarm etaj hol [%s]" <door>                         (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_etaj hol:state:default]"}
 Contact contact_sonerie "Sonerie [%s]" <door>                               (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_sonerie:state:default]"}
-Contact contact_usa_intrare "Usa intrare [%s]" <frontdoor>                       (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_usa intrare:state:default]"}
+Contact contact_usa_intrare "Usa intrare [%s]" <door>                       (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_usa intrare:state:default]"}
 Contact contact_portita "Portita [%s]" <door>                               (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_portita:state:default]"}
-Contact contact_gate "Gate [%s]" <garagedoor>                                     (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_gate:state:default]"}
-Contact contact_usa_garaj "Usa garaj [%s]" <garagedoor>                           (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_usa garaj:state:default]"}
+Contact contact_gate "Gate [%s]" <door>                                     (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_gate:state:default]"}
+Contact contact_usa_garaj "Usa garaj [%s]" <door>                           (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_usa garaj:state:default]"}
 
 Number p_switch                         ""
