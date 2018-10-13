@@ -179,6 +179,8 @@ Frame {
 	Default item=relay_front_lights_relay
 	Default item=relay_plug_1
 	Default item=relay_plug_2
+	Default item=relay_beci_contactor
+	Default item=relay_beci_upscharge
 }
 
 Frame {
