@@ -153,9 +153,9 @@ def set_value(network, node, value):
                                                    notify_transport_enabled=True, save_to_graph=True, debug=False)
                     current_record.commit_record_to_db()
         else:
-            L.l.info("Cannot find sensor definition in db, address=[{}]".format(sensor_address))
-            record = models.Sensor(address=sensor_address, sensor_name="N/A - " + sensor_address)
-            record.add_commit_record_to_db()
+            L.l.info("Cannot find sensor definition in db, address={} rec={}".format(sensor_address, current_record))
+            # record = models.Sensor(address=sensor_address, sensor_name="N/A - " + sensor_address)
+            # record.add_commit_record_to_db()
     except Exception as ex:
         L.l.error("Error in zwave value={}".format(ex), exc_info=True)
 
