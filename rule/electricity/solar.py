@@ -178,7 +178,7 @@ def rule_energy_export(obj=models.Utility(), field_changed_list=None):
         if obj.utility_name == 'power main mono':
             P.grid_watts = obj.units_2_delta
             # let all devices know grid status
-            for device in P.device_list:
+            for device in P.device_list.values():
                 device.grid_updated(P.grid_watts)
         else:
             # set consumption for device
