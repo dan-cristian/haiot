@@ -20,10 +20,12 @@ class Relaydevice:
     RELAY_NAME = None
     STATE_CHANGE_INTERVAL = 30  # how often can change state
     MAX_OFF_INTERVAL = 600  # seconds, how long can stay off after job has started, if device supports breaks
+    MIN_ON_INTERVAL = 60  # how long to run before auto stop
     DEVICE_SUPPORTS_BREAKS = False  # can this device be started/stopped several times during the job
     AVG_CONSUMPTION = 1
     watts = None
     last_state_change = datetime.min
+    last_state_on = datetime.min
     state = DeviceState.NO_INIT
     power_is_on = None
 
@@ -38,8 +40,20 @@ class Relaydevice:
         else:
             if self.can_state_change():
                 if self.get_power_status() != power_is_on:
-                    rule_common.update_custom_relay(relay_pin_name=self.RELAY_NAME, power_is_on=power_is_on)
-                    self.last_state_change = datetime.now()
+                    valid_power_status = None
+                    if not power_is_on:
+                        if self.can_stop_relay():
+                            valid_power_status = power_is_on
+                        else:
+                            # not allowed to stop the relay
+                            pass
+                    else:
+                        valid_power_status = power_is_on
+                    if valid_power_status is not None:
+                        rule_common.update_custom_relay(relay_pin_name=self.RELAY_NAME, power_is_on=valid_power_status)
+                        self.last_state_change = datetime.now()
+                        if valid_power_status:
+                            self.last_state_on = datetime.now()
                 else:
                     L.l.info("Relay {} state already {}, power={}".format(self.RELAY_NAME, self.state,
                                                                           self.power_is_on))
@@ -63,9 +77,9 @@ class Relaydevice:
                         L.l.info("Keep relay on {}, state={}".format(self.RELAY_NAME, self.state))
                         pass
                 else:
-                    if self.state == DeviceState.AUTO_START:
-                        self.state = DeviceState.AUTO_STOP
+                    if self.state in [DeviceState.AUTO_START, DeviceState.NO_INIT, DeviceState.FIRST_START]:
                         L.l.info("Auto stop relay {}, state={}".format(self.RELAY_NAME, self.state))
+                        self.state = DeviceState.AUTO_STOP
                     else:
                         L.l.info("Unexpected state relay {}, state={}".format(self.RELAY_NAME, self.state))
             else:
@@ -83,6 +97,10 @@ class Relaydevice:
 
     def can_state_change(self):
         return (datetime.now() - self.last_state_change).total_seconds() >= self.STATE_CHANGE_INTERVAL
+
+    def can_stop_relay(self):
+        delta = (datetime.now() - self.last_state_on).total_seconds()
+        return delta >= self.MIN_ON_INTERVAL
 
     def update_job_finished(self):
         # job is never finished for devices without power metering
@@ -156,6 +174,7 @@ class Dishwasher(Powerdevice):
     UTILITY_NAME = 'power plug 1'
     DEVICE_SUPPORTS_BREAKS = True
     MAX_OFF_INTERVAL = 60 * 30  # until water get's cold
+    MIN_ON_INTERVAL = 120
 
     def __init__(self):
         Powerdevice.__init__(self)
