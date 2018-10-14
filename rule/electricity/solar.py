@@ -131,7 +131,9 @@ class Powerdevice(Relaydevice):
                         self.last_min_watts_read = datetime.now()
                     else:
                         delta = (datetime.now() - self.last_min_watts_read).total_seconds()
+                        L.l.info("Job {} about to stop delta={}".format(self.RELAY_NAME, delta))
                         if delta >= self.JOB_FINISHED_DURATION:
+                            L.l.info("Job {} finished delta={}".format(self.RELAY_NAME, delta))
                             self.state = DeviceState.JOB_FINISHED
                             self.last_min_watts_read = None
                 else:
@@ -148,7 +150,7 @@ class Powerdevice(Relaydevice):
 
 
 class Dishwasher(Powerdevice):
-    AVG_CONSUMPTION = 80
+    AVG_CONSUMPTION = 77
     MIN_WATTS_OFF = 1
     RELAY_NAME = 'plug_1'
     UTILITY_NAME = 'power plug 1'
@@ -161,7 +163,7 @@ class Dishwasher(Powerdevice):
 
 
 class Washingmachine(Powerdevice):
-    AVG_CONSUMPTION = 80
+    AVG_CONSUMPTION = 70
     MIN_WATTS_OFF = 2
     RELAY_NAME = 'plug_2'
     UTILITY_NAME = 'power plug 2'
