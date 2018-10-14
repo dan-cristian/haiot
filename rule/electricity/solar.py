@@ -24,6 +24,7 @@ class Relaydevice:
     watts = None
     last_state_change = datetime.min
     state = DeviceState.NO_INIT
+    power_is_on = None
 
     def set_power_status(self, power_is_on):
         if (self.state == DeviceState.USER_FORCED_START or not self.DEVICE_SUPPORTS_BREAKS) and power_is_on is False:
@@ -36,7 +37,8 @@ class Relaydevice:
                     rule_common.update_custom_relay(relay_pin_name=self.RELAY_NAME, power_is_on=power_is_on)
                     self.last_state_change = datetime.now()
                 else:
-                    L.l.info("Relay {} state already {}".format(self.RELAY_NAME, self.state))
+                    L.l.info("Relay {} state already {}, power={}".format(self.RELAY_NAME, self.state,
+                                                                          self.power_is_on))
                     pass
                 if power_is_on:
                     if self.state == DeviceState.NO_INIT or self.state == DeviceState.JOB_FINISHED:
@@ -63,12 +65,12 @@ class Relaydevice:
                 L.l.info("Not changing relay {}, state={}".format(self.RELAY_NAME, self.state))
 
     def get_power_status(self):
-        power_is_on = rule_common.get_custom_relay(self.RELAY_NAME)
+        self.power_is_on = rule_common.get_custom_relay(self.RELAY_NAME)
         if self.state == DeviceState.AUTO_START:
-            if power_is_on:
+            if self.power_is_on:
                 # if user forced the device start
                 self.state = DeviceState.USER_FORCED_START
-        return power_is_on
+        return self.power_is_on
 
     def can_state_change(self):
         return (datetime.now() - self.last_state_change).total_seconds() >= self.STATE_CHANGE_INTERVAL
@@ -155,7 +157,7 @@ class Washingmachine(Powerdevice):
 
 
 class Upscharger(Relaydevice):
-    AVG_CONSUMPTION = 250
+    AVG_CONSUMPTION = 200
     RELAY_NAME = 'beci_upscharge_relay'
     DEVICE_SUPPORTS_BREAKS = False
 
