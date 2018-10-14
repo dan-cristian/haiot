@@ -12,7 +12,8 @@ class DeviceState(Enum):
     AUTO_START = 2
     AUTO_STOP = 3
     USER_FORCED_START = 4
-    JOB_FINISHED = 5
+    USER_FORCED_STOP = 5
+    JOB_FINISHED = 6
 
 
 class Relaydevice:
@@ -27,10 +28,13 @@ class Relaydevice:
     power_is_on = None
 
     def set_power_status(self, power_is_on):
-        if (self.state == DeviceState.USER_FORCED_START or not self.DEVICE_SUPPORTS_BREAKS) and power_is_on is False:
-            # do not stop the relay, as user forced a start
+        if (self.state == DeviceState.USER_FORCED_STOP or not self.DEVICE_SUPPORTS_BREAKS) and power_is_on is False:
+            # do not start the relay, as user forced a stop
             L.l.info("Not starting relay {}, state={}".format(self.RELAY_NAME, self.state))
             pass
+        elif self.state == DeviceState.USER_FORCED_START and power_is_on is False:
+            # do not stop the relay, as user forced a start
+            L.l.info("Not stopping relay {}, state={}".format(self.RELAY_NAME, self.state))
         else:
             if self.can_state_change():
                 if self.get_power_status() != power_is_on:
@@ -44,13 +48,16 @@ class Relaydevice:
                     if self.state == DeviceState.NO_INIT or self.state == DeviceState.JOB_FINISHED:
                         if power_is_on:
                             self.state = DeviceState.FIRST_START
-                            L.l.info("First relay start {}, state={}".format(self.RELAY_NAME, self.state))
+                            L.l.info("Was first relay start {}, state={}".format(self.RELAY_NAME, self.state))
                         else:
                             self.state = DeviceState.AUTO_STOP
-                            L.l.info("Auto stop relay {}, state={}".format(self.RELAY_NAME, self.state))
+                            L.l.info("Was auto stop relay {}, state={}".format(self.RELAY_NAME, self.state))
+                    elif self.state == DeviceState.FIRST_START:
+                        self.state = DeviceState.AUTO_START
+                        L.l.info("Now is auto start relay {}, state={}".format(self.RELAY_NAME, self.state))
                     elif self.state == DeviceState.AUTO_STOP:
                         self.state = DeviceState.AUTO_START
-                        L.l.info("Auto start relay {}, state={}".format(self.RELAY_NAME, self.state))
+                        L.l.info("Was auto start relay {}, state={}".format(self.RELAY_NAME, self.state))
                     elif self.state == DeviceState.AUTO_START:
                         # already on
                         L.l.info("Keep relay on {}, state={}".format(self.RELAY_NAME, self.state))
@@ -66,10 +73,12 @@ class Relaydevice:
 
     def get_power_status(self):
         self.power_is_on = rule_common.get_custom_relay(self.RELAY_NAME)
-        if self.state == DeviceState.AUTO_START:
-            if self.power_is_on:
-                # if user forced the device start
-                self.state = DeviceState.USER_FORCED_START
+        if self.state == DeviceState.AUTO_STOP and self.power_is_on:
+            # if user forced the device start
+            self.state = DeviceState.USER_FORCED_START
+        if self.state == DeviceState.AUTO_START and not self.power_is_on:
+            # if user forced the device stop
+            self.state = DeviceState.USER_FORCED_STOP
         return self.power_is_on
 
     def can_state_change(self):
