@@ -78,11 +78,15 @@ class Relaydevice:
 
     def grid_updated(self, grid_watts):
         # get relay status to check for user forced start
-        self.get_power_status()
+        power_on = self.get_power_status()
+        if power_on:
+            current_watts = self.watts
+        else:
+            current_watts = self.AVG_CONSUMPTION
         if grid_watts <= 0:
             # start device if exporting and there is enough surplus
             export = -grid_watts
-            if self.AVG_CONSUMPTION <= export:
+            if current_watts <= export:
                 self.set_power_status(power_is_on=True)
                 L.l.info("Should auto start device {}, state={} surplus={}".format(self.RELAY_NAME, self.state, export))
             else:
