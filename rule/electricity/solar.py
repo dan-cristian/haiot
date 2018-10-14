@@ -234,4 +234,5 @@ def rule_energy_export(obj=models.Utility(), field_changed_list=None):
 
 
 def init():
-    P.init_dev()
+    pass
+    # P.init_dev()
