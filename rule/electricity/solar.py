@@ -20,6 +20,7 @@ class Relaydevice:
     STATE_CHANGE_INTERVAL = 30  # how often can change state
     MAX_OFF_INTERVAL = 600  # seconds, how long can stay off after job has started, if device supports breaks
     DEVICE_SUPPORTS_BREAKS = False  # can this device be started/stopped several times during the job
+    AVG_CONSUMPTION = 1
     last_state_change = datetime.min
     state = DeviceState.NO_INIT
 
@@ -67,17 +68,9 @@ class Relaydevice:
     def can_state_change(self):
         return (datetime.now() - self.last_state_change).total_seconds() >= self.STATE_CHANGE_INTERVAL
 
-    def __init__(self):
+    def update_job_finished(self):
+        # job is never finished for devices without power metering
         pass
-
-
-class Powerdevice(Relaydevice):
-    AVG_CONSUMPTION = 1
-    MIN_WATTS_OFF = None  # min consumption to be considered OFF / job done
-    UTILITY_NAME = None
-    JOB_FINISHED_DURATION = 180  # for how long the device stays on min consumption before job is finished
-    watts = None
-    last_min_watts_read = None
 
     def grid_updated(self, grid_watts):
         # get relay status to check for user forced start
@@ -95,6 +88,17 @@ class Powerdevice(Relaydevice):
             L.l.info("Not exporting, import={}".format(grid_watts))
             pass
         self.update_job_finished()
+
+    def __init__(self):
+        pass
+
+
+class Powerdevice(Relaydevice):
+    MIN_WATTS_OFF = None  # min consumption to be considered OFF / job done
+    UTILITY_NAME = None
+    JOB_FINISHED_DURATION = 180  # for how long the device stays on min consumption before job is finished
+    watts = None
+    last_min_watts_read = None
 
     # check if device has finished job
     def update_job_finished(self):
