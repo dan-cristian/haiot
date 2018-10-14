@@ -17,6 +17,8 @@
     {"name": "MQTT_TOPIC", "value": "iot/#"},
     {"name": "MQTT_TOPIC_MAIN", "value": "iot/main", "description": "haiot node intercomm. topic"},
     {"name": "MQTT_TOPIC_OPENHAB", "value": "iot/openhab", "description": "openhab integration mqtt channel"},
+    {"name": "MQTT_TOPIC_SONOFF_1", "value": "tele/#", "description": "sonoff-tasmota integration mqtt channel"},
+    {"name": "MQTT_TOPIC_SONOFF_2", "value": "stat/#", "description": "sonoff-tasmota integration mqtt channel"},
     {"name": "MQTT_HOST_2", "value": "192.168.0.1"},
     {"name": "MQTT_PORT_2", "value": "1883"},
     {"name": "DDNS_RACKSPACE_CONFIG_FILE", "value": ".credentials/.rackspace.ddnsupdate.config.json",
@@ -82,6 +84,7 @@
     {"id":51, "active":"0", "start_order":"51", "name":"sensor.solar_aps"},
     {"id":53, "active":"0", "start_order":"53", "name":"sensor.zwave"},
     {"id":55, "active":"0", "start_order":"55", "name":"sensor.1wire"},
+    {"id":57, "active":"0", "start_order":"57", "name":"sensor.sonoff"},
     {"id":105, "active":"0", "start_order":"50", "name":"apps.dashcam"},
     {"id":101, "active":"0", "start_order":"101", "name":"webui.chart"},
     {"id":102, "active":"1", "start_order":"102", "name":"webui.api"},
@@ -103,6 +106,7 @@
     {"id":599, "active":"1", "start_order":"99", "name":"test", "host_name":"netbook"},
     {"id":511, "active":"1", "start_order":"11", "name":"alarm", "host_name":"netbook"},
     {"id":541, "active":"0", "start_order":"41", "name":"cloud.alexa", "host_name":"netbook"},
+    {"id":557, "active":"1", "start_order":"57", "name":"sensor.sonoff", "host_name":"netbook"},
 
     {"id":609, "active":"1", "start_order":"9", "name":"heat", "host_name":"pi-face"},
     {"id":611, "active":"1", "start_order":"11", "name":"alarm", "host_name":"pi-face"},
@@ -112,7 +116,8 @@
     {"id":649, "active":"1", "start_order":"49", "name":"sensor.ups_legrand", "host_name":"pi-face"},
     {"id":651, "active":"1", "start_order":"51", "name":"sensor.solar_aps", "host_name":"pi-face"},
     {"id":653, "active":"1", "start_order":"53", "name":"sensor.zwave", "host_name":"pi-face"},
-    {"id":655, "active":"1", "start_order":"55", "name":"sensor.1wire", "host_name":"pi-face"}
+    {"id":655, "active":"1", "start_order":"55", "name":"sensor.1wire", "host_name":"pi-face"},
+    {"id":657, "active":"1", "start_order":"57", "name":"sensor.sonoff", "host_name":"pi-face"}
 
   ],
 
