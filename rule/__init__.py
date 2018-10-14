@@ -231,6 +231,7 @@ def init():
         scheduler.start()
         P.timestamp = _get_stamp()
         rule_common.init()
+        solar.init()
     else:
         L.l.warning('Rules not initialised as scheduler is not available')
     thread_pool.add_interval_callable(thread_run, run_interval_second=1)
