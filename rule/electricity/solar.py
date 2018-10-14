@@ -91,6 +91,9 @@ class Powerdevice(Relaydevice):
             else:
                 self.set_power_status(power_is_on=False)
                 L.l.info("Should auto stop device {}, state={} surplus={}".format(self.RELAY_NAME, self.state, export))
+        else:
+            L.l.info("Not exporting, import={}".format(grid_watts))
+            pass
         self.update_job_finished()
 
     # check if device has finished job
@@ -154,11 +157,15 @@ class P:
     device_list = {}  # key is utility name
     EXPORT_MIN_WATTS = -50
 
+    @staticmethod
     # init in order of priority
+    def init_dev():
+        P.device_list[Dishwasher.RELAY_NAME] = Dishwasher()
+        P.device_list[Washingmachine.RELAY_NAME] = Washingmachine()
+        P.device_list[Upscharger.RELAY_NAME] = Upscharger()
+
     def __init__(self):
-        self.device_list[Dishwasher.RELAY_NAME] = Dishwasher()
-        self.device_list[Washingmachine.RELAY_NAME] = Washingmachine()
-        self.device_list[Upscharger.RELAY_NAME] = Upscharger()
+        pass
 
 
 # energy rule
@@ -173,3 +180,7 @@ def rule_energy_export(obj=models.Utility(), field_changed_list=None):
             # set consumption for device
             if obj.utility_name in P.device_list.keys():
                 P.device_list[obj.utility_name].set_watts(obj.units_2_delta)
+
+
+def init():
+    P.init_dev()
