@@ -21,6 +21,7 @@ class Relaydevice:
     MAX_OFF_INTERVAL = 600  # seconds, how long can stay off after job has started, if device supports breaks
     DEVICE_SUPPORTS_BREAKS = False  # can this device be started/stopped several times during the job
     AVG_CONSUMPTION = 1
+    watts = None
     last_state_change = datetime.min
     state = DeviceState.NO_INIT
 
@@ -79,7 +80,7 @@ class Relaydevice:
     def grid_updated(self, grid_watts):
         # get relay status to check for user forced start
         power_on = self.get_power_status()
-        if power_on:
+        if power_on and self.watts is not None:
             current_watts = self.watts
         else:
             current_watts = self.AVG_CONSUMPTION
@@ -105,7 +106,6 @@ class Powerdevice(Relaydevice):
     MIN_WATTS_OFF = None  # min consumption to be considered OFF / job done
     UTILITY_NAME = None
     JOB_FINISHED_DURATION = 180  # for how long the device stays on min consumption before job is finished
-    watts = None
     last_min_watts_read = None
 
     # check if device has finished job
