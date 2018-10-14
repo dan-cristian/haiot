@@ -101,12 +101,10 @@ class Relaydevice:
             if current_watts <= export:
                 self.set_power_status(power_is_on=True)
                 L.l.info("Should auto start device {}, state={} surplus={}".format(self.RELAY_NAME, self.state, export))
-            else:
-                self.set_power_status(power_is_on=False)
-                L.l.info("Should auto stop device {}, state={} surplus={}".format(self.RELAY_NAME, self.state, export))
         else:
             L.l.info("Not exporting, import={}".format(grid_watts))
-            pass
+            self.set_power_status(power_is_on=False)
+            L.l.info("Should auto stop device {}, state={} surplus={}".format(self.RELAY_NAME, self.state, export))
         self.update_job_finished()
 
     def __init__(self):
