@@ -30,11 +30,11 @@ class Relaydevice:
     def set_power_status(self, power_is_on):
         if (self.state == DeviceState.USER_FORCED_STOP or not self.DEVICE_SUPPORTS_BREAKS) and power_is_on is False:
             # do not start the relay, as user forced a stop
-            L.l.info("Not starting relay {}, state={}".format(self.RELAY_NAME, self.state))
+            L.l.info("Not starting relay {}, state={} power={}".format(self.RELAY_NAME, self.state, power_is_on))
             pass
         elif self.state == DeviceState.USER_FORCED_START and power_is_on is False:
             # do not stop the relay, as user forced a start
-            L.l.info("Not stopping relay {}, state={}".format(self.RELAY_NAME, self.state))
+            L.l.info("Not stopping relay {}, state={} power={}".format(self.RELAY_NAME, self.state, power_is_on))
         else:
             if self.can_state_change():
                 if self.get_power_status() != power_is_on:
