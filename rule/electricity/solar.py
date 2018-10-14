@@ -31,8 +31,12 @@ class Relaydevice:
             pass
         else:
             if self.can_state_change():
-                rule_common.update_custom_relay(relay_pin_name=self.RELAY_NAME, power_is_on=power_is_on)
-                self.last_state_change = datetime.now()
+                if self.get_power_status() != power_is_on:
+                    rule_common.update_custom_relay(relay_pin_name=self.RELAY_NAME, power_is_on=power_is_on)
+                    self.last_state_change = datetime.now()
+                else:
+                    L.l.info("Relay {} state already {}".format(self.RELAY_NAME, self.state))
+                    pass
                 if power_is_on:
                     if self.state == DeviceState.NO_INIT or self.state == DeviceState.JOB_FINISHED:
                         if power_is_on:
