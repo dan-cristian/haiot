@@ -125,16 +125,20 @@ class Powerdevice(Relaydevice):
     # check if device has finished job
     def update_job_finished(self):
         if self.state == DeviceState.AUTO_START:
-            if self.watts <= self.MIN_WATTS_OFF:
-                if self.last_min_watts_read is None:
-                    self.last_min_watts_read = datetime.now()
+            if self.power_is_on:
+                if self.watts <= self.MIN_WATTS_OFF:
+                    if self.last_min_watts_read is None:
+                        self.last_min_watts_read = datetime.now()
+                    else:
+                        delta = (datetime.now() - self.last_min_watts_read).total_seconds()
+                        if delta >= self.JOB_FINISHED_DURATION:
+                            self.state = DeviceState.JOB_FINISHED
+                            self.last_min_watts_read = None
                 else:
-                    delta = (datetime.now() - self.last_min_watts_read).total_seconds()
-                    if delta >= self.JOB_FINISHED_DURATION:
-                        self.state = DeviceState.JOB_FINISHED
-                        self.last_min_watts_read = None
+                    self.last_min_watts_read = None
             else:
-                self.last_min_watts_read = None
+                L.l.info("Warning, relay {} state is {} but power is {}".format(self.RELAY_NAME, self.state,
+                                                                                self.power_is_on))
 
     def set_watts(self, watts):
         self.watts = watts
