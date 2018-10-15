@@ -169,6 +169,7 @@ def zone_custom_relay_record_update(json_object):
                 elif relay_type == Constant.GPIO_PIN_TYPE_SONOFF:
                     if source_host == Constant.HOST_NAME:
                         # no need for extra actions, relay already set and saved in DB
+                        L.l.info("Warning - what sonoff action should I do ?")
                         pass
                     else:
                         # fixme: what to do here?
