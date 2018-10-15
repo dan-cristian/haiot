@@ -41,6 +41,7 @@ def mqtt_on_message(client, userdata, msg):
                 current_relay = models.ZoneCustomRelay.query.filter_by(gpio_pin_code=sensor_name,
                                                                        gpio_host_name=Constant.HOST_NAME).first()
                 if current_relay is not None:
+                    L.l.info("Got relay {} state={}".format(sensor_name, power_is_on))
                     new_relay = models.ZoneCustomRelay(gpio_pin_code=sensor_name, gpio_host_name=Constant.HOST_NAME)
                     new_relay.relay_is_on = power_is_on
                     models.ZoneCustomRelay().save_changed_fields(
