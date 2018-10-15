@@ -133,6 +133,7 @@ def zone_custom_relay_record_update(json_object):
     # carefull not to trigger infinite recursion updates
     try:
         host_name = utils.get_object_field_value(json_object, 'gpio_host_name')
+        source_host = utils.get_object_field_value(json_object, 'source_host_')
         # L.l.info('Received custom relay state update for host {}'.format(host_name))
         if host_name == Constant.HOST_NAME:
             # execute local pin change related actions like turn on/off a relay
@@ -142,6 +143,9 @@ def zone_custom_relay_record_update(json_object):
                 relay_is_on = utils.get_object_field_value(json_object, 'relay_is_on')
                 expire = utils.get_object_field_value(json_object, 'expire')
                 if relay_type == Constant.GPIO_PIN_TYPE_ZWAVE:
+                    if source_host == Constant.HOST_NAME:
+                        # fixme: check this scenario
+                        L.l.info("Warning - do I execute the zwave relay action twice?")
                     vals = gpio_pin_code.split('_')
                     if len(vals) == 2:
                         node_id = int(vals[1])
@@ -162,10 +166,17 @@ def zone_custom_relay_record_update(json_object):
                                 exit(999)
                     else:
                         L.l.error("Incorrect zwave switch format {}, must be <name>_<node_id>".format(gpio_pin_code))
+                elif relay_type == Constant.GPIO_PIN_TYPE_SONOFF:
+                    if source_host == Constant.HOST_NAME:
+                        # no need for extra actions, relay already set and saved in DB
+                        pass
+                    else:
+                        # fixme: what to do here?
+                        L.l.info("Warning - what should I do?")
                 else:
                     gpio_record = models.GpioPin.query.filter_by(pin_code=gpio_pin_code,
                                                                  host_name=Constant.HOST_NAME).first()
-                    if gpio_record:
+                    if gpio_record is not None:
                         value = 1 if relay_is_on else 0
                         pin_code = gpio_record.pin_index_bcm
                         pin_type = gpio_record.pin_type
