@@ -253,6 +253,10 @@
     {"relay_pin_name": "beci_upscharge_relay", "zone_id": "10", "gpio_pin_code": "0:out:3", "gpio_host_name": "pi-face"},
     {"relay_pin_name": "beci_extra_relay", "zone_id": "10", "gpio_pin_code": "0:out:4", "gpio_host_name": "pi-face"},
 
+    {"relay_pin_name": "freezer_relay", "zone_id": "10", "gpio_pin_code": "sonoff-pow-1", "gpio_host_name": "pi-face"},
+    {"relay_pin_name": "other_relay", "zone_id": "2", "gpio_pin_code": "sonoff-pow-2", "gpio_host_name": "pi-face"},
+    {"relay_pin_name": "other_relay_test", "zone_id": "2", "gpio_pin_code": "sonoff-pow-2", "gpio_host_name": "netbook"},
+
     {"relay_pin_name": "test_relay_netbook", "zone_id": "1", "gpio_pin_code": "1", "gpio_host_name": "netbook"},
     {"relay_pin_name": "unused-formerheat", "zone_id": "19", "gpio_pin_code": "24", "gpio_host_name": "pi-power"},
     {"relay_pin_name": "pod_music_relay", "zone_id": "1", "gpio_pin_code": "23", "gpio_host_name": "pi-power"},
