@@ -6,6 +6,7 @@ from main.logger_helper import L
 from main.admin import model_helper, models
 from main import thread_pool
 from transport import mqtt_io
+from transport.mqtt_io import sender
 
 
 class P:
@@ -44,6 +45,7 @@ def mqtt_on_message(client, userdata, msg):
                     L.l.info("Got relay {} state={}".format(sensor_name, power_is_on))
                     new_relay = models.ZoneCustomRelay(gpio_pin_code=sensor_name, gpio_host_name=Constant.HOST_NAME)
                     new_relay.relay_is_on = power_is_on
+                    current_relay.is_event_external = True
                     models.ZoneCustomRelay().save_changed_fields(
                         current_record=current_relay, new_record=new_relay, notify_transport_enabled=True,
                         save_to_graph=True)
@@ -53,6 +55,16 @@ def mqtt_on_message(client, userdata, msg):
                 L.l.warning("Energy payload missing from topic {}".format(msg.topic))
         else:
             L.l.warning("Invalid sensor topic {}".format(msg.topic))
+
+
+# iot/sonoff/stat/sonoff-basic-5/POWER = ON/OFF
+def set_relay_state(relay_name, relay_is_on):
+    if relay_is_on:
+        payload = 'ON'
+    else:
+        payload = 'OFF'
+    topic = P.sonoff_topic.replace('#', '')
+    sender.send_message(payload, topic + 'cmnd/' + relay_name + '/POWER')
 
 
 def thread_run():
