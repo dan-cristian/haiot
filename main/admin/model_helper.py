@@ -44,6 +44,7 @@ def model_row_to_json(obj, operation=''):
         return utils.safeobj2json(safe_obj)
     except Exception as ex:
         L.l.critical('Error convert model obj to json, err {}'.format(ex))
+        return None
 
 
 def get_param(name):

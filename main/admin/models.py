@@ -129,7 +129,7 @@ class DbBase:
     # graph_save_frequency in seconds
     def save_changed_fields(self, current_record=None, new_record='', notify_transport_enabled=False,
                             save_to_graph=False, ignore_only_updated_on_change=True, debug=False,
-                            graph_save_frequency=0, query_filter=None, save_all_fields=False):
+                            graph_save_frequency=0, save_all_fields=False):
         _start_time = utils.get_base_location_now_date()
         try:
             # inherit BaseGraph to enable persistence
@@ -192,7 +192,7 @@ class DbBase:
                     current_record.notify_transport_enabled = False
                 # fixme: remove hardcoded field name
                 elif len(current_record.last_commit_field_changed_list) == 1 and ignore_only_updated_on_change and \
-                                Constant.DB_FIELD_UPDATE in current_record.last_commit_field_changed_list:
+                        Constant.DB_FIELD_UPDATE in current_record.last_commit_field_changed_list:
                     current_record.notify_transport_enabled = False
             else:
                 new_record.notify_transport_enabled = notify_transport_enabled
@@ -259,6 +259,7 @@ class DbEvent:
     notified_on_db_commit = False
     notify_transport_enabled = False
     event_sent_datetime = None
+    is_event_external = None
 
     operation_type = None
     last_commit_field_changed_list = []
