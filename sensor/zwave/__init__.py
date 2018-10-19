@@ -96,6 +96,7 @@ def _set_custom_relay_state(sensor_address, state):
     if current_relay is not None:
         new_relay = models.ZoneCustomRelay(gpio_pin_code=sensor_address, gpio_host_name=Constant.HOST_NAME)
         new_relay.relay_is_on = state
+        new_relay.is_event_external = True
         models.ZoneCustomRelay().save_changed_fields(
             current_record=current_relay, new_record=new_relay, notify_transport_enabled=True, save_to_graph=True)
     else:
@@ -144,6 +145,7 @@ def set_value(network, node, value):
                         current_record.vdd = None
                         sensor_name = current_record.sensor_name
                     record = models.Sensor(address=sensor_address, sensor_name=sensor_name)
+                    record.is_event_external = True
                     if value.label == "Voltage":
                         record.vad = round(value.data, 0)
                         record.save_changed_fields(current_record=current_record, new_record=record,

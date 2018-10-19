@@ -6,6 +6,7 @@ from main.admin import models
 from main.admin.model_helper import commit
 from main import thread_pool
 from sensor import zwave
+from sensor import sonoff
 import std_gpio
 import piface
 import threading
@@ -134,6 +135,7 @@ def zone_custom_relay_record_update(json_object):
     try:
         host_name = utils.get_object_field_value(json_object, 'gpio_host_name')
         source_host = utils.get_object_field_value(json_object, 'source_host_')
+        is_event_external = utils.get_object_field_value(json_object, 'is_event_external')
         # L.l.info('Received custom relay state update for host {}'.format(host_name))
         if host_name == Constant.HOST_NAME:
             # execute local pin change related actions like turn on/off a relay
@@ -168,12 +170,15 @@ def zone_custom_relay_record_update(json_object):
                         L.l.error("Incorrect zwave switch format {}, must be <name>_<node_id>".format(gpio_pin_code))
                 elif relay_type == Constant.GPIO_PIN_TYPE_SONOFF:
                     if source_host == Constant.HOST_NAME:
-                        # no need for extra actions, relay already set and saved in DB
-                        L.l.info("Warning - what sonoff action should I do ?")
-                        pass
+                        if is_event_external:
+                            # event received from outside, so no need to set relay state again
+                            pass
+                        else:
+                            # event received from user db change, so act it
+                            sonoff.set_relay_state(relay_name=gpio_pin_code, relay_is_on=relay_is_on)
                     else:
                         # fixme: what to do here?
-                        L.l.info("Warning - what should I do?")
+                        L.l.info("Warning - what should I do, event from other host?")
                 else:
                     gpio_record = models.GpioPin.query.filter_by(pin_code=gpio_pin_code,
                                                                  host_name=Constant.HOST_NAME).first()

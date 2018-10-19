@@ -101,6 +101,7 @@
     {"id":443, "active":"0", "start_order":"43", "name":"cloud.thingspeak", "host_name":"pidash"},
 
     {"id":501, "active":"0", "start_order":"50", "name":"apps.dashcam", "host_name":"netbook"},
+    {"id":503, "active":"0", "start_order":"3", "name":"health_monitor"},
     {"id":509, "active":"1", "start_order":"9", "name":"heat", "host_name":"netbook"},
     {"id":599, "active":"1", "start_order":"99", "name":"test", "host_name":"netbook"},
     {"id":511, "active":"1", "start_order":"11", "name":"alarm", "host_name":"netbook"},
@@ -256,6 +257,11 @@
     {"relay_pin_name": "freezer_relay", "zone_id": "10", "gpio_pin_code": "sonoff-pow-1", "gpio_host_name": "pi-face", "relay_type": "sonoff"},
     {"relay_pin_name": "other_relay", "zone_id": "2", "gpio_pin_code": "sonoff-pow-2", "gpio_host_name": "pi-face", "relay_type": "sonoff"},
     {"relay_pin_name": "other_relay_test", "zone_id": "2", "gpio_pin_code": "sonoff-pow-2", "gpio_host_name": "netbook", "relay_type": "sonoff"},
+    {"relay_pin_name": "sonoff-1", "zone_id": "2", "gpio_pin_code": "sonoff-basic-1", "gpio_host_name": "pi-face", "relay_type": "sonoff"},
+    {"relay_pin_name": "sonoff-2", "zone_id": "2", "gpio_pin_code": "sonoff-basic-2", "gpio_host_name": "pi-face", "relay_type": "sonoff"},
+    {"relay_pin_name": "sonoff-3", "zone_id": "2", "gpio_pin_code": "sonoff-basic-3", "gpio_host_name": "pi-face", "relay_type": "sonoff"},
+    {"relay_pin_name": "sonoff-4", "zone_id": "2", "gpio_pin_code": "sonoff-basic-4", "gpio_host_name": "pi-face", "relay_type": "sonoff"},
+    {"relay_pin_name": "sonoff-5", "zone_id": "2", "gpio_pin_code": "sonoff-basic-5", "gpio_host_name": "pi-face", "relay_type": "sonoff"},
 
     {"relay_pin_name": "test_relay_netbook", "zone_id": "1", "gpio_pin_code": "1", "gpio_host_name": "netbook"},
     {"relay_pin_name": "unused-formerheat", "zone_id": "19", "gpio_pin_code": "24", "gpio_host_name": "pi-power"},
