@@ -189,8 +189,8 @@ def zone_custom_relay_record_update(json_object):
                         board = gpio_record.board_index
                         relay_set(gpio_pin_index_bcm=pin_code, gpio_pin_type=pin_type, gpio_board_index=board,
                                   value=value, from_web=False)
-                        if expire is not None:
-                            # revert back to initial state in x seconds
+                        if expire is not None and relay_is_on:
+                            # revert back to off state in x seconds
                             expire_time = datetime.now() + timedelta(seconds=expire)
                             init_val = not (bool(relay_is_on))
                             func = (relay_set, pin_code, pin_type, board, init_val, False)
