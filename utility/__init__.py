@@ -65,7 +65,7 @@ def __utility_update_ex(sensor_name, value, unit=None, index=None):
                                            notify_transport_enabled=True, save_to_graph=True, save_all_fields=True)
 
             else:
-                L.l.critical("Utility ex sensor [{}] is not defined in Utility table".format(sensor_name))
+                L.l.critical("Utility ex sensor {} index {} not defined in Utility table".format(sensor_name, index))
     except Exception as ex:
         L.l.error("Error saving utility ex update {}".format(ex), exc_info=True)
         if "Bind '" + Constant.DB_REPORTING_ID + "' is not specified" in ex.message:
