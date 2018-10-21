@@ -51,6 +51,7 @@ def mqtt_on_message(client, userdata, msg):
                 else:
                     L.l.error("ZoneCustomRelay with code {} does not exist in database".format(sensor_name))
             elif 'COUNTER' in obj:
+                # TelePeriod 60
                 counter = obj['COUNTER']
                 for i in [1, 2, 3, 4]:
                     c = 'C{}'.format(i)
