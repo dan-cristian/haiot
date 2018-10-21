@@ -60,8 +60,9 @@ def __utility_update_ex(sensor_name, value, unit=None, index=None):
             else:
                 L.l.critical("Utility ex sensor [{}] is not defined in Utility table".format(sensor_name))
     except Exception as ex:
-        L.l.error("Error saving utility ex update {}, try to connect to reporting DB".format(ex))
+        L.l.error("Error saving utility ex update {}".format(ex), exc_info=True)
         if "Bind '" + Constant.DB_REPORTING_ID + "' is not specified" in ex.message:
+            L.l.info('Try to connect to reporting DB, connection seems down')
             model_helper.init_reporting()
 
 
