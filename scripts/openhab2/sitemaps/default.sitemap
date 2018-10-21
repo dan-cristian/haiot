@@ -173,7 +173,7 @@ Frame {
 	Default item=electricity_voltage_plug_2
 	Default item=electricity_current_plug_2
 	Default item=electricity_power_freezer
-	Default item=electricity_power_other
+	Default item=electricity_power_gas_heater
 }
 
 Frame {

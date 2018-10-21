@@ -12,32 +12,47 @@ initialised = False
 
 
 # water & electricity utility from specialised sensors
-def __utility_update_ex(sensor_name, value, unit=None):
+def __utility_update_ex(sensor_name, value, unit=None, index=None):
     try:
         if value is not None:
             record = models.Utility(sensor_name=sensor_name)
-            current_record = models.Utility.query.filter_by(sensor_name=sensor_name).first()
+            if index is None:
+                current_record = models.Utility.query.filter_by(sensor_name=sensor_name).first()
+            else:
+                current_record = models.Utility.query.filter_by(sensor_name=sensor_name, sensor_index=index).first()
             if current_record is not None:
                 if current_record.units_total is None:
-                    current_record.units_total = 0.0
-                #else: - should not be needed
+                    # need to get
+                    last_rec = models.UtilityHistory.query.filter_by(
+                        utility_name=record.utility_name).order_by(desc(models.UtilityHistory.id)).first()
+                    if last_rec is not None:
+                        current_record.units_total = last_rec.units_total
+                    else:
+                        current_record.units_total = 0.0
+                # else: - should not be needed
                 #    # force save
                 #    if current_record is not None:
                 #        current_record.units_total = -1
                 record.utility_name = current_record.utility_name
-                if current_record.utility_type == Constant.UTILITY_TYPE_WATER_LEVEL:
+                if current_record.utility_type == Constant.UTILITY_TYPE_WATER:
+                    new_value = value / (current_record.ticks_per_unit * 1.0)
+                    delta = max(0, current_record.units_total - new_value)
+                    record.units_total = new_value
+                    record.units_delta = delta
+                    record.units_2_delta = 0.0
+                elif current_record.utility_type == Constant.UTILITY_TYPE_WATER_LEVEL:
                     record.units_total = value / (current_record.ticks_per_unit * 1.0)
                     L.l.info("Saving utility water level value={} depth={}".format(value, record.units_total))
                 elif current_record.utility_type == Constant.UTILITY_TYPE_ELECTRICITY:
                     if unit == current_record.unit_2_name:
                         record.units_2_delta = value
-                        record.units_delta = 0
+                        record.units_delta = 0.0
                     elif unit == current_record.unit_name:
                         record.units_total = value
                         record.units_delta = value - current_record.units_total
                         current_record.units_total = value
                         current_record.commit_record_to_db()
-                    #L.l.info("Saving power level value={} depth={}".format(value, record.units_2_delta))
+                    # L.l.info("Saving power level value={} depth={}".format(value, record.units_2_delta))
                 L.l.debug("Saving utility ex record {} name={}".format(current_record, record.utility_name))
                 record.save_changed_fields(current_record=current_record, new_record=record, debug=False,
                                            notify_transport_enabled=True, save_to_graph=True, save_all_fields=True)
