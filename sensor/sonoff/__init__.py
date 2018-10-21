@@ -46,9 +46,8 @@ def mqtt_on_message(client, userdata, msg):
                     new_relay = models.ZoneCustomRelay(gpio_pin_code=sensor_name, gpio_host_name=Constant.HOST_NAME)
                     new_relay.relay_is_on = power_is_on
                     current_relay.is_event_external = True
-                    models.ZoneCustomRelay().save_changed_fields(
-                        current_record=current_relay, new_record=new_relay, notify_transport_enabled=True,
-                        save_to_graph=True)
+                    models.ZoneCustomRelay().save_changed_fields(current_record=current_relay, new_record=new_relay,
+                                                                 notify_transport_enabled=True, save_to_graph=True)
                 else:
                     L.l.error("ZoneCustomRelay with code {} does not exist in database".format(sensor_name))
             elif 'COUNTER' in obj:
@@ -57,8 +56,7 @@ def mqtt_on_message(client, userdata, msg):
                     c = 'C{}'.format(i)
                     if c in counter:
                         cval = int(counter[c])
-                        dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=cval, unit='l',
-                                        index=i)
+                        dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=cval, index=i)
             else:
                 L.l.warning("Usefull payload missing from topic {} payload={}".format(msg.topic, msg.payload))
         else:
