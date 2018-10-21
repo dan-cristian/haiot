@@ -243,9 +243,9 @@
     {"relay_pin_name": "test_relay", "zone_id": "1", "gpio_pin_code": "66", "gpio_host_name": "pi-face"},
     {"relay_pin_name": "puffer_pump_heat_relay", "zone_id": "38", "gpio_pin_code": "22", "gpio_host_name": "pi-face"},
     {"relay_pin_name": "puffer_pump_water_relay", "zone_id": "38", "gpio_pin_code": "5", "gpio_host_name": "pi-face"},
-    {"relay_pin_name": "pump_recirculation_relay", "zone_id": "29", "gpio_pin_code": "27", "gpio_host_name": "pi-face", "expire": "1"},
+    {"relay_pin_name": "pump_recirculation_relay", "zone_id": "29", "gpio_pin_code": "27", "gpio_host_name": "pi-face", "expire": "120"},
     {"relay_pin_name": "other_heat_relay", "zone_id": "29", "gpio_pin_code": "26", "gpio_host_name": "pi-face"},
-    {"relay_pin_name": "front_lights_relay", "zone_id": "14", "gpio_pin_code": "6", "gpio_host_name": "pi-face"},
+    {"relay_pin_name": "front_lights_relay", "zone_id": "14", "gpio_pin_code": "6", "gpio_host_name": "pi-face", "expire": "60"},
     {"relay_pin_name": "puffer_gas_valve_relay", "zone_id": "38", "gpio_pin_code": "13", "gpio_host_name": "pi-face"},
     {"relay_pin_name": "unused_beci_relay", "zone_id": "14", "gpio_pin_code": "19", "gpio_host_name": "pi-face"},
 
@@ -255,7 +255,7 @@
     {"relay_pin_name": "beci_extra_relay", "zone_id": "10", "gpio_pin_code": "0:out:4", "gpio_host_name": "pi-face"},
 
     {"relay_pin_name": "freezer_relay", "zone_id": "10", "gpio_pin_code": "sonoff-pow-1", "gpio_host_name": "pi-face", "relay_type": "sonoff"},
-    {"relay_pin_name": "other_relay", "zone_id": "2", "gpio_pin_code": "sonoff-pow-2", "gpio_host_name": "pi-face", "relay_type": "sonoff"},
+    {"relay_pin_name": "gas_heater_relay", "zone_id": "29", "gpio_pin_code": "sonoff-pow-2", "gpio_host_name": "pi-face", "relay_type": "sonoff"},
     {"relay_pin_name": "other_relay_test", "zone_id": "2", "gpio_pin_code": "sonoff-pow-2", "gpio_host_name": "netbook", "relay_type": "sonoff"},
     {"relay_pin_name": "sonoff-1", "zone_id": "2", "gpio_pin_code": "sonoff-basic-1", "gpio_host_name": "pi-face", "relay_type": "sonoff"},
     {"relay_pin_name": "sonoff-2", "zone_id": "2", "gpio_pin_code": "sonoff-basic-2", "gpio_host_name": "pi-face", "relay_type": "sonoff"},
@@ -389,7 +389,12 @@
     {"utility_name":"power plug 2", "sensor_name":"zwave plug 2", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
 
     {"utility_name":"power freezer", "sensor_name":"sonoff-pow-1", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
-    {"utility_name":"power other", "sensor_name":"sonoff-pow-2", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
+    {"utility_name":"power gas heater", "sensor_name":"sonoff-pow-2", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
+
+    {"utility_name":"water hot", "sensor_name":"sonoff-basic-2", "sensor_index":1, "ticks_per_unit":1, "unit_name":"l", "utility_type":"water", "unit_cost":2.9388},
+    {"utility_name":"gas", "sensor_name":"sonoff-basic-2", "sensor_index":2, "ticks_per_unit":100, "unit_name":"mc", "utility_type":"gas", "unit_cost":1.5675},
+
+    {"utility_name":"water house", "sensor_name":"sonoff-basic-4", "sensor_index":1, "ticks_per_unit":1, "unit_name":"l", "utility_type":"water", "unit_cost":2.9388},
 
     {"utility_name":"power rack", "sensor_name":"power rack", "sensor_index":0, "ticks_per_unit":2000, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
     {"utility_name":"power beci", "sensor_name":"utility beci", "sensor_index":0, "ticks_per_unit":1600, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
