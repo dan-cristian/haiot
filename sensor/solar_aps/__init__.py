@@ -1,7 +1,7 @@
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
 from main.logger_helper import L
-from common import Constant, utils, variable
+from common import Constant, utils
 from main.admin import models, model_helper
 from main import thread_pool
 
@@ -19,6 +19,9 @@ class P:
     end_key_temp = '&nbsp;<sup>o</sup>C'
     start_key_panel = '<td align=center>'
     end_key_panel = '-A</td>'
+
+    def __init__(self):
+        pass
 
 
 def init_solar_aps():

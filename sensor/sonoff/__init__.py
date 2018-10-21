@@ -30,10 +30,10 @@ def mqtt_on_message(client, userdata, msg):
             obj = utils.json2obj(msg.payload)
             if 'ENERGY' in obj:
                 energy = obj['ENERGY']
-                power = energy['Power']
-                voltage = energy['Voltage']
+                power = float(energy['Power'])
+                voltage = int(energy['Voltage'])
                 factor = energy['Factor']
-                current = energy['Current']
+                current = float(energy['Current'])
                 # unit should match Utility unit name in models definition
                 dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=power, unit='watt')
                 dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=current, unit='kWh')
@@ -54,9 +54,11 @@ def mqtt_on_message(client, userdata, msg):
             elif 'COUNTER' in obj:
                 counter = obj['COUNTER']
                 for i in [1, 2, 3, 4]:
-                    if 'C{}'.format(i) in counter:
-                        c = 'C{}'.format(i)
-                        dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=c, unit='l', index=i)
+                    c = 'C{}'.format(i)
+                    if c in counter:
+                        cval = int(counter[c])
+                        dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=cval, unit='l',
+                                        index=i)
             else:
                 L.l.warning("Usefull payload missing from topic {} payload={}".format(msg.topic, msg.payload))
         else:
