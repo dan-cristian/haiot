@@ -51,8 +51,14 @@ def mqtt_on_message(client, userdata, msg):
                         save_to_graph=True)
                 else:
                     L.l.error("ZoneCustomRelay with code {} does not exist in database".format(sensor_name))
+            elif 'COUNTER' in obj:
+                counter = obj['COUNTER']
+                for i in [1, 2, 3, 4]:
+                    if 'C{}'.format(i) in counter:
+                        c = 'C{}'.format(i)
+                        dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=c, unit='l', index=i)
             else:
-                L.l.warning("Energy payload missing from topic {}".format(msg.topic))
+                L.l.warning("Usefull payload missing from topic {} payload={}".format(msg.topic, msg.payload))
         else:
             L.l.warning("Invalid sensor topic {}".format(msg.topic))
 
