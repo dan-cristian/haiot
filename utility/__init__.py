@@ -52,7 +52,14 @@ def __utility_update_ex(sensor_name, value, unit=None, index=None):
                         record.units_delta = value - current_record.units_total
                         current_record.units_total = value
                         current_record.commit_record_to_db()
-                    # L.l.info("Saving power level value={} depth={}".format(value, record.units_2_delta))
+                elif current_record.utility_type == Constant.UTILITY_TYPE_GAS:
+                    new_value = value / (current_record.ticks_per_unit * 1.0)
+                    delta = max(0, current_record.units_total - new_value)
+                    record.units_total = new_value
+                    record.units_delta = delta
+                    record.units_2_delta = 0.0
+                else:
+                    L.l.warning("Unkown utility type not processed from sensor {}".format(sensor_name))
                 L.l.debug("Saving utility ex record {} name={}".format(current_record, record.utility_name))
                 record.save_changed_fields(current_record=current_record, new_record=record, debug=False,
                                            notify_transport_enabled=True, save_to_graph=True, save_all_fields=True)
