@@ -300,8 +300,8 @@ def thread_run():
     progress_status = 'Looping zones'
     if P.threshold is None:
         P.threshold = float(get_param(Constant.P_TEMPERATURE_THRESHOLD))
-    if P.temp_limit is None:
         P.temp_limit = float(get_param(Constant.P_HEAT_SOURCE_MIN_TEMP))
+        P.MAX_DELTA_TEMP_KEEP_WARM = float(get_param(Constant.P_MAX_DELTA_TEMP_KEEP_WARM))
     set_main_heat_source()
     loop_zones()
     # loop_heat_relay()
