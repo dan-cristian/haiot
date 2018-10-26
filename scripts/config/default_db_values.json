@@ -53,6 +53,7 @@
     {"name": "ALEXA_WEMO_LISTEN_PORT", "value": "50000", "description":"starting port to be used to listen by alexa wemo devices"},
     {"name": "HEAT_SOURCE_MIN_TEMP", "value": "40", "description":"minimum temperature to consider a heat source usable"},
     {"name": "HEAT_STATE_REFRESH_PERIOD", "value": "1", "description":"period in minutes to do a heath status & gpio pins refresh"},
+    {"name": "MAX_DELTA_TEMP_KEEP_WARM", "value": "2", "description":"max delta in degrees for a keep warm zone to be started"},
     {"name": "SOLAR_APS_LOCAL_URL", "value": "http://192.168.0.10/cgi-bin/home", "description":"link to aps ecu page with day production"},
     {"name": "SOLAR_APS_LOCAL_REALTIME_URL", "value": "http://192.168.0.10/cgi-bin/parameters", "description":"link to aps ecu page with realtime production"},
     {"name": "SOLAR_UTILITY_NAME", "value": "solar_aps", "description":"utility name from utility table"}
@@ -362,12 +363,6 @@
     {"zone_id":27 , "sensor_address": "b8:01", "sensor_name": "desk"},
     {"zone_id":49 , "sensor_address": "AC000003BE024F28", "sensor_name": "soba beci", "target_material": "water"},
     {"zone_id":10 , "sensor_address": "4E000001CEF07926", "sensor_name": "voltage-water"},
-    {"zone_id":8 ,  "sensor_address": "A80000000F86B81D", "sensor_name": "power main 1"},
-    {"zone_id":7 ,  "sensor_address": "BE0000000F870C1D", "sensor_name": "water main"},
-    {"zone_id":29 , "sensor_address": "EF0000000F97CA1D", "sensor_name": "power main 2"},
-    {"zone_id":29 , "sensor_address": "F90000000FFEAB1D", "sensor_name": "power rack"},
-    {"zone_id":10 , "sensor_address": "1C0000000F99851D", "sensor_name": "utility beci", "alt_address": "1D.85990F000000"},
-    {"zone_id":29 , "sensor_address": "AB0000000F60491D", "sensor_name": "water beci", "alt_address": "1D.49600F000000"},
     {"zone_id":4 ,  "sensor_address": "FB00000017413E3A", "sensor_name": "dormitor bedroom", "target_material": "air"},
     {"zone_id":7 ,  "sensor_address": "C8000004F3495728", "sensor_name": "curte fata", "target_material": "air"},
     {"zone_id":27 , "sensor_address": "02000004F31C1C28", "sensor_name": "pod fata", "target_material": "air", "alt_address": ""},
@@ -378,12 +373,6 @@
   ],
 
   "Utility": [
-    {"utility_name":"water main", "sensor_name":"water main", "sensor_index":1, "ticks_per_unit":0.1, "unit_name":"l", "utility_type":"water", "unit_cost":2.9388},
-    {"utility_name":"water house", "sensor_name":"water beci", "sensor_index":0, "ticks_per_unit":1, "unit_name":"l", "utility_type":"water", "unit_cost":2.9388},
-    {"utility_name":"water hot", "sensor_name":"water beci", "sensor_index":1, "ticks_per_unit":1, "unit_name":"l", "utility_type":"water", "unit_cost":2.9388},
-    {"utility_name":"power main 3", "sensor_name":"power main 1", "sensor_index":1, "ticks_per_unit":2000, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
-    {"utility_name":"power main 1", "sensor_name":"power main 2", "sensor_index":0, "ticks_per_unit":2000, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
-    {"utility_name":"power main 2", "sensor_name":"power main 2", "sensor_index":1, "ticks_per_unit":2000, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
     {"utility_name":"power main mono", "sensor_name":"zwave main power meter", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
     {"utility_name":"power plug 1", "sensor_name":"zwave plug 1", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
     {"utility_name":"power plug 2", "sensor_name":"zwave plug 2", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
@@ -393,20 +382,10 @@
 
     {"utility_name":"water hot", "sensor_name":"sonoff-basic-2", "sensor_index":1, "ticks_per_unit":1, "unit_name":"l", "utility_type":"water", "unit_cost":2.9388},
     {"utility_name":"gas", "sensor_name":"sonoff-basic-2", "sensor_index":2, "ticks_per_unit":100, "unit_name":"mc", "utility_type":"gas", "unit_cost":1.5675},
-
     {"utility_name":"water house", "sensor_name":"sonoff-basic-4", "sensor_index":1, "ticks_per_unit":1, "unit_name":"l", "utility_type":"water", "unit_cost":2.9388},
     {"utility_name":"unused 1", "sensor_name":"sonoff-basic-4", "sensor_index":2, "ticks_per_unit":1, "unit_name":"l", "utility_type":"water", "unit_cost":0},
     {"utility_name":"water main", "sensor_name":"sonoff-basic-5", "sensor_index":1, "ticks_per_unit":0.1, "unit_name":"l", "utility_type":"water", "unit_cost":2.9388},
 
-    {"utility_name":"power rack", "sensor_name":"power rack", "sensor_index":0, "ticks_per_unit":2000, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
-    {"utility_name":"power beci", "sensor_name":"utility beci", "sensor_index":0, "ticks_per_unit":1600, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
-    {"utility_name":"gas", "sensor_name":"utility beci", "sensor_index":1, "ticks_per_unit":100, "unit_name":"mc", "utility_type":"gas", "unit_cost":1.5675},
-
-    {"utility_name":"broken", "sensor_name":"water main", "sensor_index":0, "ticks_per_unit":1, "unit_name":"", "utility_type":"none", "unit_cost":0},
-    {"utility_name":"broken", "sensor_name":"power main 1", "sensor_index":0, "ticks_per_unit":1, "unit_name":"", "utility_type":"none", "unit_cost":0},
-    {"utility_name":"unavailable", "sensor_name":"power rack", "sensor_index":1, "ticks_per_unit":1, "unit_name":"", "utility_type":"none", "unit_cost":0},
-
-    {"utility_name":"dirty water", "sensor_name":"voltage-water", "sensor_index":0, "ticks_per_unit":0.6666, "unit_name":"meter", "utility_type":"water level", "unit_cost":0},
     {"utility_name":"solar_aps", "sensor_name":"none", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259}
   ],
 
