@@ -136,7 +136,7 @@ def unload():
 
 
 def post_init():
-    L.l.info('Running post_init')
+    L.l.info('Running post_init piface')
     # read default values
     for board in P.pfd.keys():
         for pin in range(8):
