@@ -65,6 +65,7 @@ def _save_threads_cpu_percent(p, interval=0.1):
             log.write("{} % \t {} \t\t\t\t {}\n".format(load, tname, t))
         log.write("Total={} %\n".format(total))
 
+
 def _cpu_profiling():
     p = psutil.Process(os.getpid())
     #mem = p.get_memory_info()[0] / float(2 ** 20)
