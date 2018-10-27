@@ -132,12 +132,13 @@ def post_init():
             gpio_pin_code = _format_pin_code(board_index=board, pin_direction=Constant.GPIO_PIN_DIRECTION_OUT,
                                              pin_index=pin)
             pin_out_val = get_out_pin_value(pin_index=pin, board_index=board)
+            L.l.info('Read out pin {} value={}'.format(gpio_pin_code, pin_out_val))
             io_common.update_custom_relay(pin_code=gpio_pin_code, pin_value=pin_out_val, notify=True)
             gpio_pin_code = _format_pin_code(board_index=board, pin_direction=Constant.GPIO_PIN_DIRECTION_IN,
                                              pin_index=pin)
             pin_in_val = _get_in_pin_value(pin_index=pin, board_index=board)
-            alt_pin_in = P.pfd[board].input_pins[pin].value
-            # L.l.info('Read input pin {} value={} alt={}'.format(gpio_pin_code, pin_in_val, alt_pin_in))
+            # alt_pin_in = P.pfd[board].input_pins[pin].value
+            L.l.info('Read input pin {} value={}'.format(gpio_pin_code, pin_in_val))
             io_common.update_custom_relay(pin_code=gpio_pin_code, pin_value=pin_in_val, notify=True)
             # resend to ensure is received by other late init modules like openhab
             dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio_pin_code, direction=Constant.GPIO_PIN_DIRECTION_IN,
