@@ -120,7 +120,7 @@ def init_modules():
             else:
                 # Log.logger.info("Initialising generic mod definition name={} active={}".format(mod.name, mod.active))
                 mod_name = mod.name
-                mod_active = 1
+                mod_active = mod.active
             init_module(mod_name, mod_active)
 
 
