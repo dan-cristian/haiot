@@ -28,7 +28,7 @@ def handle_event_alarm(gpio_pin_code='', direction='', pin_value='', pin_connect
                 else:
                     L.l.error(
                         "Could not find zone for gpio pin {}, trigger actions could be missed".format(gpio_pin_code))
-                zonealarm.alarm_pin_triggered = pin_value
+                zonealarm.alarm_pin_triggered = pin_connected
                 zonealarm.updated_on = utils.get_base_location_now_date()
                 zonealarm.notify_transport_enabled = True
                 commit()
