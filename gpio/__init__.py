@@ -200,6 +200,7 @@ def zone_custom_relay_record_update(json_object):
                                         pin_code_ok = pin_code
                                     func_update = (io_common.update_custom_relay, pin_code_ok, init_val, True)
                                     if expire_time not in P.expire_func_list.keys():
+                                        L.l.info('Add expire code={} type={}'.format(pin_code_ok, pin_type))
                                         P.expire_func_list[expire_time] = func
                                         P.expire_func_list[expire_time + timedelta(microseconds=1)] = func_update
                                     else:

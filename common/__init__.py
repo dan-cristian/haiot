@@ -160,8 +160,8 @@ class Constant:
     JSON_PUBLISH_RECORD_UUID = 'record_uuid'
 
     GPIO_PIN_TYPE_BBB = 'bbb'
-    GPIO_PIN_TYPE_PI_STDGPIO = 'pi-stdgpio'
-    GPIO_PIN_TYPE_PI_FACE_SPI = 'pi-face-spi'
+    GPIO_PIN_TYPE_PI_STDGPIO = 'gpio'
+    GPIO_PIN_TYPE_PI_FACE_SPI = 'piface'
     GPIO_PIN_TYPE_ZWAVE = 'zwave'
     GPIO_PIN_TYPE_SONOFF = 'sonoff'
     GPIO_PIN_DIRECTION_IN = 'in'
