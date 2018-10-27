@@ -17,3 +17,5 @@ def update_custom_relay(pin_code, pin_value, notify=False):
         relay.relay_is_on = bool(pin_value)
         relay.notify_transport_enabled = notify
         relay.commit_record_to_db()
+        L.l.info('Updated relay {} val={}'.format(pin_code, bool(pin_value)))
+
