@@ -110,7 +110,7 @@ def setup_in_ports_pif(gpio_pin_list):
                         P.listener[board].register(pin, pfio.IODIR_ON, input_event)
                         P.listener[board].register(pin, pfio.IODIR_OFF, input_event)
                         L.l.info('OK callback set on piface board {}, {} pin {}'.format(board, gpio_pin.pin_code, pin))
-                        _read_default(pin=pin)
+                        _read_default(pin=pin, board_index=board)
                 except Exception as ex:
                     L.l.critical('Unable to setup piface listener board={} pin={} err={}'.format(
                         board, gpio_pin.pin_code, ex))
