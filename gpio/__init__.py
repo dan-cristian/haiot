@@ -171,6 +171,15 @@ def zone_custom_relay_record_update(json_object):
                     gpio_record = models.GpioPin.query.filter_by(pin_code=gpio_pin_code,
                                                                  host_name=Constant.HOST_NAME).first()
                     if gpio_record is not None:
+                        if source_host == Constant.HOST_NAME:
+                            if is_event_external:
+                                L.l.info('Event received from outside, so no need to set relay state again')
+                                pass
+                            else:
+                                L.l.info('Event received from user db change, so act it')
+                                pass
+                        else:
+                            L.l.info('Event received from other host')
                         value = 1 if relay_is_on else 0
                         pin_code = gpio_record.pin_index_bcm
                         pin_type = gpio_record.pin_type
