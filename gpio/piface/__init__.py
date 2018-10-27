@@ -60,10 +60,11 @@ def _input_event(event):
     pin_num = event.pin_num
     board_index = event.chip.hardware_addr
     direction = event.direction  # 0 for press/contact, 1 for release/disconnect
+    alt_val = _get_in_pin_value(pin_num, board_index)
     gpio_pin_code = _format_pin_code(board_index=board_index, pin_direction=Constant.GPIO_PIN_DIRECTION_IN,
                                      pin_index=pin_num)
     # if gpio_pin_code == 7:
-    L.l.info('Event piface gpio={} direction={}'.format(gpio_pin_code, direction))
+    L.l.info('Event piface gpio={} direction={} altval={}'.format(gpio_pin_code, direction, alt_val))
     dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio_pin_code, direction=Constant.GPIO_PIN_DIRECTION_IN,
                     pin_value=direction, pin_connected=(direction == 0))
 
@@ -127,7 +128,8 @@ def _setup_board():
 def unload():
     L.l.info('Piface unloading')
     if P.import_ok:
-        pfio.deinit_board()
+        pass
+        # pfio.deinit_board()
 
 
 def post_init():
