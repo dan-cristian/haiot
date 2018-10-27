@@ -194,13 +194,12 @@ def zone_custom_relay_record_update(json_object):
                                     # set notify to true to inform openhab on state change
                                     if pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
                                         pin_code_ok = piface.format_pin_code(
-                                            board_index=board, pin_direction=Constant.GPIO_PIN_DIRECTION_IN,
+                                            board_index=board, pin_direction=Constant.GPIO_PIN_DIRECTION_OUT,
                                             pin_index=pin_code)
                                     else:
                                         pin_code_ok = pin_code
                                     func_update = (io_common.update_custom_relay, pin_code_ok, init_val, True)
                                     if expire_time not in P.expire_func_list.keys():
-                                        L.l.info('Add expire code={} type={}'.format(pin_code_ok, pin_type))
                                         P.expire_func_list[expire_time] = func
                                         P.expire_func_list[expire_time + timedelta(microseconds=1)] = func_update
                                     else:
