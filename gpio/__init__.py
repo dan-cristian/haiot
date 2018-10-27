@@ -149,7 +149,7 @@ def zone_custom_relay_record_update(json_object):
                             func = (zwave.set_switch_state, node_id, init_val)
                             if expire_time not in P.expire_func_list.keys():
                                 P.expire_func_list[expire_time] = func
-                                func_update = (io_common.update_custom_relay, gpio_pin_code, init_val)
+                                func_update = (io_common.update_custom_relay, gpio_pin_code, init_val, True)
                                 P.expire_func_list[expire_time + timedelta(microseconds=1)] = func_update
                             else:
                                 L.l.error("Duplicate zwave key in list")
@@ -182,7 +182,8 @@ def zone_custom_relay_record_update(json_object):
                             expire_time = datetime.now() + timedelta(seconds=expire)
                             init_val = not (bool(relay_is_on))
                             func = (relay_set, pin_code, pin_type, board, init_val, False)
-                            func_update = (io_common.update_custom_relay, pin_code, init_val)
+                            # set notify to true to inform openhab on state change
+                            func_update = (io_common.update_custom_relay, pin_code, init_val, True)
                             if expire_time not in P.expire_func_list.keys():
                                 P.expire_func_list[expire_time] = func
                                 P.expire_func_list[expire_time + timedelta(microseconds=1)] = func_update

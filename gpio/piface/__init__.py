@@ -59,12 +59,13 @@ def _input_event(event):
     # L.l.info('Piface switch event={}'.format(event))
     pin_num = event.pin_num
     board_index = event.chip.hardware_addr
+    # direction gives different results than pin value
     direction = event.direction  # 0 for press/contact, 1 for release/disconnect
     pin_val = _get_in_pin_value(pin_num, board_index)
     gpio_pin_code = _format_pin_code(board_index=board_index, pin_direction=Constant.GPIO_PIN_DIRECTION_IN,
                                      pin_index=pin_num)
     # if gpio_pin_code == 7:
-    L.l.info('Event piface gpio={} direction={} altval={}'.format(gpio_pin_code, direction, pin_val))
+    # L.l.info('Event piface gpio={} direction={} altval={}'.format(gpio_pin_code, direction, pin_val))
     dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio_pin_code, direction=Constant.GPIO_PIN_DIRECTION_IN,
                     pin_value=pin_val, pin_connected=(pin_val == 1))
 
@@ -136,7 +137,7 @@ def post_init():
                                              pin_index=pin)
             pin_in_val = _get_in_pin_value(pin_index=pin, board_index=board)
             alt_pin_in = P.pfd[board].input_pins[pin].value
-            L.l.info('Read input pin {} value={} alt={}'.format(gpio_pin_code, pin_in_val, alt_pin_in))
+            # L.l.info('Read input pin {} value={} alt={}'.format(gpio_pin_code, pin_in_val, alt_pin_in))
             io_common.update_custom_relay(pin_code=gpio_pin_code, pin_value=pin_in_val, notify=True)
             # resend to ensure is received by other late init modules like openhab
             dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio_pin_code, direction=Constant.GPIO_PIN_DIRECTION_IN,
