@@ -148,6 +148,9 @@ def post_init():
                                              pin_index=pin)
             pin_in_val = get_in_pin_value(pin_index=pin, board_index=board)
             io_common.update_custom_relay(pin_code=gpio_pin_code, pin_value=pin_in_val, notify=True)
+            # resend to ensure is received by other late init modules like openhab
+            dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio_pin_code, direction=Constant.GPIO_PIN_DIRECTION_IN,
+                            pin_value=pin_in_val, pin_connected=(pin_in_val == 0))
 
 
 def init():
