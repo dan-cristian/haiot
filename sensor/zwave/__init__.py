@@ -97,6 +97,7 @@ def _set_custom_relay_state(sensor_address, state):
         new_relay = models.ZoneCustomRelay(gpio_pin_code=sensor_address, gpio_host_name=Constant.HOST_NAME)
         new_relay.relay_is_on = state
         new_relay.is_event_external = True
+        current_relay.is_event_external = None
         models.ZoneCustomRelay().save_changed_fields(
             current_record=current_relay, new_record=new_relay, notify_transport_enabled=True, save_to_graph=True)
     else:
