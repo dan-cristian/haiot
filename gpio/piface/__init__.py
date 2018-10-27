@@ -35,7 +35,9 @@ def _format_pin_code(board_index, pin_direction, pin_index):
     return str(board_index) + ":" + str(pin_direction) + ":" + str(pin_index)
 
 
-def get_in_pin_value(pin_index, board_index):
+# To read the state of an input use the pfio.digital_read(pin) function. If a button is
+# pressed the function returns a 1, otherwise it returns a 0.
+def _get_in_pin_value(pin_index, board_index):
     return pfio.digital_read(pin_num=pin_index, hardware_addr=board_index)
 
 
@@ -53,11 +55,6 @@ def set_pin_value(pin_index, pin_value, board_index):
     return act_value
 
 
-# not used
-# def set_relay(index, value):
-#    pfio.relays[index].value = value
-
-
 def _input_event(event):
     # L.l.info('Piface switch event={}'.format(event))
     pin_num = event.pin_num
@@ -73,7 +70,7 @@ def _input_event(event):
 
 # read input pins and set signal (for alarm status etc)
 def _read_default(pin, board_index):
-    val = get_in_pin_value(pin_index=pin)
+    val = _get_in_pin_value(pin_index=pin, board_index=board_index)
     gpio_pin_code = _format_pin_code(board_index=board_index, pin_direction=Constant.GPIO_PIN_DIRECTION_IN,
                                      pin_index=pin)
     dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio_pin_code, direction=Constant.GPIO_PIN_DIRECTION_IN,
@@ -144,8 +141,9 @@ def post_init():
             io_common.update_custom_relay(pin_code=gpio_pin_code, pin_value=pin_out_val, notify=True)
             gpio_pin_code = _format_pin_code(board_index=board, pin_direction=Constant.GPIO_PIN_DIRECTION_IN,
                                              pin_index=pin)
-            pin_in_val = get_in_pin_value(pin_index=pin, board_index=board)
-            L.l.info('Read input pin {} value={}'.format(gpio_pin_code, pin_in_val))
+            pin_in_val = _get_in_pin_value(pin_index=pin, board_index=board)
+            alt_pin_in = P.pfd[board].input_pins[pin]
+            L.l.info('Read input pin {} value={} alt={}'.format(gpio_pin_code, pin_in_val, alt_pin_in))
             io_common.update_custom_relay(pin_code=gpio_pin_code, pin_value=pin_in_val, notify=True)
             # resend to ensure is received by other late init modules like openhab
             dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio_pin_code, direction=Constant.GPIO_PIN_DIRECTION_IN,
