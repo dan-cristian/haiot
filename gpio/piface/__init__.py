@@ -130,7 +130,7 @@ def _setup_board():
 def unload():
     L.l.info('Piface unloading')
     if P.import_ok:
-        for listener in P.listener:
+        for listener in P.listener.values():
             listener.deactivate()
         pfio.deinit_board()
 
