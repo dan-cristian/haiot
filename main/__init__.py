@@ -10,7 +10,7 @@ from main.logger_helper import L
 try:
     import pymysql
 except ImportError as ex:
-    print "Unable to import pymysql, err={}".format(ex)
+    print("Unable to import pymysql, err={}".format(ex))
 
 # location for main db - sqlite db
 DB_LOCATION = None
@@ -27,6 +27,14 @@ BIND_IP = None
 BIND_PORT = None
 IS_STANDALONE_MODE = None  # runs standalone, no node / mqtt connection & history
 
+
+class P:
+    init_mod_list = []
+
+    def __init__(self):
+        pass
+
+
 def my_import(name):
     # http://stackoverflow.com/questions/547829/how-to-dynamically-load-a-python-class
     try:
@@ -42,7 +50,7 @@ def my_import(name):
 
 def init_module(module_name, module_is_active):
     if module_is_active:
-        #L.l.info("Importing module {}".format(module_name))
+        # L.l.info("Importing module {}".format(module_name))
         dynclass = my_import(module_name)
         if dynclass:
             # Log.logger.info('Module {} is marked as active'.format(module_name))
@@ -53,6 +61,7 @@ def init_module(module_name, module_is_active):
             if not inited:
                 L.l.info('Module {} initialising'.format(module_name))
                 dynclass.init()
+                P.init_mod_list.append(module_name)
             else:
                 L.l.info('Module {} already initialised, skipping init'.format(module_name))
         else:
@@ -106,27 +115,27 @@ def init_modules():
             if mod_host_specific:
                 # Log.logger.info("Initialising host specific module definition {} {}".format(
                 #    mod_host_specific.name, mod_host_specific.active))
-                init_module(mod_host_specific.name, mod_host_specific.active == 1)
+                mod_name = mod_host_specific.name
+                mod_active = mod_host_specific.active
             else:
                 # Log.logger.info("Initialising generic mod definition name={} active={}".format(mod.name, mod.active))
-                init_module(mod.name, mod.active == 1)
+                mod_name = mod.name
+                mod_active = 1
+            init_module(mod_name, mod_active)
+
+
+def init_post_modules():
     # run post_init actions
-    for mod in module_list:
-        if mod.name != 'main':
-            mod_host_specific = m().query_filter_first(m.host_name.in_([Constant.HOST_NAME]), m.name.in_([mod.name]))
-            if mod_host_specific:
-                module_name = mod_host_specific.name
+    for module_name in P.init_mod_list:
+        dynclass = my_import(module_name)
+        if dynclass:
+            # Log.logger.info('Module {} is marked as active'.format(module_name))
+            if hasattr(dynclass, 'initialised'):
+                inited = dynclass.initialised
             else:
-                module_name = mod.name
-            dynclass = my_import(module_name)
-            if dynclass:
-                # Log.logger.info('Module {} is marked as active'.format(module_name))
-                if hasattr(dynclass, 'initialised'):
-                    inited = dynclass.initialised
-                else:
-                    inited = dynclass.P.initialised
-                if inited and hasattr('post_init'):
-                    dynclass.post_init()
+                inited = dynclass.P.initialised
+            if inited and hasattr(dynclass, 'post_init'):
+                dynclass.post_init()
 
 
 def signal_handler(signal_name, frame):
@@ -185,16 +194,6 @@ def unload():
     shutting_down = True
     main.thread_pool.__thread_pool_enabled = False
     unload_modules()
-
-    from main import cron
-    cron.unload()
-
-    #if webui.initialised:
-    #    webui.unload()
-    #if mqtt_io.initialised:
-    #    mqtt_io.unload()
-    #if gpio.initialised:
-    #    gpio.unload()
 
 
 def init():
@@ -299,9 +298,6 @@ def init():
     t.daemon = True
     t.start()
 
-    from main import cron
-    cron.init()
-
     from common import performance
     performance.init(admin.model_helper.get_param(Constant.P_PERF_FILE_PATH))
 
@@ -312,9 +308,9 @@ def init():
     @models_committed.connect_via(app)
     def on_models_committed(sender, changes):
         from main.admin import event
-        #L.l.debug('Model commit detected sender {} change {}'.format(sender, changes))
+        # L.l.debug('Model commit detected sender {} change {}'.format(sender, changes))
         event.on_models_committed(sender, changes)
-
+    init_post_modules()
     L.l.info('Feeding dogs with grass until app will exit')
     global exit_code
     # stop app from exiting
@@ -373,7 +369,6 @@ def run(arg_list):
         elif 'bind_port=' in s:
             global BIND_PORT
             BIND_PORT = s.split('=')[1]
-
 
     global MODEL_AUTO_UPDATE, IS_STANDALONE_MODE
     MODEL_AUTO_UPDATE = 'model_auto_update' in arg_list
