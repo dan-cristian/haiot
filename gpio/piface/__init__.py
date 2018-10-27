@@ -60,22 +60,13 @@ def _input_event(event):
     pin_num = event.pin_num
     board_index = event.chip.hardware_addr
     direction = event.direction  # 0 for press/contact, 1 for release/disconnect
-    alt_val = _get_in_pin_value(pin_num, board_index)
+    pin_val = _get_in_pin_value(pin_num, board_index)
     gpio_pin_code = _format_pin_code(board_index=board_index, pin_direction=Constant.GPIO_PIN_DIRECTION_IN,
                                      pin_index=pin_num)
     # if gpio_pin_code == 7:
-    L.l.info('Event piface gpio={} direction={} altval={}'.format(gpio_pin_code, direction, alt_val))
+    L.l.info('Event piface gpio={} direction={} altval={}'.format(gpio_pin_code, direction, pin_val))
     dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio_pin_code, direction=Constant.GPIO_PIN_DIRECTION_IN,
-                    pin_value=direction, pin_connected=(direction == 0))
-
-
-# read input pins and set signal (for alarm status etc)
-def _read_default(pin, board_index):
-    val = _get_in_pin_value(pin_index=pin, board_index=board_index)
-    gpio_pin_code = _format_pin_code(board_index=board_index, pin_direction=Constant.GPIO_PIN_DIRECTION_IN,
-                                     pin_index=pin)
-    dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio_pin_code, direction=Constant.GPIO_PIN_DIRECTION_IN,
-                    pin_value=val, pin_connected=(val == 0))
+                    pin_value=pin_val, pin_connected=(pin_val == 1))
 
 
 #  define all ports that are used as read/input
@@ -149,7 +140,7 @@ def post_init():
             io_common.update_custom_relay(pin_code=gpio_pin_code, pin_value=pin_in_val, notify=True)
             # resend to ensure is received by other late init modules like openhab
             dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio_pin_code, direction=Constant.GPIO_PIN_DIRECTION_IN,
-                            pin_value=pin_in_val, pin_connected=(pin_in_val == 0))
+                            pin_value=pin_in_val, pin_connected=(pin_in_val == 1))
 
 
 def init():
