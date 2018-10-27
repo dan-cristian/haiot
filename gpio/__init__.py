@@ -232,6 +232,10 @@ def unload():
     P.initialised = False
 
 
+def post_init():
+    piface.post_init()
+
+
 def init():
     L.l.debug("GPIO initialising")
     if Constant.IS_MACHINE_RASPBERRYPI:
