@@ -223,12 +223,15 @@ def thread_run():
 
 
 def unload():
-    if Constant.HOST_MACHINE_TYPE in [Constant.MACHINE_TYPE_RASPBERRY, Constant.MACHINE_TYPE_BEAGLEBONE]:
-        L.l.info('Unloading gpio pins')
-        std_gpio.unload()
-        piface.unload()
-        # bbb_io.unload()
-        rpi_gpio.unload()
+    try:
+        if Constant.HOST_MACHINE_TYPE in [Constant.MACHINE_TYPE_RASPBERRY, Constant.MACHINE_TYPE_BEAGLEBONE]:
+            L.l.info('Unloading gpio pins')
+            std_gpio.unload()
+            piface.unload()
+            # bbb_io.unload()
+            rpi_gpio.unload()
+    except Exception as ex:
+        L.l.error('Error unloading gpio, ex={}'.format(ex), exc_info=True)
     P.initialised = False
 
 
