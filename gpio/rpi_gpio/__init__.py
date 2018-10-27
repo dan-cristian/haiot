@@ -147,8 +147,10 @@ def post_init():
     for relay in relays:
         L.l.info('Reading gpio pin {}'.format(relay.gpio_pin_code))
         if len(relay.gpio_pin_code) <= 2:  # run this only for gpio bcm pins (piface has longer size)
-            pin_val = get_pin_bcm(int(relay.gpio_pin_code))
-            io_common.update_custom_relay(pin_code=relay.gpio_pin_code, pin_value=pin_val, notify=True)
+            pin_bcm = int(relay.gpio_pin_code)
+            GPIO.setup(pin_bcm, GPIO.OUT)
+            pin_val = get_pin_bcm(pin_bcm)
+            io_common.update_custom_relay(pin_code=pin_bcm, pin_value=pin_val, notify=True)
 
 
 def unload():
