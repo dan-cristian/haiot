@@ -35,16 +35,16 @@ def _format_pin_code(board_index, pin_direction, pin_index):
     return str(board_index) + ":" + str(pin_direction) + ":" + str(pin_index)
 
 
-def get_in_pin_value(pin_index=None, board_index=0):
+def get_in_pin_value(pin_index, board_index):
     return pfio.digital_read(pin_num=pin_index, hardware_addr=board_index)
 
 
-def get_out_pin_value(pin_index=None, board_index=0):
+def get_out_pin_value(pin_index, board_index):
     return P.pfd[board_index].output_pins[pin_index].value
 
 
 # http://www.farnell.com/datasheets/1881551.pdf
-def set_pin_value(pin_index=None, pin_value=None, board_index=0):
+def set_pin_value(pin_index, pin_value, board_index):
     L.l.info('Set piface pin {} value {} board {}'.format(pin_index, pin_value, board_index))
     pfio.digital_write(pin_num=pin_index, value=pin_value, hardware_addr=board_index)
     act_value = get_out_pin_value(pin_index=pin_index, board_index=board_index)
@@ -66,13 +66,13 @@ def _input_event(event):
     gpio_pin_code = _format_pin_code(board_index=board_index, pin_direction=Constant.GPIO_PIN_DIRECTION_IN,
                                      pin_index=pin_num)
     # if gpio_pin_code == 7:
-    # L.l.info('Event piface gpio={} direction={}'.format(gpio_pin_code, direction))
+    L.l.info('Event piface gpio={} direction={}'.format(gpio_pin_code, direction))
     dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio_pin_code, direction=Constant.GPIO_PIN_DIRECTION_IN,
                     pin_value=direction, pin_connected=(direction == 0))
 
 
 # read input pins and set signal (for alarm status etc)
-def _read_default(pin, board_index=0):
+def _read_default(pin, board_index):
     val = get_in_pin_value(pin_index=pin)
     gpio_pin_code = _format_pin_code(board_index=board_index, pin_direction=Constant.GPIO_PIN_DIRECTION_IN,
                                      pin_index=pin)
@@ -97,7 +97,7 @@ def _setup_in_ports_pif(gpio_pin_list):
                     P.listener[board].register(pin, pfio.IODIR_ON, _input_event)
                     P.listener[board].register(pin, pfio.IODIR_OFF, _input_event)
                     L.l.info('OK callback set on piface board {}, {} pin {}'.format(board, gpio_pin.pin_code, pin))
-                    _read_default(pin=pin, board_index=board)
+                    # _read_default(pin=pin, board_index=board)
             except Exception as ex:
                 L.l.critical('Unable to setup piface listener board={} pin={} err={}'.format(
                     board, gpio_pin.pin_code, ex))
@@ -130,8 +130,6 @@ def _setup_board():
 def unload():
     L.l.info('Piface unloading')
     if P.import_ok:
-        for listener in P.listener.values():
-            listener.deactivate()
         pfio.deinit_board()
 
 
@@ -147,6 +145,7 @@ def post_init():
             gpio_pin_code = _format_pin_code(board_index=board, pin_direction=Constant.GPIO_PIN_DIRECTION_IN,
                                              pin_index=pin)
             pin_in_val = get_in_pin_value(pin_index=pin, board_index=board)
+            L.l.info('Read input pin {} value={}'.format(gpio_pin_code, pin_in_val))
             io_common.update_custom_relay(pin_code=gpio_pin_code, pin_value=pin_in_val, notify=True)
             # resend to ensure is received by other late init modules like openhab
             dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio_pin_code, direction=Constant.GPIO_PIN_DIRECTION_IN,
