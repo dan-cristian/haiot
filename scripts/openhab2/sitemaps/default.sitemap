@@ -184,7 +184,7 @@ Frame {
 	Default item=relay_beci_contactor
 	Default item=relay_beci_upscharge
 	Default item=relay_freezer
-	Default item=relay_other
+	Default item=relay_gas_heater
 }
 
 Frame {
