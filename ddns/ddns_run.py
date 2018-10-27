@@ -43,7 +43,7 @@ def __update_ddns_rackspace():
             #public_isp = ip_json_obj['isp']
             public_ip = ip_json_obj['ip']
             public_isp = ip_json_obj['org']
-        except Exception, ex:
+        except Exception as ex:
             L.l.warning('Unable to get my ip, err={} text={}'.format(ex, ip_json_test))
             return
 
@@ -56,7 +56,7 @@ def __update_ddns_rackspace():
             # get IP address
             try:
                 cache['ip:'+isp] = socket.gethostbyname(config['record_name'])
-            except Exception, ex:
+            except Exception as ex:
                 cache['ip:'+isp] = None
                 L.l.warning('Unable to get ip for host {}, err={}'.format(config['record_name'], ex))
 
@@ -95,7 +95,7 @@ def __update_ddns_rackspace():
                 L.l.info('Updated IP address for {} to {}'.format(config['record_name'], public_ip))
             else:
                 L.l.warning('Unable to update IP, response={}'.format(result))
-    except Exception, ex:
+    except Exception as ex:
         L.l.warning('Unable to check and update dns, err={}'.format(ex))
 
 
