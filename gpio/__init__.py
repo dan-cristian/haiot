@@ -213,7 +213,7 @@ def thread_run():
     prctl.set_name("gpio")
     threading.current_thread().name = "gpio"
     # pigpio_gpio.thread_run()
-    piface.thread_run()
+    # piface.thread_run()
     # bbb_io.thread_run()
     std_gpio.thread_run()
     rpi_gpio.thread_run()
