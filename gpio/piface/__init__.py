@@ -31,7 +31,7 @@ except Exception as ex:
     L.l.info('Pifacedigitalio module not available')
 
 
-def _format_pin_code(board_index, pin_direction, pin_index):
+def format_pin_code(board_index, pin_direction, pin_index):
     return str(board_index) + ":" + str(pin_direction) + ":" + str(pin_index)
 
 
@@ -62,8 +62,8 @@ def _input_event(event):
     # direction gives different results than pin value
     direction = event.direction  # 0 for press/contact, 1 for release/disconnect
     pin_val = _get_in_pin_value(pin_num, board_index)
-    gpio_pin_code = _format_pin_code(board_index=board_index, pin_direction=Constant.GPIO_PIN_DIRECTION_IN,
-                                     pin_index=pin_num)
+    gpio_pin_code = format_pin_code(board_index=board_index, pin_direction=Constant.GPIO_PIN_DIRECTION_IN,
+                                    pin_index=pin_num)
     # if gpio_pin_code == 7:
     # L.l.info('Event piface gpio={} direction={} altval={}'.format(gpio_pin_code, direction, pin_val))
     dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio_pin_code, direction=Constant.GPIO_PIN_DIRECTION_IN,
@@ -129,13 +129,13 @@ def post_init():
     # read default values
     for board in P.pfd.keys():
         for pin in range(8):
-            gpio_pin_code = _format_pin_code(board_index=board, pin_direction=Constant.GPIO_PIN_DIRECTION_OUT,
-                                             pin_index=pin)
+            gpio_pin_code = format_pin_code(board_index=board, pin_direction=Constant.GPIO_PIN_DIRECTION_OUT,
+                                            pin_index=pin)
             pin_out_val = get_out_pin_value(pin_index=pin, board_index=board)
             L.l.info('Read out pin {} value={}'.format(gpio_pin_code, pin_out_val))
             io_common.update_custom_relay(pin_code=gpio_pin_code, pin_value=pin_out_val, notify=True)
-            gpio_pin_code = _format_pin_code(board_index=board, pin_direction=Constant.GPIO_PIN_DIRECTION_IN,
-                                             pin_index=pin)
+            gpio_pin_code = format_pin_code(board_index=board, pin_direction=Constant.GPIO_PIN_DIRECTION_IN,
+                                            pin_index=pin)
             pin_in_val = _get_in_pin_value(pin_index=pin, board_index=board)
             # alt_pin_in = P.pfd[board].input_pins[pin].value
             L.l.info('Read input pin {} value={}'.format(gpio_pin_code, pin_in_val))
