@@ -143,7 +143,8 @@ def setup_in_ports(gpio_pin_list):
 
 
 def post_init():
-    relays = models.ZoneCustomRelay.query.filter_by(gpio_host_name=Constant.HOST_NAME, relay_type='gpio').all()
+    relays = models.ZoneCustomRelay.query.filter_by(
+        gpio_host_name=Constant.HOST_NAME, relay_type=Constant.GPIO_PIN_TYPE_PI_STDGPIO).all()
     for relay in relays:
         L.l.info('Reading gpio pin {}'.format(relay.gpio_pin_code))
         if len(relay.gpio_pin_code) <= 2:  # run this only for gpio bcm pins (piface has longer size)
