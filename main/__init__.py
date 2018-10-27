@@ -110,6 +110,23 @@ def init_modules():
             else:
                 # Log.logger.info("Initialising generic mod definition name={} active={}".format(mod.name, mod.active))
                 init_module(mod.name, mod.active == 1)
+    # run post_init actions
+    for mod in module_list:
+        if mod.name != 'main':
+            mod_host_specific = m().query_filter_first(m.host_name.in_([Constant.HOST_NAME]), m.name.in_([mod.name]))
+            if mod_host_specific:
+                module_name = mod_host_specific.name
+            else:
+                module_name = mod.name
+            dynclass = my_import(module_name)
+            if dynclass:
+                # Log.logger.info('Module {} is marked as active'.format(module_name))
+                if hasattr(dynclass, 'initialised'):
+                    inited = dynclass.initialised
+                else:
+                    inited = dynclass.P.initialised
+                if inited and hasattr('post_init'):
+                    dynclass.post_init()
 
 
 def signal_handler(signal_name, frame):
