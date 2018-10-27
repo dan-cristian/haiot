@@ -174,31 +174,29 @@ def zone_custom_relay_record_update(json_object):
                         if source_host == Constant.HOST_NAME:
                             if is_event_external:
                                 L.l.info('Event received from outside, so no need to set relay state again')
-                                pass
                             else:
                                 L.l.info('Event received from user db change, so act it')
-                                pass
+                                value = 1 if relay_is_on else 0
+                                pin_code = gpio_record.pin_index_bcm
+                                pin_type = gpio_record.pin_type
+                                board = gpio_record.board_index
+                                relay_set(gpio_pin_index_bcm=pin_code, gpio_pin_type=pin_type, gpio_board_index=board,
+                                          value=value, from_web=False)
+                                if expire is not None and relay_is_on:
+                                    # revert back to off state in x seconds
+                                    expire_time = datetime.now() + timedelta(seconds=expire)
+                                    init_val = not (bool(relay_is_on))
+                                    func = (relay_set, pin_code, pin_type, board, init_val, False)
+                                    # set notify to true to inform openhab on state change
+                                    func_update = (io_common.update_custom_relay, pin_code, init_val, True)
+                                    if expire_time not in P.expire_func_list.keys():
+                                        P.expire_func_list[expire_time] = func
+                                        P.expire_func_list[expire_time + timedelta(microseconds=1)] = func_update
+                                    else:
+                                        L.l.error("Duplicate key in gpio list")
+                                        exit(999)
                         else:
                             L.l.info('Event received from other host')
-                        value = 1 if relay_is_on else 0
-                        pin_code = gpio_record.pin_index_bcm
-                        pin_type = gpio_record.pin_type
-                        board = gpio_record.board_index
-                        relay_set(gpio_pin_index_bcm=pin_code, gpio_pin_type=pin_type, gpio_board_index=board,
-                                  value=value, from_web=False)
-                        if expire is not None and relay_is_on:
-                            # revert back to off state in x seconds
-                            expire_time = datetime.now() + timedelta(seconds=expire)
-                            init_val = not (bool(relay_is_on))
-                            func = (relay_set, pin_code, pin_type, board, init_val, False)
-                            # set notify to true to inform openhab on state change
-                            func_update = (io_common.update_custom_relay, pin_code, init_val, True)
-                            if expire_time not in P.expire_func_list.keys():
-                                P.expire_func_list[expire_time] = func
-                                P.expire_func_list[expire_time + timedelta(microseconds=1)] = func_update
-                            else:
-                                L.l.error("Duplicate key in gpio list")
-                                exit(999)
                     else:
                         L.l.warning('Could not find gpio record for custom relay pin code={}'.format(gpio_pin_code))
         # todo: check if for zwave we get multiple redundant db saves
@@ -226,7 +224,7 @@ def thread_run():
     # piface.thread_run()
     # bbb_io.thread_run()
     std_gpio.thread_run()
-    rpi_gpio.thread_run()
+    # rpi_gpio.thread_run()
     _process_expire()
     prctl.set_name("idle")
     threading.current_thread().name = "idle"
@@ -247,6 +245,7 @@ def unload():
 
 def post_init():
     piface.post_init()
+    rpi_gpio.post_init()
 
 
 def init():

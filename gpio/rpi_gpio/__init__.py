@@ -2,6 +2,8 @@ from pydispatch import dispatcher
 from main import thread_pool
 from main.logger_helper import L
 from common import Constant
+from main.admin import models
+from gpio import io_common
 import time
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
@@ -140,8 +142,13 @@ def setup_in_ports(gpio_pin_list):
             __pool_pin_codes.append(gpio_pin.pin_code)
 
 
-def thread_run():
-    pass
+def post_init():
+    relays = models.ZoneCustomRelay.query.filter_by(gpio_host_name=Constant.HOST_NAME).all
+    for relay in relays:
+        L.l.info('Reading gpio pin {}'.format(relay.gpio_pin_code))
+        if len(relay.gpio_pin_code) <= 2:  # run this only for gpio bcm pins (piface has longer size)
+            pin_val = get_pin_bcm(int(relay.gpio_pin_code))
+            io_common.update_custom_relay(pin_code=relay.gpio_pin_code, pin_value=pin_val, notify=True)
 
 
 def unload():
@@ -150,7 +157,6 @@ def unload():
             GPIO.remove_event_detect(gpio_pin)
     time.sleep(1)
     GPIO.cleanup()
-    thread_pool.remove_callable(thread_run)
     global initialised
     initialised = False
 
@@ -160,7 +166,6 @@ def init():
     try:
         GPIO.setmode(GPIO.BCM)
         dispatcher.connect(setup_in_ports, signal=Constant.SIGNAL_GPIO_INPUT_PORT_LIST, sender=dispatcher.Any)
-        thread_pool.add_interval_callable(thread_run, run_interval_second=10)
         global initialised
         initialised = True
     except Exception as ex:
