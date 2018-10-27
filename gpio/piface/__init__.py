@@ -136,17 +136,18 @@ def unload():
 
 
 def post_init():
+    L.l.info('Running post_init')
     # read default values
     for board in P.pfd.keys():
         for pin in range(8):
             gpio_pin_code = _format_pin_code(board_index=board, pin_direction=Constant.GPIO_PIN_DIRECTION_OUT,
                                              pin_index=pin)
             pin_out_val = get_out_pin_value(pin_index=pin, board_index=board)
-            io_common.update_custom_relay(pin_code=gpio_pin_code, pin_value=pin_out_val)
+            io_common.update_custom_relay(pin_code=gpio_pin_code, pin_value=pin_out_val, notify=True)
             gpio_pin_code = _format_pin_code(board_index=board, pin_direction=Constant.GPIO_PIN_DIRECTION_IN,
                                              pin_index=pin)
             pin_in_val = get_in_pin_value(pin_index=pin, board_index=board)
-            io_common.update_custom_relay(pin_code=gpio_pin_code, pin_value=pin_in_val)
+            io_common.update_custom_relay(pin_code=gpio_pin_code, pin_value=pin_in_val, notify=True)
 
 
 def init():
@@ -156,7 +157,6 @@ def init():
             _setup_board()
             # thread_pool.add_interval_callable(thread_run, run_interval_second=10)
             dispatcher.connect(_setup_in_ports_pif, signal=Constant.SIGNAL_GPIO_INPUT_PORT_LIST, sender=dispatcher.Any)
-            post_init()
             P.initialised = True
             L.l.info('Piface initialised OK')
         except Exception as ex1:
