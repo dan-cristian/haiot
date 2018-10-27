@@ -85,10 +85,13 @@
     {"id":53, "active":"0", "start_order":"53", "name":"sensor.zwave"},
     {"id":55, "active":"0", "start_order":"55", "name":"sensor.1wire"},
     {"id":57, "active":"0", "start_order":"57", "name":"sensor.sonoff"},
-    {"id":105, "active":"0", "start_order":"50", "name":"apps.dashcam"},
+
+    {"id":90, "active":"0", "start_order":"90", "name":"apps.dashcam"},
+    {"id":99, "active":"0", "start_order":"99", "name":"main.cron"},
     {"id":101, "active":"0", "start_order":"101", "name":"webui.chart"},
     {"id":102, "active":"1", "start_order":"102", "name":"webui.api"},
     {"id":103, "active":"1", "start_order":"103", "name":"webui"},
+
 
     {"id":121, "active":"0", "start_order":"21", "name":"cloud.youtube", "host_name":"nas"},
     {"id":123, "active":"0", "start_order":"23", "name":"sysutils.filewatch", "host_name":"nas"},

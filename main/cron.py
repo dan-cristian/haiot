@@ -14,9 +14,9 @@ initialised = False
 def openshift_keepalive():
     try:
         # if variable.NODE_THIS_IS_MASTER_OVERALL:
-        #req = requests.get('http://iot-dancristian.rhcloud.com')
+        # req = requests.get('http://iot-dancristian.rhcloud.com')
         pass
-    except Exception, ex:
+    except Exception as ex:
         L.l.info('Error keeping openshift alive, err={}'.format(ex))
 
 
