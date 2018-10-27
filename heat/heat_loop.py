@@ -63,9 +63,9 @@ def __decide_action(zone, current_temperature, target_temperature, force_on=Fals
     else:
         last_heat_update_age_sec = 300
     if zone.heat_is_on != heat_is_on or last_heat_update_age_sec >= 300 or zone.last_heat_status_update is None:
-        L.l.info('Heat must change, is {} in {} temp={} target+thresh={}, forced={}'.format(
+        L.l.debug('Heat must change, is {} in {} temp={} target+thresh={}, forced={}'.format(
             heat_is_on, zone.name, current_temperature, target_temperature + P.threshold, force_on))
-        L.l.info('Heat change due to: is_on_next={} is_on_db={} age={} last={}'.format(
+        L.l.debug('Heat change due to: is_on_next={} is_on_db={} age={} last={}'.format(
             heat_is_on, zone.heat_is_on, last_heat_update_age_sec, zone.last_heat_status_update ))
         __save_heat_state_db(zone=zone, heat_is_on=heat_is_on)
     #else:
@@ -124,7 +124,7 @@ def __update_zone_heat(zone, heat_schedule, sensor):
                         L.l.critical("Missing keep warm pattern for zone {}".format(zone.name))
                 if temperature_target:
                     if zone.active_heat_schedule_pattern_id != schedule_pattern.id:
-                        L.l.info('Pattern in zone {} changed to {}, target={}'.format(
+                        L.l.debug('Pattern in zone {} changed to {}, target={}'.format(
                             zone.name, schedule_pattern.name, temperature_target.target))
                         zone.active_heat_schedule_pattern_id = schedule_pattern.id
                     zone.heat_target_temperature = temperature_target.target
