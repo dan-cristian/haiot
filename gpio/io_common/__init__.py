@@ -11,11 +11,9 @@ def update_custom_relay(pin_code, pin_value, notify=False):
         gpio.notify_transport_enabled = notify
         gpio.commit_record_to_db()
     else:
-        L.l.warning('Unable tp find gpio pin {}'.format(pin_code))
+        L.l.warning('Unable to find gpio pin {}'.format(pin_code))
     relay = models.ZoneCustomRelay.query.filter_by(gpio_pin_code=pin_code, gpio_host_name=Constant.HOST_NAME).first()
     if relay is not None:
         relay.relay_is_on = bool(pin_value)
         relay.notify_transport_enabled = notify
         relay.commit_record_to_db()
-    else:
-        L.l.warning('Unable tp custom relay pin {}'.format(pin_code))
