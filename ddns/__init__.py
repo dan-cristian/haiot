@@ -14,7 +14,6 @@ class P:
 
 def unload():
     L.l.info('DDNS module unloading')
-    # ...
     thread_pool.remove_callable(ddns_run.thread_run)
     P.initialised = False
 
