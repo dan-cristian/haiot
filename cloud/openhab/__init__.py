@@ -11,19 +11,20 @@ import prctl
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
-initialised = False
-
 
 class P:
     event_list = []
     func_list = None
+    initialised = False
 
     def __init__(self):
         pass
 
 
+# empty
 class Obj:
-    pass
+    def __init__(self):
+        pass
 
 
 def parse_rules(obj, change):
@@ -93,8 +94,7 @@ def thread_run():
 def unload():
     L.l.info('Openhab module unloading')
     thread_pool.remove_callable(thread_run)
-    global initialised
-    initialised = False
+    P.initialised = False
 
 
 def init():
@@ -104,5 +104,4 @@ def init():
     __load_rules()
     thread_pool.add_interval_callable(thread_run, run_interval_second=1)
     dispatcher.connect(parse_rules, signal=Constant.SIGNAL_DB_CHANGE_FOR_RULES, sender=dispatcher.Any)
-    global initialised
-    initialised = True
+    P.initialised = True
