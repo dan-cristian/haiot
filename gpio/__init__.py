@@ -14,7 +14,7 @@ import prctl
 # import bbb_io
 # import pigpio_gpio
 import rpi_gpio
-
+import io_common
 
 class P:
     initialised = False
@@ -61,7 +61,8 @@ def relay_get(gpio_pin_obj=None, from_web=False):
                 pin_value = std_gpio.get_pin_bcm(bcm_id=gpio_pin_obj.pin_index_bcm)
         elif gpio_pin_obj.pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
             # todo: check if pin index is bcm type indeed for piface
-            pin_value = piface.get_pin_value(pin_index=gpio_pin_obj.pin_index_bcm, board_index=gpio_pin_obj.board_index)
+            pin_value = piface.get_out_pin_value(
+                pin_index=gpio_pin_obj.pin_index_bcm, board_index=gpio_pin_obj.board_index)
         else:
             L.l.warning('Cannot select gpio method for pin={}'.format(gpio_pin_obj))
             pin_value = None
@@ -116,19 +117,6 @@ def gpio_record_update(json_object):
         L.l.warning('Error on gpio state update, err {}'.format(ex))
 
 
-def _update_custom_relay(pin_code, pin_value):
-    gpio = models.GpioPin.query.filter_by(pin_code=pin_code, host_name=Constant.HOST_NAME).first()
-    if gpio is not None:
-        gpio.pin_value = int(pin_value)
-        gpio.notify_transport_enabled = False
-        gpio.commit_record_to_db()
-    relay = models.ZoneCustomRelay.query.filter_by(gpio_pin_code=pin_code, gpio_host_name=Constant.HOST_NAME).first()
-    if relay is not None:
-        relay.relay_is_on = bool(pin_value)
-        relay.notify_transport_enabled = False
-        relay.commit_record_to_db()
-
-
 def zone_custom_relay_record_update(json_object):
     # save relay state to db, except for current node
     # carefull not to trigger infinite recursion updates
@@ -161,7 +149,7 @@ def zone_custom_relay_record_update(json_object):
                             func = (zwave.set_switch_state, node_id, init_val)
                             if expire_time not in P.expire_func_list.keys():
                                 P.expire_func_list[expire_time] = func
-                                func_update = (_update_custom_relay, gpio_pin_code, init_val)
+                                func_update = (io_common.update_custom_relay, gpio_pin_code, init_val)
                                 P.expire_func_list[expire_time + timedelta(microseconds=1)] = func_update
                             else:
                                 L.l.error("Duplicate zwave key in list")
@@ -194,7 +182,7 @@ def zone_custom_relay_record_update(json_object):
                             expire_time = datetime.now() + timedelta(seconds=expire)
                             init_val = not (bool(relay_is_on))
                             func = (relay_set, pin_code, pin_type, board, init_val, False)
-                            func_update = (_update_custom_relay, pin_code, init_val)
+                            func_update = (io_common.update_custom_relay, pin_code, init_val)
                             if expire_time not in P.expire_func_list.keys():
                                 P.expire_func_list[expire_time] = func
                                 P.expire_func_list[expire_time + timedelta(microseconds=1)] = func_update
