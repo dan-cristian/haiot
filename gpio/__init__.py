@@ -134,28 +134,32 @@ def zone_custom_relay_record_update(json_object):
                 expire = utils.get_object_field_value(json_object, 'expire')
                 if relay_type == Constant.GPIO_PIN_TYPE_ZWAVE:
                     if source_host == Constant.HOST_NAME:
-                        # fixme: check this scenario
-                        L.l.info("Warning - do I execute the zwave relay action twice?")
-                    vals = gpio_pin_code.split('_')
-                    if len(vals) == 2:
-                        node_id = int(vals[1])
-                        L.l.info('Received relay state update host {}, obj={}'.format(host_name, json_object))
-                        # zwave switch name is not needed, identify device only by node_id
-                        zwave.set_switch_state(node_id=node_id, state=relay_is_on)
-                        if expire is not None:
-                            # revert back to initial state
-                            expire_time = datetime.now() + timedelta(seconds=expire)
-                            init_val = not (bool(relay_is_on))
-                            func = (zwave.set_switch_state, node_id, init_val)
-                            if expire_time not in P.expire_func_list.keys():
-                                P.expire_func_list[expire_time] = func
-                                func_update = (io_common.update_custom_relay, gpio_pin_code, init_val, True)
-                                P.expire_func_list[expire_time + timedelta(microseconds=1)] = func_update
+                        if is_event_external:
+                            # event received from outside, so no need to set relay state again
+                            pass
+                        else:
+                            # event received from user db change, so act it
+                            vals = gpio_pin_code.split('_')
+                            if len(vals) == 2:
+                                node_id = int(vals[1])
+                                L.l.info('Received relay state update host {}, obj={}'.format(host_name, json_object))
+                                # zwave switch name is not needed, identify device only by node_id
+                                zwave.set_switch_state(node_id=node_id, state=relay_is_on)
+                                if expire is not None:
+                                    # revert back to initial state
+                                    expire_time = datetime.now() + timedelta(seconds=expire)
+                                    init_val = not (bool(relay_is_on))
+                                    func = (zwave.set_switch_state, node_id, init_val)
+                                    if expire_time not in P.expire_func_list.keys():
+                                        P.expire_func_list[expire_time] = func
+                                        func_update = (io_common.update_custom_relay, gpio_pin_code, init_val, True)
+                                        P.expire_func_list[expire_time + timedelta(microseconds=1)] = func_update
+                                    else:
+                                        L.l.error("Duplicate zwave key in list")
+                                        exit(999)
                             else:
-                                L.l.error("Duplicate zwave key in list")
-                                exit(999)
-                    else:
-                        L.l.error("Incorrect zwave switch format {}, must be <name>_<node_id>".format(gpio_pin_code))
+                                L.l.error("Incorrect zwave switch format {}, must be <name>_<node_id>".format(
+                                    gpio_pin_code))
                 elif relay_type == Constant.GPIO_PIN_TYPE_SONOFF:
                     if source_host == Constant.HOST_NAME:
                         if is_event_external:
@@ -175,7 +179,7 @@ def zone_custom_relay_record_update(json_object):
                             if is_event_external:
                                 L.l.info('Event received from outside, so no need to set relay state again')
                             else:
-                                L.l.info('Event received from user db change, so act it')
+                                # L.l.info('Event received from user db change, so act it')
                                 value = 1 if relay_is_on else 0
                                 pin_code = gpio_record.pin_index_bcm
                                 pin_type = gpio_record.pin_type
