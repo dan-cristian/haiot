@@ -58,7 +58,7 @@ def rule_openhab_utility(obj=models.Utility(), field_changed_list=None):
 
 def rule_openhab_alarm(obj=models.ZoneAlarm(), field_changed_list=None):
     key = 'contact'
-    if obj.alarm_pin_triggered:
+    if obj.alarm_pin_triggered is True:
         state = "OPEN"
     else:
         state = "CLOSED"
