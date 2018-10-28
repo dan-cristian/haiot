@@ -58,6 +58,21 @@ def mqtt_on_message(client, userdata, msg):
                     if c in counter:
                         cval = int(counter[c])
                         dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=cval, index=i)
+            elif 'BMP280' in obj:
+                # iot/sonoff/tele/sonoff-basic-3/SENSOR =
+                # {"Time":"2018-10-28T08:12:26","BMP280":{"Temperature":24.6,"Pressure":971.0},"TempUnit":"C"}
+                bmp = obj['BMP280']
+                temp = bmp['Temperature']
+                press = bmp['Pressure']
+                sensor_address = '{}_{}'.format(sensor_name, 'bmp280')
+                current_sensor = models.ZoneSensor.query.filter_by(sensor_address=sensor_address).first()
+                if current_sensor is not None:
+                    sensor = models.Sensor(address=sensor_address, sensor_name=current_sensor.sensor_name)
+                    sensor.temperature = temp
+                    sensor.pressure = press
+                    sensor.save_changed_fields(notify_transport_enabled=True)
+                else:
+                    L.l.info('Undefined sensor found in {}, value={}'.format(sensor_address, bmp))
             else:
                 L.l.warning("Usefull payload missing from topic {} payload={}".format(msg.topic, msg.payload))
         else:
