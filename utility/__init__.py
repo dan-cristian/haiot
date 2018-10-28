@@ -39,14 +39,14 @@ def __utility_update_ex(sensor_name, value, unit=None, index=None):
                     delta = max(0, new_value - current_record.units_total)
                     record.units_total = new_value
                     record.units_delta = delta
-                    record.units_2_delta = 0.0
+                    # record.units_2_delta = 0.0
                 elif current_record.utility_type == Constant.UTILITY_TYPE_WATER_LEVEL:
                     record.units_total = value / (current_record.ticks_per_unit * 1.0)
                     L.l.info("Saving utility water level value={} depth={}".format(value, record.units_total))
                 elif current_record.utility_type == Constant.UTILITY_TYPE_ELECTRICITY:
                     if unit == current_record.unit_2_name:
                         record.units_2_delta = value
-                        record.units_delta = 0.0
+                        # record.units_delta = 0.0
                     elif unit == current_record.unit_name:
                         record.units_total = value
                         record.units_delta = value - current_record.units_total
@@ -57,7 +57,7 @@ def __utility_update_ex(sensor_name, value, unit=None, index=None):
                     delta = max(0, new_value - current_record.units_total)
                     record.units_total = new_value
                     record.units_delta = delta
-                    record.units_2_delta = 0.0
+                    # record.units_2_delta = 0.0
                 else:
                     L.l.warning("Unkown utility type not processed from sensor {}".format(sensor_name))
                 # L.l.debug("Saving utility ex record {} name={}".format(current_record, record.utility_name))
