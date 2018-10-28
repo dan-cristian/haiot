@@ -62,7 +62,7 @@ def __utility_update_ex(sensor_name, value, unit=None, index=None):
                     L.l.warning("Unkown utility type not processed from sensor {}".format(sensor_name))
                 # L.l.debug("Saving utility ex record {} name={}".format(current_record, record.utility_name))
                 record.save_changed_fields(current_record=current_record, new_record=record, debug=False,
-                                           notify_transport_enabled=True, save_to_graph=True, save_all_fields=True)
+                                           notify_transport_enabled=True, save_to_graph=True, save_all_fields=False)
 
             else:
                 L.l.critical("Utility ex sensor {} index {} not defined in Utility table".format(sensor_name, index))
