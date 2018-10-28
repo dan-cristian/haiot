@@ -67,10 +67,11 @@ def mqtt_on_message(client, userdata, msg):
                 sensor_address = '{}_{}'.format(sensor_name, 'bmp280')
                 current_sensor = models.ZoneSensor.query.filter_by(sensor_address=sensor_address).first()
                 if current_sensor is not None:
+                    current_sensor = models.Sensor.query.filter_by(address=sensor_address).first()
                     sensor = models.Sensor(address=sensor_address, sensor_name=current_sensor.sensor_name)
                     sensor.temperature = temp
                     sensor.pressure = press
-                    sensor.save_changed_fields(notify_transport_enabled=True)
+                    sensor.save_changed_fields(current_record=current_sensor, notify_transport_enabled=True)
                 else:
                     L.l.info('Undefined sensor found in {}, value={}'.format(sensor_address, bmp))
             else:
