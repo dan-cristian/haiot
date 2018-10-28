@@ -65,7 +65,7 @@ def __utility_update_ex(sensor_name, value, unit=None, index=None):
                 #    is_debug = True
                 # else:
                 #    is_debug = False
-                record.save_changed_fields(current_record=current_record, new_record=record, debug=is_debug,
+                record.save_changed_fields(current_record=current_record, new_record=record, debug=False,
                                            notify_transport_enabled=True, save_to_graph=True, save_all_fields=False)
 
             else:
