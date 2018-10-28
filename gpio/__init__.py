@@ -256,6 +256,7 @@ def unload():
 def post_init():
     piface.post_init()
     rpi_gpio.post_init()
+    sonoff.post_init()
 
 
 def init():
