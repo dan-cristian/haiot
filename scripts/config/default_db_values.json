@@ -371,7 +371,7 @@
     {"zone_id":8 ,  "sensor_address": "ZMNHTDx Smart meter S4 S5 S6_2",             "sensor_name": "zwave main power meter"},
     {"zone_id":29 , "sensor_address": "TZ69 Smart energy plug in switch_4",         "sensor_name": "zwave plug 1"},
     {"zone_id":29 , "sensor_address": "TZ69 Smart energy plug in switch_5",         "sensor_name": "zwave plug 2"},
-    {"zone_id":10 , "sensor_address": "sonoff-basic-3_bmp280",                      "sensor_name": "baro_scari_beci"}
+    {"zone_id":10 , "sensor_address": "sonoff-basic-3_bmp280",                      "sensor_name": "baro_house"}
   ],
 
   "Utility": [
