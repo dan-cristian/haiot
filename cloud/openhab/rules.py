@@ -24,6 +24,9 @@ def rule_openhab_sensor(obj=models.Sensor(), field_changed_list=None):
     key = 'humidity'
     if hasattr(obj, key) and obj.humidity is not None:
         send_mqtt_openhab(subtopic=key + "_" + obj.sensor_name, payload=obj.humidity)
+    key = 'pressure'
+    if hasattr(obj, key) and obj.pressure is not None:
+        send_mqtt_openhab(subtopic=key + "_" + obj.sensor_name, payload=obj.pressure)
     key = 'vad'
     if hasattr(obj, key) and obj.vad is not None:
         send_mqtt_openhab(subtopic=key + "_" + obj.sensor_name, payload=obj.vad)
