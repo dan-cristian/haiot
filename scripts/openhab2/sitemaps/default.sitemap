@@ -82,6 +82,8 @@ Frame {
         Chart item=temperature_fridge period=Y refresh=10000 visibility=[p_switch==5]
         }
     Default item=humidity_fridge
+    Default item=pressure_baro_house
+	Default item=temperature_baro_house
 	Default item=temperature_horn
 	Default item=temperature_gas_heater
 	Default item=temperature_gas_boiler

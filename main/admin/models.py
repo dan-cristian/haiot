@@ -951,6 +951,7 @@ class SensorHistory(db.Model, DbBase):
     address = db.Column(db.String(50))
     temperature = db.Column(db.Float)
     humidity = db.Column(db.Float)
+    pressure = db.Column(db.Float)
     counters_a = db.Column(db.BigInteger)
     counters_b = db.Column(db.BigInteger)
     delta_counters_a = db.Column(db.BigInteger)
