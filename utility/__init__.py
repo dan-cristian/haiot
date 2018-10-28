@@ -46,7 +46,7 @@ def __utility_update_ex(sensor_name, value, unit=None, index=None):
                 elif current_record.utility_type == Constant.UTILITY_TYPE_ELECTRICITY:
                     if unit == current_record.unit_2_name:
                         record.units_2_delta = value
-                        # record.units_delta = 0.0
+                        # record.units_delta = 0.0  # needed for comparison
                     elif unit == current_record.unit_name:
                         record.units_total = value
                         record.units_delta = value - current_record.units_total
@@ -61,7 +61,11 @@ def __utility_update_ex(sensor_name, value, unit=None, index=None):
                 else:
                     L.l.warning("Unkown utility type not processed from sensor {}".format(sensor_name))
                 # L.l.debug("Saving utility ex record {} name={}".format(current_record, record.utility_name))
-                record.save_changed_fields(current_record=current_record, new_record=record, debug=False,
+                # if sensor_name == 'sonoff-basic-2':
+                #    is_debug = True
+                # else:
+                #    is_debug = False
+                record.save_changed_fields(current_record=current_record, new_record=record, debug=is_debug,
                                            notify_transport_enabled=True, save_to_graph=True, save_all_fields=False)
 
             else:
