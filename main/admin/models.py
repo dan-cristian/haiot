@@ -127,11 +127,13 @@ class DbBase:
             L.l.error('Exception save json to db {}'.format(ex))
 
     # graph_save_frequency in seconds
-    def save_changed_fields(self, current_record=None, new_record='', notify_transport_enabled=False,
+    def save_changed_fields(self, current_record=None, new_record=None, notify_transport_enabled=False,
                             save_to_graph=False, ignore_only_updated_on_change=True, debug=False,
                             graph_save_frequency=0, save_all_fields=False):
         _start_time = utils.get_base_location_now_date()
         try:
+            if new_record is None:
+                new_record = self
             # inherit BaseGraph to enable persistence
             if hasattr(self, 'save_to_graph'):  # not all models inherit graph, used for periodic save
                 if current_record:
@@ -467,6 +469,7 @@ class Sensor(db.Model, graphs.SensorGraph, DbEvent, DbBase):
     type = db.Column(db.String(50))
     temperature = db.Column(db.Float)
     humidity = db.Column(db.Float)
+    pressure = db.Column(db.Float)
     counters_a = db.Column(db.BigInteger)
     counters_b = db.Column(db.BigInteger)
     delta_counters_a = db.Column(db.BigInteger)
