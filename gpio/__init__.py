@@ -175,38 +175,39 @@ def zone_custom_relay_record_update(json_object):
                     gpio_record = models.GpioPin.query.filter_by(pin_code=gpio_pin_code,
                                                                  host_name=Constant.HOST_NAME).first()
                     if gpio_record is not None:
-                        if source_host == Constant.HOST_NAME:
-                            if is_event_external:
-                                L.l.info('Event received from outside, so no need to set relay state again')
-                            else:
-                                # L.l.info('Event received from user db change, so act it')
-                                value = 1 if relay_is_on else 0
-                                pin_code = gpio_record.pin_index_bcm
-                                pin_type = gpio_record.pin_type
-                                board = gpio_record.board_index
-                                relay_set(gpio_pin_index_bcm=pin_code, gpio_pin_type=pin_type, gpio_board_index=board,
-                                          value=value, from_web=False)
-                                if expire is not None and relay_is_on:
-                                    # revert back to off state in x seconds
-                                    expire_time = datetime.now() + timedelta(seconds=expire)
-                                    init_val = not (bool(relay_is_on))
-                                    func = (relay_set, pin_code, pin_type, board, init_val, False)
-                                    # set notify to true to inform openhab on state change
-                                    if pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
-                                        pin_code_ok = piface.format_pin_code(
-                                            board_index=board, pin_direction=Constant.GPIO_PIN_DIRECTION_OUT,
-                                            pin_index=pin_code)
-                                    else:
-                                        pin_code_ok = pin_code
-                                    func_update = (io_common.update_custom_relay, pin_code_ok, init_val, True)
-                                    if expire_time not in P.expire_func_list.keys():
-                                        P.expire_func_list[expire_time] = func
-                                        P.expire_func_list[expire_time + timedelta(microseconds=1)] = func_update
-                                    else:
-                                        L.l.error("Duplicate key in gpio list")
-                                        exit(999)
+                        if source_host != Constant.HOST_NAME:
+                            L.l.info('Event received from other host, event={}'.format(json_object))
+                        # if source_host == Constant.HOST_NAME:
+                        if is_event_external:
+                            L.l.info('Event received from outside, so no need to set relay state again')
                         else:
-                            L.l.info('Event received from other host')
+                            # L.l.info('Event received from user db change, so act it')
+                            value = 1 if relay_is_on else 0
+                            pin_code = gpio_record.pin_index_bcm
+                            pin_type = gpio_record.pin_type
+                            board = gpio_record.board_index
+                            relay_set(gpio_pin_index_bcm=pin_code, gpio_pin_type=pin_type, gpio_board_index=board,
+                                      value=value, from_web=False)
+                            if expire is not None and relay_is_on:
+                                # revert back to off state in x seconds
+                                expire_time = datetime.now() + timedelta(seconds=expire)
+                                init_val = not (bool(relay_is_on))
+                                func = (relay_set, pin_code, pin_type, board, init_val, False)
+                                # set notify to true to inform openhab on state change
+                                if pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
+                                    pin_code_ok = piface.format_pin_code(
+                                        board_index=board, pin_direction=Constant.GPIO_PIN_DIRECTION_OUT,
+                                        pin_index=pin_code)
+                                else:
+                                    pin_code_ok = pin_code
+                                func_update = (io_common.update_custom_relay, pin_code_ok, init_val, True)
+                                if expire_time not in P.expire_func_list.keys():
+                                    P.expire_func_list[expire_time] = func
+                                    P.expire_func_list[expire_time + timedelta(microseconds=1)] = func_update
+                                else:
+                                    L.l.error("Duplicate key in gpio list")
+                                    exit(999)
+
                     else:
                         L.l.warning('Could not find gpio record for custom relay pin code={}'.format(gpio_pin_code))
         # todo: check if for zwave we get multiple redundant db saves
