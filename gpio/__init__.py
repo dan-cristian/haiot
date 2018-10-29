@@ -121,11 +121,11 @@ def zone_custom_relay_record_update(json_object):
     # save relay state to db, except for current node
     # carefull not to trigger infinite recursion updates
     try:
-        host_name = utils.get_object_field_value(json_object, 'gpio_host_name')
+        target_host_name = utils.get_object_field_value(json_object, 'gpio_host_name')
         source_host = utils.get_object_field_value(json_object, 'source_host_')
         is_event_external = utils.get_object_field_value(json_object, 'is_event_external')
         # L.l.info('Received custom relay state update for host {}'.format(host_name))
-        if host_name == Constant.HOST_NAME:
+        if target_host_name == Constant.HOST_NAME:
             # execute local pin change related actions like turn on/off a relay
             if P.initialised:
                 gpio_pin_code = utils.get_object_field_value(json_object, 'gpio_pin_code')
@@ -142,7 +142,8 @@ def zone_custom_relay_record_update(json_object):
                             vals = gpio_pin_code.split('_')
                             if len(vals) == 2:
                                 node_id = int(vals[1])
-                                L.l.info('Received relay state update host {}, obj={}'.format(host_name, json_object))
+                                L.l.info('Received relay state update host {}, obj={}'.format(
+                                    target_host_name, json_object))
                                 # zwave switch name is not needed, identify device only by node_id
                                 zwave.set_switch_state(node_id=node_id, state=relay_is_on)
                                 if expire is not None:
@@ -175,8 +176,8 @@ def zone_custom_relay_record_update(json_object):
                     gpio_record = models.GpioPin.query.filter_by(pin_code=gpio_pin_code,
                                                                  host_name=Constant.HOST_NAME).first()
                     if gpio_record is not None:
-                        if source_host != Constant.HOST_NAME:
-                            L.l.info('Event received from other host, event={}'.format(json_object))
+                        # if source_host != Constant.HOST_NAME:
+                        #    L.l.info('Event received from other host, event={}'.format(json_object))
                         # if source_host == Constant.HOST_NAME:
                         if is_event_external:
                             L.l.info('Event received from outside, so no need to set relay state again')
