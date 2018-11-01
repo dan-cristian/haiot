@@ -43,6 +43,7 @@ Switch relay_beci_upscharge "Ups beci charge" <switch>                      {mqt
 Switch relay_freezer "Freezer" <switch>                                     {mqtt="<[mosquitto:iot/openhab/relay_freezer_relay:state:default],>[mosquitto:iot/openhab:command:ON:relay_freezer_relay=1],>[mosquitto:iot/openhab:command:OFF:relay_freezer_relay=0]", autoupdate="false"}
 Switch relay_gas_heater "Gas heater relay" <switch>                         {mqtt="<[mosquitto:iot/openhab/relay_gas_heater_relay:state:default],>[mosquitto:iot/openhab:command:ON:relay_gas_heater_relay=1],>[mosquitto:iot/openhab:command:OFF:relay_gas_heater_relay=0]", autoupdate="false"}
 Switch relay_washing "Washing relay" <switch>                               {mqtt="<[mosquitto:iot/openhab/relay_washing_relay:state:default],>[mosquitto:iot/openhab:command:ON:relay_washing_relay=1],>[mosquitto:iot/openhab:command:OFF:relay_washing_relay=0]", autoupdate="false"}
+Switch relay_solar "Solar relay" <switch>                                   {mqtt="<[mosquitto:iot/openhab/relay_solar_relay:state:default],>[mosquitto:iot/openhab:command:ON:relay_solar_relay=1],>[mosquitto:iot/openhab:command:OFF:relay_solar_relay=0]", autoupdate="false"}
 
 Group:Switch:OR(ON, OFF)    RELAY_BACK_WATER "Back watering [(%d)]"  <switch>
 Group:Switch:OR(ON, OFF)    RELAY_FRONT_WATER "Front watering [(%d)]"   <switch>
@@ -104,6 +105,7 @@ Number electricity_current_plug_2 "Plug 2 current [%.1f A]" <poweroutlet_eu>    
 Number electricity_power_freezer "Power freezer [%.0f watt]" <energy>       {mqtt="<[mosquitto:iot/openhab/electricity_power freezer:state:default]"}
 Number electricity_power_gas_heater "Power gas heater[%.0f watt]" <energy>  {mqtt="<[mosquitto:iot/openhab/electricity_power gas heater:state:default]"}
 Number electricity_power_washing "Power washing[%.0f watt]" <energy>        {mqtt="<[mosquitto:iot/openhab/electricity_power washing:state:default]"}
+Number electricity_power_solar "Power solar[%.0f watt]" <energy>            {mqtt="<[mosquitto:iot/openhab/electricity_power solar:state:default]"}
 
 Number gas_gas "Gas [%.1f mc]" <gas>                                        {mqtt="<[mosquitto:iot/openhab/gas_gas:state:default]"}
 Number water_main "Water main [%.0f l]" <water>                             {mqtt="<[mosquitto:iot/openhab/water_water main:state:default]"}
