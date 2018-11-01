@@ -259,6 +259,7 @@
 
     {"relay_pin_name": "freezer_relay", "zone_id": "10", "gpio_pin_code": "sonoff-pow-1", "gpio_host_name": "pi-face", "relay_type": "sonoff"},
     {"relay_pin_name": "gas_heater_relay", "zone_id": "29", "gpio_pin_code": "sonoff-pow-2", "gpio_host_name": "pi-face", "relay_type": "sonoff"},
+    {"relay_pin_name": "washing_relay", "zone_id": "29", "gpio_pin_code": "sonoff-pow-5", "gpio_host_name": "pi-face", "relay_type": "sonoff"},
     {"relay_pin_name": "other_relay_test", "zone_id": "2", "gpio_pin_code": "sonoff-pow-2", "gpio_host_name": "netbook", "relay_type": "sonoff"},
     {"relay_pin_name": "sonoff-1", "zone_id": "2", "gpio_pin_code": "sonoff-basic-1", "gpio_host_name": "pi-face", "relay_type": "sonoff"},
     {"relay_pin_name": "sonoff-2", "zone_id": "2", "gpio_pin_code": "sonoff-basic-2", "gpio_host_name": "pi-face", "relay_type": "sonoff"},
@@ -381,6 +382,7 @@
 
     {"utility_name":"power freezer", "sensor_name":"sonoff-pow-1", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
     {"utility_name":"power gas heater", "sensor_name":"sonoff-pow-2", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
+    {"utility_name":"power washing", "sensor_name":"sonoff-pow-5", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
 
     {"utility_name":"water hot", "sensor_name":"sonoff-basic-2", "sensor_index":1, "ticks_per_unit":1, "unit_name":"l", "utility_type":"water", "unit_cost":2.9388},
     {"utility_name":"gas", "sensor_name":"sonoff-basic-2", "sensor_index":2, "ticks_per_unit":100, "unit_name":"mc", "utility_type":"gas", "unit_cost":1.5675},

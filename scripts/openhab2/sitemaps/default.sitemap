@@ -176,6 +176,7 @@ Frame {
 	Default item=electricity_current_plug_2
 	Default item=electricity_power_freezer
 	Default item=electricity_power_gas_heater
+	Default item=electricity_power_washing
 }
 
 Frame {
@@ -187,6 +188,7 @@ Frame {
 	Default item=relay_beci_upscharge
 	Default item=relay_freezer
 	Default item=relay_gas_heater
+	Default item=relay_washing
 }
 
 Frame {
