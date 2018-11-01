@@ -20,6 +20,9 @@ class P:
 
 # '{"Time":"2018-10-14T21:57:33","ENERGY":{"Total":0.006,"Yesterday":0.000,"Today":0.006,"Power":5,"Factor":0.10,"Voltage":214,"Current":0.241}}'
 # 'iot/sonoff/tele/sonoff-pow-2/SENSOR'
+# {"Time":"2018-11-01T23:42:54","ENERGY":{"TotalStartTime":"2018-10-31T20:05:27","Total":0.000,"Yesterday":0.000,"Today":0.000,"Period":0,
+# "Power":0,"ApparentPower":0,"ReactivePower":0,"Factor":0.00,"Voltage":220,"Current":0.000}}
+#
 # Tasmota MQTT - put /iot/sonoff prefix in MQTT settings
 def mqtt_on_message(client, userdata, msg):
     # L.l.info("Topic={} payload={}".format(msg.topic, msg.payload))
@@ -36,7 +39,36 @@ def mqtt_on_message(client, userdata, msg):
                 current = float(energy['Current'])
                 # unit should match Utility unit name in models definition
                 dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=power, unit='watt')
-                dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=current, unit='kWh')
+                # todo: save total energy utility
+                if voltage or factor or current:
+                    zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=sensor_name).first()
+                    if zone_sensor is not None:
+                        current_record = models.Sensor.query.filter_by(address=sensor_name).first()
+                        if current_record is None:
+                            pass
+                        else:
+                            current_record.vad = None
+                            current_record.iad = None
+                            current_record.vdd = None
+                        record = models.Sensor(address=sensor_name, sensor_name=zone_sensor.sensor_name)
+                        record.is_event_external = True
+                        if voltage:
+                            record.vad = round(voltage, 0)
+                            record.save_changed_fields(current_record=current_record, new_record=record,
+                                                       notify_transport_enabled=True, save_to_graph=True, debug=False)
+                        if current:
+                            record.iad = round(current, 1)
+                            record.save_changed_fields(current_record=current_record, new_record=record,
+                                                       notify_transport_enabled=True, save_to_graph=True, debug=False)
+                        if factor:
+                            record.vdd = round(factor, 1)
+                            record.save_changed_fields(current_record=current_record, new_record=record,
+                                                       notify_transport_enabled=True, save_to_graph=True, debug=False)
+                        if current_record is not None:
+                            current_record.commit_record_to_db()
+                        else:
+                            record.add_commit_record_to_db()
+                # dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=current, unit='kWh')
             elif 'POWER' in obj:
                 power_is_on = obj['POWER'] == 'ON'
                 current_relay = models.ZoneCustomRelay.query.filter_by(gpio_pin_code=sensor_name,

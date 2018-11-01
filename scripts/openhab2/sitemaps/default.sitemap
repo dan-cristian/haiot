@@ -177,6 +177,7 @@ Frame {
 	Default item=electricity_power_freezer
 	Default item=electricity_power_gas_heater
 	Default item=electricity_power_washing
+	Default item=electricity_power_solar
 }
 
 Frame {
@@ -189,6 +190,7 @@ Frame {
 	Default item=relay_freezer
 	Default item=relay_gas_heater
 	Default item=relay_washing
+	Default item=relay_solar
 }
 
 Frame {
