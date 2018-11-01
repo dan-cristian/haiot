@@ -67,6 +67,7 @@ def thread_run():
                         record.sensor_name = record.type + panel_id
                 record.temperature = temperature
                 record.updated_on = utils.get_base_location_now_date()
+                # fixme: keeps saving same temp even when panels are off. stop during night.
                 record.save_changed_fields(current_record=current_record, new_record=record,
                                            notify_transport_enabled=True, save_to_graph=True, debug=False)
             if production is not None:
