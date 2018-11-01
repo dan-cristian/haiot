@@ -34,9 +34,18 @@ def mqtt_on_message(client, userdata, msg):
             if 'ENERGY' in obj:
                 energy = obj['ENERGY']
                 power = float(energy['Power'])
-                voltage = int(energy['Voltage'])
-                factor = energy['Factor']
-                current = float(energy['Current'])
+                if 'Voltage' in energy:
+                    voltage = int(energy['Voltage'])
+                else:
+                    voltage = None
+                if 'Factor' in energy:
+                    factor = energy['Factor']
+                else:
+                    factor = None
+                if 'Current' in energy:
+                    current = float(energy['Current'])
+                else:
+                    current = None
                 # unit should match Utility unit name in models definition
                 dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=power, unit='watt')
                 # todo: save total energy utility
