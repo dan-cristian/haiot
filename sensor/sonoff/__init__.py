@@ -61,22 +61,18 @@ def mqtt_on_message(client, userdata, msg):
                             current_record.vdd = None
                         record = models.Sensor(address=sensor_name, sensor_name=zone_sensor.sensor_name)
                         record.is_event_external = True
-                        if voltage:
+                        if voltage is not None:
                             record.vad = round(voltage, 0)
                             record.save_changed_fields(current_record=current_record, new_record=record,
                                                        notify_transport_enabled=True, save_to_graph=True, debug=False)
-                        if current:
+                        if current is not None:
                             record.iad = round(current, 1)
                             record.save_changed_fields(current_record=current_record, new_record=record,
                                                        notify_transport_enabled=True, save_to_graph=True, debug=False)
-                        if factor:
+                        if factor is not None:
                             record.vdd = round(factor, 1)
                             record.save_changed_fields(current_record=current_record, new_record=record,
                                                        notify_transport_enabled=True, save_to_graph=True, debug=False)
-                        if current_record is not None:
-                            current_record.commit_record_to_db()
-                        else:
-                            record.add_commit_record_to_db()
                 # dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=current, unit='kWh')
             elif 'POWER' in obj:
                 power_is_on = obj['POWER'] == 'ON'
