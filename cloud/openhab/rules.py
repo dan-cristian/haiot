@@ -88,7 +88,6 @@ def rule_openhab_ups(obj=models.Ups(), field_changed_list=None):
             send_mqtt_openhab(subtopic="ups_" + key, payload=obj.input_voltage)
 
 
-
 def rule_openhab_custom_relay(obj=models.ZoneCustomRelay(), field_changed_list=None):
     if field_changed_list is not None:
         if obj.relay_is_on:
