@@ -1,7 +1,8 @@
 __author__ = 'dcristian'
 from datetime import datetime, timedelta
 from main.logger_helper import L
-from common import Constant, utils
+from common import Constant
+from common import utils
 from main.admin import models
 from main.admin.model_helper import commit
 from main import thread_pool
