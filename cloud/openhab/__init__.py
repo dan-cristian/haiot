@@ -16,6 +16,8 @@ class P:
     event_list = []
     func_list = None
     initialised = False
+    mqtt_topic_receive = None
+    mqtt_topic_receive_prefix = None
 
     def __init__(self):
         pass
@@ -54,6 +56,24 @@ def parse_rules(obj, change):
 
 
 def mqtt_on_message(client, userdata, msg):
+    item = msg.topic.split(P.mqtt_topic_receive_prefix)
+    if len(item) == 2:
+        name = item[1]
+        state = None
+        if msg.payload == 'ON':
+            state = 1
+        if msg.payload == 'OFF':
+            state = 0
+        if name.startswith("relay_"):
+            vals = name.split("relay_")
+            rules.custom_relay(vals[1], state)
+        elif name.startswith("heat_"):
+            vals = name.split("heat_")
+            rules.heat_relay(vals[1], state)
+        elif name.startswith("mpd_"):
+            vals = name.split("mpd_")
+    else:
+        L.l.warning("Unexpected mqtt receive topic format {}".format(item))
     if "=" in msg.payload:
         vals = msg.payload.split("=")
         name = vals[0]
@@ -102,8 +122,9 @@ def unload():
 def init():
     L.l.info('Openhab module initialising')
     rules.P.openhab_topic = str(model_helper.get_param(Constant.P_MQTT_TOPIC_OPENHAB_SEND))
-    recv = str(model_helper.get_param(Constant.P_MQTT_TOPIC_OPENHAB_RECEIVE))
-    mqtt_io.P.mqtt_client.message_callback_add(recv, mqtt_on_message)
+    P.mqtt_topic_receive = str(model_helper.get_param(Constant.P_MQTT_TOPIC_OPENHAB_RECEIVE))
+    P.mqtt_topic_receive_prefix = P.mqtt_topic_receive.replace('#', '')
+    mqtt_io.P.mqtt_client.message_callback_add(P.mqtt_topic_receive, mqtt_on_message)
     __load_rules()
     thread_pool.add_interval_callable(thread_run, run_interval_second=1)
     dispatcher.connect(parse_rules, signal=Constant.SIGNAL_DB_CHANGE_FOR_RULES, sender=dispatcher.Any)
