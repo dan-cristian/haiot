@@ -125,8 +125,8 @@ Contact contact_portita "Portita [%s]" <door>                               (CON
 Contact contact_gate "Gate [%s]" <door>                                     (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_gate:state:default]"}
 Contact contact_usa_garaj "Usa garaj [%s]" <door>                           (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_usa garaj:state:default]"}
 
-Player mpd_player_living                                                    {mqtt="<[mosquitto:iot/openhab/mpd_player_living:state:default],>[mosquitto:iot/openhab/mpd_player_living:command:*:default]"}
-Dimmer mpd_volume_living
+Player mpd_player_living
+Dimmer mpd_volume_living    {mqtt="<[mosquitto:iot/openhab/mpd_volume_living:state:default],>[mosquitto:iot/openhab/mpd_volume_living:command:*:default]"}
 Dimmer mpd_position_living
 String mpd_song_living
 
