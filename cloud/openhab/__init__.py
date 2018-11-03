@@ -73,22 +73,7 @@ def mqtt_on_message(client, userdata, msg):
         elif name.startswith("mpd_"):
             vals = name.split("mpd_")
     else:
-        L.l.warning("Unexpected mqtt receive topic format {}".format(item))
-    if "=" in msg.payload:
-        vals = msg.payload.split("=")
-        name = vals[0]
-        value = vals[1]
-        L.l.info("Got openhab event {}={}".format(name, value))
-        if name.startswith("relay_"):
-            vals = name.split("relay_")
-            rules.custom_relay(vals[1], int(value))
-        elif name.startswith("heat_"):
-            vals = name.split("heat_")
-            rules.heat_relay(vals[1], int(value))
-        elif name.startswith("mpd_"):
-            vals = name.split("mpd_")
-    else:
-        L.l.warning("Openhab topic {} has invalid payload={}".format(msg.topic, msg.payload))
+        L.l.warning("Unexpected mqtt receive topic {} payload={}".format(msg.topic, msg.payload))
 
 
 def __load_rules():
