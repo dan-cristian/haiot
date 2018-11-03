@@ -68,7 +68,7 @@ def mqtt_on_message(client, userdata, msg):
         elif name.startswith("mpd_"):
             vals = name.split("mpd_")
     else:
-        L.l.warning("Openhab payload does not contain = character, invalid payload={}".format(msg.payload))
+        L.l.warning("Openhab topic {} has invalid payload={}".format(msg.topic, msg.payload))
 
 
 def __load_rules():
@@ -101,8 +101,9 @@ def unload():
 
 def init():
     L.l.info('Openhab module initialising')
-    rules.P.openhab_topic = str(model_helper.get_param(Constant.P_MQTT_TOPIC_OPENHAB))
-    mqtt_io.P.mqtt_client.message_callback_add(rules.P.openhab_topic, mqtt_on_message)
+    rules.P.openhab_topic = str(model_helper.get_param(Constant.P_MQTT_TOPIC_OPENHAB_SEND))
+    recv = str(model_helper.get_param(Constant.P_MQTT_TOPIC_OPENHAB_RECEIVE))
+    mqtt_io.P.mqtt_client.message_callback_add(recv, mqtt_on_message)
     __load_rules()
     thread_pool.add_interval_callable(thread_run, run_interval_second=1)
     dispatcher.connect(parse_rules, signal=Constant.SIGNAL_DB_CHANGE_FOR_RULES, sender=dispatcher.Any)
