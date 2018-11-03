@@ -1,7 +1,8 @@
 sitemap default label="Home" {
 
 Frame {
-Default item=mpd_living
+    Default item=mpd_player_living
+    Default item=mpd_volume_living
 }
 
 Frame {
