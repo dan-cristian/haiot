@@ -140,9 +140,9 @@ def set_value(network, node, value):
                         sensor_name = zone_sensor.sensor_name
                     else:
                         # L.l.info("Received node={}, value={}".format(node, value))
-                        current_record.vad = None
-                        current_record.iad = None
-                        current_record.vdd = None
+                        current_record.vad = 0
+                        current_record.iad = 0
+                        current_record.vdd = 0
                         sensor_name = current_record.sensor_name
                     record = models.Sensor(address=sensor_address, sensor_name=sensor_name)
                     record.is_event_external = True
