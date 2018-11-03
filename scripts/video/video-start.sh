@@ -14,7 +14,7 @@ kill_proc "kodi/kodi.bin"
 
 function stop_browser(){
 echo2 "Stopping browser"
-kill_proc "midori"
+kill_proc "qupzilla"
 }
 
 
@@ -28,7 +28,7 @@ fi
 }
 
 function exit_if_browser_run(){
-ps ax | grep -q [/]usr/bin/midori
+ps ax | grep -q [/]usr/bin/qupzilla
 browser_code=$?
 if [ $browser_code -eq 0 ]; then
         echo2 "Browser is running, exit"
@@ -167,9 +167,10 @@ echo2 "Starting browser display $DISPLAY"
 set_workspace $I3_WORKSPACE_BROWSER
 echo2 "Workspace set for browser"
 exit_if_browser_run
-echo2 "Launch midori"
-rm -R ~/.config/midori/
-midori -e Fullscreen http://localhost:8080 >> $LOG 2>&1 &
+echo2 "Launch browser"
+#rm -R ~/.config/midori/
+#midori -e Fullscreen http://localhost:8080 >> $LOG 2>&1 &
+qupzilla >> $LOG 2>&1 &
 }
 
 function presence(){
