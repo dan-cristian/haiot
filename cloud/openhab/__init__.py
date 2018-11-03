@@ -63,8 +63,16 @@ def mqtt_on_message(client, userdata, msg):
         state = None
         if msg.payload == 'ON':
             state = 1
-        if msg.payload == 'OFF':
+        elif msg.payload == 'OFF':
             state = 0
+        elif msg.payload == 'DOWN':
+            pass
+        elif msg.payload == 'UP':
+            pass
+        elif msg.payload == 'STOP':
+            pass
+        elif msg.payload == 'MOVE':
+            pass
         if name.startswith("relay_"):
             vals = name.split("relay_")
             rules.custom_relay(vals[1], state)
