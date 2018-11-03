@@ -105,6 +105,12 @@ def pause(zone_name):
         return False
 
 
+def set_volume(zone_name, volume):
+    client = _get_client(_get_port(zone_name))
+    if client is not None:
+        client.setvol(volume)
+
+
 # http://pythonhosted.org/python-mpd2/topics/commands.html#the-music-database
 def populate(zone_name, default_dir=None):
     client = _get_client(port=_get_port(zone_name))
