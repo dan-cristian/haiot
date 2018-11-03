@@ -16,7 +16,7 @@
     {"name": "MQTT_PORT_1", "value": "1883"},
     {"name": "MQTT_TOPIC", "value": "iot/#"},
     {"name": "MQTT_TOPIC_MAIN", "value": "iot/main", "description": "haiot node intercomm. topic"},
-    {"name": "MQTT_TOPIC_OPENHAB_SEND", "value": "iot/openhab/", "description": "openhab integration mqtt channel for sending to openhab"},
+    {"name": "MQTT_TOPIC_OPENHAB_SEND", "value": "iot/openhab", "description": "openhab integration mqtt channel for sending to openhab"},
     {"name": "MQTT_TOPIC_OPENHAB_RECEIVE", "value": "iot/openhab/cmd/#", "description": "openhab integration mqtt channel for receiving"},
     {"name": "MQTT_TOPIC_SONOFF_1", "value": "iot/sonoff/#", "description": "sonoff-tasmota integration mqtt channel"},
     {"name": "MQTT_HOST_2", "value": "192.168.0.1"},

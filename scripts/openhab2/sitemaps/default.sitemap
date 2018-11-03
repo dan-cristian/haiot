@@ -3,7 +3,9 @@ sitemap default label="Home" {
 Frame {
     Default item=mpd_player_living
     Default item=mpd_volume_living
+    Default item=mpd_position_living
     Default item=mpd_player_beci
+    Default item=mpd_player_pod
 }
 
 Frame {
