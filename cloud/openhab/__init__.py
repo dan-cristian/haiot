@@ -8,6 +8,7 @@ from transport import mqtt_io
 import rules
 import threading
 import prctl
+from music import mpd
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
@@ -72,6 +73,15 @@ def mqtt_on_message(client, userdata, msg):
             rules.heat_relay(vals[1], state)
         elif name.startswith("mpd_"):
             vals = name.split("mpd_")
+            items = vals[1].split('_')
+            if items[0] == 'volume':
+                mpd.set_volume(zone_name=items[1], volume=msg.payload)
+            elif items[0] == 'position':
+                pass
+            elif items[0] == 'player':
+                pass
+            else:
+                L.l.warning('Undefined mpd command {}'.format(msg.topic))
     else:
         L.l.warning("Unexpected mqtt receive topic {} payload={}".format(msg.topic, msg.payload))
 
