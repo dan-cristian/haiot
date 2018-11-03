@@ -65,6 +65,8 @@ def mqtt_on_message(client, userdata, msg):
         elif name.startswith("heat_"):
             vals = name.split("heat_")
             rules.heat_relay(vals[1], int(value))
+        elif name.startswith("mpd_"):
+            vals = name.split("mpd_")
     else:
         L.l.warning("Openhab payload does not contain = character, invalid payload={}".format(msg.payload))
 
