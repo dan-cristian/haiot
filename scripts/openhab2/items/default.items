@@ -47,10 +47,10 @@ Switch relay_solar "Solar relay" <switch>                                   {mqt
 
 Group:Switch:OR(ON, OFF)    RELAY_BACK_WATER "Back watering [(%d)]"  <switch>
 Group:Switch:OR(ON, OFF)    RELAY_FRONT_WATER "Front watering [(%d)]"   <switch>
-Switch relay_back_pump_relay "Back pump" <switch>                           (RELAY_BACK_WATER, RELAY_FRONT_WATER) {mqtt="<[mosquitto:iot/openhab/relay_back_pump_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_back_pump_relay:command:*:default,>[mosquitto:iot/openhab:command:OFF:relay_back_pump_relay=0]", autoupdate="false"}
-Switch relay_back_valve_relay "Back valve" <switch>                         (RELAY_BACK_WATER) {mqtt="<[mosquitto:iot/openhab/relay_back_valve_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_back_valve_relay:command:*:default,>[mosquitto:iot/openhab:command:OFF:relay_back_valve_relay=0]", autoupdate="false"}
-Switch relay_front_valve_relay "Front valve" <switch>                       (RELAY_FRONT_WATER) {mqtt="<[mosquitto:iot/openhab/relay_front_valve_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_front_valve_relay:command:*:default,>[mosquitto:iot/openhab:command:OFF:relay_front_valve_relay=0]", autoupdate="false"}
-Switch relay_front_main_valve_relay "Front main valve" <switch>             (RELAY_FRONT_WATER) {mqtt="<[mosquitto:iot/openhab/relay_front_main_valve_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_front_main_valve_relay:command:*:default,>[mosquitto:iot/openhab:command:OFF:relay_front_main_valve_relay=0]", autoupdate="false"}
+Switch relay_back_pump_relay "Back pump" <switch>                           (RELAY_BACK_WATER, RELAY_FRONT_WATER) {mqtt="<[mosquitto:iot/openhab/relay_back_pump_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_back_pump_relay:command:*:default]", autoupdate="false"}
+Switch relay_back_valve_relay "Back valve" <switch>                         (RELAY_BACK_WATER) {mqtt="<[mosquitto:iot/openhab/relay_back_valve_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_back_valve_relay:command:*:default]", autoupdate="false"}
+Switch relay_front_valve_relay "Front valve" <switch>                       (RELAY_FRONT_WATER) {mqtt="<[mosquitto:iot/openhab/relay_front_valve_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_front_valve_relay:command:*:default]", autoupdate="false"}
+Switch relay_front_main_valve_relay "Front main valve" <switch>             (RELAY_FRONT_WATER) {mqtt="<[mosquitto:iot/openhab/relay_front_main_valve_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_front_main_valve_relay:command:*:default]", autoupdate="false"}
 
 Number temperature_boiler_sus "Boiler sus [%.1f °C]" <temperature_hot>          (BOI, TEMP_BOI) {mqtt="<[mosquitto:iot/openhab/temperature_boiler sus:state:default]"}
 Number temperature_boiler_mijloc "Boiler mijloc [%.1f °C]" <temperature_hot>    (BOI, TEMP_BOI) {mqtt="<[mosquitto:iot/openhab/temperature_boiler mijloc:state:default]"}
@@ -125,7 +125,7 @@ Contact contact_portita "Portita [%s]" <door>                               (CON
 Contact contact_gate "Gate [%s]" <door>                                     (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_gate:state:default]"}
 Contact contact_usa_garaj "Usa garaj [%s]" <door>                           (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_usa garaj:state:default]"}
 
-Player mpd_player_living    {mqtt=">[mosquitto:iot/openhab/mpd_player_living:command:*:default]"}
+Player mpd_player_living
 Dimmer mpd_volume_living    {mqtt="<[mosquitto:iot/openhab/mpd_volume_living:state:default],>[mosquitto:iot/openhab/cmd/mpd_volume_living:command:*:default]"}
 Dimmer mpd_position_living  {mqtt="<[mosquitto:iot/openhab/mpd_position_living:state:default],>[mosquitto:iot/openhab/cmd/mpd_position_living:command:*:default]"}
 String mpd_song_living      {mqtt="<[mosquitto:iot/openhab/mpd_song_living:state:default]"}
