@@ -106,8 +106,20 @@ def rule_openhab_heat_relay(obj=models.ZoneHeatRelay(), field_changed_list=None)
         send_mqtt_openhab(subtopic="heat_" + obj.heat_pin_name, payload=state)
 
 
-#  INBOUD RULES START
+def rule_openhab_music(obj=models.Music(), field_changed_list=None):
+    if field_changed_list is not None:
+        zone = obj.zone_name
+        for key in ['volume', 'position', 'song', 'artist', 'state']:
+            if key in field_changed_list:
+                val = getattr(obj, key)
+                send_mqtt_openhab(subtopic='mpd_' + key + '_' + zone, payload=val)
+        # key = 'state'
+        # if key in field_changed_list:
+        #    state = obj[key]
+        #    send_mqtt_openhab(subtopic='mpd_player_' + zone, payload=state)
 
+
+# INBOUD RULES START
 def custom_relay(name, value):
     # L.l.info("Try to set custom relay {} to {}".format(name, value))
     t = models.ZoneCustomRelay

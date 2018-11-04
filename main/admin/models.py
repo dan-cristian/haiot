@@ -925,6 +925,26 @@ class Position(db.Model, DbEvent, DbBase):
     satellite_valid = db.Column(db.Integer)
     updated_on = db.Column(db.DateTime())
 
+
+class Music(db.Model, DbEvent, DbBase):
+    id = db.Column(db.Integer, primary_key=True)
+    zone_name = db.Column(db.String(50))  # unique name
+    state = db.Column(db.String(50))
+    volume = db.Column(db.Integer)
+    position = db.Column(db.Integer)  # percent
+    song = db.Column(db.String(100))
+    artist = db.Column(db.String(100))
+
+    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
+
+    def __init__(self, zone_name=''):
+        super(Music, self).__init__()
+        self.zone_name = zone_name
+
+    def __repr__(self):
+        return '{} {} {} {}'.format(self.id, self.zone_name, self.state, self.song)
+
+
 '''
 tables used to store historical data
 column names must match the source model names as save is done automatically

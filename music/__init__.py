@@ -2,25 +2,32 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 from main.logger_helper import L
 from main import thread_pool
-import music_run
+import prctl
+import threading
+import mpd
 
 initialised = False
+
+
+def thread_run():
+    prctl.set_name("music")
+    threading.current_thread().name = "music"
+    mpd.thread_run()
+    L.l.debug('Processing music_run')
+    return 'Processed music_run'
 
 
 def unload():
     L.l.info('Music module unloading')
     # ...
-    thread_pool.remove_callable(music_run.thread_run)
+    thread_pool.remove_callable(thread_run)
     global initialised
     initialised = False
 
 
 def init():
     L.l.info('Music module initialising')
-    thread_pool.add_interval_callable(music_run.thread_run, run_interval_second=60)
+    thread_pool.add_interval_callable(thread_run, run_interval_second=10)
+    mpd.init()
     global initialised
     initialised = True
-
-
-if __name__ == '__main__':
-    music_run.thread_run()
