@@ -1,3 +1,4 @@
+import unicodedata
 from mpd import MPDClient
 from main.logger_helper import L
 from main.admin.model_helper import get_param
@@ -80,6 +81,18 @@ def next():
     return '{"result": "' + _multify(result) + '"}'
 
 
+def next_song(zone_name):
+    client = _get_client(_get_port(zone_name))
+    if client is not None:
+        client.next()
+
+
+def previous_song(zone_name):
+    client = _get_client(_get_port(zone_name))
+    if client is not None:
+        client.previous()
+
+
 def toggle():
     client = get_first_active_mpd()
     if client is not None:
@@ -89,6 +102,15 @@ def toggle():
             client.pause(0)
     result = client.status()['state']
     return '{"result": "' + _multify(result) + '"}'
+
+
+def toggle_state(zone_name):
+    client = _get_client(_get_port(zone_name))
+    if client is not None:
+        if client.status()['state'] == 'play':
+            client.pause(1)
+        else:
+            client.pause(0)
 
 
 def play(zone_name, default_dir=None):
@@ -151,12 +173,18 @@ def _read_port_config():
             P.unique_ports[int(port)] = names
 
 
+def _normalise(uni):
+    uni = unicode(uni, "utf-8")
+    return unicodedata.normalize('NFKD', uni).encode('ascii', 'ignore')
+
+
 # {'songid': '100', 'playlistlength': '32', 'playlist': '8', 'repeat': '0', 'consume': '0', 'mixrampdb': '0.000000',
 # 'random': '0', 'state': 'play', 'elapsed': '116.831', 'volume': '26', 'single': '0', 'nextsong': '4',
 # 'time': '117:262', 'song': '3', 'audio': '44100:24:2', 'bitrate': '320', 'nextsongid': '101'}
 #
-# {'album': 'A State of Trance 888 (2018-11-01) [IYPP] (SBD)', 'title': 'Destiny', 'track': '20', 'artist': 'Soul Lifters',
-# 'pos': '19', 'last-modified': '2018-11-02T18:44:57Z', 'file': '_New/recent/asot888/20. Soul Lifters - Destiny.mp3', 'time': '287', 'id': '116'}
+# {'album': 'A State of Trance 888 (2018-11-01) [IYPP] (SBD)', 'title': 'Destiny', 'track': '20',
+# 'artist': 'Soul Lifters', 'pos': '19', 'last-modified': '2018-11-02T18:44:57Z',
+# 'file': '_New/recent/asot888/20. Soul Lifters - Destiny.mp3', 'time': '287', 'id': '116'}
 def _save_status(zone, status_json, song):
     cur_rec = models.Music.query.filter_by(zone_name=zone).first()
     rec = models.Music(zone_name=zone)
@@ -165,9 +193,11 @@ def _save_status(zone, status_json, song):
     if 'elapsed' in status_json and 'time' in song:
         rec.position = 100 * (float(status_json['elapsed']) / float(song['time']))
     if 'title' in song:
-        rec.song = song['title']
+        rec.song = _normalise(song['title'])
     if 'artist' in song:
-        rec.artist = song['artist']
+        rec.artist = _normalise(song['artist'])
+    if 'album' in song:
+        rec.album = _normalise(song['album'])
     rec.save_changed_fields(current_record=cur_rec, notify_transport_enabled=True)
 
 
