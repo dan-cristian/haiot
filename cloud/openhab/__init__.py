@@ -80,9 +80,9 @@ def mqtt_on_message(client, userdata, msg):
             elif items[0] == 'position':
                 mpd.set_position(zone_name=zone_name, position_percent=float(msg.payload))
             elif items[0] == 'player':
-                if msg.payload == 'DOWN':
+                if msg.payload == 'UP':
                     mpd.previous_song(zone_name)
-                elif msg.payload == 'UP':
+                elif msg.payload == 'DOWN':
                     mpd.next_song(zone_name=zone_name)
                 elif msg.payload == 'STOP':
                     mpd.toggle_state(zone_name=zone_name)
