@@ -10,6 +10,7 @@ Frame {
     Default item=mpd_volume_beci
     Default item=mpd_position_beci
     Default item=mpd_song_beci
+    Default item=mpd_state_beci
 
     Default item=mpd_player_dormitor
 }
