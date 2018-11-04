@@ -934,6 +934,7 @@ class Music(db.Model, DbEvent, DbBase):
     position = db.Column(db.Integer)  # percent
     song = db.Column(db.String(100))
     artist = db.Column(db.String(100))
+    album = db.Column(db.String(100))
 
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
 
