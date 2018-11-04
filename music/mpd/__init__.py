@@ -145,7 +145,8 @@ def set_position(zone_name, position_percent):
     client = _get_client(_get_port(zone_name))
     if client is not None:
         song = client.currentsong()
-        client.seekcur(song.time * position_percent)
+        if 'time' in song:
+            client.seekcur(float(song['time']) * position_percent / 100)
 
 
 # http://pythonhosted.org/python-mpd2/topics/commands.html#the-music-database
