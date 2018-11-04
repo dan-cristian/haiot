@@ -199,7 +199,7 @@ def _save_status(zone, status_json, song):
     rec.state = status_json['state']
     rec.volume = int(status_json['volume'])
     if 'elapsed' in status_json and 'time' in song:
-        rec.position = 100 * (float(status_json['elapsed']) / float(song['time']))
+        rec.position = int(100 * (float(status_json['elapsed']) / float(song['time'])))
     if 'title' in song:
         rec.title = _normalise(song['title'])
     if 'artist' in song:
@@ -211,19 +211,30 @@ def _save_status(zone, status_json, song):
     rec.save_changed_fields(current_record=cur_rec, notify_transport_enabled=True)
 
 
-# https://github.com/Mic92/python-mpd2/blob/master/doc/topics/commands.rst
-def thread_run():
+def update_state(zone_name):
+    client = _get_client(_get_port(zone_name=zone_name))
+    if client is not None:
+        status = client.status()
+        song = client.currentsong()
+        _save_status(zone=zone_name, status_json=status, song=song)
+
+
+def update_state_all():
     try:
         for port in P.unique_ports.keys():
             client = _get_client(port)
             if client is not None:
                 zone_name = P.unique_ports[port]
                 status = client.status()
-                # L.l.info('MPD status zone {} = {}'.format(zone_name, status))
                 song = client.currentsong()
                 _save_status(zone=zone_name, status_json=status, song=song)
     except Exception as ex:
         L.l.error('Error in mpd run, ex={}'.format(ex), exc_info=True)
+
+
+# https://github.com/Mic92/python-mpd2/blob/master/doc/topics/commands.rst
+def thread_run():
+    update_state_all()
 
 
 def init():
