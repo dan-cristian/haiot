@@ -75,7 +75,10 @@ def mqtt_on_message(client, userdata, msg):
         elif name.startswith("mpd_"):
             vals = name.split("mpd_")
             items = vals[1].split('_')
-            zone_name = items[1]
+            if len(items) >= 2:
+                zone_name = items[1]
+            else:
+                zone_name = None
             cmd = False
             if items[0] == 'volume':
                 mpd.set_volume(zone_name=zone_name, volume=int(msg.payload))
@@ -95,6 +98,7 @@ def mqtt_on_message(client, userdata, msg):
                     cmd = True
             elif items[0] == 'lastfmloved':
                 lastfm.set_current_loved(loved=(switch_state == 1))
+                cmd = True
             if cmd:
                 mpd.update_state(zone_name=zone_name)
             else:
