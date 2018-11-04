@@ -132,5 +132,7 @@ Dimmer mpd_volume_living    {mqtt="<[mosquitto:iot/openhab/mpd_volume_living:sta
 Dimmer mpd_position_living  {mqtt="<[mosquitto:iot/openhab/mpd_position_living:state:default],>[mosquitto:iot/openhab/cmd/mpd_position_living:command:*:default]"}
 String mpd_song_living      {mqtt="<[mosquitto:iot/openhab/mpd_song_living:state:default]"}
 
+Dimmer mpd_volume_beci    {mqtt="<[mosquitto:iot/openhab/mpd_volume_beci:state:default],>[mosquitto:iot/openhab/cmd/mpd_volume_beci:command:*:default]"}
+
 
 Number p_switch                         ""
