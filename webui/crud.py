@@ -100,7 +100,7 @@ class CRUDView(MethodView):
             # process triggers on actions initiated by user
             dispatcher.send(signal=Constant.SIGNAL_UI_DB_POST, model=self.model, row=obj)
             return redirect(self.path)
-        except AttributeError, aex:
+        except AttributeError as aex:
             L.l.error('Error CRUD POST {}'.format(aex))
             return redirect(self.path)
 
@@ -165,4 +165,5 @@ def init_crud():
     register_crud(user, '/rule', 'rule', Rule, filters=simple_filters)
     register_crud(user, '/commandoverriderelay', 'commandoverriderelay', CommandOverrideRelay, filters=simple_filters)
     register_crud(user, '/utility', 'utility', models.Utility, filters=simple_filters)
+    register_crud(user, '/music', 'music', models.Music, filters=simple_filters)
     register_crud(user, '/log', 'log', models.L, filters=simple_filters)
