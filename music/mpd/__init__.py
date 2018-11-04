@@ -4,7 +4,7 @@ from main.logger_helper import L
 from main.admin.model_helper import get_param
 from common import Constant
 from main.admin import models
-
+from cloud import lastfm
 
 class P:
     zone_port = {}
@@ -193,11 +193,13 @@ def _normalise(uni):
 # {'album': 'A State of Trance 888 (2018-11-01) [IYPP] (SBD)', 'title': 'Destiny', 'track': '20',
 # 'artist': 'Soul Lifters', 'pos': '19', 'last-modified': '2018-11-02T18:44:57Z',
 # 'file': '_New/recent/asot888/20. Soul Lifters - Destiny.mp3', 'time': '287', 'id': '116'}
-def _save_status(zone, status_json, song):
+def _save_status(zone, status_json, song, lastfmloved, lastfmsong):
     cur_rec = models.Music.query.filter_by(zone_name=zone).first()
     rec = models.Music(zone_name=zone)
     rec.state = status_json['state']
     rec.volume = int(status_json['volume'])
+    rec.lastfmloved = lastfmloved
+    rec.lastfmsong = lastfmsong
     if 'elapsed' in status_json and 'time' in song:
         rec.position = int(100 * (float(status_json['elapsed']) / float(song['time'])))
     if 'title' in song:
@@ -216,7 +218,9 @@ def update_state(zone_name):
     if client is not None:
         status = client.status()
         song = client.currentsong()
-        _save_status(zone=zone_name, status_json=status, song=song)
+        lastfmloved = lastfm.iscurrent_loved()
+        lastfmsong = lastfm.get_current_song()
+        _save_status(zone=zone_name, status_json=status, song=song, lastfmloved=lastfmloved, lastfmsong=lastfmsong)
 
 
 def update_state_all():
@@ -227,7 +231,10 @@ def update_state_all():
                 zone_name = P.unique_ports[port]
                 status = client.status()
                 song = client.currentsong()
-                _save_status(zone=zone_name, status_json=status, song=song)
+                lastfmloved = lastfm.iscurrent_loved()
+                lastfmsong = lastfm.get_current_song()
+                _save_status(zone=zone_name, status_json=status, song=song,
+                             lastfmloved=lastfmloved, lastfmsong=lastfmsong)
     except Exception as ex:
         L.l.error('Error in mpd run, ex={}'.format(ex), exc_info=True)
 
