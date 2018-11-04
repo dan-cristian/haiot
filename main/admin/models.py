@@ -932,8 +932,9 @@ class Music(db.Model, DbEvent, DbBase):
     state = db.Column(db.String(50))
     volume = db.Column(db.Integer)
     position = db.Column(db.Integer)  # percent
-    song = db.Column(db.String(100))
+    title = db.Column(db.String(100))
     artist = db.Column(db.String(100))
+    song = db.Column(db.String(200))
     album = db.Column(db.String(100))
 
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
