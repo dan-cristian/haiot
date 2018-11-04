@@ -96,11 +96,15 @@ def mqtt_on_message(client, userdata, msg):
                 elif msg.payload == 'STOP' or msg.payload == 'TOGGLE':
                     mpd.toggle_state(zone_name=zone_name)
                     cmd = True
+                elif msg.payload == 'PLAY':
+                    mpd.play(zone_name=zone_name)
+                    cmd = True
             elif items[0] == 'lastfmloved':
                 lastfm.set_current_loved(loved=(switch_state == 1))
                 cmd = True
             if cmd:
                 mpd.update_state(zone_name=zone_name)
+                mpd.save_lastfm()
             else:
                 L.l.warning('Undefined mpd command {}'.format(msg.topic))
     else:
