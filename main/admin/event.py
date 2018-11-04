@@ -150,6 +150,9 @@ def mqtt_thread_run():
                     elif table == utils.get_table_name(models.Music):
                         # no additional processing
                         pass
+                    elif table == utils.get_table_name(models.MusicLoved):
+                        # no additional processing
+                        pass
                     else:
                         L.l.warning('Table %s content from %s is not mqtt processed' % (table, source_host))
 
