@@ -47,7 +47,7 @@
     {"name": "P_HIPCHAT_TOKEN", "value": "fqlWeMHD2KxcSBYOt9nxu3t97CcFgljmUJZoBc3d", "description":"room token"},
     {"name": "P_HIPCHAT_ROOM_API_ID", "value": "2941088", "description":"room api id"},
     {"name": "P_MPD_SERVER", "value": "192.168.0.9", "description":"IP of mpd music server"},
-    {"name": "P_MPD_PORT_ZONE","value": "livingroom=6600,headset=6601,basement=6602,bedroom=6603,bathroom=6604,attic=6605", "description":"mpd port for each music zone"},
+    {"name": "P_MPD_PORT_ZONE","value": "livingroom:living=6600,headset=6601,basement:beci=6602,bedroom:dormitor=6603,bathroom:baie=6604,attic:pod=6605", "description":"mpd port for each music zone, can use multiple names for a zone, separated by :"},
     {"name": "GMUSICPROXY_URL", "value": "http://192.168.0.9:8081", "description":"url for gmusicproxy"},
     {"name": "AMP_SERIAL_HOST", "value": "192.168.0.9", "description":"host for serial over net - ser2net, amp control"},
     {"name": "AMP_SERIAL_PORT", "value": "2000", "description":"port for serial over net - ser2net, amp control"},
@@ -86,6 +86,7 @@
     {"id":53, "active":"0", "start_order":"53", "name":"sensor.zwave"},
     {"id":55, "active":"0", "start_order":"55", "name":"sensor.1wire"},
     {"id":57, "active":"0", "start_order":"57", "name":"sensor.sonoff"},
+    {"id":59, "active":"0", "start_order":"59", "name":"music"},
 
     {"id":90, "active":"0", "start_order":"90", "name":"apps.dashcam"},
     {"id":99, "active":"0", "start_order":"99", "name":"main.cron"},
@@ -112,6 +113,7 @@
     {"id":511, "active":"1", "start_order":"11", "name":"alarm", "host_name":"netbook"},
     {"id":541, "active":"0", "start_order":"41", "name":"cloud.alexa", "host_name":"netbook"},
     {"id":557, "active":"1", "start_order":"57", "name":"sensor.sonoff", "host_name":"netbook"},
+    {"id":559, "active":"1", "start_order":"59", "name":"music", "host_name":"netbook"},
 
     {"id":609, "active":"1", "start_order":"9", "name":"heat", "host_name":"pi-face"},
     {"id":611, "active":"1", "start_order":"11", "name":"alarm", "host_name":"pi-face"},
@@ -122,7 +124,8 @@
     {"id":651, "active":"1", "start_order":"51", "name":"sensor.solar_aps", "host_name":"pi-face"},
     {"id":653, "active":"1", "start_order":"53", "name":"sensor.zwave", "host_name":"pi-face"},
     {"id":655, "active":"1", "start_order":"55", "name":"sensor.1wire", "host_name":"pi-face"},
-    {"id":657, "active":"1", "start_order":"57", "name":"sensor.sonoff", "host_name":"pi-face"}
+    {"id":657, "active":"1", "start_order":"57", "name":"sensor.sonoff", "host_name":"pi-face"},
+    {"id":659, "active":"1", "start_order":"59", "name":"music", "host_name":"pi-face"}
 
   ],
 
