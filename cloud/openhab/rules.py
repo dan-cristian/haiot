@@ -113,8 +113,6 @@ def rule_openhab_music(obj=models.Music(), field_changed_list=None):
             if key in field_changed_list:
                 if hasattr(obj, key):
                     val = getattr(obj, key)
-                    if key == 'state':
-                        key = 'player'
                     send_mqtt_openhab(subtopic='mpd_' + key + '_' + zone, payload=val)
                 else:
                     L.l.warning('Field {} in change list but not in obj={}'.format(key, obj))
