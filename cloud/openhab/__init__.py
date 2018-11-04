@@ -72,23 +72,20 @@ def mqtt_on_message(client, userdata, msg):
             vals = name.split("heat_")
             rules.heat_relay(vals[1], state)
         elif name.startswith("mpd_"):
-            if msg.payload == 'DOWN':
-                pass
-            elif msg.payload == 'UP':
-                pass
-            elif msg.payload == 'STOP':
-                pass
-            elif msg.payload == 'MOVE':
-                pass
-
             vals = name.split("mpd_")
             items = vals[1].split('_')
+            zone_name = items[1]
             if items[0] == 'volume':
-                mpd.set_volume(zone_name=items[1], volume=int(msg.payload))
+                mpd.set_volume(zone_name=zone_name, volume=int(msg.payload))
             elif items[0] == 'position':
                 pass
             elif items[0] == 'player':
-                pass
+                if msg.payload == 'DOWN':
+                    mpd.previous_song(zone_name)
+                elif msg.payload == 'UP':
+                    mpd.next_song(zone_name=zone_name)
+                elif msg.payload == 'STOP':
+                    mpd.toggle_state(zone_name=zone_name)
             else:
                 L.l.warning('Undefined mpd command {}'.format(msg.topic))
     else:
