@@ -936,17 +936,29 @@ class Music(db.Model, DbEvent, DbBase):
     artist = db.Column(db.String(100))
     song = db.Column(db.String(200))
     album = db.Column(db.String(100))
-    lastfmloved = db.Column(db.Boolean, default=False)
-    lastfmsong = db.Column(db.String(200))  # not the best place to store this global variable
 
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
 
-    def __init__(self, zone_name=''):
+    def __init__(self, zone_name=None):
         super(Music, self).__init__()
         self.zone_name = zone_name
 
     def __repr__(self):
         return '{} {} {} {}'.format(self.id, self.zone_name, self.state, self.song)
+
+
+class MusicLoved(db.Model, DbEvent, DbBase):
+    id = db.Column(db.Integer, primary_key=True)
+    lastfmloved = db.Column(db.Boolean, default=False)
+    lastfmsong = db.Column(db.String(200))
+
+    def __init__(self, lastfmsong=None):
+        super(MusicLoved, self).__init__()
+        self.lastfmsong = lastfmsong
+
+    def __repr__(self):
+        return '{} {} {}'.format(self.id, self.lastfmsong, self.lastfmloved)
+
 
 
 '''

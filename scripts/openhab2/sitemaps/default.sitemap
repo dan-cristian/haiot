@@ -1,7 +1,9 @@
 sitemap default label="Home" {
 
-Default item=mpd_lastfmloved
-Default item=mpd_lastfmsong
+Frame {
+    Default item=mpd_lastfmloved
+    Default item=mpd_lastfmsong
+}
 
 Frame {
     Default item=mpd_player_living
