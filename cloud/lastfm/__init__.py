@@ -55,6 +55,7 @@ def love(request):
     return '{"result": "' + _multify(result) + '"}'
 
 
+# used for garmin
 def current():
     track = _get_current()
     if track is None:
@@ -65,9 +66,42 @@ def current():
                 prefix = '! '
             else:
                 prefix = ''
-        except Exception, ex:
+        except Exception as ex:
             prefix = "? "
         return '{"result": "' + _multify(prefix + track.title) + '"}'
+
+
+def get_current_song():
+    track = _get_current()
+    if track is not None:
+        return track.title
+    else:
+        return '(None)'
+
+
+def iscurrent_loved():
+    track = _get_current()
+    res = None
+    if track is not None:
+        try:
+            res = track.get_userloved()
+        except Exception as ex:
+            L.l.warning('Cannot get track love status, ex={}'.format(ex))
+    return res
+
+
+def set_current_loved(loved):
+    track = _get_current()
+    res = None
+    if track is not None:
+        try:
+            if loved:
+                res = track.love()
+            else:
+                res = track.unlove()
+        except Exception as ex:
+            L.l.warning('Cannot set track love status, ex={}'.format(ex))
+    return res
 
 
 def _add_to_playlist(tracks):

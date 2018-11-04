@@ -9,6 +9,7 @@ import rules
 import threading
 import prctl
 from music import mpd
+from cloud import lastfm
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
@@ -60,17 +61,17 @@ def mqtt_on_message(client, userdata, msg):
     item = msg.topic.split(P.mqtt_topic_receive_prefix)
     if len(item) == 2:
         name = item[1]
-        state = None
+        switch_state = None
         if msg.payload == 'ON':
-            state = 1
+            switch_state = 1
         elif msg.payload == 'OFF':
-            state = 0
+            switch_state = 0
         if name.startswith("relay_"):
             vals = name.split("relay_")
-            rules.custom_relay(vals[1], state)
+            rules.custom_relay(vals[1], switch_state)
         elif name.startswith("heat_"):
             vals = name.split("heat_")
-            rules.heat_relay(vals[1], state)
+            rules.heat_relay(vals[1], switch_state)
         elif name.startswith("mpd_"):
             vals = name.split("mpd_")
             items = vals[1].split('_')
@@ -92,6 +93,8 @@ def mqtt_on_message(client, userdata, msg):
                 elif msg.payload == 'STOP' or msg.payload == 'TOGGLE':
                     mpd.toggle_state(zone_name=zone_name)
                     cmd = True
+            elif items[0] == 'lastfmloved':
+                lastfm.set_current_loved(loved=(switch_state == 1))
             if cmd:
                 mpd.update_state(zone_name=zone_name)
             else:

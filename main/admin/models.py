@@ -936,6 +936,8 @@ class Music(db.Model, DbEvent, DbBase):
     artist = db.Column(db.String(100))
     song = db.Column(db.String(200))
     album = db.Column(db.String(100))
+    lastfmloved = db.Column(db.Boolean, default=False)
+    lastfmsong = db.Column(db.String(200))  # not the best place to store this global variable
 
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
 
