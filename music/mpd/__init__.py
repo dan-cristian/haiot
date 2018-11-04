@@ -2,6 +2,15 @@ from mpd import MPDClient
 from main.logger_helper import L
 from main.admin.model_helper import get_param
 from common import Constant
+from main.admin import models
+
+
+class P:
+    zone_port = {}
+    unique_ports = {}
+
+    def __init__(self):
+        pass
 
 
 def _multify(text):
@@ -13,12 +22,10 @@ def _multify(text):
 
 
 def _get_port(zone_name):
-    port_config = get_param(Constant.P_MPD_PORT_ZONE).split(',')
-    for pair in port_config:
-        split = pair.split('=')
-        if split[0] == zone_name:
-            return int(split[1])
-    return None
+    if zone_name in P.zone_port.keys():
+        return P.zone_port[zone_name]
+    else:
+        return None
 
 
 def _get_client(port=None):
@@ -109,6 +116,7 @@ def set_volume(zone_name, volume):
     client = _get_client(_get_port(zone_name))
     if client is not None:
         client.setvol(volume)
+        L.l.info('Set volume for {} vol={}'.format(zone_name, volume))
 
 
 # http://pythonhosted.org/python-mpd2/topics/commands.html#the-music-database
@@ -125,3 +133,58 @@ def populate(zone_name, default_dir=None):
         return len(client.playlist())
     else:
         return False
+
+
+def _read_port_config():
+    port_config = get_param(Constant.P_MPD_PORT_ZONE).split(',')
+    for pair in port_config:
+        split = pair.split('=')
+        names = split[0]
+        port = split[1]
+        if ':' in names:
+            name_list = names.split(':')
+            for name in name_list:
+                P.zone_port[name] = int(port)
+                P.unique_ports[int(port)] = name
+        else:
+            P.zone_port[names] = int(port)
+            P.unique_ports[int(port)] = names
+
+
+# {'songid': '100', 'playlistlength': '32', 'playlist': '8', 'repeat': '0', 'consume': '0', 'mixrampdb': '0.000000',
+# 'random': '0', 'state': 'play', 'elapsed': '116.831', 'volume': '26', 'single': '0', 'nextsong': '4',
+# 'time': '117:262', 'song': '3', 'audio': '44100:24:2', 'bitrate': '320', 'nextsongid': '101'}
+#
+# {'album': 'A State of Trance 888 (2018-11-01) [IYPP] (SBD)', 'title': 'Destiny', 'track': '20', 'artist': 'Soul Lifters',
+# 'pos': '19', 'last-modified': '2018-11-02T18:44:57Z', 'file': '_New/recent/asot888/20. Soul Lifters - Destiny.mp3', 'time': '287', 'id': '116'}
+def _save_status(zone, status_json, song):
+    cur_rec = models.Music.query.filter_by(zone_name=zone).first()
+    rec = models.Music(zone_name=zone)
+    rec.state = status_json['state']
+    rec.volume = int(status_json['volume'])
+    if 'elapsed' in status_json and 'time' in song:
+        rec.position = 100 * (float(status_json['elapsed']) / float(song['time']))
+    if 'title' in song:
+        rec.song = song['title']
+    if 'artist' in song:
+        rec.artist = song['artist']
+    rec.save_changed_fields(current_record=cur_rec, notify_transport_enabled=True)
+
+
+# https://github.com/Mic92/python-mpd2/blob/master/doc/topics/commands.rst
+def thread_run():
+    try:
+        for port in P.unique_ports.keys():
+            client = _get_client(port)
+            if client is not None:
+                zone_name = P.unique_ports[port]
+                status = client.status()
+                # L.l.info('MPD status zone {} = {}'.format(zone_name, status))
+                song = client.currentsong()
+                _save_status(zone=zone_name, status_json=status, song=song)
+    except Exception as ex:
+        L.l.error('Error in mpd run, ex={}'.format(ex), exc_info=True)
+
+
+def init():
+    _read_port_config()
