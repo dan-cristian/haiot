@@ -5,13 +5,17 @@ Frame {
     Default item=mpd_volume_living
     Default item=mpd_position_living
     Default item=mpd_song_living
+}
 
+Frame {
     Default item=mpd_player_beci
     Default item=mpd_volume_beci
     Default item=mpd_position_beci
     Default item=mpd_song_beci
     Default item=mpd_state_beci
+}
 
+Frame {
     Default item=mpd_player_dormitor
 }
 
