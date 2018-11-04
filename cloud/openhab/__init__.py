@@ -83,7 +83,7 @@ def mqtt_on_message(client, userdata, msg):
             vals = name.split("mpd_")
             items = vals[1].split('_')
             if items[0] == 'volume':
-                mpd.set_volume(zone_name=items[1], volume=msg.payload)
+                mpd.set_volume(zone_name=items[1], volume=int(msg.payload))
             elif items[0] == 'position':
                 pass
             elif items[0] == 'player':
