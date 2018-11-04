@@ -109,13 +109,12 @@ def rule_openhab_heat_relay(obj=models.ZoneHeatRelay(), field_changed_list=None)
 def rule_openhab_music(obj=models.Music(), field_changed_list=None):
     if field_changed_list is not None:
         zone = obj.zone_name
-        for key in ['volume', 'position', 'song', 'artist', 'state', 'lastfmloved']:
-            if key in field_changed_list:
-                if hasattr(obj, key):
-                    val = getattr(obj, key)
-                    send_mqtt_openhab(subtopic='mpd_' + key + '_' + zone, payload=val)
-                else:
-                    L.l.warning('Field {} in change list but not in obj={}'.format(key, obj))
+        for key in field_changed_list:
+            if hasattr(obj, key):
+                val = getattr(obj, key)
+                send_mqtt_openhab(subtopic='mpd_' + key + '_' + zone, payload=val)
+            else:
+                L.l.warning('Field {} in change list but not in obj={}'.format(key, obj))
         # key = 'state'
         # if key in field_changed_list:
         #    state = obj[key]
