@@ -215,13 +215,16 @@ def _save_status(zone, status_json, song, lastfmloved, lastfmsong):
 
 
 def update_state(zone_name):
-    client = _get_client(_get_port(zone_name=zone_name))
-    if client is not None:
-        status = client.status()
-        song = client.currentsong()
-        lastfmloved = lastfm.iscurrent_loved()
-        lastfmsong = lastfm.get_current_song()
-        _save_status(zone=zone_name, status_json=status, song=song, lastfmloved=lastfmloved, lastfmsong=lastfmsong)
+    if zone_name is not None:
+        client = _get_client(_get_port(zone_name=zone_name))
+        if client is not None:
+            status = client.status()
+            song = client.currentsong()
+            lastfmloved = lastfm.iscurrent_loved()
+            lastfmsong = lastfm.get_current_song()
+            _save_status(zone=zone_name, status_json=status, song=song, lastfmloved=lastfmloved, lastfmsong=lastfmsong)
+    else:
+        update_state_all()
 
 
 def update_state_all():
