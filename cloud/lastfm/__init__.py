@@ -3,7 +3,8 @@ from urllib import addinfo
 import pylast
 from main.admin.model_helper import get_param
 from common import Constant
-from music import mpd, gmusicproxy
+import music.mpd
+from music import gmusicproxy
 from main.logger_helper import L
 import json
 
@@ -105,7 +106,7 @@ def set_current_loved(loved):
 
 
 def _add_to_playlist(tracks):
-    mpd_client = mpd.get_first_active_mpd()
+    mpd_client = music.mpd.get_first_active_mpd()
     added = 0
     if mpd_client is not None:
         mpd_client.clear()
