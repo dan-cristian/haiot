@@ -75,17 +75,25 @@ def mqtt_on_message(client, userdata, msg):
             vals = name.split("mpd_")
             items = vals[1].split('_')
             zone_name = items[1]
+            cmd = False
             if items[0] == 'volume':
                 mpd.set_volume(zone_name=zone_name, volume=int(msg.payload))
+                cmd = True
             elif items[0] == 'position':
                 mpd.set_position(zone_name=zone_name, position_percent=float(msg.payload))
-            elif items[0] == 'player':
+                cmd = True
+            elif items[0] == 'player' or items[0] == 'state':
                 if msg.payload == 'UP':
                     mpd.previous_song(zone_name)
+                    cmd = True
                 elif msg.payload == 'DOWN':
                     mpd.next_song(zone_name=zone_name)
-                elif msg.payload == 'STOP':
+                    cmd = True
+                elif msg.payload == 'STOP' or msg.payload == 'TOGGLE':
                     mpd.toggle_state(zone_name=zone_name)
+                    cmd = True
+            if cmd:
+                mpd.update_state(zone_name=zone_name)
             else:
                 L.l.warning('Undefined mpd command {}'.format(msg.topic))
     else:
