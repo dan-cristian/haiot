@@ -65,14 +65,6 @@ def mqtt_on_message(client, userdata, msg):
             state = 1
         elif msg.payload == 'OFF':
             state = 0
-        elif msg.payload == 'DOWN':
-            pass
-        elif msg.payload == 'UP':
-            pass
-        elif msg.payload == 'STOP':
-            pass
-        elif msg.payload == 'MOVE':
-            pass
         if name.startswith("relay_"):
             vals = name.split("relay_")
             rules.custom_relay(vals[1], state)
@@ -80,6 +72,15 @@ def mqtt_on_message(client, userdata, msg):
             vals = name.split("heat_")
             rules.heat_relay(vals[1], state)
         elif name.startswith("mpd_"):
+            if msg.payload == 'DOWN':
+                pass
+            elif msg.payload == 'UP':
+                pass
+            elif msg.payload == 'STOP':
+                pass
+            elif msg.payload == 'MOVE':
+                pass
+
             vals = name.split("mpd_")
             items = vals[1].split('_')
             if items[0] == 'volume':
