@@ -137,6 +137,6 @@ String mpd_song_beci "[%s]"                     {mqtt="<[mosquitto:iot/openhab/m
 
 Dimmer mpd_player_pod           {mqtt="<[mosquitto:iot/openhab/mpd_player_pod:state:default],>[mosquitto:iot/openhab/cmd/mpd_player_pod:command:*:default]"}
 
-Player mpd_player_dormitor "[%s]"   {channel="exec:command:*:default"}
+Player mpd_player_dormitor "[%s]"   {channel="exec:command:aaa:default"}
 
 Number p_switch                         ""
