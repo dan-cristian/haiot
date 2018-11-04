@@ -115,10 +115,21 @@ def rule_openhab_music(obj=models.Music(), field_changed_list=None):
                 send_mqtt_openhab(subtopic='mpd_' + key + '_' + zone, payload=val)
             else:
                 L.l.warning('Field {} in change list but not in obj={}'.format(key, obj))
-        # key = 'state'
-        # if key in field_changed_list:
-        #    state = obj[key]
-        #    send_mqtt_openhab(subtopic='mpd_player_' + zone, payload=state)
+
+
+def rule_openhab_musicloved(obj=models.MusicLoved(), field_changed_list=None):
+    if field_changed_list is not None:
+        for key in field_changed_list:
+            if hasattr(obj, key):
+                val = getattr(obj, key)
+                if key == 'lastfmloved':
+                    if val is True:
+                        val = 'ON'
+                    else:
+                        val = 'OFF'
+                send_mqtt_openhab(subtopic='mpd_' + key, payload=val)
+            else:
+                L.l.warning('Field musicloved {} in change list but not in obj={}'.format(key, obj))
 
 
 # INBOUD RULES START

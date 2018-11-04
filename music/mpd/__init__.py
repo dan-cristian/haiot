@@ -194,13 +194,11 @@ def _normalise(uni):
 # {'album': 'A State of Trance 888 (2018-11-01) [IYPP] (SBD)', 'title': 'Destiny', 'track': '20',
 # 'artist': 'Soul Lifters', 'pos': '19', 'last-modified': '2018-11-02T18:44:57Z',
 # 'file': '_New/recent/asot888/20. Soul Lifters - Destiny.mp3', 'time': '287', 'id': '116'}
-def _save_status(zone, status_json, song, lastfmloved, lastfmsong):
+def _save_status(zone, status_json, song):
     cur_rec = models.Music.query.filter_by(zone_name=zone).first()
     rec = models.Music(zone_name=zone)
     rec.state = status_json['state']
     rec.volume = int(status_json['volume'])
-    rec.lastfmloved = lastfmloved
-    rec.lastfmsong = _normalise(lastfmsong)
     if 'elapsed' in status_json and 'time' in song:
         rec.position = int(100 * (float(status_json['elapsed']) / float(song['time'])))
     if 'title' in song:
@@ -214,15 +212,26 @@ def _save_status(zone, status_json, song, lastfmloved, lastfmsong):
     rec.save_changed_fields(current_record=cur_rec, notify_transport_enabled=True)
 
 
+def save_lastfm():
+    lastfmloved = lastfm.iscurrent_loved()
+    lastfmsong = lastfm.get_current_song()
+    cur_rec = models.MusicLoved.query.first()
+    rec = models.MusicLoved(lastfmsong=lastfmsong)
+    if lastfmloved is None:
+        lastfmloved = False
+    rec.lastfmloved = lastfmloved
+    rec.lastfmsong = lastfmsong
+    # notify all as loved state might not change
+    rec.save_changed_fields(current_record=cur_rec, notify_transport_enabled=True, save_all_fields=True)
+
+
 def update_state(zone_name):
     if zone_name is not None:
         client = _get_client(_get_port(zone_name=zone_name))
         if client is not None:
             status = client.status()
             song = client.currentsong()
-            lastfmloved = lastfm.iscurrent_loved()
-            lastfmsong = lastfm.get_current_song()
-            _save_status(zone=zone_name, status_json=status, song=song, lastfmloved=lastfmloved, lastfmsong=lastfmsong)
+            _save_status(zone=zone_name, status_json=status, song=song)
     else:
         update_state_all()
 
@@ -235,10 +244,7 @@ def update_state_all():
                 zone_name = P.unique_ports[port]
                 status = client.status()
                 song = client.currentsong()
-                lastfmloved = lastfm.iscurrent_loved()
-                lastfmsong = lastfm.get_current_song()
-                _save_status(zone=zone_name, status_json=status, song=song,
-                             lastfmloved=lastfmloved, lastfmsong=lastfmsong)
+                _save_status(zone=zone_name, status_json=status, song=song)
     except Exception as ex:
         L.l.error('Error in mpd run, ex={}'.format(ex), exc_info=True)
 
@@ -246,6 +252,7 @@ def update_state_all():
 # https://github.com/Mic92/python-mpd2/blob/master/doc/topics/commands.rst
 def thread_run():
     update_state_all()
+    save_lastfm()
 
 
 def init():

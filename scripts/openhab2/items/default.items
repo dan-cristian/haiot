@@ -138,7 +138,7 @@ String mpd_song_beci "[%s]"                     {mqtt="<[mosquitto:iot/openhab/m
 String mpd_state_beci "[%s]"                    {mqtt="<[mosquitto:iot/openhab/mpd_state_beci:state:default],>[mosquitto:iot/openhab/cmd/mpd_state_beci:command:*:default]"}
 
 Switch mpd_lastfmloved "[%s]" <fire>            {mqtt="<[mosquitto:iot/openhab/mpd_lastfmloved:state:default],>[mosquitto:iot/openhab/cmd/mpd_lastfmloved:command:*:default]", autoupdate="false"}
-String mpd_lastfmsong "[%s]"                    {mqtt="<[mosquitto:iot/openhab/mpd_lastfmsong:state:default]"}
+String mpd_lastfmsong "[%s]"  <fire>            {mqtt="<[mosquitto:iot/openhab/mpd_lastfmsong:state:default]"}
 
 Dimmer mpd_player_pod           {mqtt="<[mosquitto:iot/openhab/mpd_player_pod:state:default],>[mosquitto:iot/openhab/cmd/mpd_player_pod:command:*:default]"}
 
