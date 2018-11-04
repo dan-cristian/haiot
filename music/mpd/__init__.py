@@ -182,7 +182,8 @@ def _read_port_config():
 
 
 def _normalise(uni):
-    uni = unicode(uni, "utf-8")
+    if isinstance(uni, str):
+        uni = unicode(uni, "utf-8")
     return unicodedata.normalize('NFKD', uni).encode('ascii', 'ignore')
 
 
@@ -199,7 +200,7 @@ def _save_status(zone, status_json, song, lastfmloved, lastfmsong):
     rec.state = status_json['state']
     rec.volume = int(status_json['volume'])
     rec.lastfmloved = lastfmloved
-    rec.lastfmsong = lastfmsong
+    rec.lastfmsong = _normalise(lastfmsong)
     if 'elapsed' in status_json and 'time' in song:
         rec.position = int(100 * (float(status_json['elapsed']) / float(song['time'])))
     if 'title' in song:
