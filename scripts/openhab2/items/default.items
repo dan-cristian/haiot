@@ -134,6 +134,7 @@ Switch mpd_player_beci "[%s]"                   {mqtt="<[mosquitto:iot/openhab/m
 Dimmer mpd_position_beci                        {mqtt="<[mosquitto:iot/openhab/mpd_position_beci:state:default],>[mosquitto:iot/openhab/cmd/mpd_position_beci:command:*:default]"}
 Dimmer mpd_volume_beci <soundvolume>            {mqtt="<[mosquitto:iot/openhab/mpd_volume_beci:state:default],>[mosquitto:iot/openhab/cmd/mpd_volume_beci:command:*:default]"}
 String mpd_song_beci "[%s]"                     {mqtt="<[mosquitto:iot/openhab/mpd_song_beci:state:default]"}
+String mpd_state_beci "[%s]"                    {mqtt="<[mosquitto:iot/openhab/mpd_state_beci:state:default]"}
 
 Dimmer mpd_player_pod           {mqtt="<[mosquitto:iot/openhab/mpd_player_pod:state:default],>[mosquitto:iot/openhab/cmd/mpd_player_pod:command:*:default]"}
 
