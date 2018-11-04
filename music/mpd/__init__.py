@@ -141,6 +141,13 @@ def set_volume(zone_name, volume):
         L.l.info('Set volume for {} vol={}'.format(zone_name, volume))
 
 
+def set_position(zone_name, position_percent):
+    client = _get_client(_get_port(zone_name))
+    if client is not None:
+        song = client.currentsong()
+        client.seekcur(song.time * position_percent)
+
+
 # http://pythonhosted.org/python-mpd2/topics/commands.html#the-music-database
 def populate(zone_name, default_dir=None):
     client = _get_client(port=_get_port(zone_name))
@@ -193,11 +200,13 @@ def _save_status(zone, status_json, song):
     if 'elapsed' in status_json and 'time' in song:
         rec.position = 100 * (float(status_json['elapsed']) / float(song['time']))
     if 'title' in song:
-        rec.song = _normalise(song['title'])
+        rec.title = _normalise(song['title'])
     if 'artist' in song:
         rec.artist = _normalise(song['artist'])
     if 'album' in song:
         rec.album = _normalise(song['album'])
+    if rec.title and rec.artist:
+        rec.song = "{} - {}".format(rec.artist, rec.title)
     rec.save_changed_fields(current_record=cur_rec, notify_transport_enabled=True)
 
 

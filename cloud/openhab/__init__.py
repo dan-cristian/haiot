@@ -78,7 +78,7 @@ def mqtt_on_message(client, userdata, msg):
             if items[0] == 'volume':
                 mpd.set_volume(zone_name=zone_name, volume=int(msg.payload))
             elif items[0] == 'position':
-                pass
+                mpd.set_position(zone_name=zone_name, position_percent=float(msg.payload))
             elif items[0] == 'player':
                 if msg.payload == 'DOWN':
                     mpd.previous_song(zone_name)
