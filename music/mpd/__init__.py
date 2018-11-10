@@ -85,6 +85,9 @@ def next_song(zone_name):
     client = _get_client(_get_port(zone_name))
     if client is not None:
         client.next()
+        # force state change
+        client.pause(1)
+        client.pause(0)
 
 
 def previous_song(zone_name):
