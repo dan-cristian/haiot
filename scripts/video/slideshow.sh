@@ -11,7 +11,8 @@ kill_proc "$params"
 i3-msg workspace 5
 
 #cmd="echo %f > $FEH_CURRENT_FILE; exiv2 -pt %f | grep Exif.Photo.UserComment | grep -q $PICTURE_TAG_PRIVATE; if [ $? -eq 0 ]; then echo skip; kill -SIGUSR1 %V; else echo ok; fi"
-cmd="echo '%f' > '$FEH_CURRENT_FILE'; echo %V > $FEH_SLIDESHOW_PID; echo 'Feh analyse %f' >> $LOG; if exiv2 -pt '%f' | grep 'Exif.Photo.UserComment' | grep  -q '$PICTURE_TAG_PRIVATE'; then echo 'Skipping private picture %f' >> $LOG; kill -SIGUSR1 %V; fi"
+# too verbose cmd="echo '%f' > '$FEH_CURRENT_FILE'; echo %V > $FEH_SLIDESHOW_PID; echo 'Feh analyse %f' >> $LOG; if exiv2 -pt '%f' | grep 'Exif.Photo.UserComment' | grep  -q '$PICTURE_TAG_PRIVATE'; then echo 'Skipping private picture %f' >> $LOG; kill -SIGUSR1 %V; fi"
+cmd="echo '%f' > '$FEH_CURRENT_FILE'; echo %V > $FEH_SLIDESHOW_PID; if exiv2 -pt '%f' | grep 'Exif.Photo.UserComment' | grep  -q '$PICTURE_TAG_PRIVATE'; then echo 'Skipping private picture %f' >> $LOG; kill -SIGUSR1 %V; fi"
 #echo Launching $params --info \"$cmd\" /mnt/photos/Poze Proprii/
 $params --info "$cmd" /mnt/photos/Poze\ Proprii/ &
 
