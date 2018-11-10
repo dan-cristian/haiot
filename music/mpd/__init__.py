@@ -110,7 +110,10 @@ def toggle_state(zone_name):
         if client.status()['state'] == 'play':
             client.pause(1)
         else:
-            client.pause(0)
+            if client.status()['state'] == 'stop':
+                client.play()
+            else:
+                client.pause(0)
 
 
 def play(zone_name, default_dir=None):
