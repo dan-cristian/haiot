@@ -62,9 +62,9 @@ def rule_openhab_utility(obj=models.Utility(), field_changed_list=None):
 def rule_openhab_alarm(obj=models.ZoneAlarm(), field_changed_list=None):
     key = 'contact'
     if obj.alarm_pin_triggered is True:
-        state = "OPEN"
+        state = "open"
     else:
-        state = "CLOSED"
+        state = "closed"
     send_mqtt_openhab(subtopic=key + "_" + obj.alarm_pin_name, payload=state)
 
 
@@ -73,9 +73,9 @@ def rule_openhab_ups(obj=models.Ups(), field_changed_list=None):
         key = 'power_failed'
         if key in field_changed_list:
             if obj.power_failed:
-                state = "OFF"
+                state = "off"
             else:
-                state = "ON"
+                state = "on"
             send_mqtt_openhab(subtopic="ups_" + key, payload=state)
         key = 'load_percent'
         if key in field_changed_list:
@@ -91,18 +91,18 @@ def rule_openhab_ups(obj=models.Ups(), field_changed_list=None):
 def rule_openhab_custom_relay(obj=models.ZoneCustomRelay(), field_changed_list=None):
     if field_changed_list is not None:
         if obj.relay_is_on:
-            state = "ON"
+            state = "on"
         else:
-            state = "OFF"
+            state = "off"
         send_mqtt_openhab(subtopic="relay_" + obj.relay_pin_name, payload=state)
 
 
 def rule_openhab_heat_relay(obj=models.ZoneHeatRelay(), field_changed_list=None):
     if field_changed_list is not None:
         if obj.heat_is_on:
-            state = "ON"
+            state = "on"
         else:
-            state = "OFF"
+            state = "off"
         send_mqtt_openhab(subtopic="heat_" + obj.heat_pin_name, payload=state)
 
 
@@ -124,9 +124,9 @@ def rule_openhab_musicloved(obj=models.MusicLoved(), field_changed_list=None):
                 val = getattr(obj, key)
                 if key == 'lastfmloved':
                     if val is True:
-                        val = 'ON'
+                        val = 'on'
                     else:
-                        val = 'OFF'
+                        val = 'off'
                 send_mqtt_openhab(subtopic='mpd_' + key, payload=val)
             else:
                 L.l.warning('Field musicloved {} in change list but not in obj={}'.format(key, obj))
