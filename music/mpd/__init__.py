@@ -204,17 +204,23 @@ def _save_status(zone, status_json, song):
     cur_rec = models.Music.query.filter_by(zone_name=zone).first()
     rec = models.Music(zone_name=zone)
     rec.state = status_json['state']
+    if rec.state == 'stop':
+        rec.title = ''
+        rec.artist = ''
+        rec.album = ''
+        rec.song = ''
+    else:
+        if 'title' in song:
+            rec.title = _normalise(song['title'])
+        if 'artist' in song:
+            rec.artist = _normalise(song['artist'])
+        if 'album' in song:
+            rec.album = _normalise(song['album'])
+        if rec.title and rec.artist:
+            rec.song = "{} - {}".format(rec.artist, rec.title)
     rec.volume = int(status_json['volume'])
     if 'elapsed' in status_json and 'time' in song:
         rec.position = int(100 * (float(status_json['elapsed']) / float(song['time'])))
-    if 'title' in song:
-        rec.title = _normalise(song['title'])
-    if 'artist' in song:
-        rec.artist = _normalise(song['artist'])
-    if 'album' in song:
-        rec.album = _normalise(song['album'])
-    if rec.title and rec.artist:
-        rec.song = "{} - {}".format(rec.artist, rec.title)
     rec.save_changed_fields(current_record=cur_rec, notify_transport_enabled=True)
 
 
