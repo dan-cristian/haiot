@@ -62,9 +62,9 @@ def rule_openhab_utility(obj=models.Utility(), field_changed_list=None):
 def rule_openhab_alarm(obj=models.ZoneAlarm(), field_changed_list=None):
     key = 'contact'
     if obj.alarm_pin_triggered is True:
-        state = "open"
+        state = "OPEN"
     else:
-        state = "closed"
+        state = "CLOSED"
     send_mqtt_openhab(subtopic=key + "_" + obj.alarm_pin_name, payload=state)
 
 
