@@ -260,18 +260,18 @@ elif [ "$1" == "start-kodi-once" ]; then
 	start_kodi
 	#increase_prio
 elif [ "$1" == "start-browser" ]; then
-        #startx_once
-        stop_browser
-	start_browser
-        #increase_prio
+    #startx_once
+    stop_browser
+    start_browser
+    #increase_prio
 elif [ "$1" == "startx" ]; then
-        startx_once
+    startx_once
 elif [ "$1" == "presence" ]; then
-        presence
+    presence
 elif [ "$1" == "touch" ]; then
-        presence
+    presence
 elif [ "$1" == "gesture-config" ]; then
-        gesture-config
+    gesture-config
 else
 	echo2 "Action not mapped for command=[$1], try to run anyways"
 	$1
