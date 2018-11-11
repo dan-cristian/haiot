@@ -59,12 +59,13 @@ def parse_rules(obj, change):
 
 def mqtt_on_message(client, userdata, msg):
     item = msg.topic.split(P.mqtt_topic_receive_prefix)
+    payload = msg.payload.lower()
     if len(item) == 2:
         name = item[1]
         switch_state = None
-        if msg.payload == 'ON':
+        if payload == 'on':
             switch_state = 1
-        elif msg.payload == 'OFF':
+        elif payload == 'off':
             switch_state = 0
         if name.startswith("relay_"):
             vals = name.split("relay_")
@@ -81,22 +82,22 @@ def mqtt_on_message(client, userdata, msg):
                 zone_name = None
             cmd = False
             if items[0] == 'volume':
-                mpd.set_volume(zone_name=zone_name, volume=int(msg.payload))
+                mpd.set_volume(zone_name=zone_name, volume=int(payload))
                 cmd = True
             elif items[0] == 'position':
-                mpd.set_position(zone_name=zone_name, position_percent=float(msg.payload))
+                mpd.set_position(zone_name=zone_name, position_percent=float(payload))
                 cmd = True
             elif items[0] == 'player' or items[0] == 'state':
-                if msg.payload == 'UP':
+                if payload == 'up':
                     mpd.previous_song(zone_name)
                     cmd = True
-                elif msg.payload == 'DOWN':
+                elif payload == 'down':
                     mpd.next_song(zone_name=zone_name)
                     cmd = True
-                elif msg.payload == 'STOP' or msg.payload == 'TOGGLE':
+                elif payload == 'stop' or payload == 'toggle':
                     mpd.toggle_state(zone_name=zone_name)
                     cmd = True
-                elif msg.payload == 'PLAY':
+                elif payload == 'play':
                     mpd.play(zone_name=zone_name)
                     cmd = True
             elif items[0] == 'lastfmloved':
