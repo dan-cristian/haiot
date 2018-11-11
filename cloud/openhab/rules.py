@@ -73,9 +73,9 @@ def rule_openhab_ups(obj=models.Ups(), field_changed_list=None):
         key = 'power_failed'
         if key in field_changed_list:
             if obj.power_failed:
-                state = "off"
+                state = "OFF"
             else:
-                state = "on"
+                state = "ON"
             send_mqtt_openhab(subtopic="ups_" + key, payload=state)
         key = 'load_percent'
         if key in field_changed_list:
@@ -91,18 +91,18 @@ def rule_openhab_ups(obj=models.Ups(), field_changed_list=None):
 def rule_openhab_custom_relay(obj=models.ZoneCustomRelay(), field_changed_list=None):
     if field_changed_list is not None:
         if obj.relay_is_on:
-            state = "on"
+            state = "ON"
         else:
-            state = "off"
+            state = "OFF"
         send_mqtt_openhab(subtopic="relay_" + obj.relay_pin_name, payload=state)
 
 
 def rule_openhab_heat_relay(obj=models.ZoneHeatRelay(), field_changed_list=None):
     if field_changed_list is not None:
         if obj.heat_is_on:
-            state = "on"
+            state = "ON"
         else:
-            state = "off"
+            state = "OFF"
         send_mqtt_openhab(subtopic="heat_" + obj.heat_pin_name, payload=state)
 
 
@@ -124,9 +124,9 @@ def rule_openhab_musicloved(obj=models.MusicLoved(), field_changed_list=None):
                 val = getattr(obj, key)
                 if key == 'lastfmloved':
                     if val is True:
-                        val = 'on'
+                        val = 'ON'
                     else:
-                        val = 'off'
+                        val = 'OFF'
                 send_mqtt_openhab(subtopic='mpd_' + key, payload=val)
             else:
                 L.l.warning('Field musicloved {} in change list but not in obj={}'.format(key, obj))
