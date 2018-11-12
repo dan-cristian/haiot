@@ -8,6 +8,8 @@ fi
 COUNTRY_CODE=RO
 USERNAME=haiot
 USERPASS=haiot
+EMAIL_USER=antonio.gaudi33@gmail.com
+EMAIL_TEST=dan.cristian@gmail.com
 ENABLE_WEBMIN=0
 ENABLE_OPTIONAL=0
 ENABLE_HAIOT=0
@@ -265,7 +267,7 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
     echo "Getting HAIOT application from git"
     cd /home/${USERNAME}
     if [ -d PYC ]; then
-        echo "PYC exists, remove? y/[n]"
+        echo "PYC exists, remove? If Yes, beware that you lose all python packages, reinstall takes ages. y/[n]"
         read -t 30 remove
         if [ "$remove" == "y" ]; then
             rm -r PYC
@@ -306,16 +308,20 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
 
     echo "Instaling bluetooth modules"
     apt install -y bluez python-bluez
-    apt-get -y build-dep python-bluez
+    echo "Install build modules"
+    apt-get -y build-dep
+    if [ "$?" != "0" ]; then
+        # https://askubuntu.com/questions/312767/installing-pygame-with-pip
+    fi
 
-    pip -V
+    pip -V > /dev/null 2>&1
     if [ "$?" != "0" ]; then
         echo "Installing python pip"
         wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py
         python get-pip.py
         rm get-pip.py
     fi
-    virtualenv  --version
+    virtualenv  --version > /dev/null 2>&1
     if [ "$?" != "0" ]; then
         echo "Installing virtualenv"
         pip install --no-cache-dir virtualenv
@@ -326,7 +332,7 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
     chmod +x scripts/*sh*
     chmod +x *.sh
 
-    source venv/bin/activate
+    source venv/bin/activate > /dev/null 2>&1
     if [ "$?" != "0" ]; then
         #sudo pip install --upgrade pip
         sudo pip install virtualenv
@@ -359,9 +365,11 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
     res=`cat /etc/os-release | grep raspbian -q ; echo $?`
     if [ "$res" == "0" ]; then
         # needed for python-prctl
-        apt-get install -y libcap2-dev
+        apt-get install -y libcap2-dev libffi-dev python-dev
         pip install --no-cache-dir -r requirements-rpi.txt
-        apt-get remove -y libcap2-dev
+        # this can fail due to pygame
+        pip install --no-cache-dir -r requirements-rpi-extra.txt
+        apt-get remove -y libcap2-dev libffi-dev python-dev
     else
         pip install --no-cache-dir -r requirements-beaglebone.txt
     fi
@@ -1160,7 +1168,6 @@ stream_localhost off
 stream_maxrate 8
 webcontrol_localhost off
 " >> $cam2_conf
-fi
 
 fi
 
@@ -1177,6 +1184,7 @@ if [ "$ENABLE_DASHCAM_PI_LCD_DF" == "1" ]; then
         apt install -y dkms raspberrypi-kernel-headers python-pip 
         #https://askubuntu.com/questions/299950/how-do-i-install-pygame-in-virtualenv/299965#299965
         apt build-dep -y python-pygame
+        # https://askubuntu.com/questions/312767/installing-pygame-with-pip
         apt install -y libsdl-dev python-pygame
         dpkg -i rp-usbdisplay-dkms_1.0_all.deb
         echo "Probing module"
@@ -1317,8 +1325,8 @@ cat /etc/ssmtp/ssmtp.conf | grep "smtp.gmail.com"
 if [ "$?" == "1" ]; then
     apt install -y ssmtp mailutils
     echo "Setting email"
-    read -sp "Enter email password:" emailpass
-    echo "AuthUser=antonio.gaudi33@gmail.com" >> /etc/ssmtp/ssmtp.conf
+    read -sp "Enter email password for $EMAIL_USER:" emailpass
+    echo "AuthUser=$EMAIL_USER" >> /etc/ssmtp/ssmtp.conf
     echo "AuthPass=$emailpass" >> /etc/ssmtp/ssmtp.conf
     echo "FromLineOverride=YES" >> /etc/ssmtp/ssmtp.conf
     echo "mailhub=smtp.gmail.com:587" >> /etc/ssmtp/ssmtp.conf
@@ -1326,8 +1334,8 @@ if [ "$?" == "1" ]; then
     #echo "Now enter your password in email conf and save with CTRL+x"
     #sleep 3
     #nano /etc/ssmtp/ssmtp.conf
-    echo "Sending test email"
-    dmesg | mail -s "Test" dan.cristian@gmail.com
+    echo "Sending test email to $EMAIL_TEST"
+    dmesg | mail -s "Test" $EMAIL_TEST
 fi
 
 echo "Removing not needed files and cleaning apt files"
