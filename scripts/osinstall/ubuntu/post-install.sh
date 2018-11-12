@@ -167,7 +167,7 @@ while true;do
     sleep 1
 done
 
-echo "Starting update & auto install in 10 seconds"
+echo "Starting update & auto install in 10 seconds. CTRL+C to interrupt."
 sleep 10
 
 echo "Updating apt-get and upgrade"
@@ -364,12 +364,15 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
     echo Install optional requirements, you can ignore errors
     res=`cat /etc/os-release | grep raspbian -q ; echo $?`
     if [ "$res" == "0" ]; then
-        # needed for python-prctl
-        apt-get install -y libcap2-dev libffi-dev python-dev
+        # needed for python-prctl, other packages
+        apt-get install -y libcap2-dev libffi-dev python-dev libssl-dev
         pip install --no-cache-dir -r requirements-rpi.txt
+        if [ "$?" != "0" ]; then
+            echo "Failed to install mandatory requirements. Check errors. Interrupting."
+            exit 1
+        fi
         # this can fail due to pygame
         pip install --no-cache-dir -r requirements-rpi-extra.txt
-        apt-get remove -y libcap2-dev libffi-dev python-dev
     else
         pip install --no-cache-dir -r requirements-beaglebone.txt
     fi
@@ -1339,7 +1342,8 @@ if [ "$?" == "1" ]; then
 fi
 
 echo "Removing not needed files and cleaning apt files"
-apt-get -y remove build-essential
+# apt-get -y remove build-essential
+# apt-get remove -y libcap2-dev libffi-dev python-dev
 rm /usr/share/doc -r
 rm /usr/share/man -r
 apt-get -y autoremove
