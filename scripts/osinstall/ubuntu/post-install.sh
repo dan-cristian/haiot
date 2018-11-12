@@ -308,10 +308,11 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
 
     echo "Instaling bluetooth modules"
     apt install -y bluez python-bluez
-    echo "Install build modules"
-    apt-get -y build-dep
+    apt-get -y build-dep python-bluez
     if [ "$?" != "0" ]; then
         # https://askubuntu.com/questions/312767/installing-pygame-with-pip
+        echo "Uncomment  #deb_src. Exiting."
+        exit 1
     fi
 
     pip -V > /dev/null 2>&1
@@ -366,6 +367,8 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
     if [ "$res" == "0" ]; then
         # needed for python-prctl, other packages
         apt-get install -y libcap2-dev libffi-dev python-dev libssl-dev
+        # for openzwave
+        apt-get install -y libudev-dev libyaml-dev
         pip install --no-cache-dir -r requirements-rpi.txt
         if [ "$?" != "0" ]; then
             echo "Failed to install mandatory requirements. Check errors. Interrupting."
