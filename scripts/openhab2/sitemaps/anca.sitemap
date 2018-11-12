@@ -7,6 +7,10 @@ Frame {
 
 Frame {
     Group item=CON_PIR {
+        Default item=contact_usa_garaj
+        Default item=contact_gate
+        Default item=contact_portita
+        Default item=contact_usa_intrare
         Default item=alarm_living
         Default item=alarm_bucatarie
         Default item=alarm_birou
@@ -14,10 +18,6 @@ Frame {
         Default item=alarm_beci_mare
         Default item=alarm_beci_mic
         Default item=alarm_etaj_hol
-        Default item=contact_usa_garaj
-        Default item=contact_usa_intrare
-        Default item=contact_gate
-        Default item=contact_portita
         }
 }
 
