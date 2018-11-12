@@ -4,7 +4,7 @@ import time
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy  # workaround for resolve issue
 from flask_sqlalchemy import models_committed
-from wakeonlan import wol
+from wakeonlan import send_magic_packet
 from main.logger_helper import L
 
 try:
@@ -158,7 +158,7 @@ def execute_command(command, node=None):
     elif command == 'wake':
         #http://techie-blog.blogspot.ro/2014/03/making-wake-on-lan-wol-work-in-windows.html
         L.l.info('Sending wol magic packet to MAC {}'.format(node.mac))
-        wol.send_magic_packet(node.mac)
+        send_magic_packet(node.mac)
 
     if exit_code != 0:
         unload()

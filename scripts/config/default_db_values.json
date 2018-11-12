@@ -1,9 +1,10 @@
 {
   "Node": [
     {"id":1,  "priority":"10", "name":"netbook", "machine_type":"raspberry"},
+    {"id":3,  "priority":"3", "name":"pi-face", "machine_type":"raspberry"},
     {"id":6,  "priority":"6", "name":"pi-power", "machine_type":"raspberry"},
-    {"id":9,  "priority":"3", "name":"pi-face", "machine_type":"raspberry"},
-    {"id":4,  "priority":"11", "name":"pidash", "machine_type":"raspberry"}
+    {"id":7,  "priority":"7", "name":"pidash", "machine_type":"raspberry"},
+    {"id":8,  "priority":"8", "name":"pizero", "machine_type":"raspberry"}
   ],
 
   "Parameter": [
