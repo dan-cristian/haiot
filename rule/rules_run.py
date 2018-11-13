@@ -195,10 +195,10 @@ def rule_ups_power(obj=models.Ups(), field_changed_list=None):
 
 
 # ## MACROS - must not have any parameter and must not start with "_" to exec as API and show in WEB UI#####
-# year=*;month=*;week=*;day=*;day_of_week=*;hour=*;minute=*;second=0;is_active=1
+# year=*;month=*;week=*;day=*;day_of_week=*;hour=*;minute=*;second=0;is_active=true
 
 def test_code():
-    """second=18;is_active=0"""
+    """second=18;is_active=false"""
     L.l.info("Test rule code 3")
     #rule_common.update_custom_relay('test_relay', True)
     #time.sleep(0.5)
@@ -217,53 +217,53 @@ def toggle_gate():
 
 
 def morning_alarm_dormitor():
-    """day_of_week=1-5;hour=7;minute=15;is_active=1"""
+    """day_of_week=1-5;hour=7;minute=15;is_active=true"""
     L.l.info('Rule: morning alarm dormitor')
     execfile("~/PYC/scripts/audio/mpc-play.sh 6603 music")
 
 
 def water_all_3_minute():
-    """is_async=1"""
+    """is_async=true"""
     water_front_3_minute()
     water_back_3_minute()
 
 
 def water_main_all_3_minute():
-    """is_async=1"""
+    """is_async=true"""
     water_front_main_3_minute()
     water_back_main_3_minute()
 
 
 def water_front_3_minute():
-    """is_async=1"""
+    """is_async=true"""
     water_front_on()
     time.sleep(60*3)
     water_front_off()
 
 
 def water_back_3_minute():
-    """is_async=1"""
+    """is_async=true"""
     water_back_on()
     time.sleep(60*3)
     water_back_off()
 
 
 def water_front_main_3_minute():
-    """is_async=1"""
+    """is_async=true"""
     water_front_main_on()
     time.sleep(60*3)
     water_front_main_off()
 
 
 def water_back_main_3_minute():
-    """is_async=1"""
+    """is_async=true"""
     water_back_main_on()
     time.sleep(60*3)
     water_back_main_off()
 
 
 def back_pump_on():
-    """month=05-09;hour=07;minute=50;is_active=0"""
+    """month=05-09;hour=07;minute=50;is_active=false"""
     L.l.info('Rule: back pump on')
     rule_common.update_custom_relay('back_pump_relay', True)
     # with app.test_request_context():
@@ -273,20 +273,20 @@ def back_pump_on():
 
 
 def back_pump_off():
-    """month=05-09;hour=07;minute=56;is_active=0"""
+    """month=05-09;hour=07;minute=56;is_active=false"""
     L.l.info('back pump off')
     rule_common.update_custom_relay('back_pump_relay', False)
 
 
 def water_front_on():
-    """month=05-09;hour=07;minute=50;is_active=0"""
+    """month=05-09;hour=07;minute=50;is_active=false"""
     L.l.info('water front on')
     back_pump_on()
     rule_common.update_custom_relay('front_valve_relay', True)
 
 
 def water_front_off():
-    """month=05-09;hour=07;minute=52;is_active=0"""
+    """month=05-09;hour=07;minute=52;is_active=false"""
     L.l.info('water front off')
     rule_common.update_custom_relay('front_valve_relay', False)
     # let the pump build some pressure
@@ -296,28 +296,28 @@ def water_front_off():
 
 
 def water_front_main_on():
-    """month=05-09;hour=07;minute=50;is_active=0"""
+    """month=05-09;hour=07;minute=50;is_active=false"""
     L.l.info('water front main on')
     rule_common.update_custom_relay('front_main_valve_relay', True)
     rule_common.update_custom_relay('front_valve_relay', True)
 
 
 def water_front_main_off():
-    """month=05-09;hour=07;minute=52;is_active=0"""
+    """month=05-09;hour=07;minute=52;is_active=false"""
     L.l.info('water front main off')
     rule_common.update_custom_relay('front_main_valve_relay', False)
     rule_common.update_custom_relay('front_valve_relay', True)
 
 
 def water_back_on():
-    """month=05-09;hour=07;minute=54;is_active=0"""
+    """month=05-09;hour=07;minute=54;is_active=false"""
     L.l.info('water back on')
     back_pump_on()
     rule_common.update_custom_relay('back_valve_relay', True)
 
 
 def water_back_off():
-    """month=05-09;hour=07;minute=57;is_active=0"""
+    """month=05-09;hour=07;minute=57;is_active=false"""
     L.l.info('water back off')
     rule_common.update_custom_relay('back_valve_relay', False)
     # let the pump build some pressure
@@ -327,14 +327,14 @@ def water_back_off():
 
 
 def water_back_main_on():
-    """month=05-09;hour=07;minute=54;is_active=0"""
+    """month=05-09;hour=07;minute=54;is_active=false"""
     L.l.info('water back main on')
     rule_common.update_custom_relay('front_main_valve_relay', True)
     rule_common.update_custom_relay('back_valve_relay', True)
 
 
 def water_back_main_off():
-    """month=05-09;hour=07;minute=57;is_active=0"""
+    """month=05-09;hour=07;minute=57;is_active=false"""
     L.l.info('water back main off')
     rule_common.update_custom_relay('front_main_valve_relay', False)
     rule_common.update_custom_relay('back_valve_relay', False)
