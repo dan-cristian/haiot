@@ -181,10 +181,10 @@ def __add_rules_into_db(module):
                         else:
                             record.second = "0"
                         if "is_active" in pairs.keys():
-                            record.is_active = pairs["is_active"]
+                            record.is_active = bool(pairs["is_active"])
                         if "is_async" in pairs.keys():
-                            record.is_async= pairs["is_async"]
-                        if record.is_active is "1":
+                            record.is_async = bool(pairs["is_async"])
+                        if record.is_active is True:
                             scheduler.add_job(func[1], trigger='cron', year=record.year, month=record.month,
                                               day=record.day, week=record.week, day_of_week=record.day_of_week,
                                               second=record.second, hour=record.hour, minute=record.minute,
