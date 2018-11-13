@@ -537,6 +537,7 @@ class ZoneSensor(db.Model, DbBase):
     # zone = db.relationship('Zone', backref=db.backref('ZoneSensor(zone)', lazy='dynamic'))
     sensor_address = db.Column(db.String(50), db.ForeignKey('sensor.address'))
     target_material = db.Column(db.String(50))  # what material is being measured, water, air, etc
+    alt_address = db.Column(db.String(50))
     # sensor = db.relationship('Sensor', backref=db.backref('ZoneSensor(sensor)', lazy='dynamic'))
 
     def __init__(self, zone_id='', sensor_address='', sensor_name=''):
