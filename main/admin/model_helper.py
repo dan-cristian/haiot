@@ -202,6 +202,8 @@ def populate_tables(model_auto_update=False):
                     new_record = table()
                     # setattr(new_record, config_record, default_values[config_record])
                     for field in config_record:
+                        # if type(getattr(new_record, field)) is bool:
+                        #    val = config_record[field]
                         setattr(new_record, field, config_record[field])
                     # Log.logger.info("Adding conf record: {}".format(new_record))
                     db.session.add(new_record)

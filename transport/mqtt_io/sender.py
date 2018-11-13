@@ -20,5 +20,5 @@ def send_message(txt, topic=None):
                 transport.mqtt_io.init()
             return False
     except Exception as ex:
-        L.l.error('Error sending mqtt message, topic={}, err={}'.format(topic, ex), exc_info=True)
+        L.l.error('Error sending mqtt message, topic={}, payload={}, err={}'.format(topic, txt, ex), exc_info=True)
         return False
