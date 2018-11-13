@@ -381,7 +381,11 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
     fi
 
     echo "Setup python done"
-
+    echo "Installing haiot service"
+    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/haiot.service /lib/systemd/system/
+    systemctl enable haiot.service
+    ln -s $HAIOT_DIR/scripts /home/scripts
+    chown $USERNAME:$USERNAME /home/scripts
     #source scripts/setup.sh
 
     chown -R ${USERNAME}:${USERNAME} .
