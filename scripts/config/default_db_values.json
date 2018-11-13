@@ -308,8 +308,8 @@
   ],
 
   "SchedulePattern": [
-    {"id":1, "name":"week-bucatarie-winter",     "pattern":".... ..22 .... .... ..22 2222", "keep_warm":"1", "keep_warm_pattern":"00000000001000000000"},
-    {"id":2, "name":"weekend-bucatarie-winter",  "pattern":".... ..22 2222 2222 2222 2222", "keep_warm":"1", "keep_warm_pattern":"00000000001000000000"},
+    {"id":1, "name":"week-bucatarie-winter",     "pattern":".... ..22 .... .... ..22 2222", "keep_warm":"True", "keep_warm_pattern":"00000000001000000000"},
+    {"id":2, "name":"weekend-bucatarie-winter",  "pattern":".... ..22 2222 2222 2222 2222", "keep_warm":"True", "keep_warm_pattern":"00000000001000000000"},
     {"id":3, "name":"week-bucatarie-summer",     "pattern":".... ..22 2222 2222 2222 2222"},
     {"id":4, "name":"weekend-bucatarie-summer",  "pattern":".... .... bbbb bbbb bbbb bbbb"},
     {"id":5, "name":"week-living-winter",        "pattern":".... ..22 .... .... 3333 3333"},
@@ -324,7 +324,7 @@
     {"id":14, "name":"weekend-dormitor-winter",  "pattern":"2222 2222 .... .222 ...2 2222"},
     {"id":15, "name":"week-dormitor-summer",     "pattern":"bbbb bbbb .... .... ...b bbbb"},
     {"id":16, "name":"weekend-dormitor-summer",  "pattern":"bbbb bbbb .... .bbb ...b bbbb"},
-    {"id":17, "name":"week-boiler-summer",       "pattern":"hh.. .hhh hhhh hhhh hhhh hhhh", "activate_on_condition":"1", "activate_condition_relay":"puffer gas valve", "main_source_needed":"0"}
+    {"id":17, "name":"week-boiler-summer",       "pattern":"hh.. .hhh hhhh hhhh hhhh hhhh", "activate_on_condition":"True", "activate_condition_relay":"puffer gas valve", "main_source_needed":"False"}
   ],
 
   "HeatSchedule": [
