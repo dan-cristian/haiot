@@ -637,8 +637,11 @@ class PowerMonitor(db.Model, graphs.UpsGraph, DbEvent, DbBase):
     i2c_addr = db.Column(db.String(50))
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
 
+    def __init__(self):
+        super(PowerMonitor, self).__init__()
+
     def __repr__(self):
-        return '{} {} {}'.format(self.id, self.name, self.updated_on)
+        return '{} {} v={} {}'.format(self.id, self.name, self.voltage, self.updated_on)
 
 
 class SystemDisk(db.Model, graphs.SystemDiskGraph, DbEvent, DbBase):
