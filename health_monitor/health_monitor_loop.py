@@ -536,7 +536,7 @@ def _read_battery_power():
                 power = round(ina.power(), 0)
                 dispatcher.send(signal=Constant.SIGNAL_BATTERY_STAT, battery_name=addr[0],
                                 voltage=voltage, current=current, power=power)
-                power_rec = models.PowerMonitor.query.filter_by(i2c_addr = addr).first()
+                power_rec = models.PowerMonitor.query.filter_by(i2c_addr=addr).first()
                 if power_rec is not None:
                     power_rec.voltage = voltage
                     power_rec.current = current
