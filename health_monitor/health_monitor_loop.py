@@ -536,6 +536,12 @@ def _read_battery_power():
                 power = round(ina.power(), 0)
                 dispatcher.send(signal=Constant.SIGNAL_BATTERY_STAT, battery_name=addr[0],
                                 voltage=voltage, current=current, power=power)
+                power_rec = models.PowerMonitor.query.filter_by(i2c_addr = addr).first()
+                if power_rec is not None:
+                    power_rec.voltage = voltage
+                    power_rec.current = current
+                    power_rec.power = power
+                    power_rec.commit_record_to_db()
             except ImportError as imp:
                 L.l.info("INA module not available on this system, ex={}".format(imp))
                 _import_ina_failed = True
