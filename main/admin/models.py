@@ -1162,7 +1162,7 @@ class PowerMonitorHistory(db.Model, DbBase):
     __bind_key__ = 'reporting'
     __tablename__ = 'powermonitor_history'  # convention: append '_history' -> 'History' to source table name
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), unique=True)
+    name = db.Column(db.String(50))
     type = db.Column(db.String(50))  # INA, etc
     host_name = db.Column(db.String(50))
     voltage = db.Column(db.Float)  # volts
