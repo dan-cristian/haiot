@@ -538,7 +538,7 @@ def _read_battery_power():
                                 voltage=voltage, current=current, power=power)
                 power_rec = models.PowerMonitor.query.filter_by(name=addr[0]).first()
                 if power_rec is not None:
-                    new_rec = models.PowerMonitor()
+                    new_rec = models.PowerMonitor(id=power_rec.id)
                     new_rec.voltage = voltage
                     new_rec.current = current
                     new_rec.power = power
