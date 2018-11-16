@@ -538,10 +538,12 @@ def _read_battery_power():
                                 voltage=voltage, current=current, power=power)
                 power_rec = models.PowerMonitor.query.filter_by(name=addr[0]).first()
                 if power_rec is not None:
-                    power_rec.voltage = voltage
-                    power_rec.current = current
-                    power_rec.power = power
-                    power_rec.commit_record_to_db()
+                    new_rec = models.PowerMonitor()
+                    new_rec.voltage = voltage
+                    new_rec.current = current
+                    new_rec.power = power
+                    new_rec.save_changed_fields(current_record=power_rec, notify_transport_enabled=True,
+                                                save_to_graph=True)
             except ImportError as imp:
                 L.l.info("INA module not available on this system, ex={}".format(imp))
                 _import_ina_failed = True
