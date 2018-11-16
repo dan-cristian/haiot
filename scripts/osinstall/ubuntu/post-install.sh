@@ -158,6 +158,8 @@ if [ `cat /etc/hostname` == "raspberrypi" ]; then
     read -sp "Enter host name:" new_host_name
     echo $new_host_name > /etc/hostname
     echo "127.0.0.1" $new_host_name > /etc/hosts
+    # this is needed on first host name set as ssmtp will fail without
+    echo "127.0.0.1 raspberrypi" >> /etc/hosts
 fi
 
 
@@ -311,8 +313,12 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
     apt-get -y build-dep python-bluez
     if [ "$?" != "0" ]; then
         # https://askubuntu.com/questions/312767/installing-pygame-with-pip
-        echo "Uncomment  #deb_src. Exiting."
-        exit 1
+        sed -i -e 's/#deb-src/deb-src/g' /etc/apt/sources.list
+        apt update
+        apt-get -y build-dep python-bluez
+        if [ "$?" != "0" ]; then
+            echo "Unexpected error on building dependencies. Ignoring!"
+        fi
     fi
 
     pip -V > /dev/null 2>&1
@@ -336,7 +342,7 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
     source venv/bin/activate > /dev/null 2>&1
     if [ "$?" != "0" ]; then
         #sudo pip install --upgrade pip
-        sudo pip install virtualenv
+        pip install virtualenv
         virtualenv venv
         source venv/bin/activate
     fi
@@ -360,16 +366,16 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
     fi
 
     echo Install mandatory requirements
-    pip install --no-cache-dir -r requirements.txt
+    # needed for python-prctl, other packages
+    apt-get install -y libcap2-dev libffi-dev python-dev libssl-dev
+    pip install -r requirements.txt
 
     echo Install optional requirements, you can ignore errors
     res=`cat /etc/os-release | grep raspbian -q ; echo $?`
     if [ "$res" == "0" ]; then
-        # needed for python-prctl, other packages
-        apt-get install -y libcap2-dev libffi-dev python-dev libssl-dev
         # for openzwave
         apt-get install -y libudev-dev libyaml-dev
-        pip install --no-cache-dir -r requirements-rpi.txt
+        pip install -r requirements-rpi.txt
         if [ "$?" != "0" ]; then
             echo "Failed to install mandatory requirements. Check errors. Interrupting."
             exit 1
