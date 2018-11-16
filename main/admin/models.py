@@ -1156,3 +1156,23 @@ class ZoneCustomRelayHistory(db.Model, DbBase):
     relay_is_on = db.Column(db.Boolean, default=False)
     relay_type = db.Column(db.String(20))
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
+
+
+class PowerMonitorHistory(db.Model, DbBase):
+    __bind_key__ = 'reporting'
+    __tablename__ = 'powermonitor_history'  # convention: append '_history' -> 'History' to source table name
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True)
+    type = db.Column(db.String(50))  # INA, etc
+    host_name = db.Column(db.String(50))
+    voltage = db.Column(db.Float)  # volts
+    current = db.Column(db.Float)  # miliamps
+    power = db.Column(db.Float)
+    max_voltage = db.Column(db.Float)
+    warn_voltage = db.Column(db.Float)
+    critical_voltage = db.Column(db.Float)
+    min_voltage = db.Column(db.Float)
+    warn_current = db.Column(db.Integer)
+    critical_current = db.Column(db.Integer)
+    i2c_addr = db.Column(db.String(50))
+    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
