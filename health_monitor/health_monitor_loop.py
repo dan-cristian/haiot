@@ -553,6 +553,7 @@ def init():
             if "ina" in power.type:
                 addr = int(power.i2c_addr, 16)
                 P.power_monitor_ina_addr.append([power.name, addr])
+                L.l.info("Added INA sensor [{}] in the loop".format(power.name))
             else:
                 L.l.warning("Unknown power monitor type {}, name={}".format(power.type, power.name))
 
