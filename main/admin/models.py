@@ -637,8 +637,9 @@ class PowerMonitor(db.Model, graphs.UpsGraph, DbEvent, DbBase):
     i2c_addr = db.Column(db.String(50))
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
 
-    def __init__(self):
+    def __init__(self, id):
         super(PowerMonitor, self).__init__()
+        self.id = id
 
     def __repr__(self):
         return '{} {} v={} {}'.format(self.id, self.name, self.voltage, self.updated_on)
