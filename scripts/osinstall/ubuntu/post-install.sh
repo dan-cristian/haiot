@@ -300,7 +300,7 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
     chmod +x /etc/profile.d/haiot.sh
     cp /etc/profile.d/haiot.sh /etc/profile.d/root.sh
 
-    apt-get -y install mosquitto owfs ow-shell
+    apt-get -y install mosquitto owfs ow-shell usbutils
 
     echo "Installing I2C for owfs"
     #https://gist.github.com/kmpm/4445289
