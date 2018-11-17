@@ -256,7 +256,7 @@ def populate_tables(model_auto_update=False):
                         db.session.add(gpio)
                 commit()
         # fixme: check for other PI revisions
-        elif node.machine_type == Constant.MACHINE_TYPE_RASPBERRY:
+        elif node.machine_type in [Constant.MACHINE_TYPE_RASPBERRY, Constant.MACHINE_TYPE_ODROID]:
             if len(models.GpioPin.query.filter_by(
                     pin_type=Constant.GPIO_PIN_TYPE_PI_STDGPIO, host_name=node.name).all()) != 40:
                 models.GpioPin.query.filter_by(pin_type=Constant.GPIO_PIN_TYPE_PI_STDGPIO, host_name=node.name).delete()
