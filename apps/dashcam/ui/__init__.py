@@ -1,13 +1,13 @@
 import sys
-import pygame
 import os
 import io
 import glob
 import errno
 try:
+    import pygame
     from rpusbdisp import Touchscreen
     _disp_initialised = True
-except Exception, ex:
+except Exception as ex:
     print ex
     _disp_initialised = False
 
