@@ -7,6 +7,10 @@ from main.logger_helper import L
 initialised=False
 
 
+def powermonitor_record_update(obj):
+    pass
+
+
 def unload():
     global initialised
     initialised = False
