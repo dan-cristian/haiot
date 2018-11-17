@@ -58,6 +58,9 @@ def init():
             elif description_hardware and 'BCM2' in description_hardware:
                 Constant.HOST_MACHINE_TYPE = Constant.MACHINE_TYPE_RASPBERRY
                 Constant.IS_MACHINE_RASPBERRYPI = True
+            elif description_hardware and 'ODROID' in description_hardware:
+                Constant.HOST_MACHINE_TYPE = Constant.MACHINE_TYPE_ODROID
+                Constant.IS_MACHINE_RASPBERRYPI = False
             if description_system_type and 'Atheros' in description_system_type:
                 Constant.HOST_MACHINE_TYPE = Constant.MACHINE_TYPE_OPENWRT
                 Constant.IS_MACHINE_OPENWRT = True
