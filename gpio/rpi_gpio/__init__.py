@@ -17,6 +17,9 @@ try:
 except ImportError:
     L.l.info('Module RPI.GPIO is not installed, module will not be initialised')
     import_module_exist = False
+except RuntimeError as re:
+    L.l.info('Cannot import RPI.GPIO, module will not be initialised, err={}'.format(re))
+    import_module_exist = False
 
 
 # https://sourceforge.net/p/raspberry-gpio-python/wiki/Checking%20function%20of%20GPIO%20channels/

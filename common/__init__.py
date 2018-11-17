@@ -43,6 +43,7 @@ class Constant:
     OS_WINDOWS = {'windows', 'nt'}
     MACHINE_TYPE_BEAGLEBONE = 'beaglebone'
     MACHINE_TYPE_RASPBERRY = 'raspberry'
+    MACHINE_TYPE_ODROID = 'odroid'
     MACHINE_TYPE_OPENWRT = 'openwrt'
     MACHINE_TYPE_INTEL_LINUX = 'intel-linux'
 
@@ -180,6 +181,7 @@ class Constant:
     LOG_SENSOR_INACTIVE = ''
 
     DB_REPORTING_ID = 'reporting'
+
 
 def load_config_json():
     from main.logger_helper import L
