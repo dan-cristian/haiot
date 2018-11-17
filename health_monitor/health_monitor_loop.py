@@ -550,7 +550,7 @@ def _read_battery_power():
             except DeviceRangeError as ex:
                 L.l.error("Current out of device range with specified shunt resister, ex={}".format(ex))
             except Exception as ex:
-                L.l.info("INA board not initialised, ex={}".format(ex))
+                L.l.error("INA board not initialised, ex={}".format(ex), exc_info=True)
                 _import_ina_failed = True
 
 
