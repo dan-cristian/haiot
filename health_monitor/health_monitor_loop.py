@@ -530,7 +530,7 @@ def _read_battery_power():
         for addr in P.power_monitor_ina_addr:
             try:
                 ina = INA219(shunt_ohms=0.1, address=addr[1])
-                ina.configure(voltage_range=ina.RANGE_16V, gain=ina.GAIN_AUTO)  #, bus_adc=ina.ADC_4SAMP, shunt_adc=ina.ADC_4SAMP)
+                ina.configure(voltage_range=ina.RANGE_16V, gain=ina.GAIN_AUTO, bus_adc=ina.ADC_4SAMP)  #, bus_adc=ina.ADC_4SAMP, shunt_adc=ina.ADC_4SAMP)
                 voltage = ina.voltage()
                 current = round(ina.current(), 0)
                 power = round(ina.power(), 0)
@@ -550,7 +550,7 @@ def _read_battery_power():
             except DeviceRangeError as ex:
                 L.l.error("Current out of device range with specified shunt resister, ex={}".format(ex))
             except Exception as ex:
-                L.l.info("INA board not available on this system, ex={}".format(ex))
+                L.l.info("INA board not initialised, ex={}".format(ex))
                 _import_ina_failed = True
 
 
