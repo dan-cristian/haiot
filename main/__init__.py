@@ -4,8 +4,11 @@ import time
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy  # workaround for resolve issue
 from flask_sqlalchemy import models_committed
-from wakeonlan import send_magic_packet
 from main.logger_helper import L
+try:
+    from wakeonlan import send_magic_packet
+except ImportError as ex:
+    from wakeonlan.wol import send_magic_packet
 
 try:
     import pymysql

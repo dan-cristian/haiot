@@ -12,7 +12,7 @@ EMAIL_USER=antonio.gaudi33@gmail.com
 EMAIL_TEST=dan.cristian@gmail.com
 ENABLE_WEBMIN=0
 ENABLE_OPTIONAL=0
-ENABLE_HAIOT=0
+ENABLE_HAIOT=1
 ENABLE_RAMRUN=0
 ENABLE_MEDIA=0
 MUSIC_ROOT=/mnt/data/hdd-wdr-evhk/music
@@ -52,11 +52,11 @@ ENABLE_SECURE_SSH=0
 
 ENABLE_ROUTER=0
 
-ENABLE_DASHCAM_PI=1
-ENABLE_DASHCAM_PI_LCD_DF=1
+ENABLE_DASHCAM_PI=0
+ENABLE_DASHCAM_PI_LCD_DF=0
 ENABLE_DASHCAM_MOTION=0
-ENABLE_UPS_PICO=1
-ENABLE_3G_MODEM=1
+ENABLE_UPS_PICO=0
+ENABLE_3G_MODEM=0
 ENABLE_LOG_RAM=0
 
 ENABLE_THINGSBOARD=0
@@ -129,6 +129,8 @@ echo "Setting timezone ..."
 echo "Europe/Bucharest" > /etc/timezone
 dpkg-reconfigure -f noninteractive tzdata
 
+# needed for above functions
+apt-get install -y lua50
 
 # give internet connectivity via WIFI first
 if [ "$ENABLE_DASHCAM_PI" == "1" ]; then
@@ -349,6 +351,7 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
 
     echo "Installing mysql connector"
     wget http://dev.mysql.com/get/Downloads/Connector-Python/mysql-connector-python-2.1.3.zip
+    apt-get -y install unzip
     unzip mysql-connector-python-2.1.3.zip
     cd mysql-connector-python-2.1.3/
     python setup.py install
