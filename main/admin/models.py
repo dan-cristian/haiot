@@ -1168,11 +1168,4 @@ class PowerMonitorHistory(db.Model, DbBase):
     voltage = db.Column(db.Float)  # volts
     current = db.Column(db.Float)  # miliamps
     power = db.Column(db.Float)
-    max_voltage = db.Column(db.Float)
-    warn_voltage = db.Column(db.Float)
-    critical_voltage = db.Column(db.Float)
-    min_voltage = db.Column(db.Float)
-    warn_current = db.Column(db.Integer)
-    critical_current = db.Column(db.Integer)
-    i2c_addr = db.Column(db.String(50))
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
