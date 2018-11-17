@@ -375,12 +375,12 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
         touch /tmp/updated_pip
     fi
 
-    echo Install mandatory requirements
+    echo "Install mandatory requirements from folder: " `pwd`
     # needed for python-prctl, other packages
     apt-get install -y libcap2-dev libffi-dev python-dev libssl-dev
     pip install -r requirements.txt
 
-    echo Install optional requirements, you can ignore errors
+    echo "Install optional requirements, you can ignore errors. I am in folder:" `pwd`
     res=`cat /etc/os-release | grep raspbian -q ; echo $?`
     if [ "$res" == "0" ]; then
         # for openzwave
