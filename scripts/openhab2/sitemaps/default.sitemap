@@ -231,6 +231,7 @@ Frame {
     Default item=heat_puffer_gas_valve
     Default item=relay_recirculation_pump
     Default item=relay_other_heat
+    Default item=relay_blackwater_pump_relay
 }
 
 Frame {
