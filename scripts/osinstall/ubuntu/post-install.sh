@@ -307,7 +307,14 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
     apt install -y i2c-tools libi2c-dev python-smbus
     #python-smbus is needed for realtime clock
     if ! grep -q "^i2c[-_]dev" /etc/modules; then printf "i2c-dev\n" >> /etc/modules; fi
+    # for raspberry
     if ! grep -q "^i2c[-_]bcm2708" /etc/modules; then printf "i2c-bcm2708\n" >> /etc/modules; fi
+    # for odroid
+        # uname -a | grep odroid
+        # if [[ "$?" == "0" ]]; then
+    if ! grep -q "^aml[-_]i2c" /etc/modules; then printf "aml_i2c\n" >> /etc/modules; fi
+    modprobe aml_i2c
+        # fi
     set_config_var dtparam i2c_arm=on /boot/config.txt
 
     echo "Instaling bluetooth modules"
