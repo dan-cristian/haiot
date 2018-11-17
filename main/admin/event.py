@@ -12,6 +12,7 @@ import node
 import sensor
 import heat
 import gpio
+import health_monitor
 #import rule
 import presence
 import main.persistence
@@ -153,6 +154,8 @@ def mqtt_thread_run():
                     elif table == utils.get_table_name(models.MusicLoved):
                         # no additional processing
                         pass
+                    elif table == utils.get_table_name(models.PowerMonitor):
+                        health_monitor.powermonitor_record_update(obj)
                     else:
                         L.l.warning('Table %s content from %s is not mqtt processed' % (table, source_host))
 
