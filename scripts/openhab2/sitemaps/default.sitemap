@@ -203,6 +203,7 @@ Frame {
 	Default item=electricity_power_freezer
 	Default item=electricity_power_gas_heater
 	Default item=electricity_power_washing
+	Default item=powermonitor_battery_1_voltage
 }
 
 Frame {
