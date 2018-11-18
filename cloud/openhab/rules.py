@@ -114,7 +114,18 @@ def rule_openhab_music(obj=models.Music(), field_changed_list=None):
                 val = getattr(obj, key)
                 send_mqtt_openhab(subtopic='mpd_' + key + '_' + zone, payload=val)
             else:
-                L.l.warning('Field {} in change list but not in obj={}'.format(key, obj))
+                L.l.warning('Field {} in music change list but not in obj={}'.format(key, obj))
+
+
+def rule_openhab_powermonitor(obj=models.PowerMonitor(), field_changed_list=None):
+    if field_changed_list is not None:
+        name = obj.name
+        for key in field_changed_list:
+            if key not in ['updated_on'] and hasattr(obj, key):
+                val = getattr(obj, key)
+                send_mqtt_openhab(subtopic='powermonitor_' + key + '_' + name, payload=val)
+            else:
+                L.l.warning('Field {} in power change list but not in obj={}'.format(key, obj))
 
 
 def rule_openhab_musicloved(obj=models.MusicLoved(), field_changed_list=None):
