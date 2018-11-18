@@ -271,7 +271,7 @@
     {"relay_pin_name": "other_relay_test", "zone_id": "2", "gpio_pin_code": "sonoff-pow-2", "gpio_host_name": "netbook", "relay_type": "sonoff"},
     {"relay_pin_name": "sonoff-1", "zone_id": "2", "gpio_pin_code": "sonoff-basic-1", "gpio_host_name": "pi-face", "relay_type": "sonoff"},
     {"relay_pin_name": "sonoff-2", "zone_id": "2", "gpio_pin_code": "sonoff-basic-2", "gpio_host_name": "pi-face", "relay_type": "sonoff"},
-    {"relay_pin_name": "blackwater_pump_relay", "zone_id": "2", "gpio_pin_code": "sonoff-basic-3", "gpio_host_name": "pi-face", "relay_type": "sonoff"},
+    {"relay_pin_name": "blackwater_pump_relay", "zone_id": "9", "gpio_pin_code": "sonoff-basic-3", "gpio_host_name": "netbook", "relay_type": "sonoff"},
     {"relay_pin_name": "sonoff-4", "zone_id": "2", "gpio_pin_code": "sonoff-basic-4", "gpio_host_name": "pi-face", "relay_type": "sonoff"},
     {"relay_pin_name": "sonoff-5", "zone_id": "2", "gpio_pin_code": "sonoff-basic-5", "gpio_host_name": "pi-face", "relay_type": "sonoff"},
     {"relay_pin_name": "fan_bucatarie_relay", "zone_id": "2", "gpio_pin_code": "sonoff-basic-6", "gpio_host_name": "pi-face", "relay_type": "sonoff"},
