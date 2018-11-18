@@ -67,7 +67,7 @@ def exit_module():
                 global initialised
                 initialised = False
                 return 'werkzeug exited'
-    except Exception, ex:
+    except Exception as ex:
         L.l.warning('Unable to shutdown werkzeug, err {}'.format(ex))
     return 'werkzeug not exited'
 
