@@ -110,7 +110,7 @@ def rule_openhab_music(obj=models.Music(), field_changed_list=None):
     if field_changed_list is not None:
         zone = obj.zone_name
         for key in field_changed_list:
-            if hasattr(obj, key):
+            if key not in ['updated_on'] and hasattr(obj, key):
                 val = getattr(obj, key)
                 send_mqtt_openhab(subtopic='mpd_' + key + '_' + zone, payload=val)
             else:
