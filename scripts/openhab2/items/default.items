@@ -45,6 +45,7 @@ Switch relay_fan_baie_parter_relay "Fan baie parter" <switch>               {mqt
 
 Switch relay_beci_contactor "Contactor beci" <switch>                       {mqtt="<[mosquitto:iot/openhab/relay_beci_contactor_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_beci_contactor_relay:command:*:default]", autoupdate="false"}
 Switch relay_beci_upscharge "Ups beci charge" <switch>                      {mqtt="<[mosquitto:iot/openhab/relay_beci_upscharge_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_beci_upscharge_relay:command:*:default]", autoupdate="false"}
+Switch relay_beci_extra_relay "Beci extra" <switch>                         {mqtt="<[mosquitto:iot/openhab/relay_beci_extra_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_beci_extra_relay:command:*:default]", autoupdate="false"}
 Switch relay_freezer "Freezer" <switch>                                     {mqtt="<[mosquitto:iot/openhab/relay_freezer_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_freezer_relay:command:*:default]", autoupdate="false"}
 Switch relay_gas_heater "Gas heater relay" <switch>                         {mqtt="<[mosquitto:iot/openhab/relay_gas_heater_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_gas_heater_relay:command:*:default]", autoupdate="false"}
 Switch relay_washing "Washing relay" <switch>                               {mqtt="<[mosquitto:iot/openhab/relay_washing_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_washing_relay:command:*:default]", autoupdate="false"}
