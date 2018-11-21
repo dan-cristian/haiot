@@ -109,10 +109,11 @@ Number electricity_power_factor_plug_2 "Plug 2 power factor [%.2f]" <flow>  {mqt
 Number electricity_voltage_plug_2 "Plug 2 voltage [%.0f V]" <energy>        {mqtt="<[mosquitto:iot/openhab/vad_TZ69 Smart energy plug in switch_5:state:default]"}
 Number electricity_current_plug_2 "Plug 2 current [%.1f A]" <poweroutlet_eu>    {mqtt="<[mosquitto:iot/openhab/iad_TZ69 Smart energy plug in switch_5:state:default]"}
 
-Number electricity_power_freezer "Power freezer [%.0fw]" <energy>       {mqtt="<[mosquitto:iot/openhab/electricity_power freezer:state:default]"}
-Number electricity_power_gas_heater "Power gas heater[%.0fw]" <energy>  {mqtt="<[mosquitto:iot/openhab/electricity_power gas heater:state:default]"}
-Number electricity_power_washing "Power washing[%.0fw]" <energy>        {mqtt="<[mosquitto:iot/openhab/electricity_power washing:state:default]"}
-Number electricity_power_solar "Power solar[%.0fw]" <energy>            {mqtt="<[mosquitto:iot/openhab/electricity_power solar:state:default]"}
+Number electricity_power_freezer "Power freezer [%.0fw]" <energy>           {mqtt="<[mosquitto:iot/openhab/electricity_power freezer:state:default]"}
+Number electricity_power_gas_heater "Power gas heater[%.0fw]" <energy>      {mqtt="<[mosquitto:iot/openhab/electricity_power gas heater:state:default]"}
+Number electricity_power_washing "Power washing[%.0fw]" <energy>            {mqtt="<[mosquitto:iot/openhab/electricity_power washing:state:default]"}
+Number electricity_power_floor_bath1 "Power floor bath1[%.0fw]" <energy>    {mqtt="<[mosquitto:iot/openhab/electricity_power floor bath1:state:default]"}
+Number electricity_power_solar "Power solar[%.0fw]" <energy>                {mqtt="<[mosquitto:iot/openhab/electricity_power solar:state:default]"}
 
 Number powermonitor_voltage_battery_1 "Battery 1 voltage [%.2f V]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_voltage_battery 1:state:default]"}
 
