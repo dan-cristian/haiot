@@ -49,6 +49,7 @@ Switch relay_beci_extra_relay "Beci extra" <switch>                         {mqt
 Switch relay_freezer "Freezer" <switch>                                     {mqtt="<[mosquitto:iot/openhab/relay_freezer_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_freezer_relay:command:*:default]", autoupdate="false"}
 Switch relay_gas_heater "Gas heater relay" <switch>                         {mqtt="<[mosquitto:iot/openhab/relay_gas_heater_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_gas_heater_relay:command:*:default]", autoupdate="false"}
 Switch relay_washing "Washing relay" <switch>                               {mqtt="<[mosquitto:iot/openhab/relay_washing_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_washing_relay:command:*:default]", autoupdate="false"}
+Switch relay_floor_bath1 "Floor bath1 relay" <switch>                       {mqtt="<[mosquitto:iot/openhab/relay_floor_bath1_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_floor_bath1_relay:command:*:default]", autoupdate="false"}
 Switch relay_solar "Solar relay" <switch>                                   {mqtt="<[mosquitto:iot/openhab/relay_solar_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_solar_relay:command:*:default]", autoupdate="false"}
 
 Group:Switch:OR(ON, OFF)    RELAY_BACK_WATER "Back watering [(%d)]"  <switch>
