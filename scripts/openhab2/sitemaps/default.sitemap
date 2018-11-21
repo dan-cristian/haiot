@@ -217,6 +217,7 @@ Frame {
 	Default item=relay_freezer
 	Default item=relay_gas_heater
 	Default item=relay_washing
+	Default item=relay_floor_bath1
 	Default item=relay_solar
 	Default item=relay_tv
 }
