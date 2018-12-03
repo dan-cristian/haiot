@@ -390,8 +390,12 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
             echo "Failed to install mandatory requirements. Check errors. Interrupting."
             exit 1
         fi
-        # this can fail due to pygame
-        pip install --no-cache-dir -r requirements-rpi-extra.txt
+        echo "Install other long running requirements like openzwave and pygame? y/[n]"
+        read -t 30 extra
+        if [ "$extra" == "y" ]; then
+            # this can fail due to pygame
+            pip install --no-cache-dir -r requirements-rpi-extra.txt
+        fi
     else
         pip install --no-cache-dir -r requirements-beaglebone.txt
     fi
