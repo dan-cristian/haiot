@@ -6,4 +6,3 @@ smbus2
 pi-ina219
 psutil
 python-prctl
-python_openzwave
