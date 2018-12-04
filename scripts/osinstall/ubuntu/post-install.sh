@@ -157,11 +157,14 @@ if [ "$ENABLE_DASHCAM_PI" == "1" ]; then
 fi
 
 if [ `cat /etc/hostname` == "raspberrypi" ]; then
+    # make sound
+    echo -ne '\007'
     read -sp "Enter host name:" new_host_name
     echo $new_host_name > /etc/hostname
     echo "127.0.0.1" $new_host_name > /etc/hosts
     # this is needed on first host name set as ssmtp will fail without
     echo "127.0.0.1 raspberrypi" >> /etc/hosts
+    echo "Host set as $new_host_name"
 fi
 
 
@@ -186,6 +189,8 @@ else
 fi
 
 echo "Installing additional generic packages"
+# make sound as localepurge needs user input
+echo -ne '\007'
 apt-get -y install ssh dialog sudo nano wget runit git ssmtp mailutils psmisc smartmontools localepurge sshpass dos2unix
 
 
@@ -271,6 +276,8 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
     echo "Getting HAIOT application from git"
     cd /home/${USERNAME}
     if [ -d PYC ]; then
+        # make sound as we need user input
+        echo -ne '\007'
         echo "PYC exists, remove? If Yes, beware that you lose all python packages, reinstall takes ages. y/[n]"
         read -t 30 remove
         if [ "$remove" == "y" ]; then
@@ -317,16 +324,23 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
         # fi
     set_config_var dtparam i2c_arm=on /boot/config.txt
 
-    echo "Instaling bluetooth modules"
-    apt install -y bluez python-bluez
-    apt-get -y build-dep python-bluez
-    if [ "$?" != "0" ]; then
-        # https://askubuntu.com/questions/312767/installing-pygame-with-pip
-        sed -i -e 's/#deb-src/deb-src/g' /etc/apt/sources.list
-        apt update
+
+    # make sound as we need user input
+    echo -ne '\007'
+    echo "Do you need bluez? y/[n]"
+    read -t 30 bluez
+    if [ "$bluez" == "y" ]; then
+        echo "Instaling bluetooth modules"
+        apt install -y bluez python-bluez
         apt-get -y build-dep python-bluez
         if [ "$?" != "0" ]; then
-            echo "Unexpected error on building dependencies. Ignoring!"
+            # https://askubuntu.com/questions/312767/installing-pygame-with-pip
+            sed -i -e 's/#deb-src/deb-src/g' /etc/apt/sources.list
+            apt update
+            apt-get -y build-dep python-bluez
+            if [ "$?" != "0" ]; then
+                echo "Unexpected error on building dependencies. Ignoring!"
+            fi
         fi
     fi
 
@@ -380,16 +394,18 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
     apt-get install -y libcap2-dev libffi-dev python-dev libssl-dev
     pip install -r requirements.txt
 
-    echo "Install optional requirements, you can ignore errors. I am in folder:" `pwd`
+    echo "Install RPI requirements. I am in folder:" `pwd`
     res=`cat /etc/os-release | grep raspbian -q ; echo $?`
     if [ "$res" == "0" ]; then
         # for openzwave
         apt-get install -y libudev-dev libyaml-dev
         pip install -r requirements-rpi.txt
         if [ "$?" != "0" ]; then
-            echo "Failed to install mandatory requirements. Check errors. Interrupting."
+            echo "Failed to install RPI requirements. Check errors. Interrupting."
             exit 1
         fi
+        # make sound as we need user input
+        echo -ne '\007'
         echo "Install other long running requirements like openzwave and pygame? y/[n]"
         read -t 30 extra
         if [ "$extra" == "y" ]; then
@@ -1354,6 +1370,8 @@ fi
 cat /etc/ssmtp/ssmtp.conf | grep "smtp.gmail.com"
 if [ "$?" == "1" ]; then
     apt install -y ssmtp mailutils
+    # make sound as we need user input
+    echo -ne '\007'
     echo "Setting email"
     read -sp "Enter email password for $EMAIL_USER:" emailpass
     echo "AuthUser=$EMAIL_USER" >> /etc/ssmtp/ssmtp.conf
@@ -1364,6 +1382,7 @@ if [ "$?" == "1" ]; then
     #echo "Now enter your password in email conf and save with CTRL+x"
     #sleep 3
     #nano /etc/ssmtp/ssmtp.conf
+    echo ""
     echo "Sending test email to $EMAIL_TEST"
     dmesg | mail -s "Test" $EMAIL_TEST
 fi
@@ -1375,5 +1394,8 @@ rm /usr/share/doc -r
 rm /usr/share/man -r
 apt-get -y autoremove
 apt-get clean
+
+# make sound to inform user
+echo -ne '\007'
 
 echo "Install completed"
