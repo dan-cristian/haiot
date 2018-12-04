@@ -6,7 +6,6 @@ from common import utils
 from main.admin import models
 from main.admin.model_helper import commit
 from main import thread_pool
-from sensor import zwave
 from sensor import sonoff
 import std_gpio
 import piface
@@ -17,12 +16,21 @@ import prctl
 import rpi_gpio
 import io_common
 
+
 class P:
     initialised = False
     expire_func_list = {}
+    has_zwave = False
 
     def __init__(self):
         pass
+
+
+try:
+    from sensor import zwave
+    P.has_zwave = True
+except ImportError as ie:
+    L.l.info("Zwave module cannot be imported")
 
 
 # update hardware pin state and record real pin value in local DB only
@@ -133,7 +141,7 @@ def zone_custom_relay_record_update(json_object):
                 relay_type = utils.get_object_field_value(json_object, 'relay_type')
                 relay_is_on = utils.get_object_field_value(json_object, 'relay_is_on')
                 expire = utils.get_object_field_value(json_object, 'expire')
-                if relay_type == Constant.GPIO_PIN_TYPE_ZWAVE:
+                if P.has_zwave and relay_type == Constant.GPIO_PIN_TYPE_ZWAVE:
                     if source_host == Constant.HOST_NAME:
                         if is_event_external:
                             # event received from outside, so no need to set relay state again
