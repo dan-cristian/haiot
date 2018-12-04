@@ -5,7 +5,23 @@ import datetime
 from main.logger_helper import L
 from main.admin import models
 import rule_common
-from sensor import zwave
+
+__author__ = 'Dan Cristian<dan.cristian@gmail.com>'
+
+
+class P:
+    last_bell = datetime.datetime.min
+    has_zwave = False
+
+    def __init__(self):
+        pass
+
+
+try:
+    from sensor import zwave
+    P.has_zwave = True
+except ImportError as ie:
+    L.l.info("Zwave module cannot be imported")
 
 try:
     # sometimes I get "ImportError: cannot import name scheduler" so trying two import methods
@@ -13,14 +29,7 @@ try:
 except ImportError:
     from . import scheduler
 
-__author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
-
-class P:
-    last_bell = datetime.datetime.min
-
-    def __init__(self):
-        pass
 # two types of rules are supported:
 # 1: cron based rules
 # https://apscheduler.readthedocs.org/en/latest/userguide.html#adding-jobs
@@ -350,11 +359,13 @@ def front_lights_on():
 
 
 def zwave_start_inclusion():
-    zwave.include_node()
+    if P.has_zwave:
+        zwave.include_node()
 
 
 def zwave_stop_inclusion():
-    zwave.stop_include_node()
+    if P.has_zwave:
+        zwave.stop_include_node()
 
 # ##### MACROS END ##############
 
