@@ -106,6 +106,21 @@ def rule_openhab_heat_relay(obj=models.ZoneHeatRelay(), field_changed_list=None)
         send_mqtt_openhab(subtopic="heat_" + obj.heat_pin_name, payload=state)
 
 
+def rule_openhab_thermo(obj=models.ZoneThermostat(), field_changed_list=None):
+    if field_changed_list is not None:
+        if 'heat_target_temperature' in field_changed_list:
+            temp = obj.heat_target_temperature
+            zone = obj.zone_name
+            send_mqtt_openhab(subtopic='temperature_target_' + zone, payload=temp)
+        if 'is':
+            if obj.heat_is_on:
+                state = "heaton"
+            else:
+                state = "off"
+            zone = obj.zone_name
+            send_mqtt_openhab(subtopic='temperature_mode_' + zone, payload=state)
+
+
 def rule_openhab_music(obj=models.Music(), field_changed_list=None):
     if field_changed_list is not None:
         zone = obj.zone_name

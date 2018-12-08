@@ -279,9 +279,12 @@ class DbEvent:
     #    return utils.json_to_record(self, json_object)
 
 
-class DbHistory():
+class DbHistory:
     record_uuid = db.Column(db.String(36))
     source_host_ = db.Column(db.String(50))
+
+    def __init__(self):
+        pass
 
 
 class Module(db.Model, DbBase):
@@ -307,10 +310,10 @@ class Module(db.Model, DbBase):
 class Zone(db.Model, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
-    active_heat_schedule_pattern_id = db.Column(db.Integer)
-    heat_is_on = db.Column(db.Boolean, default=False)
-    last_heat_status_update = db.Column(db.DateTime(), default=None)
-    heat_target_temperature = db.Column(db.Integer)
+    # active_heat_schedule_pattern_id = db.Column(db.Integer)
+    # heat_is_on = db.Column(db.Boolean, default=False)
+    # last_heat_status_update = db.Column(db.DateTime(), default=None)
+    # heat_target_temperature = db.Column(db.Integer)
     is_indoor_heated = db.Column(db.Boolean)
     is_indoor = db.Column(db.Boolean)
     is_outdoor = db.Column(db.Boolean)
@@ -430,6 +433,21 @@ class TemperatureTarget(db.Model, DbBase):
 
     def __repr__(self):
         return '{} code {}={}'.format(self.id, self.code, self.target)
+
+
+class ZoneThermostat(db.Model, DbBase):
+    id = db.Column(db.Integer, primary_key=True)
+    zone_id = db.Column(db.Integer)
+    zone_name = db.Column(db.String(50))
+    active_heat_schedule_pattern_id = db.Column(db.Integer)
+    heat_is_on = db.Column(db.Boolean, default=False)
+    last_heat_status_update = db.Column(db.DateTime(), default=None)
+    heat_target_temperature = db.Column(db.Integer)
+    mode_auto = db.Column(db.Boolean, default=True)
+
+    def __repr__(self):
+        return '{} zoneid={} name={} target={}'.format(self.id, self.zone_id, self.zone_name,
+                                                       self.heat_target_temperature)
 
 
 class HeatSchedule(db.Model, DbBase):
