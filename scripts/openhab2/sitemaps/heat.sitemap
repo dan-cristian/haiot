@@ -6,6 +6,11 @@ Frame {
         Default item=temperature_target_living
         Default item=temperature_mode_living
         }
+    Group item=DORMITOR_THERMO {
+        Default item=temperature_dormitor
+        Default item=temperature_target_dormitor
+        Default item=temperature_mode_dormitor
+        }
 }
 
 }
