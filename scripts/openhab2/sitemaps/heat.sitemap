@@ -1,0 +1,11 @@
+sitemap default label="Heat" {
+
+Frame {
+    Group item=LIVING_THERMO {
+        Default item=temperature_living
+        Default item=temperature_target_living
+        Default item=temperature_mode_living
+        }
+}
+
+}
