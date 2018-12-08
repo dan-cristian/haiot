@@ -115,10 +115,11 @@ def rule_openhab_thermo(obj=models.ZoneThermostat(), field_changed_list=None):
             zone = obj.zone_name
             send_mqtt_openhab(subtopic='temperature_target_' + zone, payload=temp)
     #if 'heat_is_on' in field_changed_list:
+    #0- Off, 1-Heating, 2- Cooling
     if obj.heat_is_on:
-        state = "heaton"
+        state = 1
     else:
-        state = "off"
+        state = 0
     zone = obj.zone_name
     send_mqtt_openhab(subtopic='temperature_mode_' + zone, payload=state)
 
