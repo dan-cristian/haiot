@@ -1,4 +1,4 @@
-sitemap default label="Heat" {
+sitemap heat label="Heat" {
 
 Frame {
     Group item=LIVING_THERMO {
