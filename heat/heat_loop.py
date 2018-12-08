@@ -22,6 +22,12 @@ class P:
 def __save_heat_state_db(zone, heat_is_on):
     assert isinstance(zone, models.Zone)
     zone_heat_relay = models.ZoneHeatRelay.query.filter_by(zone_id=zone.id).first()
+    zone_thermo = models.ZoneThermostat.query.filter_by(zone_id=zone.id).first()
+    if zone_thermo is None:
+        zone_thermo = models.ZoneThermostat()
+        zone_thermo.zone_id = zone.id
+        zone_thermo.zone_name = zone.name
+        zone_thermo.add_record_to_session()
     if zone_heat_relay is not None:
         zone_heat_relay.heat_is_on = heat_is_on
         zone_heat_relay.updated_on = utils.get_base_location_now_date()
@@ -31,17 +37,17 @@ def __save_heat_state_db(zone, heat_is_on):
         zone_heat_relay.save_to_graph = True
         zone_heat_relay.save_to_history = True
         # save latest heat state for caching purposes
-        zone.heat_is_on = heat_is_on
-        zone.last_heat_status_update = utils.get_base_location_now_date()
+        zone_thermo.heat_is_on = heat_is_on
+        zone_thermo.last_heat_status_update = utils.get_base_location_now_date()
         commit()
     else:
         L.l.warning('No heat relay found in zone {}'.format(zone.name))
 
 
 # triggers heat status update if heat changed
-def __decide_action(zone, current_temperature, target_temperature, force_on=False, force_off=False):
+def __decide_action(zone, current_temperature, target_temperature, force_on=False, force_off=False,
+                    zone_thermo=None):
     assert isinstance(zone, models.Zone)
-
     L.l.debug("Asses heat zone={} current={} target={} thresh={}".format(
         zone, current_temperature, target_temperature, P.threshold))
     heat_is_on = None
@@ -50,7 +56,7 @@ def __decide_action(zone, current_temperature, target_temperature, force_on=Fals
     if force_off:
         heat_is_on = False
     if heat_is_on is None:
-        heat_is_on = zone.heat_is_on
+        heat_is_on = zone_thermo.heat_is_on
         if heat_is_on is None:
             heat_is_on = False
         if current_temperature < target_temperature:
@@ -58,15 +64,17 @@ def __decide_action(zone, current_temperature, target_temperature, force_on=Fals
         if current_temperature > (target_temperature + P.threshold):
             heat_is_on = False
     # trigger if state is different and every 5 minutes (in case other hosts with relays have restarted)
-    if zone.last_heat_status_update is not None:
-        last_heat_update_age_sec = (utils.get_base_location_now_date() - zone.last_heat_status_update).total_seconds()
+    if zone_thermo.last_heat_status_update is not None:
+        last_heat_update_age_sec = (utils.get_base_location_now_date() -
+                                    zone_thermo.last_heat_status_update).total_seconds()
     else:
         last_heat_update_age_sec = 300
-    if zone.heat_is_on != heat_is_on or last_heat_update_age_sec >= 300 or zone.last_heat_status_update is None:
+    if zone_thermo.heat_is_on != heat_is_on or last_heat_update_age_sec >= 300 \
+            or zone_thermo.last_heat_status_update is None:
         L.l.debug('Heat must change, is {} in {} temp={} target+thresh={}, forced={}'.format(
             heat_is_on, zone.name, current_temperature, target_temperature + P.threshold, force_on))
         L.l.debug('Heat change due to: is_on_next={} is_on_db={} age={} last={}'.format(
-            heat_is_on, zone.heat_is_on, last_heat_update_age_sec, zone.last_heat_status_update ))
+            heat_is_on, zone_thermo.heat_is_on, last_heat_update_age_sec, zone_thermo.last_heat_status_update))
         __save_heat_state_db(zone=zone, heat_is_on=heat_is_on)
     #else:
     #    Log.logger.info('Heat should not change, is {} in {} temp={} target={}'.format(heat_is_on, zone.name,
@@ -79,6 +87,12 @@ def __decide_action(zone, current_temperature, target_temperature, force_on=Fals
 def __update_zone_heat(zone, heat_schedule, sensor):
     heat_is_on = False
     main_source_needed = True
+    zone_thermo = models.ZoneThermostat.query.filter_by(zone_id=zone.id).first()
+    if zone_thermo is None:
+        zone_thermo = models.ZoneThermostat()
+        zone_thermo.zone_id = zone.id
+        zone_thermo.zone_name = zone.name
+        zone_thermo.add_record_to_session()
     try:
         minute = utils.get_base_location_now_date().minute
         hour = utils.get_base_location_now_date().hour
@@ -123,15 +137,16 @@ def __update_zone_heat(zone, heat_schedule, sensor):
                     else:
                         L.l.critical("Missing keep warm pattern for zone {}".format(zone.name))
                 if temperature_target:
-                    if zone.active_heat_schedule_pattern_id != schedule_pattern.id:
+                    if zone_thermo.active_heat_schedule_pattern_id != schedule_pattern.id:
                         L.l.debug('Pattern in zone {} changed to {}, target={}'.format(
                             zone.name, schedule_pattern.name, temperature_target.target))
-                        zone.active_heat_schedule_pattern_id = schedule_pattern.id
-                    zone.heat_target_temperature = temperature_target.target
+                        zone_thermo.active_heat_schedule_pattern_id = schedule_pattern.id
+                    zone_thermo.heat_target_temperature = temperature_target.target
                     commit()
                     if sensor.temperature is not None:
                         heat_is_on = __decide_action(zone, sensor.temperature, temperature_target.target,
-                                                     force_on=force_on, force_off=force_off)
+                                                     force_on=force_on, force_off=force_off,
+                                                     zone_thermo=zone_thermo)
                     #else:
                     #    heat_is_on = zone.heat_is_on
                 else:
@@ -139,8 +154,8 @@ def __update_zone_heat(zone, heat_schedule, sensor):
             else:
                 L.l.warning('Incorrect temp pattern [{}] in zone {}, length is not 24'.format(pattern, zone.name))
     except Exception as ex:
-        L.l.error('Error updatezoneheat, err={}'.format(ex, exc_info=True))
-    #Log.logger.info("Temp in {} has target={} and current={}, heat should be={}".format(zone.name,
+        L.l.error('Error updatezoneheat, err={}'.format(ex), exc_info=True)
+    # Log.logger.info("Temp in {} has target={} and current={}, heat should be={}".format(zone.name,
     #                                                                            zone.heat_target_temperature,
     #                                                                             sensor.temperature, heat_is_on))
     return heat_is_on, main_source_needed
@@ -176,11 +191,13 @@ def loop_zones():
         if heatrelay_main_source is not None:
             L.l.info("Main heat relay={}".format(heatrelay_main_source))
             main_source_zone = models.Zone.query.filter_by(id=heatrelay_main_source.zone_id).first()
+            main_thermo = models.ZoneThermostat.query.filter_by(zone_id=main_source_zone.id).first()
             if main_source_zone is not None:
                 update_age_mins = (utils.get_base_location_now_date() - P.last_main_heat_update).total_seconds() / 60
                 # # avoid setting relay state too often but do periodic refreshes every x minutes
-                if main_source_zone.heat_is_on != heat_is_on or update_age_mins >= int(get_param(
-                        Constant.P_HEAT_STATE_REFRESH_PERIOD)):
+                # check when thermo is none
+                if main_thermo is None or (main_thermo.heat_is_on != heat_is_on or update_age_mins >= int(get_param(
+                        Constant.P_HEAT_STATE_REFRESH_PERIOD))):
                     L.l.info("Setting main heat on={}, zone={}".format(heat_is_on, main_source_zone))
                     __save_heat_state_db(zone=main_source_zone, heat_is_on=heat_is_on)
                     P.last_main_heat_update = utils.get_base_location_now_date()
@@ -189,7 +206,7 @@ def loop_zones():
         else:
             L.l.critical('No heat main source is defined in db')
     except Exception as ex:
-        L.l.error('Error loop_zones, err={}'.format(ex, exc_info=True))
+        L.l.error('Error loop_zones, err={}'.format(ex), exc_info=True)
 
 
 # check actual heat relay status in db in case relay pin was modified externally
@@ -220,13 +237,13 @@ def loop_heat_relay():
                         L.l.warning("Inconsistent heat status relay={} db_relay_status={} pin_status={}".format(
                             heat_relay.heat_pin_name, heat_relay.heat_is_on, pin_state_int))
                     if zone_inconsistency:
-                        L.l.warning("Inconsistent zone heat zone={} db_heat_status={} db_relay_status={}".format(
-                            zone.name, zone.heat_is_on, heat_relay.heat_is_on))
+                        L.l.warning("Inconsistent zone heat zone={}  db_relay_status={}".format(
+                            zone.name, heat_relay.heat_is_on))
                     if relay_inconsistency or zone_inconsistency:
                         # fixme: we got flip of states due to inconsistency messages
                         # __save_heat_state_db(zone=zone, heat_is_on=pin_state)
                         __save_heat_state_db(zone=zone, heat_is_on=heat_relay.heat_is_on)
-                    #else:
+                    # else:
                     #    Log.logger.info("Heat pin {} status equal to gpio status {}".format(heat_relay.heat_is_on, pin_state_int))
         except Exception as ex:
             L.l.exception('Error processing heat relay=[{}] pin=[{}] err={}'.format(heat_relay, gpio_pin, ex))
@@ -264,8 +281,8 @@ def set_main_heat_source():
                 # if alternate source is no longer valid
                 if heat_source_relay.is_alternate_source_switch:
                     # stop alternate heat source
-                    #heatrelay_alt_source = models.ZoneHeatRelay.query.filter_by(is_alternate_heat_source=1).first()
-                    #if heatrelay_alt_source is not None:
+                    # heatrelay_alt_source = models.ZoneHeatRelay.query.filter_by(is_alternate_heat_source=1).first()
+                    # if heatrelay_alt_source is not None:
                     #    alt_source_zone = models.Zone.query.filter_by(id=heatrelay_alt_source.zone_id).first()
                     #    __save_heat_state_db(zone=alt_source_zone, heat_is_on=False)
                     # turn valve back to main position

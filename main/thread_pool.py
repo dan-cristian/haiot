@@ -82,7 +82,7 @@ def run_thread_pool():
                     result = future_obj.result()
                     # L.l.info('Thread end {}={}'.format(print_name, result))
                 except Exception as exc:
-                    L.l.error('Exception {} in {}'.format(exc, print_name, exc_info=True))
+                    L.l.error('Exception {} in {}'.format(exc, print_name), exc_info=True)
                 # print('%s=%s' % (print_name, future_obj.result()))
                 # run the function again at given interval
                 if elapsed_seconds and elapsed_seconds > exec_interval:
