@@ -16,6 +16,10 @@ class P:
     MAX_DELTA_TEMP_KEEP_WARM = 0.5  # keep warm a zone with floor heating, check not to go too hot above target temp
     threshold = None  # delta to avoid quick on/off
     temp_limit = None  # alternate source min temp
+    check_period = 60  # how often to check for temp target change
+
+    def __init__(self):
+        pass
 
 
 # save heat status and announce to all nodes.
@@ -68,8 +72,8 @@ def __decide_action(zone, current_temperature, target_temperature, force_on=Fals
         last_heat_update_age_sec = (utils.get_base_location_now_date() -
                                     zone_thermo.last_heat_status_update).total_seconds()
     else:
-        last_heat_update_age_sec = 300
-    if zone_thermo.heat_is_on != heat_is_on or last_heat_update_age_sec >= 300 \
+        last_heat_update_age_sec = P.check_period
+    if zone_thermo.heat_is_on != heat_is_on or last_heat_update_age_sec >= P.check_period \
             or zone_thermo.last_heat_status_update is None:
         L.l.debug('Heat must change, is {} in {} temp={} target+thresh={}, forced={}'.format(
             heat_is_on, zone.name, current_temperature, target_temperature + P.threshold, force_on))
