@@ -151,6 +151,7 @@ def init_crud():
     register_crud(user, '/schedulepattern', 'schedulepattern', SchedulePattern, filters=simple_filters)
     register_crud(user, '/heatschedule', 'heatschedule', HeatSchedule, filters=simple_filters)
     register_crud(user, '/temperaturetarget', 'temperaturetarget', TemperatureTarget, filters=simple_filters)
+    register_crud(user, '/zonethermostat', 'zonethermostat', models.ZoneThermostat, filters=simple_filters)
     register_crud(user, '/sensor', 'sensor', Sensor, filters=simple_filters)
     register_crud(user, '/sensorerror', 'sensorerror', SensorError, filters=simple_filters)
     register_crud(user, '/zonesensor', 'zonesensor', ZoneSensor, filters=simple_filters)
