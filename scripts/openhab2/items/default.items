@@ -61,13 +61,13 @@ Switch relay_front_main_valve_relay "Front main valve" <switch>             (REL
 
 Group LIVING_THERMO "Living Thermostat" ["Thermostat"]
 Number temperature_living "Living [%.1f °C]" <temperature>                 (LIVING_THERMO) [ "CurrentTemperature" ]           {mqtt="<[mosquitto:iot/openhab/temperature_living:state:default]"}
-Number temperature_target_living <temperature>                             (LIVING_THERMO) [ "TargetTemperature" ]            {mqtt="<[mosquitto:iot/openhab/temperature_target_living:state:default]"}
-Number temperature_mode_living                                             (LIVING_THERMO) [ "homekit:HeatingCoolingMode" ]   {mqtt="<[mosquitto:iot/openhab/temperature_mode_living:state:default]"}
+Number temperature_target_living "Living set  [%.1f °C]" <temperature>     (LIVING_THERMO) [ "TargetTemperature" ]            {mqtt="<[mosquitto:iot/openhab/temperature_target_living:state:default]"}
+Number temperature_mode_living "Living mode [%.0f]"                        (LIVING_THERMO) [ "homekit:HeatingCoolingMode" ]   {mqtt="<[mosquitto:iot/openhab/temperature_mode_living:state:default]"}
 
 Group DORMITOR_THERMO "Dormitor Thermostat" ["Thermostat"]
 Number temperature_dormitor "Dormitor [%.1f °C]" <temperature>                  (DORMITOR_THERMO) [ "CurrentTemperature" ]           {mqtt="<[mosquitto:iot/openhab/temperature_dormitor:state:default]"}
-Number temperature_target_dormitor <temperature>                                (DORMITOR_THERMO) [ "TargetTemperature" ]            {mqtt="<[mosquitto:iot/openhab/temperature_target_dormitor:state:default]"}
-Number temperature_mode_dormitor                                                (DORMITOR_THERMO) [ "homekit:HeatingCoolingMode" ]   {mqtt="<[mosquitto:iot/openhab/temperature_mode_dormitor:state:default]"}
+Number temperature_target_dormitor "Dormitor set [%.1f °C]" <temperature>       (DORMITOR_THERMO) [ "TargetTemperature" ]            {mqtt="<[mosquitto:iot/openhab/temperature_target_dormitor:state:default]"}
+Number temperature_mode_dormitor  "Dormitor mode [%.0f]"                        (DORMITOR_THERMO) [ "homekit:HeatingCoolingMode" ]   {mqtt="<[mosquitto:iot/openhab/temperature_mode_dormitor:state:default]"}
 
 Number temperature_boiler_sus "Boiler sus [%.1f °C]" <temperature_hot>                      (BOI, TEMP_BOI) ["CurrentTemperature"] {mqtt="<[mosquitto:iot/openhab/temperature_boiler sus:state:default]"}
 Number temperature_boiler_mijloc "Boiler mijloc [%.1f °C]" <temperature_hot>                (BOI, TEMP_BOI) {mqtt="<[mosquitto:iot/openhab/temperature_boiler mijloc:state:default]"}
