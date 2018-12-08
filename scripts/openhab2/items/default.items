@@ -13,11 +13,11 @@ Number ups_load_percent "UPS Load [%.0f %%]" <light>                        {mqt
 Number ups_battery_voltage "UPS Battery [%.1f V]" <batterylevel>            {mqtt="<[mosquitto:iot/openhab/ups_battery_voltage:state:default]"}
 Number ups_input_voltage "UPS Input [%.0f V]" <poweroutlet_us>              {mqtt="<[mosquitto:iot/openhab/ups_input_voltage:state:default]"}
 
-Switch relay_front_lights_relay "Front lights" <switch>                     {mqtt="<[mosquitto:iot/openhab/relay_front_lights_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_front_lights_relay:command:*:default]", autoupdate="false"}
+Switch relay_front_lights_relay "Front lights" <switch> [ "Lighting" ]      {mqtt="<[mosquitto:iot/openhab/relay_front_lights_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_front_lights_relay:command:*:default]", autoupdate="false"}
 Switch relay_plug_1 "Plug 1" <switch>                                       {mqtt="<[mosquitto:iot/openhab/relay_plug_1:state:default],>[mosquitto:iot/openhab/cmd/relay_plug_1:command:*:default]", autoupdate="false"}
 Switch relay_plug_2 "Plug 2" <switch>                                       {mqtt="<[mosquitto:iot/openhab/relay_plug_2:state:default],>[mosquitto:iot/openhab/cmd/relay_plug_2:command:*:default]", autoupdate="false"}
 
-Switch relay_tv "TV" <switch>                                               {mqtt="<[mosquitto:iot/openhab/relay_tv_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_tv_relay:command:*:default]", autoupdate="false"}
+Switch relay_tv "TV" <switch>                           ["Switchable"]      {mqtt="<[mosquitto:iot/openhab/relay_tv_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_tv_relay:command:*:default]", autoupdate="false"}
 
 Group:Switch:OR(ON, OFF)    RELAY_AMP   "Music amp [(%d)]"  <switch>
 Switch relay_living_music_relay "Living amp" <switch>                       (RELAY_AMP) {mqtt="<[mosquitto:iot/openhab/relay_living_music_relay:state:default]"}
@@ -36,12 +36,12 @@ Switch heat_puffer_boiler "Heat puffer boiler" <switch>                     {mqt
 Switch heat_puffer_heat "Heat puffer heat" <switch>                         {mqtt="<[mosquitto:iot/openhab/heat_puffer heat:state:default],>[mosquitto:iot/openhab/cmd/heat_puffer heat:command:*:default]", autoupdate="false"}
 Switch heat_puffer_gas_valve "Heat puffer gas valve" <switch>               {mqtt="<[mosquitto:iot/openhab/heat_puffer gas valve:state:default],>[mosquitto:iot/openhab/cmd/heat_puffer gas valve:command:*:default]", autoupdate="false"}
 
-Switch relay_recirculation_pump "Recirculation pump" <switch>               {mqtt="<[mosquitto:iot/openhab/relay_pump_recirculation_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_pump_recirculation_relay:command:*:default]", autoupdate="false"}
-Switch relay_blackwater_pump_relay "Blackwater pump" <switch>               {mqtt="<[mosquitto:iot/openhab/relay_blackwater_pump_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_blackwater_pump_relay:command:*:default]", autoupdate="false"}
+Switch relay_recirculation_pump "Recirculation pump" <switch> ["Switchable"]              {mqtt="<[mosquitto:iot/openhab/relay_pump_recirculation_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_pump_recirculation_relay:command:*:default]", autoupdate="false"}
+Switch relay_blackwater_pump_relay "Blackwater pump" <switch> ["Switchable"]              {mqtt="<[mosquitto:iot/openhab/relay_blackwater_pump_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_blackwater_pump_relay:command:*:default]", autoupdate="false"}
 Switch relay_other_heat "Other heat" <switch>                               {mqtt="<[mosquitto:iot/openhab/relay_other_heat_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_other_heat_relay:command:*:default]", autoupdate="false"}
-Switch relay_front_gate "Front gate" <switch>                               {mqtt="<[mosquitto:iot/openhab/relay_front_gate_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_front_gate_relay:command:*:default]", autoupdate="false"}
-Switch relay_fan_bucatarie_relay "Fan bucatarie" <switch>                   {mqtt="<[mosquitto:iot/openhab/relay_fan_bucatarie_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_fan_bucatarie_relay:command:*:default]", autoupdate="false"}
-Switch relay_fan_baie_parter_relay "Fan baie parter" <switch>               {mqtt="<[mosquitto:iot/openhab/relay_fan_baie_parter_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_fan_baie_parter_relay:command:*:default]", autoupdate="false"}
+Switch relay_front_gate "Front gate" <switch> ["Switchable"]                               {mqtt="<[mosquitto:iot/openhab/relay_front_gate_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_front_gate_relay:command:*:default]", autoupdate="false"}
+Switch relay_fan_bucatarie_relay "Fan bucatarie" <switch> ["Switchable"]                  {mqtt="<[mosquitto:iot/openhab/relay_fan_bucatarie_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_fan_bucatarie_relay:command:*:default]", autoupdate="false"}
+Switch relay_fan_baie_parter_relay "Fan baie parter" <switch> ["Switchable"]              {mqtt="<[mosquitto:iot/openhab/relay_fan_baie_parter_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_fan_baie_parter_relay:command:*:default]", autoupdate="false"}
 
 Switch relay_beci_contactor "Contactor beci" <switch>                       {mqtt="<[mosquitto:iot/openhab/relay_beci_contactor_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_beci_contactor_relay:command:*:default]", autoupdate="false"}
 Switch relay_beci_upscharge "Ups beci charge" <switch>                      {mqtt="<[mosquitto:iot/openhab/relay_beci_upscharge_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_beci_upscharge_relay:command:*:default]", autoupdate="false"}
@@ -59,27 +59,27 @@ Switch relay_back_valve_relay "Back valve" <switch>                         (REL
 Switch relay_front_valve_relay "Front valve" <switch>                       (RELAY_FRONT_WATER) {mqtt="<[mosquitto:iot/openhab/relay_front_valve_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_front_valve_relay:command:*:default]", autoupdate="false"}
 Switch relay_front_main_valve_relay "Front main valve" <switch>             (RELAY_FRONT_WATER) {mqtt="<[mosquitto:iot/openhab/relay_front_main_valve_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_front_main_valve_relay:command:*:default]", autoupdate="false"}
 
-Number temperature_boiler_sus "Boiler sus [%.1f °C]" <temperature_hot>          (BOI, TEMP_BOI) {mqtt="<[mosquitto:iot/openhab/temperature_boiler sus:state:default]"}
-Number temperature_boiler_mijloc "Boiler mijloc [%.1f °C]" <temperature_hot>    (BOI, TEMP_BOI) {mqtt="<[mosquitto:iot/openhab/temperature_boiler mijloc:state:default]"}
-Number temperature_boiler_jos "Boiler jos [%.1f °C]" <temperature_hot>          (BOI, TEMP_BOI) {mqtt="<[mosquitto:iot/openhab/temperature_boiler jos:state:default]"}
-Number temperature_puffer_sus "Puffer sus [%.1f °C]" <temperature_hot>          (PUF, TEMP_PUF) {mqtt="<[mosquitto:iot/openhab/temperature_puffer sus:state:default]"}
-Number temperature_puffer_mijloc "Puffer mijloc [%.1f °C]" <temperature_hot>    (PUF, TEMP_PUF) {mqtt="<[mosquitto:iot/openhab/temperature_puffer mijloc:state:default]"}
-Number temperature_puffer_jos "Puffer jos [%.1f °C]" <temperature_hot>          (PUF, TEMP_PUF) {mqtt="<[mosquitto:iot/openhab/temperature_puffer jos:state:default]"}
-Number temperature_solar_jos "Solar jos[%.1f °C]" <temperature_hot>         {mqtt="<[mosquitto:iot/openhab/temperature_solar jos:state:default]"}
-Number temperature_curte_fata "Curte fata [%.1f °C]" <garden>               {mqtt="<[mosquitto:iot/openhab/temperature_curte fata:state:default]"}
-Number temperature_living "Living [%.1f °C]" <temperature>                  {mqtt="<[mosquitto:iot/openhab/temperature_living:state:default]"}
-Number temperature_birou "Birou [%.1f °C]" <temperature>                    {mqtt="<[mosquitto:iot/openhab/temperature_birou:state:default]"}
-Number temperature_bucatarie "Bucatarie [%.1f °C]" <temperature>            {mqtt="<[mosquitto:iot/openhab/temperature_bucatarie:state:default]"}
-Number temperature_dormitor "Dormitor [%.1f °C]" <temperature>              {mqtt="<[mosquitto:iot/openhab/temperature_dormitor:state:default]"}
-Number temperature_dormitor_spate "Dormitor spate [%.1f °C]" <temperature>  {mqtt="<[mosquitto:iot/openhab/temperature_dormitor spate:state:default]"}
-Number temperature_pod_fata "Pod fata [%.1f °C]" <temperature>              {mqtt="<[mosquitto:iot/openhab/temperature_pod fata:state:default]"}
-Number temperature_horn "Horn [%.1f °C]" <temperature>                      {mqtt="<[mosquitto:iot/openhab/temperature_horn:state:default]"}
-Number temperature_gas_boiler "Gas boiler [%.1f °C]" <heating>              {mqtt="<[mosquitto:iot/openhab/temperature_gas boiler:state:default]"}
-Number temperature_gas_heater "Gas heater [%.1f °C]" <heating>              {mqtt="<[mosquitto:iot/openhab/temperature_gas heater:state:default]"}
-Number temperature_solar_back "Solar back [%.1f °C]" <temperature>          {mqtt="<[mosquitto:iot/openhab/temperature_solar back:state:default]"}
-Number temperature_soba_beci "Soba beci [%.1f °C]" <temperature>            {mqtt="<[mosquitto:iot/openhab/temperature_soba beci:state:default]"}
-Number temperature_fridge "Fridge [%.1f °C]" <temperature>                  {mqtt="<[mosquitto:iot/openhab/temperature_fridge:state:default]"}
-Number temperature_baro_house "Baro house [%.1f °C]" <temperature>          {mqtt="<[mosquitto:iot/openhab/temperature_baro_house:state:default]"}
+Number temperature_boiler_sus "Boiler sus [%.1f °C]" <temperature_hot> ["CurrentTemperature"]       (BOI, TEMP_BOI) {mqtt="<[mosquitto:iot/openhab/temperature_boiler sus:state:default]"}
+Number temperature_boiler_mijloc "Boiler mijloc [%.1f °C]" <temperature_hot>                        (BOI, TEMP_BOI) {mqtt="<[mosquitto:iot/openhab/temperature_boiler mijloc:state:default]"}
+Number temperature_boiler_jos "Boiler jos [%.1f °C]" <temperature_hot>                              (BOI, TEMP_BOI) {mqtt="<[mosquitto:iot/openhab/temperature_boiler jos:state:default]"}
+Number temperature_puffer_sus "Puffer sus [%.1f °C]" <temperature_hot> ["CurrentTemperature"]       (PUF, TEMP_PUF) {mqtt="<[mosquitto:iot/openhab/temperature_puffer sus:state:default]"}
+Number temperature_puffer_mijloc "Puffer mijloc [%.1f °C]" <temperature_hot>                        (PUF, TEMP_PUF) {mqtt="<[mosquitto:iot/openhab/temperature_puffer mijloc:state:default]"}
+Number temperature_puffer_jos "Puffer jos [%.1f °C]" <temperature_hot>                              (PUF, TEMP_PUF) {mqtt="<[mosquitto:iot/openhab/temperature_puffer jos:state:default]"}
+Number temperature_solar_jos "Solar jos[%.1f °C]" <temperature_hot>                                 {mqtt="<[mosquitto:iot/openhab/temperature_solar jos:state:default]"}
+Number temperature_curte_fata "Curte fata [%.1f °C]" <garden> ["CurrentTemperature"]                {mqtt="<[mosquitto:iot/openhab/temperature_curte fata:state:default]"}
+Number temperature_living "Living [%.1f °C]" <temperature>    ["CurrentTemperature"]                {mqtt="<[mosquitto:iot/openhab/temperature_living:state:default]"}
+Number temperature_birou "Birou [%.1f °C]" <temperature>      ["CurrentTemperature"]                {mqtt="<[mosquitto:iot/openhab/temperature_birou:state:default]"}
+Number temperature_bucatarie "Bucatarie [%.1f °C]" <temperature> ["CurrentTemperature"]             {mqtt="<[mosquitto:iot/openhab/temperature_bucatarie:state:default]"}
+Number temperature_dormitor "Dormitor [%.1f °C]" <temperature> ["CurrentTemperature"]               {mqtt="<[mosquitto:iot/openhab/temperature_dormitor:state:default]"}
+Number temperature_dormitor_spate "Dormitor spate [%.1f °C]" <temperature>  ["CurrentTemperature"]  {mqtt="<[mosquitto:iot/openhab/temperature_dormitor spate:state:default]"}
+Number temperature_pod_fata "Pod fata [%.1f °C]" <temperature> ["CurrentTemperature"]               {mqtt="<[mosquitto:iot/openhab/temperature_pod fata:state:default]"}
+Number temperature_horn "Horn [%.1f °C]" <temperature>                                              {mqtt="<[mosquitto:iot/openhab/temperature_horn:state:default]"}
+Number temperature_gas_boiler "Gas boiler [%.1f °C]" <heating>                                      {mqtt="<[mosquitto:iot/openhab/temperature_gas boiler:state:default]"}
+Number temperature_gas_heater "Gas heater [%.1f °C]" <heating>                                      {mqtt="<[mosquitto:iot/openhab/temperature_gas heater:state:default]"}
+Number temperature_solar_back "Solar back [%.1f °C]" <temperature>                                  {mqtt="<[mosquitto:iot/openhab/temperature_solar back:state:default]"}
+Number temperature_soba_beci "Soba beci [%.1f °C]" <temperature>                                    {mqtt="<[mosquitto:iot/openhab/temperature_soba beci:state:default]"}
+Number temperature_fridge "Fridge [%.1f °C]" <temperature> ["CurrentTemperature"]                   {mqtt="<[mosquitto:iot/openhab/temperature_fridge:state:default]"}
+Number temperature_baro_house "Baro house [%.1f °C]" <temperature>                                  {mqtt="<[mosquitto:iot/openhab/temperature_baro_house:state:default]"}
 
 Number humidity_living "Living [%.0f %%]" <humidity>                         {mqtt="<[mosquitto:iot/openhab/humidity_living:state:default]"}
 Number humidity_curte_fata "Curte fata [%.0f %%]" <humidity>                 {mqtt="<[mosquitto:iot/openhab/humidity_curte fata:state:default]"}
@@ -94,7 +94,7 @@ Number electricity_current_mono "Main current [%.1f A]" <poweroutlet_eu>    {mqt
 
 Number electricity_kWh_power_main_1 "KWh main 1 [%.2f kWh]" <energy>        {mqtt="<[mosquitto:iot/openhab/electricity_kWh_power main 1:state:default]"}
 
-Number electricity_solar_aps "Power solar [%.0fw]" <solarplant>         {mqtt="<[mosquitto:iot/openhab/electricity_solar_aps:state:default]"}
+Number electricity_solar_aps "Power solar [%.0fw]" <solarplant>             {mqtt="<[mosquitto:iot/openhab/electricity_solar_aps:state:default]"}
 Number electricity_kWh_solar_aps "KWh solar [%.2f kWh]" <solarplant>        {mqtt="<[mosquitto:iot/openhab/electricity_kWh_solar_aps:state:default]"}
 
 Number electricity_power_plug_1 "Power plug 1 [%.0fw]" <energy>         {mqtt="<[mosquitto:iot/openhab/electricity_power plug 1:state:default]"}
