@@ -1,4 +1,4 @@
-sitemap default label="Anca" {
+sitemap anca label="Anca" {
 
 Frame {
     Default item=relay_front_gate
