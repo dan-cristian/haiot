@@ -130,7 +130,10 @@ def exceptions(e):
     tb = traceback.format_exc()
     L.l.error('%s %s %s %s 5xx INTERNAL SERVER ERROR\n%s',
               request.remote_addr, request.method, request.scheme, request.full_path, tb)
-    return e.status_code
+    if hasattr(e, 'status_code'):
+        return e.status_code
+    else:
+        return e
 
 
 @app.errorhandler(404)
