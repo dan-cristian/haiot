@@ -8,6 +8,7 @@ import importlib
 from collections import namedtuple
 import pytz
 import urllib2
+import _strptime #  workaround to fix this issue: https://www.raspberrypi.org/forums/viewtopic.php?t=166912
 from main.logger_helper import L
 
 __author__ = 'dcristian'
