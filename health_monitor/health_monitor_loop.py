@@ -526,11 +526,12 @@ def _read_disk_stats():
 
 
 def _get_total_subtracted_voltage(id_list):
-    id_atoms = id_list.split(',')
     voltage = 0
-    for pow_id in id_atoms:
-        power_rec = models.PowerMonitor.query.filter_by(id=pow_id).first()
-        voltage += power_rec.voltage
+    if id_list is not None:
+        id_atoms = id_list.splt(',')
+        for pow_id in id_atoms:
+            power_rec = models.PowerMonitor.query.filter_by(id=pow_id).first()
+            voltage += power_rec.voltage
     return voltage
 
 
