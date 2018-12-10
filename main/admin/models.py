@@ -653,6 +653,8 @@ class PowerMonitor(db.Model, graphs.UpsGraph, DbEvent, DbBase):
     warn_current = db.Column(db.Integer)
     critical_current = db.Column(db.Integer)
     i2c_addr = db.Column(db.String(50))
+    voltage_divider_ratio = db.Column(db.Float)  # divider (0.5 etc)
+    subtracted_sensor_id_list = db.Column(db.String(50))  # comma separated sensor ids, total voltage to be subtracted
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
 
     def __init__(self):
