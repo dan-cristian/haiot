@@ -525,6 +525,15 @@ def _read_disk_stats():
                         'Unexpected lower number of split atoms={} in diskstat={}'.format(len(words), line))
 
 
+def _get_total_subtracted_voltage(id_list):
+    id_atoms = id_list.split(',')
+    voltage = 0
+    for pow_id in id_atoms:
+        power_rec = models.PowerMonitor.query.filter_by(id=pow_id).first()
+        voltage += power_rec.voltage
+    return voltage
+
+
 def _read_battery_power():
     global _import_ina_failed
     if not _import_ina_failed:
@@ -540,7 +549,11 @@ def _read_battery_power():
                 power_rec = models.PowerMonitor.query.filter_by(name=addr[0]).first()
                 if power_rec is not None:
                     new_rec = models.PowerMonitor()
-                    new_rec.voltage = voltage
+                    total_subtracted_voltage = _get_total_subtracted_voltage(power_rec.subtracted_sensor_id_list)
+                    if power_rec.voltage_divider_ratio is not None:
+                        new_rec.voltage = (voltage / power_rec.voltage_divider_ratio) - total_subtracted_voltage
+                    else:
+                        new_rec.voltage = voltage - total_subtracted_voltage
                     new_rec.current = current
                     new_rec.power = power
                     new_rec.save_changed_fields(current_record=power_rec, notify_transport_enabled=True,
@@ -585,7 +598,7 @@ def thread_run():
     _read_system_attribs()
     progress_status = 'reading disk stats'
     _read_disk_stats()
-    #progress_status = 'checking log size'
+    # progress_status = 'checking log size'
     # not needed if RotatingFileHandler if used for logging
     # __check_log_file_size()
     _read_battery_power()
