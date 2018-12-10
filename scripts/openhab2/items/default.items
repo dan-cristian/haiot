@@ -123,7 +123,10 @@ Number electricity_power_washing "Power washing[%.0fw]" <energy>            {mqt
 Number electricity_power_floor_bath1 "Power floor bath1[%.0fw]" <energy>    {mqtt="<[mosquitto:iot/openhab/electricity_power floor bath1:state:default]"}
 Number electricity_power_solar "Power solar[%.0fw]" <energy>                {mqtt="<[mosquitto:iot/openhab/electricity_power solar:state:default]"}
 
-Number powermonitor_voltage_battery_1 "Battery 1 voltage [%.2f V]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_voltage_battery 1:state:default]"}
+Number powermonitor_voltage_big_battery_1 "Big battery 1 [%.2f V]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_voltage_big battery 1:state:default]"}
+Number powermonitor_voltage_big_battery_2 "Big battery 2 [%.2f V]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_voltage_big battery 2:state:default]"}
+Number powermonitor_voltage_big_battery_3 "Big battery 3 [%.2f V]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_voltage_big battery 3:state:default]"}
+Number powermonitor_voltage_big_battery_4 "Big battery 4 [%.2f V]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_voltage_big battery 4:state:default]"}
 
 Number gas_gas "Gas [%.1f mc]" <gas>                                        {mqtt="<[mosquitto:iot/openhab/gas_gas:state:default]"}
 Number water_main "Water main [%.0f l]" <water>                             {mqtt="<[mosquitto:iot/openhab/water_water main:state:default]"}
