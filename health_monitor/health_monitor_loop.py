@@ -550,6 +550,7 @@ def _read_battery_power():
                 power_rec = models.PowerMonitor.query.filter_by(name=addr[0]).first()
                 if power_rec is not None:
                     new_rec = models.PowerMonitor()
+                    new_rec.raw_voltage = voltage
                     total_subtracted_voltage = _get_total_subtracted_voltage(power_rec.subtracted_sensor_id_list)
                     if power_rec.voltage_divider_ratio is not None:
                         new_rec.voltage = (voltage / power_rec.voltage_divider_ratio) - total_subtracted_voltage
