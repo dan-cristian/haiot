@@ -643,9 +643,10 @@ class PowerMonitor(db.Model, graphs.UpsGraph, DbEvent, DbBase):
     name = db.Column(db.String(50), unique=True)
     type = db.Column(db.String(50))  # INA, etc
     host_name = db.Column(db.String(50))
-    voltage = db.Column(db.Float)  # volts
+    voltage = db.Column(db.Float)  # volts, estimated voltage when using divider and batteries in series
     current = db.Column(db.Float)  # miliamps
     power = db.Column(db.Float)
+    raw_voltage = db.Column(db.Float)  # volts, read from sensor without
     max_voltage = db.Column(db.Float)
     warn_voltage = db.Column(db.Float)
     critical_voltage = db.Column(db.Float)
