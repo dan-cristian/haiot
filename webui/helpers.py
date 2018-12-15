@@ -34,7 +34,8 @@ class FlaskInThread(threading.Thread):
         while not main.shutting_down:
             try:
                 L.l.info('Starting flask web ui on host {} port {}'.format(self._host, self._port))
-                self._app.run(host=self._host, port=self._port, debug=self._debug, use_reloader=self._use_reloader)
+                self._app.run(host=self._host, port=self._port, debug=self._debug, use_reloader=self._use_reloader,
+                              threaded=True)
             except IOError as e:
                 if e.errno == errno.EPIPE:
                     L.l.info('Flask broken pipe, {}'.format(e))
