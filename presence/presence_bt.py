@@ -3,10 +3,24 @@ import struct
 import array
 import threading
 import prctl
-import bluetooth
 from pydispatch import dispatcher
 from common import utils, Constant
 from main.admin import models
+
+
+class P:
+    bt_initialised = False
+
+    def __init__(self):
+        pass
+
+
+try:
+    import bluetooth
+    P.bt_initialised = True
+except ImportError as ie:
+    pass
+
 try:
     import bluetooth._bluetooth as bt
     import fcntl
@@ -73,8 +87,8 @@ def _check_presence():
             btrssi = None
             try:
                 result = bluetooth.lookup_name(dev.bt_address.upper(), timeout=2)
-            except Exception, ex:
-                print "BT scan error: {}".format(ex)
+            except Exception as ex:
+                print("BT scan error: {}".format(ex))
             if result is not None:
                 try:
                     #if rssi_initialised:
@@ -91,22 +105,23 @@ def _check_presence():
                             dispatcher.send(Constant.SIGNAL_PRESENCE, device=dev.name, people=people.name)
                             #if btrssi is not None:
                             #    print "Rssi for {}={}".format(people.name, btrssi.get_rssi())
-                except Exception, ex:
-                    print "Error on bt presence".format(ex)
+                except Exception as ex:
+                    print("Error on bt presence".format(ex))
 
 
 def _list_all():
-    #result = bluetooth.lookup_name('E0:DB:10:1E:E0:8A', timeout=2)
+    # result = bluetooth.lookup_name('E0:DB:10:1E:E0:8A', timeout=2)
     btrssi = BluetoothRSSI(addr='E0:DB:10:1E:E0:8A')
     nearby_devices = bluetooth.discover_devices(duration=8, lookup_names=True, flush_cache=True, lookup_class=False)
-    print "A"
+    print("A")
 
 
 def thread_run():
     prctl.set_name("presence_bt")
     threading.current_thread().name = "presence_bt"
-    L.l.debug('Processing presence_run')
-    _check_presence()
+    if P.bt_initialised:
+        L.l.debug('Processing presence_run')
+        _check_presence()
     return 'Processed presence_run'
 
 
