@@ -116,6 +116,7 @@ def __load_rules_from_db():
         for rule in rule_list:
             method_to_call = getattr(rules_run, rule.command)
             if rule.is_active:
+                L.l.info("Adding job {} to scheduler, active=".format(method_to_call, rule.is_active))
                 year = rule.year if rule.year != '' else None
                 month = rule.month if rule.month != '' else None
                 day = rule.day if rule.day != '' else None
@@ -181,15 +182,16 @@ def __add_rules_into_db(module):
                         else:
                             record.second = "0"
                         if "is_active" in pairs.keys():
-                            record.is_active = bool(pairs["is_active"])
+                            record.is_active = (pairs["is_active"].lower() == "true")
                         if "is_async" in pairs.keys():
-                            record.is_async = bool(pairs["is_async"])
+                            record.is_async = (pairs["is_async"].lower() == "true")
                         if record.is_active is True:
                             scheduler.add_job(func[1], trigger='cron', year=record.year, month=record.month,
                                               day=record.day, week=record.week, day_of_week=record.day_of_week,
                                               second=record.second, hour=record.hour, minute=record.minute,
                                               max_instances=1, misfire_grace_time=None)
-                            L.l.info("Adding rule {}:{} to scheduler ".format(record.name, record.command))
+                            L.l.info("Adding rule {}:{} to scheduler {}".format(record.name, record.command,
+                                                                                record.is_active))
                     record.add_commit_record_to_db()
     except Exception as ex:
         L.l.exception('Error adding rules into db {}'.format(ex), exc_info=1)
