@@ -195,18 +195,12 @@ def rule_ups_power(obj=models.Ups(), field_changed_list=None):
     return 'ups rule ok'
 
 
-
-
-
 # VALUE TRIGGER RULES END ###########
-
 
 # ##### JOBS are executed asyncronously via a thread pool ######
 
-
 # ## MACROS - must not have any parameter and must not start with "_" to exec as API and show in WEB UI#####
 # year=*;month=*;week=*;day=*;day_of_week=*;hour=*;minute=*;second=0;is_active=true
-
 def test_code():
     """second=18;is_active=false"""
     L.l.info("Test rule code 3")
@@ -216,6 +210,7 @@ def test_code():
     # rule_common.send_notification(title='Alarm ON {}'.format('test 1'), priority=3)
     # rule_common.send_notification(title='Alarm ON {}'.format('test 2'), priority=3)
     # rule_common.send_notification(title='Alarm ON {}'.format('test 3'), priority=3)
+    pass
 
 
 def toggle_gate():
