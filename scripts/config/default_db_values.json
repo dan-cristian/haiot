@@ -5,7 +5,9 @@
     {"id":6,  "priority":"6", "name":"pi-power", "machine_type":"raspberry"},
     {"id":7,  "priority":"7", "name":"pidash", "machine_type":"raspberry"},
     {"id":8,  "priority":"8", "name":"pizero", "machine_type":"raspberry"},
-    {"id":9,  "priority":"9", "name":"odroid", "machine_type":"odroid"}
+    {"id":9,  "priority":"9", "name":"odroid", "machine_type":"odroid"},
+    {"id":11,  "priority":"11", "name":"pizero2", "machine_type":"raspberry"},
+    {"id":13,  "priority":"13", "name":"pizero3", "machine_type":"raspberry"}
   ],
 
   "Parameter": [
