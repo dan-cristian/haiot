@@ -112,6 +112,18 @@ def mqtt_on_message(client, userdata, msg):
                         current_record=current_sensor, notify_transport_enabled=True, save_to_graph=True)
                 else:
                     L.l.info('Undefined sensor found in {}, value={}'.format(sensor_address, bmp))
+            elif 'INA219' in obj:
+                ina = obj['INA219']
+                voltage = ina['Voltage']
+                current = ina['Current']
+                power = ina['Power']
+                sensor = models.PowerMonitor.query.filter_by(host_name=sensor_name).first()
+                if sensor is not None:
+                    new = models.PowerMonitor()
+                    new.voltage = voltage
+                    new.save_changed_fields(current_record = sensor, notify_transport_enabled=True, save_to_graph=True)
+                else:
+                    L.l.warning('Sensor INA on {} not defined in db'.format(sensor_name))
             else:
                 L.l.warning("Usefull payload missing from topic {} payload={}".format(msg.topic, msg.payload))
         else:
