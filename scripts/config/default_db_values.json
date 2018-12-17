@@ -296,10 +296,10 @@
   "PowerMonitor": [
     {"id":1, "name":"dashcam lipo", "type":"ina", "i2c_addr":"0x41", "host_name":"pidash", "max_voltage":4.2, "warn_voltage":3.2, "critical_voltage":3.1, "min_voltage":3, "warn_current":900, "critical_current":1000},
     {"id":2, "name":"dashcam car", "type":"ina", "i2c_addr":"0x40", "host_name":"pidash", "max_voltage":14.7, "warn_voltage":12.5, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
-    {"id":3, "name":"big battery 1", "type":"ina", "host_name":"sonoff-basic-9", "max_voltage":14.7, "warn_voltage":12.5, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
-    {"id":4, "name":"big battery 2", "type":"ina", "host_name":"sonoff-basic-8", "max_voltage":14.7, "warn_voltage":12.5, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
-    {"id":5, "name":"big battery 3", "type":"ina", "i2c_addr":"0x44", "host_name":"pizero", "voltage_divider_ratio": 0.5, "subtracted_sensor_id_list": "3,4", "max_voltage":14.7, "warn_voltage":12.5, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
-    {"id":6, "name":"big battery 4", "type":"ina", "i2c_addr":"0x45", "host_name":"pizero", "voltage_divider_ratio": 0.3, "subtracted_sensor_id_list": "3,4,5", "max_voltage":14.7, "warn_voltage":12.5, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000}
+    {"id":3, "name":"big battery 1", "type":"ina", "host_name":"sonoff-basic-9",  "max_voltage":14.7, "warn_voltage":12.5, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
+    {"id":4, "name":"big battery 2", "type":"ina", "host_name":"sonoff-basic-8",  "max_voltage":14.7, "warn_voltage":12.5, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
+    {"id":5, "name":"big battery 3", "type":"ina", "host_name":"sonoff-basic-11", "max_voltage":14.7, "warn_voltage":12.5, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
+    {"id":6, "name":"big battery 4", "type":"ina", "host_name":"sonoff-basic-12", "max_voltage":14.7, "warn_voltage":12.5, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000}
   ],
 
   "TemperatureTarget": [
