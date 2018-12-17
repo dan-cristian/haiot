@@ -279,6 +279,7 @@
     {"relay_pin_name": "sonoff-5", "zone_id": "2", "gpio_pin_code": "sonoff-basic-5", "gpio_host_name": "pi-face", "relay_type": "sonoff"},
     {"relay_pin_name": "fan_bucatarie_relay", "zone_id": "2", "gpio_pin_code": "sonoff-basic-6", "gpio_host_name": "pi-face", "relay_type": "sonoff"},
     {"relay_pin_name": "fan_baie_parter_relay", "zone_id": "56", "gpio_pin_code": "sonoff-basic-7", "gpio_host_name": "pi-face", "relay_type": "sonoff"},
+    {"relay_pin_name": "big_battery_relay", "zone_id": "54", "gpio_pin_code": "sonoff-basic-12", "gpio_host_name": "pi-face", "relay_type": "sonoff"},
 
     {"relay_pin_name": "unused-formerheat", "zone_id": "19", "gpio_pin_code": "24", "gpio_host_name": "pi-power", "relay_type": "gpio"},
     {"relay_pin_name": "pod_music_relay", "zone_id": "1", "gpio_pin_code": "23", "gpio_host_name": "pi-power", "relay_type": "gpio"},
