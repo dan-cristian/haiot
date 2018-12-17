@@ -67,12 +67,12 @@ def _save_threads_cpu_percent(p, interval=0.1):
 
 
 def _cpu_profiling():
-    p = psutil.Process(os.getpid())
-    #mem = p.get_memory_info()[0] / float(2 ** 20)
+    # p = psutil.Process(os.getpid())
+    # mem = p.get_memory_info()[0] / float(2 ** 20)
     # treads_list = p.threads()
     _save_threads_cpu_percent(p)
-    #li = get_threads_cpu_percent(p)
-    #with open(P.log_file, "w") as log:
+    # li = get_threads_cpu_percent(p)
+    # with open(P.log_file, "w") as log:
         #log.write(mem)
         #log.write("PID={}\n".format(os.getpid()))
         #log.write("Threads: {}\n".format(li))
@@ -81,7 +81,7 @@ def _cpu_profiling():
 def thread_run():
     prctl.set_name("performance")
     threading.current_thread().name = "performance"
-    _cpu_profiling()
+    # _cpu_profiling()
     prctl.set_name("idle")
     threading.current_thread().name = "idle"
 
