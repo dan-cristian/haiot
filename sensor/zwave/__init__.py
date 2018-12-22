@@ -366,6 +366,10 @@ def set_switch_state(node_id, state):
         L.l.error("Switch with id={} not found in zwave network".format(node_id))
 
 
+# https://hk.saowen.com/a/b5d414ca130fafc1f306a46dc0e2f13ec54876d9070ff3122a0a93a956b1fa2f
+def _set_param():
+    pass
+
 def thread_run():
     prctl.set_name("zwave")
     threading.current_thread().name = "zwave"
@@ -385,6 +389,9 @@ def thread_run():
                     if not P.thread_run_at_init:
                         L.l.info("Request state for node {}".format(node))
                     node.request_state()
+                    config = node.get_configs()
+                    prod = node.product_name
+                    L.l.info("Config={} prod={}".format(config, prod))
             if not P.thread_run_at_init:
                 P.thread_run_at_init = True
             sec = (datetime.now() - P.last_value_received).total_seconds()
