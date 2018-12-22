@@ -374,7 +374,9 @@ def _set_param(node_id, param_name, value):
     conf = []
     for c in configs:
         if configs[c].label == param_name:
+            old = configs[c].data
             node.set_config(c, value)
+            L.l.info("Set ok param {} {} to {}, old value={}".format(c, configs[c].label, value, old))
             return True
         conf.append(configs[c])
     L.l.warning("Could not find parameter {} in config list {}".format(param_name, conf))
