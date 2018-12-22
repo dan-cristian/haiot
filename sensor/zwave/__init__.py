@@ -389,9 +389,11 @@ def thread_run():
                     if not P.thread_run_at_init:
                         L.l.info("Request state for node {}".format(node))
                     node.request_state()
-                    config = node.get_configs()
+                    configs = node.get_configs()
                     prod = node.product_name
-                    L.l.info("Config={} prod={}".format(config, prod))
+                    for c in configs:
+                        L.l.info("config {}={}".format(c, configs[c]))
+                    # L.l.info("Config={} prod={}".format(config, prod))
             if not P.thread_run_at_init:
                 P.thread_run_at_init = True
             sec = (datetime.now() - P.last_value_received).total_seconds()
