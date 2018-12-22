@@ -383,15 +383,17 @@ def _set_param(node_id, param_name, value):
     return False
 
 
+# https://github.com/openhab/org.openhab.binding.zwave/blob/master/doc/qubino/zmnhxd_0_0.md
 def _initial_node_init():
     if not P.init_done:
-        _set_param(2, 'Power reporting in Watts on power change', 2)
+        _set_param(2, 'Power reporting in Watts on power change', 1)
+        _set_param(2, 'Power reporting in Watts by time interval', 0)
         P.init_done = True
         node = P.network.nodes[2]
         configs = node.get_configs()
         prod = node.product_name
         for c in configs:
-            L.l.info("config {}={}".format(c, configs[c]))
+            L.l.info("config {}".format(configs[c]))
 
 
 def thread_run():
