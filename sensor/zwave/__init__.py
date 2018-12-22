@@ -27,6 +27,7 @@ class P:
     log_file = "OZW_Log.log"
     last_value_received = datetime.max
     MAX_SILENCE_SEC = 120
+    init_done = False
 
 
 try:
@@ -367,8 +368,29 @@ def set_switch_state(node_id, state):
 
 
 # https://hk.saowen.com/a/b5d414ca130fafc1f306a46dc0e2f13ec54876d9070ff3122a0a93a956b1fa2f
-def _set_param():
-    pass
+def _set_param(node_id, param_name, value):
+    node = P.network.nodes[node_id]
+    configs = node.get_configs()
+    conf = []
+    for c in configs:
+        if configs[c]['label'] == param_name:
+            node.set_config(c, value)
+            return True
+        conf.append(configs[c])
+    L.l.warning("Could not find parameter {} in config list {}".format(param_name, conf))
+    return False
+
+
+def _initial_node_init():
+    if not P.init_done:
+        _set_param(2, 'Power reporting in Watts on power change', 2)
+        P.init_done = True
+        node = P.network.nodes[2]
+        configs = node.get_configs()
+        prod = node.product_name
+        for c in configs:
+            L.l.info("config {}={}".format(c, configs[c]))
+
 
 def thread_run():
     prctl.set_name("zwave")
@@ -389,17 +411,14 @@ def thread_run():
                     if not P.thread_run_at_init:
                         L.l.info("Request state for node {}".format(node))
                     node.request_state()
-                    configs = node.get_configs()
-                    prod = node.product_name
-                    for c in configs:
-                        L.l.info("config {}={}".format(c, configs[c]))
-                    # L.l.info("Config={} prod={}".format(config, prod))
+
             if not P.thread_run_at_init:
                 P.thread_run_at_init = True
             sec = (datetime.now() - P.last_value_received).total_seconds()
             if sec > P.MAX_SILENCE_SEC:
                 L.l.info("Zwave seems inactive, no value received since {} sec, reset now".format(sec))
                 P.initialised = _init_controller()
+            _initial_node_init()
     except Exception as ex:
         L.l.error("Error in zwave thread run={}".format(ex), exc_info=True)
     prctl.set_name("idle")
