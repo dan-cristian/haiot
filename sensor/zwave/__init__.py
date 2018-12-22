@@ -373,7 +373,7 @@ def _set_param(node_id, param_name, value):
     configs = node.get_configs()
     conf = []
     for c in configs:
-        if configs[c]['label'] == param_name:
+        if configs[c].label == param_name:
             node.set_config(c, value)
             return True
         conf.append(configs[c])
