@@ -321,8 +321,8 @@
   ],
 
   "SchedulePattern": [
-    {"id":1, "name":"week-bucatarie-winter",     "pattern":".... ..22 .... .... ..22 2222", "keep_warm":true, "keep_warm_pattern":"00000000001000000000"},
-    {"id":2, "name":"weekend-bucatarie-winter",  "pattern":".... ..22 2222 2222 2222 2222", "keep_warm":true, "keep_warm_pattern":"00000000001000000000"},
+    {"id":1, "name":"week-bucatarie-winter",     "pattern":".... ..22 .... .... ..22 2222", "keep_warm":true, "keep_warm_pattern":"00001000000001000000"},
+    {"id":2, "name":"weekend-bucatarie-winter",  "pattern":".... ..22 2222 2222 2222 2222", "keep_warm":true, "keep_warm_pattern":"00001000000001000000"},
     {"id":3, "name":"week-bucatarie-summer",     "pattern":".... ..22 2222 2222 2222 2222"},
     {"id":4, "name":"weekend-bucatarie-summer",  "pattern":".... .... bbbb bbbb bbbb bbbb"},
     {"id":5, "name":"week-living-winter",        "pattern":".... ..22 .... .... 3333 3333"},
@@ -337,15 +337,21 @@
     {"id":14, "name":"weekend-dormitor-winter",  "pattern":"2222 2222 .... .222 ...2 2222"},
     {"id":15, "name":"week-dormitor-summer",     "pattern":"bbbb bbbb .... .... ...b bbbb"},
     {"id":16, "name":"weekend-dormitor-summer",  "pattern":"bbbb bbbb .... .bbb ...b bbbb"},
-    {"id":17, "name":"week-boiler-summer",       "pattern":"hh.. .hhh hhhh hhhh hhhh hhhh", "activate_on_condition":true, "activate_condition_relay":"puffer gas valve", "main_source_needed":false}
+    {"id":17, "name":"week-boiler-summer",       "pattern":"hh.. .hhh hhhh hhhh hhhh hhhh", "activate_on_condition":true, "activate_condition_relay":"puffer gas valve", "main_source_needed":false},
+    {"id":20, "name":"away",                     "pattern":".... .... .... .... .... ...."}
   ],
 
   "HeatSchedule": [
-    {"zone_id":1, "pattern_week_id":1,  "pattern_weekend_id":2,  "temp_target_code_min_presence":"b", "temp_target_code_max_no_presence":"."},
-    {"zone_id":2, "pattern_week_id":5,  "pattern_weekend_id":6,  "temp_target_code_min_presence":"3", "temp_target_code_max_no_presence":"."},
-    {"zone_id":47,"pattern_week_id":9, "pattern_weekend_id":10, "temp_target_code_min_presence":"b", "temp_target_code_max_no_presence":"."},
-    {"zone_id":4, "pattern_week_id":13, "pattern_weekend_id":14, "temp_target_code_min_presence":"2", "temp_target_code_max_no_presence":"."},
-    {"zone_id":52,"pattern_week_id":17, "pattern_weekend_id":17, "temp_target_code_min_presence":"h", "temp_target_code_max_no_presence":"."}
+    {"zone_id":1,  "pattern_week_id":1,   "pattern_weekend_id":2,  "pattern_id_presence":2,  "pattern_id_no_presence":20, "season": "winter"},
+    {"zone_id":1,  "pattern_week_id":3,   "pattern_weekend_id":4,  "pattern_id_presence":4,  "pattern_id_no_presence":20, "season": "summer"},
+    {"zone_id":2,  "pattern_week_id":5,   "pattern_weekend_id":6,  "pattern_id_presence":6,  "pattern_id_no_presence":20, "season": "winter"},
+    {"zone_id":2,  "pattern_week_id":7,   "pattern_weekend_id":8,  "pattern_id_presence":8,  "pattern_id_no_presence":20, "season": "summer"},
+    {"zone_id":47, "pattern_week_id":9,   "pattern_weekend_id":10, "pattern_id_presence":10, "pattern_id_no_presence":20, "season": "winter"},
+    {"zone_id":47, "pattern_week_id":11,  "pattern_weekend_id":12, "pattern_id_presence":12, "pattern_id_no_presence":20, "season": "summer"},
+    {"zone_id":4,  "pattern_week_id":13,  "pattern_weekend_id":14, "pattern_id_presence":14, "pattern_id_no_presence":20, "season": "winter"},
+    {"zone_id":4,  "pattern_week_id":13,  "pattern_weekend_id":14, "pattern_id_presence":14, "pattern_id_no_presence":20, "season": "summer"},
+    {"zone_id":52, "pattern_week_id":17,  "pattern_weekend_id":17, "pattern_id_presence":17, "pattern_id_no_presence":20, "season": "winter"},
+    {"zone_id":52, "pattern_week_id":17,  "pattern_weekend_id":17, "pattern_id_presence":17, "pattern_id_no_presence":20, "season": "summer"}
   ],
 
   "ZoneHeatRelay":[

@@ -22,6 +22,7 @@ def handle_event_alarm(gpio_pin_code='', direction='', pin_value='', pin_connect
                 if zone is not None:
                     dispatcher.send(signal=Constant.SIGNAL_ALARM, zone_name=zone.name,
                                     alarm_pin_name=zonealarm.alarm_pin_name, pin_connected=pin_connected)
+                    dispatcher.send(Constant.SIGNAL_PRESENCE, zone_name=zone.name, zone_id=zone.id)
                     # L.l.info('Got alarm {} zone={} pin={} pin_conn={} pin_value={} gpio={}'.format(
                     #    zone.name, zonealarm.zone_id, zonealarm.alarm_pin_name,
                     #    pin_connected, pin_value, gpio_pin_code))
