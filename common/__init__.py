@@ -15,7 +15,7 @@ class Constant:
     SIGNAL_SENSOR = 'signal-from-sensor'
     SIGNAL_UI_DB_POST = 'signal-from-db-post'
     SIGNAL_MQTT_RECEIVED = 'signal-from-mqtt-data-received'
-    SIGNAL_HEAT = 'signal-from-heat'
+    # SIGNAL_HEAT = 'signal-from-heat'
     SIGNAL_GPIO = 'signal-from-GPIO'
     SIGNAL_CAMERA = 'signal-from-CAMERA'
     SIGNAL_GPIO_INPUT_PORT_LIST = 'signal-setup-GPIO-input'
