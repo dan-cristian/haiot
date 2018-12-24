@@ -399,8 +399,6 @@ class SchedulePattern(db.Model, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
     pattern = db.Column(db.String(24))
-    auto_activate_on_move = db.Column(db.Boolean, default=False)
-    auto_deactivate_on_away = db.Column(db.Boolean, default=False)
     keep_warm = db.Column(db.Boolean, default=False)  # keep the zone warm, used for cold floors
     keep_warm_pattern = db.Column(db.String(20))  # pattern, 5 minutes increments of on/off: 10000100010000111000
     activate_on_condition = db.Column(db.Boolean, default=False)  # activate heat only if relay state condition is meet
@@ -442,8 +440,12 @@ class ZoneThermostat(db.Model, DbBase):
     active_heat_schedule_pattern_id = db.Column(db.Integer)
     heat_is_on = db.Column(db.Boolean, default=False)
     last_heat_status_update = db.Column(db.DateTime(), default=None)
-    heat_target_temperature = db.Column(db.Integer)
-    mode_auto = db.Column(db.Boolean, default=True)
+    heat_target_temperature = db.Column(db.Float)
+    mode_presence_auto = db.Column(db.Boolean, default=False)
+    last_presence_set = db.Column(db.DateTime())
+    mode_manual = db.Column(db.Boolean, default=False)
+    manual_temp_target = db.Column(db.Float)
+    last_manual_set = db.Column(db.DateTime())
 
     def __repr__(self):
         return '{} zoneid={} name={} target={}'.format(self.id, self.zone_id, self.zone_name,
@@ -456,16 +458,12 @@ class HeatSchedule(db.Model, DbBase):
     # zone = db.relationship('Zone', backref=db.backref('heat schedule zone', lazy='dynamic'))
     pattern_week_id = db.Column(db.Integer, db.ForeignKey('schedule_pattern.id'), nullable=False)
     pattern_weekend_id = db.Column(db.Integer, db.ForeignKey('schedule_pattern.id'), nullable=False)
-    ''' temp minimum target if there is move in a zone, to ensure there is heat if someone is at home unplanned'''
-    temp_target_code_min_presence = db.Column(db.String(1), db.ForeignKey('temperature_target.code'), nullable=False)
-    ''' temp max target if there is no move, to preserve energy'''
-    temp_target_code_max_no_presence = db.Column(db.String(1), db.ForeignKey('temperature_target.code'), nullable=False)
-    # pattern_week = db.relationship('SchedulePattern', foreign_keys='[HeatSchedule.pattern_week_id]',
-    #                               backref=db.backref('schedule_pattern_week', lazy='dynamic'))
-    # pattern_weekend = db.relationship('SchedulePattern', foreign_keys='[HeatSchedule.pattern_weekend_id]',
-    #                                backref=db.backref('schedule_pattern_weekend', lazy='dynamic'))
-    season_name = db.Column(db.String(50))  # season name when this will apply
-    active = db.Column(db.Boolean, default=True)
+    ''' temp pattern if there is move in a zone, to ensure there is heat if someone is at home unplanned'''
+    pattern_id_presence = db.Column(db.Integer)
+    ''' temp pattern if there is no move, to preserve energy'''
+    pattern_id_no_presence = db.Column(db.Integer)
+    season = db.Column(db.String(50))  # season name when this schedule will apply
+    # active = db.Column(db.Boolean, default=True)
 
     def __init__(self, id=None, zone_id=None, pattern_week_id=None, pattern_weekend_id=None,
                  temp_target_code_min_presence=None, temp_target_code_max_no_presence=None):
@@ -479,8 +477,7 @@ class HeatSchedule(db.Model, DbBase):
         self.temp_target_code_max_no_presence = temp_target_code_max_no_presence
 
     def __repr__(self):
-        return 'Zone {}, Active {}, Week {}, Weekend {}'.format(self.zone_id, self.active,
-                                                                self.pattern_week_id, self.pattern_weekend_id)
+        return 'Zone {}, Week {}, Weekend {}'.format(self.zone_id, self.pattern_week_id, self.pattern_weekend_id)
 
 
 class Sensor(db.Model, graphs.SensorGraph, DbEvent, DbBase):
