@@ -317,7 +317,8 @@
     {"code":"d", "target":"23.5"},
     {"code":"4", "target":"24"},
     {"code":"e", "target":"24.5"},
-    {"code":"h", "target":"45"}
+    {"code":"h", "target":"45"},
+    {"code":"i", "target":"43"}
   ],
 
   "SchedulePattern": [
@@ -337,7 +338,8 @@
     {"id":14, "name":"weekend-dormitor-winter",  "pattern":"2222 2222 .... .222 ...2 2222"},
     {"id":15, "name":"week-dormitor-summer",     "pattern":"bbbb bbbb .... .... ...b bbbb"},
     {"id":16, "name":"weekend-dormitor-summer",  "pattern":"bbbb bbbb .... .bbb ...b bbbb"},
-    {"id":17, "name":"week-boiler-summer",       "pattern":"hh.. .hhh hhhh hhhh hhhh hhhh", "activate_on_condition":true, "activate_condition_relay":"puffer gas valve", "main_source_needed":false},
+    {"id":17, "name":"week-boiler-winter",       "pattern":"hh.. .hhh hhhh hhhh hhhh hhhh", "activate_on_condition":true, "activate_condition_relay":"puffer gas valve", "main_source_needed":false},
+    {"id":18, "name":"week-boiler-summer",       "pattern":"ii.. .iii iiii iiii iiii iiii", "activate_on_condition":true, "activate_condition_relay":"puffer gas valve", "main_source_needed":false},
     {"id":20, "name":"away",                     "pattern":".... .... .... .... .... ...."}
   ],
 
@@ -351,7 +353,7 @@
     {"zone_id":4,  "pattern_week_id":13,  "pattern_weekend_id":14, "pattern_id_presence":14, "pattern_id_no_presence":20, "season": "winter"},
     {"zone_id":4,  "pattern_week_id":13,  "pattern_weekend_id":14, "pattern_id_presence":14, "pattern_id_no_presence":20, "season": "summer"},
     {"zone_id":52, "pattern_week_id":17,  "pattern_weekend_id":17, "pattern_id_presence":17, "pattern_id_no_presence":20, "season": "winter"},
-    {"zone_id":52, "pattern_week_id":17,  "pattern_weekend_id":17, "pattern_id_presence":17, "pattern_id_no_presence":20, "season": "summer"}
+    {"zone_id":52, "pattern_week_id":18,  "pattern_weekend_id":18, "pattern_id_presence":18, "pattern_id_no_presence":20, "season": "summer"}
   ],
 
   "ZoneHeatRelay":[
