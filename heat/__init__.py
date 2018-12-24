@@ -163,11 +163,11 @@ def _get_schedule_pattern(heat_schedule):
         delta = (datetime.datetime.now() - heat_thermo.last_presence_set).total_seconds()
         if delta <= P.PRESENCE_SEC and heat_schedule.pattern_id_presence is not None:
             # we have recent move
-            L.l.info("Move detected, set move pattern in zone id {}".format(heat_schedule.zone_id))
+            L.l.info("Move detected, set move heat pattern in zone id {}".format(heat_schedule.zone_id))
             schedule_pattern = models.SchedulePattern.query.filter_by(id=heat_schedule.pattern_id_presence).first()
         if delta >= P.AWAY_SEC and heat_schedule.pattern_id_no_presence is not None:
             # no move for a while, switch to away
-            L.l.info("No move detected, set away pattern in zone id {}".format(heat_schedule.zone_id))
+            L.l.info("No move detected, set away heat pattern in zone id {}".format(heat_schedule.zone_id))
             schedule_pattern = models.SchedulePattern.query.filter_by(id=heat_schedule.pattern_id_no_presence).first()
     # if no recent move or away detected, set normal schedule
     if schedule_pattern is None:
@@ -185,8 +185,8 @@ def _get_heat_off_condition(schedule_pattern):
     zone_heat_relay = models.ZoneHeatRelay.query.filter_by(heat_pin_name=relay_name).first()
     if zone_heat_relay is not None:
         force_off = zone_heat_relay.heat_is_on is False
-        if force_off:
-            L.l.info('Heat off condition in zone {} due to relay {}'.format(schedule_pattern.name, zone_heat_relay))
+        # if force_off:
+        #    L.l.info('Heat off condition in zone {} due to relay {}'.format(schedule_pattern.name, zone_heat_relay))
     else:
         L.l.error('Could not find the heat relay for zone heat {}'.format(schedule_pattern.name))
     return force_off
@@ -441,6 +441,6 @@ def init():
     L.l.info('Heat module initialising')
     dispatcher.connect(_handle_presence, signal=Constant.SIGNAL_PRESENCE, sender=dispatcher.Any)
     # dispatcher.connect(handle_event_heat, signal=Constant.SIGNAL_HEAT, sender=dispatcher.Any)
-    thread_pool.add_interval_callable(thread_run, 10)
+    thread_pool.add_interval_callable(thread_run, 60)
     global initialised
     initialised = True
