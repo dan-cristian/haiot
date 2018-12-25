@@ -6,3 +6,4 @@ smbus2
 pi-ina219
 psutil
 python-prctl
+bmp280
