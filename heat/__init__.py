@@ -216,7 +216,7 @@ def _get_heat_on_keep_warm(schedule_pattern, temp_code, temp_target, temp_actual
                 force_on = ((schedule_pattern.keep_warm_pattern[interval] == "1") and
                             temp_code is not P.TEMP_NO_HEAT)
             else:
-                L.l.info("Temperature is too high with delta {}, ignoring keep warm".format(delta_warm))
+                L.l.info("Temp too high in {} with {}, ignoring keep warm".format(schedule_pattern.name, delta_warm))
         else:
             L.l.critical("Missing keep warm pattern for zone {}".format(schedule_pattern.name))
     return force_on
