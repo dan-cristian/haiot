@@ -21,7 +21,7 @@ class P:
 def _read_bmp280():
     temperature = P.obj_bmp280.get_temperature()
     pressure = P.obj_bmp280.get_pressure()
-    sensor_address = Constant.HOST_NAME + 'bmp280'
+    sensor_address = Constant.HOST_NAME + '_bmp280'
     zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=sensor_address).first()
     if zone_sensor is not None:
         sensor_name = zone_sensor.sensor_name
@@ -34,7 +34,7 @@ def _read_bmp280():
         record.save_changed_fields(current_record=current_record, new_record=record,
                                    notify_transport_enabled=True, save_to_graph=True, debug=False)
     else:
-        L.l.info("Undefined bmp280 sensor found with temp={} and pressure={}".format(temperature, pressure))
+        L.l.info("Undefined {} sensor found temp={} and pressure={}".format(sensor_address, temperature, pressure))
 
 
 def thread_run():
