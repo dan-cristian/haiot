@@ -441,9 +441,10 @@ class ZoneThermostat(db.Model, DbBase):
     heat_is_on = db.Column(db.Boolean, default=False)
     last_heat_status_update = db.Column(db.DateTime(), default=None)
     heat_target_temperature = db.Column(db.Float)
-    mode_presence_auto = db.Column(db.Boolean, default=False)
+    mode_presence_auto = db.Column(db.Boolean, default=False)  # fixme: not used yet
     last_presence_set = db.Column(db.DateTime())
-    mode_manual = db.Column(db.Boolean, default=False)
+    is_mode_manual = db.Column(db.Boolean, default=False)
+    manual_duration_min = db.Column(db.Integer, default=120)  # period to keep heat on for manual mode
     manual_temp_target = db.Column(db.Float)
     last_manual_set = db.Column(db.DateTime())
 

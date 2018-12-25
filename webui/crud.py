@@ -77,6 +77,26 @@ class CRUDView(MethodView):
                 obj = self.model.query.all()
         return self.render_list(obj=obj)
 
+    # copy object to a dict
+    def _copy_obj(self, obj):
+        dict_res = {}
+        attr_list = [a for a in dir(obj) if not a.startswith('_') and not callable(getattr(obj, a))
+                     and not hasattr(getattr(obj, a), '__dict__')]
+        for item in attr_list:
+            value = getattr(obj, item)
+            dict_res[item] = value
+        return dict_res
+
+    def _delta(self, dict_pre, obj_post):
+        dict_res = {}
+        attr_list = [a for a in dir(obj_post) if not a.startswith('_') and not callable(getattr(obj_post, a))
+                     and not hasattr(getattr(obj_post, a), '__dict__')]
+        for item in attr_list:
+            value = getattr(obj_post, item)
+            if dict_pre[item] != value:
+                dict_res[item] = value
+        return dict_res
+
     def post(self, obj_id=''):
         try:
             # either load and object to update if obj_id is given
@@ -93,12 +113,14 @@ class CRUDView(MethodView):
             form = self.ObjForm(request.form)
             # this actually populates the obj (the blog post)
             # from the form, that we have populated from the request post
+            pre_obj_dict = self._copy_obj(obj)
             form.populate_obj(obj)
-
+            changes = self._delta(dict_pre=pre_obj_dict, obj_post=obj)
             db.session.add(obj)
             db.session.commit()
             # process triggers on actions initiated by user
-            dispatcher.send(signal=Constant.SIGNAL_UI_DB_POST, model=self.model, row=obj)
+            dispatcher.send(signal=Constant.SIGNAL_UI_DB_POST, model=self.model, row=obj,
+                            last_commit_field_changed_list=changes)
             return redirect(self.path)
         except AttributeError as aex:
             L.l.error('Error CRUD POST {}'.format(aex))

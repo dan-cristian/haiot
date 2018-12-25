@@ -32,7 +32,7 @@ def model_row_to_json(obj, operation=''):
         # removing infinite recursions and class noise
         # for attr in obj._sa_class_manager:
         for attr in dir(obj):
-            if not attr.startswith('_') and not '(' in attr \
+            if not attr.startswith('_') and '(' not in attr \
                     and attr != 'query' and not callable(getattr(obj, attr)) \
                     and attr != 'metadata':
                 value = getattr(obj, attr)
