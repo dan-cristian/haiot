@@ -231,9 +231,12 @@ def _get_heat_on_manual(zone_thermo):
         if delta_minutes <= zone_thermo.manual_duration_min:
             manual_temp_target = zone_thermo.manual_temp_target
             force_on = True
+            L.l.info("Set heat on due to manual in {}, target={}".format(zone_thermo.zone_name, manual_temp_target))
         else:
             zone_thermo.is_mode_manual = False
+            zone_thermo.last_manual_set = None
             zone_thermo.commit_record_to_db()
+            L.l.info("Manual heat expired {}, target={}".format(zone_thermo.zone_name, manual_temp_target))
     return force_on, manual_temp_target
 
 
@@ -473,5 +476,5 @@ def init():
     L.l.info('Heat module initialising')
     dispatcher.connect(_handle_presence, signal=Constant.SIGNAL_PRESENCE, sender=dispatcher.Any)
     # dispatcher.connect(handle_event_heat, signal=Constant.SIGNAL_HEAT, sender=dispatcher.Any)
-    thread_pool.add_interval_callable(thread_run, 60)
+    thread_pool.add_interval_callable(thread_run, 30)
     P.initialised = True
