@@ -260,6 +260,7 @@ def _update_zone_heat(zone, heat_schedule, sensor):
             #    L.l.info("Main heat source is not needed for zone {}".format(zone))
             # set heat to off if condition is met (i.e. do not try to heat water if heat source is cold)
             if std_temp_target is not None:
+                act_temp_target = std_temp_target
                 if schedule_pattern.activate_on_condition:
                     force_off = _get_heat_off_condition(schedule_pattern)
                 else:
@@ -270,8 +271,6 @@ def _update_zone_heat(zone, heat_schedule, sensor):
                     force_on, manual_temp_target = _get_heat_on_manual(zone_thermo=zone_thermo)
                     if manual_temp_target is not None:
                         act_temp_target = manual_temp_target
-                    else:
-                        act_temp_target = std_temp_target
                 if zone_thermo.active_heat_schedule_pattern_id != schedule_pattern.id:
                     L.l.debug('Pattern {} is {}, target={}'.format(zone.name, schedule_pattern.name, act_temp_target))
                     zone_thermo.active_heat_schedule_pattern_id = schedule_pattern.id
