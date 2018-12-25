@@ -356,6 +356,7 @@
     {"zone_id":52, "pattern_week_id":18,  "pattern_weekend_id":18, "pattern_id_presence":18, "pattern_id_no_presence":20, "season": "summer"}
   ],
 
+
   "ZoneHeatRelay":[
     {"zone_id":1, "heat_pin_name":"bucatarie", "gpio_pin_code":"18", "gpio_host_name":"pi-face"},
     {"zone_id":2, "heat_pin_name":"living", "gpio_pin_code":"23", "gpio_host_name":"pi-face"},
