@@ -90,7 +90,8 @@
     {"id":53, "active":"0", "start_order":"53", "name":"sensor.zwave"},
     {"id":55, "active":"0", "start_order":"55", "name":"sensor.1wire"},
     {"id":57, "active":"0", "start_order":"57", "name":"sensor.sonoff"},
-    {"id":59, "active":"0", "start_order":"59", "name":"music"},
+    {"id":59, "active":"0", "start_order":"59", "name":"sensor.i2c"},
+    {"id":70, "active":"0", "start_order":"70", "name":"music"},
 
     {"id":90, "active":"0", "start_order":"90", "name":"apps.dashcam"},
     {"id":99, "active":"0", "start_order":"99", "name":"main.cron"},
@@ -116,19 +117,23 @@
     {"id":511, "active":"1", "start_order":"11", "name":"alarm", "host_name":"netbook"},
     {"id":541, "active":"0", "start_order":"41", "name":"cloud.alexa", "host_name":"netbook"},
     {"id":557, "active":"1", "start_order":"57", "name":"sensor.sonoff", "host_name":"netbook"},
-    {"id":559, "active":"1", "start_order":"59", "name":"music", "host_name":"netbook"},
+    {"id":559, "active":"1", "start_order":"59", "name":"sensor.i2c", "host_name":"netbook"},
+    {"id":570, "active":"1", "start_order":"70", "name":"music", "host_name":"netbook"},
 
     {"id":609, "active":"1", "start_order":"9", "name":"heat", "host_name":"pi-face"},
     {"id":611, "active":"1", "start_order":"11", "name":"alarm", "host_name":"pi-face"},
     {"id":619, "active":"1", "start_order":"19", "name":"ddns", "host_name":"pi-face"},
     {"id":641, "active":"1", "start_order":"41", "name":"cloud.alexa", "host_name":"pi-face"},
+
     {"id":647, "active":"1", "start_order":"47", "name":"sensor.rfxcom", "host_name":"pi-face"},
     {"id":649, "active":"1", "start_order":"49", "name":"sensor.ups_legrand", "host_name":"pi-face"},
     {"id":651, "active":"1", "start_order":"51", "name":"sensor.solar_aps", "host_name":"pi-face"},
     {"id":653, "active":"1", "start_order":"53", "name":"sensor.zwave", "host_name":"pi-face"},
     {"id":655, "active":"1", "start_order":"55", "name":"sensor.1wire", "host_name":"pi-face"},
     {"id":657, "active":"1", "start_order":"57", "name":"sensor.sonoff", "host_name":"pi-face"},
-    {"id":659, "active":"1", "start_order":"59", "name":"music", "host_name":"pi-face"}
+    {"id":659, "active":"1", "start_order":"59", "name":"sensor.i2c", "host_name":"pi-face"},
+
+    {"id":670, "active":"1", "start_order":"70", "name":"music", "host_name":"pi-face"}
 
   ],
 
@@ -401,7 +406,7 @@
     {"zone_id":8 ,  "sensor_address": "ZMNHTDx Smart meter S4 S5 S6_2",             "sensor_name": "zwave main power meter"},
     {"zone_id":29 , "sensor_address": "TZ69 Smart energy plug in switch_4",         "sensor_name": "zwave plug 1"},
     {"zone_id":29 , "sensor_address": "TZ69 Smart energy plug in switch_5",         "sensor_name": "zwave plug 2"},
-    {"zone_id":10 , "sensor_address": "sonoff-basic-3_bmp280",                      "sensor_name": "baro_house"},
+    {"zone_id":10 , "sensor_address": "pi-face_bmp280",                             "sensor_name": "baro_house"},
     {"zone_id":54 , "sensor_address": "sonoff-pow-3",                               "sensor_name": "solar meter"}
   ],
 
