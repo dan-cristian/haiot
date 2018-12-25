@@ -83,7 +83,7 @@ def _handle_record(new_record=None, current_record=None):
                         cloud_field_name = cloud_field[0]
                         # only save changed value fields
                         if hasattr(new_record, cloud_field_name) \
-                                and hasattr(current_record, "last_commit_field_changed_list") \
+                                and hasattr(current_record, Constant.JSON_PUBLISH_FIELDS_CHANGED) \
                                 and (current_record is None or cloud_field_name
                                      in current_record.last_commit_field_changed_list):
                             cloud_key_val = cloud_field[1]

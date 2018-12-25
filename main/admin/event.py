@@ -23,7 +23,7 @@ __mqtt_lock = threading.Lock()
 
 
 # executed on local db changes done via web ui only, including API calls
-def handle_local_event_db_post(model, row):
+def handle_local_event_db_post(model, row, last_commit_field_changed_list):
     processed = False
     L.l.debug('Local DB change sent by model {} row {}'.format(model, row))
     if str(models.Parameter) in str(model):
@@ -39,19 +39,22 @@ def handle_local_event_db_post(model, row):
     # add here tables you are sure are safe to be propagated to all nodes
     elif str(models.Node) in str(model) or str(models.GpioPin) in str(model) \
             or str(models.ZoneCustomRelay) in str(model) \
-            or str(models.Rule) in str(model):  # or str(models.Area) in str(model):
+            or str(models.Rule) in str(model) \
+            or str(models.ZoneThermostat) in str(model):  # or str(models.Area) in str(model):
         txt = model_helper.model_row_to_json(row, operation='update')
         # execute all events directly first, then broadcast, as local events are not handled by remote mqtt queue
-        handle_event_mqtt_received(None, None, 'direct-event', utils.json2obj(txt))
+        obj_json = utils.json2obj(txt)
+        obj_json[Constant.JSON_PUBLISH_FIELDS_CHANGED] = last_commit_field_changed_list
+        handle_event_mqtt_received(None, None, 'direct-event', obj_json)
         mqtt_thread_run()
         if transport.mqtt_io.client_connected:
             transport.send_message_json(json=txt)
         processed = True
 
-    if processed:
-        L.l.debug('Detected {} record change, row={}, trigger executed'.format(model, row))
-    else:
-        L.l.debug('Detected {} record change, row={}, but change processing ignored'.format(model, row))
+    # if processed:
+    #    L.l.debug('Detected {} record change, row={}, trigger executed'.format(model, row))
+    # else:
+    #    L.l.debug('Detected {} record change, row={}, but change processing ignored'.format(model, row))
 
 
 # executed on every mqqt message received (except those sent by this host)
@@ -156,6 +159,8 @@ def mqtt_thread_run():
                         pass
                     elif table == utils.get_table_name(models.PowerMonitor):
                         health_monitor.powermonitor_record_update(obj)
+                    elif table == utils.get_table_name(models.ZoneThermostat):
+                        heat.zone_thermo_record_update(obj)
                     else:
                         L.l.warning('Table %s content from %s is not mqtt processed' % (table, source_host))
 

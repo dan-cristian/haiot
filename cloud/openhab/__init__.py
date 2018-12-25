@@ -37,7 +37,7 @@ def parse_rules(obj, change):
     L.l.debug('Received openhab obj={} change={} for rule parsing'.format(obj, change))
     try:
         # extract only changed fields
-        if hasattr(obj, 'last_commit_field_changed_list'):
+        if hasattr(obj, Constant.JSON_PUBLISH_FIELDS_CHANGED):
             field_changed_list = obj.last_commit_field_changed_list
         else:
             field_changed_list = []
