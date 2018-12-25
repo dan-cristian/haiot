@@ -175,7 +175,7 @@ def populate_tables(model_auto_update=False):
                         models.TemperatureTarget, models.SchedulePattern, models.HeatSchedule, models.ZoneHeatRelay,
                         models.ZoneSensor, models.ZoneAlarm, models.ZoneThermostat,
                         models.SystemMonitor, models.SystemDisk,
-                        # models.Sensor,
+                        models.Sensor,
                         models.Ups, models.Rule,
                         models.CommandOverrideRelay, models.PlotlyCache, models.Utility, models.Presence,
                         models.SensorError, models.State, models.People,
