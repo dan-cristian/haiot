@@ -11,8 +11,6 @@ from main.admin.model_helper import commit, get_param
 from common import utils, Constant
 import gpio
 
-initialised=False
-
 
 class P:
     last_main_heat_update = datetime.datetime.min
@@ -24,6 +22,7 @@ class P:
     season = None
     PRESENCE_SEC = 60 * 60 * 1  # no of secs after a move considered to be presence
     AWAY_SEC = 60 * 60 * 6  # no of secs after no move to be considered away
+    initialised = False
 
     def __init__(self):
         pass
@@ -74,6 +73,19 @@ def record_update(obj_dict=None):
         L.l.warning('Error updating heat relay state, err {}'.format(ex))
 
 
+# when db changes via UI
+def zone_thermo_record_update(obj_dict=None):
+    if Constant.JSON_PUBLISH_FIELDS_CHANGED in obj_dict.keys():
+        changes = obj_dict[Constant.JSON_PUBLISH_FIELDS_CHANGED]
+        is_mode_manual = utils.get_object_field_value(
+            changes, utils.get_model_field_name(models.ZoneThermostat.is_mode_manual))
+        # activate manual mode if set by user in UI
+        if is_mode_manual is not None:
+            thermo_id = utils.get_object_field_value(obj_dict, utils.get_model_field_name(models.ZoneThermostat.id))
+            thermo_rec = models.ZoneThermostat.query.filter_by(id=thermo_id).first()
+            if thermo_rec is not None and is_mode_manual:
+                thermo_rec.last_manual_set = datetime.datetime.now()
+                thermo_rec.commit_record_to_db()
 
 
 # save heat status and announce to all nodes.
@@ -210,6 +222,21 @@ def _get_heat_on_keep_warm(schedule_pattern, temp_code, temp_target, temp_actual
     return force_on
 
 
+# check if temp target is manually overridden
+def _get_heat_on_manual(zone_thermo):
+    force_on = False
+    manual_temp_target = None
+    if zone_thermo.last_manual_set is not None and zone_thermo.is_mode_manual:
+        delta_minutes = (datetime.datetime.now() - zone_thermo.last_manual_set).total_seconds() / 60
+        if delta_minutes <= zone_thermo.manual_duration_min:
+            manual_temp_target = zone_thermo.manual_temp_target
+            force_on = True
+        else:
+            zone_thermo.is_mode_manual = False
+            zone_thermo.commit_record_to_db()
+    return force_on, manual_temp_target
+
+
 # set and return the required heat state in a zone (True - on, False - off).
 # Also return if main source is needed, usefull if you only heat a boiler from alternate heat source
 def _update_zone_heat(zone, heat_schedule, sensor):
@@ -224,25 +251,31 @@ def _update_zone_heat(zone, heat_schedule, sensor):
     try:
         schedule_pattern = _get_schedule_pattern(heat_schedule)
         if schedule_pattern:
-            temp_target, temp_code = _get_temp_target(schedule_pattern.id)
+            std_temp_target, temp_code = _get_temp_target(schedule_pattern.id)
             main_source_needed = schedule_pattern.main_source_needed
             # if main_source_needed is False:
             #    L.l.info("Main heat source is not needed for zone {}".format(zone))
             # set heat to off if condition is met (i.e. do not try to heat water if heat source is cold)
-            if temp_target is not None:
+            if std_temp_target is not None:
                 if schedule_pattern.activate_on_condition:
                     force_off = _get_heat_off_condition(schedule_pattern)
                 else:
                     force_off = False
                 force_on = _get_heat_on_keep_warm(schedule_pattern=schedule_pattern, temp_code=temp_code,
-                                                  temp_target=temp_target, temp_actual=sensor.temperature)
+                                                  temp_target=std_temp_target, temp_actual=sensor.temperature)
+                if not force_on:
+                    force_on, manual_temp_target = _get_heat_on_manual(zone_thermo=zone_thermo)
+                    if manual_temp_target is not None:
+                        act_temp_target = manual_temp_target
+                    else:
+                        act_temp_target = std_temp_target
                 if zone_thermo.active_heat_schedule_pattern_id != schedule_pattern.id:
-                    L.l.debug('Pattern {} is {}, target={}'.format(zone.name, schedule_pattern.name, temp_target))
+                    L.l.debug('Pattern {} is {}, target={}'.format(zone.name, schedule_pattern.name, act_temp_target))
                     zone_thermo.active_heat_schedule_pattern_id = schedule_pattern.id
-                zone_thermo.heat_target_temperature = temp_target
+                zone_thermo.heat_target_temperature = std_temp_target
                 commit()
                 if sensor.temperature is not None:
-                    heat_is_on = __decide_action(zone, sensor.temperature, temp_target, force_on=force_on,
+                    heat_is_on = __decide_action(zone, sensor.temperature, act_temp_target, force_on=force_on,
                                                  force_off=force_off, zone_thermo=zone_thermo)
             else:
                 L.l.critical('Unknown temperature pattern code {}'.format(temp_code))
@@ -431,8 +464,7 @@ def thread_run():
 
 def unload():
     L.l.info('Heat module unloading')
-    global initialised
-    initialised = False
+    P.initialised = False
     thread_pool.remove_callable(thread_run)
     # dispatcher.disconnect(handle_event_heat, signal=Constant.SIGNAL_HEAT, sender=dispatcher.Any)
 
@@ -442,5 +474,4 @@ def init():
     dispatcher.connect(_handle_presence, signal=Constant.SIGNAL_PRESENCE, sender=dispatcher.Any)
     # dispatcher.connect(handle_event_heat, signal=Constant.SIGNAL_HEAT, sender=dispatcher.Any)
     thread_pool.add_interval_callable(thread_run, 60)
-    global initialised
-    initialised = True
+    P.initialised = True

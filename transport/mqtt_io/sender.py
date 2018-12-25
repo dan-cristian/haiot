@@ -11,7 +11,7 @@ def send_message(txt, topic=None):
             topic = transport.mqtt_io.P.topic_main
         # Log.logger.debug('Sending message at {} [{}] '.format(utils.get_base_location_now_date(), txt))
         if transport.mqtt_io.client_connected:
-            transport.mqtt_io.P.mqtt_client.publish(topic, txt)
+            transport.mqtt_io.P.mqtt_client.publish(topic, "{}".format(txt))
             return True
         else:
             # Log.logger.debug('MQTT client not connected, retrying connect, message to be discarded: {}'.format(txt))
