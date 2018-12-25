@@ -26,9 +26,10 @@ def _read_bmp280():
     if zone_sensor is not None:
         sensor_name = zone_sensor.sensor_name
         current_record = models.Sensor.query.filter_by(address=sensor_address).first()
-        if current_record is None:
-            sensor_name = zone_sensor.sensor_name
+        sensor_name = zone_sensor.sensor_name
         record = models.Sensor(address=sensor_address, sensor_name=sensor_name)
+        if current_record is None:
+            record.type = 'BMP280'
         record.temperature = round(temperature, 1)
         record.pressure = round(pressure, 1)
         record.save_changed_fields(current_record=current_record, new_record=record,
