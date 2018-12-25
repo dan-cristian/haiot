@@ -23,7 +23,7 @@ __mqtt_lock = threading.Lock()
 
 
 # executed on local db changes done via web ui only, including API calls
-def handle_local_event_db_post(model, row, last_commit_field_changed_list):
+def handle_local_event_db_post(model, row, last_commit_field_changed_list=None):
     processed = False
     L.l.debug('Local DB change sent by model {} row {}'.format(model, row))
     if str(models.Parameter) in str(model):
