@@ -5,12 +5,12 @@ from main.logger_helper import L
 from common import Constant, variable
 from main.admin import models
 from main import thread_pool
+import time
 import six
 if six.PY3:
     from pydispatch import dispatcher
 else:
     from louie import dispatcher
-import time
 from pydispatch import dispatcher as haiot_dispatch
 
 
@@ -28,6 +28,9 @@ class P:
     last_value_received = datetime.max
     MAX_SILENCE_SEC = 120
     init_done = False
+
+    def __init__(self):
+        pass
 
 
 try:
@@ -124,7 +127,7 @@ def set_value(network, node, value):
             if value.label == "Switch":
                 _set_custom_relay_state(sensor_address=sensor_address, state=value.data)
             elif value.label == "Power" or (value.label == "Energy" and value.units == "kWh"):
-                # L.l.info("Saving power utility")
+                L.l.info("Saving power utility")
                 if value.units == "W":
                     units_adjusted = "watt"  # this should match Utility unit name in models definition
                     value_adjusted = round(value.data, 0)
@@ -133,6 +136,7 @@ def set_value(network, node, value):
                     value_adjusted = value.data
                 haiot_dispatch.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=value_adjusted,
                                     unit=units_adjusted)
+                L.l.info("Saving power utility {} {} {}".format(sensor_name, value_adjusted, units_adjusted))
             else:
                 # skip controller node
                 if node.node_id > 1:
@@ -151,22 +155,23 @@ def set_value(network, node, value):
                         record.vad = round(value.data, 0)
                         record.save_changed_fields(current_record=current_record, new_record=record,
                                                    notify_transport_enabled=True, save_to_graph=True, debug=False)
+                        L.l.info("Saving voltage {} {}".format(sensor_name, value.data))
                     elif value.label == "Current":
                         record.iad = round(value.data, 1)
                         record.save_changed_fields(current_record=current_record, new_record=record,
                                                    notify_transport_enabled=True, save_to_graph=True, debug=False)
+                        L.l.info("Saving current {} {}".format(sensor_name, value.data))
                     elif value.label == "Power Factor":
                         record.vdd = round(value.data, 1)
                         record.save_changed_fields(current_record=current_record, new_record=record,
                                                    notify_transport_enabled=True, save_to_graph=True, debug=False)
+                        L.l.info("Saving power factor {} {}".format(sensor_name, value.data))
                     if current_record is not None:
                         current_record.commit_record_to_db()
                     else:
                         record.add_commit_record_to_db()
         else:
             L.l.info("Cannot find zonesensor definition in db, address={}".format(sensor_address))
-            # record = models.Sensor(address=sensor_address, sensor_name="N/A - " + sensor_address)
-            # record.add_commit_record_to_db()
     except Exception as ex:
         L.l.error("Error in zwave value={}".format(ex), exc_info=True)
 
@@ -386,7 +391,7 @@ def _set_param(node_id, param_name, value):
 # https://github.com/openhab/org.openhab.binding.zwave/blob/master/doc/qubino/zmnhxd_0_0.md
 def _initial_node_init():
     if not P.init_done:
-        _set_param(2, 'Power reporting in Watts on power change', 1)
+        _set_param(2, 'Power reporting in Watts on power change',  1)
         _set_param(2, 'Power reporting in Watts by time interval', 0)
         P.init_done = True
         node = P.network.nodes[2]
