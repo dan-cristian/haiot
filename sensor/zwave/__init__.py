@@ -28,6 +28,7 @@ class P:
     last_value_received = datetime.max
     MAX_SILENCE_SEC = 120
     init_done = False
+    DELTA_SAVE_SECONDS = 30
 
     def __init__(self):
         pass
@@ -126,42 +127,46 @@ def set_value(network, node, value):
             P.last_value_received = datetime.now()
             if value.label == "Switch":
                 _set_custom_relay_state(sensor_address=sensor_address, state=value.data)
-            elif value.label == "Power" or (value.label == "Energy" and value.units == "kWh"):
-                L.l.info("Saving power utility")
+            elif value.label == "Power":
                 if value.units == "W":
                     units_adjusted = "watt"  # this should match Utility unit name in models definition
                     value_adjusted = round(value.data, 0)
+                    haiot_dispatch.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=value_adjusted,
+                                        unit=units_adjusted)
                 else:
-                    units_adjusted = value.units
-                    value_adjusted = value.data
-                haiot_dispatch.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=value_adjusted,
-                                    unit=units_adjusted)
-                L.l.info("Saving power utility {} {} {}".format(sensor_name, value_adjusted, units_adjusted))
+                    L.l.warning("Unknown power units {} for sensor {}".format(value.units, sensor_name))
+                L.l.info("Saving power utility {} {} {}".format(sensor_name, value.units, value.data))
+            elif value.label == "Energy" and value.units == "kWh":
+                haiot_dispatch.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=value.data,
+                                    unit=value.units)
+                L.l.info("Saving energy utility {} {} {}".format(sensor_name, value.units, value.data))
             else:
                 # skip controller node
                 if node.node_id > 1:
                     current_record = models.Sensor.query.filter_by(address=sensor_address).first()
                     if current_record is None:
                         sensor_name = zone_sensor.sensor_name
+                        delta_last_save = 0
                     else:
                         # L.l.info("Received node={}, value={}".format(node, value))
                         current_record.vad = 0
                         current_record.iad = 0
                         current_record.vdd = 0
                         sensor_name = current_record.sensor_name
+                        delta_last_save = (datetime.now() - current_record.updated_on).total_seconds()
                     record = models.Sensor(address=sensor_address, sensor_name=sensor_name)
                     record.is_event_external = True
-                    if value.label == "Voltage":
+                    if delta_last_save > P.DELTA_SAVE_SECONDS and value.label == "Voltage":
                         record.vad = round(value.data, 0)
                         record.save_changed_fields(current_record=current_record, new_record=record,
                                                    notify_transport_enabled=True, save_to_graph=True, debug=False)
                         L.l.info("Saving voltage {} {}".format(sensor_name, value.data))
-                    elif value.label == "Current":
+                    elif delta_last_save > P.DELTA_SAVE_SECONDS and value.label == "Current":
                         record.iad = round(value.data, 1)
                         record.save_changed_fields(current_record=current_record, new_record=record,
                                                    notify_transport_enabled=True, save_to_graph=True, debug=False)
                         L.l.info("Saving current {} {}".format(sensor_name, value.data))
-                    elif value.label == "Power Factor":
+                    elif delta_last_save > P.DELTA_SAVE_SECONDS and value.label == "Power Factor":
                         record.vdd = round(value.data, 1)
                         record.save_changed_fields(current_record=current_record, new_record=record,
                                                    notify_transport_enabled=True, save_to_graph=True, debug=False)
