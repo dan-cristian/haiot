@@ -149,9 +149,9 @@ def set_value(network, node, value):
                         delta_last_save = 0
                     else:
                         # L.l.info("Received node={}, value={}".format(node, value))
-                        current_record.vad = 0
-                        current_record.iad = 0
-                        current_record.vdd = 0
+                        # current_record.vad = 0
+                        # current_record.iad = 0
+                        # current_record.vdd = 0
                         sensor_name = current_record.sensor_name
                         delta_last_save = (datetime.now() - current_record.updated_on).total_seconds()
                     record = models.Sensor(address=sensor_address, sensor_name=sensor_name)
