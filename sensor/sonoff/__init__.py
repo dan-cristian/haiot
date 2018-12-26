@@ -124,6 +124,10 @@ def mqtt_on_message(client, userdata, msg):
                     new.save_changed_fields(current_record = sensor, notify_transport_enabled=True, save_to_graph=True)
                 else:
                     L.l.warning('Sensor INA on {} not defined in db'.format(sensor_name))
+            elif 'ANALOG' in obj:
+                an = obj['ANALOG']
+                a0 = an['A0']
+                L.l.info('Got analog {} from {}'.format(a0, sensor_name))
             else:
                 L.l.warning("Usefull payload missing from topic {} payload={}".format(msg.topic, msg.payload))
         else:
