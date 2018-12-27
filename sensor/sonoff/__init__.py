@@ -18,6 +18,17 @@ class P:
         pass
 
 
+def _get_sensor(sensor_address, sensor_type):
+    zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=sensor_address).first()
+    if zone_sensor is None:
+        actual_sensor_name = 'N/A {} {}'.format(sensor_address, sensor_type)
+    else:
+        actual_sensor_name = zone_sensor.sensor_name
+    sensor = models.Sensor.query.filter_by(address=sensor_address).first()
+    new_sensor = models.Sensor(address=sensor_address, sensor_name=actual_sensor_name)
+    return zone_sensor, sensor, new_sensor
+
+
 # '{"Time":"2018-10-14T21:57:33","ENERGY":{"Total":0.006,"Yesterday":0.000,"Today":0.006,"Power":5,"Factor":0.10,"Voltage":214,"Current":0.241}}'
 # 'iot/sonoff/tele/sonoff-pow-2/SENSOR'
 # {"Time":"2018-11-01T23:42:54","ENERGY":{"TotalStartTime":"2018-10-31T20:05:27","Total":0.000,"Yesterday":0.000,"Today":0.000,"Period":0,
@@ -102,16 +113,10 @@ def mqtt_on_message(client, userdata, msg):
                 temp = bmp['Temperature']
                 press = bmp['Pressure']
                 sensor_address = '{}_{}'.format(sensor_name, 'bmp280')
-                current_zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=sensor_address).first()
-                if current_zone_sensor is not None:
-                    current_sensor = models.Sensor.query.filter_by(address=sensor_address).first()
-                    sensor = models.Sensor(address=sensor_address, sensor_name=current_zone_sensor.sensor_name)
-                    sensor.temperature = temp
-                    sensor.pressure = press
-                    sensor.save_changed_fields(
-                        current_record=current_sensor, notify_transport_enabled=True, save_to_graph=True)
-                else:
-                    L.l.info('Undefined sensor found in {}, value={}'.format(sensor_address, bmp))
+                zone_sensor, sensor, new_sensor = _get_sensor(sensor_address=sensor_address, sensor_type='BMP280')
+                new_sensor.temperature = temp
+                new_sensor.pressure = press
+                new_sensor.save_changed_fields(current_record=sensor, notify_transport_enabled=True, save_to_graph=True)
             elif 'INA219' in obj:
                 ina = obj['INA219']
                 voltage = ina['Voltage']
@@ -127,7 +132,10 @@ def mqtt_on_message(client, userdata, msg):
             elif 'ANALOG' in obj:
                 an = obj['ANALOG']
                 a0 = an['A0']
-                L.l.info('Got analog {} from {}'.format(a0, sensor_name))
+                sensor_address = '{}_{}'.format(sensor_name, 'a0')
+                zone_sensor, sensor, new_sensor = _get_sensor(sensor_address=sensor_address, sensor_type='A0')
+                new_sensor.vad = a0
+                new_sensor.save_changed_fields(current_record=sensor, notify_transport_enabled=True, save_to_graph=True)
             else:
                 L.l.warning("Usefull payload missing from topic {} payload={}".format(msg.topic, msg.payload))
         else:
