@@ -89,6 +89,7 @@ Number temperature_solar_back "Solar back [%.1f °C]" <temperature>             
 Number temperature_soba_beci "Soba beci [%.1f °C]" <temperature>                                    {mqtt="<[mosquitto:iot/openhab/temperature_soba beci:state:default]"}
 Number temperature_fridge "Fridge [%.1f °C]" <temperature> ["CurrentTemperature"]                   {mqtt="<[mosquitto:iot/openhab/temperature_fridge:state:default]"}
 Number temperature_baro_house "Baro house [%.1f °C]" <temperature>                                  {mqtt="<[mosquitto:iot/openhab/temperature_baro_house:state:default]"}
+Number gas_co_beci "Gas CO beci [%.0f]" <gas>                                                       {mqtt="<[mosquitto:iot/openhab/vad_gas CO beci:state:default]"}
 
 Number humidity_living "Living [%.0f %%]" <humidity> [ "CurrentHumidity" ]                        {mqtt="<[mosquitto:iot/openhab/humidity_living:state:default]"}
 Number humidity_curte_fata "Curte fata [%.0f %%]" <humidity> [ "CurrentHumidity" ]                {mqtt="<[mosquitto:iot/openhab/humidity_curte fata:state:default]"}
