@@ -133,7 +133,7 @@ def mqtt_on_message(client, userdata, msg):
                 an = obj['ANALOG']
                 a0 = an['A0']
                 sensor_address = '{}_{}'.format(sensor_name, 'a0')
-                zone_sensor, sensor, new_sensor = _get_sensor(sensor_address=sensor_address, sensor_type='A0')
+                zone_sensor, sensor, new_sensor = _get_sensor(sensor_address=sensor_address, sensor_type='ANALOG')
                 new_sensor.vad = a0
                 new_sensor.save_changed_fields(current_record=sensor, notify_transport_enabled=True, save_to_graph=True)
             else:
