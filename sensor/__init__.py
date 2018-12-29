@@ -9,8 +9,7 @@ __author__ = 'dcristian'
 def record_update(obj):
     # save sensor state to db, except for current node
     try:
-        sensor_host_name = utils.get_object_field_value(obj, 'name')
-        L.l.debug('Received sensor state update from {}'.format(sensor_host_name))
+        sensor_host_name = utils.get_object_field_value(obj, Constant.JSON_PUBLISH_SOURCE_HOST)
         # avoid node to update itself in infinite recursion
         if sensor_host_name != Constant.HOST_NAME:
             address = utils.get_object_field_value(obj, 'address')
