@@ -709,6 +709,7 @@ class GpioPin(db.Model, DbEvent, DbBase):
     board_index = db.Column(db.Integer)  # 0 to n (max 3 for piface)
     description = db.Column(db.String(50))
     is_active = db.Column(db.Boolean, default=False)  # if pin was setup(exported) through this app. will be unexported when app exit
+    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
 
     def __init__(self):
         super(GpioPin, self).__init__()
