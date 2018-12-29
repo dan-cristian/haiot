@@ -26,6 +26,6 @@ do
         try_kill=1
     else
         echo "Program is not running or no pid found, nothing to stop"
-        exit 0
+        break
     fi
 done
