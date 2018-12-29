@@ -116,9 +116,9 @@ def init():
         P.topic = str(model_helper.get_param(Constant.P_MQTT_TOPIC))
         P.topic_main = str(model_helper.get_param(Constant.P_MQTT_TOPIC_MAIN))
         if mqtt_paho_exists:
-            P.mqtt_client = mqtt.Client()
+            P.mqtt_client = mqtt.Client(client_id=Constant.HOST_NAME)
         elif mqtt_mosquitto_exists:
-            P.mqtt_client = mqtt.Mosquitto()
+            P.mqtt_client = mqtt.Mosquitto(client_id=Constant.HOST_NAME)
 
         global client_connected
         global initialised
