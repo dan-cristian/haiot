@@ -336,7 +336,7 @@ def run(arg_list):
         # https://github.com/Microsoft/PTVS/wiki/Cross-Platform-Remote-Debugging
         try:
             import ptvsd
-            ptvsd.enable_attach(secret='secret', address=('0.0.0.0', 5678))
+            ptvsd.enable_attach(address=('0.0.0.0', 5678), redirect_output=True)
             print('Enabled remote debugging, waiting 15 seconds for client to attach')
             ptvsd.wait_for_attach(timeout=15)
         except Exception as ex:
