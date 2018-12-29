@@ -166,3 +166,13 @@ def parse_http(url, start_key, end_key, end_first=False):
 
 def sleep(secs):
     time.sleep(secs)
+
+
+def dump_primitives_as_text(obj):
+    res = ''
+    attr_list = [a for a in dir(obj) if not a.startswith('_') and not callable(getattr(obj, a))
+                 and not hasattr(getattr(obj, a), '__dict__')]
+    for item in attr_list:
+        value = getattr(obj, item)
+        res = '{}{}={}, '.format(res, item, value)
+    return res
