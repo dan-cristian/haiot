@@ -96,6 +96,9 @@ Number humidity_living "Living [%.0f %%]" <humidity> [ "CurrentHumidity" ]      
 Number humidity_curte_fata "Curte fata [%.0f %%]" <humidity> [ "CurrentHumidity" ]                {mqtt="<[mosquitto:iot/openhab/humidity_curte fata:state:default]"}
 Number humidity_fridge "Fridge [%.0f %%]" <humidity> [ "CurrentHumidity" ]                        {mqtt="<[mosquitto:iot/openhab/humidity_fridge:state:default]"}
 Number pressure_baro_house "Pressure [%.0f hPa]" <pressure>                   {mqtt="<[mosquitto:iot/openhab/pressure_baro_house:state:default]"}
+Number humidity_parter "Parter [%.0f %%]" <humidity> [ "CurrentHumidity" ]                        {mqtt="<[mosquitto:iot/openhab/humidity_parter:state:default]"}
+Number humidity_dormitor_etaj "Dormitor etaj [%.0f %%]" <humidity> [ "CurrentHumidity" ]                        {mqtt="<[mosquitto:iot/openhab/humidity_dormitor etaj:state:default]"}
+
 
 Number electricity_power_main_mono "Power main mono [%.0fw]" <energy>   {mqtt="<[mosquitto:iot/openhab/electricity_power main mono:state:default]"}
 Number electricity_kWh_power_main_mono "KWh main mono [%.2f kWh]" <energy>  {mqtt="<[mosquitto:iot/openhab/electricity_kWh_power main mono:state:default]"}
