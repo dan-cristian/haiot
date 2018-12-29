@@ -176,3 +176,9 @@ def dump_primitives_as_text(obj):
         value = getattr(obj, item)
         res = '{}{}={}, '.format(res, item, value)
     return res
+
+
+def get_primitives(obj):
+    attr_list = [a for a in dir(obj) if not a.startswith('_') and not callable(getattr(obj, a))
+                 and not hasattr(getattr(obj, a), '__dict__')]
+    return attr_list

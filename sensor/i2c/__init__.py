@@ -4,8 +4,6 @@ from common import Constant, utils
 from main.logger_helper import L
 from main.admin import models
 from main import thread_pool
-from smbus2 import SMBus
-from bmp280 import BMP280
 
 
 class P:
@@ -16,6 +14,13 @@ class P:
 
     def __init__(self):
         pass
+
+
+try:
+    from smbus2 import SMBus
+    from bmp280 import BMP280
+except ImportError:
+    pass
 
 
 def _read_bmp280():

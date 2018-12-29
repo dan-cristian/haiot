@@ -22,6 +22,8 @@ def record_update(obj):
                 record.sensor_name = zone_sensor.sensor_name
             else:
                 record.sensor_name = '(n/a) {} {} {}'.format(address, n_address, sensor_type)
+            # mark the source to avoid duplicate actions
+            setattr(record, Constant.JSON_PUBLISH_SOURCE_HOST, sensor_host_name)
             record.type = utils.get_object_field_value(obj, 'type')
             record.updated_on = utils.get_base_location_now_date()
             if obj.has_key('counters_a'): record.counters_a = utils.get_object_field_value(obj, 'counters_a')
