@@ -123,15 +123,15 @@ def _read_all_hdd_smart():
                             # print 'SMART Status is {}'.format(status)
                         if Constant.SMARTCTL_MODEL_DEVICE in line:
                             words = line.split(': ')
-                            record.device = words[1].replace('\r', '').replace('\n', '').lstrip()
+                            record.hdd_device = words[1].replace('\r', '').replace('\n', '').lstrip()
                             # print 'Device is {}'.format(device)
                         if Constant.SMARTCTL_MODEL_FAMILY in line:
                             words = line.split(': ')
-                            record.family = words[1].replace('\r', '').replace('\n', '').lstrip()
+                            #record.family = words[1].replace('\r', '').replace('\n', '').lstrip()
                             # print 'Family is {}'.format(family)
                         if Constant.SMARTCTL_SERIAL_NUMBER in line:
                             words = line.split(': ')
-                            record.serial = words[1].replace('\r', '').replace('\n', '').lstrip()
+                            #record.serial = words[1].replace('\r', '').replace('\n', '').lstrip()
                             # print 'Serial is {}'.format(serial)
                             # print ('Disk dev is {}'.format(disk_dev))
                 record.updated_on = utils.get_base_location_now_date()
