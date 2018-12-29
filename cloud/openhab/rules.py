@@ -20,9 +20,9 @@ def send_mqtt_openhab(subtopic, payload):
 def rule_openhab_sensor(obj=models.Sensor(), field_changed_list=None):
     key = 'temperature'
     if hasattr(obj, key) and obj.temperature is not None:
-        if obj.sensor_name == 'curte fata':
-            obj_text = utils.dump_primitives_as_text(obj)
-            L.l.info('CURTE TEMP={}'.format(obj_text))
+        # if obj.sensor_name == 'curte fata':
+        #    obj_text = utils.dump_primitives_as_text(obj)
+        #    L.l.info('CURTE TEMP={}'.format(obj_text))
         send_mqtt_openhab(subtopic=key + "_" + obj.sensor_name, payload=obj.temperature)
     key = 'humidity'
     if hasattr(obj, key) and obj.humidity is not None:
