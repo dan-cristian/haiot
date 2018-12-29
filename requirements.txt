@@ -26,7 +26,7 @@ pygal
 pymysql
 python-mpd2
 pylast
-ptvsd==3.0.0
+ptvsd
 web.py
 thingspeak
 tzlocal
