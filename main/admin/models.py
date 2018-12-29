@@ -161,35 +161,39 @@ class DbBase:
                 current_record.save_to_history = save_to_graph
                 current_record.last_commit_field_changed_list = []
                 current_record.notify_transport_enabled = notify_transport_enabled
-                for column in new_record.query.statement._columns._all_columns:
+                # for column in new_record.query.statement._columns._all_columns: # this iter skips class attributes
+                for column in utils.get_primitives(new_record):
                     column_name = str(column)
                     new_value = getattr(new_record, column_name)
-                    old_value = getattr(current_record, column_name)
-                    if debug:
-                        L.l.info('DEBUG process Col={} New={} Old={} Saveall={}'.format(
-                            column_name, new_value, old_value, save_all_fields))
-                    # fixme: comparison not working for float, because str appends .0
-                    # if ((new_value is not None) and (str(old_value) != str(new_value)))
-
-                    if ((new_value is not None) and (old_value != new_value)) \
-                            or (save_all_fields and (new_value is not None)):
-                        if column_name != Constant.DB_FIELD_UPDATE:
-                            try:
-                                obj_type = str(type(self)).split('\'')[1]
-                                obj_type_words = obj_type.split('.')
-                                obj_type = obj_type_words[len(obj_type_words) - 1]
-                            except Exception as ex:
-                                obj_type = str(type(self))
-                        else:
-                            pass
-                        if column_name != "id":  # do not change primary key with None
-                            setattr(current_record, column_name, new_value)
-                            current_record.last_commit_field_changed_list.append(column_name)
-                            if debug:
-                                L.l.info('DEBUG CHANGE COL={} old={} new={}'.format(column_name, old_value, new_value))
-                    else:
+                    if hasattr(current_record, column_name):
+                        old_value = getattr(current_record, column_name)
                         if debug:
-                            L.l.info('DEBUG NOT change col={}'.format(column_name))
+                            L.l.info('DEBUG process Col={} New={} Old={} Saveall={}'.format(
+                                column_name, new_value, old_value, save_all_fields))
+                        # fixme: comparison not working for float, because str appends .0
+                        # if ((new_value is not None) and (str(old_value) != str(new_value)))
+
+                        if ((new_value is not None) and (old_value != new_value)) \
+                                or (save_all_fields and (new_value is not None)):
+                            if column_name != Constant.DB_FIELD_UPDATE:
+                                try:
+                                    obj_type = str(type(self)).split('\'')[1]
+                                    obj_type_words = obj_type.split('.')
+                                    obj_type = obj_type_words[len(obj_type_words) - 1]
+                                except Exception as ex:
+                                    obj_type = str(type(self))
+                            else:
+                                pass
+                            if column_name != "id":  # do not change primary key with None
+                                setattr(current_record, column_name, new_value)
+                                current_record.last_commit_field_changed_list.append(column_name)
+                                if debug:
+                                    L.l.info('DEBUG CHANGE COL={} old={} new={}'.format(column_name, old_value, new_value))
+                        else:
+                            if debug:
+                                L.l.info('DEBUG NOT change col={}'.format(column_name))
+                    else:
+                        L.l.error('Unexpected field {} at savechanged in rec {}'.format(column_name, new_record))
                 if debug:
                     L.l.info('DEBUG len changed fields={}'.format(len(current_record.last_commit_field_changed_list)))
                 if len(current_record.last_commit_field_changed_list) == 0:
@@ -262,6 +266,7 @@ class DbEvent:
 
     notified_on_db_commit = False
     notify_transport_enabled = False
+    source_host_ = None
     event_sent_datetime = None
     is_event_external = None
 
@@ -281,7 +286,7 @@ class DbEvent:
 
 class DbHistory:
     record_uuid = db.Column(db.String(36))
-    source_host_ = db.Column(db.String(50))
+    #source_host_ = db.Column(db.String(50)) # moved to dbase
 
     def __init__(self):
         pass
