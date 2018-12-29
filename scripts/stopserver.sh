@@ -6,7 +6,12 @@ do
     if [ $try_kill == 1 ]; then
         echo "Stop process failed, check if you own the process!"
     fi
-    proc_pid=$(ps w | grep '[h]aiot.py' | awk '{print $1}')
+
+    proc_pid=$(ps ax | grep '[h]aiot.py' | awk '{print $1}')
+    if [ $? -ne 0 ]; then
+	    proc_pid=$(ps w | grep '[h]aiot.py' | awk '{print $1}')
+    fi
+
     # echo "proc pid=$proc_pid, 1st attempt"
     if [ -z "$proc_pid" ]; then
         # echo "No pid found with ps w, trying now with ps wx"
