@@ -35,26 +35,30 @@ def parse_rules(obj, change):
     """ running rule method corresponding with obj type """
     # executed on all db value changes
     L.l.debug('Received openhab obj={} change={} for rule parsing'.format(obj, change))
-    try:
-        # extract only changed fields
-        if hasattr(obj, Constant.JSON_PUBLISH_FIELDS_CHANGED):
-            field_changed_list = obj.last_commit_field_changed_list
-        else:
-            field_changed_list = []
-        if P.func_list:
-            for func in P.func_list:
-                if func[1].func_defaults and len(func[1].func_defaults) > 0:
-                    first_param = func[1].func_defaults[0]
-                    # calling rule methods with first param type equal to passed object type
-                    if type(obj) == type(first_param):
-                        record = Obj()
-                        for attr, value in obj.__dict__.iteritems():
-                            setattr(record, attr, value)
-                        P.event_list.append([record, func[0], field_changed_list])
-                        # optimise CPU, but ensure each function name is unique in rule file
-                        break
-    except Exception as ex:
-        L.l.exception('Error parsing openhab rules, ex={}'.format(ex))
+    if hasattr(obj, Constant.JSON_PUBLISH_SOURCE_HOST):
+        source = getattr(obj, Constant.JSON_PUBLISH_SOURCE_HOST)
+        # process only local initiated changes
+        if source == Constant.HOST_NAME or source is None:
+            try:
+                # extract only changed fields
+                if hasattr(obj, Constant.JSON_PUBLISH_FIELDS_CHANGED):
+                    field_changed_list = obj.last_commit_field_changed_list
+                else:
+                    field_changed_list = []
+                if P.func_list:
+                    for func in P.func_list:
+                        if func[1].func_defaults and len(func[1].func_defaults) > 0:
+                            first_param = func[1].func_defaults[0]
+                            # calling rule methods with first param type equal to passed object type
+                            if type(obj) == type(first_param):
+                                record = Obj()
+                                for attr, value in obj.__dict__.iteritems():
+                                    setattr(record, attr, value)
+                                P.event_list.append([record, func[0], field_changed_list])
+                                # optimise CPU, but ensure each function name is unique in rule file
+                                break
+            except Exception as ex:
+                L.l.exception('Error parsing openhab rules, ex={}'.format(ex))
 
 
 def mqtt_on_message(client, userdata, msg):
