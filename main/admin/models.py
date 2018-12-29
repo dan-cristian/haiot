@@ -155,6 +155,8 @@ class DbBase:
                     new_record.save_to_graph = save_to_graph
             # ensure is set for both new and existing records
             new_record.save_to_history = save_to_graph
+            # reset to avoid duplication
+            new_record.last_commit_field_changed_list = []
             _now1 = utils.get_base_location_now_date()
             if current_record is not None:
                 # ensure is set for both new and existing records
