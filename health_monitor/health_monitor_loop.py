@@ -344,7 +344,7 @@ def __get_cpu_temperature():
         else:
             L.l.warning('Unable to get CPU temp, no function available')
     else:
-        if Constant.IS_MACHINE_RASPBERRYPI:
+        if Constant.IS_MACHINE_RASPBERRYPI or Constant.IS_MACHINE_ODROID:
             path = '/sys/class/thermal/thermal_zone0/temp'
         elif Constant.IS_MACHINE_BEAGLEBONE:
             path = '/sys/class/hwmon/hwmon0/device/temp1_input'
