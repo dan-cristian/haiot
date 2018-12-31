@@ -106,6 +106,7 @@ def _setup_board():
                 bus = 32766
             try:
                 for chip in chip_range:
+                    L.l.info("Try piface init on spi spidev{}.{}".format(bus, chip))
                     pfio.init(bus=bus, chip_select=chip)
                     L.l.info("Initialised piface spi spidev{}.{}".format(bus, chip))
             except Exception as ex:
@@ -165,10 +166,11 @@ def init():
     if P.import_ok:
         try:
             _setup_board()
-            # thread_pool.add_interval_callable(thread_run, run_interval_second=10)
-            dispatcher.connect(_setup_in_ports_pif, signal=Constant.SIGNAL_GPIO_INPUT_PORT_LIST, sender=dispatcher.Any)
-            P.initialised = True
-            L.l.info('Piface initialised OK')
+            if P.board_init:
+                # thread_pool.add_interval_callable(thread_run, run_interval_second=10)
+                dispatcher.connect(_setup_in_ports_pif, signal=Constant.SIGNAL_GPIO_INPUT_PORT_LIST, sender=dispatcher.Any)
+                P.initialised = True
+                L.l.info('Piface initialised OK')
         except Exception as ex1:
             L.l.info('Piface not initialised, err={}'.format(ex1))
     else:
