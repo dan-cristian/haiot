@@ -97,7 +97,7 @@ def unload_module(module_name):
             L.l.info("Error unloading module {}, ex={}".format(module_name, ex))
 
 
-def init_modules():
+def init_modules(init_mod=None):
     import admin.models
     import admin.model_helper
     from common import Constant
@@ -124,7 +124,10 @@ def init_modules():
                 # Log.logger.info("Initialising generic mod definition name={} active={}".format(mod.name, mod.active))
                 mod_name = mod.name
                 mod_active = mod.active
-            init_module(mod_name, mod_active)
+            if init_mod is True:
+                init_module(mod_name, mod_active)
+            elif init_mod is False and mod_active is True:
+                unload_module(mod_name)
 
 
 def init_post_modules():
@@ -168,23 +171,7 @@ def execute_command(command, node=None):
 
 
 def unload_modules():
-    import admin.models
-    #import admin.model_helper
-    from common import Constant
-    from main.logger_helper import L
-
-    m = admin.models.Module
-    # http://docs.sqlalchemy.org/en/rel_0_9/core/sqlelement.html
-    # keep host name default to '' rather than None (which does not work on filter in)
-    # get the unique/distinct list of all modules defined in config, generic or host specific ones
-    module_list = m.query.filter(m.host_name.in_([Constant.HOST_NAME, ""])).group_by(m.start_order).all()
-    for mod in module_list:
-        assert isinstance(mod, admin.models.Module)
-        if mod.name != 'main':
-            try:
-                unload_module(mod.name)
-            except Exception as ex:
-                print("Error unloading module {}: {}".format(mod.name, ex))
+    init_modules(init=False)
 
 #  --------------------------------------------------------------------------  #
 
@@ -292,7 +279,7 @@ def init():
 
     L.l.info('Machine type is {}'.format(Constant.HOST_MACHINE_TYPE))
     L.l.info('Initialising modules')
-    init_modules()
+    init_modules(init=True)
 
     L.l.info('Initialising generic processing threads')
     from main import thread_pool
