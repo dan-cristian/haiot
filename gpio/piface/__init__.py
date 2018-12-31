@@ -96,25 +96,33 @@ def _setup_in_ports_pif(gpio_pin_list):
 
 
 def _setup_board():
-    try:
-        bus, chip = 0, 0
+    if Constant.MACHINE_TYPE_RASPBERRY or Constant.MACHINE_TYPE_ODROID:
         try:
-            for chip in [0, 1]:
-                pfio.init(bus=bus, chip_select=chip)
-                L.l.info("Initialised piface spi spidev{}.{}".format(bus, chip))
-        except Exception as ex:
-            pass
-        for board in [0, 1, 2, 3]:
+            if Constant.MACHINE_TYPE_RASPBERRY:
+                chip_range = [0, 1]
+                bus = 0
+            if Constant.MACHINE_TYPE_ODROID:
+                chip_range = [0, 1]
+                bus = 32766
             try:
-                pfd = pfio.PiFaceDigital(hardware_addr=board, init_board=True)
-                P.pfd[board] = pfd
-                P.listener[board] = pfio.InputEventListener(chip=P.pfd[board])
-                L.l.info("Initialised piface listener board {}".format(board))
-            except NoPiFaceDigitalDetectedError as ex:
+                for chip in chip_range:
+                    pfio.init(bus=bus, chip_select=chip)
+                    L.l.info("Initialised piface spi spidev{}.{}".format(bus, chip))
+            except Exception as ex:
                 pass
-        P.board_init = True
-    except Exception as ex:
-        L.l.critical('Piface setup board failed, err={}'.format(ex))
+            for board in [0, 1, 2, 3]:
+                try:
+                    pfd = pfio.PiFaceDigital(hardware_addr=board, init_board=True)
+                    P.pfd[board] = pfd
+                    P.listener[board] = pfio.InputEventListener(chip=P.pfd[board])
+                    L.l.info("Initialised piface listener board {}".format(board))
+                except NoPiFaceDigitalDetectedError as ex:
+                    pass
+            P.board_init = True
+        except Exception as ex:
+            L.l.critical('Piface setup board failed, err={}'.format(ex))
+    else:
+        L.l.info('Piface can only be initialised on PI or ODROID')
 
 
 def unload():
