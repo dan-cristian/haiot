@@ -56,6 +56,7 @@ class Constant:
 
     IS_MACHINE_BEAGLEBONE = False
     IS_MACHINE_RASPBERRYPI = False
+    IS_MACHINE_ODROID = False
     IS_MACHINE_INTEL = False
     IS_MACHINE_OPENWRT = False
 
