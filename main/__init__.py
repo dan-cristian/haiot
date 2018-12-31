@@ -171,7 +171,7 @@ def execute_command(command, node=None):
 
 
 def unload_modules():
-    init_modules(init=False)
+    init_modules(init_mod=False)
 
 #  --------------------------------------------------------------------------  #
 
@@ -279,7 +279,7 @@ def init():
 
     L.l.info('Machine type is {}'.format(Constant.HOST_MACHINE_TYPE))
     L.l.info('Initialising modules')
-    init_modules(init=True)
+    init_modules(init_mod=True)
 
     L.l.info('Initialising generic processing threads')
     from main import thread_pool
