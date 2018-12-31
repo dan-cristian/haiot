@@ -318,8 +318,14 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
     if ! grep -q "^i2c[-_]bcm2708" /etc/modules; then printf "i2c-bcm2708\n" >> /etc/modules; fi
     # for odroid
         # https://askubuntu.com/questions/1058750/new-alert-keeps-showing-up-server-returned-error-nxdomain-mitigating-potential
-        # uname -a | grep odroid
-        # if [[ "$?" == "0" ]]; then
+        uname -a | grep odroid
+        if [[ "$?" == "0" ]]; then
+            modprobe spi-bitbang
+            modprobe spi-gpio
+            modprobe spidev
+            if ! grep -q "^spi[-_]bitbang" /etc/modules; then printf "spi-bitbang\n" >> /etc/modules; fi
+            if ! grep -q "^spi[-_]gpio" /etc/modules; then printf "spi-gpio\n" >> /etc/modules; fi
+            if ! grep -q "^spi[d_]ev" /etc/modules; then printf "spi-dev\n" >> /etc/modules; fi
 
     if ! grep -q "^aml[-_]i2c" /etc/modules; then printf "aml_i2c\n" >> /etc/modules; fi
     modprobe aml_i2c
