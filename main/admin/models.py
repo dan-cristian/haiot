@@ -298,7 +298,7 @@ class Module(db.Model, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     host_name = db.Column(db.String(50))
     name = db.Column(db.String(50))
-    active = db.Column(db.Integer)  # does not work well as Boolean due to all values by default are True
+    active = db.Column(db.Boolean, default=False)  # does not work well as Boolean due to all values by default are True
     start_order = db.Column(db.Integer)
 
     def __init__(self, id='', host_name='', name='', active=0, start_order='999'):
