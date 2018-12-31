@@ -272,7 +272,7 @@ def post_init():
 
 def init():
     L.l.debug("GPIO initialising")
-    if Constant.IS_MACHINE_RASPBERRYPI:
+    if Constant.IS_MACHINE_RASPBERRYPI or Constant.IS_MACHINE_ODROID:
         piface.init()
         # pigpio_gpio.init()
         rpi_gpio.init()
