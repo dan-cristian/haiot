@@ -121,7 +121,7 @@ def _setup_board():
                     pass
             P.board_init = True
         except Exception as ex:
-            L.l.critical('Piface setup board failed, err={}'.format(ex))
+            L.l.critical('Piface setup board failed, err={}'.format(ex), exc_info=True)
     else:
         L.l.info('Piface can only be initialised on PI or ODROID')
 
