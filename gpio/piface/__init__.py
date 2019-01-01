@@ -58,7 +58,7 @@ def _input_event(event):
     L.l.info('Piface switch event={}'.format(event))
     pin_num = event.pin_num
     board_index = event.chip.hardware_addr
-    # direction gives different results than pin value
+    # direction gives different results than pin value, not used, reading value instead
     direction = event.direction  # 0 for press/contact, 1 for release/disconnect
     pin_val = _get_in_pin_value(pin_num, board_index)
     gpio_pin_code = format_pin_code(board_index=board_index, pin_direction=Constant.GPIO_PIN_DIRECTION_IN,
@@ -102,11 +102,13 @@ def _setup_board():
             if Constant.MACHINE_TYPE_RASPBERRY:
                 chip_range = [0, 1, 2, 3]
                 bus = 0
-                board_range = [0, 1, 2, 3]
-            if Constant.MACHINE_TYPE_ODROID:
+                board_range = [0]
+            elif Constant.MACHINE_TYPE_ODROID:
                 chip_range = [0, 1, 2, 3]
                 bus = 32766
-                board_range = [0, 1, 2, 3]
+                board_range = [0]
+            else:
+                L.l.error("Cannot initialise piface board on {}".format(Constant.HOST_MACHINE_TYPE))
             try:
                 for chip in chip_range:
                     L.l.info("Try piface init on spi spidev{}.{}".format(bus, chip))
@@ -118,11 +120,11 @@ def _setup_board():
             for board in board_range:
                 for chip in P.chip_list:
                     try:
-                        L.l.info("Try piface pfio on spi spidev{}.{}".format(bus, chip))
+                        L.l.info("Try piface pfio on board {} spidev{}.{}".format(board, bus, chip))
                         pfd = pfio.PiFaceDigital(hardware_addr=board, bus=bus, chip_select=chip, init_board=True)
                         P.pfd[board] = pfd
                         P.listener[board] = pfio.InputEventListener(chip=P.pfd[board])
-                        L.l.info("Initialised piface pfio listener board {}".format(board))
+                        L.l.info("Initialised piface pfio listener board {} spidev{}.{}".format(board, bus, chip))
                     except NoPiFaceDigitalDetectedError as ex:
                         pass
                     except SPIInitError as spex:
