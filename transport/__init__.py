@@ -1,41 +1,49 @@
 import threading
 import prctl
+import transport.mqtt_io
+from common import utils
 from main.logger_helper import L
-import transport_run
 from transport import mqtt_io
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 
-initialised = False
-__send_json_queue = []
-__mqtt_lock = threading.Lock()
+class P:
+    initialised = False
+    send_json_queue = []
+    mqtt_lock = threading.Lock()
+
+    def __init__(self):
+        pass
 
 
 # exit fast to avoid blocking db commit request?
 def send_message_json(json=''):
-    __send_json_queue.append(json)
+    P.send_json_queue.append([json, mqtt_io.P.topic_main])
 
 
-def send_message_obj(obj=''):
-    pass
+def send_message_topic(json='', topic=None):
+    P.send_json_queue.append([json, topic])
 
 
 def thread_run():
     prctl.set_name("transport")
     threading.current_thread().name = "transport"
-    global __mqtt_lock
-    __mqtt_lock.acquire()
+    P.mqtt_lock.acquire()
     try:
-        # FIXME: complete this, will potentially accumulate too many requests
-        for json in list(__send_json_queue):
-            #  Log.logger.info("Sending mqtt {}".format(json))
-            if mqtt_io.sender.send_message(json):
-                __send_json_queue.remove(json)
-        if len(__send_json_queue) > 20:
-            L.l.warning("{} messages are pending in transport send queue".format(len(__send_json_queue)))
+        if mqtt_io.P.client_connected:
+            # FIXME: complete this, will potentially accumulate too many requests
+            for [json, topic] in list(P.send_json_queue):
+                if transport.mqtt_io._send_message(json, topic):
+                    P.send_json_queue.remove([json, topic])
+            if len(P.send_json_queue) > 20:
+                L.l.warning("{} messages are pending in transport send queue".format(len(P.send_json_queue)))
+        else:
+            elapsed = (utils.get_base_location_now_date() - mqtt_io.P.last_connect_attempt).total_seconds()
+            if elapsed > 10:
+                init()
     finally:
-        __mqtt_lock.release()
+        P.mqtt_lock.release()
     prctl.set_name("idle")
     threading.current_thread().name = "idle"
 
@@ -45,8 +53,7 @@ def unload():
     L.l.info('Transport unloading')
     # ...
     thread_pool.remove_callable(thread_run)
-    global initialised
-    initialised = False
+    P.initialised = False
 
 
 def init():
@@ -54,5 +61,4 @@ def init():
     L.l.info('Transport initialising')
     thread_pool.add_interval_callable(thread_run, run_interval_second=1)
     mqtt_io.init()
-    global initialised
-    initialised = True
+    P.initialised = True
