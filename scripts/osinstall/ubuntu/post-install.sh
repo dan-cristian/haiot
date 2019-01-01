@@ -332,6 +332,16 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
 
         echo "For odroid you must install RPI.GPIO port from https://github.com/jfath/RPi.GPIO-Odroid"
 
+        if ! grep -q "c110988[0]" /etc/rc.local; then
+            echo "Setting proper permissions for odroid"
+            echo "chgrp -R gpio /sys/class/gpio" >> /etc/rc.local
+            echo "chmod -R g+rw /sys/class/gpio" >> /etc/rc.local
+            # ln /dev/spidev32766.0 /dev/spidev0.0
+            echo "chown root:spi /dev/spi*" >> /etc/rc.local
+            echo "chmod g+rw /dev/spi*" >> /etc/rc.local
+            # needed for piface interrupts
+            echo "chown -R root:gpio /sys/devices/c1109880.pinmux" >> /etc/rc.local
+        fi
 
     if ! grep -q "^aml[-_]i2c" /etc/modules; then printf "aml_i2c\n" >> /etc/modules; fi
     modprobe aml_i2c
