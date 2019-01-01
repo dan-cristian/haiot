@@ -100,9 +100,11 @@ def _setup_board():
             if Constant.MACHINE_TYPE_RASPBERRY:
                 chip_range = [0, 1]
                 bus = 0
+                board_range = [0, 1, 2, 3]
             if Constant.MACHINE_TYPE_ODROID:
                 chip_range = [0, 1]
                 bus = 32766
+                board_range = [32766]
             try:
                 for chip in chip_range:
                     L.l.info("Try piface init on spi spidev{}.{}".format(bus, chip))
@@ -110,7 +112,7 @@ def _setup_board():
                     L.l.info("Initialised piface spi spidev{}.{} OK".format(bus, chip))
             except Exception as ex:
                 pass
-            for board in [0, 1, 2, 3]:
+            for board in board_range:
                 try:
                     pfd = pfio.PiFaceDigital(hardware_addr=board, init_board=True)
                     P.pfd[board] = pfd
