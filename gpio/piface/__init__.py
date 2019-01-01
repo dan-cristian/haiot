@@ -104,7 +104,7 @@ def _setup_board():
             if Constant.MACHINE_TYPE_ODROID:
                 chip_range = [0, 1]
                 bus = 32766
-                board_range = [32766]
+                board_range = [0, 1, 2, 3]
             try:
                 for chip in chip_range:
                     L.l.info("Try piface init on spi spidev{}.{}".format(bus, chip))
@@ -114,10 +114,11 @@ def _setup_board():
                 pass
             for board in board_range:
                 try:
-                    pfd = pfio.PiFaceDigital(hardware_addr=board, init_board=True)
+                    L.l.info("Try piface pfio on spi spidev{}.{}".format(bus, chip))
+                    pfd = pfio.PiFaceDigital(hardware_addr=board, bus=bus, chip_select=chip, init_board=True)
                     P.pfd[board] = pfd
                     P.listener[board] = pfio.InputEventListener(chip=P.pfd[board])
-                    L.l.info("Initialised piface listener board {}".format(board))
+                    L.l.info("Initialised piface pfio listener board {}".format(board))
                 except NoPiFaceDigitalDetectedError as ex:
                     pass
             P.board_init = True
