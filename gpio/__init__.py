@@ -62,7 +62,7 @@ def relay_update(gpio_pin_code=None, pin_value=None, from_web=False):
 # parameter is GpioPin model, not the pin index!
 def relay_get(gpio_pin_obj=None, from_web=False):
     message = 'Get relay state for pin {}'.format(gpio_pin_obj)
-    #if Constant.HOST_MACHINE_TYPE in [Constant.MACHINE_TYPE_RASPBERRY, Constant.MACHINE_TYPE_BEAGLEBONE,
+    # if Constant.HOST_MACHINE_TYPE in [Constant.MACHINE_TYPE_RASPBERRY, Constant.MACHINE_TYPE_BEAGLEBONE,
     #                                  Constant.MACHINE_TYPE_ODROID]:
     if gpio_pin_obj.pin_type in [Constant.GPIO_PIN_TYPE_PI_STDGPIO, Constant.GPIO_PIN_TYPE_BBB]:
         if rpi_gpio.initialised:
@@ -76,7 +76,7 @@ def relay_get(gpio_pin_obj=None, from_web=False):
     else:
         L.l.warning('Cannot select gpio method for pin={}'.format(gpio_pin_obj))
         pin_value = None
-    #else:
+    # else:
     #    message += ' error not running on gpio enabled devices'
     #    pin_value = None
     #    L.l.warning(message)
@@ -93,20 +93,21 @@ def relay_set(gpio_pin_index_bcm=None, gpio_pin_type=None, gpio_board_index=None
     value = int(value)
     message = 'Set relay state [{}] for pin [{}] from web=[{}]'.format(value, gpio_pin_index_bcm, from_web)
     # L.l.info(message)
-    if Constant.HOST_MACHINE_TYPE in [Constant.MACHINE_TYPE_RASPBERRY, Constant.MACHINE_TYPE_BEAGLEBONE]:
-        if gpio_pin_type in [Constant.GPIO_PIN_TYPE_PI_STDGPIO, Constant.GPIO_PIN_TYPE_BBB]:
-            if rpi_gpio.initialised:
-                pin_value = rpi_gpio.set_pin_bcm(bcm_id=int(gpio_pin_index_bcm), pin_value=int(value))
-            else:
-                pin_value = std_gpio.set_pin_bcm(gpio_pin_index_bcm, value)
-        elif gpio_pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
-            pin_value = piface.set_pin_value(pin_index=int(gpio_pin_index_bcm), pin_value=int(value),
-                                             board_index=int(gpio_board_index))
+    # if Constant.HOST_MACHINE_TYPE in [Constant.MACHINE_TYPE_RASPBERRY, Constant.MACHINE_TYPE_BEAGLEBONE,
+    #     #                             Constant.MACHINE_TYPE_ODROID]:
+    if gpio_pin_type in [Constant.GPIO_PIN_TYPE_PI_STDGPIO, Constant.GPIO_PIN_TYPE_BBB]:
+        if rpi_gpio.initialised:
+            pin_value = rpi_gpio.set_pin_bcm(bcm_id=int(gpio_pin_index_bcm), pin_value=int(value))
         else:
-            L.l.warning("Unknown pin type {}".format(gpio_pin_type))
+            pin_value = std_gpio.set_pin_bcm(gpio_pin_index_bcm, value)
+    elif gpio_pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
+        pin_value = piface.set_pin_value(pin_index=int(gpio_pin_index_bcm), pin_value=int(value),
+                                         board_index=int(gpio_board_index))
     else:
-        message += ' error not running on gpio enabled devices'
-        L.l.warning(message)
+        L.l.warning("Unknown pin type {}".format(gpio_pin_type))
+    # else:
+    #    message += ' error not running on gpio enabled devices'
+    #    L.l.warning(message)
 
     # if from_web:
     #    return return_web_message(pin_value=pin_value, ok_message=message, err_message=message)
