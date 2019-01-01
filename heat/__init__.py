@@ -209,16 +209,19 @@ def _get_heat_on_keep_warm(schedule_pattern, temp_code, temp_target, temp_actual
     force_on = False
     if schedule_pattern.keep_warm:
         minute = utils.get_base_location_now_date().minute
-        if len(schedule_pattern.keep_warm_pattern) == 20:
+        if len(schedule_pattern.keep_warm_pattern) == 12:
             interval = int(minute / 5)
             delta_warm = temp_actual - temp_target
             if delta_warm <= P.MAX_DELTA_TEMP_KEEP_WARM:
                 force_on = ((schedule_pattern.keep_warm_pattern[interval] == "1") and
                             temp_code is not P.TEMP_NO_HEAT)
+                if force_on:
+                    L.l.info("Forcing heat on due to keep warm, zone {}".format(schedule_pattern.name))
             else:
                 L.l.info("Temp too high in {} with {}, ignoring keep warm".format(schedule_pattern.name, delta_warm))
         else:
-            L.l.critical("Missing keep warm pattern for zone {}".format(schedule_pattern.name))
+            L.l.critical("Missing or incorrect keep warm pattern for zone {}={}".format(
+                schedule_pattern.name, schedule_pattern.keep_warm_pattern))
     return force_on
 
 
