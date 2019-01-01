@@ -13,6 +13,7 @@ class P:
     listener = {}
     initialised = False
     board_init = False
+    chip_list = []
     # pool_pin_codes = []
 
     def __init__(self):
@@ -22,6 +23,7 @@ class P:
 try:
     import pifacedigitalio as pfio
     from pifacedigitalio.core import NoPiFaceDigitalDetectedError
+    from pifacecommon.spi import SPIInitError
     P.import_ok = True
 except Exception as ex:
     P.import_ok = False
@@ -98,29 +100,33 @@ def _setup_board():
     if Constant.MACHINE_TYPE_RASPBERRY or Constant.MACHINE_TYPE_ODROID:
         try:
             if Constant.MACHINE_TYPE_RASPBERRY:
-                chip_range = [0, 1]
+                chip_range = [0, 1, 2, 3]
                 bus = 0
                 board_range = [0, 1, 2, 3]
             if Constant.MACHINE_TYPE_ODROID:
-                chip_range = [0, 1]
+                chip_range = [0, 1, 2, 3]
                 bus = 32766
                 board_range = [0, 1, 2, 3]
             try:
                 for chip in chip_range:
                     L.l.info("Try piface init on spi spidev{}.{}".format(bus, chip))
                     pfio.init(bus=bus, chip_select=chip)
+                    P.chip_list.append(chip)
                     L.l.info("Initialised piface spi spidev{}.{} OK".format(bus, chip))
             except Exception as ex:
                 pass
             for board in board_range:
-                try:
-                    L.l.info("Try piface pfio on spi spidev{}.{}".format(bus, chip))
-                    pfd = pfio.PiFaceDigital(hardware_addr=board, bus=bus, chip_select=chip, init_board=True)
-                    P.pfd[board] = pfd
-                    P.listener[board] = pfio.InputEventListener(chip=P.pfd[board])
-                    L.l.info("Initialised piface pfio listener board {}".format(board))
-                except NoPiFaceDigitalDetectedError as ex:
-                    pass
+                for chip in P.chip_list:
+                    try:
+                        L.l.info("Try piface pfio on spi spidev{}.{}".format(bus, chip))
+                        pfd = pfio.PiFaceDigital(hardware_addr=board, bus=bus, chip_select=chip, init_board=True)
+                        P.pfd[board] = pfd
+                        P.listener[board] = pfio.InputEventListener(chip=P.pfd[board])
+                        L.l.info("Initialised piface pfio listener board {}".format(board))
+                    except NoPiFaceDigitalDetectedError as ex:
+                        pass
+                    except SPIInitError as spex:
+                        pass
             P.board_init = True
         except Exception as ex:
             L.l.critical('Piface setup board failed, err={}'.format(ex), exc_info=True)
