@@ -62,7 +62,8 @@ def relay_update(gpio_pin_code=None, pin_value=None, from_web=False):
 # parameter is GpioPin model, not the pin index!
 def relay_get(gpio_pin_obj=None, from_web=False):
     message = 'Get relay state for pin {}'.format(gpio_pin_obj)
-    if Constant.HOST_MACHINE_TYPE in [Constant.MACHINE_TYPE_RASPBERRY, Constant.MACHINE_TYPE_BEAGLEBONE]:
+    if Constant.HOST_MACHINE_TYPE in [Constant.MACHINE_TYPE_RASPBERRY, Constant.MACHINE_TYPE_BEAGLEBONE,
+                                      Constant.MACHINE_TYPE_ODROID]:
         if gpio_pin_obj.pin_type in [Constant.GPIO_PIN_TYPE_PI_STDGPIO, Constant.GPIO_PIN_TYPE_BBB]:
             if rpi_gpio.initialised:
                 pin_value = rpi_gpio.get_pin_bcm(bcm_id=int(gpio_pin_obj.pin_index_bcm))
