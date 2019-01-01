@@ -1,13 +1,10 @@
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
-import time
 from pydispatch import dispatcher
 from main import L
-from main import thread_pool
 from common import Constant
-from main.admin import models
-from main.admin.model_helper import commit
 from gpio import io_common
+
 
 # https://piface.github.io/pifacedigitalio/example.html
 class P:
@@ -28,7 +25,7 @@ try:
     P.import_ok = True
 except Exception as ex:
     P.import_ok = False
-    L.l.info('Pifacedigitalio module not available')
+    L.l.info('Pifacedigitalio module not available due to {}'.format(ex))
 
 
 def format_pin_code(board_index, pin_direction, pin_index):

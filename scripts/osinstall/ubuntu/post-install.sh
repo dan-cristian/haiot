@@ -202,8 +202,6 @@ adduser ${USERNAME} audio
 adduser ${USERNAME} video
 adduser ${USERNAME} tty
 adduser ${USERNAME} dialout
-adduser ${USERNAME} i2c
-adduser ${USERNAME} spi
 adduser ${USERNAME} gpio
 adduser ${USERNAME} netdev # for wpa_cli access as non-root
 echo "${USERNAME} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/010_pi-nopasswd
@@ -316,22 +314,31 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
     if ! grep -q "^i2c[-_]dev" /etc/modules; then printf "i2c-dev\n" >> /etc/modules; fi
     # for raspberry
     if ! grep -q "^i2c[-_]bcm2708" /etc/modules; then printf "i2c-bcm2708\n" >> /etc/modules; fi
+    modprobe i2c-dev
+    modprobe i2c-bcm2708
     # for odroid
-        # https://askubuntu.com/questions/1058750/new-alert-keeps-showing-up-server-returned-error-nxdomain-mitigating-potential
-        uname -a | grep odroid
-        if [[ "$?" == "0" ]]; then
-            modprobe spi-bitbang
-            modprobe spi-gpio
-            modprobe spidev
-            if ! grep -q "^spi[-_]bitbang" /etc/modules; then printf "spi-bitbang\n" >> /etc/modules; fi
-            if ! grep -q "^spi[-_]gpio" /etc/modules; then printf "spi-gpio\n" >> /etc/modules; fi
-            if ! grep -q "^spi[d_]ev" /etc/modules; then printf "spi-dev\n" >> /etc/modules; fi
+    # https://askubuntu.com/questions/1058750/new-alert-keeps-showing-up-server-returned-error-nxdomain-mitigating-potential
+    uname -a | grep odroid
+    if [[ "$?" == "0" ]]; then
+        modprobe spi-bitbang
+        modprobe spi-gpio
+        modprobe spidev
+        if ! grep -q "^spi[-_]bitbang" /etc/modules; then printf "spi-bitbang\n" >> /etc/modules; fi
+        if ! grep -q "^spi[-_]gpio" /etc/modules; then printf "spi-gpio\n" >> /etc/modules; fi
+        if ! grep -q "^spi[d_]ev" /etc/modules; then printf "spi-dev\n" >> /etc/modules; fi
+        # on odroid the group might be missing
+        groupadd spi
+
+        echo "For odroid you must install RPI.GPIO port from https://github.com/jfath/RPi.GPIO-Odroid"
+
 
     if ! grep -q "^aml[-_]i2c" /etc/modules; then printf "aml_i2c\n" >> /etc/modules; fi
     modprobe aml_i2c
         # fi
     set_config_var dtparam i2c_arm=on /boot/config.txt
 
+    adduser ${USERNAME} i2c
+    adduser ${USERNAME} spi
 
     # make sound as we need user input
     echo -ne '\007'
