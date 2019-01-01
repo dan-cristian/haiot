@@ -177,7 +177,7 @@ def init():
                     if P.client_connected:
                         P.mqtt_client.message_callback_add(P.topic_main, on_message)
                         P.mqtt_client.on_disconnect = on_disconnect
-                        thread_pool.add_interval_callable(thread_run, run_interval_second=10)
+                        # thread_pool.add_interval_callable(thread_run, run_interval_second=10)
                         P.initialised = True
                         P.client_connecting = False
                     else:
@@ -198,20 +198,6 @@ def init():
             L.l.critical('MQTT connection not available, all connect attempts failed')
     except Exception as ex:
         L.l.error('Exception on mqtt init, err={}'.format(ex))
-
-
-def thread_run():
-    prctl.set_name("mqtt_receiver")
-    threading.current_thread().name = "mqtt_receiver"
-    # L.l.debug('Processing mqtt_io receiver')
-    seconds_elapsed = (utils.get_base_location_now_date() - P.last_rec).total_seconds()
-    if seconds_elapsed > 120:
-        L.l.warning('Last mqtt message received {} seconds long ago'.format(seconds_elapsed))
-        init()
-    # mqtt_io.mqtt_client.loop(timeout=1)
-    prctl.set_name("idle")
-    threading.current_thread().name = "idle"
-    return 'Processed mqtt rec'
 
 
 def _send_message(txt, topic=None):
