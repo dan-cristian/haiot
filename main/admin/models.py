@@ -407,7 +407,7 @@ class SchedulePattern(db.Model, DbBase):
     name = db.Column(db.String(50))
     pattern = db.Column(db.String(24))
     keep_warm = db.Column(db.Boolean, default=False)  # keep the zone warm, used for cold floors
-    keep_warm_pattern = db.Column(db.String(20))  # pattern, 5 minutes increments of on/off: 10000100010000111000
+    keep_warm_pattern = db.Column(db.String(12))  # pattern, 5 minutes increments of on/off: 100001000100
     activate_on_condition = db.Column(db.Boolean, default=False)  # activate heat only if relay state condition is meet
     activate_condition_relay = db.Column(db.String(50))  # the relay that must be on to activate this schedule pattern
     season_name = db.Column(db.String(50))  # season name when this will apply
