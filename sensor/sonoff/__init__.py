@@ -1,12 +1,13 @@
 import threading
 import prctl
 from pydispatch import dispatcher
+
+import transport.mqtt_io
 from common import Constant, utils
 from main.logger_helper import L
 from main.admin import model_helper, models
 from main import thread_pool
 from transport import mqtt_io
-from transport.mqtt_io import sender
 
 
 class P:
@@ -149,12 +150,12 @@ def set_relay_state(relay_name, relay_is_on):
     else:
         payload = 'OFF'
     topic = P.sonoff_topic.replace('#', '')
-    sender.send_message(payload, topic + 'cmnd/' + relay_name + '/POWER')
+    transport.send_message_topic(payload, topic + 'cmnd/' + relay_name + '/POWER')
 
 
 def _get_relay_status(relay_name):
     topic = P.sonoff_topic.replace('#', '')
-    sender.send_message('', topic + 'cmnd/' + relay_name + '/Power1')
+    transport.send_message_topic('', topic + 'cmnd/' + relay_name + '/Power1')
 
 
 def post_init():
