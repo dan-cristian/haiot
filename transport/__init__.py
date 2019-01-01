@@ -41,7 +41,7 @@ def thread_run():
         else:
             elapsed = (utils.get_base_location_now_date() - mqtt_io.P.last_connect_attempt).total_seconds()
             if elapsed > 10:
-                init()
+                mqtt_io.init()
     finally:
         P.mqtt_lock.release()
     prctl.set_name("idle")
