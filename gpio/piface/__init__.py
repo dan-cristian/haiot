@@ -100,7 +100,7 @@ def _setup_board():
                 bus = 0
             if Constant.MACHINE_TYPE_ODROID:
                 chip_range = [0, 1]
-                bus = 32766
+                bus = 0
             try:
                 for chip in chip_range:
                     L.l.info("Try piface init on spi spidev{}.{}".format(bus, chip))
