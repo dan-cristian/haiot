@@ -1,6 +1,7 @@
+import transport.mqtt_io
 from main.logger_helper import L
 from main.admin import models
-from transport.mqtt_io import sender
+import transport
 from common import Constant, utils
 
 
@@ -12,7 +13,7 @@ class P:
 
 
 def send_mqtt_openhab(subtopic, payload):
-    sender.send_message(payload, P.openhab_topic + "/" + subtopic)
+    transport.send_message_topic(payload, P.openhab_topic + "/" + subtopic)
 
 #  OUTBOUND RULES START
 
