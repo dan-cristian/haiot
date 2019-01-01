@@ -62,24 +62,24 @@ def relay_update(gpio_pin_code=None, pin_value=None, from_web=False):
 # parameter is GpioPin model, not the pin index!
 def relay_get(gpio_pin_obj=None, from_web=False):
     message = 'Get relay state for pin {}'.format(gpio_pin_obj)
-    if Constant.HOST_MACHINE_TYPE in [Constant.MACHINE_TYPE_RASPBERRY, Constant.MACHINE_TYPE_BEAGLEBONE,
-                                      Constant.MACHINE_TYPE_ODROID]:
-        if gpio_pin_obj.pin_type in [Constant.GPIO_PIN_TYPE_PI_STDGPIO, Constant.GPIO_PIN_TYPE_BBB]:
-            if rpi_gpio.initialised:
-                pin_value = rpi_gpio.get_pin_bcm(bcm_id=int(gpio_pin_obj.pin_index_bcm))
-            else:
-                pin_value = std_gpio.get_pin_bcm(bcm_id=gpio_pin_obj.pin_index_bcm)
-        elif gpio_pin_obj.pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
-            # todo: check if pin index is bcm type indeed for piface
-            pin_value = piface.get_out_pin_value(
-                pin_index=gpio_pin_obj.pin_index_bcm, board_index=gpio_pin_obj.board_index)
+    #if Constant.HOST_MACHINE_TYPE in [Constant.MACHINE_TYPE_RASPBERRY, Constant.MACHINE_TYPE_BEAGLEBONE,
+    #                                  Constant.MACHINE_TYPE_ODROID]:
+    if gpio_pin_obj.pin_type in [Constant.GPIO_PIN_TYPE_PI_STDGPIO, Constant.GPIO_PIN_TYPE_BBB]:
+        if rpi_gpio.initialised:
+            pin_value = rpi_gpio.get_pin_bcm(bcm_id=int(gpio_pin_obj.pin_index_bcm))
         else:
-            L.l.warning('Cannot select gpio method for pin={}'.format(gpio_pin_obj))
-            pin_value = None
+            pin_value = std_gpio.get_pin_bcm(bcm_id=gpio_pin_obj.pin_index_bcm)
+    elif gpio_pin_obj.pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
+        # todo: check if pin index is bcm type indeed for piface
+        pin_value = piface.get_out_pin_value(
+            pin_index=gpio_pin_obj.pin_index_bcm, board_index=gpio_pin_obj.board_index)
     else:
-        message += ' error not running on gpio enabled devices'
+        L.l.warning('Cannot select gpio method for pin={}'.format(gpio_pin_obj))
         pin_value = None
-        L.l.warning(message)
+    #else:
+    #    message += ' error not running on gpio enabled devices'
+    #    pin_value = None
+    #    L.l.warning(message)
 
     # if from_web:
     #    return return_web_message(pin_value=pin_value, ok_message=message, err_message=message)
