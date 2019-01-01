@@ -53,7 +53,7 @@ def set_pin_value(pin_index, pin_value, board_index):
 
 
 def _input_event(event):
-    # L.l.info('Piface switch event={}'.format(event))
+    L.l.info('Piface switch event={}'.format(event))
     pin_num = event.pin_num
     board_index = event.chip.hardware_addr
     # direction gives different results than pin value
@@ -105,7 +105,7 @@ def _setup_board():
                 for chip in chip_range:
                     L.l.info("Try piface init on spi spidev{}.{}".format(bus, chip))
                     pfio.init(bus=bus, chip_select=chip)
-                    L.l.info("Initialised piface spi spidev{}.{}".format(bus, chip))
+                    L.l.info("Initialised piface spi spidev{}.{} OK".format(bus, chip))
             except Exception as ex:
                 pass
             for board in [0, 1, 2, 3]:
@@ -159,7 +159,7 @@ def post_init():
 
 
 def init():
-    L.l.debug('Piface initialising')
+    L.l.info('Piface initialising')
     if P.import_ok:
         try:
             _setup_board()
