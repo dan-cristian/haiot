@@ -338,12 +338,12 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
             echo "chown root:spi /dev/spi*" >> /etc/rc.local
             echo "chmod g+rw /dev/spi*" >> /etc/rc.local
 
-            echo "chgrp -R gpio /sys/class/gpio" >> /etc/rc.local
-            echo "chmod -R g+rw /sys/class/gpio" >> /etc/rc.local
-            # needed for piface interrupts
-            echo "chown -R root:gpio /sys/devices/c1109880.pinmux" >> /etc/rc.local
-            echo "chmod g+w -R /sys/devices/c1109880.pinmux" >> /etc/rc.local
+            # echo "chgrp -R gpio /sys/class/gpio" >> /etc/rc.local
+            # echo "chmod -R g+rw /sys/class/gpio" >> /etc/rc.local
+            # echo "chown -R root:gpio /sys/devices/c1109880.pinmux" >> /etc/rc.local
+            # echo "chmod g+w -R /sys/devices/c1109880.pinmux" >> /etc/rc.local
 
+            # needed for piface interrupts, replacing above settings
             # https://forum.odroid.com/viewtopic.php?t=15000
             cat $HAIOT_DIR/scripts/osinstall/ubuntu/etc/udev/10-odroid.rules >> /etc/udev/rules.d/
         fi
