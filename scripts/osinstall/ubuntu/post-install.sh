@@ -341,6 +341,7 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
             echo "chmod g+rw /dev/spi*" >> /etc/rc.local
             # needed for piface interrupts
             echo "chown -R root:gpio /sys/devices/c1109880.pinmux" >> /etc/rc.local
+            echo "chmod g+w -R /sys/devices/c1109880.pinmux/" >> /etc/rc.local
         fi
 
     if ! grep -q "^aml[-_]i2c" /etc/modules; then printf "aml_i2c\n" >> /etc/modules; fi
