@@ -328,6 +328,7 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
         if ! grep -q "^spi[d_]ev" /etc/modules; then printf "spi-dev\n" >> /etc/modules; fi
         # on odroid the group might be missing
         groupadd spi
+        groupadd gpio
 
         echo "For odroid you must install RPI.GPIO port from https://github.com/jfath/RPi.GPIO-Odroid"
 
