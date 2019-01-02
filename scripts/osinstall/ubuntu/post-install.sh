@@ -1262,7 +1262,7 @@ if [ "$ENABLE_DASHCAM_PI_LCD_DF" == "1" ]; then
         #https://askubuntu.com/questions/299950/how-do-i-install-pygame-in-virtualenv/299965#299965
         apt build-dep -y python-pygame
         # https://askubuntu.com/questions/312767/installing-pygame-with-pip
-        apt install -y libsdl-dev python-pygame
+        apt install -y libsdl-dev python-pygame  libfreetype6-dev
         dpkg -i rp-usbdisplay-dkms_1.0_all.deb
         echo "Probing module"
         modprobe rp_usbdisplay
