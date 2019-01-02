@@ -47,8 +47,7 @@ def handle_local_event_db_post(model, row, last_commit_field_changed_list=None):
         obj_json[Constant.JSON_PUBLISH_FIELDS_CHANGED] = last_commit_field_changed_list
         handle_event_mqtt_received(None, None, 'direct-event', obj_json)
         mqtt_thread_run()
-        if transport.mqtt_io.client_connected:
-            transport.send_message_json(json=txt)
+        transport.send_message_json(json=txt)
         processed = True
 
     # if processed:
