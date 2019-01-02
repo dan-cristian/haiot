@@ -132,5 +132,5 @@ def set_amp_power(power_state, relay_name, amp_zone_index):
             result_amp = amp_zone_power(power_state, amp_zone_index)
             return msg + result_amp
     except Exception as ex:
-        L.l.error("Error set_amp_power {}".format(ex))
+        L.l.error("Error set_amp_power {}".format(ex), exc_info=True)
         return "Error set_amp_power {}".format(ex)
