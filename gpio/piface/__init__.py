@@ -110,14 +110,14 @@ def _setup_board():
             else:
                 L.l.error("Cannot initialise piface board on {}".format(Constant.HOST_MACHINE_TYPE))
                 return
-            try:
-                for chip in chip_range:
+            for chip in chip_range:
+                try:
                     L.l.info("Try piface init on spi spidev{}.{}".format(bus, chip))
                     pfio.init(bus=bus, chip_select=chip)
                     P.chip_list.append(chip)
                     L.l.info("Initialised piface spi spidev{}.{} OK".format(bus, chip))
-            except Exception as ex:
-                pass
+                except Exception as ex:
+                    pass
             for board in board_range:
                 for chip in P.chip_list:
                     try:
