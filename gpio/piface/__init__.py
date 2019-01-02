@@ -121,11 +121,11 @@ def _setup_board():
             for board in board_range:
                 for chip in P.chip_list:
                     try:
-                        L.l.info("Try piface pfio on board {} spidev{}.{}".format(board, bus, chip))
+                        L.l.info("Try piface pfio on board-hw {} spidev{}.{}".format(board, bus, chip))
                         pfd = pfio.PiFaceDigital(hardware_addr=board, bus=bus, chip_select=chip, init_board=True)
                         P.pfd[board] = pfd
                         P.listener[board] = pfio.InputEventListener(chip=P.pfd[board])
-                        L.l.info("Initialised piface pfio listener board {} spidev{}.{}".format(board, bus, chip))
+                        L.l.info("Initialised piface pfio listener board-hw {} spidev{}.{}".format(board, bus, chip))
                     except NoPiFaceDigitalDetectedError as ex:
                         pass
                     except SPIInitError as spex:
