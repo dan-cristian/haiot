@@ -99,11 +99,11 @@ def _setup_in_ports_pif(gpio_pin_list):
 def _setup_board():
     if Constant.MACHINE_TYPE_RASPBERRY or Constant.MACHINE_TYPE_ODROID:
         try:
-            if Constant.MACHINE_TYPE_RASPBERRY:
+            if Constant.IS_MACHINE_RASPBERRYPI:
                 chip_range = [0, 1, 2, 3]
                 bus = 0
                 board_range = [0, 1, 2]
-            elif Constant.MACHINE_TYPE_ODROID:
+            elif Constant.IS_MACHINE_ODROID:
                 chip_range = [0, 1, 2, 3]
                 bus = 32766
                 board_range = [0, 1, 2]
