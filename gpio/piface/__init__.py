@@ -102,11 +102,11 @@ def _setup_board():
             if Constant.IS_MACHINE_RASPBERRYPI:
                 chip_range = [0, 1, 2, 3]
                 bus = 0
-                board_range = [0, 1, 2]
+                board_range = [0, 1, 2, 3]
             elif Constant.IS_MACHINE_ODROID:
                 chip_range = [0, 1, 2, 3]
                 bus = 32766
-                board_range = [0, 1, 2]
+                board_range = [0, 1, 2, 3]
             else:
                 L.l.error("Cannot initialise piface board on {}".format(Constant.HOST_MACHINE_TYPE))
                 return
