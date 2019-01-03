@@ -175,18 +175,25 @@ def get_bus(sensor, dev, ow):
 def get_temperature(sensor, dev, ow):
     try:
         dev = get_prefix(sensor, dev, ow)
+        # val = None
         # 2 digits round
-        if P.failed_temp and P.failed_temp_count < 100:
-            val = utils.round_sensor_value(ow.read(sensor + 'fasttemp'))
-        else:
-            val = utils.round_sensor_value(ow.read(sensor + 'temperature'))
-            P.failed_temp_count = 0
+        # if P.failed_temp and P.failed_temp_count < 100:
+        #    try:
+        #        val = utils.round_sensor_value(ow.read(sensor + 'fasttemp'))
+        #    except Exception as ex1:
+        #        # fasttemp might not exist, so revert to normal
+        #        P.failed_temp = False
+        #        P.failed_temp_count = 0
+        # if val is None:
+        val = utils.round_sensor_value(ow.read(sensor + 'temperature'))
+        P.failed_temp_count = 0
+        P.failed_temp = False
         if val != P.IGNORED_TEMPERATURE:
             dev['temperature'] = val
     except Exception as ex:
-        L.l.warning("Read temp failed with {}".format(ex))
-        P.failed_temp = True
-        P.failed_temp_count += 1
+        L.l.warning("Read temp with {}".format(ex))
+        # P.failed_temp = True
+        # P.failed_temp_count += 1
     return dev
 
 
