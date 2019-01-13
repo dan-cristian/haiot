@@ -23,3 +23,32 @@ def update_custom_relay(pin_code, pin_value, notify=False, ignore_missing=False)
         if not ignore_missing:
             L.l.warning('Unable to find relay pin {}'.format(pin_code))
 
+
+class Port:
+    _port_list = []
+    type = None
+    TYPE_GPIO = 'gpio'
+    TYPE_PIFACE = 'piface'
+    TYPE_PCF8574 = 'pcf8574'
+    _types = frozenset([TYPE_GPIO, TYPE_PIFACE, TYPE_PCF8574])
+
+    def __init__(self):
+        pass
+
+
+class OutputPort(Port):
+
+    def __init__(self):
+        pass
+
+
+class InputPort(Port):
+
+    def __init__(self):
+        pass
+
+
+class IOPort(InputPort, OutputPort):
+
+    def __init__(self):
+        pass

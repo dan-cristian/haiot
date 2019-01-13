@@ -23,8 +23,11 @@ def init():
     PASSWORD = config_list['lastfm_pass']
     # In order to perform a write operation you need to authenticate yourself
     password_hash = pylast.md5(PASSWORD)
-    _network = pylast.LastFMNetwork(api_key=API_KEY, api_secret=API_SECRET,
-                                    username=USERNAME, password_hash=password_hash)
+    try:
+        _network = pylast.LastFMNetwork(api_key=API_KEY, api_secret=API_SECRET,
+                                        username=USERNAME, password_hash=password_hash)
+    except Exception as ex:
+        L.l.error("Cannot init lastfm, ex={}".format(ex))
 
 
 def _multify(text):
