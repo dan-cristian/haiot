@@ -40,9 +40,11 @@ def _multify(text):
 
 def _get_current():
     global _network, USERNAME
+    track = None
     if _network is None:
         init()
-    track = _network.get_user(USERNAME).get_now_playing()
+    if _network is not None:
+        track = _network.get_user(USERNAME).get_now_playing()
     return track
 
 
