@@ -340,7 +340,7 @@
     {"id":7, "name":"week-living-summer",        "pattern":".... ..22 .... .... 2222 2222"},
     {"id":8, "name":"weekend-living-summer",     "pattern":".... .... 2222 2222 2222 2222"},
     {"id":9, "name":"week-birou-winter",         "pattern":".... .... .... .... ..22 2222"},
-    {"id":10, "name":"weekend-birou-winter",     "pattern":".... .... .... bbbb bbbb bbbb"},
+    {"id":10, "name":"weekend-birou-winter",     "pattern":".... .... ..bb bbbb bbbb bbbb"},
     {"id":11, "name":"week-birou-summer",        "pattern":".... .... .... .... ..bb bbbb"},
     {"id":12, "name":"weekend-birou-summer",     "pattern":".... .... .bbb bbbb bbbb bbbb"},
     {"id":13, "name":"week-dormitor-winter",     "pattern":"2222 2222 .... .... ...2 2222"},
