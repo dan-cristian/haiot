@@ -133,6 +133,7 @@
     {"id":659, "active":true, "start_order":"59", "name":"sensor.i2c", "host_name":"pi-face"},
     {"id":670, "active":true, "start_order":"70", "name":"music", "host_name":"pi-face"},
 
+    {"id":903, "active":false, "start_order":"3", "name":"health_monitor", "host_name":"odroid"},
     {"id":911, "active":true, "start_order":"11", "name":"alarm", "host_name":"odroid"},
     {"id":955, "active":true, "start_order":"55", "name":"sensor.1wire", "host_name":"odroid"},
     {"id":959, "active":true, "start_order":"59", "name":"sensor.i2c", "host_name":"odroid"}
