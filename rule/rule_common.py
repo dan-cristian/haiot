@@ -42,8 +42,12 @@ def play_bell_local(sound_file):
     # client = mpd.MPDClient(use_unicode=True)
     # client.connect(get_param(Constant.P_MPD_SERVER), 6600)
     #result = subprocess.check_output(['aplay', 'scripts/audio/{}'.format(sound_file)], stderr=subprocess.STDOUT)
-    result = subprocess.check_output(['aplay', 'scripts/static/sounds/{}'.format(sound_file)], stderr=subprocess.STDOUT)
-    L.l.info("Play bell returned: {}".format(result))
+    try:
+        result = subprocess.check_output(['aplay', 'scripts/static/sounds/{}'.format(sound_file)],
+                                         stderr=subprocess.STDOUT)
+        L.l.info("Play bell returned: {}".format(result))
+    except Exception as ex:
+        L.l.error('Unable to play local sound {}, er={}'.format(sound_file, ex))
 
 
 def send_notification(title, message=None, url=None, priority=None, deviceid=None, image_url=None):
