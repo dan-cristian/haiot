@@ -53,7 +53,7 @@ while $must_run; do
     fi
     if [ $exit_code == 139 ]; then
         echo "App segfaulted!!!"
-        must_run=false
+        must_run=0
     fi
     if [ $exit_code == 1 ]; then
         echo "App was interrupted with CTRL-C or by exception code [$exit_code]"
