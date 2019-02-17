@@ -7,18 +7,25 @@ import time
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
-initialised = False
-__pool_pin_codes = []
+
+class P:
+    initialised = False
+    pool_pin_codes = []
+    import_module_exist = None
+
+    def __init__(self):
+        pass
+
 
 try:
     import RPi.GPIO as GPIO
-    import_module_exist = True
+    P.import_module_exist = True
 except ImportError:
     L.l.info('Module RPI.GPIO is not installed, module will not be initialised')
-    import_module_exist = False
+    P.import_module_exist = False
 except RuntimeError as re:
     L.l.info('Cannot import RPI.GPIO, module will not be initialised, err={}'.format(re))
-    import_module_exist = False
+    P.import_module_exist = False
 
 
 # https://sourceforge.net/p/raspberry-gpio-python/wiki/Checking%20function%20of%20GPIO%20channels/
@@ -59,10 +66,6 @@ def get_pin_bcm(bcm_id):
 
 def _do_event(channel, state):
     try:
-        # global import_module_exist
-        # if import_module_exist:
-        #    state = GPIO.input(channel)
-            # L.l.debug('Event rpi.gpio input detected channel={} state={}'.format(channel, state))
         dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=channel, direction='in',
                         pin_value=state, pin_connected=(state == 0))
     except Exception as ex:
@@ -141,7 +144,7 @@ def setup_in_ports(gpio_pin_list):
                 # L.l.info('OK callback set on rpi.gpio'.format(gpio_pin.pin_code))
             except Exception as ex:
                 L.l.critical('Unable to setup rpi.gpio callback pin={} err={}'.format(gpio_pin.pin_code, ex))
-            __pool_pin_codes.append(gpio_pin.pin_code)
+            P.pool_pin_codes.append(gpio_pin.pin_code)
 
 
 def post_init():
@@ -157,21 +160,19 @@ def post_init():
 
 
 def unload():
-    for gpio_pin in __pool_pin_codes:
+    for gpio_pin in P.pool_pin_codes:
         if isinstance(gpio_pin, int):
             GPIO.remove_event_detect(gpio_pin)
     time.sleep(1)
     GPIO.cleanup()
-    global initialised
-    initialised = False
+    P.initialised = False
 
 
 def init():
-    L.l.debug('RPI.GPIO module initialising')
+    L.l.info('RPI.GPIO module initialising')
     try:
         GPIO.setmode(GPIO.BCM)
         dispatcher.connect(setup_in_ports, signal=Constant.SIGNAL_GPIO_INPUT_PORT_LIST, sender=dispatcher.Any)
-        global initialised
-        initialised = True
+        P.initialised = True
     except Exception as ex:
         L.l.critical('Module rpi.gpio not initialised, err={}'.format(ex))

@@ -50,7 +50,7 @@ def post_init():
         relays = models.ZoneCustomRelay.query.filter_by(
             gpio_host_name=Constant.HOST_NAME, relay_type=Constant.GPIO_PIN_TYPE_PI_PCF8574).all()
         for relay in relays:
-            L.l.info('Reading gpio pin {}'.format(relay.gpio_pin_code))
+            L.l.info('Reading pcf pin {}'.format(relay.gpio_pin_code))
             pin_index = int(relay.gpio_pin_code)
             pin_val = P.pcf.port[pin_index]
             io_common.update_custom_relay(pin_code=pin_index, pin_value=pin_val, notify=True)
@@ -60,6 +60,7 @@ def post_init():
 
 def init():
     if P.import_module_exist:
+        L.l.info('Initialising PCF8574')
         P.pcf = PCF8574(P.i2c_port_num, P.pcf_address)
         P.initialised = True
 
