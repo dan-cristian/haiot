@@ -211,7 +211,7 @@ def __read_hddparm(disk_dev=''):
         L.l.debug('Invalid disk {} err {}'.format(disk_dev, ex))
     except Exception as exc:
         L.l.exception('Disk read error disk was {} err {}'.format(disk_dev, exc))
-    raise subprocess.CalledProcessError(1, 'No power status obtained on hdparm, output={}'.format(hddparm_out))
+    # raise subprocess.CalledProcessError(1, 'No power status obtained on hdparm, output={}'.format(hddparm_out))
 
 
 def __get_mem_avail_percent_linux():
