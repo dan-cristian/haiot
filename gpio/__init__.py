@@ -63,7 +63,7 @@ def relay_get(gpio_pin_obj=None, from_web=False):
     # if Constant.HOST_MACHINE_TYPE in [Constant.MACHINE_TYPE_RASPBERRY, Constant.MACHINE_TYPE_BEAGLEBONE,
     #                                  Constant.MACHINE_TYPE_ODROID]:
     if gpio_pin_obj.pin_type in [Constant.GPIO_PIN_TYPE_PI_STDGPIO, Constant.GPIO_PIN_TYPE_BBB]:
-        if rpi_gpio.initialised:
+        if rpi_gpio.P.initialised:
             pin_value = rpi_gpio.get_pin_bcm(bcm_id=int(gpio_pin_obj.pin_index_bcm))
         else:
             pin_value = std_gpio.get_pin_bcm(bcm_id=gpio_pin_obj.pin_index_bcm)
@@ -96,7 +96,7 @@ def relay_set(gpio_pin_index_bcm=None, gpio_pin_type=None, gpio_board_index=None
     # if Constant.HOST_MACHINE_TYPE in [Constant.MACHINE_TYPE_RASPBERRY, Constant.MACHINE_TYPE_BEAGLEBONE,
     #     #                             Constant.MACHINE_TYPE_ODROID]:
     if gpio_pin_type in [Constant.GPIO_PIN_TYPE_PI_STDGPIO, Constant.GPIO_PIN_TYPE_BBB]:
-        if rpi_gpio.initialised:
+        if rpi_gpio.P.initialised:
             pin_value = rpi_gpio.set_pin_bcm(bcm_id=int(gpio_pin_index_bcm), pin_value=int(value))
         else:
             pin_value = std_gpio.set_pin_bcm(gpio_pin_index_bcm, value)
