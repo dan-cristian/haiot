@@ -66,4 +66,5 @@ def init():
         L.l.info('Initialising PCF8574')
         P.pcf = PCF8574(P.i2c_port_num, P.pcf_address)
         P.initialised = True
+        L.l.info('Initialising PCF8574 OK, state= {}'.format(P.pcf.port))
 
