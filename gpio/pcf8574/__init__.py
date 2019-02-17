@@ -46,8 +46,8 @@ def set_pin_value(pin_index, pin_value):
 
 
 def post_init():
-    L.l.info('Running post_init pcf')
     if P.initialised:
+        L.l.info('Running post_init pcf')
         relays = models.ZoneCustomRelay.query.filter_by(
             gpio_host_name=Constant.HOST_NAME, relay_type=Constant.GPIO_PIN_TYPE_PI_PCF8574).all()
         for relay in relays:
