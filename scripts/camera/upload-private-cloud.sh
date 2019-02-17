@@ -2,7 +2,8 @@
 LOG=/mnt/log/private-cloud.log
 SSH_SERVER=haiot@x.y.z.t
 SSH_PORT=65432
-CLOUD_DIR=/media/usb/motion/
+SSH_CIPHER=chacha20-poly1305@openssh.com
+CLOUD_DIR=/mnt/sdd1/motion/
 SRC_DIR=/mnt/motion/tmp/
 OLD_COUNT=1000
 MOTION_URL=http://localhost:9999
@@ -43,9 +44,9 @@ if [ $# -ne 0 ]; then
   
   #/usr/sbin/rclone copy $source $dest_parent >> $LOG 2>&1
   echo2 "Creating remote parent folder $dest_parent"
-  ssh -T -p ${SSH_PORT} -c aes128-cbc -o Compression=no $SSH_SERVER "mkdir -p $dest_parent" >> $LOG 2>&1
+  ssh -T -p ${SSH_PORT} -c ${SSH_CIPHER} -o Compression=no $SSH_SERVER "mkdir -p $dest_parent" >> $LOG 2>&1
   echo2 "Now uploading"
-  rsync -avPe 'ssh -T -p ${SSH_PORT} -c aes128-cbc -o Compression=no -x' $source $SSH_SERVER:$dest_parent/ >> $LOG 2>&1
+  rsync -avPe 'ssh -T -p '${SSH_PORT}' -c ${SSH_CIPHER} -o Compression=no -x' $source $SSH_SERVER:$dest_parent/ >> $LOG 2>&1
   
   #cp -f $source $dest >> $LOG 2>&1
   result=$?
@@ -156,10 +157,10 @@ count=0
 count_failed=0
 be_quiet=1
 #find $SRC_DIR -type f -mtime +1 |
-find $SRC_DIR -type f  |
+find ${SRC_DIR} -type f  |
 while read source
 do
-  echo2 "Processing old file ["$source"]"
+  echo2 "Processing old file ["${source}"]"
   if [[ -f "${source}" ]]; then
 	file_count=`find /mnt/motion/tmp -type f | wc -l`
 	if [[ ${file_count} -le "154000" ]]; then
@@ -180,10 +181,10 @@ do
         		move "${source}"
 			result=$?
 			#echo2 "Moved older done result=$result"
-			exit ${result}
+			return ${result}
   		else
         		echo2 "Already processing file $source, try next"
-			exit 6
+			return 6
   		fi
   		) 200>${lock}
   		result=$?
@@ -214,7 +215,7 @@ be_quiet=0
 move $1 $2
 #tune
 #should be last one as it exits on success
-if [ $# -eq 0 ]; then
+if [[ $# -eq 0 ]]; then
   	lock2=/tmp/.motion.move-history.$file.exclusivelock
 	(
 		if flock -x -w 1 200 ; then
@@ -222,6 +223,6 @@ if [ $# -eq 0 ]; then
 		else
 			echo2 "Move history already in progress, skipping"
 		fi
-	) 200>$lock2
-	rm $lock2
+	) 200>${lock2}
+	rm ${lock2}
 fi
