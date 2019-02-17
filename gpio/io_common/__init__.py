@@ -3,7 +3,7 @@ from main.admin import models
 from main.logger_helper import L
 
 
-# update in db without propagatting the change
+# update in db (without propagatting the change by default)
 def update_custom_relay(pin_code, pin_value, notify=False, ignore_missing=False):
     gpio = models.GpioPin.query.filter_by(pin_code=pin_code, host_name=Constant.HOST_NAME).first()
     if gpio is not None:
