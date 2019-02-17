@@ -148,12 +148,12 @@ def mpd_toggle():
 
 @app.route('/amp/zone_on/<zone_index>', methods=['GET'])
 def amp_zone_on(zone_index):
-    return amp.zone_set(on=True, zone_index=zone_index)
+    return amp.amp_zone_power(on=True, zone_index=zone_index)
 
 
 @app.route('/amp/zone_off/<zone_index>', methods=['GET'])
 def amp_zone_off(zone_index):
-    return amp.zone_set(on=False, zone_index=zone_index)
+    return amp.amp_zone_power(on=False, zone_index=zone_index)
 
 
 # @app.route('/ebooks', defaults={'req_path': ''})
@@ -179,7 +179,8 @@ def dir_listing(req_path):
         # Show directory contents
         files = os.listdir(abs_path)
         return render_template('files.html', files=files)
-    except Exception, ex:
+    except Exception as ex:
         return 'Error request={}, err={}'.format(req_path, ex)
+
 
 L.l.info('API V1 module initialised')
