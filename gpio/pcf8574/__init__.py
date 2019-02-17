@@ -30,6 +30,7 @@ def _not_initialised(message):
 def get_pin(pin_index):
     if P.initialised:
         if pin_index in range(0, 8):
+            L.l.info('Getting pcf pin {}'.format(pin_index))
             return P.pcf.port[pin_index]
         else:
             L.l.error('PCF pin index must be between 0 and 7, unexpected val {}'.format(pin_index))
@@ -40,6 +41,7 @@ def get_pin(pin_index):
 
 def set_pin_value(pin_index, pin_value):
     if P.initialised:
+        L.l.info('Setting pcf pin {}={}'.format(pin_index, pin_value))
         P.pcf.port[pin_index] = pin_value
     else:
         return _not_initialised('set_pin_value')
@@ -53,7 +55,7 @@ def post_init():
         for relay in relays:
             L.l.info('Reading pcf pin {}'.format(relay.gpio_pin_code))
             pin_index = int(relay.gpio_pin_code)
-            pin_val = P.pcf.port[pin_index]
+            pin_val = get_pin(pin_index)
             io_common.update_custom_relay(pin_code=pin_index, pin_value=pin_val, notify=True)
     else:
         return _not_initialised('post_init')
