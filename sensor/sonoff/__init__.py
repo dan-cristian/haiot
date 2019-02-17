@@ -159,12 +159,13 @@ def _get_relay_status(relay_name):
 
 
 def post_init():
-    # force sonoff sensors to send their status
-    relays = models.ZoneCustomRelay.query.filter_by(
-        gpio_host_name=Constant.HOST_NAME, relay_type=Constant.GPIO_PIN_TYPE_SONOFF).all()
-    for relay in relays:
-        L.l.info('Reading sonoff sensor {}'.format(relay.gpio_pin_code))
-        _get_relay_status(relay.gpio_pin_code)
+    if P.initialised:
+        # force sonoff sensors to send their status
+        relays = models.ZoneCustomRelay.query.filter_by(
+            gpio_host_name=Constant.HOST_NAME, relay_type=Constant.GPIO_PIN_TYPE_SONOFF).all()
+        for relay in relays:
+            L.l.info('Reading sonoff sensor {}'.format(relay.gpio_pin_code))
+            _get_relay_status(relay.gpio_pin_code)
 
 
 def thread_run():
