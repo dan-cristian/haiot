@@ -130,7 +130,10 @@ def _setup_board():
                         pass
                     except SPIInitError as spex:
                         pass
-            P.board_init = True
+            if len(P.chip_list) > 0:
+                P.board_init = True
+            else:
+                L.l.warning('Piface setup failed, no boards found')
         except Exception as ex:
             L.l.critical('Piface setup board failed, err={}'.format(ex), exc_info=True)
     else:
