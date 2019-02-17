@@ -7,3 +7,4 @@ pi-ina219
 psutil
 python-prctl
 bmp280
+pcf8574

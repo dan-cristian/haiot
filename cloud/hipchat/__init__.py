@@ -54,8 +54,11 @@ def hipchat_notify(message, color='yellow', notify=False, format='html', host='a
         'message_format': format,
         'color': color
     }
-    r = requests.post(url, data=json.dumps(payload), headers=headers)
-    r.raise_for_status()
+    try:
+        r = requests.post(url, data=json.dumps(payload), headers=headers)
+        r.raise_for_status()
+    except Exception as ex:
+        L.l.warning('Unable to send hipchat message, er={}'.format(ex))
 
 
 def unload():
