@@ -51,6 +51,10 @@ while $must_run; do
         echo "App was killed with -9"
         must_run=false
     fi
+    if [ $exit_code == 139 ]; then
+        echo "App segfaulted!!!"
+        must_run=false
+    fi
     if [ $exit_code == 1 ]; then
         echo "App was interrupted with CTRL-C or by exception code [$exit_code]"
         must_run=false
