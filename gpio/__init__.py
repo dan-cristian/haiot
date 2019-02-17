@@ -4,15 +4,13 @@ from main.logger_helper import L
 from common import Constant
 from common import utils
 from main.admin import models
-from main.admin.model_helper import commit
 from main import thread_pool
 from sensor import sonoff
 import std_gpio
 import piface
+import pcf8574
 import threading
 import prctl
-# import bbb_io
-# import pigpio_gpio
 import rpi_gpio
 import io_common
 
@@ -73,6 +71,8 @@ def relay_get(gpio_pin_obj=None, from_web=False):
         # todo: check if pin index is bcm type indeed for piface
         pin_value = piface.get_out_pin_value(
             pin_index=gpio_pin_obj.pin_index_bcm, board_index=gpio_pin_obj.board_index)
+    elif gpio_pin_obj.pin_type == Constant.GPIO_PIN_TYPE_PI_PCF8574:
+        pin_value = pcf8574.get_pin(pin_index=int(gpio_pin_obj.pin_index_bcm))
     else:
         L.l.warning('Cannot select gpio method for pin={}'.format(gpio_pin_obj))
         pin_value = None
@@ -103,6 +103,8 @@ def relay_set(gpio_pin_index_bcm=None, gpio_pin_type=None, gpio_board_index=None
     elif gpio_pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
         pin_value = piface.set_pin_value(pin_index=int(gpio_pin_index_bcm), pin_value=int(value),
                                          board_index=int(gpio_board_index))
+    elif gpio_pin_type == Constant.GPIO_PIN_TYPE_PI_PCF8574:
+        pin_value = pcf8574.set_pin_value(pin_index=int(gpio_pin_index_bcm), pin_value=value)
     else:
         L.l.warning("Unknown pin type {}".format(gpio_pin_type))
     # else:
@@ -269,6 +271,7 @@ def unload():
 def post_init():
     piface.post_init()
     rpi_gpio.post_init()
+    pcf8574.post_init()
     sonoff.post_init()
 
 
@@ -278,6 +281,7 @@ def init():
         piface.init()
         # pigpio_gpio.init()
         rpi_gpio.init()
+        pcf8574.init()
     if Constant.IS_MACHINE_BEAGLEBONE:
         # bbb_io.init()
         std_gpio.init()
