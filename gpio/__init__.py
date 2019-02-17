@@ -287,3 +287,12 @@ def init():
         std_gpio.init()
     thread_pool.add_interval_callable(thread_run, run_interval_second=1)
     P.initialised = True
+
+    if L.DEBUG_REMOTE:
+        try:
+            import ptvsd
+            ptvsd.enable_attach(address=('0.0.0.0', 5678), redirect_output=True)
+            print('Enabled remote debugging, waiting 15 seconds for client to attach')
+            ptvsd.wait_for_attach(timeout=15)
+        except Exception as ex:
+            print("Error in remote debug: {}".format(ex))
