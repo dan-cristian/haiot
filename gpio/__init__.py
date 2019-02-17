@@ -8,7 +8,7 @@ from main import thread_pool
 from sensor import sonoff
 import std_gpio
 import piface
-import pcf8574
+import pcf8574_gpio
 import threading
 import prctl
 import rpi_gpio
@@ -72,7 +72,7 @@ def relay_get(gpio_pin_obj=None, from_web=False):
         pin_value = piface.get_out_pin_value(
             pin_index=gpio_pin_obj.pin_index_bcm, board_index=gpio_pin_obj.board_index)
     elif gpio_pin_obj.pin_type == Constant.GPIO_PIN_TYPE_PI_PCF8574:
-        pin_value = pcf8574.get_pin(pin_index=int(gpio_pin_obj.pin_index_bcm))
+        pin_value = pcf8574_gpio.get_pin(pin_index=int(gpio_pin_obj.pin_index_bcm))
     else:
         L.l.warning('Cannot select gpio method for pin={}'.format(gpio_pin_obj))
         pin_value = None
@@ -104,7 +104,7 @@ def relay_set(gpio_pin_index_bcm=None, gpio_pin_type=None, gpio_board_index=None
         pin_value = piface.set_pin_value(pin_index=int(gpio_pin_index_bcm), pin_value=int(value),
                                          board_index=int(gpio_board_index))
     elif gpio_pin_type == Constant.GPIO_PIN_TYPE_PI_PCF8574:
-        pin_value = pcf8574.set_pin_value(pin_index=int(gpio_pin_index_bcm), pin_value=value)
+        pin_value = pcf8574_gpio.set_pin_value(pin_index=int(gpio_pin_index_bcm), pin_value=value)
     else:
         L.l.warning("Unknown pin type {}".format(gpio_pin_type))
     # else:
@@ -271,7 +271,7 @@ def unload():
 def post_init():
     piface.post_init()
     rpi_gpio.post_init()
-    pcf8574.post_init()
+    pcf8574_gpio.post_init()
     sonoff.post_init()
 
 
@@ -281,9 +281,9 @@ def init():
         piface.init()
         # pigpio_gpio.init()
         rpi_gpio.init()
-        pcf8574.init()
+        pcf8574_gpio.init()
     if Constant.IS_MACHINE_BEAGLEBONE:
         # bbb_io.init()
         std_gpio.init()
-    # thread_pool.add_interval_callable(thread_run, run_interval_second=1)
+    thread_pool.add_interval_callable(thread_run, run_interval_second=1)
     P.initialised = True
