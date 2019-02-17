@@ -159,45 +159,45 @@ find $SRC_DIR -type f  |
 while read source
 do
   echo2 "Processing old file ["$source"]"
-  if [ -f "$source" ]; then
+  if [[ -f "${source}" ]]; then
 	file_count=`find /mnt/motion/tmp -type f | wc -l`
-	if [ $file_count -le "154000" ]; then
+	if [[ ${file_count} -le "154000" ]]; then
 		be_quiet=1
 	fi
-  	file=`basename "$source"`
+  	file=`basename "${source}"`
 	# check if file is in use with lsof
-	filename=$(basename "$file")
-	lsof -w | grep -q "$filename"
-	if [ $? = 1 ]; then
+	filename=$(basename "${file}")
+	lsof -w | grep -q "${filename}"
+	if [[ $? = 1 ]]; then
 		echo2 "FILE COUNT in tmp folder is $file_count"
   		lock=/tmp/.motion.move.$file.exclusivelock
   		echo2 "Picking older file tryok #$count tryfail #$count_failed $source"
   		(
   		# Wait for lock on /var/lock/..exclusivelock (fd 200) for 1 seconds
   		if flock -x -w 1 200 ; then
-        		echo2 "Moving older file $source"
-        		move "$source"
+        		echo2 "Moving older file ${source}"
+        		move "${source}"
 			result=$?
 			#echo2 "Moved older done result=$result"
-			exit $result
+			exit ${result}
   		else
         		echo2 "Already processing file $source, try next"
 			exit 6
   		fi
-  		) 200>$lock
+  		) 200>${lock}
   		result=$?
-  		rm $lock
+  		rm ${lock}
   		#echo2 "Move older file result is $result"
-		if [ $result -eq 0 ];then
-			((count++))
+		if [[ ${result} -eq 0 ]];then
+			count=$((count+1))
 			#move x files then exit
-			if [ $count -eq $OLD_COUNT ];then
+			if [[ ${count} -eq ${OLD_COUNT} ]];then
 				echo2 "Exiting as I moved $count files out of $OLD_COUNT"
 	  			return 0
 			fi
   		else
-			((count_failed++))
-			if [ $count_failed -eq 500 ]; then
+			count_failed=$((count_failed+1))
+			if [[ ${count_failed} -eq 10 ]]; then
 				echo2 "Exiting as I failed to move $count_failed files"
 				return 1
 			fi
