@@ -1,6 +1,7 @@
 #!/bin/bash
 LOG=/mnt/log/private-cloud.log
-SSH_SERVER=haiot@192.168.0.18
+SSH_SERVER=haiot@x.y.z.t
+SSH_PORT=65432
 CLOUD_DIR=/media/usb/motion/
 SRC_DIR=/mnt/motion/tmp/
 OLD_COUNT=1000
@@ -42,9 +43,9 @@ if [ $# -ne 0 ]; then
   
   #/usr/sbin/rclone copy $source $dest_parent >> $LOG 2>&1
   echo2 "Creating remote parent folder $dest_parent"
-  ssh -T -p 222 -c aes128-cbc -o Compression=no $SSH_SERVER "mkdir -p $dest_parent" >> $LOG 2>&1
+  ssh -T -p ${SSH_PORT} -c aes128-cbc -o Compression=no $SSH_SERVER "mkdir -p $dest_parent" >> $LOG 2>&1
   echo2 "Now uploading"
-  rsync -avPe 'ssh -T -p 222 -c aes128-cbc -o Compression=no -x' $source $SSH_SERVER:$dest_parent/ >> $LOG 2>&1
+  rsync -avPe 'ssh -T -p ${SSH_PORT} -c aes128-cbc -o Compression=no -x' $source $SSH_SERVER:$dest_parent/ >> $LOG 2>&1
   
   #cp -f $source $dest >> $LOG 2>&1
   result=$?
