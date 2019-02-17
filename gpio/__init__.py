@@ -248,7 +248,7 @@ def thread_run():
     # pigpio_gpio.thread_run()
     # piface.thread_run()
     # bbb_io.thread_run()
-    std_gpio.thread_run()
+    # std_gpio.thread_run()
     # rpi_gpio.thread_run()
     _process_expire()
     prctl.set_name("idle")
@@ -285,5 +285,5 @@ def init():
     if Constant.IS_MACHINE_BEAGLEBONE:
         # bbb_io.init()
         std_gpio.init()
-    thread_pool.add_interval_callable(thread_run, run_interval_second=1)
+    # thread_pool.add_interval_callable(thread_run, run_interval_second=1)
     P.initialised = True
