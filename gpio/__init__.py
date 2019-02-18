@@ -271,7 +271,7 @@ def unload():
 def post_init():
     piface.post_init()
     rpi_gpio.post_init()
-    pcf8574_gpio.post_init()
+    # pcf8574_gpio.post_init()
     sonoff.post_init()
 
 
@@ -281,14 +281,14 @@ def init():
         piface.init()
         # pigpio_gpio.init()
         rpi_gpio.init()
-        pcf8574_gpio.init()
+        # pcf8574_gpio.init()
     if Constant.IS_MACHINE_BEAGLEBONE:
         # bbb_io.init()
         std_gpio.init()
     thread_pool.add_interval_callable(thread_run, run_interval_second=1)
     P.initialised = True
 
-    if L.DEBUG_REMOTE:
+    if False:  # L.DEBUG_REMOTE:
         try:
             import ptvsd
             ptvsd.enable_attach(address=('0.0.0.0', 5678), redirect_output=True)
