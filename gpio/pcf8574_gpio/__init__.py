@@ -2,7 +2,7 @@ from main.logger_helper import L
 from main.admin import models
 from common import Constant
 from gpio import io_common
-
+import time
 
 class P:
     pcf = None
@@ -30,7 +30,8 @@ def _not_initialised(message):
 def get_pin(pin_index):
     if P.initialised:
         if pin_index in range(0, 8):
-            L.l.info('Getting pcf pin {}'.format(pin_index))
+            L.l.info('Getting == PCF == pin {}'.format(pin_index))
+            time.sleep(5)
             return P.pcf.port[pin_index]
         else:
             L.l.error('PCF pin index must be between 0 and 7, unexpected val {}'.format(pin_index))
@@ -41,7 +42,8 @@ def get_pin(pin_index):
 
 def set_pin_value(pin_index, pin_value):
     if P.initialised:
-        L.l.info('Setting pcf pin {}={}'.format(pin_index, pin_value))
+        L.l.info('Setting == PCF == pin {}={}'.format(pin_index, pin_value))
+        time.sleep(5)
         P.pcf.port[pin_index] = bool(pin_value)
     else:
         return _not_initialised('set_pin_value')
