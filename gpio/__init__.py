@@ -271,7 +271,7 @@ def unload():
 def post_init():
     piface.post_init()
     rpi_gpio.post_init()
-    # pcf8574_gpio.post_init()
+    pcf8574_gpio.post_init()
     sonoff.post_init()
 
 
@@ -279,9 +279,9 @@ def init():
     L.l.debug("GPIO initialising")
     if Constant.IS_MACHINE_RASPBERRYPI or Constant.IS_MACHINE_ODROID:
         piface.init()
-        # pigpio_gpio.init()
         rpi_gpio.init()
-        # pcf8574_gpio.init()
+        pcf8574_gpio.init()
+        # pigpio_gpio.init()
     if Constant.IS_MACHINE_BEAGLEBONE:
         # bbb_io.init()
         std_gpio.init()
