@@ -31,8 +31,7 @@ def get_pin(pin_index):
     if P.initialised:
         if pin_index in range(0, 8):
             L.l.info('Getting == PCF == pin {}'.format(pin_index))
-            time.sleep(5)
-            return P.pcf.port[pin_index]
+            return P.pcf.port[int(pin_index)]
         else:
             L.l.error('PCF pin index must be between 0 and 7, unexpected val {}'.format(pin_index))
             return None
@@ -43,8 +42,7 @@ def get_pin(pin_index):
 def set_pin_value(pin_index, pin_value):
     if P.initialised:
         L.l.info('Setting == PCF == pin {}={}'.format(pin_index, pin_value))
-        time.sleep(5)
-        P.pcf.port[pin_index] = bool(pin_value)
+        P.pcf.port[int(pin_index)] = bool(pin_value)
     else:
         return _not_initialised('set_pin_value')
 
@@ -69,4 +67,3 @@ def init():
         P.pcf = PCF8574(P.i2c_port_num, P.pcf_address)
         P.initialised = True
         L.l.info('Initialising PCF8574 OK, state= {}'.format(P.pcf.port))
-
