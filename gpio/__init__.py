@@ -43,7 +43,7 @@ def relay_update(gpio_pin_code=None, pin_value=None, from_web=False):
             if lenpin > 1:
                 L.l.warning("Multiple records with same pin code {} len {}".format(gpio_pin_code, lenpin))
             for gpiopin in gpiopin_list:
-                # L.l.info("Update relay {} value={}".format(gpiopin, pin_value))
+                L.l.info("Update relay {} value={}".format(gpiopin, pin_value))
                 pin_value = relay_set(gpio_pin_index_bcm=gpiopin.pin_index_bcm, gpio_pin_type=gpiopin.pin_type,
                                       gpio_board_index=gpiopin.board_index, value=pin_value, from_web=from_web)
                 result = pin_value
@@ -257,7 +257,6 @@ def thread_run():
 
 def unload():
     try:
-        #if Constant.HOST_MACHINE_TYPE in [Constant.MACHINE_TYPE_RASPBERRY, Constant.MACHINE_TYPE_BEAGLEBONE]:
         L.l.info('Unloading gpio pins')
         std_gpio.unload()
         piface.unload()
