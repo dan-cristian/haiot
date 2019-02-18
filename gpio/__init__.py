@@ -185,6 +185,17 @@ def zone_custom_relay_record_update(json_object):
                     else:
                         # fixme: what to do here?
                         L.l.info("Warning - what should I do, event from other host?")
+                elif relay_type == Constant.GPIO_PIN_TYPE_PI_PCF8574:
+                    if source_host == Constant.HOST_NAME:
+                        if is_event_external:
+                            # event received from outside, so no need to set relay state again
+                            pass
+                        else:
+                            # event received from user db change, so act it
+                            pcf8574_gpio.set_pin_value(pin_index=gpio_pin_code, pin_value=not relay_is_on)
+                    else:
+                        # fixme: what to do here?
+                        L.l.info("Warning - pcf what should I do, event from other host?")
                 else:
                     gpio_record = models.GpioPin.query.filter_by(pin_code=gpio_pin_code,
                                                                  host_name=Constant.HOST_NAME).first()
@@ -197,6 +208,7 @@ def zone_custom_relay_record_update(json_object):
                         else:
                             # L.l.info('Event received from user db change, so act it')
                             value = 1 if relay_is_on else 0
+
                             pin_code = gpio_record.pin_index_bcm
                             pin_type = gpio_record.pin_type
                             board = gpio_record.board_index
