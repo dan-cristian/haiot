@@ -116,6 +116,9 @@ def _setup_board():
                     pfio.init(bus=bus, chip_select=chip)
                     P.chip_list.append(chip)
                     L.l.info("Initialised piface spi spidev{}.{} OK".format(bus, chip))
+                except SPIInitError as ex1:
+                    if "I can't see /dev/spidev" in ex1.message:
+                        L.l.warning("Unable to init spi, probably not spi not enabled, er={}".format(ex1))
                 except Exception as ex:
                     pass
             for board in board_range:
