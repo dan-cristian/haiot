@@ -133,10 +133,10 @@
     {"id":659, "active":true, "start_order":"59", "name":"sensor.i2c", "host_name":"pi-face"},
     {"id":670, "active":true, "start_order":"70", "name":"music", "host_name":"pi-face"},
 
-    {"id":903, "active":false, "start_order":"3", "name":"health_monitor", "host_name":"odroid"},
-    {"id":911, "active":true, "start_order":"11", "name":"alarm", "host_name":"odroid"},
-    {"id":955, "active":true, "start_order":"55", "name":"sensor.1wire", "host_name":"odroid"},
-    {"id":959, "active":true, "start_order":"59", "name":"sensor.i2c", "host_name":"odroid"}
+    {"id":903, "active":false, "start_order":"3", "name":"health_monitor", "host_name":"pizero2"},
+    {"id":911, "active":true, "start_order":"11", "name":"alarm", "host_name":"pizero2"},
+    {"id":955, "active":true, "start_order":"55", "name":"sensor.1wire", "host_name":"pizero2"},
+    {"id":959, "active":true, "start_order":"59", "name":"sensor.i2c", "host_name":"pizero2"}
   ],
 
   "People": [
@@ -302,21 +302,21 @@
     {"relay_pin_name": "plug_1", "zone_id": "29", "gpio_pin_code": "TZ69 Smart energy plug in switch_4", "relay_type": "zwave", "gpio_host_name": "pi-face"},
     {"relay_pin_name": "plug_2", "zone_id": "29", "gpio_pin_code": "TZ69 Smart energy plug in switch_5", "relay_type": "zwave", "gpio_host_name": "pi-face"},
 
-    {"relay_pin_name": "odroid_gpio_4", "zone_id": "7", "gpio_pin_code": "249", "gpio_host_name": "odroid", "relay_type": "gpio"},
-    {"relay_pin_name": "odroid_0_0", "zone_id": "7", "gpio_pin_code": "0:out:0", "gpio_host_name": "odroid", "relay_type": "piface"},
-    {"relay_pin_name": "odroid_0_1", "zone_id": "7", "gpio_pin_code": "0:out:1", "gpio_host_name": "odroid", "relay_type": "piface"},
-    {"relay_pin_name": "odroid_0_2", "zone_id": "7", "gpio_pin_code": "0:out:2", "gpio_host_name": "odroid", "relay_type": "piface"},
-    {"relay_pin_name": "odroid_0_3", "zone_id": "7", "gpio_pin_code": "0:out:3", "gpio_host_name": "odroid", "relay_type": "piface"},
-    {"relay_pin_name": "odroid_0_4", "zone_id": "7", "gpio_pin_code": "0:out:4", "gpio_host_name": "odroid", "relay_type": "piface"},
-    {"relay_pin_name": "odroid_0_5", "zone_id": "7", "gpio_pin_code": "0:out:5", "gpio_host_name": "odroid", "relay_type": "piface"},
-    {"relay_pin_name": "odroid_0_6", "zone_id": "7", "gpio_pin_code": "0:out:6", "gpio_host_name": "odroid", "relay_type": "piface"},
-    {"relay_pin_name": "odroid_0_7", "zone_id": "7", "gpio_pin_code": "0:out:7", "gpio_host_name": "odroid", "relay_type": "piface"},
-    {"relay_pin_name": "odroid_1_0", "zone_id": "7", "gpio_pin_code": "1:out:0", "gpio_host_name": "odroid", "relay_type": "piface"},
-    {"relay_pin_name": "odroid_1_1", "zone_id": "7", "gpio_pin_code": "1:out:1", "gpio_host_name": "odroid", "relay_type": "piface"},
-    {"relay_pin_name": "odroid_1_2", "zone_id": "7", "gpio_pin_code": "1:out:2", "gpio_host_name": "odroid", "relay_type": "piface"},
-    {"relay_pin_name": "odroid_pcf_0", "zone_id": "7", "gpio_pin_code": "0", "gpio_host_name": "odroid", "relay_type": "pcf8574"},
-    {"relay_pin_name": "odroid_pcf_1", "zone_id": "7", "gpio_pin_code": "1", "gpio_host_name": "odroid", "relay_type": "pcf8574"},
-    {"relay_pin_name": "odroid_pcf_7", "zone_id": "7", "gpio_pin_code": "7", "gpio_host_name": "odroid", "relay_type": "pcf8574"}
+    {"relay_pin_name": "odroid_gpio_4", "zone_id": "7", "gpio_pin_code": "249", "gpio_host_name": "pizero2", "relay_type": "gpio"},
+    {"relay_pin_name": "odroid_0_0", "zone_id": "7", "gpio_pin_code": "0:out:0", "gpio_host_name": "pizero2", "relay_type": "piface"},
+    {"relay_pin_name": "odroid_0_1", "zone_id": "7", "gpio_pin_code": "0:out:1", "gpio_host_name": "pizero2", "relay_type": "piface"},
+    {"relay_pin_name": "odroid_0_2", "zone_id": "7", "gpio_pin_code": "0:out:2", "gpio_host_name": "pizero2", "relay_type": "piface"},
+    {"relay_pin_name": "odroid_0_3", "zone_id": "7", "gpio_pin_code": "0:out:3", "gpio_host_name": "pizero2", "relay_type": "piface"},
+    {"relay_pin_name": "odroid_0_4", "zone_id": "7", "gpio_pin_code": "0:out:4", "gpio_host_name": "pizero2", "relay_type": "piface"},
+    {"relay_pin_name": "odroid_0_5", "zone_id": "7", "gpio_pin_code": "0:out:5", "gpio_host_name": "pizero2", "relay_type": "piface"},
+    {"relay_pin_name": "odroid_0_6", "zone_id": "7", "gpio_pin_code": "0:out:6", "gpio_host_name": "pizero2", "relay_type": "piface"},
+    {"relay_pin_name": "odroid_0_7", "zone_id": "7", "gpio_pin_code": "0:out:7", "gpio_host_name": "pizero2", "relay_type": "piface"},
+    {"relay_pin_name": "odroid_1_0", "zone_id": "7", "gpio_pin_code": "1:out:0", "gpio_host_name": "pizero2", "relay_type": "piface"},
+    {"relay_pin_name": "odroid_1_1", "zone_id": "7", "gpio_pin_code": "1:out:1", "gpio_host_name": "pizero2", "relay_type": "piface"},
+    {"relay_pin_name": "odroid_1_2", "zone_id": "7", "gpio_pin_code": "1:out:2", "gpio_host_name": "pizero2", "relay_type": "piface"},
+    {"relay_pin_name": "odroid_pcf_0", "zone_id": "7", "gpio_pin_code": "0", "gpio_host_name": "pizero2", "relay_type": "pcf8574"},
+    {"relay_pin_name": "odroid_pcf_1", "zone_id": "7", "gpio_pin_code": "1", "gpio_host_name": "pizero2", "relay_type": "pcf8574"},
+    {"relay_pin_name": "odroid_pcf_7", "zone_id": "7", "gpio_pin_code": "7", "gpio_host_name": "pizero2", "relay_type": "pcf8574"}
   ],
 
   "PowerMonitor": [
@@ -391,7 +391,7 @@
     {"zone_id":50,"heat_pin_name":"puffer heat", "gpio_pin_code":"22", "gpio_host_name":"pi-face", "temp_sensor_name":"puffer sus"},
     {"zone_id":51,"heat_pin_name":"puffer gas valve", "gpio_pin_code":"13", "gpio_host_name":"pi-face", "is_alternate_source_switch":true, "temp_sensor_name":"puffer sus"},
 
-    {"zone_id":19,"heat_pin_name":"gas heat", "gpio_pin_code":"0:out:0", "gpio_host_name":"odroid", "is_main_heat_source":true}
+    {"zone_id":19,"heat_pin_name":"gas heat", "gpio_pin_code":"0:out:0", "gpio_host_name":"pizero2", "is_main_heat_source":true}
   ],
 
   "ZoneSensor": [
@@ -472,19 +472,19 @@
     {"zone_id":7 ,  "gpio_pin_code":"2:in:2", "gpio_host_name": "pi-face", "alarm_pin_name": "sonerie", "sensor_type": "contact"},
     {"zone_id":3 ,  "gpio_pin_code":"2:in:3", "gpio_host_name": "pi-face", "alarm_pin_name": "usa garaj", "sensor_type": "contact"},
 
-    {"zone_id":9 ,  "gpio_pin_code":"0:in:0", "gpio_host_name": "odroid", "alarm_pin_name": "beci mare", "sensor_type": "pir"},
-    {"zone_id":1 ,  "gpio_pin_code":"0:in:1", "gpio_host_name": "odroid", "alarm_pin_name": "bucatarie", "sensor_type": "pir"},
-    {"zone_id":2 ,  "gpio_pin_code":"0:in:2", "gpio_host_name": "odroid", "alarm_pin_name": "living", "sensor_type": "pir"},
-    {"zone_id":3 ,  "gpio_pin_code":"0:in:3", "gpio_host_name": "odroid", "alarm_pin_name": "beci mic", "sensor_type": "pir"},
-    {"zone_id":47 , "gpio_pin_code":"0:in:4", "gpio_host_name": "odroid", "alarm_pin_name": "birou", "sensor_type": "pir"},
-    {"zone_id":10 , "gpio_pin_code":"0:in:5", "gpio_host_name": "odroid", "alarm_pin_name": "scari beci", "sensor_type": "pir"},
-    {"zone_id":11 , "gpio_pin_code":"0:in:6", "gpio_host_name": "odroid", "alarm_pin_name": "etaj hol", "sensor_type": "pir"},
-    {"zone_id":7 ,  "gpio_pin_code":"0:in:7", "gpio_host_name": "odroid", "alarm_pin_name": "usa intrare", "sensor_type": "contact"},
+    {"zone_id":9 ,  "gpio_pin_code":"0:in:0", "gpio_host_name": "pizero2", "alarm_pin_name": "beci mare", "sensor_type": "pir"},
+    {"zone_id":1 ,  "gpio_pin_code":"0:in:1", "gpio_host_name": "pizero2", "alarm_pin_name": "bucatarie", "sensor_type": "pir"},
+    {"zone_id":2 ,  "gpio_pin_code":"0:in:2", "gpio_host_name": "pizero2", "alarm_pin_name": "living", "sensor_type": "pir"},
+    {"zone_id":3 ,  "gpio_pin_code":"0:in:3", "gpio_host_name": "pizero2", "alarm_pin_name": "beci mic", "sensor_type": "pir"},
+    {"zone_id":47 , "gpio_pin_code":"0:in:4", "gpio_host_name": "pizero2", "alarm_pin_name": "birou", "sensor_type": "pir"},
+    {"zone_id":10 , "gpio_pin_code":"0:in:5", "gpio_host_name": "pizero2", "alarm_pin_name": "scari beci", "sensor_type": "pir"},
+    {"zone_id":11 , "gpio_pin_code":"0:in:6", "gpio_host_name": "pizero2", "alarm_pin_name": "etaj hol", "sensor_type": "pir"},
+    {"zone_id":7 ,  "gpio_pin_code":"0:in:7", "gpio_host_name": "pizero2", "alarm_pin_name": "usa intrare", "sensor_type": "contact"},
 
-    {"zone_id":7 ,  "gpio_pin_code":"1:in:0", "gpio_host_name": "odroid", "alarm_pin_name": "portita", "sensor_type": "contact"},
-    {"zone_id":7 ,  "gpio_pin_code":"1:in:1", "gpio_host_name": "odroid", "alarm_pin_name": "gate", "sensor_type": "contact"},
-    {"zone_id":7 ,  "gpio_pin_code":"1:in:2", "gpio_host_name": "odroid", "alarm_pin_name": "sonerie", "sensor_type": "contact"},
-    {"zone_id":3 ,  "gpio_pin_code":"1:in:3", "gpio_host_name": "odroid", "alarm_pin_name": "usa garaj", "sensor_type": "contact"},
+    {"zone_id":7 ,  "gpio_pin_code":"1:in:0", "gpio_host_name": "pizero2", "alarm_pin_name": "portita", "sensor_type": "contact"},
+    {"zone_id":7 ,  "gpio_pin_code":"1:in:1", "gpio_host_name": "pizero2", "alarm_pin_name": "gate", "sensor_type": "contact"},
+    {"zone_id":7 ,  "gpio_pin_code":"1:in:2", "gpio_host_name": "pizero2", "alarm_pin_name": "sonerie", "sensor_type": "contact"},
+    {"zone_id":3 ,  "gpio_pin_code":"1:in:3", "gpio_host_name": "pizero2", "alarm_pin_name": "usa garaj", "sensor_type": "contact"},
 
 
     {"zone_id":29 , "gpio_pin_code":"18", "gpio_host_name": "pi-face", "alarm_pin_name": "beci test"},
