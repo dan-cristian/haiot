@@ -42,7 +42,7 @@ def get_pin(pin_index):
 
 def set_pin_value(pin_index, pin_value):
     if P.initialised:
-        L.l.info('Setting == PCF == pin {}={}'.format(pin_index, pin_value))
+        L.l.info('Setting == PCF == pin {} val={}'.format(pin_index, pin_value))
         P.pcf.port[int(pin_index)] = bool(pin_value)
     else:
         return _not_initialised('set_pin_value')
