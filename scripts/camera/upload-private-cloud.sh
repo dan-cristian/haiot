@@ -44,7 +44,7 @@ if [ $# -ne 0 ]; then
   echo2 "Creating remote parent folder $dest_parent"
   ssh -T -p ${HAIOT_SSH_PORT} -c ${HAIOT_SSH_CIPHER} -o Compression=no ${HAIOT_SSH_SERVER} "mkdir -p $dest_parent" >> $LOG 2>&1
   echo2 "Now uploading"
-  rsync -avPe 'ssh -T -p '${HAIOT_SSH_PORT}' -c ${HAIOT_SSH_CIPHER} -o Compression=no -x' ${source} ${HAIOT_SSH_SERVER}:${dest_parent}/ >> $LOG 2>&1
+  rsync -avPe 'ssh -T -p '${HAIOT_SSH_PORT}' -c '${HAIOT_SSH_CIPHER}' -o Compression=no -x' ${source} ${HAIOT_SSH_SERVER}:${dest_parent}/ >> $LOG 2>&1
   
   #cp -f $source $dest >> $LOG 2>&1
   result=$?
