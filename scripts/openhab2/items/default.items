@@ -52,6 +52,7 @@ Switch relay_washing "Washing relay" <switch>                               {mqt
 Switch relay_floor_bath1 "Floor bath1 relay" <switch> [ "Switchable" ]      {mqtt="<[mosquitto:iot/openhab/relay_floor_bath1_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_floor_bath1_relay:command:*:default]", autoupdate="false"}
 Switch relay_solar "Solar relay" <switch>                                   {mqtt="<[mosquitto:iot/openhab/relay_solar_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_solar_relay:command:*:default]", autoupdate="false"}
 Switch relay_big_battery "Big battery " <switch>                            {mqtt="<[mosquitto:iot/openhab/relay_big_battery_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_big_battery_relay:command:*:default]", autoupdate="false"}
+Switch relay_small_battery "Small battery " <switch>                        {mqtt="<[mosquitto:iot/openhab/relay_small_battery_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_small_battery_relay:command:*:default]", autoupdate="false"}
 
 Group:Switch:OR(ON, OFF)    RELAY_BACK_WATER "Back watering [(%d)]"  <switch>
 Group:Switch:OR(ON, OFF)    RELAY_FRONT_WATER "Front watering [(%d)]"   <switch>
