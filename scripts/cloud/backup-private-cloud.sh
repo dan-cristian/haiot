@@ -1,6 +1,6 @@
 #!/bin/bash
 LOG=/mnt/log/backup-private-cloud.log
-source ${HAIOT_DIR}/.credentials/.general.credentials
+source /home/haiot/PYC/.credentials/.general.credentials
 
 function echo2(){
 echo [`date +%T.%N`] $1 $2 $3 $4 $5 >> $LOG 2>&1
