@@ -1,5 +1,5 @@
 #!/bin/bash
-source ${HAIOT_DIR}/.credentials/.general.credentials
+source /home/haiot/PYC/.credentials/.general.credentials
 LOG=/mnt/log/private-cloud.log
 CLOUD_DIR=/mnt/sdd1/motion/
 SRC_DIR=/mnt/motion/tmp/
