@@ -110,7 +110,7 @@ def on_message(client, userdata, msg):
     except AttributeError as ex:
         L.l.warning('Unknown attribute error in msg {} err {}'.format(json, ex))
     except ValueError as e:
-        L.l.warning('Invalid JSON {} {}'.format(json, e))
+        L.l.warning('Invalid JSON on mqtt, error={}, json={}'.format(e, json))
 
 
 
