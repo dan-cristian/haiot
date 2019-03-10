@@ -197,7 +197,7 @@ def do_pwm(name, frequency, duty_cycle):
         if pwm.is_started:
             P.pi.hardware_PWM(pwm.gpio_pin_code, frequency, duty_cycle)
             L.l.info("Started PWM {} with frequency {} and duty {}".format(name, frequency, duty_cycle))
-            # _update_pwm(pwm)
+            _update_pwm(pwm)
         else:
             stop_pwm(name)
 
@@ -207,7 +207,7 @@ def stop_pwm(name):
     if pwm is not None:
         P.pi.hardware_PWM(pwm.gpio_pin_code, 0, 0)
         L.l.info("Stopped PWM {}".format(name))
-        # _update_pwm(pwm)
+        _update_pwm(pwm)
 
 
 def _update_pwm(pwm_record):
@@ -219,6 +219,7 @@ def _update_pwm(pwm_record):
         pwm_record.duty_cycle = P.pi.get_PWM_dutycycle(pwm_record.gpio_pin_code)
     except Exception:
         pwm_record.duty_cycle = 0
+    pwm_record.notify_transport_enabled = False
     pwm_record.commit_record_to_db()
 
 
