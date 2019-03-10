@@ -499,8 +499,8 @@
   ],
 
   "Pwm": [
-    {"name": "boiler", "frequency": "60", "duty_cycle": "10", "gpio_pin_code": "20", "host_name": "pizero1"},
-    {"name": "boiler2", "frequency": "60", "duty_cycle": "10", "gpio_pin_code": "20", "host_name": "netbook"}
+    {"name": "boiler", "frequency": "60", "duty_cycle": "10", "gpio_pin_code": "18", "host_name": "pizero1"},
+    {"name": "boiler2", "frequency": "60", "duty_cycle": "10", "gpio_pin_code": "18", "host_name": "netbook"}
   ],
 
   "_ZoneAlarmComments": [
