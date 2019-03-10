@@ -172,7 +172,7 @@ def input_event(gpio, level, tick):
 
 def pwm_record_update(json_object):
     try:
-        # L.l.info("Updating pwm {}".format(json_object))
+        L.l.info("Updating pwm {}".format(json_object))
         if P.initialised:
             pwm = utils.json_to_record(models.Pwm, json_object)
             if pwm.host_name == Constant.HOST_NAME:
