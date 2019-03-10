@@ -202,7 +202,7 @@ def _get_pwm_record(name):
 def do_pwm(name, frequency, duty_cycle):
     pwm = _get_pwm_record(name)
     if pwm is not None:
-        if pwm.is_started:
+        if pwm.is_started and frequency > 0 and duty_cycle > 0:
             if P.pi is not None:  # just for debug on windows
                 P.pi.hardware_PWM(pwm.gpio_pin_code, frequency, duty_cycle)
             L.l.info("Started PWM {} with frequency {} and duty {}".format(name, frequency, duty_cycle))
