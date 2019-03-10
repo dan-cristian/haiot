@@ -58,8 +58,6 @@ def post_init():
             pin_index = int(relay.gpio_pin_code)
             pin_val = get_pin(pin_index)
             io_common.update_custom_relay(pin_code=pin_index, pin_value=pin_val, notify=True)
-    else:
-        return _not_initialised('post_init')
 
 
 def init():
