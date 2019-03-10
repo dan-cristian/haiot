@@ -224,7 +224,8 @@ def thread_run():
 
 def unload():
     P.callback = []
-    P.pi.stop()
+    if P.initialised:
+        P.pi.stop()
 
 
 def init():
