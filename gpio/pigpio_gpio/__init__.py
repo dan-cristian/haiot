@@ -195,7 +195,7 @@ def do_pwm(name, frequency, duty_cycle):
     pwm = _get_pwm_record(name)
     if pwm is not None:
         if pwm.is_started:
-            P.pi.hardware_PWM(pwm.gpio_pin_code, frequency, duty_cycle * 1e6 / 100)
+            P.pi.hardware_PWM(pwm.gpio_pin_code, frequency, duty_cycle)
             L.l.info("Started PWM {} with frequency {} and duty {}".format(name, frequency, duty_cycle))
             _update_pwm(pwm)
         else:
@@ -208,6 +208,18 @@ def stop_pwm(name):
         P.pi.hardware_PWM(pwm.gpio_pin_code, 0, 0)
         L.l.info("Stopped PWM {}".format(name))
         _update_pwm(pwm)
+
+
+def _update_pwm(pwm_record):
+    try:
+        pwm_record.frequency = P.pi.get_PWM_frequency(pwm_record.gpio_pin_code)
+    except Exception:
+        pwm_record.frequency = 0
+    try:
+        pwm_record.duty_cycle = P.pi.get_PWM_dutycycle(pwm_record.gpio_pin_code)
+    except Exception:
+        pwm_record.duty_cycle = 0
+    pwm_record.commit_record_to_db()
 
 
 def setup_in_ports(gpio_pin_list):
@@ -244,16 +256,6 @@ def setup_in_ports(gpio_pin_list):
         L.l.critical('PiGpio not yet initialised but was asked to setup IN ports. Check module init order.')
 
 
-def _update_pwm(pwm_record):
-    try:
-        pwm_record.frequency = P.pi.get_PWM_frequency(pwm_record.gpio_pin_code)
-    except Exception:
-        pwm_record.frequency = 0
-    try:
-        pwm_record.duty_cycle = P.pi.get_PWM_dutycycle(pwm_record.gpio_pin_code)
-    except Exception:
-        pwm_record.duty_cycle = 0
-    pwm_record.commit_record_to_db()
 
 
 def _init_pwm():
