@@ -12,6 +12,7 @@ import pcf8574_gpio
 import threading
 import prctl
 import rpi_gpio
+import pigpio_gpio
 import io_common
 
 
@@ -274,6 +275,7 @@ def unload():
         piface.unload()
         # bbb_io.unload()
         rpi_gpio.unload()
+        pigpio_gpio.unload()
     except Exception as ex:
         L.l.error('Error unloading gpio, ex={}'.format(ex), exc_info=True)
     P.initialised = False
@@ -292,7 +294,7 @@ def init():
         pcf8574_gpio.init()
         piface.init()
         rpi_gpio.init()
-        # pigpio_gpio.init()
+        pigpio_gpio.init()
     if Constant.IS_MACHINE_BEAGLEBONE:
         # bbb_io.init()
         std_gpio.init()
