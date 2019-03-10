@@ -997,7 +997,7 @@ class Pwm(db.Model, DbEvent, DbBase):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
     frequency = db.Column(db.Integer)
-    duty_cycle = db.Column(db.Float)
+    duty_cycle = db.Column(db.Integer)  # 0-100
     gpio_pin_code = db.Column(db.Integer)
     host_name = db.Column(db.String(50))
     is_started = db.Column(db.Boolean, default=False)
