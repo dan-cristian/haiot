@@ -172,6 +172,7 @@ def input_event(gpio, level, tick):
 
 def pwm_record_update(json_object):
     try:
+        L.l.info("Updating pwm {}".format(json_object))
         if P.initialised:
             pwm = utils.json_to_record(models.Pwm, json_object)
             if pwm.host_name == Constant.HOST_NAME:
@@ -190,12 +191,12 @@ def _get_pwm_record(name):
 
 
 # pi.hardware_PWM(18, 800, 250000) # 800Hz 25% dutycycle
-def do_pwm(name, duty_cycle):
+def do_pwm(name, frequency, duty_cycle):
     pwm = _get_pwm_record(name)
     if pwm is not None:
         if pwm.is_started:
-            P.pi.hardware_PWM(pwm.gpio_pin_code, pwm.frequency, duty_cycle * 1e6)
-            L.l.info("Started PWM {} with frequency {} and duty {}".format(name, pwm.frequency, duty_cycle))
+            P.pi.hardware_PWM(pwm.gpio_pin_code, frequency, duty_cycle * 1e6)
+            L.l.info("Started PWM {} with frequency {} and duty {}".format(name, frequency, duty_cycle))
             _update_pwm(pwm)
         else:
             stop_pwm(name)
