@@ -35,7 +35,7 @@ def _get_sensor(sensor_address, sensor_type):
 # {"Time":"2018-11-01T23:42:54","ENERGY":{"TotalStartTime":"2018-10-31T20:05:27","Total":0.000,"Yesterday":0.000,"Today":0.000,"Period":0,
 # "Power":0,"ApparentPower":0,"ReactivePower":0,"Factor":0.00,"Voltage":220,"Current":0.000}}
 #
-# Tasmota MQTT - put /iot/sonoff prefix in MQTT settings
+# Tasmota MQTT - put /iot/sonoff/ prefix in MQTT settings
 def mqtt_on_message(client, userdata, msg):
     # L.l.info("Topic={} payload={}".format(msg.topic, msg.payload))
     if '/SENSOR' in msg.topic or '/RESULT' in msg.topic:
