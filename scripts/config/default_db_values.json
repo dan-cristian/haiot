@@ -498,6 +498,11 @@
     {"zone_id":200 , "gpio_pin_code":"25", "gpio_host_name": "pidash", "alarm_pin_name": "switch", "sensor_type": "contact"}
   ],
 
+  "Pwm": [
+    {"name": "boiler", "frequency": "60", "duty_cycle": "0.1", "gpio_pin_code": "20", "host_name": "pizero1"},
+    {"name": "boiler2", "frequency": "60", "duty_cycle": "0.1", "gpio_pin_code": "20", "host_name": "netbook"}
+  ],
+
   "_ZoneAlarmComments": [
     {"zone_id":8 , "gpio_pin_code":"3", "gpio_host_name": "pi-face", "alarm_pin_name": "not used"},
     {"zone_id":28 , "gpio_pin_code":"2", "gpio_host_name": "pi-face", "alarm_pin_name": "sonerie", "sensor_type": "contact"},

@@ -40,6 +40,7 @@ def handle_local_event_db_post(model, row, last_commit_field_changed_list=None):
     elif str(models.Node) in str(model) or str(models.GpioPin) in str(model) \
             or str(models.ZoneCustomRelay) in str(model) \
             or str(models.Rule) in str(model) \
+            or str(models.Pwm) in str(model) \
             or str(models.ZoneThermostat) in str(model):  # or str(models.Area) in str(model):
         txt = model_helper.model_row_to_json(row, operation='update')
         # execute all events directly first, then broadcast, as local events are not handled by remote mqtt queue
@@ -160,6 +161,8 @@ def mqtt_thread_run():
                         health_monitor.powermonitor_record_update(obj)
                     elif table == utils.get_table_name(models.ZoneThermostat):
                         heat.zone_thermo_record_update(obj)
+                    elif table == utils.get_table_name(models.Pwm):
+                        gpio.pigpio_gpio.pwm_record_update(obj)
                     else:
                         L.l.warning('Table %s content from %s is not mqtt processed' % (table, source_host))
 
