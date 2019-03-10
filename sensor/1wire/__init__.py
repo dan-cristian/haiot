@@ -54,6 +54,7 @@ def do_device(ow, path):
                 # start = datetime.datetime.now()
                 try:
                     dev = {}
+                    dev['path'] = path
                     sensortype = ow.read(sensor + 'type')
                     if sensortype == 'DS2423':
                         dev = get_counter(sensor, dev, ow)
@@ -107,7 +108,8 @@ def save_to_db(dev):
             record.sensor_name = '{} {} {}'.format(address, dev['n_address'], dev['type'])
         record.type = dev['type']
         record.updated_on = utils.get_base_location_now_date()
-        if dev.has_key('counters_a'):
+        record.comment = dev['path']
+        if 'counters_a' in dev.keys():
             record.counters_a = dev['counters_a']
             if current_record:
                 record.delta_counters_a = record.counters_a - current_record.counters_a
@@ -116,30 +118,30 @@ def save_to_db(dev):
             else:  # when running first time with db empty
                 record.delta_counters_a = 0  # don't know prev. count, assume no consumption (ticks could be lost)
                 delta_time_counters = P.sampling_period_seconds
-        if dev.has_key('counters_b'):
+        if 'counters_b' in dev.keys():
             record.counters_b = dev['counters_b']
             if current_record:
                 record.delta_counters_b = record.counters_b - current_record.counters_b
             else:
                 # fixme: don't know prev. count, assume no consumption (ticks could be lost)
                 record.delta_counters_b = 0
-        if dev.has_key('temperature'):
+        if 'temperature' in dev.keys():
             record.temperature = dev['temperature']
-        if dev.has_key('humidity'):
+        if 'humidity' in dev.keys():
             record.humidity = dev['humidity']
-        if dev.has_key('iad'):
+        if 'iad' in dev.keys():
             record.iad = dev['iad']
-        if dev.has_key('vad'):
+        if 'vad' in dev.keys():
             record.vad = dev['vad']
-        if dev.has_key('vdd'):
+        if 'vdd' in dev.keys():
             record.vdd = dev['vdd']
-        if dev.has_key('pio_a'):
+        if 'pio_a' in dev.keys():
             record.pio_a = dev['pio_a']
-        if dev.has_key('pio_b'):
+        if 'pio_b' in dev.keys():
             record.pio_b = dev['pio_b']
-        if dev.has_key('sensed_a'):
+        if 'sensed_a' in dev.keys():
             record.sensed_a = dev['sensed_a']
-        if dev.has_key('sensed_b'):
+        if 'sensed_b' in dev.keys():
             record.sensed_b = dev['sensed_b']
         # force field changed detection for delta_counters to enable save in history
         # but allow one 0 record to be saved for nicer graphics
