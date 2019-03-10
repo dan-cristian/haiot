@@ -5,7 +5,7 @@ from pydispatch import dispatcher
 from main import L
 from main.admin import models
 from main.admin.model_helper import commit
-from common import Constant
+from common import Constant, utils
 
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
@@ -22,9 +22,6 @@ class P:
     callback_thread = None
     pin_tick_dict = {}  # {InputEvent}
     lock_dict = {}  # lock list for each gpio
-    PWM_PIN = 18
-    PWM_FREQ = 800
-    current_duty = None
 
     def __init__(self):
         pass
@@ -173,15 +170,38 @@ def input_event(gpio, level, tick):
                 lock.release()
 
 
+def pwm_record_update(json_object):
+    try:
+        if P.initialised:
+            pwm = utils.json_to_record(models.Pwm, json_object)
+            if pwm.host_name == Constant.HOST_NAME:
+                do_pwm(pwm.name, pwm.frequency, pwm.duty_cycle)
+    except Exception as ex:
+        pass
+
+
+def _get_pwm_record(name):
+    pwm = models.Pwm.query.filter_by(host_name=Constant.HOST_NAME, name=name).first()
+    if pwm is not None:
+        return pwm
+    else:
+        L.l.warning("No pwm record with name={}".format(name))
+        return None
+
+
 # pi.hardware_PWM(18, 800, 250000) # 800Hz 25% dutycycle
-def do_pwm(duty):
-    P.pi.hardware_PWM(P.PWM_PIN, P.PWM_FREQ, duty * 1e6)
-    P.current_duty = duty
+def do_pwm(name, duty_cycle):
+    pwm = _get_pwm_record(name)
+    if pwm is not None:
+        P.pi.hardware_PWM(pwm.gpio_pin_code, pwm.frequency, duty_cycle * 1e6)
+        _update_pwm(pwm)
 
 
-def stop_pwm():
-    P.pi.hardware_PWM(P.PWM_PIN, 0, 0)
-    P.current_duty = 0
+def stop_pwm(name):
+    pwm = _get_pwm_record(name)
+    if pwm is not None:
+        P.pi.hardware_PWM(pwm.gpio_pin_code, 0, 0)
+        _update_pwm(pwm)
 
 
 def setup_in_ports(gpio_pin_list):
@@ -218,6 +238,24 @@ def setup_in_ports(gpio_pin_list):
         L.l.critical('PiGpio not yet initialised but was asked to setup IN ports. Check module init order.')
 
 
+def _update_pwm(pwm_record):
+    try:
+        pwm_record.frequency = P.pi.get_PWM_frequency(pwm_record.gpio_pin_code)
+    except Exception:
+        pwm_record.frequency = 0
+    try:
+        pwm_record.duty_cycle = P.pi.get_PWM_dutycycle(pwm_record.gpio_pin_code)
+    except Exception:
+        pwm_record.duty_cycle = 0
+    pwm_record.commit_record_to_db()
+
+
+def _init_pwm():
+    pwm_list = models.Pwm.query.filter_by(host_name=Constant.HOST_NAME).all()
+    for pwm in pwm_list:
+        _update_pwm(pwm)
+
+
 def thread_run():
     pass
 
@@ -239,6 +277,7 @@ def init():
             dispatcher.connect(setup_in_ports, signal=Constant.SIGNAL_GPIO_INPUT_PORT_LIST, sender=dispatcher.Any)
             P.initialised = True
             L.l.info('PiGpio initialised OK')
+            _init_pwm()
         except Exception as ex1:
             L.l.info('Unable to initialise PiGpio, err={}'.format(ex1))
             P.pi = None
