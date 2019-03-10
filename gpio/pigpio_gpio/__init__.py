@@ -197,7 +197,7 @@ def do_pwm(name, frequency, duty_cycle):
         if pwm.is_started:
             P.pi.hardware_PWM(pwm.gpio_pin_code, frequency, duty_cycle)
             L.l.info("Started PWM {} with frequency {} and duty {}".format(name, frequency, duty_cycle))
-            _update_pwm(pwm)
+            # _update_pwm(pwm)
         else:
             stop_pwm(name)
 
@@ -207,7 +207,7 @@ def stop_pwm(name):
     if pwm is not None:
         P.pi.hardware_PWM(pwm.gpio_pin_code, 0, 0)
         L.l.info("Stopped PWM {}".format(name))
-        _update_pwm(pwm)
+        # _update_pwm(pwm)
 
 
 def _update_pwm(pwm_record):
@@ -254,8 +254,6 @@ def setup_in_ports(gpio_pin_list):
         L.l.info('Exit gpio callback thread loop')
     else:
         L.l.critical('PiGpio not yet initialised but was asked to setup IN ports. Check module init order.')
-
-
 
 
 def _init_pwm():
