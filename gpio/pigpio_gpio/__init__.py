@@ -177,7 +177,7 @@ def pwm_record_update(json_object):
             if pwm.host_name == Constant.HOST_NAME:
                 do_pwm(pwm.name, pwm.frequency, pwm.duty_cycle)
     except Exception as ex:
-        pass
+        L.l.error("Unable to update pwm state, err={}".format(ex))
 
 
 def _get_pwm_record(name):
