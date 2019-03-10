@@ -514,6 +514,7 @@ class Sensor(db.Model, graphs.SensorGraph, DbEvent, DbBase):
     # zone_name = db.Column(db.String(50))
     sensor_name = db.Column(db.String(50))
     alt_address = db.Column(db.String(50)) # alternate address format, use for 1-wire, better readability
+    comment = db.Column(db.String(50))
 
     def __init__(self, address='', sensor_name=''):
         super(Sensor, self).__init__()
