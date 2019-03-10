@@ -8,3 +8,4 @@ psutil
 python-prctl
 bmp280
 pcf8574
+pigpio
