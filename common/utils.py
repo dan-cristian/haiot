@@ -182,3 +182,13 @@ def get_primitives(obj):
     attr_list = [a for a in dir(obj) if not a.startswith('_') and not callable(getattr(obj, a))
                  and not hasattr(getattr(obj, a), '__dict__')]
     return attr_list
+
+
+def _json_object_hook(d):
+    return namedtuple('X', d.keys())(*d.values())
+
+
+def json2obj_v2(data):
+    return json.loads(data, object_hook=_json_object_hook)
+
+

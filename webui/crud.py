@@ -191,4 +191,5 @@ def init_crud():
     register_crud(user, '/powermonitor', 'powermonitor', models.PowerMonitor, filters=simple_filters)
     register_crud(user, '/music', 'music', models.Music, filters=simple_filters)
     register_crud(user, '/musicloved', 'musicloved', models.MusicLoved, filters=simple_filters)
+    register_crud(user, '/pwm', 'pwm', models.Pwm, filters=simple_filters)
     register_crud(user, '/log', 'log', models.L, filters=simple_filters)

@@ -180,7 +180,7 @@ def populate_tables(model_auto_update=False):
                         models.CommandOverrideRelay, models.PlotlyCache, models.Utility, models.Presence,
                         models.SensorError, models.State, models.People,
                         models.Device, models.PeopleDevice, models.Position,
-                        models.PowerMonitor, models.Music, models.MusicLoved]
+                        models.PowerMonitor, models.Music, models.MusicLoved, models.Pwm]
     # tables that will be cleaned on every app start
     table_force_clean = [models.Parameter, models.Zone, models.Presence, models.Module, models.Node, models.Rule,
                          models.ZoneHeatRelay]
