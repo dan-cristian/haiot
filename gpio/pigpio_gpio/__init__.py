@@ -176,7 +176,15 @@ def pwm_record_update(json_object):
         if P.initialised:
             pwm = utils.json_to_record(models.Pwm, json_object)
             if pwm.host_name == Constant.HOST_NAME:
-                do_pwm(pwm.name, pwm.frequency, pwm.duty_cycle)
+                if 'frequency' in pwm.last_commit_field_changed_list:
+                    frequency = pwm.last_commit_field_changed_list['frequency']
+                else:
+                    frequency = pwm.frequency
+                if 'duty_cycle' in pwm.last_commit_field_changed_list:
+                    duty_cycle = pwm.last_commit_field_changed_list['duty_cycle']
+                else:
+                    duty_cycle = pwm.duty_cycle
+                do_pwm(pwm.name, frequency, duty_cycle)
     except Exception as ex:
         L.l.error("Unable to update pwm state, err={}".format(ex))
 
