@@ -6,6 +6,7 @@ from main.admin import models
 from main.logger_helper import L
 from common import Constant
 from pydispatch import dispatcher
+from sqlalchemy import desc, asc
 
 admin = Blueprint('admin', __name__, template_folder='templates')
 user = Blueprint('user', __name__, template_folder='templates')
@@ -72,7 +73,7 @@ class CRUDView(MethodView):
             obj = self.model.query.order_by(self.model.created_on.desc()).all()
         else:
             if hasattr(self.model, "id"):
-                obj = self.model.query.order_by(self.model.id.asc()).all()
+                obj = self.model.query.order_by(asc(self.model.id)).all()
             else:
                 obj = self.model.query.all()
         return self.render_list(obj=obj)
