@@ -193,14 +193,19 @@ def _get_pwm_record(name):
 def do_pwm(name, duty_cycle):
     pwm = _get_pwm_record(name)
     if pwm is not None:
-        P.pi.hardware_PWM(pwm.gpio_pin_code, pwm.frequency, duty_cycle * 1e6)
-        _update_pwm(pwm)
+        if pwm.is_started:
+            P.pi.hardware_PWM(pwm.gpio_pin_code, pwm.frequency, duty_cycle * 1e6)
+            L.l.info("Started PWM {} with frequency {} and duty {}".format(name, pwm.frequency, duty_cycle))
+            _update_pwm(pwm)
+        else:
+            stop_pwm(name)
 
 
 def stop_pwm(name):
     pwm = _get_pwm_record(name)
     if pwm is not None:
         P.pi.hardware_PWM(pwm.gpio_pin_code, 0, 0)
+        L.l.info("Stopped PWM {}".format(name))
         _update_pwm(pwm)
 
 
