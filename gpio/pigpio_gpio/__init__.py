@@ -195,7 +195,8 @@ def do_pwm(name, frequency, duty_cycle):
     pwm = _get_pwm_record(name)
     if pwm is not None:
         if pwm.is_started:
-            P.pi.hardware_PWM(pwm.gpio_pin_code, frequency, duty_cycle)
+            if P.pi is not None:  # just for debug on windows
+                P.pi.hardware_PWM(pwm.gpio_pin_code, frequency, duty_cycle)
             L.l.info("Started PWM {} with frequency {} and duty {}".format(name, frequency, duty_cycle))
             _update_pwm(pwm)
         else:
@@ -277,11 +278,12 @@ def init():
     L.l.info('PiGpio initialising')
     if P.import_ok:
         try:
-            P.pi = pigpio.pi()
-            # test if daemon is on
-            P.pi.get_current_tick()
-            # setup this to receive list of ports that must be set as "IN" and have callbacks defined
-            dispatcher.connect(setup_in_ports, signal=Constant.SIGNAL_GPIO_INPUT_PORT_LIST, sender=dispatcher.Any)
+            if Constant.HOST_NAME != 'netbook':
+                P.pi = pigpio.pi()
+                # test if daemon is on
+                P.pi.get_current_tick()
+                # setup this to receive list of ports that must be set as "IN" and have callbacks defined
+                # dispatcher.connect(setup_in_ports, signal=Constant.SIGNAL_GPIO_INPUT_PORT_LIST, sender=dispatcher.Any)
             P.initialised = True
             L.l.info('PiGpio initialised OK')
             _init_pwm()

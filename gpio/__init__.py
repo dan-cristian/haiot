@@ -298,6 +298,8 @@ def init():
     if Constant.IS_MACHINE_BEAGLEBONE:
         # bbb_io.init()
         std_gpio.init()
+    if Constant.IS_OS_WINDOWS():
+        pigpio_gpio.init()
     thread_pool.add_interval_callable(thread_run, run_interval_second=1)
     P.initialised = True
 
