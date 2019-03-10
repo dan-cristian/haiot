@@ -72,10 +72,10 @@ class CRUDView(MethodView):
         if hasattr(self.model, "created_on"):
             obj = self.model.query.order_by(self.model.created_on.desc()).all()
         else:
-            if hasattr(self.model, "id"):
-                obj = self.model.query.order_by(self.model.id.asc()).all()
-            else:
-                obj = self.model.query.all()
+            #if hasattr(self.model, "id"):
+            #    obj = self.model.query.order_by(self.model.id.asc()).all()
+            #else:
+            obj = self.model.query.all()
         return self.render_list(obj=obj)
 
     # copy object to a dict
