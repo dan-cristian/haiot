@@ -19,14 +19,27 @@ class P:
         pass
 
 
-def _get_sensor(sensor_address, sensor_type):
+def _get_zone_sensor(sensor_address, sensor_type):
     zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=sensor_address).first()
     if zone_sensor is None:
         actual_sensor_name = 'N/A {} {}'.format(sensor_address, sensor_type)
     else:
         actual_sensor_name = zone_sensor.sensor_name
+    return zone_sensor, actual_sensor_name
+
+
+def _get_sensor(sensor_address, sensor_type):
+    zone_sensor, actual_sensor_name = _get_zone_sensor(sensor_address, sensor_type)
     sensor = models.Sensor.query.filter_by(address=sensor_address).first()
     new_sensor = models.Sensor(address=sensor_address, sensor_name=actual_sensor_name)
+    return zone_sensor, sensor, new_sensor
+
+
+def _get_dust_sensor(sensor_address, sensor_type):
+    zone_sensor, actual_sensor_name = _get_zone_sensor(sensor_address, sensor_type)
+    sensor = models.DustSensor.query.filter_by(sensor_address=sensor_address).first()
+    new_sensor = models.DustSensor()
+    new_sensor.address = sensor_address
     return zone_sensor, sensor, new_sensor
 
 
@@ -131,11 +144,28 @@ def mqtt_on_message(client, userdata, msg):
                 else:
                     L.l.warning('Sensor INA on {} not defined in db'.format(sensor_name))
             elif 'ANALOG' in obj:
+                # "ANALOG":{"A0":7}
                 an = obj['ANALOG']
                 a0 = an['A0']
                 sensor_address = '{}_{}'.format(sensor_name, 'a0')
                 zone_sensor, sensor, new_sensor = _get_sensor(sensor_address=sensor_address, sensor_type='ANALOG')
                 new_sensor.vad = a0
+                new_sensor.save_changed_fields(current_record=sensor, notify_transport_enabled=True, save_to_graph=True)
+            elif 'PMS5003' in obj:
+                # "PMS5003":{"CF1":0,"CF2.5":1,"CF10":3,"PM1":0,"PM2.5":1,"PM10":3,"PB0.3":444,"PB0.5":120,"PB1":12,
+                # "PB2.5":6,"PB5":2,"PB10":2}
+                pms = obj['PMS5003']
+                sensor_address = '{}_{}'.format(sensor_name, 'PMS5003')
+                zone_sensor, sensor, new_sensor = _get_dust_sensor(sensor_address=sensor_address, sensor_type='PMS5003')
+                new_sensor.pm_1 = pms['PM1']
+                new_sensor.pm_2_5 = pms['PM2.5']
+                new_sensor.pm_10 = pms['PM10']
+                new_sensor.p_0_3 = pms['PB0.3']
+                new_sensor.p_0_5 = pms['PB0.5']
+                new_sensor.p_1 = pms['PB1']
+                new_sensor.p_2_5 = pms['PB2.5']
+                new_sensor.p_5 = pms['PB.5']
+                new_sensor.p_10 = pms['PB10']
                 new_sensor.save_changed_fields(current_record=sensor, notify_transport_enabled=True, save_to_graph=True)
             else:
                 L.l.warning("Usefull payload missing from topic {} payload={}".format(msg.topic, msg.payload))
