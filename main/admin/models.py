@@ -525,6 +525,27 @@ class Sensor(db.Model, graphs.SensorGraph, DbEvent, DbBase):
         return '{}, {}, {}, {}'.format(self.type, self.sensor_name, self.address, self.temperature)
 
 
+class DustSensor(db.Model, DbEvent, DbBase):
+    id = db.Column(db.Integer, primary_key=True)
+    address = db.Column(db.String(50), unique=True)
+    pm_1 = db.Column(db.Integer)
+    pm_2_5 = db.Column(db.Integer)
+    pm_10 = db.Column(db.Integer)
+    p_0_3 = db.Column(db.Integer)
+    p_0_5 = db.Column(db.Integer)
+    p_1 = db.Column(db.Integer)
+    p_2_5 = db.Column(db.Integer)
+    p_5 = db.Column(db.Integer)
+    p_10 = db.Column(db.Integer)
+
+    def __init__(self):
+        super(DustSensor, self).__init__()
+
+    def __repr__(self):
+        return '{}, {}, {}'.format(self.type, self.sensor_name, self.address)
+
+
+
 class SensorError(db.Model, DbBase, DbEvent):
     id = db.Column(db.Integer, primary_key=True)
     sensor_name = db.Column(db.String(50), index=True)
