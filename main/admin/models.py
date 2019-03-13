@@ -525,7 +525,7 @@ class Sensor(db.Model, graphs.SensorGraph, DbEvent, DbBase):
         return '{}, {}, {}, {}'.format(self.type, self.sensor_name, self.address, self.temperature)
 
 
-class DustSensor(db.Model, DbEvent, DbBase):
+class DustSensor(db.Model, DbEvent, DbBase, graphs.BaseGraph):
     id = db.Column(db.Integer, primary_key=True)
     address = db.Column(db.String(50), unique=True)
     pm_1 = db.Column(db.Integer)
@@ -1239,7 +1239,8 @@ class DustSensorHistory(db.Model, DbBase):
     __bind_key__ = 'reporting'
     __tablename__ = 'dustsensor_history'  # convention: append '_history' -> 'History' to source table name
     id = db.Column(db.Integer, primary_key=True)
-    address = db.Column(db.String(50), unique=True)
+    address = db.Column(db.String(50))
     pm_1 = db.Column(db.Integer)
     pm_2_5 = db.Column(db.Integer)
     pm_10 = db.Column(db.Integer)
+    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
