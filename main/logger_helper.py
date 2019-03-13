@@ -38,7 +38,7 @@ class L:
         # global LOGGING_LEVEL, LOG_FILE, LOG_TO_SYSLOG, SYSLOG_ADDRESS, SYSLOG_PORT, RUN_IN_LIVE
         # global logger, remote_logger
         # set logging general formatting
-        logging.basicConfig(format='%(asctime)s haiot %(levelname)s %(module)s:%(funcName)s %(message)s')
+        logging.basicConfig(format='%(asctime)s haiot %(levelname)s %(thread)d %(module)s:%(funcName)s %(message)s')
         # %(threadName)s
         L.l = logging.getLogger('haiot-' + socket.gethostname())
         L.remote_logger = logging.getLogger('haiot-remote-' + socket.gethostname())
@@ -74,7 +74,7 @@ class L:
                     ntl = logging.handlers.NTEventLogHandler(appname='haiot')
                     L.l.addHandler(ntl)
                 except Exception as ex:
-                    print 'Unable to init syslog handler err={}'.format(ex)
+                    print('Unable to init syslog handler err={}'.format(ex))
         else:
             if L.LOG_FILE is not None:
                 file_handler = logging.handlers.RotatingFileHandler(L.LOG_FILE, maxBytes=1024 * 1024 * 1, backupCount=3)

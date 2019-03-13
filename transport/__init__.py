@@ -41,6 +41,7 @@ def thread_run():
         else:
             elapsed = (utils.get_base_location_now_date() - mqtt_io.P.last_connect_attempt).total_seconds()
             if elapsed > 10:
+                L.l.info("Initialising mqtt as message needs to be sent, elapsed={}".format(elapsed))
                 mqtt_io.init()
     finally:
         P.mqtt_lock.release()
