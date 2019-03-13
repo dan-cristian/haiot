@@ -156,6 +156,7 @@ def check_history_tables():
     """Add below all history tables you want to be initialised"""
     table_collection_list = [
         models.NodeHistory, models.SensorHistory, models.SystemDiskHistory, models.SystemMonitorHistory,
+        models.DustSensorHistory,
         models.UpsHistory, models.PresenceHistory, models.SensorErrorHistory, models.ZoneHeatRelayHistory,
         models.ZoneCustomRelayHistory, models.PowerMonitorHistory]
     for table in table_collection_list:

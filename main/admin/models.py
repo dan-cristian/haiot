@@ -542,8 +542,7 @@ class DustSensor(db.Model, DbEvent, DbBase):
         super(DustSensor, self).__init__()
 
     def __repr__(self):
-        return '{}, {}, {}'.format(self.type, self.sensor_name, self.address)
-
+        return '{}'.format(self.address)
 
 
 class SensorError(db.Model, DbBase, DbEvent):
@@ -1234,3 +1233,13 @@ class PowerMonitorHistory(db.Model, DbBase):
     current = db.Column(db.Float)  # miliamps
     power = db.Column(db.Float)
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
+
+
+class DustSensorHistory(db.Model, DbBase):
+    __bind_key__ = 'reporting'
+    __tablename__ = 'dustsensor_history'  # convention: append '_history' -> 'History' to source table name
+    id = db.Column(db.Integer, primary_key=True)
+    address = db.Column(db.String(50), unique=True)
+    pm_1 = db.Column(db.Integer)
+    pm_2_5 = db.Column(db.Integer)
+    pm_10 = db.Column(db.Integer)
