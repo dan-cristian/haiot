@@ -40,7 +40,7 @@ __author__ = 'dcristian'
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect_paho(client, userdata, flags, rc):
     L.l.info("Connected to mqtt paho with result code " + str(rc))
-    P.client_connected = True
+    # P.client_connected = True
     subscribe()
 
 
@@ -52,7 +52,9 @@ def on_connect_mosquitto(mosq, userdata, rc):
 def on_disconnect(client, userdata, rc):
     if rc != 0:
         L.l.warning("Unexpected disconnection from mqtt")
-    L.l.warning("Disconnected from mqtt")
+    else:
+        L.l.info("Expected disconnect from mqtt")
+    P.mqtt_client.loop_stop()
     P.client_connected = False
 
 
@@ -65,7 +67,8 @@ def on_subscribe(client, userdata, mid, granted_qos):
 
 
 def on_unsubscribe(client, userdata, mid):
-    P.client_connected = False
+    # P.client_connected = False
+    pass
 
 
 def subscribe():
@@ -111,8 +114,6 @@ def on_message(client, userdata, msg):
         L.l.warning('Unknown attribute error in msg {} err {}'.format(json, ex))
     except ValueError as e:
         L.l.warning('Invalid JSON on mqtt, error={}, json={}'.format(e, json))
-
-
 
 
 def unload():
@@ -174,6 +175,7 @@ def init():
                     while not P.client_connected and seconds_lapsed < 10:
                         time.sleep(1)
                         seconds_lapsed += 1
+                        L.l.info('Waiting for mqtt connect {}'.format(seconds_lapsed))
                     if P.client_connected:
                         P.mqtt_client.message_callback_add(P.topic_main, on_message)
                         P.mqtt_client.on_disconnect = on_disconnect
