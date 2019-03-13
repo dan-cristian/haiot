@@ -37,7 +37,7 @@ def _get_sensor(sensor_address, sensor_type):
 
 def _get_dust_sensor(sensor_address, sensor_type):
     zone_sensor, actual_sensor_name = _get_zone_sensor(sensor_address, sensor_type)
-    sensor = models.DustSensor.query.filter_by(sensor_address=sensor_address).first()
+    sensor = models.DustSensor.query.filter_by(address=sensor_address).first()
     new_sensor = models.DustSensor()
     new_sensor.address = sensor_address
     return zone_sensor, sensor, new_sensor
@@ -48,8 +48,8 @@ def _get_dust_sensor(sensor_address, sensor_type):
 # {"Time":"2018-11-01T23:42:54","ENERGY":{"TotalStartTime":"2018-10-31T20:05:27","Total":0.000,"Yesterday":0.000,"Today":0.000,"Period":0,
 # "Power":0,"ApparentPower":0,"ReactivePower":0,"Factor":0.00,"Voltage":220,"Current":0.000}}
 #
-# Tasmota MQTT - put /iot/sonoff/ prefix in MQTT settings
-def mqtt_on_message(client, userdata, msg):
+# Tasmota MQTT - put iot/sonoff/%prefix%/%topic%/ in MQTT settings
+def _process_message(msg):
     # L.l.info("Topic={} payload={}".format(msg.topic, msg.payload))
     if '/SENSOR' in msg.topic or '/RESULT' in msg.topic:
         topic_clean = P.sonoff_topic.replace('#', '')
@@ -99,7 +99,7 @@ def mqtt_on_message(client, userdata, msg):
                             record.save_changed_fields(current_record=current_record, new_record=record,
                                                        notify_transport_enabled=True, save_to_graph=True, debug=False)
                 # dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=current, unit='kWh')
-            elif 'POWER' in obj:
+            if 'POWER' in obj:
                 power_is_on = obj['POWER'] == 'ON'
                 current_relay = models.ZoneCustomRelay.query.filter_by(gpio_pin_code=sensor_name,
                                                                        gpio_host_name=Constant.HOST_NAME).first()
@@ -112,7 +112,7 @@ def mqtt_on_message(client, userdata, msg):
                                                                  notify_transport_enabled=True, save_to_graph=True)
                 else:
                     L.l.error("ZoneCustomRelay with code {} does not exist in database".format(sensor_name))
-            elif 'COUNTER' in obj:
+            if 'COUNTER' in obj:
                 # TelePeriod 60
                 counter = obj['COUNTER']
                 for i in [1, 2, 3, 4]:
@@ -120,7 +120,7 @@ def mqtt_on_message(client, userdata, msg):
                     if c in counter:
                         cval = int(counter[c])
                         dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=cval, index=i)
-            elif 'BMP280' in obj:
+            if 'BMP280' in obj:
                 # iot/sonoff/tele/sonoff-basic-3/SENSOR =
                 # {"Time":"2018-10-28T08:12:26","BMP280":{"Temperature":24.6,"Pressure":971.0},"TempUnit":"C"}
                 bmp = obj['BMP280']
@@ -131,7 +131,7 @@ def mqtt_on_message(client, userdata, msg):
                 new_sensor.temperature = temp
                 new_sensor.pressure = press
                 new_sensor.save_changed_fields(current_record=sensor, notify_transport_enabled=True, save_to_graph=True)
-            elif 'INA219' in obj:
+            if 'INA219' in obj:
                 ina = obj['INA219']
                 voltage = ina['Voltage']
                 current = ina['Current']
@@ -143,7 +143,7 @@ def mqtt_on_message(client, userdata, msg):
                     new.save_changed_fields(current_record = sensor, notify_transport_enabled=True, save_to_graph=True)
                 else:
                     L.l.warning('Sensor INA on {} not defined in db'.format(sensor_name))
-            elif 'ANALOG' in obj:
+            if 'ANALOG' in obj:
                 # "ANALOG":{"A0":7}
                 an = obj['ANALOG']
                 a0 = an['A0']
@@ -151,7 +151,7 @@ def mqtt_on_message(client, userdata, msg):
                 zone_sensor, sensor, new_sensor = _get_sensor(sensor_address=sensor_address, sensor_type='ANALOG')
                 new_sensor.vad = a0
                 new_sensor.save_changed_fields(current_record=sensor, notify_transport_enabled=True, save_to_graph=True)
-            elif 'PMS5003' in obj:
+            if 'PMS5003' in obj:
                 # "PMS5003":{"CF1":0,"CF2.5":1,"CF10":3,"PM1":0,"PM2.5":1,"PM10":3,"PB0.3":444,"PB0.5":120,"PB1":12,
                 # "PB2.5":6,"PB5":2,"PB10":2}
                 pms = obj['PMS5003']
@@ -160,17 +160,24 @@ def mqtt_on_message(client, userdata, msg):
                 new_sensor.pm_1 = pms['PM1']
                 new_sensor.pm_2_5 = pms['PM2.5']
                 new_sensor.pm_10 = pms['PM10']
+
                 new_sensor.p_0_3 = pms['PB0.3']
                 new_sensor.p_0_5 = pms['PB0.5']
                 new_sensor.p_1 = pms['PB1']
+
                 new_sensor.p_2_5 = pms['PB2.5']
-                new_sensor.p_5 = pms['PB.5']
+                new_sensor.p_5 = pms['PB5']
                 new_sensor.p_10 = pms['PB10']
                 new_sensor.save_changed_fields(current_record=sensor, notify_transport_enabled=True, save_to_graph=True)
-            else:
-                L.l.warning("Usefull payload missing from topic {} payload={}".format(msg.topic, msg.payload))
         else:
             L.l.warning("Invalid sensor topic {}".format(msg.topic))
+
+
+def mqtt_on_message(client, userdata, msg):
+    try:
+        _process_message(msg)
+    except Exception as ex:
+        L.l.error("Error processing sonoff mqtt {}, err={}".format(msg.topic, ex), exc_info=True)
 
 
 # iot/sonoff/stat/sonoff-basic-5/POWER = ON/OFF
