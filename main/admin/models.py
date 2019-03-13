@@ -135,24 +135,24 @@ class DbBase:
             if new_record is None:
                 new_record = self
             # inherit BaseGraph to enable persistence
-            if hasattr(self, 'save_to_graph'):  # not all models inherit graph, used for periodic save
-                if current_record:
-                    # if a record in db already exists
-                    if not current_record.last_save_to_graph:
-                        current_record.last_save_to_graph = datetime.min
-                    save_to_graph_elapsed = (utils.get_base_location_now_date() -
-                                             current_record.last_save_to_graph).total_seconds()
-                    if save_to_graph_elapsed > graph_save_frequency:
-                        if debug:
-                            L.l.info('Saving to graph record {}'.format(new_record))
-                        current_record.save_to_graph = save_to_graph
-                        current_record.save_to_history = save_to_graph
-                    else:
-                        current_record.save_to_graph = False
-                        current_record.save_to_history = False
+            # if hasattr(self, 'save_to_graph'):  # not all models inherit graph, used for periodic save
+            if current_record is not None:
+                # if a record in db already exists
+                if not hasattr(current_record, 'last_save_to_graph') or current_record.last_save_to_graph is None:
+                    current_record.last_save_to_graph = datetime.min
+                save_to_graph_elapsed = (utils.get_base_location_now_date() -
+                                         current_record.last_save_to_graph).total_seconds()
+                if save_to_graph_elapsed > graph_save_frequency:
+                    if debug:
+                        L.l.info('Saving to graph record {}'.format(new_record))
+                    current_record.save_to_graph = save_to_graph
+                    current_record.save_to_history = save_to_graph
                 else:
-                    # this is a new record
-                    new_record.save_to_graph = save_to_graph
+                    current_record.save_to_graph = False
+                    current_record.save_to_history = False
+            else:
+                # this is a new record
+                new_record.save_to_graph = save_to_graph
             # ensure is set for both new and existing records
             new_record.save_to_history = save_to_graph
             new_record.save_to_graph = save_to_graph
