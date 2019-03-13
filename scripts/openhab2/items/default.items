@@ -153,9 +153,9 @@ Contact contact_portita "Portita [%s]" <door>                               (CON
 Contact contact_gate "Gate [%s]" <door>                                     (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_gate:state:default]"}
 Contact contact_usa_garaj "Usa garaj [%s]" <door>                           (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_usa garaj:state:default]"}
 
-Number dust_pm1 "Dust PM1 [%.0f ug/m3]" <smoke>                             {mqtt="<[mosquitto:iot/openhab/u'dustsensor_pm_1_wemos-micro-1_PMS5003':state:default]"}
-Number dust_pm2_5 "Dust PM2.5 [%.0f ug/m3]" <smoke>                         {mqtt="<[mosquitto:iot/openhab/u'dustsensor_pm_2_5_wemos-micro-1_PMS5003':state:default]"}
-Number dust_pm10 "Dust PM10 [%.0f ug/m3]" <smoke>                           {mqtt="<[mosquitto:iot/openhab/u'dustsensor_pm_10_wemos-micro-1_PMS5003':state:default]"}
+Number dust_pm1 "Dust PM1 [%.0f ug/m3]" <smoke>                             {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_1_wemos-micro-1_PMS5003:state:default]"}
+Number dust_pm2_5 "Dust PM2.5 [%.0f ug/m3]" <smoke>                         {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_2_5_wemos-micro-1_PMS5003:state:default]"}
+Number dust_pm10 "Dust PM10 [%.0f ug/m3]" <smoke>                           {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_10_wemos-micro-1_PMS5003:state:default]"}
 
 Rollershutter mpd_player_living                 {mqtt="<[mosquitto:iot/openhab/mpd_player_living:state:default],>[mosquitto:iot/openhab/cmd/mpd_player_living:command:*:default]"}
 Dimmer mpd_volume_living "[%s]" <soundvolume>   {mqtt="<[mosquitto:iot/openhab/mpd_volume_living:state:default],>[mosquitto:iot/openhab/cmd/mpd_volume_living:command:*:default]"}
