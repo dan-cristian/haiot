@@ -42,6 +42,17 @@ def rule_openhab_sensor(obj=models.Sensor(), field_changed_list=None):
         send_mqtt_openhab(subtopic=key + "_" + obj.sensor_name, payload=obj.iad)
 
 
+def rule_openhab_dustsensor(obj=models.DustSensor(), field_changed_list=None):
+    if field_changed_list is not None:
+        address = obj.address
+        for key in field_changed_list:
+            if key not in ['updated_on'] and hasattr(obj, key):
+                val = getattr(obj, key)
+                send_mqtt_openhab(subtopic='dustsensor_' + key + '_' + address, payload=val)
+            else:
+                L.l.warning('Field {} in dustsensor change list but not in obj={}'.format(key, obj))
+
+
 def rule_openhab_utility(obj=models.Utility(), field_changed_list=None):
     if hasattr(obj, 'utility_type'):
         # L.l.info("PROCESSING utility {}".format(obj.utility_type))
