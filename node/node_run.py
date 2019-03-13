@@ -36,10 +36,11 @@ def node_update(obj=None):
                 event_sent_date_time = utils.parse_to_date(sent_date)
                 seconds_elapsed = (utils.get_base_location_now_date()-event_sent_date_time).total_seconds()
                 if seconds_elapsed>15:
-                    L.l.warning('Very slow mqtt, delay is {} seconds rate msg {}/min'.format(seconds_elapsed,
-                                                                                             mqtt_io.mqtt_msg_count_per_minute))
+                    L.l.warning('Very slow mqtt, delay is {} seconds rate msg {}/min'.format(
+                        seconds_elapsed, mqtt_io.P.mqtt_msg_count_per_minute))
     except Exception as ex:
         L.l.warning('Error on node update, err {}'.format(ex))
+
 
 def check_if_no_masters_overall():
     node_masters = models.Node.query.filter_by(is_master_overall=True).all()
