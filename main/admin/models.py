@@ -155,6 +155,8 @@ class DbBase:
                     new_record.save_to_graph = save_to_graph
             # ensure is set for both new and existing records
             new_record.save_to_history = save_to_graph
+            new_record.save_to_graph = save_to_graph
+            new_record.notify_transport_enabled = notify_transport_enabled
             # reset to avoid duplication
             new_record.last_commit_field_changed_list = []
             _now1 = utils.get_base_location_now_date()
@@ -537,6 +539,7 @@ class DustSensor(db.Model, DbEvent, DbBase, graphs.BaseGraph):
     p_2_5 = db.Column(db.Integer)
     p_5 = db.Column(db.Integer)
     p_10 = db.Column(db.Integer)
+    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
 
     def __init__(self):
         super(DustSensor, self).__init__()
