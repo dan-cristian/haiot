@@ -1,6 +1,7 @@
 {
     "version": "0.2.0",
     "configurations": [
+
         {
             "name": "Python",
             "type": "python",
@@ -9,11 +10,10 @@
             "pythonPath": "${config:python.pythonPath}",
             "program": "${workspaceRoot}/haiot.py",
             "cwd": "${workspaceRoot}",
-            "debugOptions": [
-                "WaitOnAbnormalExit",
-                "WaitOnNormalExit",
-                "RedirectOutput"
-            ]
+            "args": [
+                "db_mem",
+                "model_auto_update "
+            ],
         },
         {
             "name": "PySpark",
