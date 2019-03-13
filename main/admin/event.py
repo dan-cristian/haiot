@@ -129,6 +129,8 @@ def mqtt_thread_run():
                         heat.record_update(obj)
                     elif table == utils.get_table_name(models.Sensor):
                         sensor.record_update(obj)
+                    elif table == utils.get_table_name(models.DustSensor):
+                        pass
                     elif table == utils.get_table_name(models.ZoneCustomRelay):
                         gpio.zone_custom_relay_record_update(obj)
                     elif table == utils.get_table_name(models.GpioPin):
