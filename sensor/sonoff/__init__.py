@@ -169,7 +169,7 @@ def _process_message(msg):
                 new_sensor.p_5 = pms['PB5']
                 new_sensor.p_10 = pms['PB10']
                 new_sensor.save_changed_fields(current_record=sensor, notify_transport_enabled=True,
-                                               save_to_graph=True, debug=True)
+                                               save_to_graph=True)
         else:
             L.l.warning("Invalid sensor topic {}".format(msg.topic))
 
