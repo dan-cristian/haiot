@@ -157,6 +157,11 @@ Number dust_pm1 "Dust PM1 [%.0f ug/m3]" <smoke>                             {mqt
 Number dust_pm2_5 "Dust PM2.5 [%.0f ug/m3]" <smoke>                         {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_2_5_wemos-micro-1_PMS5003:state:default]"}
 Number dust_pm10 "Dust PM10 [%.0f ug/m3]" <smoke>                           {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_10_wemos-micro-1_PMS5003:state:default]"}
 
+Number dust_etaj_pm1 "Dust etaj PM1 [%.0f ug/m3]" <smoke>                             {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_1_wemos-micro-2_PMS5003:state:default]"}
+Number dust_etaj_pm2_5 "Dust etaj PM2.5 [%.0f ug/m3]" <smoke>                         {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_2_5_wemos-micro-2_PMS5003:state:default]"}
+Number dust_etaj_pm10 "Dust etaj PM10 [%.0f ug/m3]" <smoke>                           {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_10_wemos-micro-2_PMS5003:state:default]"}
+
+
 Rollershutter mpd_player_living                 {mqtt="<[mosquitto:iot/openhab/mpd_player_living:state:default],>[mosquitto:iot/openhab/cmd/mpd_player_living:command:*:default]"}
 Dimmer mpd_volume_living "[%s]" <soundvolume>   {mqtt="<[mosquitto:iot/openhab/mpd_volume_living:state:default],>[mosquitto:iot/openhab/cmd/mpd_volume_living:command:*:default]"}
 Dimmer mpd_position_living "[%s %%]"            {mqtt="<[mosquitto:iot/openhab/mpd_position_living:state:default],>[mosquitto:iot/openhab/cmd/mpd_position_living:command:*:default]"}
