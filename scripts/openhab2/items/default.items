@@ -129,6 +129,8 @@ Number electricity_power_gas_heater "Power gas heater[%.0fw]" <energy>      {mqt
 Number electricity_power_washing "Power washing[%.0fw]" <energy>            {mqtt="<[mosquitto:iot/openhab/electricity_power washing:state:default]"}
 Number electricity_power_floor_bath1 "Power floor bath1[%.0fw]" <energy>    {mqtt="<[mosquitto:iot/openhab/electricity_power floor bath1:state:default]"}
 Number electricity_power_solar "Power solar[%.0fw]" <energy>                {mqtt="<[mosquitto:iot/openhab/electricity_power solar:state:default]"}
+Number electricity_power_boiler "Power boiler[%.0fw]" <energy>              {mqtt="<[mosquitto:iot/openhab/electricity_power boiler:state:default]"}
+
 
 Number powermonitor_voltage_big_battery_1 "Big battery 1 [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_voltage_big battery 1:state:default]"}
 Number powermonitor_voltage_big_battery_2 "Big battery 2 [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_voltage_big battery 2:state:default]"}
