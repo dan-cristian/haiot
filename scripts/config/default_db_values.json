@@ -436,7 +436,9 @@
     {"zone_id":47 , "sensor_address": "wemos-mini-1_bme280",                        "sensor_name": "birou_atmo"},
     {"zone_id":29 , "sensor_address": "esp12-1_a0",                                 "sensor_name": "gas CO beci"},
     {"zone_id":29 , "sensor_address": "esp12-2_a0",                                 "sensor_name": "gas CH4 beci"},
-    {"zone_id":54 , "sensor_address": "sonoff-pow-3",                               "sensor_name": "solar meter"}
+    {"zone_id":54 , "sensor_address": "sonoff-pow-3",                               "sensor_name": "solar meter"},
+
+    {"zone_id":56 , "sensor_address": "sonoff-basic-7_bme280",                        "sensor_name": "baie_parter_atmo"}
   ],
 
   "Utility": [
