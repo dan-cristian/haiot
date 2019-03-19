@@ -130,8 +130,9 @@ class Relaydevice:
                                                                                     grid_watts))
         self.update_job_finished()
 
-    def __init__(self):
-        pass
+    def __init__(self, relay_name, avg_consumption):
+        self.AVG_CONSUMPTION = avg_consumption
+        self.RELAY_NAME = relay_name
 
 
 class Powerdevice(Relaydevice):
@@ -163,43 +164,52 @@ class Powerdevice(Relaydevice):
     def set_watts(self, watts):
         self.watts = watts
 
-    def __init__(self):
-        Relaydevice.__init__(self)
+    def __init__(self, relay_name, utility_name):
+        self.UTILITY_NAME = utility_name
+        Relaydevice.__init__(self, relay_name)
+
+
+class LoadPowerDevice(Relaydevice):
+    UTILITY_NAME = None
+    MAX_WATTS = None
+
+    def __init__(self, relay_name, utility_name, max_watts):
+        self.UTILITY_NAME = utility_name
+        self.MAX_WATTS = max_watts
+        Relaydevice.__init__(self, relay_name, avg_consumption=None)  # no avg consumption for load devices
 
 
 class Dishwasher(Powerdevice):
-    AVG_CONSUMPTION = 77
     MIN_WATTS_OFF = 1
-    RELAY_NAME = 'plug_1'
-    UTILITY_NAME = 'power plug 1'
     DEVICE_SUPPORTS_BREAKS = True
     MAX_OFF_INTERVAL = 60 * 30  # until water get's cold
     MIN_ON_INTERVAL = 120
 
-    def __init__(self):
-        Powerdevice.__init__(self)
-        # super(Powerdevice, self).__init__()
+    def __init__(self, relay_name, utility_name, avg_consumption):
+        Powerdevice.__init__(self, relay_name, utility_name, avg_consumption)
 
 
 class Washingmachine(Powerdevice):
-    AVG_CONSUMPTION = 70
     MIN_WATTS_OFF = 2
-    RELAY_NAME = 'plug_2'
-    UTILITY_NAME = 'power plug 2'
     DEVICE_SUPPORTS_BREAKS = False
     MAX_OFF_INTERVAL = 60 * 10  # until water get's cold
 
-    def __init__(self):
-        Powerdevice.__init__(self)
+    def __init__(self, relay_name, utility_name, avg_consumption):
+        Powerdevice.__init__(self, relay_name, utility_name, avg_consumption)
 
 
 class Upscharger(Relaydevice):
-    AVG_CONSUMPTION = 200
-    RELAY_NAME = 'beci_upscharge_relay'
     DEVICE_SUPPORTS_BREAKS = False
 
-    def __init__(self):
-        Relaydevice.__init__(self)
+    def __init__(self, relay_name, avg_consumption):
+        Relaydevice.__init__(self, relay_name, avg_consumption)
+
+
+class PwmHeater(LoadPowerDevice):
+    DEVICE_SUPPORTS_BREAKS = True
+
+    def __init__(self, relay_name, utility_name, max_watts):
+        LoadPowerDevice.__init__(self, relay_name, utility_name, max_watts)
 
 
 class P:
@@ -211,9 +221,13 @@ class P:
     @staticmethod
     # init in order of priority
     def init_dev():
-        P.device_list[Dishwasher.RELAY_NAME] = Dishwasher()
-        P.device_list[Washingmachine.RELAY_NAME] = Washingmachine()
-        P.device_list[Upscharger.RELAY_NAME] = Upscharger()
+        P.device_list[Washingmachine.RELAY_NAME] = Washingmachine(
+            relay_name='plug_2', utility_name='power plug 2', avg_consumption=70)
+        P.device_list[Dishwasher.RELAY_NAME] = Dishwasher(
+            relay_name='plug_1', utility_name='power plug 1', avg_consumption=80)
+        P.device_list[Upscharger.RELAY_NAME] = Upscharger(relay_name='beci_upscharge_relay', avg_consumption=200)
+        P.device_list[PwmHeater.RELAY_NAME] = PwmHeater(
+            relay_name='boiler', utility_name='power boiler', max_watts=2400)
 
     def __init__(self):
         pass
@@ -227,10 +241,13 @@ def rule_energy_export(obj=models.Utility(), field_changed_list=None):
             # let all devices know grid status
             for device in P.device_list.values():
                 device.grid_updated(P.grid_watts)
+            # then run actions?
+            pass
         else:
             # set consumption for device
-            if obj.utility_name in P.device_list.keys():
-                P.device_list[obj.utility_name].set_watts(obj.units_2_delta)
+            for dev in P.device_list:
+                if issubclass(type(dev), Powerdevice) and dev.UTILITY_NAME == obj.utility_name:
+                    dev.set_watts(obj.units_2_delta)
 
 
 def init():
