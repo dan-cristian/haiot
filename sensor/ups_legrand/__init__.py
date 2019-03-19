@@ -139,6 +139,11 @@ def __read_ups_status():
         L.l.info('Read empty UPS status')
 
 
+def _quiet():
+    status = __write_read_port(P.serial, 'Q\r')
+    L.l.info('Set quiet returned: {}'.format(status))
+
+
 def _create_dummy_entry():
     name = "dummy UPS"
     record = models.Ups()
