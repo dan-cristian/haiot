@@ -133,7 +133,7 @@ def _process_message(msg):
                 new_sensor.save_changed_fields(current_record=sensor, notify_transport_enabled=True, save_to_graph=True)
             if 'BME280' in obj:
                 # "BME280":{"Temperature":24.1,"Humidity":39.2,"Pressure":980.0},"PressureUnit":"hPa","TempUnit":"C"}
-                bmp = obj['BMP280']
+                bmp = obj['BME280']
                 temp = bmp['Temperature']
                 press = bmp['Pressure']
                 humid = bmp['Humidity']
