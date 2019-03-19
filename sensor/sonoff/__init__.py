@@ -131,6 +131,18 @@ def _process_message(msg):
                 new_sensor.temperature = temp
                 new_sensor.pressure = press
                 new_sensor.save_changed_fields(current_record=sensor, notify_transport_enabled=True, save_to_graph=True)
+            if 'BME280' in obj:
+                # "BME280":{"Temperature":24.1,"Humidity":39.2,"Pressure":980.0},"PressureUnit":"hPa","TempUnit":"C"}
+                bmp = obj['BMP280']
+                temp = bmp['Temperature']
+                press = bmp['Pressure']
+                humid = bmp['Humidity']
+                sensor_address = '{}_{}'.format(sensor_name, 'bme280')
+                zone_sensor, sensor, new_sensor = _get_sensor(sensor_address=sensor_address, sensor_type='BME280')
+                new_sensor.temperature = temp
+                new_sensor.pressure = press
+                new_sensor.humidity = humid
+                new_sensor.save_changed_fields(current_record=sensor, notify_transport_enabled=True, save_to_graph=True)
             if 'INA219' in obj:
                 ina = obj['INA219']
                 voltage = ina['Voltage']
