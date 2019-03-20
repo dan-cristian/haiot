@@ -23,6 +23,7 @@ class P:
     PRESENCE_SEC = 60 * 60 * 1  # no of secs after a move considered to be presence
     AWAY_SEC = 60 * 60 * 6  # no of secs after no move to be considered away
     initialised = False
+    debug = False
 
     def __init__(self):
         pass
@@ -40,15 +41,17 @@ def record_update(obj_dict=None):
         is_on = utils.get_object_field_value(obj_dict,utils.get_model_field_name(models.ZoneHeatRelay.heat_is_on))
         # fixme: remove hard reference to object field
         sent_on = utils.get_object_field_value(obj_dict, "event_sent_datetime")
-        L.l.debug('Received heat relay update from {} zoneid={} pin={} is_on={} sent={}'.format(
-            source_host_name, zone_id, pin_name, is_on, sent_on))
+        if P.debug:
+            L.l.info('Received heat relay update from {} zoneid={} pin={} is_on={} sent={}'.format(
+                source_host_name, zone_id, pin_name, is_on, sent_on))
         zone_heat_relay = models.ZoneHeatRelay.query.filter_by(zone_id=zone_id).first()
         if zone_heat_relay:
             gpio_host_name = zone_heat_relay.gpio_host_name
             cmd_heat_is_on = utils.get_object_field_value(
                 obj_dict, utils.get_model_field_name(models.ZoneHeatRelay.heat_is_on))
-            L.l.debug('Local heat state zone_id {} must be changed to {} on pin {}'.format(
-                zone_id, cmd_heat_is_on, zone_heat_relay.gpio_pin_code))
+            if P.debug:
+                L.l.info('Local heat state zone_id {} must be changed to {} on pin {}'.format(
+                    zone_id, cmd_heat_is_on, zone_heat_relay.gpio_pin_code))
             if cmd_heat_is_on:
                 pin_value = 1
             else:
@@ -86,6 +89,7 @@ def zone_thermo_record_update(obj_dict=None):
             if thermo_rec is not None and is_mode_manual:
                 thermo_rec.last_manual_set = datetime.datetime.now()
                 thermo_rec.commit_record_to_db()
+            L.l.info('Set thermostat active={} zone={}'.format(is_mode_manual, thermo_rec.zone_name))
 
 
 # save heat status and announce to all nodes.
@@ -101,8 +105,9 @@ def __save_heat_state_db(zone, heat_is_on):
     if zone_heat_relay is not None:
         zone_heat_relay.heat_is_on = heat_is_on
         zone_heat_relay.updated_on = utils.get_base_location_now_date()
-        L.l.debug('Heat state changed to is-on={} via pin={} in zone={}'.format(
-            heat_is_on, zone_heat_relay.heat_pin_name, zone.name))
+        if P.debug:
+            L.l.info('Heat state changed to is-on={} via pin={} in zone={}'.format(
+                heat_is_on, zone_heat_relay.heat_pin_name, zone.name))
         zone_heat_relay.notify_transport_enabled = True
         zone_heat_relay.save_to_graph = True
         zone_heat_relay.save_to_history = True
@@ -117,8 +122,9 @@ def __save_heat_state_db(zone, heat_is_on):
 # triggers heat status update if heat changed
 def __decide_action(zone, current_temperature, target_temperature, force_on=False, force_off=False, zone_thermo=None):
     assert isinstance(zone, models.Zone)
-    L.l.debug("Asses heat zone={} current={} target={} thresh={}".format(
-        zone, current_temperature, target_temperature, P.threshold))
+    if P.debug:
+        L.l.info("Asses heat zone={} current={} target={} thresh={}".format(
+            zone, current_temperature, target_temperature, P.threshold))
     heat_is_on = None
     if force_on:
         heat_is_on = True
@@ -140,10 +146,11 @@ def __decide_action(zone, current_temperature, target_temperature, force_on=Fals
         last_heat_update_age_sec = P.check_period
     if zone_thermo.heat_is_on != heat_is_on or last_heat_update_age_sec >= P.check_period \
             or zone_thermo.last_heat_status_update is None:
-        L.l.debug('Heat must change, is {} in {} temp={} target+thresh={}, forced={}'.format(
-            heat_is_on, zone.name, current_temperature, target_temperature + P.threshold, force_on))
-        L.l.debug('Heat change due to: is_on_next={} is_on_db={} age={} last={}'.format(
-            heat_is_on, zone_thermo.heat_is_on, last_heat_update_age_sec, zone_thermo.last_heat_status_update))
+        if P.debug:
+            L.l.info('Heat must change, is {} in {} temp={} target+thresh={}, forced={}'.format(
+                heat_is_on, zone.name, current_temperature, target_temperature + P.threshold, force_on))
+            L.l.info('Heat change due to: is_on_next={} is_on_db={} age={} last={}'.format(
+                heat_is_on, zone_thermo.heat_is_on, last_heat_update_age_sec, zone_thermo.last_heat_status_update))
         __save_heat_state_db(zone=zone, heat_is_on=heat_is_on)
     #else:
     #    Log.logger.info('Heat should not change, is {} in {} temp={} target={}'.format(heat_is_on, zone.name,
@@ -480,3 +487,5 @@ def init():
     # dispatcher.connect(handle_event_heat, signal=Constant.SIGNAL_HEAT, sender=dispatcher.Any)
     thread_pool.add_interval_callable(thread_run, 30)
     P.initialised = True
+    P.debug = True
+
