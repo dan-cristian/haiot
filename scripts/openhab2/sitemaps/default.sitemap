@@ -115,6 +115,9 @@ Frame {
 	Default item=temperature_gas_boiler
 	Default item=temperature_solar_back
 	Default item=temperature_soba_beci
+	Default item=temperature_bucatarie_hota
+	Default item=humidity_bucatarie
+	Default item=pressure_bucatarie
 	Default item=temperature_baie_parter
 	Default item=humidity_baie_parter
 	Default item=pressure_baie_parter
