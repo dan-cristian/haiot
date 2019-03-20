@@ -306,7 +306,7 @@ def loop_zones():
         for zone in zone_list:
             progress_status = 'do zone {}'.format(zone.name)
             heat_schedule = models.HeatSchedule.query.filter_by(zone_id=zone.id, season=P.season).first()
-            zonesensor_list = models.ZoneSensor.query.filter_by(zone_id=zone.id).all()
+            zonesensor_list = models.ZoneSensor.query.filter_by(zone_id=zone.id, is_main=True).all()
             sensor_processed = {}
             for zonesensor in zonesensor_list:
                 if heat_schedule is not None and zonesensor is not None:
