@@ -585,6 +585,7 @@ class ZoneSensor(db.Model, DbBase):
     sensor_address = db.Column(db.String(50), db.ForeignKey('sensor.address'))
     target_material = db.Column(db.String(50))  # what material is being measured, water, air, etc
     alt_address = db.Column(db.String(50))
+    is_main = db.Column(db.Boolean(), default=False)  # is main temperature sensor for heat reference
     # priority = db.Column(db.Integer, default=0)  # if multiple sensors exists - i.e. temperature
     # sensor = db.relationship('Sensor', backref=db.backref('ZoneSensor(sensor)', lazy='dynamic'))
 
