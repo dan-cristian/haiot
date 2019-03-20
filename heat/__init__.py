@@ -307,6 +307,7 @@ def loop_zones():
             progress_status = 'do zone {}'.format(zone.name)
             heat_schedule = models.HeatSchedule.query.filter_by(zone_id=zone.id, season=P.season).first()
             zonesensor_list = models.ZoneSensor.query.filter_by(zone_id=zone.id).all()
+            sensor_processed = {}
             for zonesensor in zonesensor_list:
                 if heat_schedule is not None and zonesensor is not None:
                     sensor = models.Sensor.query.filter_by(address=zonesensor.sensor_address).first()
@@ -318,6 +319,13 @@ def loop_zones():
                         heat_state, main_source_needed = _update_zone_heat(zone, heat_schedule, sensor)
                         if not heat_is_on:
                             heat_is_on = main_source_needed and heat_state
+                        if zonesensor.zone_id in sensor_processed:
+                            prev_sensor = sensor_processed[zonesensor.zone_id]
+                            L.l.warning('Already processed temp sensor {} in zone {}, duplicate?'.format(
+                                prev_sensor, zonesensor.zone_id))
+                        else:
+                            sensor_processed[zonesensor.zone_id] = sensor.sensor_name
+
         # turn on/off the main heating system based on zone heat needs
         # check first to find alternate valid heat sources
         heatrelay_main_source = models.ZoneHeatRelay.query.filter_by(is_alternate_heat_source=1).first()
