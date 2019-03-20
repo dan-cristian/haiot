@@ -102,10 +102,13 @@ Number pressure_baro_house "Pressure [%.0f hPa]" <pressure>                     
 Number humidity_parter "Parter [%.0f %%]" <humidity> [ "CurrentHumidity" ]                        {mqtt="<[mosquitto:iot/openhab/humidity_parter:state:default]"}
 Number humidity_dormitor_etaj "Dormitor etaj [%.0f %%]" <humidity> [ "CurrentHumidity" ]          {mqtt="<[mosquitto:iot/openhab/humidity_dormitor etaj:state:default]"}
 
+Number temperature_living_tv "Living TV [%.1f °C]" <temperature>                            {mqtt="<[mosquitto:iot/openhab/temperature_living_atmo:state:default]"}
+Number humidity_living "Living [%.0f %%]" <humidity> [ "CurrentHumidity" ]                  {mqtt="<[mosquitto:iot/openhab/humidity_living_atmo:state:default]"}
+Number pressure_living "Living [%.0f hPa]" <pressure>                                       {mqtt="<[mosquitto:iot/openhab/pressure_living_atmo:state:default]"}
+
 Number temperature_bucatarie_hota "Bucatarie hota [%.1f °C]" <temperature>                      {mqtt="<[mosquitto:iot/openhab/temperature_bucatarie_atmo:state:default]"}
 Number humidity_bucatarie "Bucatarie [%.0f %%]" <humidity> [ "CurrentHumidity" ]                {mqtt="<[mosquitto:iot/openhab/humidity_bucatarie_atmo:state:default]"}
 Number pressure_bucatarie "Bucatarie [%.0f hPa]" <pressure>                                     {mqtt="<[mosquitto:iot/openhab/pressure_bucatarie_atmo:state:default]"}
-
 
 Number temperature_baie_parter "Baie parter [%.1f °C]" <temperature>                              {mqtt="<[mosquitto:iot/openhab/temperature_baie_parter_atmo:state:default]"}
 Number humidity_baie_parter "Baie parter [%.0f %%]" <humidity> [ "CurrentHumidity" ]              {mqtt="<[mosquitto:iot/openhab/humidity_baie_parter_atmo:state:default]"}
