@@ -495,5 +495,5 @@ def init():
     # dispatcher.connect(handle_event_heat, signal=Constant.SIGNAL_HEAT, sender=dispatcher.Any)
     thread_pool.add_interval_callable(thread_run, 30)
     P.initialised = True
-    P.debug = True
+    # P.debug = True
 
