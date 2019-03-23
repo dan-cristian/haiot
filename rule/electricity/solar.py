@@ -221,13 +221,16 @@ class P:
     @staticmethod
     # init in order of priority
     def init_dev():
-        P.device_list[Washingmachine.RELAY_NAME] = Washingmachine(
-            relay_name='plug_2', utility_name='power plug 2', avg_consumption=70)
-        P.device_list[Dishwasher.RELAY_NAME] = Dishwasher(
-            relay_name='plug_1', utility_name='power plug 1', avg_consumption=80)
-        P.device_list[Upscharger.RELAY_NAME] = Upscharger(relay_name='beci_upscharge_relay', avg_consumption=200)
-        P.device_list[PwmHeater.RELAY_NAME] = PwmHeater(
-            relay_name='boiler', utility_name='power boiler', max_watts=2400)
+        relay = 'plug_2'
+        P.device_list[relay] = Washingmachine(relay_name=relay, utility_name='power plug 2', avg_consumption=70)
+        relay = 'plug_1'
+        P.device_list[relay] = Dishwasher(relay_name=relay, utility_name='power plug 1', avg_consumption=80)
+        relay = 'beci_upscharge_relay'
+        P.device_list[relay] = Upscharger(relay_name=relay, avg_consumption=200)
+        relay = 'big_battery_relay'
+        P.device_list[relay] = Upscharger(relay_name=relay, avg_consumption=50)
+        relay = 'boiler'
+        P.device_list[relay] = PwmHeater(relay_name=relay, utility_name='power boiler', max_watts=2400)
 
     def __init__(self):
         pass

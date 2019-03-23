@@ -6,6 +6,7 @@ from main import L
 from main.admin import models
 from main.admin.model_helper import commit
 from common import Constant, utils
+from main import thread_pool
 
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
@@ -206,7 +207,6 @@ def do_pwm(name, frequency, duty_cycle):
             if P.pi is not None:  # just for debug on windows
                 P.pi.hardware_PWM(pwm.gpio_pin_code, frequency, duty_cycle)
             L.l.info("Started PWM {} with frequency {} and duty {}".format(name, frequency, duty_cycle))
-            _update_pwm(pwm)
         else:
             stop_pwm(name)
 
@@ -216,7 +216,6 @@ def stop_pwm(name):
     if pwm is not None:
         P.pi.hardware_PWM(pwm.gpio_pin_code, 0, 0)
         L.l.info("Stopped PWM {}".format(name))
-        _update_pwm(pwm)
 
 
 def _update_pwm(pwm_record):
@@ -243,9 +242,8 @@ def setup_in_ports(gpio_pin_list):
             for gpio_pin in gpio_pin_list:
                 if gpio_pin.pin_type == Constant.GPIO_PIN_TYPE_PI_STDGPIO:
                     try:
-                        L.l.info('Set pincode={} type={} index={} as input'.format(gpio_pin.pin_code,
-                                                                                   gpio_pin.pin_type,
-                                                                                   gpio_pin.pin_index_bcm))
+                        L.l.info('Set pincode={} type={} index={} as input'.format(
+                            gpio_pin.pin_code, gpio_pin.pin_type, gpio_pin.pin_index_bcm))
                         P.pi.set_mode(int(gpio_pin.pin_index_bcm), pigpio.INPUT)
                         # https://learn.sparkfun.com/tutorials/pull-up-resistors
                         P.pi.set_pull_up_down(int(gpio_pin.pin_index_bcm), pigpio.PUD_UP)
@@ -273,7 +271,7 @@ def _init_pwm():
 
 
 def thread_run():
-    pass
+    _init_pwm()
 
 
 def unload():
@@ -286,13 +284,14 @@ def init():
     L.l.info('PiGpio initialising')
     if P.import_ok:
         try:
-            if Constant.HOST_NAME != 'netbook':
+            if Constant.HOST_NAME != 'netbook':  # debug
                 P.pi = pigpio.pi()
                 # test if daemon is on
                 P.pi.get_current_tick()
                 # setup this to receive list of ports that must be set as "IN" and have callbacks defined
                 # dispatcher.connect(setup_in_ports, signal=Constant.SIGNAL_GPIO_INPUT_PORT_LIST, sender=dispatcher.Any)
             P.initialised = True
+            thread_pool.add_interval_callable(thread_run, run_interval_second=30)
             L.l.info('PiGpio initialised OK')
             _init_pwm()
         except Exception as ex1:
