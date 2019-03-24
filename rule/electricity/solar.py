@@ -106,7 +106,9 @@ class Relaydevice:
         # job is never finished for devices without power metering
         pass
 
+    # returns power status changes
     def grid_updated(self, grid_watts):
+        changed_relay_status = False
         # get relay status to check for user forced start
         power_on = self.get_power_status()
         if power_on and self.watts is not None:
@@ -119,16 +121,19 @@ class Relaydevice:
             if current_watts <= export:
                 self.set_power_status(power_is_on=True)
                 L.l.info("Should auto start device {}, state={} surplus={}".format(self.RELAY_NAME, self.state, export))
+                changed_relay_status = True
         else:
             L.l.info("Not exporting, import={}".format(grid_watts))
             if current_watts < grid_watts:
                 self.set_power_status(power_is_on=False)
                 L.l.info("Should auto stop device {}, state={} surplus={}".format(self.RELAY_NAME, self.state,
                                                                                   grid_watts))
+                changed_relay_status = True
             else:
                 L.l.info("Keep device {} consumption {} even with import {}".format(self.RELAY_NAME, current_watts,
                                                                                     grid_watts))
         self.update_job_finished()
+        return changed_relay_status
 
     def __init__(self, relay_name, avg_consumption):
         self.AVG_CONSUMPTION = avg_consumption
@@ -164,9 +169,10 @@ class Powerdevice(Relaydevice):
     def set_watts(self, watts):
         self.watts = watts
 
-    def __init__(self, relay_name, utility_name):
+    def __init__(self, relay_name, utility_name, avg_consumption):
         self.UTILITY_NAME = utility_name
         Relaydevice.__init__(self, relay_name)
+        self.AVG_CONSUMPTION = avg_consumption
 
 
 class LoadPowerDevice(Relaydevice):
@@ -198,15 +204,20 @@ class Washingmachine(Powerdevice):
         Powerdevice.__init__(self, relay_name, utility_name, avg_consumption)
 
 
-class Upscharger(Relaydevice):
+class Upscharger(Powerdevice):
     DEVICE_SUPPORTS_BREAKS = False
 
-    def __init__(self, relay_name, avg_consumption):
-        Relaydevice.__init__(self, relay_name, avg_consumption)
+    def __init__(self, relay_name, utility_name, avg_consumption):
+        Powerdevice.__init__(self, relay_name, utility_name, avg_consumption)
 
 
 class PwmHeater(LoadPowerDevice):
     DEVICE_SUPPORTS_BREAKS = True
+    max_duty = 1000000
+
+    def set_power_level(self, watts):
+        required_duty = (watts / self.MAX_WATTS) * self.max_duty
+        rule_common.update_pwm(self.RELAY_NAME, duty=required_duty)
 
     def __init__(self, relay_name, utility_name, max_watts):
         LoadPowerDevice.__init__(self, relay_name, utility_name, max_watts)
@@ -215,8 +226,9 @@ class PwmHeater(LoadPowerDevice):
 class P:
     grid_watts = None
     grid_importing = None
+    grid_exporting = None
     device_list = {}  # key is utility name
-    EXPORT_MIN_WATTS = -50
+    MIN_WATTS_THRESHOLD = 30
 
     @staticmethod
     # init in order of priority
@@ -225,10 +237,12 @@ class P:
         P.device_list[relay] = Washingmachine(relay_name=relay, utility_name='power plug 2', avg_consumption=70)
         relay = 'plug_1'
         P.device_list[relay] = Dishwasher(relay_name=relay, utility_name='power plug 1', avg_consumption=80)
-        relay = 'beci_upscharge_relay'
-        P.device_list[relay] = Upscharger(relay_name=relay, avg_consumption=200)
         relay = 'big_battery_relay'
         P.device_list[relay] = Upscharger(relay_name=relay, avg_consumption=50)
+        relay = 'beci_upscharge_relay'
+        P.device_list[relay] = Upscharger(relay_name=relay, avg_consumption=200)
+        relay = 'blackwater_pump_relay'
+        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=50)
         relay = 'boiler'
         P.device_list[relay] = PwmHeater(relay_name=relay, utility_name='power boiler', max_watts=2400)
 
@@ -241,11 +255,18 @@ def rule_energy_export(obj=models.Utility(), field_changed_list=None):
     if field_changed_list is not None and 'units_2_delta' in field_changed_list:
         if obj.utility_name == 'power main mono':
             P.grid_watts = obj.units_2_delta
-            # let all devices know grid status
-            for device in P.device_list.values():
-                device.grid_updated(P.grid_watts)
-            # then run actions?
-            pass
+            P.grid_importing = (P.grid_watts > P.MIN_WATTS_THRESHOLD)
+            P.grid_exporting = (P.grid_watts < -P.MIN_WATTS_THRESHOLD)
+            # let all devices know grid status and make power changes
+            dev_list = []
+            if P.grid_exporting:
+                dev_list = P.device_list.values()
+            if P.grid_importing:
+                dev_list = reversed(P.device_list.values())
+            for device in dev_list:
+                changed = device.grid_updated(P.grid_watts)
+                if changed:  # exit to allow main meter to update and recheck if more power changes are needed
+                    break
         else:
             # set consumption for device
             for dev in P.device_list:
