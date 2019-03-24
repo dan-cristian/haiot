@@ -12,6 +12,7 @@ import node
 import sensor
 import heat
 import gpio
+import utility
 import health_monitor
 #import rule
 import presence
@@ -144,9 +145,8 @@ def mqtt_thread_run():
                     elif table == utils.get_table_name(models.ZoneAlarm):
                         # no processing (no local save)
                         pass
-                    elif table == utils.get_table_name(models.Utility):
-                        # no additional processing
-                        pass
+                    elif table == utils.get_table_name(models.Utility, source_host):
+                        utility.record_update(obj)
                     elif table == utils.get_table_name(models.Ups):
                         # no additional processing
                         pass
