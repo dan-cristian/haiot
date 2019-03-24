@@ -208,6 +208,7 @@ def _get_pwm_record(name):
 
 # pi.hardware_PWM(18, 800, 250000) # 800Hz 25% dutycycle
 def do_pwm(name, frequency, duty_cycle, is_started):
+    L.l.info("Do pwm {} freq={} duty={} started={}".format(name, frequency, duty_cycle, is_started))
     pwm = _get_pwm_record(name)
     if pwm is not None:
         if is_started and frequency > 0 and duty_cycle > 0:
