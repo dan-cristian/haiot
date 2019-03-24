@@ -1,7 +1,7 @@
 from sqlalchemy import desc
 from main.logger_helper import L
 from main import thread_pool
-from common import Constant
+from common import Constant, utils
 from pydispatch import dispatcher
 from main.admin import models, model_helper
 
@@ -9,6 +9,13 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 
 initialised = False
+
+
+def record_update(obj, source_host):
+    utility_rec = utils.json_to_record(models.Utility(), obj)
+    if source_host != Constant.HOST_NAME:
+        current_rec = models.Utility.query.filter_by(utility_name=utility_rec.utility_name)
+        utility_rec.save_changed_fields(current_record=current_rec, notify_transport_enabled=False, save_to_graph=False)
 
 
 # water & electricity utility from specialised sensors
