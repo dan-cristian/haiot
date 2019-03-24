@@ -23,13 +23,13 @@ class Relaydevice:
     MIN_ON_INTERVAL = 60  # how long to run before auto stop
     DEVICE_SUPPORTS_BREAKS = False  # can this device be started/stopped several times during the job
     AVG_CONSUMPTION = 1
-    watts = None
+    watts = None  # current consumption for this device
     last_state_change = datetime.min
     last_state_on = datetime.min
     state = DeviceState.NO_INIT
     power_is_on = None
 
-    def set_power_status(self, power_is_on):
+    def set_power_status(self, power_is_on, exported_watts):
         if (self.state == DeviceState.USER_FORCED_STOP or not self.DEVICE_SUPPORTS_BREAKS) and power_is_on is False:
             # do not start the relay, as user forced a stop
             L.l.info("Not starting relay {}, state={} power={}".format(self.RELAY_NAME, self.state, power_is_on))
@@ -55,8 +55,8 @@ class Relaydevice:
                         if valid_power_status:
                             self.last_state_on = datetime.now()
                 else:
-                    L.l.info("Relay {} state already {}, power={}".format(self.RELAY_NAME, self.state,
-                                                                          self.power_is_on))
+                    L.l.info("Relay {} state already {}, power={}".format(
+                        self.RELAY_NAME, self.state, self.power_is_on))
                     pass
                 if power_is_on:
                     if self.state == DeviceState.NO_INIT or self.state == DeviceState.JOB_FINISHED:
@@ -119,19 +119,19 @@ class Relaydevice:
             # start device if exporting and there is enough surplus
             export = -grid_watts
             if current_watts <= export:
-                self.set_power_status(power_is_on=True)
-                L.l.info("Should auto start device {}, state={} surplus={}".format(self.RELAY_NAME, self.state, export))
+                self.set_power_status(power_is_on=True, exported_watts=grid_watts)
+                L.l.info("Should auto start device {} state={} surplus={}".format(self.RELAY_NAME, self.state, export))
                 changed_relay_status = True
         else:
             L.l.info("Not exporting, import={}".format(grid_watts))
             if current_watts < grid_watts:
-                self.set_power_status(power_is_on=False)
-                L.l.info("Should auto stop device {}, state={} surplus={}".format(self.RELAY_NAME, self.state,
-                                                                                  grid_watts))
+                self.set_power_status(power_is_on=False, exported_watts=grid_watts)
+                L.l.info("Should auto stop device {} state={} surplus={}".format(
+                    self.RELAY_NAME, self.state, grid_watts))
                 changed_relay_status = True
             else:
-                L.l.info("Keep device {} consumption {} even with import {}".format(self.RELAY_NAME, current_watts,
-                                                                                    grid_watts))
+                L.l.info("Keep device {} consumption {} even with import {}".format(
+                    self.RELAY_NAME, current_watts, grid_watts))
         self.update_job_finished()
         return changed_relay_status
 
