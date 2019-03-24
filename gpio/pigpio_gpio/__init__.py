@@ -187,7 +187,7 @@ def pwm_record_update(json_object):
                     duty_cycle = pwm.duty_cycle
                 if 'is_started' in pwm.last_commit_field_changed_list:
                     is_started = pwm.last_commit_field_changed_list['is_started']
-                    if not is_started:
+                    if is_started is False:
                         stop_pwm(pwm.name)
                     else:
                         do_pwm(pwm.name, frequency, duty_cycle)
@@ -215,6 +215,8 @@ def do_pwm(name, frequency, duty_cycle):
                 P.pi.hardware_PWM(pwm.gpio_pin_code, frequency, duty_cycle)
             L.l.info("Started PWM {} with frequency {} and duty {}".format(name, frequency, duty_cycle))
         else:
+            L.l.info("Stopping pwm {} with freq={} duty={} is_started={}".format(
+                name, frequency, duty_cycle, pwm.is_started))
             stop_pwm(name)
 
 
