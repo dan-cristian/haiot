@@ -206,6 +206,24 @@ def _get_pwm_record(name):
         return None
 
 
+def _get_pwm_attrib(name):
+    pwm = _get_pwm_record(name)
+    try:
+        frequency = P.pi.get_PWM_frequency(pwm.gpio_pin_code)
+    except Exception as ex:
+        frequency = 0
+    try:
+        duty_cycle = P.pi.get_PWM_dutycycle(pwm.gpio_pin_code)
+    except Exception as ex:
+        duty_cycle = 0
+    return frequency, duty_cycle
+
+
+def is_pwm_on(name):
+    freq, duty = _get_pwm_attrib(name)
+    return freq > 0 and duty > 0
+
+
 # pi.hardware_PWM(18, 800, 250000) # 800Hz 25% dutycycle
 def do_pwm(name, frequency, duty_cycle, is_started):
     L.l.info("Do pwm {} freq={} duty={} started={}".format(name, frequency, duty_cycle, is_started))
@@ -230,14 +248,7 @@ def stop_pwm(name):
 
 
 def _update_pwm(pwm_record):
-    try:
-        pwm_record.frequency = P.pi.get_PWM_frequency(pwm_record.gpio_pin_code)
-    except Exception:
-        pwm_record.frequency = 0
-    try:
-        pwm_record.duty_cycle = P.pi.get_PWM_dutycycle(pwm_record.gpio_pin_code)
-    except Exception:
-        pwm_record.duty_cycle = 0
+    pwm_record.frequency, pwm_record.duty_cycle = _get_pwm_attrib(pwm_record.name)
     pwm_record.notify_transport_enabled = False
     pwm_record.commit_record_to_db()
 

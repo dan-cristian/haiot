@@ -4,6 +4,7 @@ import time
 from main.logger_helper import L
 from main.admin import models
 from rule import rule_common
+from gpio import pigpio_gpio
 
 
 class DeviceState(Enum):
@@ -171,8 +172,7 @@ class Powerdevice(Relaydevice):
 
     def __init__(self, relay_name, utility_name, avg_consumption):
         self.UTILITY_NAME = utility_name
-        Relaydevice.__init__(self, relay_name)
-        self.AVG_CONSUMPTION = avg_consumption
+        Relaydevice.__init__(self, relay_name, avg_consumption)
 
 
 class LoadPowerDevice(Relaydevice):
@@ -207,7 +207,7 @@ class Washingmachine(Powerdevice):
 class Upscharger(Powerdevice):
     DEVICE_SUPPORTS_BREAKS = False
 
-    def __init__(self, relay_name, utility_name, avg_consumption):
+    def __init__(self, relay_name, utility_name=None, avg_consumption=None):
         Powerdevice.__init__(self, relay_name, utility_name, avg_consumption)
 
 
@@ -215,9 +215,14 @@ class PwmHeater(LoadPowerDevice):
     DEVICE_SUPPORTS_BREAKS = True
     max_duty = 1000000
 
-    def set_power_level(self, watts):
-        required_duty = (watts / self.MAX_WATTS) * self.max_duty
-        rule_common.update_pwm(self.RELAY_NAME, duty=required_duty)
+    # override
+    def set_power_status(self, power_is_on, exported_watts):
+        required_duty = (exported_watts / self.MAX_WATTS) * self.max_duty
+        pigpio_gpio.update_pwm_db(self.RELAY_NAME, frequency=None, duty=required_duty)
+
+    def get_power_status(self):
+        is_on = pigpio_gpio.is_pwm_on(self.RELAY_NAME)
+        return is_on
 
     def __init__(self, relay_name, utility_name, max_watts):
         LoadPowerDevice.__init__(self, relay_name, utility_name, max_watts)
@@ -275,5 +280,5 @@ def rule_energy_export(obj=models.Utility(), field_changed_list=None):
 
 
 def init():
-    pass
-    # P.init_dev()
+    # pass
+    P.init_dev()
