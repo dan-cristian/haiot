@@ -190,9 +190,9 @@ def pwm_record_update(json_object):
                     if is_started is False:
                         stop_pwm(pwm.name)
                     else:
-                        do_pwm(pwm.name, frequency, duty_cycle)
+                        do_pwm(pwm.name, frequency, duty_cycle, is_started=True)
                 else:
-                    do_pwm(pwm.name, frequency, duty_cycle)
+                    do_pwm(pwm.name, frequency, duty_cycle, is_started=True)
     except Exception as ex:
         L.l.error("Unable to update pwm state, err={}".format(ex))
 
@@ -207,16 +207,16 @@ def _get_pwm_record(name):
 
 
 # pi.hardware_PWM(18, 800, 250000) # 800Hz 25% dutycycle
-def do_pwm(name, frequency, duty_cycle):
+def do_pwm(name, frequency, duty_cycle, is_started):
     pwm = _get_pwm_record(name)
     if pwm is not None:
-        if pwm.is_started and frequency > 0 and duty_cycle > 0:
+        if is_started and frequency > 0 and duty_cycle > 0:
             if P.pi is not None:  # just for debug on windows
                 P.pi.hardware_PWM(pwm.gpio_pin_code, frequency, duty_cycle)
             L.l.info("Started PWM {} with frequency {} and duty {}".format(name, frequency, duty_cycle))
         else:
             L.l.info("Stopping pwm {} with freq={} duty={} is_started={}".format(
-                name, frequency, duty_cycle, pwm.is_started))
+                name, frequency, duty_cycle, is_started))
             stop_pwm(name)
 
 
