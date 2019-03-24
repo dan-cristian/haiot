@@ -41,7 +41,7 @@ class Relaydevice:
             L.l.info("Not stopping relay {}, state={} power={}".format(self.RELAY_NAME, self.state, power_is_on))
         else:
             if self.can_state_change():
-                if self.get_power_status() != power_is_on:
+                if self.is_power_on() != power_is_on:
                     valid_power_status = None
                     if not power_is_on:
                         if self.can_stop_relay():
@@ -87,7 +87,7 @@ class Relaydevice:
             else:
                 L.l.info("Not changing relay {}, state={}".format(self.RELAY_NAME, self.state))
 
-    def get_power_status(self):
+    def is_power_on(self):
         self.power_is_on = rule_common.get_custom_relay(self.RELAY_NAME)
         if self.state == DeviceState.AUTO_STOP and self.power_is_on:
             # if user forced the device start
@@ -112,7 +112,7 @@ class Relaydevice:
     def grid_updated(self, grid_watts):
         changed_relay_status = False
         # get relay status to check for user forced start
-        power_on = self.get_power_status()
+        power_on = self.is_power_on()
         if power_on and self.watts is not None:
             current_watts = self.watts
         else:
@@ -121,22 +121,23 @@ class Relaydevice:
             # start device if exporting and there is enough surplus
             export_watts = -grid_watts
             # only trigger power on if over treshold
-            if export_watts > P.MIN_WATTS_THRESHOLD and current_watts <= export_watts:
+            if export_watts > P.MIN_WATTS_THRESHOLD and current_watts <= export_watts and not self.is_power_on():
                 self.set_power_status(power_is_on=True, exported_watts=grid_watts)
-                L.l.info("Should auto start device {} state={} surplus={}".format(self.RELAY_NAME, self.state, export_watts))
+                L.l.info("Should auto start device {} state={} surplus={}".format(
+                    self.RELAY_NAME, self.state, export_watts))
                 changed_relay_status = True
         else:
             L.l.info("Not exporting, import={}".format(grid_watts))
             import_watts = grid_watts
             # only trigger power off if over treshold
-            if import_watts > P.MIN_WATTS_THRESHOLD and current_watts < grid_watts:
+            if import_watts > P.MIN_WATTS_THRESHOLD and current_watts < grid_watts and self.is_power_on():
                 self.set_power_status(power_is_on=False)
                 L.l.info("Should auto stop device {} state={} surplus={}".format(
                     self.RELAY_NAME, self.state, grid_watts))
                 changed_relay_status = True
             else:
-                L.l.info("Keep device {} consumption {} even with import {}".format(
-                    self.RELAY_NAME, current_watts, grid_watts))
+                L.l.debug("Keep device {} consumption {} with import power {} and power_on={}".format(
+                    self.RELAY_NAME, current_watts, grid_watts, self.is_power_on()))
         self.update_job_finished()
         return changed_relay_status
 
@@ -168,8 +169,8 @@ class Powerdevice(Relaydevice):
                 else:
                     self.last_min_watts_read = None
             else:
-                L.l.info("Warning, relay {} state is {} but power is {}".format(self.RELAY_NAME, self.state,
-                                                                                self.power_is_on))
+                L.l.info("Warning, relay {} state is {} but power is {}".format(
+                    self.RELAY_NAME, self.state, self.power_is_on))
 
     def set_watts(self, watts):
         self.watts = watts
@@ -229,7 +230,7 @@ class PwmHeater(LoadPowerDevice):
         else:
             pigpio_gpio.stop_pwm(self.RELAY_NAME)
 
-    def get_power_status(self):
+    def is_power_on(self):
         is_on = pigpio_gpio.is_pwm_on(self.RELAY_NAME)
         return is_on
 
