@@ -14,7 +14,7 @@ initialised = False
 def record_update(obj, source_host):
     utility_rec = utils.json_to_record(models.Utility(), obj)
     if source_host != Constant.HOST_NAME:
-        current_rec = models.Utility.query.filter_by(utility_name=utility_rec.utility_name)
+        current_rec = models.Utility.query.filter_by(utility_name=utility_rec.utility_name).first()
         utility_rec.save_changed_fields(current_record=current_rec, notify_transport_enabled=False, save_to_graph=False)
 
 

@@ -1,6 +1,7 @@
 from datetime import datetime
 from enum import Enum
 import time
+import collections
 from main.logger_helper import L
 from main.admin import models
 from rule import rule_common
@@ -30,7 +31,7 @@ class Relaydevice:
     state = DeviceState.NO_INIT
     power_is_on = None
 
-    def set_power_status(self, power_is_on, exported_watts):
+    def set_power_status(self, power_is_on, exported_watts=None):
         if (self.state == DeviceState.USER_FORCED_STOP or not self.DEVICE_SUPPORTS_BREAKS) and power_is_on is False:
             # do not start the relay, as user forced a stop
             L.l.info("Not starting relay {}, state={} power={}".format(self.RELAY_NAME, self.state, power_is_on))
@@ -118,15 +119,18 @@ class Relaydevice:
             current_watts = self.AVG_CONSUMPTION
         if grid_watts <= 0:
             # start device if exporting and there is enough surplus
-            export = -grid_watts
-            if current_watts <= export:
+            export_watts = -grid_watts
+            # only trigger power on if over treshold
+            if export_watts > P.MIN_WATTS_THRESHOLD and current_watts <= export_watts:
                 self.set_power_status(power_is_on=True, exported_watts=grid_watts)
-                L.l.info("Should auto start device {} state={} surplus={}".format(self.RELAY_NAME, self.state, export))
+                L.l.info("Should auto start device {} state={} surplus={}".format(self.RELAY_NAME, self.state, export_watts))
                 changed_relay_status = True
         else:
             L.l.info("Not exporting, import={}".format(grid_watts))
-            if current_watts < grid_watts:
-                self.set_power_status(power_is_on=False, exported_watts=grid_watts)
+            import_watts = grid_watts
+            # only trigger power off if over treshold
+            if import_watts > P.MIN_WATTS_THRESHOLD and current_watts < grid_watts:
+                self.set_power_status(power_is_on=False)
                 L.l.info("Should auto stop device {} state={} surplus={}".format(
                     self.RELAY_NAME, self.state, grid_watts))
                 changed_relay_status = True
@@ -216,9 +220,14 @@ class PwmHeater(LoadPowerDevice):
     max_duty = 1000000
 
     # override
-    def set_power_status(self, power_is_on, exported_watts):
-        required_duty = (exported_watts / self.MAX_WATTS) * self.max_duty
-        pigpio_gpio.update_pwm_db(self.RELAY_NAME, frequency=None, duty=required_duty)
+    def set_power_status(self, power_is_on, exported_watts=None):
+        L.l.info("Setting pwm {} status {} to watts level {}".format(self.RELAY_NAME, power_is_on, exported_watts))
+        if power_is_on:
+            assert exported_watts is not None
+            required_duty = (exported_watts / self.MAX_WATTS) * self.max_duty
+            pigpio_gpio.update_pwm_db(self.RELAY_NAME, frequency=None, duty=required_duty)
+        else:
+            pigpio_gpio.stop_pwm(self.RELAY_NAME)
 
     def get_power_status(self):
         is_on = pigpio_gpio.is_pwm_on(self.RELAY_NAME)
@@ -232,7 +241,7 @@ class P:
     grid_watts = None
     grid_importing = None
     grid_exporting = None
-    device_list = {}  # key is utility name
+    device_list = collections.OrderedDict()  # key is utility name
     MIN_WATTS_THRESHOLD = 30
 
     @staticmethod
@@ -249,6 +258,8 @@ class P:
         relay = 'blackwater_pump_relay'
         P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=50)
         relay = 'boiler'
+        P.device_list[relay] = PwmHeater(relay_name=relay, utility_name='power boiler', max_watts=2400)
+        relay = 'boiler2'
         P.device_list[relay] = PwmHeater(relay_name=relay, utility_name='power boiler', max_watts=2400)
 
     def __init__(self):
