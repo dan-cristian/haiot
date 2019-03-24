@@ -185,7 +185,14 @@ def pwm_record_update(json_object):
                     duty_cycle = pwm.last_commit_field_changed_list['duty_cycle']
                 else:
                     duty_cycle = pwm.duty_cycle
-                do_pwm(pwm.name, frequency, duty_cycle)
+                if 'is_started' in pwm.last_commit_field_changed_list:
+                    is_started = pwm.last_commit_field_changed_list['is_started']
+                    if not is_started:
+                        stop_pwm(pwm.name)
+                    else:
+                        do_pwm(pwm.name, frequency, duty_cycle)
+                else:
+                    do_pwm(pwm.name, frequency, duty_cycle)
     except Exception as ex:
         L.l.error("Unable to update pwm state, err={}".format(ex))
 
@@ -231,6 +238,18 @@ def _update_pwm(pwm_record):
     pwm_record.commit_record_to_db()
 
 
+def update_pwm_db(name, frequency=None, duty=None):
+    pwm = models.Pwm.query.filter_by(host_name=Constant.HOST_NAME, name=name).first()
+    if pwm is not None:
+        if frequency is not None:
+            pwm.frequency = frequency
+        if duty is not None:
+            pwm.duty_cycle = duty
+        pwm.commit_record_to_db()
+    else:
+        L.l.info("Cannot find pwm {} to update in db".format(name))
+
+
 def setup_in_ports(gpio_pin_list):
     # Log.logger.info('Socket timeout={}'.format(socket.getdefaulttimeout()))
     # socket.setdefaulttimeout(None)
@@ -270,6 +289,12 @@ def _init_pwm():
         _update_pwm(pwm)
 
 
+def _stop_all_pwm():
+    pwm_list = models.Pwm.query.filter_by(host_name=Constant.HOST_NAME).all()
+    for pwm in pwm_list:
+        P.pi.hardware_PWM(pwm.gpio_pin_code, 0, 0)
+
+
 def thread_run():
     _init_pwm()
 
@@ -277,6 +302,7 @@ def thread_run():
 def unload():
     P.callback = []
     if P.initialised:
+        _stop_all_pwm()
         P.pi.stop()
 
 
