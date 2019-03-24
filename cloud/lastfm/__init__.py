@@ -44,7 +44,10 @@ def _get_current():
     if _network is None:
         init()
     if _network is not None:
-        track = _network.get_user(USERNAME).get_now_playing()
+        try:
+            track = _network.get_user(USERNAME).get_now_playing()
+        except Exception as ex:
+            L.l.warning("Unable to get current lastfm play, err={}".format(ex))
     return track
 
 
