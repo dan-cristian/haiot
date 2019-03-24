@@ -4,6 +4,7 @@ from main.logger_helper import L
 from main.admin import models, model_helper
 from common import Constant
 from pydispatch import dispatcher
+from gpio import pigpio_gpio
 # import mpd
 from main.admin.model_helper import get_param
 
@@ -17,6 +18,10 @@ def update_custom_relay(relay_pin_name, power_is_on):
         current_relay.commit_record_to_db_notify()
     else:
         L.l.info("Cannot find relay {} on rule common update relay".format(relay_pin_name))
+
+
+def update_pwm(name, frequency=None, duty=None):
+    pigpio_gpio.update_pwm_db(name, frequency=frequency, duty=duty)
 
 
 def get_custom_relay(relay_pin_name):
