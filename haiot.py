@@ -5,5 +5,4 @@ import sys
 
 if __name__ == '__main__':
     import main
-    sys.settrace(None)
     main.run(sys.argv[1:])
