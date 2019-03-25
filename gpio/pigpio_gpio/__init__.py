@@ -297,6 +297,8 @@ def unload():
 
 
 def init():
+    P.pwm = Pwm(obj=models.Pwm)
+
     L.l.info('PiGpio initialising')
     if P.import_ok:
         try:
@@ -309,7 +311,6 @@ def init():
             P.initialised = True
             thread_pool.add_interval_callable(thread_run, run_interval_second=30)
             L.l.info('PiGpio initialised OK')
-            P.pwm = Pwm(obj=models.Pwm)
         except Exception as ex1:
             L.l.info('Unable to initialise PiGpio, err={}'.format(ex1))
             P.pi = None
