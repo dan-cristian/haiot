@@ -9,3 +9,4 @@ database.db
 prctl.py
 openzwave/*
 openzwave/__init__.py
+test/__init__.pyc
