@@ -121,6 +121,7 @@
     {"id":557, "active":true, "start_order":"57", "name":"sensor.sonoff", "host_name":"netbook"},
     {"id":559, "active":true, "start_order":"59", "name":"sensor.i2c", "host_name":"netbook"},
     {"id":570, "active":true, "start_order":"70", "name":"music", "host_name":"netbook"},
+    {"id":503,  "active":false, "start_order":"3", "name":"health_monitor", "host_name":"netbook"},
 
     {"id":609, "active":true, "start_order":"9", "name":"heat", "host_name":"pi-face"},
     {"id":611, "active":true, "start_order":"11", "name":"alarm", "host_name":"pi-face"},
