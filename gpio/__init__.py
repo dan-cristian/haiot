@@ -6,6 +6,7 @@ from common import utils
 from main.admin import models
 from main import thread_pool
 from sensor import sonoff
+import io_common
 import std_gpio
 import piface
 import pcf8574_gpio
@@ -13,7 +14,6 @@ import threading
 import prctl
 import rpi_gpio
 import pigpio_gpio
-import io_common
 
 
 class P:
@@ -30,6 +30,7 @@ try:
     P.has_zwave = True
 except ImportError as ie:
     L.l.info("Zwave module cannot be imported")
+
 
 
 # update hardware pin state and record real pin value in local DB only

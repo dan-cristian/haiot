@@ -7,6 +7,7 @@ from main.admin import models
 from main.admin.model_helper import commit
 from common import Constant, utils
 from main import thread_pool
+from gpio.io_common import GpioBase
 
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
@@ -20,6 +21,7 @@ class P:
     initialised = False
     callback = []
     pi = None
+    pwm = None
     callback_thread = None
     pin_tick_dict = {}  # {InputEvent}
     lock_dict = {}  # lock list for each gpio
@@ -171,101 +173,86 @@ def input_event(gpio, level, tick):
                 lock.release()
 
 
-def pwm_record_update(json_object):
-    try:
-        L.l.info("Updating pwm {}".format(json_object))
-        if P.initialised:
-            pwm = utils.json_to_record(models.Pwm, json_object)
-            if pwm.host_name == Constant.HOST_NAME:
-                if 'frequency' in pwm.last_commit_field_changed_list:
-                    frequency = pwm.last_commit_field_changed_list['frequency']
-                else:
-                    frequency = pwm.frequency
-                if 'duty_cycle' in pwm.last_commit_field_changed_list:
-                    duty_cycle = pwm.last_commit_field_changed_list['duty_cycle']
-                else:
-                    duty_cycle = pwm.duty_cycle
-                if 'is_started' in pwm.last_commit_field_changed_list:
-                    is_started = pwm.last_commit_field_changed_list['is_started']
-                    if is_started is False:
-                        stop_pwm(pwm.name)
-                    else:
-                        do_pwm(pwm.name, frequency, duty_cycle, is_started=True)
-                else:
-                    do_pwm(pwm.name, frequency, duty_cycle, is_started=True)
-    except Exception as ex:
-        L.l.error("Unable to update pwm state, err={}".format(ex))
+class Pwm(GpioBase):
 
+    @staticmethod
+    def _get_db_record(name):
+        return models.Pwm.query.filter_by(name=name).first()
 
-def _get_pwm_record(name):
-    pwm = models.Pwm.query.filter_by(host_name=Constant.HOST_NAME, name=name).first()
-    if pwm is not None:
-        return pwm
-    else:
-        L.l.warning("No pwm record with name={}".format(name))
+    @staticmethod
+    def _get_pwm_attrib(gpio):
+        is_started = True
+        try:
+            frequency = P.pi.get_PWM_frequency(gpio)
+        except Exception as ex:
+            frequency = 0
+            is_started = False
+        try:
+            duty_cycle = P.pi.get_PWM_dutycycle(gpio)
+        except Exception as ex:
+            duty_cycle = 0
+            is_started = False
+        return frequency, duty_cycle, is_started
+
+    @staticmethod
+    def sync_2_db(key):
+        pwm = Pwm._get_db_record(name=key)
+        pwm.frequency, pwm.duty_cycle, pwm.is_started = Pwm._get_pwm_attrib(pwm.gpio_pin_code)
+        pwm.notify_transport_enabled = True
+        pwm.commit_record_to_db()
+
+    @staticmethod
+    def _init_pwm():
+        pwm_list = models.Pwm.query.filter_by(host_name=Constant.HOST_NAME).all()
+        for pwm in pwm_list:
+            Pwm.sync_2_db(pwm.name)
+
+    @staticmethod
+    def set(key, values):
+        pwm = Pwm._get_db_record(name=key)
+        if pwm is not None:
+            frequency = pwm.frequency
+            duty_cycle = pwm.duty_cycle
+            for field in values:
+                if field == 'frequency':
+                    frequency = values[field]
+                elif field == 'duty_cycle':
+                    duty_cycle = values[field]
+                elif field == 'is_started':
+                    is_started = values[field]
+                    if not is_started:
+                        frequency = 0
+                        duty_cycle = 0
+                        break
+            P.pi.hardware_PWM(pwm.gpio_pin_code, frequency, duty_cycle)
+        else:
+            L.l.info("Cannot find pwm {} to set".format(key))
+
+    @staticmethod
+    def get(key):
         return None
 
+    @staticmethod
+    def get_current_record(record):
+        record = Pwm._get_db_record(name=record.name)
+        return record, record.name
 
-def _get_pwm_attrib(name):
-    pwm = _get_pwm_record(name)
-    try:
-        frequency = P.pi.get_PWM_frequency(pwm.gpio_pin_code)
-    except Exception as ex:
-        frequency = 0
-    try:
-        duty_cycle = P.pi.get_PWM_dutycycle(pwm.gpio_pin_code)
-    except Exception as ex:
-        duty_cycle = 0
-    return frequency, duty_cycle
-
-
-def is_pwm_on(name):
-    freq, duty = _get_pwm_attrib(name)
-    return freq > 0 and duty > 0
-
-
-# pi.hardware_PWM(18, 800, 250000) # 800Hz 25% dutycycle
-def do_pwm(name, frequency, duty_cycle, is_started):
-    L.l.info("Do pwm {} freq={} duty={} started={}".format(name, frequency, duty_cycle, is_started))
-    pwm = _get_pwm_record(name)
-    if pwm is not None:
-        if is_started and frequency > 0 and duty_cycle > 0:
-            if P.pi is not None:  # just for debug on windows
-                P.pi.hardware_PWM(pwm.gpio_pin_code, frequency, duty_cycle)
-            L.l.info("Started PWM {} with frequency {} and duty {}".format(name, frequency, duty_cycle))
-        else:
-            L.l.info("Stopping pwm {} with freq={} duty={} is_started={}".format(
-                name, frequency, duty_cycle, is_started))
-            stop_pwm(name)
-
-
-def stop_pwm(name):
-    pwm = _get_pwm_record(name)
-    if pwm is not None:
-        if P.pi is not None:  # just for debug on windows
+    @staticmethod
+    def unload():
+        pwm_list = models.Pwm.query.filter_by(host_name=Constant.HOST_NAME).all()
+        for pwm in pwm_list:
             P.pi.hardware_PWM(pwm.gpio_pin_code, 0, 0)
-        L.l.info("Stopped PWM {}".format(name))
+
+    def __init__(self, obj):
+        GpioBase.__init__(self, obj)
+        Pwm._init_pwm()
 
 
-def _update_pwm(pwm_record):
-    pwm_record.frequency, pwm_record.duty_cycle = _get_pwm_attrib(pwm_record.name)
-    pwm_record.notify_transport_enabled = False
-    pwm_record.commit_record_to_db()
+def pwm_record_update(json_object):
+    P.pwm.record_update(json_object)
 
 
-def update_pwm_db(name, frequency=None, duty=None):
-    pwm = models.Pwm.query.filter_by(host_name=Constant.HOST_NAME, name=name).first()
-    if pwm is not None:
-        if frequency is not None:
-            pwm.frequency = frequency
-        if duty is not None:
-            pwm.duty_cycle = duty
-        pwm.commit_record_to_db()
-    else:
-        L.l.info("Cannot find pwm {} to update in db".format(name))
-
-
-def setup_in_ports(gpio_pin_list):
+def _setup_in_ports(gpio_pin_list):
     # Log.logger.info('Socket timeout={}'.format(socket.getdefaulttimeout()))
     # socket.setdefaulttimeout(None)
     L.l.info('Configuring {} gpio input ports'.format(len(gpio_pin_list)))
@@ -298,26 +285,14 @@ def setup_in_ports(gpio_pin_list):
         L.l.critical('PiGpio not yet initialised but was asked to setup IN ports. Check module init order.')
 
 
-def _init_pwm():
-    pwm_list = models.Pwm.query.filter_by(host_name=Constant.HOST_NAME).all()
-    for pwm in pwm_list:
-        _update_pwm(pwm)
-
-
-def _stop_all_pwm():
-    pwm_list = models.Pwm.query.filter_by(host_name=Constant.HOST_NAME).all()
-    for pwm in pwm_list:
-        P.pi.hardware_PWM(pwm.gpio_pin_code, 0, 0)
-
-
 def thread_run():
-    _init_pwm()
+    pass
 
 
 def unload():
     P.callback = []
     if P.initialised:
-        _stop_all_pwm()
+        P.pwm.unload()
         P.pi.stop()
 
 
@@ -334,7 +309,7 @@ def init():
             P.initialised = True
             thread_pool.add_interval_callable(thread_run, run_interval_second=30)
             L.l.info('PiGpio initialised OK')
-            _init_pwm()
+            P.pwm = Pwm(obj=models.Pwm)
         except Exception as ex1:
             L.l.info('Unable to initialise PiGpio, err={}'.format(ex1))
             P.pi = None
