@@ -228,10 +228,10 @@ class PwmHeater(LoadPowerDevice):
             required_duty = (exported_watts / self.MAX_WATTS) * self.max_duty
             pigpio_gpio.update_pwm_db(self.RELAY_NAME, frequency=None, duty=required_duty)
         else:
-            pigpio_gpio.stop_pwm(self.RELAY_NAME)
+            pigpio_gpio.stop_pwm_db(self.RELAY_NAME)
 
     def is_power_on(self):
-        is_on = pigpio_gpio.is_pwm_on(self.RELAY_NAME)
+        is_on = pigpio_gpio.is_pwm_on_db(self.RELAY_NAME)
         return is_on
 
     def __init__(self, relay_name, utility_name, max_watts):
