@@ -1,6 +1,8 @@
 from common import Constant
 from main.admin import models
 from main.logger_helper import L
+import abc
+from common import utils
 
 
 # update in db (without propagatting the change by default)
@@ -52,3 +54,45 @@ class IOPort(InputPort, OutputPort):
 
     def __init__(self):
         pass
+
+
+class GpioBase:
+    __metaclass__ = abc.ABCMeta
+
+    @staticmethod
+    @abc.abstractmethod
+    def get_current_record(record):
+        return None, None
+
+    def record_update(self, json_object):
+        record = utils.json_to_record(self.obj, json_object)
+        current_record, key = self.get_current_record(record)
+        new_record = self.obj()
+        for field in record.last_commit_field_changed_list:
+            setattr(new_record, field, record.last_commit_field_changed_list[field])
+        if record.host_name == Constant.HOST_NAME:
+            self.set(key, values=record.last_commit_field_changed_list)
+        new_record.save_changed_fields(current_record=current_record)
+
+    @staticmethod
+    @abc.abstractmethod
+    def set(key, values):
+        pass
+
+    @staticmethod
+    @abc.abstractmethod
+    def get(key):
+        return None
+
+    @staticmethod
+    @abc.abstractmethod
+    def sync_to_db(key):
+        pass
+
+    @staticmethod
+    @abc.abstractmethod
+    def unload():
+        pass
+
+    def __init__(self, obj):
+        self.obj = obj
