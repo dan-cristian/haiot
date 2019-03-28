@@ -32,60 +32,22 @@ class Relaydevice:
     power_is_on = None
 
     def set_power_status(self, power_is_on, exported_watts=None):
-        if (self.state == DeviceState.USER_FORCED_STOP or not self.DEVICE_SUPPORTS_BREAKS) and power_is_on is False:
-            # do not start the relay, as user forced a stop
-            L.l.info("Not starting relay {}, state={} power={}".format(self.RELAY_NAME, self.state, power_is_on))
-            pass
-        elif self.state == DeviceState.USER_FORCED_START and power_is_on is False:
+        valid_power_status = power_is_on
+        if not power_is_on and self.state == DeviceState.USER_FORCED_START:
             # do not stop the relay, as user forced a start
-            L.l.info("Not stopping relay {}, state={} power={}".format(self.RELAY_NAME, self.state, power_is_on))
-        else:
-            if self.can_state_change():
-                if self.is_power_on() != power_is_on:
-                    valid_power_status = None
-                    if not power_is_on:
-                        if self.can_stop_relay():
-                            valid_power_status = power_is_on
-                        else:
-                            # not allowed to stop the relay
-                            pass
-                    else:
-                        valid_power_status = power_is_on
-                    if valid_power_status is not None:
-                        rule_common.update_custom_relay(relay_pin_name=self.RELAY_NAME, power_is_on=valid_power_status)
-                        self.last_state_change = datetime.now()
-                        if valid_power_status:
-                            self.last_state_on = datetime.now()
-                else:
-                    L.l.info("Relay {} state already {}, power={}".format(
-                        self.RELAY_NAME, self.state, self.power_is_on))
-                    pass
-                if power_is_on:
-                    if self.state == DeviceState.NO_INIT or self.state == DeviceState.JOB_FINISHED:
-                        if power_is_on:
-                            self.state = DeviceState.FIRST_START
-                            L.l.info("Was first relay start {}, state={}".format(self.RELAY_NAME, self.state))
-                        else:
-                            self.state = DeviceState.AUTO_STOP
-                            L.l.info("Was auto stop relay {}, state={}".format(self.RELAY_NAME, self.state))
-                    elif self.state == DeviceState.FIRST_START:
-                        self.state = DeviceState.AUTO_START
-                        L.l.info("Now is auto start relay {}, state={}".format(self.RELAY_NAME, self.state))
-                    elif self.state == DeviceState.AUTO_STOP:
-                        self.state = DeviceState.AUTO_START
-                        L.l.info("Was auto start relay {}, state={}".format(self.RELAY_NAME, self.state))
-                    elif self.state == DeviceState.AUTO_START:
-                        # already on
-                        L.l.info("Keep relay on {}, state={}".format(self.RELAY_NAME, self.state))
-                        pass
-                else:
-                    if self.state in [DeviceState.AUTO_START, DeviceState.NO_INIT, DeviceState.FIRST_START]:
-                        L.l.info("Auto stop relay {}, state={}".format(self.RELAY_NAME, self.state))
-                        self.state = DeviceState.AUTO_STOP
-                    else:
-                        L.l.info("Unexpected state relay {}, state={}".format(self.RELAY_NAME, self.state))
-            else:
-                L.l.info("Not changing relay {}, state={}".format(self.RELAY_NAME, self.state))
+            L.l.info("Not stopping forced start device {}, power={}".format(self.RELAY_NAME, self.is_power_on()))
+            valid_power_status = None
+        if not power_is_on and self.is_power_on() and not self.can_state_change():
+            L.l.info("Cannot stop already started device")
+            valid_power_status = None
+        if not self.can_stop_relay():
+            L.l.info("Cannot change device status yet")
+            valid_power_status = None
+        if valid_power_status is not None and self.is_power_on() != valid_power_status:
+            rule_common.update_custom_relay(relay_pin_name=self.RELAY_NAME, power_is_on=valid_power_status)
+            self.last_state_change = datetime.now()
+            if valid_power_status:
+                self.last_state_on = datetime.now()
 
     def is_power_on(self):
         self.power_is_on = rule_common.get_custom_relay(self.RELAY_NAME)
@@ -127,13 +89,13 @@ class Relaydevice:
                     self.RELAY_NAME, self.state, export_watts))
                 changed_relay_status = True
         else:
-            L.l.info("Not exporting, import={}".format(grid_watts))
+            # L.l.info("Not exporting, import={}".format(grid_watts))
             import_watts = grid_watts
             # only trigger power off if over treshold
             if import_watts > P.MIN_WATTS_THRESHOLD and current_watts < grid_watts and self.is_power_on():
-                self.set_power_status(power_is_on=False)
                 L.l.info("Should auto stop device {} state={} surplus={}".format(
                     self.RELAY_NAME, self.state, grid_watts))
+                self.set_power_status(power_is_on=False)
                 changed_relay_status = True
             else:
                 L.l.debug("Keep device {} consumption {} with import power {} and power_on={}".format(
