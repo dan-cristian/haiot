@@ -9,8 +9,7 @@ from main.admin.model_helper import get_param
 
 
 def update_custom_relay(relay_pin_name, power_is_on):
-    current_relay = models.ZoneCustomRelay.query.filter_by(
-        relay_pin_name=relay_pin_name, gpio_host_name=Constant.HOST_NAME).first()
+    current_relay = models.ZoneCustomRelay.query.filter_by(relay_pin_name=relay_pin_name).first()
     if current_relay is not None:
         L.l.info("Update relay {} on rule common to {}".format(relay_pin_name, power_is_on))
         current_relay.relay_is_on = power_is_on
@@ -20,8 +19,7 @@ def update_custom_relay(relay_pin_name, power_is_on):
 
 
 def get_custom_relay(relay_pin_name):
-    current_relay = models.ZoneCustomRelay.query.filter_by(
-        relay_pin_name=relay_pin_name, gpio_host_name=Constant.HOST_NAME).first()
+    current_relay = models.ZoneCustomRelay.query.filter_by(relay_pin_name=relay_pin_name).first()
     if current_relay is not None:
         state = current_relay.relay_is_on
     else:

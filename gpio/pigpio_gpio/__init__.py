@@ -211,8 +211,6 @@ class Pwm(GpioBase):
     def set(key, **kwargs):
         pwm = Pwm._get_db_record(name=key)
         if pwm is not None:
-            frequency = pwm.frequency
-            duty_cycle = pwm.duty_cycle
             for key, value in kwargs.items():
                 if key == 'frequency':
                     pwm.frequency = value
@@ -220,28 +218,48 @@ class Pwm(GpioBase):
                     pwm.duty_cycle = value
                 elif key == 'is_started':
                     pwm.is_started = value
-            if notify:
-                pwm.commit_record_to_db_notify()
+            if pwm.is_started:
+                P.pi.hardware_PWM(pwm.gpio_pin_code, pwm.frequency, pwm.duty_cycle)
             else:
-                pwm.commit_record_to_db()
-            # P.pi.hardware_PWM(pwm.gpio_pin_code, frequency, duty_cycle)
+                P.pi.hardware_PWM(pwm.gpio_pin_code, pwm.frequency, 0)
+            pwm.commit_record_to_db_notify()
         else:
             L.l.info("Cannot find pwm {} to set".format(key))
 
     @staticmethod
+    def save(key, **kwargs):
+        pwm = Pwm._get_db_record(name=key)
+        if pwm is not None:
+            for key, value in kwargs.items():
+                if key == 'frequency':
+                    pwm.frequency = value
+                elif key == 'duty_cycle':
+                    pwm.duty_cycle = value
+                elif key == 'is_started':
+                    pwm.is_started = value
+            pwm.commit_record_to_db()
+        else:
+            L.l.info("Cannot find pwm {} to save".format(key))
+
+    @staticmethod
     def get(key):
-        is_started = True
-        try:
-            frequency = P.pi.get_PWM_frequency(gpio)
-        except Exception as ex:
-            frequency = 0
-            is_started = False
-        try:
-            duty_cycle = P.pi.get_PWM_dutycycle(gpio)
-        except Exception as ex:
-            duty_cycle = 0
-            is_started = False
-        return is_started, frequency, duty_cycle
+        pwm = Pwm._get_db_record(name=key)
+        if pwm is not None:
+            is_started = True
+            try:
+                frequency = P.pi.get_PWM_frequency(pwm.gpio_pin_code)
+            except Exception as ex:
+                frequency = 0
+                is_started = False
+            try:
+                duty_cycle = P.pi.get_PWM_dutycycle(pwm.gpio_pin_code)
+            except Exception as ex:
+                duty_cycle = 0
+                is_started = False
+            return is_started, frequency, duty_cycle
+        else:
+            L.l.info("Cannot find pwm {} on get".format(key))
+            return None, None, None
 
     @staticmethod
     def get_current_record(record):
