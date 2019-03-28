@@ -208,29 +208,40 @@ class Pwm(GpioBase):
             Pwm.sync_2_db(pwm.name)
 
     @staticmethod
-    def set(key, values):
+    def set(key, **kwargs):
         pwm = Pwm._get_db_record(name=key)
         if pwm is not None:
             frequency = pwm.frequency
             duty_cycle = pwm.duty_cycle
-            for field in values:
-                if field == 'frequency':
-                    frequency = values[field]
-                elif field == 'duty_cycle':
-                    duty_cycle = values[field]
-                elif field == 'is_started':
-                    is_started = values[field]
-                    if not is_started:
-                        frequency = 0
-                        duty_cycle = 0
-                        break
-            P.pi.hardware_PWM(pwm.gpio_pin_code, frequency, duty_cycle)
+            for key, value in kwargs.items():
+                if key == 'frequency':
+                    pwm.frequency = value
+                elif key == 'duty_cycle':
+                    pwm.duty_cycle = value
+                elif key == 'is_started':
+                    pwm.is_started = value
+            if notify:
+                pwm.commit_record_to_db_notify()
+            else:
+                pwm.commit_record_to_db()
+            # P.pi.hardware_PWM(pwm.gpio_pin_code, frequency, duty_cycle)
         else:
             L.l.info("Cannot find pwm {} to set".format(key))
 
     @staticmethod
     def get(key):
-        return None
+        is_started = True
+        try:
+            frequency = P.pi.get_PWM_frequency(gpio)
+        except Exception as ex:
+            frequency = 0
+            is_started = False
+        try:
+            duty_cycle = P.pi.get_PWM_dutycycle(gpio)
+        except Exception as ex:
+            duty_cycle = 0
+            is_started = False
+        return is_started, frequency, duty_cycle
 
     @staticmethod
     def get_current_record(record):
