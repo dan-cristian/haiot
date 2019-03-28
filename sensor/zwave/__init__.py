@@ -135,11 +135,11 @@ def set_value(network, node, value):
                                         unit=units_adjusted)
                 else:
                     L.l.warning("Unknown power units {} for sensor {}".format(value.units, sensor_name))
-                L.l.info("Saving power utility {} {} {}".format(sensor_name, value.units, value.data))
+                # L.l.info("Saving power utility {} {} {}".format(sensor_name, value.units, value.data))
             elif value.label == "Energy" and value.units == "kWh":
                 haiot_dispatch.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=value.data,
                                     unit=value.units)
-                L.l.info("Saving energy utility {} {} {}".format(sensor_name, value.units, value.data))
+                # L.l.info("Saving energy utility {} {} {}".format(sensor_name, value.units, value.data))
             else:
                 # skip controller node
                 if node.node_id > 1:
@@ -160,17 +160,17 @@ def set_value(network, node, value):
                         record.vad = round(value.data, 0)
                         record.save_changed_fields(current_record=current_record, new_record=record,
                                                    notify_transport_enabled=True, save_to_graph=True, debug=False)
-                        L.l.info("Saving voltage {} {}".format(sensor_name, value.data))
+                        # L.l.info("Saving voltage {} {}".format(sensor_name, value.data))
                     elif delta_last_save > P.DELTA_SAVE_SECONDS and value.label == "Current":
                         record.iad = round(value.data, 1)
                         record.save_changed_fields(current_record=current_record, new_record=record,
                                                    notify_transport_enabled=True, save_to_graph=True, debug=False)
-                        L.l.info("Saving current {} {}".format(sensor_name, value.data))
+                        # L.l.info("Saving current {} {}".format(sensor_name, value.data))
                     elif delta_last_save > P.DELTA_SAVE_SECONDS and value.label == "Power Factor":
                         record.vdd = round(value.data, 1)
                         record.save_changed_fields(current_record=current_record, new_record=record,
                                                    notify_transport_enabled=True, save_to_graph=True, debug=False)
-                        L.l.info("Saving power factor {} {}".format(sensor_name, value.data))
+                        # L.l.info("Saving power factor {} {}".format(sensor_name, value.data))
                     if current_record is not None:
                         current_record.commit_record_to_db()
                     else:
