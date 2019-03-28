@@ -226,12 +226,12 @@ class PwmHeater(LoadPowerDevice):
         if power_is_on:
             assert exported_watts is not None
             required_duty = (exported_watts / self.MAX_WATTS) * self.max_duty
-            pigpio_gpio.update_pwm_db(self.RELAY_NAME, frequency=None, duty=required_duty)
+            pigpio_gpio.P.pwm.set(self.RELAY_NAME, duty_cycle=required_duty)
         else:
-            pigpio_gpio.stop_pwm_db(self.RELAY_NAME)
+            pigpio_gpio.P.pwm.set(self.RELAY_NAME, is_started=False)
 
     def is_power_on(self):
-        is_on = pigpio_gpio.is_pwm_on_db(self.RELAY_NAME)
+        is_on, frequency, duty_cycle = pigpio_gpio.P.pwm.get(self.RELAY_NAME)
         return is_on
 
     def __init__(self, relay_name, utility_name, max_watts):
