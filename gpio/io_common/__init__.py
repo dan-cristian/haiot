@@ -81,6 +81,11 @@ class GpioBase:
 
     @staticmethod
     @abc.abstractmethod
+    def save(key, values):
+        pass
+
+    @staticmethod
+    @abc.abstractmethod
     def get(key):
         return None
 
