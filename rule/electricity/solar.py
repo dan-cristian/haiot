@@ -250,8 +250,11 @@ def rule_energy_export(obj=models.Utility(), field_changed_list=None):
         else:
             # set consumption for device
             for dev in P.device_list:
-                if issubclass(type(dev), Powerdevice) and dev.UTILITY_NAME == obj.utility_name:
+                inst = P.device_list[dev]
+                if isinstance(inst, Powerdevice) and inst.UTILITY_NAME == obj.utility_name:
                     dev.set_watts(obj.units_2_delta)
+                else:
+                    pass
 
 
 def init():
