@@ -324,7 +324,7 @@ def unload():
     for func in P.func_list:
         thread_pool.remove_callable(func)
     for ow in P.ow_conn_list:
-        ow.close_connection()
+        P.ow_conn_list[ow].close_connection()
     P.initialised = False
 
 
