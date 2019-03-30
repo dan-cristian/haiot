@@ -140,6 +140,7 @@ class Powerdevice(Relaydevice):
 
     def __init__(self, relay_name, utility_name, avg_consumption):
         self.UTILITY_NAME = utility_name
+        self.watts = 0  # must init to avoid stop as relay
         Relaydevice.__init__(self, relay_name, avg_consumption)
 
 
@@ -161,7 +162,7 @@ class Dishwasher(Powerdevice):
 
     def __init__(self, relay_name, utility_name, avg_consumption):
         Powerdevice.__init__(self, relay_name, utility_name, avg_consumption)
-
+        
 
 class Washingmachine(Powerdevice):
     MIN_WATTS_OFF = 2
