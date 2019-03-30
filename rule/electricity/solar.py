@@ -265,7 +265,7 @@ def rule_energy_export(obj=models.Utility(), field_changed_list=None):
             if obj.utility_name in P.utility_list:
                 inst = P.utility_list[obj.utility_name]
                 if isinstance(inst, Powerdevice) and inst.UTILITY_NAME == obj.utility_name:
-                    dev.set_watts(obj.units_2_delta)
+                    inst.set_watts(obj.units_2_delta)
                 else:
                     pass
             
