@@ -78,7 +78,7 @@ class Relaydevice:
         if power_on and self.watts is not None:
             current_watts = self.watts
         else:
-            current_watts = self.AVG_CONSUMPTION
+            current_watts = 0
         if grid_watts <= 0:
             # start device if exporting and there is enough surplus
             export_watts = -grid_watts
