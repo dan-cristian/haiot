@@ -182,7 +182,7 @@ def unload():
 
     global shutting_down
     shutting_down = True
-    main.thread_pool.__thread_pool_enabled = False
+    main.thread_pool.P.tpool = False
     unload_modules()
 
 
