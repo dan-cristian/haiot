@@ -214,8 +214,8 @@ class P:
     @staticmethod
     # init in order of priority
     def init_dev():
-        relay = 'plug_2'
-        utility = 'power plug 2'
+        relay = 'washing_relay'
+        utility = 'power washing'
         obj = Washingmachine(relay_name=relay, utility_name=utility, avg_consumption=70)
         P.device_list[relay] = obj
         P.utility_list[utility] = obj
