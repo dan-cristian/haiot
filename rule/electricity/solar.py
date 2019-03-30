@@ -206,15 +206,22 @@ class P:
     grid_importing = None
     grid_exporting = None
     device_list = collections.OrderedDict()  # key is utility name
+    utility_list = {}
     MIN_WATTS_THRESHOLD = 30
 
     @staticmethod
     # init in order of priority
     def init_dev():
         relay = 'plug_2'
-        P.device_list[relay] = Washingmachine(relay_name=relay, utility_name='power plug 2', avg_consumption=70)
+        utility = 'power plug 2'
+        obj = Washingmachine(relay_name=relay, utility_name=utility, avg_consumption=70)
+        P.device_list[relay] = obj
+        P.utility_list[utility] = obj
         relay = 'plug_1'
-        P.device_list[relay] = Dishwasher(relay_name=relay, utility_name='power plug 1', avg_consumption=80)
+        utility = 'power plug 1'
+        obj = Dishwasher(relay_name=relay, utility_name=utility, avg_consumption=80)
+        P.device_list[relay] = obj
+        P.utility_list[utility] = obj
         relay = 'big_battery_relay'
         P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=50)
         relay = 'beci_upscharge_relay'
@@ -222,10 +229,16 @@ class P:
         relay = 'blackwater_pump_relay'
         P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=50)
         relay = 'boiler'
-        P.device_list[relay] = PwmHeater(relay_name=relay, utility_name='power boiler', max_watts=2400)
+        utility = 'power boiler'
+        obj = PwmHeater(relay_name=relay, utility_name=utility, max_watts=2400)
+        P.device_list[relay] = obj
+        P.utility_list[utility] = obj
         relay = 'boiler2'
-        P.device_list[relay] = PwmHeater(relay_name=relay, utility_name='power boiler', max_watts=2400)
-
+        utility = 'power boiler'
+        obj = PwmHeater(relay_name=relay, utility_name='power boiler', max_watts=2400)
+        P.device_list[relay] = obj
+        P.utility_list[utility] = obj
+        
     def __init__(self):
         pass
 
@@ -249,13 +262,18 @@ def rule_energy_export(obj=models.Utility(), field_changed_list=None):
                     break
         else:
             # set consumption for device
-            for dev in P.device_list:
-                inst = P.device_list[dev]
+            if obj.utility_name in P.utility_list:
+                inst = P.utility_list[obj.utility_name]
                 if isinstance(inst, Powerdevice) and inst.UTILITY_NAME == obj.utility_name:
                     dev.set_watts(obj.units_2_delta)
                 else:
                     pass
-
+            
+            #for dev in P.device_list:
+            #    inst = P.device_list[dev]
+            #    if isinstance(inst, Powerdevice) and inst.UTILITY_NAME == obj.utility_name:
+            #        dev.set_watts(obj.units_2_delta)
+            
 
 def init():
     P.init_dev()
