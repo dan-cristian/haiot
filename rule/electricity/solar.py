@@ -90,7 +90,7 @@ class Relaydevice:
             if power_on and self.watts is not None:
                 current_watts = self.watts
             else:
-                current_watts = 0
+                current_watts = self.AVG_CONSUMPTION
             # only trigger power off if over treshold
             if current_watts > P.IDLE_WATTS:
                 if import_watts > P.MIN_WATTS_THRESHOLD and current_watts < grid_watts and self.is_power_on():
