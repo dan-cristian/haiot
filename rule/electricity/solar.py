@@ -75,22 +75,22 @@ class Relaydevice:
         changed_relay_status = False
         # get relay status to check for user forced start
         power_on = self.is_power_on()
-        if power_on and self.watts is not None:
-            current_watts = self.watts
-        else:
-            current_watts = 0
         if grid_watts <= 0:
             # start device if exporting and there is enough surplus
             export_watts = -grid_watts
             # only trigger power on if over treshold
-            if export_watts > P.MIN_WATTS_THRESHOLD and current_watts <= export_watts and not self.is_power_on():
+            if export_watts > P.MIN_WATTS_THRESHOLD and self.AVG_CONSUMPTION <= export_watts and not self.is_power_on():
                 self.set_power_status(power_is_on=True, exported_watts=grid_watts)
                 L.l.info("Should auto start device {} state={} consuming={} surplus={}".format(
-                    self.RELAY_NAME, self.state, current_watts, export_watts))
+                    self.RELAY_NAME, self.state, self.watts, export_watts))
                 changed_relay_status = True
         else:
             # L.l.info("Not exporting, import={}".format(grid_watts))
             import_watts = grid_watts
+            if power_on and self.watts is not None:
+                current_watts = self.watts
+            else:
+                current_watts = 0
             # only trigger power off if over treshold
             if current_watts > P.IDLE_WATTS:
                 if import_watts > P.MIN_WATTS_THRESHOLD and current_watts < grid_watts and self.is_power_on():
