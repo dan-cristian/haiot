@@ -96,11 +96,11 @@ class Relaydevice:
                 if import_watts > P.MIN_WATTS_THRESHOLD and current_watts < grid_watts and self.is_power_on():
                     L.l.info("Should auto stop device {} state={} consuming={} surplus={}".format(
                         self.RELAY_NAME, self.state, current_watts, grid_watts))
-                self.set_power_status(power_is_on=False)
-                changed_relay_status = True
-            else:
-                L.l.debug("Keep device {} consumption {} with import power {} and power_on={}".format(
-                    self.RELAY_NAME, current_watts, grid_watts, self.is_power_on()))
+                    self.set_power_status(power_is_on=False)
+                    changed_relay_status = True
+                else:
+                    L.l.debug("Keep device {} consumption {} with import power {} and power_on={}".format(
+                        self.RELAY_NAME, current_watts, grid_watts, self.is_power_on()))
         self.update_job_finished()
         return changed_relay_status
 
