@@ -207,6 +207,7 @@ def unload():
     if P.serial is not None and P.serial.isOpen():
         P.serial.close()
     P.initialised = False
+    dispatcher.disconnect(_init_recovery, signal=Constant.SIGNAL_USB_DEVICE_CHANGE)
 
 
 # called once a usb change is detected

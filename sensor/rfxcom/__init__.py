@@ -167,6 +167,7 @@ def thread_run():
 def unload():
     thread_pool.remove_callable(thread_run)
     P.initialised = False
+    dispatcher.disconnect(_init_recovery, signal=Constant.SIGNAL_USB_DEVICE_CHANGE)
 
 
 # called once a usb change is detected
