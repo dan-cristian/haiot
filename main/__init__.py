@@ -319,6 +319,7 @@ def init():
 
 def run(arg_list):
     L.DEBUG_REMOTE = 'debug_remote' in arg_list
+    print("Debug remote is {}".format(L.DEBUG_REMOTE))
     if L.DEBUG_REMOTE:
         # https://blogs.msdn.microsoft.com/mustafakasap/2016/02/04/py-01-visual-studio-publish-python-script-on-a-unix-machine-remote-debug/
         # https://github.com/Microsoft/PTVS/wiki/Cross-Platform-Remote-Debugging
