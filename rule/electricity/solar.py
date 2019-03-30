@@ -85,16 +85,16 @@ class Relaydevice:
             # only trigger power on if over treshold
             if export_watts > P.MIN_WATTS_THRESHOLD and current_watts <= export_watts and not self.is_power_on():
                 self.set_power_status(power_is_on=True, exported_watts=grid_watts)
-                L.l.info("Should auto start device {} state={} surplus={}".format(
-                    self.RELAY_NAME, self.state, export_watts))
+                L.l.info("Should auto start device {} state={} consuming={} surplus={}".format(
+                    self.RELAY_NAME, self.state, current_watts, export_watts))
                 changed_relay_status = True
         else:
             # L.l.info("Not exporting, import={}".format(grid_watts))
             import_watts = grid_watts
             # only trigger power off if over treshold
             if import_watts > P.MIN_WATTS_THRESHOLD and current_watts < grid_watts and self.is_power_on():
-                L.l.info("Should auto stop device {} state={} surplus={}".format(
-                    self.RELAY_NAME, self.state, grid_watts))
+                L.l.info("Should auto stop device {} state={} consuming={} surplus={}".format(
+                    self.RELAY_NAME, self.state, current_watts, grid_watts))
                 self.set_power_status(power_is_on=False)
                 changed_relay_status = True
             else:
