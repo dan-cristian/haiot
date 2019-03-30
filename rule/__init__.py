@@ -221,7 +221,7 @@ def reload_rules():
 
 def init():
     global scheduler
-    L.l.debug('Rules module initialising')
+    L.l.info('Rules module initialising')
     if scheduler:
         P.rules_modules.append(rules_run)
         P.rules_modules.append(electricity.solar)
