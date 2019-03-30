@@ -23,7 +23,7 @@ class Relaydevice:
     STATE_CHANGE_INTERVAL = 30  # how often can change state
     MAX_OFF_INTERVAL = 600  # seconds, how long can stay off after job has started, if device supports breaks
     MIN_ON_INTERVAL = 60  # how long to run before auto stop
-    DEVICE_SUPPORTS_BREAKS = False  # can this device be started/stopped several times during the job
+    DEVICE_SUPPORTS_BREAKS = True  # can this device be started/stopped several times during the job
     AVG_CONSUMPTION = 1
     watts = None  # current consumption for this device
     last_state_change = datetime.min
@@ -216,7 +216,7 @@ class P:
         relay = 'plug_1'
         P.device_list[relay] = Dishwasher(relay_name=relay, utility_name='power plug 1', avg_consumption=80)
         relay = 'big_battery_relay'
-        P.device_list[relay] = Upscharger(relay_name=relay, avg_consumption=50)
+        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=50)
         relay = 'beci_upscharge_relay'
         P.device_list[relay] = Upscharger(relay_name=relay, avg_consumption=200)
         relay = 'blackwater_pump_relay'
