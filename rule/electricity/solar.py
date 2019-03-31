@@ -40,8 +40,8 @@ class Relaydevice:
         if not power_is_on and self.is_power_on() and not self.can_state_change():
             L.l.info("Cannot stop already started device")
             valid_power_status = None
-        if not self.can_stop_relay():
-            L.l.info("Cannot change device status yet")
+        if not power_is_on and not self.can_stop_relay():
+            L.l.info("Cannot stop device yet")
             valid_power_status = None
         if valid_power_status is not None and self.is_power_on() != valid_power_status:
             rule_common.update_custom_relay(relay_pin_name=self.RELAY_NAME, power_is_on=valid_power_status)
