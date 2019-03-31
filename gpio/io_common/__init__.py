@@ -63,6 +63,11 @@ class GpioBase:
     @abc.abstractmethod
     def get_current_record(record):
         return None, None
+    
+    @staticmethod
+    @abc.abstractmethod
+    def get_db_record(key):
+        return None
 
     def record_update(self, json_object):
         record = utils.json_to_record(self.obj, json_object)
