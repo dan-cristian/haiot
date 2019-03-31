@@ -221,7 +221,7 @@ class Pwm(GpioBase):
                     pwm.duty_cycle = value
                 elif key == 'is_started':
                     pwm.is_started = value
-            if record.host_name == Constant.HOST_NAME:
+            if pwm.host_name == Constant.HOST_NAME:
                 if pwm.is_started:
                     P.pi.hardware_PWM(pwm.gpio_pin_code, pwm.frequency, pwm.duty_cycle)
                 else:
