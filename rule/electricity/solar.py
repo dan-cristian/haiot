@@ -20,9 +20,9 @@ class DeviceState(Enum):
 
 class Relaydevice:
     RELAY_NAME = None
-    STATE_CHANGE_INTERVAL = 30  # how often can change state
+    STATE_CHANGE_INTERVAL = 30  # how often can change state, in seconds
     MAX_OFF_INTERVAL = 600  # seconds, how long can stay off after job has started, if device supports breaks
-    MIN_ON_INTERVAL = 60  # how long to run before auto stop
+    MIN_ON_INTERVAL = 60  # how long to run before auto stop, in seconds
     DEVICE_SUPPORTS_BREAKS = False  # can this device be started/stopped several times during the job
     AVG_CONSUMPTION = 1
     watts = None  # current consumption for this device
@@ -38,10 +38,10 @@ class Relaydevice:
             L.l.info("Not stopping forced start device {}, power={}".format(self.RELAY_NAME, self.is_power_on()))
             valid_power_status = None
         if not power_is_on and self.is_power_on() and not self.can_state_change():
-            L.l.info("Cannot stop already started device")
+            L.l.info("Cannot stop already started device {}".format(self.RELAY_NAME))
             valid_power_status = None
         if not power_is_on and not self.can_stop_relay():
-            L.l.info("Cannot stop device yet")
+            L.l.info("Cannot stop device {} yet".format(self.RELAY_NAME))
             valid_power_status = None
         if valid_power_status is not None and self.is_power_on() != valid_power_status:
             rule_common.update_custom_relay(relay_pin_name=self.RELAY_NAME, power_is_on=valid_power_status)
@@ -104,9 +104,10 @@ class Relaydevice:
         self.update_job_finished()
         return changed_relay_status
 
-    def __init__(self, relay_name, avg_consumption):
+    def __init__(self, relay_name, avg_consumption, supports_breaks=False):
         self.AVG_CONSUMPTION = avg_consumption
         self.RELAY_NAME = relay_name
+        self.DEVICE_SUPPORTS_BREAKS = supports_breaks
 
 
 class Powerdevice(Relaydevice):
@@ -226,11 +227,11 @@ class P:
         P.device_list[relay] = obj
         P.utility_list[utility] = obj
         relay = 'big_battery_relay'
-        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=50)
+        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=50, supports_breaks=True)
         relay = 'beci_upscharge_relay'
         P.device_list[relay] = Upscharger(relay_name=relay, avg_consumption=200)
         relay = 'blackwater_pump_relay'
-        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=50)
+        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=50, supports_breaks=True)
         relay = 'boiler'
         utility = 'power boiler'
         obj = PwmHeater(relay_name=relay, utility_name=utility, max_watts=2400)
