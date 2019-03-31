@@ -23,7 +23,7 @@ class Relaydevice:
     STATE_CHANGE_INTERVAL = 30  # how often can change state
     MAX_OFF_INTERVAL = 600  # seconds, how long can stay off after job has started, if device supports breaks
     MIN_ON_INTERVAL = 60  # how long to run before auto stop
-    DEVICE_SUPPORTS_BREAKS = True  # can this device be started/stopped several times during the job
+    DEVICE_SUPPORTS_BREAKS = False  # can this device be started/stopped several times during the job
     AVG_CONSUMPTION = 1
     watts = None  # current consumption for this device
     last_state_change = datetime.min
@@ -64,7 +64,7 @@ class Relaydevice:
 
     def can_stop_relay(self):
         delta = (datetime.now() - self.last_state_on).total_seconds()
-        return delta >= self.MIN_ON_INTERVAL
+        return delta >= self.MIN_ON_INTERVAL and self.DEVICE_SUPPORTS_BREAKS
 
     def update_job_finished(self):
         # job is never finished for devices without power metering
@@ -162,7 +162,7 @@ class Dishwasher(Powerdevice):
 
     def __init__(self, relay_name, utility_name, avg_consumption):
         Powerdevice.__init__(self, relay_name, utility_name, avg_consumption)
-        
+
 
 class Washingmachine(Powerdevice):
     MIN_WATTS_OFF = 2
@@ -241,7 +241,7 @@ class P:
         obj = PwmHeater(relay_name=relay, utility_name='power boiler', max_watts=2400)
         P.device_list[relay] = obj
         P.utility_list[utility] = obj
-        
+
     def __init__(self):
         pass
 
@@ -271,12 +271,7 @@ def rule_energy_export(obj=models.Utility(), field_changed_list=None):
                     inst.set_watts(obj.units_2_delta)
                 else:
                     pass
-            
-            #for dev in P.device_list:
-            #    inst = P.device_list[dev]
-            #    if isinstance(inst, Powerdevice) and inst.UTILITY_NAME == obj.utility_name:
-            #        dev.set_watts(obj.units_2_delta)
-            
+
 
 def init():
     P.init_dev()
