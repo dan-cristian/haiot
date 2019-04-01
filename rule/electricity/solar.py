@@ -2,6 +2,7 @@ from datetime import datetime
 from enum import Enum
 import time
 import collections
+import random
 from main.logger_helper import L
 from main.admin import models
 from rule import rule_common
@@ -80,7 +81,7 @@ class Relaydevice:
             export_watts = -grid_watts
             # only trigger power on if over treshold
             if export_watts > P.MIN_WATTS_THRESHOLD and self.AVG_CONSUMPTION <= export_watts and not self.is_power_on():
-                self.set_power_status(power_is_on=True, exported_watts=grid_watts)
+                self.set_power_status(power_is_on=True, exported_watts=export_watts)
                 L.l.info("Should auto start device {} state={} consuming={} surplus={}".format(
                     self.RELAY_NAME, self.state, self.watts, export_watts))
                 changed_relay_status = True
@@ -190,7 +191,7 @@ class PwmHeater(LoadPowerDevice):
         L.l.info("Setting pwm {} status {} to watts level {}".format(self.RELAY_NAME, power_is_on, exported_watts))
         if power_is_on:
             assert exported_watts is not None
-            required_duty = (exported_watts / self.MAX_WATTS) * self.max_duty
+            required_duty = exported_watts * self.max_duty / self.MAX_WATTS
             pigpio_gpio.P.pwm.set(self.RELAY_NAME, duty_cycle=required_duty)
         else:
             pigpio_gpio.P.pwm.set(self.RELAY_NAME, is_started=False)
@@ -212,10 +213,18 @@ class P:
     utility_list = {}
     MIN_WATTS_THRESHOLD = 30
     IDLE_WATTS = 10
+    emulate_export = False # used to test export energy scenarios
 
     @staticmethod
     # init in order of priority
     def init_dev():
+        if P.emulate_export:
+            relay = 'boiler2'
+            utility = 'power boiler'
+            obj = PwmHeater(relay_name=relay, utility_name='power boiler', max_watts=2400)
+            P.device_list[relay] = obj
+            P.utility_list[utility] = obj
+
         relay = 'washing_relay'
         utility = 'power washing'
         obj = Washingmachine(relay_name=relay, utility_name=utility, avg_consumption=70)
@@ -251,7 +260,10 @@ class P:
 def rule_energy_export(obj=models.Utility(), field_changed_list=None):
     if field_changed_list is not None and 'units_2_delta' in field_changed_list:
         if obj.utility_name == 'power main mono':
-            P.grid_watts = obj.units_2_delta
+            if P.emulate_export is True:
+                P.grid_watts = random.randint(-800, -300)
+            else:
+                P.grid_watts = obj.units_2_delta
             P.grid_importing = (P.grid_watts > P.MIN_WATTS_THRESHOLD)
             P.grid_exporting = (P.grid_watts < -P.MIN_WATTS_THRESHOLD)
             # let all devices know grid status and make power changes
@@ -275,5 +287,6 @@ def rule_energy_export(obj=models.Utility(), field_changed_list=None):
 
 
 def init():
+    P.emulate_export = True
     P.init_dev()
     L.l.info("Initialised solar rules with {} devices".format(len(P.device_list)))
