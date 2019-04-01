@@ -85,7 +85,7 @@ def _handle_record(new_record=None, current_record=None):
                         if hasattr(new_record, cloud_field_name) \
                                 and hasattr(current_record, Constant.JSON_PUBLISH_FIELDS_CHANGED) \
                                 and (current_record is None or cloud_field_name
-                                     in current_record.last_commit_field_changed_list):
+                                     in current_record._last_commit_field_changed_list):
                             cloud_key_val = cloud_field[1]
                             if cloud_key_val is not None:
                                 record_key_name = getattr(new_record, cloud_field[2])

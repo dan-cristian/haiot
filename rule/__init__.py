@@ -47,7 +47,7 @@ def parse_rules(obj, change):
     try:
         # extract only changed fields
         if hasattr(obj, Constant.JSON_PUBLISH_FIELDS_CHANGED):
-            field_changed_list = obj.last_commit_field_changed_list
+            field_changed_list = obj._last_commit_field_changed_list
         else:
             field_changed_list = []
         # iterate all functions in each rule module and queue for execution what matches

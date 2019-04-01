@@ -219,6 +219,12 @@ class P:
     # init in order of priority
     def init_dev():
         if P.emulate_export:
+            relay = 'boiler'
+            utility = 'power boiler'
+            obj = PwmHeater(relay_name=relay, utility_name=utility, max_watts=2400)
+            P.device_list[relay] = obj
+            P.utility_list[utility] = obj
+
             relay = 'boiler2'
             utility = 'power boiler'
             obj = PwmHeater(relay_name=relay, utility_name='power boiler', max_watts=2400)
