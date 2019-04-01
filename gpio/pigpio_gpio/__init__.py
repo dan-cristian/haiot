@@ -224,10 +224,15 @@ class Pwm(GpioBase):
                     new_pwm.is_started = value
             if pwm.host_name == Constant.HOST_NAME and P.pi is not None:  # condition for debug
                 if pwm.is_started:
+                    L.l.info("Set PWM {} to frequency {} duty {}".format(
+                        pwm.gpio_pin_code, pwm.frequency, pwm.duty_cycle))
                     P.pi.hardware_PWM(pwm.gpio_pin_code, pwm.frequency, pwm.duty_cycle)
                 else:
+                    L.l.info("Stop PWM {} ".format(pwm.gpio_pin_code))
                     P.pi.hardware_PWM(pwm.gpio_pin_code, pwm.frequency, 0)
-            new_pwm.save_changed_fields(current_record=pwm, notify_transport_enabled=True, debug=True)
+            L.l.info("Saved status PWM {} {} to frequency {} duty {}".format(
+                key, pwm.gpio_pin_code, pwm.frequency, pwm.duty_cycle))
+            new_pwm.save_changed_fields(current_record=pwm, notify_transport_enabled=True, debug=False)
         else:
             L.l.warning("Cannot find pwm {} to set".format(key))
 
