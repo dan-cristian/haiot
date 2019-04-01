@@ -26,6 +26,7 @@ class Relaydevice:
     MIN_ON_INTERVAL = 60  # how long to run before auto stop, in seconds
     DEVICE_SUPPORTS_BREAKS = False  # can this device be started/stopped several times during the job
     AVG_CONSUMPTION = 1
+    POWER_ADJUSTABLE = False
     watts = None  # current consumption for this device
     last_state_change = datetime.min
     last_state_on = datetime.min
@@ -80,7 +81,8 @@ class Relaydevice:
             # start device if exporting and there is enough surplus
             export_watts = -grid_watts
             # only trigger power on if over treshold
-            if export_watts > P.MIN_WATTS_THRESHOLD and self.AVG_CONSUMPTION <= export_watts:  # and not self.is_power_on():
+            if export_watts > P.MIN_WATTS_THRESHOLD and self.AVG_CONSUMPTION <= export_watts \
+                    and (not self.is_power_on() or self.POWER_ADJUSTABLE):
                 self.set_power_status(power_is_on=True, exported_watts=export_watts)
                 L.l.info("Should auto start device {} state={} consuming={} surplus={}".format(
                     self.RELAY_NAME, self.state, self.watts, export_watts))
@@ -202,6 +204,7 @@ class PwmHeater(LoadPowerDevice):
 
     def __init__(self, relay_name, utility_name, max_watts):
         LoadPowerDevice.__init__(self, relay_name, utility_name, max_watts)
+        self.POWER_ADJUSTABLE = True
 
 
 class P:
