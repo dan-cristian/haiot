@@ -177,6 +177,8 @@ class Pwm(GpioBase):
 
     @staticmethod
     def get_db_record(key):
+        # m = models.Pwm
+        # rec = m().query_filter_first(m.name == 'boiler2')
         return models.Pwm.query.filter_by(name=key).first()
 
     @staticmethod
