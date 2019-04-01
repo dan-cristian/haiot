@@ -158,12 +158,12 @@ class DbBase:
             new_record.save_to_graph = save_to_graph
             new_record.notify_transport_enabled = notify_transport_enabled
             # reset to avoid duplication
-            new_record.last_commit_field_changed_list = []
+            new_record._last_commit_field_changed_list = []
             _now1 = utils.get_base_location_now_date()
             if current_record is not None:
                 # ensure is set for both new and existing records
                 current_record.save_to_history = save_to_graph
-                current_record.last_commit_field_changed_list = []
+                current_record._last_commit_field_changed_list = []
                 current_record.notify_transport_enabled = notify_transport_enabled
                 # for column in new_record.query.statement._columns._all_columns: # this iter skips class attributes
                 for column in utils.get_primitives(new_record):
@@ -190,7 +190,7 @@ class DbBase:
                                 pass
                             if column_name != "id":  # do not change primary key with None
                                 setattr(current_record, column_name, new_value)
-                                current_record.last_commit_field_changed_list.append(column_name)
+                                current_record._last_commit_field_changed_list.append(column_name)
                                 if debug:
                                     L.l.info('DEBUG CHANGE COL={} old={} new={}'.format(column_name, old_value, new_value))
                         else:
@@ -199,12 +199,12 @@ class DbBase:
                     else:
                         L.l.error('Unexpected field {} at savechanged in rec {}'.format(column_name, new_record))
                 if debug:
-                    L.l.info('DEBUG len changed fields={}'.format(len(current_record.last_commit_field_changed_list)))
-                if len(current_record.last_commit_field_changed_list) == 0:
+                    L.l.info('DEBUG len changed fields={}'.format(len(current_record._last_commit_field_changed_list)))
+                if len(current_record._last_commit_field_changed_list) == 0:
                     current_record.notify_transport_enabled = False
                 # fixme: remove hardcoded field name
-                elif len(current_record.last_commit_field_changed_list) == 1 and ignore_only_updated_on_change and \
-                        Constant.DB_FIELD_UPDATE in current_record.last_commit_field_changed_list:
+                elif len(current_record._last_commit_field_changed_list) == 1 and ignore_only_updated_on_change and \
+                        Constant.DB_FIELD_UPDATE in current_record._last_commit_field_changed_list:
                     current_record.notify_transport_enabled = False
             else:
                 new_record.notify_transport_enabled = notify_transport_enabled
@@ -212,7 +212,7 @@ class DbBase:
                     column_name = str(column)
                     new_value = getattr(new_record, column_name)
                     if new_value:
-                        new_record.last_commit_field_changed_list.append(column_name)
+                        new_record._last_commit_field_changed_list.append(column_name)
                 if debug:
                     L.l.info('DEBUG new record={}'.format(new_record))
                 db.session.add(new_record)
@@ -275,7 +275,7 @@ class DbEvent:
     is_event_external = None
 
     operation_type = None
-    last_commit_field_changed_list = []
+    _last_commit_field_changed_list = []
 
     def get_deepcopy(self):
         return deepcopy(self)
