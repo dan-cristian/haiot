@@ -200,7 +200,7 @@ class DbBase:
                                 L.l.info('DEBUG NOT change col={}'.format(column_name))
                     else:
                         L.l.error('Unexpected field {} at savechanged in rec {}'.format(column_name, new_record))
-                current_record.last_commit_field_changed_list = changed_fields
+                current_record.last_commit_field_changed_list = list(changed_fields)
                 if debug:
                     L.l.info('DEBUG len changed fields={}'.format(len(current_record.last_commit_field_changed_list)))
                 if len(current_record.last_commit_field_changed_list) == 0:
@@ -1022,7 +1022,7 @@ class MusicLoved(db.Model, DbEvent, DbBase):
 
 class Pwm(db.Model, DbEvent, DbBase):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50))
+    name = db.Column(db.String(50), unique=True)
     frequency = db.Column(db.Integer)
     duty_cycle = db.Column(db.Integer)  # 0-1e6
     gpio_pin_code = db.Column(db.Integer)
