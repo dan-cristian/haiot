@@ -221,12 +221,11 @@ class Pwm(GpioBase):
                     pwm.duty_cycle = value
                 elif key == 'is_started':
                     pwm.is_started = value
-            if pwm.host_name == Constant.HOST_NAME:
+            if pwm.host_name == Constant.HOST_NAME and P.pi is not None:  # condition for debug
                 if pwm.is_started:
                     P.pi.hardware_PWM(pwm.gpio_pin_code, pwm.frequency, pwm.duty_cycle)
                 else:
                     P.pi.hardware_PWM(pwm.gpio_pin_code, pwm.frequency, 0)
-            #fixme: notify only if saved locally
             pwm.commit_record_to_db_notify()
         else:
             L.l.warning("Cannot find pwm {} to set".format(key))
@@ -252,9 +251,7 @@ class Pwm(GpioBase):
         if pwm is not None:
             if pwm.host_name == Constant.HOST_NAME:
                 pwm.is_started, pwm.frequency, pwm.duty_cycle = Pwm._get_pwm_attrib(pwm.gpio_pin_code)
-            else:
-                return pwm.is_started, pwm.frequency, pwm.duty_cycle
-            return is_started, frequency, duty_cycle
+            return pwm.is_started, pwm.frequency, pwm.duty_cycle
         else:
             L.l.warning("Cannot find pwm {} on get".format(key))
             return None, None, None
