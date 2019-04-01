@@ -156,7 +156,7 @@ class Constant:
     # use exact field names from class BaseGraph
     JSON_PUBLISH_SAVE_TO_GRAPH = 'save_to_graph'
     JSON_PUBLISH_SAVE_TO_HISTORY = 'save_to_history'
-    JSON_PUBLISH_FIELDS_CHANGED = '_last_commit_field_changed_list'
+    JSON_PUBLISH_FIELDS_CHANGED = 'last_commit_field_changed_list'
     JSON_PUBLISH_NOTIFY_TRANSPORT = 'notify_transport_enabled'
     JSON_PUBLISH_NOTIFY_DB_COMMIT = 'notified_on_db_commit'
     # use exact field name from class DbBase

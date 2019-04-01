@@ -121,7 +121,7 @@ class CRUDView(MethodView):
             db.session.commit()
             # process triggers on actions initiated by user
             dispatcher.send(signal=Constant.SIGNAL_UI_DB_POST, model=self.model, row=obj,
-                            _last_commit_field_changed_list=changes)
+                            last_commit_field_changed_list=changes)
             return redirect(self.path)
         except AttributeError as aex:
             L.l.error('Error CRUD POST {}'.format(aex))
