@@ -155,7 +155,7 @@
             ]
         },
         {
-            "name": "Attach (Remote Debug)",
+            "name": "Attach Pi-Face (Remote Debug)",
             "type": "python",
             "request": "attach",
             "localRoot": "${workspaceRoot}",
@@ -163,6 +163,16 @@
             "port": 5678,
             "secret": "secret",
             "host": "192.168.0.12"
+        },
+        {
+            "name": "Attach Pizero1 (Remote Debug)",
+            "type": "python",
+            "request": "attach",
+            "localRoot": "${workspaceRoot}",
+            "remoteRoot": "/home/haiot/PYC",
+            "port": 5678,
+            "secret": "secret",
+            "host": "192.168.0.31"
         }
     ]
 }
