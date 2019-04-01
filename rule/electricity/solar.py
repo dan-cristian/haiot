@@ -297,5 +297,5 @@ def rule_energy_export(obj=models.Utility(), field_changed_list=None):
 
 def init():
     P.emulate_export = True
-    # P.init_dev()
+    P.init_dev()
     L.l.info("Initialised solar rules with {} devices".format(len(P.device_list)))
