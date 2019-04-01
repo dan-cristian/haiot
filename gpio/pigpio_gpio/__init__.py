@@ -214,19 +214,20 @@ class Pwm(GpioBase):
     def set(key, **kwargs):
         pwm = Pwm.get_db_record(key=key)
         if pwm is not None:
+            new_pwm = models.Pwm()
             for key, value in kwargs.items():
                 if key == 'frequency':
-                    pwm.frequency = value
+                    new_pwm.frequency = value
                 elif key == 'duty_cycle':
-                    pwm.duty_cycle = value
+                    new_pwm.duty_cycle = value
                 elif key == 'is_started':
-                    pwm.is_started = value
+                    new_pwm.is_started = value
             if pwm.host_name == Constant.HOST_NAME and P.pi is not None:  # condition for debug
                 if pwm.is_started:
                     P.pi.hardware_PWM(pwm.gpio_pin_code, pwm.frequency, pwm.duty_cycle)
                 else:
                     P.pi.hardware_PWM(pwm.gpio_pin_code, pwm.frequency, 0)
-            pwm.commit_record_to_db_notify()
+            new_pwm.save_changed_fields(current_record=pwm, notify_transport_enabled=True, debug=True)
         else:
             L.l.warning("Cannot find pwm {} to set".format(key))
 
