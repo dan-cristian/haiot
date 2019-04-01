@@ -95,7 +95,7 @@ def on_message(client, userdata, msg):
         start = msg.payload.find('{')
         end = msg.payload.rfind('}')
         json = msg.payload[start:end + 1]
-        if '"source_host_": "{}"'.format(Constant.HOST_NAME) not in json or Constant.HOST_NAME == 'netbook':
+        if '"source_host_": "{}"'.format(Constant.HOST_NAME) not in json:  # or Constant.HOST_NAME == 'netbook': #debug
             # ignore messages sent by this host
             x = utils.json2obj(json)
             # if x[Constant.JSON_PUBLISH_SOURCE_HOST] != str(Constant.HOST_NAME):
