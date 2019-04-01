@@ -24,7 +24,7 @@ __mqtt_lock = threading.Lock()
 
 
 # executed on local db changes done via web ui only, including API calls
-def handle_local_event_db_post(model, row, _last_commit_field_changed_list=None):
+def handle_local_event_db_post(model, row, last_commit_field_changed_list=None):
     processed = False
     L.l.debug('Local DB change sent by model {} row {}'.format(model, row))
     if str(models.Parameter) in str(model):
@@ -46,7 +46,7 @@ def handle_local_event_db_post(model, row, _last_commit_field_changed_list=None)
         txt = model_helper.model_row_to_json(row, operation='update')
         # execute all events directly first, then broadcast, as local events are not handled by remote mqtt queue
         obj_json = utils.json2obj(txt)
-        obj_json[Constant.JSON_PUBLISH_FIELDS_CHANGED] = _last_commit_field_changed_list
+        obj_json[Constant.JSON_PUBLISH_FIELDS_CHANGED] = last_commit_field_changed_list
         handle_event_mqtt_received(None, None, 'direct-event', obj_json)
         mqtt_thread_run()
         transport.send_message_json(json=txt)
