@@ -266,7 +266,10 @@ class Pwm(GpioBase):
     def unload():
         pwm_list = models.Pwm.query.filter_by(host_name=Constant.HOST_NAME).all()
         for pwm in pwm_list:
-            P.pi.hardware_PWM(pwm.gpio_pin_code, 0, 0)
+            try:
+                P.pi.hardware_PWM(pwm.gpio_pin_code, 0, 0)
+            except Exception as ex:
+                L.l.warning("Unable to unload pwm gpio {}, er={}".format(pwm.gpio_pin_code, ex))
 
     def __init__(self, obj):
         GpioBase.__init__(self, obj)
