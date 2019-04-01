@@ -96,10 +96,11 @@ def on_message(client, userdata, msg):
         end = msg.payload.rfind('}')
         json = msg.payload[start:end + 1]
         if '"source_host_": "{}"'.format(Constant.HOST_NAME) not in json:
-            # ignore messages send by this host
+            # ignore messages sent by this host
             x = utils.json2obj(json)
             # if x[Constant.JSON_PUBLISH_SOURCE_HOST] != str(Constant.HOST_NAME):
             start = utils.get_base_location_now_date()
+            x['is_event_external'] = True
             dispatcher.send(signal=Constant.SIGNAL_MQTT_RECEIVED, client=client, userdata=userdata, topic=msg.topic, obj=x)
             elapsed = (utils.get_base_location_now_date() - start).total_seconds()
             if elapsed > 5:
