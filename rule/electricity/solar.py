@@ -222,15 +222,15 @@ class P:
     # init in order of priority
     def init_dev():
         if P.emulate_export:
-            #relay = 'boiler'
-            #utility = 'power boiler'
-            #obj = PwmHeater(relay_name=relay, utility_name=utility, max_watts=2400)
-            #P.device_list[relay] = obj
-            #P.utility_list[utility] = obj
-
             relay = 'boiler2'
             utility = 'power boiler'
             obj = PwmHeater(relay_name=relay, utility_name='power boiler', max_watts=2400)
+            P.device_list[relay] = obj
+            P.utility_list[utility] = obj
+
+            relay = 'boiler'
+            utility = 'power boiler'
+            obj = PwmHeater(relay_name=relay, utility_name=utility, max_watts=2400)
             P.device_list[relay] = obj
             P.utility_list[utility] = obj
 
@@ -284,7 +284,10 @@ def rule_energy_export(obj=models.Utility(), field_changed_list=None):
             for device in dev_list:
                 changed = device.grid_updated(P.grid_watts)
                 if changed:  # exit to allow main meter to update and recheck if more power changes are needed
-                    break
+                    if P.emulate_export is True:
+                        pass
+                    else:
+                        break
         else:
             # set consumption for device
             if obj.utility_name in P.utility_list:
@@ -296,6 +299,6 @@ def rule_energy_export(obj=models.Utility(), field_changed_list=None):
 
 
 def init():
-    # P.emulate_export = True
+    P.emulate_export = True
     P.init_dev()
     L.l.info("Initialised solar rules with {} devices".format(len(P.device_list)))
