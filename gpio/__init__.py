@@ -204,9 +204,8 @@ def zone_custom_relay_record_update(json_object):
                     if gpio_record is not None:
                         # if source_host != Constant.HOST_NAME:
                         #    L.l.info('Event received from other host, event={}'.format(json_object))
-                        # if source_host == Constant.HOST_NAME:
-                        if is_event_external:
-                            L.l.info('Event received from outside, so no need to set relay state again')
+                        if source_host == Constant.HOST_NAME and is_event_external:
+                            L.l.info('Event received from outside from same host, so no need to set relay state again')
                         else:
                             # L.l.info('Event received from user db change, so act it')
                             value = 1 if relay_is_on else 0
