@@ -1028,6 +1028,7 @@ class Pwm(db.Model, DbEvent, DbBase):
     gpio_pin_code = db.Column(db.Integer)
     host_name = db.Column(db.String(50))
     is_started = db.Column(db.Boolean, default=False)
+    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
 
     def __init__(self):
         super(Pwm, self).__init__()
