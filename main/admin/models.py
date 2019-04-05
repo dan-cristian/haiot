@@ -1033,7 +1033,7 @@ class Pwm(db.Model, DbEvent, DbBase):
         super(Pwm, self).__init__()
 
     def __repr__(self):
-        return '{}'.format(self.id)
+        return '{} {}'.format(self.id, self.name)
 
 
 '''

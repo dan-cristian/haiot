@@ -179,7 +179,15 @@ class Pwm(GpioBase):
     def get_db_record(key):
         # m = models.Pwm
         # rec = m().query_filter_first(m.name == 'boiler2')
-        return models.Pwm.query.filter_by(name=key).first()
+        rec = models.Pwm.query.filter_by(name=key).first()
+        if rec is None:
+            L.l.error('No key retrieved for pwm {}'.format(key))
+            return None
+        else:
+            if rec.name != key:
+                L.l.error('Incorrect key retrieved on pwm {}, err val={}'.format(key, rec.name))
+            else:
+                return rec
 
     @staticmethod
     def _get_pwm_attrib(gpio):
@@ -217,12 +225,12 @@ class Pwm(GpioBase):
         pwm = Pwm.get_db_record(key=key)
         if pwm is not None:
             new_pwm = models.Pwm()
-            for key, value in kwargs.items():
-                if key == 'frequency':
+            for name, value in kwargs.items():
+                if name == 'frequency':
                     new_pwm.frequency = value
-                elif key == 'duty_cycle':
+                elif name == 'duty_cycle':
                     new_pwm.duty_cycle = value
-                elif key == 'is_started':
+                elif name == 'is_started':
                     new_pwm.is_started = value
             if pwm.host_name == Constant.HOST_NAME and P.pi is not None:  # condition for debug
                 if pwm.is_started:
