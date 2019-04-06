@@ -204,23 +204,25 @@ class DbBase:
                         L.l.error('Unexpected field {} at savechanged in rec {}'.format(column_name, new_record))
                 for field in changed_fields:
                     current_record.last_commit_field_changed_list.append(field)
+                fields_changed_len = len(current_record.last_commit_field_changed_list)
                 if debug:
-                    L.l.info('DEBUG len changed fields={}'.format(len(current_record.last_commit_field_changed_list)))
-                if len(current_record.last_commit_field_changed_list) == 0:
+                    L.l.info('DEBUG len changed fields={}'.format(fields_changed_len))
+                if fields_changed_len == 0:
                     current_record.notify_transport_enabled = False
                 # fixme: remove hardcoded field name
-                elif len(current_record.last_commit_field_changed_list) == 1 and ignore_only_updated_on_change and \
+                elif fields_changed_len == 1 and ignore_only_updated_on_change and \
                         Constant.DB_FIELD_UPDATE in current_record.last_commit_field_changed_list:
                     current_record.notify_transport_enabled = False
             else:
                 new_record.notify_transport_enabled = notify_transport_enabled
-                for column in new_record.query.statement._columns._all_columns:
+                for column in utils.get_primitives(new_record):
                     column_name = str(column)
                     new_value = getattr(new_record, column_name)
                     if new_value:
                         new_record.last_commit_field_changed_list.append(column_name)
                 if debug:
                     L.l.info('DEBUG new record={}'.format(new_record))
+                fields_changed_len = len(new_record.last_commit_field_changed_list)
                 db.session.add(new_record)
             _now2 = utils.get_base_location_now_date()
             # fixme: remove hardcoded field name
@@ -235,9 +237,9 @@ class DbBase:
             _now3 = utils.get_base_location_now_date()
             if debug:
                 pass
-            # db.session.add(current_record)
-            if len(current_record.last_commit_field_changed_list) > 0 and len(db.session.dirty) == 0:
-                L.l.info("Warning, empty commit for {}".format(current_record))
+            if fields_changed_len > 0 and len(db.session.dirty) == 0 and len(db.session.new) == 0:
+                L.l.info("Warning, fields={} but empty commit rec={}".format(fields_changed_len, current_record))
+                db.session.merge(current_record)
             commit()
         except Exception as ex:
             exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -1030,7 +1032,7 @@ class MusicLoved(db.Model, DbEvent, DbBase):
 
 class Pwm(db.Model, DbEvent, DbBase):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), unique=True)
+    name = db.Column(db.String(50))
     frequency = db.Column(db.Integer)
     duty_cycle = db.Column(db.Integer)  # 0-1e6
     gpio_pin_code = db.Column(db.Integer)
@@ -1038,12 +1040,12 @@ class Pwm(db.Model, DbEvent, DbBase):
     is_started = db.Column(db.Boolean, default=False)
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
 
-    def __init__(self, name=None):
+    def __init__(self, id=None):
         super(Pwm, self).__init__()
-        self.id = None
+        self.id = id
         self.duty_cycle = None
         self.frequency = None
-        self.name = name
+        self.name = None
         self.host_name = None
         self.gpio_pin_code = None
         self.is_started = False
