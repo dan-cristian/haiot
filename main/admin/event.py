@@ -230,9 +230,9 @@ def mqtt_thread_run():
                 if len(__mqtt_event_list) > last_count:
                     L.l.debug('Not keeping up with {} mqtt events'.format(len(__mqtt_event_list)))
             except Exception as ex:
-                L.l.critical("Error processing event err={}, mqtt={}".format(ex, obj))
+                L.l.error("Error processing event err={}, mqtt={}".format(ex, obj), exc_info=True)
     except Exception as ex:
-        L.l.critical("General error processing mqtt: {}".format(ex))
+        L.l.error("General error processing mqtt: {}".format(ex), exc_info=True)
     finally:
         __mqtt_lock.release()
         prctl.set_name("idle")
