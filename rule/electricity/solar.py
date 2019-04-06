@@ -193,7 +193,7 @@ class PwmHeater(LoadPowerDevice):
         L.l.info("Setting pwm {} status {} to watts level {}".format(self.RELAY_NAME, power_is_on, exported_watts))
         if power_is_on:
             assert exported_watts is not None
-            required_duty = exported_watts * self.max_duty / self.MAX_WATTS
+            required_duty = int(exported_watts * self.max_duty / self.MAX_WATTS)
             pigpio_gpio.P.pwm.set(self.RELAY_NAME, duty_cycle=required_duty)
         else:
             pigpio_gpio.P.pwm.set(self.RELAY_NAME, is_started=False)
