@@ -65,6 +65,7 @@ def commit():
     try:
         time_start = utils.get_base_location_now_date()
         query_details = "COMMIT " + str(db.session.identity_map)
+
         db.session.commit()
         performance.add_query(time_start, query_details=query_details)
         return True
