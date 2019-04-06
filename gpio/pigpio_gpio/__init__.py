@@ -175,12 +175,16 @@ def input_event(gpio, level, tick):
 
 class Pwm(GpioBase):
 
+    key_ok = 0
+
     @staticmethod
     def get_db_record(key):
         # m = models.Pwm
         # rec = m().query_filter_first(m.name == 'boiler2')
         rec = models.Pwm.query.filter_by(name=key).first()
         if rec is not None and rec.name == key:
+            Pwm.key_ok = Pwm.key_ok + 1
+            L.l.info("KEY found ok {}, count={}".format(key, Pwm.key_ok))
             return rec
         # recs = models.Pwm.query.all()
         # if recs is not None:

@@ -72,17 +72,18 @@ class GpioBase:
     def record_update(self, json_object):
         record = utils.json_to_record(self.obj, json_object)
         current_record, key = self.get_current_record(record)
-        new_record = self.obj()
-        kwargs = {}
-        for field in record.last_commit_field_changed_list:
-            val = getattr(record, field)
-            setattr(new_record, field, val)
-            kwargs[field] = val
-        if record.host_name == Constant.HOST_NAME and record.is_event_external is True:
-            # https://stackoverflow.com/questions/1496346/passing-a-list-of-kwargs
-            self.set(key, **kwargs)
-            # do nothing, action done already as it was local
-        new_record.save_changed_fields(current_record=current_record)
+        if current_record is not None:
+            new_record = self.obj()
+            kwargs = {}
+            for field in record.last_commit_field_changed_list:
+                val = getattr(record, field)
+                setattr(new_record, field, val)
+                kwargs[field] = val
+            if record.host_name == Constant.HOST_NAME and record.is_event_external is True:
+                # https://stackoverflow.com/questions/1496346/passing-a-list-of-kwargs
+                self.set(key, **kwargs)
+                # do nothing, action done already as it was local
+            new_record.save_changed_fields(current_record=current_record)
 
     @staticmethod
     @abc.abstractmethod
