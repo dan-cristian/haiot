@@ -213,7 +213,7 @@ def init():
     # set the project root directory as the static folder, you can set others.
     app = Flask('main', static_folder='../webui/static')  # , static_url_path='')
     # app.config['TESTING'] = True
-    app.config.update(DEBUG=True, SQLALCHEMY_ECHO = False, SQLALCHEMY_DATABASE_URI=DB_LOCATION)
+    app.config.update(DEBUG=True, SQLALCHEMY_ECHO=False, SQLALCHEMY_DATABASE_URI=DB_LOCATION)
     app.debug = True
     app.config['SECRET_KEY'] = 'secret'
     app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
@@ -349,7 +349,7 @@ def run(arg_list):
         if 'transport_syslog' in s:
             L.LOG_TO_TRANSPORT = True
         elif 'syslog=' in s:
-            #syslog=logs2.papertrailapp.com:30445
+            # syslog=logs2.papertrailapp.com:30445
             par_vals = s.split('=')[1].split(':')
             L.SYSLOG_ADDRESS = par_vals[0]
             L.SYSLOG_PORT = par_vals[1]

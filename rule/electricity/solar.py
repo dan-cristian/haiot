@@ -27,6 +27,7 @@ class Relaydevice:
     DEVICE_SUPPORTS_BREAKS = False  # can this device be started/stopped several times during the job
     AVG_CONSUMPTION = 1
     POWER_ADJUSTABLE = False
+    JOB_DURATION = 3600 * 4  # max duration if device does not support breaks
     watts = None  # current consumption for this device
     last_state_change = datetime.min
     last_state_on = datetime.min
@@ -66,7 +67,7 @@ class Relaydevice:
 
     def can_stop_relay(self):
         delta = (datetime.now() - self.last_state_on).total_seconds()
-        return delta >= self.MIN_ON_INTERVAL and self.DEVICE_SUPPORTS_BREAKS
+        return delta >= self.MIN_ON_INTERVAL and (self.DEVICE_SUPPORTS_BREAKS or delta >= self.JOB_DURATION)
 
     def update_job_finished(self):
         # job is never finished for devices without power metering
@@ -299,6 +300,6 @@ def rule_energy_export(obj=models.Utility(), field_changed_list=None):
 
 
 def init():
-    # P.emulate_export = True
+    P.emulate_export = True
     P.init_dev()
     L.l.info("Initialised solar rules with {} devices".format(len(P.device_list)))

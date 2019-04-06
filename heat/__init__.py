@@ -214,7 +214,7 @@ def _get_heat_off_condition(schedule_pattern):
 # check if we need forced heat on, if for this hour temp has a upper target than min
 def _get_heat_on_keep_warm(schedule_pattern, temp_code, temp_target, temp_actual):
     force_on = False
-    if schedule_pattern.keep_warm:
+    if schedule_pattern.keep_warm and temp_actual is not None:
         minute = utils.get_base_location_now_date().minute
         if len(schedule_pattern.keep_warm_pattern) == 12:
             interval = int(minute / 5)
