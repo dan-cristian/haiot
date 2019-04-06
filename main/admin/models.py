@@ -132,6 +132,8 @@ class DbBase:
                             graph_save_frequency=0, save_all_fields=False):
         _start_time = utils.get_base_location_now_date()
         try:
+            if debug:
+                pass
             if new_record is None:
                 new_record = self
             # inherit BaseGraph to enable persistence
@@ -200,7 +202,8 @@ class DbBase:
                                 L.l.info('DEBUG NOT change col={}'.format(column_name))
                     else:
                         L.l.error('Unexpected field {} at savechanged in rec {}'.format(column_name, new_record))
-                current_record.last_commit_field_changed_list = list(changed_fields)
+                for field in changed_fields:
+                    current_record.last_commit_field_changed_list.append(field)
                 if debug:
                     L.l.info('DEBUG len changed fields={}'.format(len(current_record.last_commit_field_changed_list)))
                 if len(current_record.last_commit_field_changed_list) == 0:
@@ -230,6 +233,11 @@ class DbBase:
                 dispatcher.send(signal=Constant.SIGNAL_STORABLE_RECORD, new_record=new_record,
                                 current_record=current_record)
             _now3 = utils.get_base_location_now_date()
+            if debug:
+                pass
+            # db.session.add(current_record)
+            if len(current_record.last_commit_field_changed_list) > 0 and len(db.session.dirty) == 0:
+                L.l.info("Warning, empty commit for {}".format(current_record))
             commit()
         except Exception as ex:
             exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -1030,8 +1038,15 @@ class Pwm(db.Model, DbEvent, DbBase):
     is_started = db.Column(db.Boolean, default=False)
     updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
 
-    def __init__(self):
+    def __init__(self, name=None):
         super(Pwm, self).__init__()
+        self.id = None
+        self.duty_cycle = None
+        self.frequency = None
+        self.name = name
+        self.host_name = None
+        self.gpio_pin_code = None
+        self.is_started = False
 
     def __repr__(self):
         return '{} {}'.format(self.id, self.name)
