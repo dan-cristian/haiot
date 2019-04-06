@@ -47,7 +47,8 @@ def handle_local_event_db_post(model, row, last_commit_field_changed_list=None):
         # execute all events directly first, then broadcast, as local events are not handled by remote mqtt queue
         obj_json = utils.json2obj(txt)
         obj_json[Constant.JSON_PUBLISH_FIELDS_CHANGED] = last_commit_field_changed_list
-        handle_event_mqtt_received(None, None, 'direct-event', obj_json)
+        # handle_event_mqtt_received(None, None, 'direct-event', obj_json)
+        _handle_internal_event(obj_json)
         mqtt_thread_run()
         transport.send_message_json(json=txt)
         processed = True
@@ -56,6 +57,11 @@ def handle_local_event_db_post(model, row, last_commit_field_changed_list=None):
     #    L.l.debug('Detected {} record change, row={}, trigger executed'.format(model, row))
     # else:
     #    L.l.debug('Detected {} record change, row={}, but change processing ignored'.format(model, row))
+
+
+def _handle_internal_event(obj):
+    obj['is_event_external'] = False
+    __mqtt_event_list.append(obj)
 
 
 # executed on every mqqt message received (except those sent by this host)
@@ -74,6 +80,8 @@ def on_models_committed(sender, changes):
     try:
         for obj, change in changes:
             # avoid recursion
+            if isinstance(obj, models.Pwm):
+                L.l.info("Commit change PWM {}".format(obj))
             if hasattr(obj, Constant.JSON_PUBLISH_NOTIFY_TRANSPORT):
                 # only send mqtt message once for db saves intended to be distributed
                 if obj.notify_transport_enabled:
@@ -86,7 +94,7 @@ def on_models_committed(sender, changes):
                                 pass
                             # execute all events directly first,
                             # then broadcast, local events not handled by remote mqtt queue
-                            handle_event_mqtt_received(None, None, 'direct-event', utils.json2obj(txt))
+                            _handle_internal_event(utils.json2obj(txt))
                             transport.send_message_json(json=txt)
                 else:
                     pass
@@ -98,8 +106,6 @@ def on_models_committed(sender, changes):
 
 # runs periodically and executes received mqqt messages from queue
 def mqtt_thread_run():
-    prctl.set_name("event_thread_run")
-    threading.current_thread().name = "event_thread_run"
     global __mqtt_lock
     __mqtt_lock.acquire()
     # from cloud import graph_plotly
@@ -107,6 +113,8 @@ def mqtt_thread_run():
         last_count = len(__mqtt_event_list)
         for obj in list(__mqtt_event_list):
             try:
+                prctl.set_name("event_thread_run")
+                threading.current_thread().name = "event_thread_run"
                 __mqtt_event_list.remove(obj)
                 # events received via mqtt transport
                 # fixme: make it generic to work with any transport
