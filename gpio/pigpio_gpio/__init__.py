@@ -179,12 +179,15 @@ class Pwm(GpioBase):
     def get_db_record(key):
         # m = models.Pwm
         # rec = m().query_filter_first(m.name == 'boiler2')
-        recs = models.Pwm.query.all()
-        if recs is not None:
-            for rec in recs:
-                if rec.name == key:
-                    return rec
-        L.l.error('No key retrieved for pwm {}'.format(key))
+        rec = models.Pwm.query.filter_by(name=key).first()
+        if rec is not None and rec.name == key:
+            return rec
+        # recs = models.Pwm.query.all()
+        # if recs is not None:
+        #    for rec in recs:
+        #        if rec.name == key:
+        #            return rec
+        L.l.error('No key retrieved for pwm {}, got {}'.format(key, rec))
         return None
 
     @staticmethod
