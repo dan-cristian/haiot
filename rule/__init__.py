@@ -33,6 +33,7 @@ class P:
     func = {}
     timestamp = None
     rules_modules = []
+    sub_modules = {}
 
 
 class Obj:
@@ -69,7 +70,7 @@ def parse_rules(obj, change):
 
 
 # async run of rules
-def process_events():
+def _process_events():
     for obj in list(P.event_list):
         try:
             for rule_mod in P.rules_modules:
@@ -85,7 +86,7 @@ def process_events():
 def thread_run():
     prctl.set_name("rule_run")
     threading.current_thread().name = "rule_run"
-    process_events()
+    _process_events()
     prctl.set_name("idle")
     threading.current_thread().name = "idle"
     return 'Processed rules thread_run'
@@ -93,8 +94,8 @@ def thread_run():
 
 def unload():
     L.l.info('Rules module unloading')
-    # ...
     thread_pool.remove_callable(thread_run)
+    thread_pool.remove_callable(reload_rules)
     P.initialised = False
 
 
@@ -134,7 +135,7 @@ def __load_rules_from_db():
 
 
 # add dynamic rules into db and sceduler to allow execution via web interface or API
-def __add_rules_into_db(module):
+def add_rules_into_db(module):
     try:
         # load all function entries from hardcoded rule script
         P.func[module] = getmembers(module, isfunction)
@@ -210,13 +211,31 @@ def reload_rules():
     if new_stamp != P.timestamp:
         L.l.info('Reloading rules as timestamp changed, {} != {}'.format(P.timestamp, new_stamp))
         imp.reload(rules_run)
-        __add_rules_into_db()
+        add_rules_into_db()
         P.timestamp = new_stamp
         rules_run.test_code()
     # else:
     #    Log.logger.info('Reloading {} skip timestamp {} != {}'.format(path, P.timestamp, new_stamp))
     prctl.set_name("idle")
     threading.current_thread().name = "idle"
+
+
+def _process_sub_rules():
+    prctl.set_name("subrule_run")
+    threading.current_thread().name = "subrule_run"
+
+    for thread_func in P.sub_modules.values():
+        thread_func()
+
+    prctl.set_name("idle")
+    threading.current_thread().name = "idle"
+
+
+def init_sub_rule(thread_run_func, rule_module):
+    add_rules_into_db(module=rule_module)
+    P.sub_modules[rule_module] = thread_run_func
+    if len(P.sub_modules) == 1:
+        thread_pool.add_interval_callable(_process_sub_rules, run_interval_second=10)
 
 
 def init():
@@ -227,8 +246,8 @@ def init():
         P.rules_modules.append(electricity.solar)
         scheduler.remove_all_jobs()
         models.Rule().delete()
-        __add_rules_into_db(module=rules_run)
-        __add_rules_into_db(module=electricity.solar)
+        add_rules_into_db(module=rules_run)
+
         # __load_rules_from_db()
         scheduler.start()
         P.timestamp = _get_stamp()
