@@ -189,8 +189,8 @@ class PwmIo(GpioBase):
         # rec = db.session.query(models.Pwm).filter(models.Pwm.name == key).first()
 
         if rec is not None and rec.id == key:
-            PwmIo.key_ok = PwmIo.key_ok + 1
-            L.l.info("KEY found ok {}, count={}".format(key, PwmIo.key_ok))
+            # PwmIo.key_ok = PwmIo.key_ok + 1
+            # L.l.info("KEY found ok {}, count={}".format(key, PwmIo.key_ok))
             return rec
         # recs = models.Pwm.query.all()
         # if recs is not None:
