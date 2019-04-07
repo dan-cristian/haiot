@@ -77,6 +77,7 @@
     {"id":23, "active":false, "start_order":"23", "name":"sysutils.filewatch"},
     {"id":24, "active":true, "start_order":"24", "name":"sysutils.usb"},
     {"id":25, "active":true, "start_order":"25", "name":"rule"},
+    {"id":26, "active":false, "start_order":"26", "name":"rule.electricity.solar"},
     {"id":27, "active":true, "start_order":"27", "name":"node"},
     {"id":33, "active":true, "start_order":"33", "name":"utility"},
     {"id":35, "active":true, "start_order":"35", "name":"cloud.newtifry"},
@@ -508,8 +509,8 @@
   ],
 
   "Pwm": [
-    {"id": 1, "name": "boiler", "frequency": "55", "duty_cycle": "100000", "gpio_pin_code": "18", "host_name": "pizero1"},
-    {"id": 2, "name": "boiler2", "frequency": "55", "duty_cycle": "100000", "gpio_pin_code": "18", "host_name": "netbook"}
+    {"id": 3, "name": "boiler", "frequency": "55", "duty_cycle": "100000", "gpio_pin_code": "18", "host_name": "pizero1"},
+    {"id": 4, "name": "boiler2", "frequency": "55", "duty_cycle": "100000", "gpio_pin_code": "18", "host_name": "netbook"}
   ],
 
   "_ZoneAlarmComments": [
