@@ -9,7 +9,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 #from sqlalchemy.ext.declarative import declarative_base
 #from sqlalchemy import event as sqlevent
-from flask_sqlalchemy_session import flask_scoped_session
 from main.logger_helper import L
 try:
     from wakeonlan import send_magic_packet
