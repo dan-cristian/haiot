@@ -4,6 +4,12 @@ import time
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy  # workaround for resolve issue
 from flask_sqlalchemy import models_committed
+from flask_sqlalchemy import before_models_committed
+from sqlalchemy import create_engine
+from sqlalchemy.orm import scoped_session, sessionmaker
+#from sqlalchemy.ext.declarative import declarative_base
+#from sqlalchemy import event as sqlevent
+from flask_sqlalchemy_session import flask_scoped_session
 from main.logger_helper import L
 try:
     from wakeonlan import send_magic_packet
@@ -29,6 +35,16 @@ MODEL_AUTO_UPDATE = False
 BIND_IP = None
 BIND_PORT = None
 IS_STANDALONE_MODE = None  # runs standalone, no node / mqtt connection & history
+#Base = declarative_base()
+
+
+class dbs:
+    session = None
+    engine = None
+    sqlal = None
+
+    def __init__(self):
+        pass
 
 
 class P:
@@ -207,23 +223,37 @@ def init():
     common.load_config_json()
     DB_LOCATION = "sqlite:///" + common.get_json_param(common.Constant.P_DB_PATH)
     L.l.info('DB file is at ' + DB_LOCATION)
-    # from main.logger_helper import LOG_TO_TRANSPORT
+
+    # db.engine = create_engine(DB_LOCATION, convert_unicode=True)
+    # db.session = scoped_session(sessionmaker(autocommit=False, autoflush=True, bind=db.engine))
+    # global Base
+    # Base.query = db.session.query_property()
+
     L.l.info('Initialising flask')
     # http://stackoverflow.com/questions/20646822/how-to-serve-static-files-in-flask
     # set the project root directory as the static folder, you can set others.
     app = Flask('main', static_folder='../webui/static')  # , static_url_path='')
+
+    # engine = create_engine(DB_LOCATION)
+    # session_factory = sessionmaker(bind=engine)
+    # dbs.session = flask_scoped_session(session_factory, app)
+
     # app.config['TESTING'] = True
     app.config.update(DEBUG=True, SQLALCHEMY_ECHO=False, SQLALCHEMY_DATABASE_URI=DB_LOCATION)
+    # app.engine = db.engine
     app.debug = True
     app.config['SECRET_KEY'] = 'secret'
     app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
     L.l.info('Initialising SQLAlchemy')
+    # http://flask.pocoo.org/docs/0.12/patterns/sqlalchemy/
+    # db.sqlal = SQLAlchemy(app)
     db = SQLAlchemy(app)
-    db.create_all()
+    # db.create_all()
 
     L.l.info('Checking main db tables')
     import admin.models
+    # Base.metadata.create_all(bind=db.engine)
     import admin.model_helper
     global MODEL_AUTO_UPDATE
 
@@ -300,6 +330,19 @@ def init():
         from main.admin import event
         # L.l.debug('Model commit detected sender {} change {}'.format(sender, changes))
         event.on_models_committed(sender, changes)
+        # pass
+
+    @before_models_committed.connect_via(app)
+    def bef_models_committed(sender, changes):
+        # from main.admin import event
+        # L.l.debug('Model commit detected sender {} change {}'.format(sender, changes))
+        # event.before_models_committed(sender, changes)
+        pass
+
+    #@sqlevent.listens_for(db.session, 'after_commit')
+    #def receive_after_commit(session):
+    #    pass
+
     init_post_modules()
     L.l.info('Feeding dogs with grass until app will exit')
     global exit_code

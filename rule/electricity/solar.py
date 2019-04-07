@@ -3,9 +3,11 @@ from enum import Enum
 import time
 import collections
 import random
+import sys
 from main.logger_helper import L
 from main.admin import models
 from rule import rule_common
+import rule
 from gpio import pigpio_gpio
 
 
@@ -108,9 +110,10 @@ class Relaydevice:
         self.update_job_finished()
         return changed_relay_status
 
-    def __init__(self, relay_name, avg_consumption, supports_breaks=False):
+    def __init__(self, relay_name, relay_id, avg_consumption, supports_breaks=False):
         self.AVG_CONSUMPTION = avg_consumption
         self.RELAY_NAME = relay_name
+        self.RELAY_ID = relay_id
         self.DEVICE_SUPPORTS_BREAKS = supports_breaks
 
 
@@ -143,20 +146,20 @@ class Powerdevice(Relaydevice):
     def set_watts(self, watts):
         self.watts = watts
 
-    def __init__(self, relay_name, utility_name, avg_consumption):
+    def __init__(self, relay_name, relay_id, utility_name, avg_consumption):
         self.UTILITY_NAME = utility_name
         self.watts = 0  # must init to avoid stop as relay
-        Relaydevice.__init__(self, relay_name, avg_consumption)
+        Relaydevice.__init__(self, relay_name, relay_id, avg_consumption)
 
 
 class LoadPowerDevice(Relaydevice):
     UTILITY_NAME = None
     MAX_WATTS = None
 
-    def __init__(self, relay_name, utility_name, max_watts):
+    def __init__(self, relay_name, relay_id, utility_name, max_watts):
         self.UTILITY_NAME = utility_name
         self.MAX_WATTS = max_watts
-        Relaydevice.__init__(self, relay_name, avg_consumption=None)  # no avg consumption for load devices
+        Relaydevice.__init__(self, relay_name, relay_id, avg_consumption=None)  # no avg consumption for load devices
 
 
 class Dishwasher(Powerdevice):
@@ -166,7 +169,8 @@ class Dishwasher(Powerdevice):
     MIN_ON_INTERVAL = 120
 
     def __init__(self, relay_name, utility_name, avg_consumption):
-        Powerdevice.__init__(self, relay_name, utility_name, avg_consumption)
+        relay_id = None
+        Powerdevice.__init__(self, relay_name, relay_id, utility_name, avg_consumption)
 
 
 class Washingmachine(Powerdevice):
@@ -175,14 +179,15 @@ class Washingmachine(Powerdevice):
     MAX_OFF_INTERVAL = 60 * 10  # until water get's cold
 
     def __init__(self, relay_name, utility_name, avg_consumption):
-        Powerdevice.__init__(self, relay_name, utility_name, avg_consumption)
+        relay_id = None
+        Powerdevice.__init__(self, relay_name, relay_id, utility_name, avg_consumption)
 
 
 class Upscharger(Powerdevice):
     DEVICE_SUPPORTS_BREAKS = False
 
     def __init__(self, relay_name, utility_name=None, avg_consumption=None):
-        Powerdevice.__init__(self, relay_name, utility_name, avg_consumption)
+        Powerdevice.__init__(self, relay_name, None, utility_name, avg_consumption)
 
 
 class PwmHeater(LoadPowerDevice):
@@ -195,16 +200,16 @@ class PwmHeater(LoadPowerDevice):
         if power_is_on:
             assert exported_watts is not None
             required_duty = int(exported_watts * self.max_duty / self.MAX_WATTS)
-            pigpio_gpio.P.pwm.set(self.RELAY_NAME, duty_cycle=required_duty)
+            pigpio_gpio.P.pwm.set(self.RELAY_ID, duty_cycle=required_duty)
         else:
-            pigpio_gpio.P.pwm.set(self.RELAY_NAME, is_started=False)
+            pigpio_gpio.P.pwm.set(self.RELAY_ID, is_started=False)
 
     def is_power_on(self):
-        is_on, frequency, duty_cycle = pigpio_gpio.P.pwm.get(self.RELAY_NAME)
+        is_on, frequency, duty_cycle = pigpio_gpio.P.pwm.get(self.RELAY_ID)
         return is_on
 
-    def __init__(self, relay_name, utility_name, max_watts):
-        LoadPowerDevice.__init__(self, relay_name, utility_name, max_watts)
+    def __init__(self, relay_name, relay_id, utility_name, max_watts):
+        LoadPowerDevice.__init__(self, relay_name, relay_id, utility_name, max_watts)
         self.POWER_ADJUSTABLE = True
 
 
@@ -225,15 +230,15 @@ class P:
         if P.emulate_export:
             relay = 'boiler2'
             utility = 'power boiler'
-            obj = PwmHeater(relay_name=relay, utility_name='power boiler', max_watts=2400)
+            obj = PwmHeater(relay_name=relay, relay_id=4, utility_name='power boiler', max_watts=2400)
             P.device_list[relay] = obj
             P.utility_list[utility] = obj
 
-            relay = 'boiler'
-            utility = 'power boiler'
-            obj = PwmHeater(relay_name=relay, utility_name=utility, max_watts=2400)
-            P.device_list[relay] = obj
-            P.utility_list[utility] = obj
+            #relay = 'boiler'
+            #utility = 'power boiler'
+            #obj = PwmHeater(relay_name=relay, relay_id=3, utility_name=utility, max_watts=2400)
+            #P.device_list[relay] = obj
+            #P.utility_list[utility] = obj
 
         relay = 'washing_relay'
         utility = 'power washing'
@@ -246,24 +251,47 @@ class P:
         P.device_list[relay] = obj
         P.utility_list[utility] = obj
         relay = 'big_battery_relay'
-        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=50, supports_breaks=True)
+        P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=50, supports_breaks=True)
         relay = 'beci_upscharge_relay'
         P.device_list[relay] = Upscharger(relay_name=relay, avg_consumption=200)
         relay = 'blackwater_pump_relay'
-        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=50, supports_breaks=True)
-        relay = 'boiler'
-        utility = 'power boiler'
-        obj = PwmHeater(relay_name=relay, utility_name=utility, max_watts=2400)
-        P.device_list[relay] = obj
-        P.utility_list[utility] = obj
-        relay = 'boiler2'
-        utility = 'power boiler'
-        obj = PwmHeater(relay_name=relay, utility_name='power boiler', max_watts=2400)
-        P.device_list[relay] = obj
-        P.utility_list[utility] = obj
+        P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=50, supports_breaks=True)
+
+
+
+        if not P.emulate_export:
+            relay = 'boiler2'
+            utility = 'power boiler'
+            obj = PwmHeater(relay_name=relay, relay_id=4, utility_name='power boiler', max_watts=2400)
+            P.device_list[relay] = obj
+            P.utility_list[utility] = obj
+
+            relay = 'boiler'
+            utility = 'power boiler'
+            obj = PwmHeater(relay_name=relay, relay_id=3, utility_name=utility, max_watts=2400)
+            P.device_list[relay] = obj
+            P.utility_list[utility] = obj
 
     def __init__(self):
         pass
+
+
+def _update_devices():
+    P.grid_importing = (P.grid_watts > P.MIN_WATTS_THRESHOLD)
+    P.grid_exporting = (P.grid_watts < -P.MIN_WATTS_THRESHOLD)
+    # let all devices know grid status and make power changes
+    dev_list = []
+    if P.grid_exporting:
+        dev_list = P.device_list.values()
+    if P.grid_importing:
+        dev_list = reversed(P.device_list.values())
+    for device in dev_list:
+        changed = device.grid_updated(P.grid_watts)
+        if changed:  # exit to allow main meter to update and recheck if more power changes are needed
+            if P.emulate_export is True:
+                pass
+            else:
+                break
 
 
 # energy rule
@@ -274,32 +302,30 @@ def rule_energy_export(obj=models.Utility(), field_changed_list=None):
                 P.grid_watts = random.randint(-800, -300)
             else:
                 P.grid_watts = obj.units_2_delta
-            P.grid_importing = (P.grid_watts > P.MIN_WATTS_THRESHOLD)
-            P.grid_exporting = (P.grid_watts < -P.MIN_WATTS_THRESHOLD)
-            # let all devices know grid status and make power changes
-            dev_list = []
-            if P.grid_exporting:
-                dev_list = P.device_list.values()
-            if P.grid_importing:
-                dev_list = reversed(P.device_list.values())
-            for device in dev_list:
-                changed = device.grid_updated(P.grid_watts)
-                if changed:  # exit to allow main meter to update and recheck if more power changes are needed
-                    if P.emulate_export is True:
-                        pass
-                    else:
-                        break
-        else:
-            # set consumption for device
-            if obj.utility_name in P.utility_list:
-                inst = P.utility_list[obj.utility_name]
-                if isinstance(inst, Powerdevice) and inst.UTILITY_NAME == obj.utility_name:
-                    inst.set_watts(obj.units_2_delta)
-                else:
-                    pass
+            #_update_devices()
+    else:
+        # set consumption for device
+        if obj.utility_name in P.utility_list:
+            inst = P.utility_list[obj.utility_name]
+            if isinstance(inst, Powerdevice) and inst.UTILITY_NAME == obj.utility_name:
+                inst.set_watts(obj.units_2_delta)
+            else:
+                pass
+
+
+def thread_run():
+    if P.emulate_export is True:
+        P.grid_watts = random.randint(-800, -300)
+    else:
+        main_rec = models.Utility.query.filter_by(utility_name='power main mono').first()
+        if main_rec is not None:
+            P.grid_watts = main_rec.units_2_delta
+    _update_devices()
 
 
 def init():
-    P.emulate_export = True
+    # P.emulate_export = True
     P.init_dev()
+    current_module = sys.modules[__name__]
+    rule.init_sub_rule(thread_run_func=thread_run, rule_module=current_module)
     L.l.info("Initialised solar rules with {} devices".format(len(P.device_list)))

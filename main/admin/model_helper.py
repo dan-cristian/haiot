@@ -3,7 +3,7 @@ import uuid
 from sqlalchemy.exc import IntegrityError, OperationalError, InvalidRequestError
 from main.logger_helper import L
 from common import Constant, utils
-from main import db, app
+from main import app, db
 import models
 from common import performance
 
@@ -65,7 +65,6 @@ def commit():
     try:
         time_start = utils.get_base_location_now_date()
         query_details = "COMMIT " + str(db.session.identity_map)
-
         db.session.commit()
         performance.add_query(time_start, query_details=query_details)
         return True
@@ -103,6 +102,7 @@ def init_reporting():
         # , 'appmeta':      'sqlite:////path/to/appmeta.db'
     }
     app.config['SQLALCHEMY_BINDS'] = SQLALCHEMY_BINDS
+    #Base.metadata.create_all(bind=Constant.DB_REPORTING_ID)
     db.create_all(bind=Constant.DB_REPORTING_ID)
     Constant.HAS_LOCAL_DB_REPORTING_CAPABILITY = True
     check_history_tables()
@@ -126,8 +126,8 @@ def check_table_schema(table, model_auto_update=False):
         else:
             L.l.warning('Unexpected error on check table {}, err={}'.format(table, ex))
     if recreate_table:
-        L.l.critical('Table {} schema in DB seems outdated, err {}, DROP it and recreate (y/n)?'.format(ex_msg,
-                                                                                                        table))
+        L.l.critical('Table {} schema in DB seems outdated, err {}, DROP it and recreate (y/n)?'.format(
+            ex_msg, table))
         read_drop_table(table, ex_msg, drop_without_user_ask=model_auto_update)
 
 
@@ -148,6 +148,7 @@ def read_drop_table(table, original_exception, drop_without_user_ask=False):
             L.l.info('Something went wrong on drop, ignoring err {}'.format(ex))
             db.session.rollback()
         L.l.info('Creating missing schema object after table drop')
+        #Base.metadata.create_all(bind=db.engine)
         db.create_all()
     else:
         raise original_exception
