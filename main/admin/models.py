@@ -3,13 +3,25 @@ import traceback
 import sys
 from copy import deepcopy
 from main.logger_helper import L
+#from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, ForeignKey, BigInteger
 from main import db
+#from main import Base
 from common import Constant
 import graphs
 from common import utils, performance
 from pydispatch import dispatcher
 from main.admin.model_helper import commit
+from sqlalchemy.orm import attributes
 
+Column = db.Column
+Integer = db.Integer
+BigInteger = db.BigInteger
+String = db.String
+Float = db.Float
+Boolean = db.Boolean
+DateTime = db.DateTime
+ForeignKey = db.ForeignKey
+Base = db.Model
 
 # TODO: read this
 # http://lucumr.pocoo.org/2011/7/19/sqlachemy-and-you/
@@ -21,7 +33,6 @@ class DbBase:
         pass
     # to fix a bug, https://stackoverflow.com/questions/27812250/sqlalchemy-inheritance-not-working
     __table_args__ = {'extend_existing': True}
-
     record_uuid = None
     save_to_history = False  # if true this record will be saved to master node database for reporting
 
@@ -129,7 +140,7 @@ class DbBase:
     # graph_save_frequency in seconds
     def save_changed_fields(self, current_record=None, new_record=None, notify_transport_enabled=False,
                             save_to_graph=False, ignore_only_updated_on_change=True, debug=False,
-                            graph_save_frequency=0, save_all_fields=False):
+                            graph_save_frequency=0, save_all_fields=False, force_dirty=False):
         _start_time = utils.get_base_location_now_date()
         try:
             if debug:
@@ -162,7 +173,6 @@ class DbBase:
             # reset to avoid duplication
             new_record.last_commit_field_changed_list = []
             changed_fields = []
-            _now1 = utils.get_base_location_now_date()
             if current_record is not None:
                 # ensure is set for both new and existing records
                 current_record.save_to_history = save_to_graph
@@ -193,6 +203,9 @@ class DbBase:
                                 pass
                             if column_name != "id":  # do not change primary key with None
                                 setattr(current_record, column_name, new_value)
+                                # https://stackoverflow.com/questions/41879671/marking-an-object-as-clean-in-sqlalchemy-orm
+                                if force_dirty:
+                                    attributes.set_attribute(current_record, column_name, new_value)
                                 # current_record.last_commit_field_changed_list.append(column_name)
                                 changed_fields.append(column_name)
                                 if debug:
@@ -224,7 +237,6 @@ class DbBase:
                     L.l.info('DEBUG new record={}'.format(new_record))
                 fields_changed_len = len(new_record.last_commit_field_changed_list)
                 db.session.add(new_record)
-            _now2 = utils.get_base_location_now_date()
             # fixme: remove hardcoded field name
             if hasattr(new_record, 'last_save_to_graph'):
                 if current_record is not None:
@@ -234,12 +246,12 @@ class DbBase:
             if save_to_graph:
                 dispatcher.send(signal=Constant.SIGNAL_STORABLE_RECORD, new_record=new_record,
                                 current_record=current_record)
-            _now3 = utils.get_base_location_now_date()
             if debug:
                 pass
             if fields_changed_len > 0 and len(db.session.dirty) == 0 and len(db.session.new) == 0:
-                L.l.info("Warning, fields={} but empty commit rec={}".format(fields_changed_len, current_record))
-                db.session.merge(current_record)
+                L.l.warning("Warning, fields={} but empty commit rec={}".format(fields_changed_len, current_record))
+                # db.session.merge(current_record)
+                pass
             commit()
         except Exception as ex:
             exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -254,14 +266,6 @@ class DbBase:
             raise ex
             # else:
             #    Log.logger.warning('Incorrect parameters received on save changed fields to db')
-        finally:
-            _run_time_sec = (utils.get_base_location_now_date() - _start_time).total_seconds()
-            s1 = (_now1 - _start_time).total_seconds()
-            s2 = (_now2 - _start_time).total_seconds()
-            s3 = (_now3 - _start_time).total_seconds()
-            if _run_time_sec > 3:
-                L.l.warning("Saving fields took {} sec: {}/{}/{} for record {}".format(
-                    _run_time_sec, s1, s2, s3, new_record))
 
 
     # save json to a new or existing record
@@ -302,19 +306,20 @@ class DbEvent:
 
 
 class DbHistory:
-    record_uuid = db.Column(db.String(36))
-    #source_host_ = db.Column(db.String(50)) # moved to dbase
+    record_uuid = Column(String(36))
+    #source_host_ = Column(String(50)) # moved to dbase
 
     def __init__(self):
         pass
 
 
-class Module(db.Model, DbBase):
-    id = db.Column(db.Integer, primary_key=True)
-    host_name = db.Column(db.String(50))
-    name = db.Column(db.String(50))
-    active = db.Column(db.Boolean, default=False)  # does not work well as Boolean due to all values by default are True
-    start_order = db.Column(db.Integer)
+class Module(Base, DbBase):
+    __tablename__ = 'module'
+    id = Column(Integer, primary_key=True)
+    host_name = Column(String(50))
+    name = Column(String(50))
+    active = Column(Boolean, default=False)  # does not work well as Boolean due to all values by default are True
+    start_order = Column(Integer)
 
     def __init__(self, id='', host_name='', name='', active=0, start_order='999'):
         super(Module, self).__init__()
@@ -329,17 +334,18 @@ class Module(db.Model, DbBase):
         return 'Module {} [{}] {} {}'.format(self.id, self.host_name, self.name[:50], self.active)
 
 
-class Zone(db.Model, DbBase):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50))
-    # active_heat_schedule_pattern_id = db.Column(db.Integer)
-    # heat_is_on = db.Column(db.Boolean, default=False)
-    # last_heat_status_update = db.Column(db.DateTime(), default=None)
-    # heat_target_temperature = db.Column(db.Integer)
-    is_indoor_heated = db.Column(db.Boolean)
-    is_indoor = db.Column(db.Boolean)
-    is_outdoor = db.Column(db.Boolean)
-    is_outdoor_heated = db.Column(db.Boolean)
+class Zone(Base, DbBase):
+    __tablename__ = 'zone'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50))
+    # active_heat_schedule_pattern_id = Column(Integer)
+    # heat_is_on = Column(Boolean, default=False)
+    # last_heat_status_update = Column(DateTime(), default=None)
+    # heat_target_temperature = Column(Integer)
+    is_indoor_heated = Column(Boolean)
+    is_indoor = Column(Boolean)
+    is_outdoor = Column(Boolean)
+    is_outdoor_heated = Column(Boolean)
 
     def __init__(self, id='', name=''):
         super(Zone, self).__init__()
@@ -351,10 +357,11 @@ class Zone(db.Model, DbBase):
         return 'Zone id {} {}'.format(self.id, self.name[:20])
 
 
-class Area(db.Model, DbBase):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50))
-    is_armed = db.Column(db.Boolean, default=False)
+class Area(Base, DbBase):
+    __tablename__ = 'area'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50))
+    is_armed = Column(Boolean, default=False)
 
     def __init__(self, id='', name=''):
         super(Area, self).__init__()
@@ -366,10 +373,11 @@ class Area(db.Model, DbBase):
         return 'Area id {} {} armed={}'.format(self.id, self.name[:20], self.is_armed)
 
 
-class ZoneArea(db.Model, DbBase):
-    id = db.Column(db.Integer, primary_key=True)
-    area_id = db.Column(db.Integer, db.ForeignKey('area.id'), nullable=False)
-    zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'), nullable=False)
+class ZoneArea(Base, DbBase):
+    __tablename__ = 'zone_area'
+    id = Column(Integer, primary_key=True)
+    area_id = Column(Integer, ForeignKey('area.id'), nullable=False)
+    zone_id = Column(Integer, ForeignKey('zone.id'), nullable=False)
 
     def __init__(self, id=''):
         super(ZoneArea, self).__init__()
@@ -380,11 +388,12 @@ class ZoneArea(db.Model, DbBase):
         return 'ZoneArea id {} zone={} area={}'.format(self.id, self.zone_id, self.area_id)
 
 
-class ZoneMusic(db.Model, DbBase):
-    id = db.Column(db.Integer, primary_key=True)
-    zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'), nullable=False)
-    server_ip = db.Column(db.String(15))
-    server_port = db.Column(db.Integer)
+class ZoneMusic(Base, DbBase):
+    __tablename__ = 'zone_music'
+    id = Column(Integer, primary_key=True)
+    zone_id = Column(Integer, ForeignKey('zone.id'), nullable=False)
+    server_ip = Column(String(15))
+    server_port = Column(Integer)
 
     def __init__(self, id=''):
         super(ZoneMusic, self).__init__()
@@ -395,19 +404,20 @@ class ZoneMusic(db.Model, DbBase):
         return 'ZoneMusic id {} zone={} port={}'.format(self.id, self.zone_id, self.area_id)
 
 
-class Presence(db.Model, DbBase, DbEvent):
-    id = db.Column(db.Integer, primary_key=True)
-    zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'), nullable=False)
-    zone_name = db.Column(db.String(50))
-    sensor_name = db.Column(db.String(50))
-    event_type = db.Column(db.String(25))  # cam, pir, contact, wifi, bt
-    event_camera_date = db.Column(db.DateTime(), default=None)
-    event_alarm_date = db.Column(db.DateTime(), default=None)
-    event_io_date = db.Column(db.DateTime(), default=None)
-    event_wifi_date = db.Column(db.DateTime(), default=None)
-    event_bt_date = db.Column(db.DateTime(), default=None)
-    is_connected = db.Column(db.Boolean, default=False)  # pin connected? true on unarmed sensors, false on alarm/move
-    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
+class Presence(Base, DbBase, DbEvent):
+    __tablename__ = 'presence'
+    id = Column(Integer, primary_key=True)
+    zone_id = Column(Integer, ForeignKey('zone.id'), nullable=False)
+    zone_name = Column(String(50))
+    sensor_name = Column(String(50))
+    event_type = Column(String(25))  # cam, pir, contact, wifi, bt
+    event_camera_date = Column(DateTime(), default=None)
+    event_alarm_date = Column(DateTime(), default=None)
+    event_io_date = Column(DateTime(), default=None)
+    event_wifi_date = Column(DateTime(), default=None)
+    event_bt_date = Column(DateTime(), default=None)
+    is_connected = Column(Boolean, default=False)  # pin connected? true on unarmed sensors, false on alarm/move
+    updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now)
 
     def __init__(self, zone_id=None):
         super(Presence, self).__init__()
@@ -417,16 +427,17 @@ class Presence(db.Model, DbBase, DbEvent):
             self.id, self.zone_id, self.sensor_name, self.is_connected)
 
 
-class SchedulePattern(db.Model, DbBase):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50))
-    pattern = db.Column(db.String(24))
-    keep_warm = db.Column(db.Boolean, default=False)  # keep the zone warm, used for cold floors
-    keep_warm_pattern = db.Column(db.String(12))  # pattern, 5 minutes increments of on/off: 100001000100
-    activate_on_condition = db.Column(db.Boolean, default=False)  # activate heat only if relay state condition is meet
-    activate_condition_relay = db.Column(db.String(50))  # the relay that must be on to activate this schedule pattern
-    season_name = db.Column(db.String(50))  # season name when this will apply
-    main_source_needed = db.Column(db.Boolean, default=True)  # main source must be on as well (i.e. gas heater)
+class SchedulePattern(Base, DbBase):
+    __tablename__ = 'schedule_pattern'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50))
+    pattern = Column(String(24))
+    keep_warm = Column(Boolean, default=False)  # keep the zone warm, used for cold floors
+    keep_warm_pattern = Column(String(12))  # pattern, 5 minutes increments of on/off: 100001000100
+    activate_on_condition = Column(Boolean, default=False)  # activate heat only if relay state condition is meet
+    activate_condition_relay = Column(String(50))  # the relay that must be on to activate this schedule pattern
+    season_name = Column(String(50))  # season name when this will apply
+    main_source_needed = Column(Boolean, default=True)  # main source must be on as well (i.e. gas heater)
 
     def __init__(self, id=None, name='', pattern=''):
         super(SchedulePattern, self).__init__()
@@ -439,10 +450,11 @@ class SchedulePattern(db.Model, DbBase):
         return self.name[:len('1234-5678-9012-3456-7890-1234')]
 
 
-class TemperatureTarget(db.Model, DbBase):
-    id = db.Column(db.Integer, primary_key=True)
-    code = db.Column(db.String(1))
-    target = db.Column(db.Float)
+class TemperatureTarget(Base, DbBase):
+    __tablename__ = 'temperature_target'
+    id = Column(Integer, primary_key=True)
+    code = Column(String(1))
+    target = Column(Float)
 
     def __init__(self, id=None, code='', target=''):
         super(TemperatureTarget, self).__init__()
@@ -455,38 +467,40 @@ class TemperatureTarget(db.Model, DbBase):
         return '{} code {}={}'.format(self.id, self.code, self.target)
 
 
-class ZoneThermostat(db.Model, DbBase):
-    id = db.Column(db.Integer, primary_key=True)
-    zone_id = db.Column(db.Integer)
-    zone_name = db.Column(db.String(50))
-    active_heat_schedule_pattern_id = db.Column(db.Integer)
-    heat_is_on = db.Column(db.Boolean, default=False)
-    last_heat_status_update = db.Column(db.DateTime(), default=None)
-    heat_target_temperature = db.Column(db.Float)
-    mode_presence_auto = db.Column(db.Boolean, default=False)  # fixme: not used yet
-    last_presence_set = db.Column(db.DateTime())
-    is_mode_manual = db.Column(db.Boolean, default=False)
-    manual_duration_min = db.Column(db.Integer, default=120)  # period to keep heat on for manual mode
-    manual_temp_target = db.Column(db.Float)
-    last_manual_set = db.Column(db.DateTime())
+class ZoneThermostat(Base, DbBase):
+    __tablename__ = 'zone_thermostat'
+    id = Column(Integer, primary_key=True)
+    zone_id = Column(Integer)
+    zone_name = Column(String(50))
+    active_heat_schedule_pattern_id = Column(Integer)
+    heat_is_on = Column(Boolean, default=False)
+    last_heat_status_update = Column(DateTime(), default=None)
+    heat_target_temperature = Column(Float)
+    mode_presence_auto = Column(Boolean, default=False)  # fixme: not used yet
+    last_presence_set = Column(DateTime())
+    is_mode_manual = Column(Boolean, default=False)
+    manual_duration_min = Column(Integer, default=120)  # period to keep heat on for manual mode
+    manual_temp_target = Column(Float)
+    last_manual_set = Column(DateTime())
 
     def __repr__(self):
         return '{} zoneid={} name={} target={}'.format(self.id, self.zone_id, self.zone_name,
                                                        self.heat_target_temperature)
 
 
-class HeatSchedule(db.Model, DbBase):
-    id = db.Column(db.Integer, primary_key=True)
-    zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'), nullable=False)
+class HeatSchedule(Base, DbBase):
+    __tablename__ = 'heat_schedule'
+    id = Column(Integer, primary_key=True)
+    zone_id = Column(Integer, ForeignKey('zone.id'), nullable=False)
     # zone = db.relationship('Zone', backref=db.backref('heat schedule zone', lazy='dynamic'))
-    pattern_week_id = db.Column(db.Integer, db.ForeignKey('schedule_pattern.id'), nullable=False)
-    pattern_weekend_id = db.Column(db.Integer, db.ForeignKey('schedule_pattern.id'), nullable=False)
+    pattern_week_id = Column(Integer, ForeignKey('schedule_pattern.id'), nullable=False)
+    pattern_weekend_id = Column(Integer, ForeignKey('schedule_pattern.id'), nullable=False)
     ''' temp pattern if there is move in a zone, to ensure there is heat if someone is at home unplanned'''
-    pattern_id_presence = db.Column(db.Integer)
+    pattern_id_presence = Column(Integer)
     ''' temp pattern if there is no move, to preserve energy'''
-    pattern_id_no_presence = db.Column(db.Integer)
-    season = db.Column(db.String(50))  # season name when this schedule will apply
-    # active = db.Column(db.Boolean, default=True)
+    pattern_id_no_presence = Column(Integer)
+    season = Column(String(50))  # season name when this schedule will apply
+    # active = Column(Boolean, default=True)
 
     def __init__(self, id=None, zone_id=None, pattern_week_id=None, pattern_weekend_id=None,
                  temp_target_code_min_presence=None, temp_target_code_max_no_presence=None):
@@ -503,33 +517,34 @@ class HeatSchedule(db.Model, DbBase):
         return 'Zone {}, Week {}, Weekend {}'.format(self.zone_id, self.pattern_week_id, self.pattern_weekend_id)
 
 
-class Sensor(db.Model, graphs.SensorGraph, DbEvent, DbBase):
-    id = db.Column(db.Integer, primary_key=True)
-    address = db.Column(db.String(50), unique=True)
-    type = db.Column(db.String(50))
-    temperature = db.Column(db.Float)
-    humidity = db.Column(db.Float)
-    pressure = db.Column(db.Float)
-    counters_a = db.Column(db.BigInteger)
-    counters_b = db.Column(db.BigInteger)
-    delta_counters_a = db.Column(db.BigInteger)
-    delta_counters_b = db.Column(db.BigInteger)
-    iad = db.Column(db.Float)  # current in Amper for qubino sensors
-    vdd = db.Column(db.Float)  # power factor for qubino sensors
-    vad = db.Column(db.Float)  # voltage in Volts for qubino sensors
-    pio_a = db.Column(db.Integer)
-    pio_b = db.Column(db.Integer)
-    sensed_a = db.Column(db.Integer)
-    sensed_b = db.Column(db.Integer)
-    battery_level = db.Column(db.Integer)  # RFXCOM specific, sensor battery
-    rssi = db.Column(db.Integer)  # RFXCOM specific, rssi - distance
-    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
-    added_on = db.Column(db.DateTime(), default=datetime.now)
+class Sensor(Base, graphs.SensorGraph, DbEvent, DbBase):
+    __tablename__ = 'sensor'
+    id = Column(Integer, primary_key=True)
+    address = Column(String(50), unique=True)
+    type = Column(String(50))
+    temperature = Column(Float)
+    humidity = Column(Float)
+    pressure = Column(Float)
+    counters_a = Column(BigInteger)
+    counters_b = Column(BigInteger)
+    delta_counters_a = Column(BigInteger)
+    delta_counters_b = Column(BigInteger)
+    iad = Column(Float)  # current in Amper for qubino sensors
+    vdd = Column(Float)  # power factor for qubino sensors
+    vad = Column(Float)  # voltage in Volts for qubino sensors
+    pio_a = Column(Integer)
+    pio_b = Column(Integer)
+    sensed_a = Column(Integer)
+    sensed_b = Column(Integer)
+    battery_level = Column(Integer)  # RFXCOM specific, sensor battery
+    rssi = Column(Integer)  # RFXCOM specific, rssi - distance
+    updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now)
+    added_on = Column(DateTime(), default=datetime.now)
     # FIXME: now filled manually, try relations
-    # zone_name = db.Column(db.String(50))
-    sensor_name = db.Column(db.String(50))
-    alt_address = db.Column(db.String(50)) # alternate address format, use for 1-wire, better readability
-    comment = db.Column(db.String(50))
+    # zone_name = Column(String(50))
+    sensor_name = Column(String(50))
+    alt_address = Column(String(50)) # alternate address format, use for 1-wire, better readability
+    comment = Column(String(50))
 
     def __init__(self, address='', sensor_name=''):
         super(Sensor, self).__init__()
@@ -540,19 +555,20 @@ class Sensor(db.Model, graphs.SensorGraph, DbEvent, DbBase):
         return '{}, {}, {}, {}'.format(self.type, self.sensor_name, self.address, self.temperature)
 
 
-class DustSensor(db.Model, DbEvent, DbBase, graphs.BaseGraph):
-    id = db.Column(db.Integer, primary_key=True)
-    address = db.Column(db.String(50), unique=True)
-    pm_1 = db.Column(db.Integer)
-    pm_2_5 = db.Column(db.Integer)
-    pm_10 = db.Column(db.Integer)
-    p_0_3 = db.Column(db.Integer)
-    p_0_5 = db.Column(db.Integer)
-    p_1 = db.Column(db.Integer)
-    p_2_5 = db.Column(db.Integer)
-    p_5 = db.Column(db.Integer)
-    p_10 = db.Column(db.Integer)
-    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
+class DustSensor(Base, DbEvent, DbBase, graphs.BaseGraph):
+    __tablename__ = 'dust_sensor'
+    id = Column(Integer, primary_key=True)
+    address = Column(String(50), unique=True)
+    pm_1 = Column(Integer)
+    pm_2_5 = Column(Integer)
+    pm_10 = Column(Integer)
+    p_0_3 = Column(Integer)
+    p_0_5 = Column(Integer)
+    p_1 = Column(Integer)
+    p_2_5 = Column(Integer)
+    p_5 = Column(Integer)
+    p_10 = Column(Integer)
+    updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now)
 
     def __init__(self):
         super(DustSensor, self).__init__()
@@ -561,23 +577,25 @@ class DustSensor(db.Model, DbEvent, DbBase, graphs.BaseGraph):
         return '{}'.format(self.address)
 
 
-class SensorError(db.Model, DbBase, DbEvent):
-    id = db.Column(db.Integer, primary_key=True)
-    sensor_name = db.Column(db.String(50), index=True)
-    sensor_address = db.Column(db.String(50))
-    error_type = db.Column(db.Integer)  # 0=not found, 1=other err
-    error_count = db.Column(db.Integer)
-    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
+class SensorError(Base, DbBase, DbEvent):
+    __tablename__ = 'sensor_error'
+    id = Column(Integer, primary_key=True)
+    sensor_name = Column(String(50), index=True)
+    sensor_address = Column(String(50))
+    error_type = Column(Integer)  # 0=not found, 1=other err
+    error_count = Column(Integer)
+    updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
 
     def __repr__(self):
         return '{} {} errors={}'.format(self.id, self.sensor_name, self.error_count)
 
 
-class Parameter(db.Model, DbBase):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), unique=True)
-    value = db.Column(db.String(255))
-    description = db.Column(db.String(255))
+class Parameter(Base, DbBase):
+    __tablename__ = 'parameter'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50), unique=True)
+    value = Column(String(255))
+    description = Column(String(255))
 
     def __init__(self, id=None, name='default', value='default'):
         super(Parameter, self).__init__()
@@ -590,16 +608,17 @@ class Parameter(db.Model, DbBase):
         return '{}, {}'.format(self.name, self.value)
 
 
-class ZoneSensor(db.Model, DbBase):
-    id = db.Column(db.Integer, primary_key=True)
-    sensor_name = db.Column(db.String(50))
-    zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'))
+class ZoneSensor(Base, DbBase):
+    __tablename__ = 'zone_sensor'
+    id = Column(Integer, primary_key=True)
+    sensor_name = Column(String(50))
+    zone_id = Column(Integer, ForeignKey('zone.id'))
     # zone = db.relationship('Zone', backref=db.backref('ZoneSensor(zone)', lazy='dynamic'))
-    sensor_address = db.Column(db.String(50), db.ForeignKey('sensor.address'))
-    target_material = db.Column(db.String(50))  # what material is being measured, water, air, etc
-    alt_address = db.Column(db.String(50))
-    is_main = db.Column(db.Boolean(), default=False)  # is main temperature sensor for heat reference
-    # priority = db.Column(db.Integer, default=0)  # if multiple sensors exists - i.e. temperature
+    sensor_address = Column(String(50), ForeignKey('sensor.address'))
+    target_material = Column(String(50))  # what material is being measured, water, air, etc
+    alt_address = Column(String(50))
+    is_main = Column(Boolean(), default=False)  # is main temperature sensor for heat reference
+    # priority = Column(Integer, default=0)  # if multiple sensors exists - i.e. temperature
     # sensor = db.relationship('Sensor', backref=db.backref('ZoneSensor(sensor)', lazy='dynamic'))
 
     def __init__(self, zone_id='', sensor_address='', sensor_name=''):
@@ -612,24 +631,25 @@ class ZoneSensor(db.Model, DbBase):
         return 'ZoneSensor zone {} sensor {}'.format(self.zone_id, self.sensor_name)
 
 
-class Node(db.Model, DbEvent, DbBase):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50))
-    ip = db.Column(db.String(15))
-    mac = db.Column(db.String(17))
-    os_type = db.Column(db.String(50))
-    machine_type = db.Column(db.String(50))
-    app_start_time = db.Column(db.DateTime())
-    is_master_overall = db.Column(db.Boolean(), default=False)
-    is_master_db_archive = db.Column(db.Boolean(), default=False)
-    is_master_graph = db.Column(db.Boolean(), default=False)
-    is_master_rule = db.Column(db.Boolean(), default=False)
-    is_master_logging = db.Column(db.Boolean(), default=False)
-    priority = db.Column(db.Integer)  # used to decide who becomes main master in case several hosts are active
-    master_overall_cycles = db.Column(db.Integer)  # count of update cycles while node was master
-    run_overall_cycles = db.Column(db.Integer)  # count of total update cycles
-    execute_command = db.Column(db.String(50))
-    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
+class Node(Base, DbEvent, DbBase):
+    __tablename__ = 'node'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50))
+    ip = Column(String(15))
+    mac = Column(String(17))
+    os_type = Column(String(50))
+    machine_type = Column(String(50))
+    app_start_time = Column(DateTime())
+    is_master_overall = Column(Boolean(), default=False)
+    is_master_db_archive = Column(Boolean(), default=False)
+    is_master_graph = Column(Boolean(), default=False)
+    is_master_rule = Column(Boolean(), default=False)
+    is_master_logging = Column(Boolean(), default=False)
+    priority = Column(Integer)  # used to decide who becomes main master in case several hosts are active
+    master_overall_cycles = Column(Integer)  # count of update cycles while node was master
+    run_overall_cycles = Column(Integer)  # count of total update cycles
+    execute_command = Column(String(50))
+    updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now)
 
     def __init__(self, id=None, name=None, ip=None, priority=None, mac=None, is_master_logging=False):
         super(Node, self).__init__()
@@ -647,60 +667,63 @@ class Node(db.Model, DbEvent, DbBase):
         return 'Node {} ip {}'.format(self.name, self.ip)
 
 
-class SystemMonitor(db.Model, graphs.SystemMonitorGraph, DbEvent, DbBase):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), unique=True)
-    cpu_usage_percent = db.Column(db.Float)
-    cpu_temperature = db.Column(db.Float)
-    memory_available_percent = db.Column(db.Float)
-    uptime_days = db.Column(db.Integer)
-    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
+class SystemMonitor(Base, graphs.SystemMonitorGraph, DbEvent, DbBase):
+    __tablename__ = 'system_monitor'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50), unique=True)
+    cpu_usage_percent = Column(Float)
+    cpu_temperature = Column(Float)
+    memory_available_percent = Column(Float)
+    uptime_days = Column(Integer)
+    updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now)
 
     def __repr__(self):
         return '{} {} {}'.format(self.id, self.name, self.updated_on)
 
 
-class Ups(db.Model, graphs.UpsGraph, DbEvent, DbBase):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), unique=True)
-    system_name = db.Column(db.String(50))
-    port = db.Column(db.String(50))
-    input_voltage = db.Column(db.Float)
-    remaining_minutes = db.Column(db.Float)
-    output_voltage = db.Column(db.Float)
-    load_percent = db.Column(db.Float)
-    power_frequency = db.Column(db.Float)
-    battery_voltage = db.Column(db.Float)
-    temperature = db.Column(db.Float)
-    power_failed = db.Column(db.Boolean(), default=False)
-    beeper_on = db.Column(db.Boolean(), default=False)
-    test_in_progress = db.Column(db.Boolean(), default=False)
-    other_status = db.Column(db.String(50))
-    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
+class Ups(Base, graphs.UpsGraph, DbEvent, DbBase):
+    __tablename__ = 'ups'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50), unique=True)
+    system_name = Column(String(50))
+    port = Column(String(50))
+    input_voltage = Column(Float)
+    remaining_minutes = Column(Float)
+    output_voltage = Column(Float)
+    load_percent = Column(Float)
+    power_frequency = Column(Float)
+    battery_voltage = Column(Float)
+    temperature = Column(Float)
+    power_failed = Column(Boolean(), default=False)
+    beeper_on = Column(Boolean(), default=False)
+    test_in_progress = Column(Boolean(), default=False)
+    other_status = Column(String(50))
+    updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now)
 
     def __repr__(self):
         return '{} {} {}'.format(self.id, self.name, self.updated_on)
 
 
-class PowerMonitor(db.Model, graphs.UpsGraph, DbEvent, DbBase):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), unique=True)
-    type = db.Column(db.String(50))  # INA, etc
-    host_name = db.Column(db.String(50))
-    voltage = db.Column(db.Float)  # volts, estimated voltage when using divider and batteries in series
-    current = db.Column(db.Float)  # miliamps
-    power = db.Column(db.Float)
-    raw_voltage = db.Column(db.Float)  # volts, read from sensor without
-    max_voltage = db.Column(db.Float)
-    warn_voltage = db.Column(db.Float)
-    critical_voltage = db.Column(db.Float)
-    min_voltage = db.Column(db.Float)
-    warn_current = db.Column(db.Integer)
-    critical_current = db.Column(db.Integer)
-    i2c_addr = db.Column(db.String(50))
-    voltage_divider_ratio = db.Column(db.Float)  # divider (0.5 etc)
-    subtracted_sensor_id_list = db.Column(db.String(50))  # comma separated sensor ids, total voltage to be subtracted
-    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
+class PowerMonitor(Base, graphs.UpsGraph, DbEvent, DbBase):
+    __tablename__ = 'power_monitor'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50), unique=True)
+    type = Column(String(50))  # INA, etc
+    host_name = Column(String(50))
+    voltage = Column(Float)  # volts, estimated voltage when using divider and batteries in series
+    current = Column(Float)  # miliamps
+    power = Column(Float)
+    raw_voltage = Column(Float)  # volts, read from sensor without
+    max_voltage = Column(Float)
+    warn_voltage = Column(Float)
+    critical_voltage = Column(Float)
+    min_voltage = Column(Float)
+    warn_current = Column(Integer)
+    critical_current = Column(Integer)
+    i2c_addr = Column(String(50))
+    voltage_divider_ratio = Column(Float)  # divider (0.5 etc)
+    subtracted_sensor_id_list = Column(String(50))  # comma separated sensor ids, total voltage to be subtracted
+    updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now)
 
     def __init__(self):
         super(PowerMonitor, self).__init__()
@@ -709,26 +732,27 @@ class PowerMonitor(db.Model, graphs.UpsGraph, DbEvent, DbBase):
         return '{} {} v={} {}'.format(self.id, self.name, self.voltage, self.updated_on)
 
 
-class SystemDisk(db.Model, graphs.SystemDiskGraph, DbEvent, DbBase):
-    id = db.Column(db.Integer, primary_key=True)
-    serial = db.Column(db.String(50), unique=True)
-    system_name = db.Column(db.String(50))
-    hdd_name = db.Column(db.String(50))  # netbook /dev/sda
-    hdd_device = db.Column(db.String(50))  # usually empty?
-    hdd_disk_dev = db.Column(db.String(50))  # /dev/sda
-    temperature = db.Column(db.Float)
-    sector_error_count = db.Column(db.Integer)
-    smart_status = db.Column(db.String(50))
-    power_status = db.Column(db.Integer)
-    load_cycle_count = db.Column(db.Integer)
-    start_stop_count = db.Column(db.Integer)
-    last_reads_completed_count = db.Column(db.Float)
-    last_reads_datetime = db.Column(db.DateTime())
-    last_writes_completed_count = db.Column(db.Float)
-    last_writes_datetime = db.Column(db.DateTime())
-    last_reads_elapsed = db.Column(db.Float)
-    last_writes_elapsed = db.Column(db.Float)
-    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
+class SystemDisk(Base, graphs.SystemDiskGraph, DbEvent, DbBase):
+    __tablename__ = 'system_disk'
+    id = Column(Integer, primary_key=True)
+    serial = Column(String(50), unique=True)
+    system_name = Column(String(50))
+    hdd_name = Column(String(50))  # netbook /dev/sda
+    hdd_device = Column(String(50))  # usually empty?
+    hdd_disk_dev = Column(String(50))  # /dev/sda
+    temperature = Column(Float)
+    sector_error_count = Column(Integer)
+    smart_status = Column(String(50))
+    power_status = Column(Integer)
+    load_cycle_count = Column(Integer)
+    start_stop_count = Column(Integer)
+    last_reads_completed_count = Column(Float)
+    last_reads_datetime = Column(DateTime())
+    last_writes_completed_count = Column(Float)
+    last_writes_datetime = Column(DateTime())
+    last_reads_elapsed = Column(Float)
+    last_writes_elapsed = Column(Float)
+    updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now)
 
     def __init__(self):
         super(SystemDisk, self).__init__()
@@ -738,18 +762,19 @@ class SystemDisk(db.Model, graphs.SystemDiskGraph, DbEvent, DbBase):
         return '{} {} {} {} {}'.format(self.id, self.serial, self.system_name, self.hdd_name, self.hdd_disk_dev)
 
 
-class GpioPin(db.Model, DbEvent, DbBase):
-    id = db.Column(db.Integer, primary_key=True)
-    host_name = db.Column(db.String(50))
-    pin_type = db.Column(db.String(50))  # bbb, pi, piface
-    pin_code = db.Column(db.String(50))  # friendly format, unique for host, Beagle = P9_11, PI = pin_index
-    pin_index_bcm = db.Column(db.String(50))  # bcm format, 0 to n
-    pin_value = db.Column(db.Integer)  # 0, 1 or None
-    pin_direction = db.Column(db.String(4))  # in, out, None
-    board_index = db.Column(db.Integer)  # 0 to n (max 3 for piface)
-    description = db.Column(db.String(50))
-    is_active = db.Column(db.Boolean, default=False)  # if pin was setup(exported) through this app. will be unexported when app exit
-    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
+class GpioPin(Base, DbEvent, DbBase):
+    __tablename__ = 'gpio_pin'
+    id = Column(Integer, primary_key=True)
+    host_name = Column(String(50))
+    pin_type = Column(String(50))  # bbb, pi, piface
+    pin_code = Column(String(50))  # friendly format, unique for host, Beagle = P9_11, PI = pin_index
+    pin_index_bcm = Column(String(50))  # bcm format, 0 to n
+    pin_value = Column(Integer)  # 0, 1 or None
+    pin_direction = Column(String(4))  # in, out, None
+    board_index = Column(Integer)  # 0 to n (max 3 for piface)
+    description = Column(String(50))
+    is_active = Column(Boolean, default=False)  # if pin was setup(exported) through this app. will be unexported when app exit
+    updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now)
 
     def __init__(self):
         super(GpioPin, self).__init__()
@@ -759,23 +784,24 @@ class GpioPin(db.Model, DbEvent, DbBase):
             self.id, self.host_name, self.pin_code, self.pin_index_bcm, self.pin_type, self.pin_value)
 
 
-class ZoneAlarm(db.Model, DbEvent, DbBase):
+class ZoneAlarm(Base, DbEvent, DbBase):
+    __tablename__ = 'zone_alarm'
     """not all gpios are alarm events, some are contacts, some are movement sensors"""
     # fixme: should be more generic, i.e. ZoneContact (with types = sensor, contact)
-    id = db.Column(db.Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
     # friendly display name for pin mapping
-    alarm_pin_name = db.Column(db.String(50))
-    zone_id = db.Column(db.Integer)  # , db.ForeignKey('zone.id'))
+    alarm_pin_name = Column(String(50))
+    zone_id = Column(Integer)  # , ForeignKey('zone.id'))
     # zone = db.relationship('Zone', backref=db.backref('ZoneAlarm(zone)', lazy='dynamic'))
-    # gpio_pin_code = db.Column(db.String(50), db.ForeignKey('gpio_pin.pin_code'))
-    gpio_pin_code = db.Column(db.String(50))
-    gpio_host_name = db.Column(db.String(50))
-    sensor_type = db.Column(db.String(25))
+    # gpio_pin_code = Column(String(50), ForeignKey('gpio_pin.pin_code'))
+    gpio_pin_code = Column(String(50))
+    gpio_host_name = Column(String(50))
+    sensor_type = Column(String(25))
     # gpio_pin = db.relationship('GpioPin', backref=db.backref('ZoneAlarm(gpiopincode)', lazy='dynamic'))
-    alarm_pin_triggered = db.Column(db.Boolean, default=False)  # True if alarm sensor is connected (move detected)
-    is_false_alarm_prone = db.Column(db.Boolean, default=False)  # True if sensor can easily trigger false alarms (gate move by wind)
-    start_alarm = db.Column(db.Boolean, default=False)  # True if alarm must start (because area/zone is armed)
-    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
+    alarm_pin_triggered = Column(Boolean, default=False)  # True if alarm sensor is connected (move detected)
+    is_false_alarm_prone = Column(Boolean, default=False)  # True if sensor can easily trigger false alarms (gate move by wind)
+    start_alarm = Column(Boolean, default=False)  # True if alarm must start (because area/zone is armed)
+    updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now)
 
     def __init__(self, zone_id='', gpio_pin_code='', host_name=''):
         super(ZoneAlarm, self).__init__()
@@ -788,20 +814,21 @@ class ZoneAlarm(db.Model, DbEvent, DbBase):
             self.gpio_host_name, self.alarm_pin_name, self.gpio_host_name, self.gpio_pin_code, self.alarm_pin_triggered)
 
 
-class ZoneHeatRelay(db.Model, DbEvent, DbBase, graphs.BaseGraph):
-    id = db.Column(db.Integer, primary_key=True)
+class ZoneHeatRelay(Base, DbEvent, DbBase, graphs.BaseGraph):
+    __tablename__ = 'zone_heat_relay'
+    id = Column(Integer, primary_key=True)
     # friendly display name for pin mapping
-    heat_pin_name = db.Column(db.String(50))
-    zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'))
-    gpio_pin_code = db.Column(db.String(50))  # user friendly format, e.g. P8_11
-    gpio_host_name = db.Column(db.String(50))
-    heat_is_on = db.Column(db.Boolean, default=False)
-    is_main_heat_source = db.Column(db.Boolean, default=False)
-    is_alternate_source_switch = db.Column(db.Boolean, default=False)  # switch to alternate source
-    is_alternate_heat_source = db.Column(db.Boolean, default=False)  # used for low cost/eco main heat sources
+    heat_pin_name = Column(String(50))
+    zone_id = Column(Integer, ForeignKey('zone.id'))
+    gpio_pin_code = Column(String(50))  # user friendly format, e.g. P8_11
+    gpio_host_name = Column(String(50))
+    heat_is_on = Column(Boolean, default=False)
+    is_main_heat_source = Column(Boolean, default=False)
+    is_alternate_source_switch = Column(Boolean, default=False)  # switch to alternate source
+    is_alternate_heat_source = Column(Boolean, default=False)  # used for low cost/eco main heat sources
 
-    temp_sensor_name = db.Column(db.String(50))  # temperature sensor name for heat sources to check for heat limit
-    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
+    temp_sensor_name = Column(String(50))  # temperature sensor name for heat sources to check for heat limit
+    updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now)
 
     def __init__(self, zone_id=None, gpio_pin_code='', host_name=''):
         super(ZoneHeatRelay, self).__init__()
@@ -813,17 +840,18 @@ class ZoneHeatRelay(db.Model, DbEvent, DbBase, graphs.BaseGraph):
         return 'host {} {} {} {}'.format(self.gpio_host_name, self.gpio_pin_code, self.heat_pin_name, self.heat_is_on)
 
 
-class ZoneCustomRelay(db.Model, DbEvent, DbBase):
-    id = db.Column(db.Integer, primary_key=True)
+class ZoneCustomRelay(Base, DbEvent, DbBase):
+    __tablename__ = 'zone_custom_relay'
+    id = Column(Integer, primary_key=True)
     # friendly display name for pin mapping
-    relay_pin_name = db.Column(db.String(50))
-    zone_id = db.Column(db.Integer, db.ForeignKey('zone.id'))
-    gpio_pin_code = db.Column(db.String(50))  # user friendly format, e.g. P8_11
-    gpio_host_name = db.Column(db.String(50))
-    relay_is_on = db.Column(db.Boolean, default=False)
-    relay_type = db.Column(db.String(20))
-    expire = db.Column(db.Integer)  # after how many seconds state goes back to original state
-    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
+    relay_pin_name = Column(String(50))
+    zone_id = Column(Integer, ForeignKey('zone.id'))
+    gpio_pin_code = Column(String(50))  # user friendly format, e.g. P8_11
+    gpio_host_name = Column(String(50))
+    relay_is_on = Column(Boolean, default=False)
+    relay_type = Column(String(20))
+    expire = Column(Integer)  # after how many seconds state goes back to original state
+    updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now)
 
     def __init__(self, id=None, zone_id=None, gpio_pin_code=None, gpio_host_name=None, relay_pin_name=None):
         super(ZoneCustomRelay, self).__init__()
@@ -839,34 +867,36 @@ class ZoneCustomRelay(db.Model, DbEvent, DbBase):
                                                self.relay_is_on)
 
 
-class CommandOverrideRelay(db.Model, DbEvent, DbBase):
-    id = db.Column(db.Integer, primary_key=True)
-    host_name = db.Column(db.String(50))
-    is_gui_source = db.Column(db.Boolean, default=False)  # gui has priority over rule
-    is_rule_source = db.Column(db.Boolean, default=False)
-    relay_pin_name = db.Column(db.String(50))
-    start_date = db.Column(db.DateTime(), default=datetime.now)
-    end_date = db.Column(db.DateTime(), default=datetime.now)
-    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
+class CommandOverrideRelay(Base, DbEvent, DbBase):
+    __tablename__ = 'command_overide_relay'
+    id = Column(Integer, primary_key=True)
+    host_name = Column(String(50))
+    is_gui_source = Column(Boolean, default=False)  # gui has priority over rule
+    is_rule_source = Column(Boolean, default=False)
+    relay_pin_name = Column(String(50))
+    start_date = Column(DateTime(), default=datetime.now)
+    end_date = Column(DateTime(), default=datetime.now)
+    updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now)
 
 
-class Rule(db.Model, DbEvent, DbBase):
-    id = db.Column(db.Integer, primary_key=True)
-    host_name = db.Column(db.String(50))
-    name = db.Column(db.String(50), unique=True)
-    command = db.Column(db.String(50))
-    hour = db.Column(db.String(20))
-    minute = db.Column(db.String(2))
-    second = db.Column(db.String(20))
-    day_of_week = db.Column(db.String(20))
-    week = db.Column(db.String(20))
-    day = db.Column(db.String(20))
-    month = db.Column(db.String(20))
-    year = db.Column(db.String(20))
-    start_date = db.Column(db.DateTime())
-    execute_now = db.Column(db.Boolean, default=False)
-    is_async = db.Column(db.Boolean, default=False)
-    is_active = db.Column(db.Boolean, default=False)
+class Rule(Base, DbEvent, DbBase):
+    __tablename__ = 'rule'
+    id = Column(Integer, primary_key=True)
+    host_name = Column(String(50))
+    name = Column(String(50), unique=True)
+    command = Column(String(50))
+    hour = Column(String(20))
+    minute = Column(String(2))
+    second = Column(String(20))
+    day_of_week = Column(String(20))
+    week = Column(String(20))
+    day = Column(String(20))
+    month = Column(String(20))
+    year = Column(String(20))
+    start_date = Column(DateTime())
+    execute_now = Column(Boolean, default=False)
+    is_async = Column(Boolean, default=False)
+    is_active = Column(Boolean, default=False)
 
     def __repr__(self):
         return '{} {}:{}'.format(self.is_active, self.name, self.command)
@@ -879,13 +909,14 @@ class Rule(db.Model, DbEvent, DbBase):
         self.host_name = host_name
 
 
-class PlotlyCache(db.Model, DbEvent, DbBase):
-    id = db.Column(db.Integer, primary_key=True)
-    grid_name = db.Column(db.String(50), unique=True)
-    grid_url = db.Column(db.String(250))
-    column_name_list = db.Column(db.String(250))
-    created_by_node_name = db.Column(db.String(50))
-    announced_on = db.Column(db.DateTime())
+class PlotlyCache(Base, DbEvent, DbBase):
+    __tablename__ = 'plotly_cache'
+    id = Column(Integer, primary_key=True)
+    grid_name = Column(String(50), unique=True)
+    grid_url = Column(String(250))
+    column_name_list = Column(String(250))
+    created_by_node_name = Column(String(50))
+    announced_on = Column(DateTime())
 
     def __repr__(self):
         return '{} {}'.format(self.grid_name, self.grid_url)
@@ -898,22 +929,23 @@ class PlotlyCache(db.Model, DbEvent, DbBase):
         self.grid_name = grid_name
 
 
-class Utility(db.Model, graphs.BaseGraph, DbEvent, DbBase):
-    id = db.Column(db.Integer, primary_key=True)
-    utility_name = db.Column(db.String(50))  # unique name, can be different than sensor name for dual counter
-    sensor_name = db.Column(db.String(50), db.ForeignKey('sensor.sensor_name'))
-    sensor_index = db.Column(db.Integer)  # 0 for counter_a, 1 for counter_b
-    units_total = db.Column(db.Float)  # total number of units measured
-    units_delta = db.Column(db.Float)  # total number of units measured since last measurement
-    units_2_delta = db.Column(db.Float)  # total number of units measured since last measurement
-    ticks_delta = db.Column(db.BigInteger)
-    ticks_per_unit = db.Column(db.Float, default=1)  # number of counter ticks in a unit (e.g. 10 for a watt)
-    unit_name = db.Column(db.String(50))  # kwh, liter etc.
-    unit_2_name = db.Column(db.String(50))  # 2nd unit type, optional, i.e. watts
-    unit_cost = db.Column(db.Float)
-    cost = db.Column(db.Float)
-    utility_type = db.Column(db.String(50))  # water, electricity, gas
-    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
+class Utility(Base, graphs.BaseGraph, DbEvent, DbBase):
+    __tablename__ = 'utility'
+    id = Column(Integer, primary_key=True)
+    utility_name = Column(String(50))  # unique name, can be different than sensor name for dual counter
+    sensor_name = Column(String(50), ForeignKey('sensor.sensor_name'))
+    sensor_index = Column(Integer)  # 0 for counter_a, 1 for counter_b
+    units_total = Column(Float)  # total number of units measured
+    units_delta = Column(Float)  # total number of units measured since last measurement
+    units_2_delta = Column(Float)  # total number of units measured since last measurement
+    ticks_delta = Column(BigInteger)
+    ticks_per_unit = Column(Float, default=1)  # number of counter ticks in a unit (e.g. 10 for a watt)
+    unit_name = Column(String(50))  # kwh, liter etc.
+    unit_2_name = Column(String(50))  # 2nd unit type, optional, i.e. watts
+    unit_cost = Column(Float)
+    cost = Column(Float)
+    utility_type = Column(String(50))  # water, electricity, gas
+    updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now)
 
     def __init__(self, sensor_name=''):
         super(Utility, self).__init__()
@@ -923,11 +955,12 @@ class Utility(db.Model, graphs.BaseGraph, DbEvent, DbBase):
         return '{} {} {}'.format(self.id, self.utility_name, self.updated_on)
 
 
-class State(db.Model, DbEvent, DbBase):
-    id = db.Column(db.Integer, primary_key=True)
-    entry_name = db.Column(db.String(50))  # unique name
-    entry_value = db.Column(db.String(50))
-    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
+class State(Base, DbEvent, DbBase):
+    __tablename__ = 'state'
+    id = Column(Integer, primary_key=True)
+    entry_name = Column(String(50))  # unique name
+    entry_value = Column(String(50))
+    updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now)
 
     def __init__(self, entry_name=''):
         super(State, self).__init__()
@@ -937,18 +970,19 @@ class State(db.Model, DbEvent, DbBase):
         return '{} {} {}'.format(self.id, self.entry_name, self.entry_value)
 
 
-class Device(db.Model, DbEvent, DbBase):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50))  # unique name
-    type = db.Column(db.String(50))
-    bt_address = db.Column(db.String(50))
-    wifi_address = db.Column(db.String(50))
-    bt_signal = db.Column(db.Integer)
-    wifi_signal = db.Column(db.Integer)
-    last_bt_active = db.Column(db.DateTime())
-    last_wifi_active = db.Column(db.DateTime())
-    last_active = db.Column(db.DateTime())
-    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
+class Device(Base, DbEvent, DbBase):
+    __tablename__ = 'device'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50))  # unique name
+    type = Column(String(50))
+    bt_address = Column(String(50))
+    wifi_address = Column(String(50))
+    bt_signal = Column(Integer)
+    wifi_signal = Column(Integer)
+    last_bt_active = Column(DateTime())
+    last_wifi_active = Column(DateTime())
+    last_active = Column(DateTime())
+    updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now)
 
     def __init__(self, name=''):
         super(Device, self).__init__()
@@ -958,11 +992,12 @@ class Device(db.Model, DbEvent, DbBase):
         return '{} {}'.format(self.id, self.name)
 
 
-class People(db.Model, DbEvent, DbBase):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50))  # unique name
-    email = db.Column(db.String(50))
-    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
+class People(Base, DbEvent, DbBase):
+    __tablename__ = 'people'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50))  # unique name
+    email = Column(String(50))
+    updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now)
 
     def __init__(self, name=''):
         super(People, self).__init__()
@@ -972,42 +1007,45 @@ class People(db.Model, DbEvent, DbBase):
         return '{} {}'.format(self.id, self.name)
 
 
-class PeopleDevice(db.Model, DbEvent, DbBase):
-    id = db.Column(db.Integer, primary_key=True)
-    people_id = db.Column(db.Integer)
-    device_id = db.Column(db.Integer)
-    give_presence = db.Column(db.Boolean, default=False)
-    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
+class PeopleDevice(Base, DbEvent, DbBase):
+    __tablename__ = 'people_device'
+    id = Column(Integer, primary_key=True)
+    people_id = Column(Integer)
+    device_id = Column(Integer)
+    give_presence = Column(Boolean, default=False)
+    updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now)
 
 
-class Position(db.Model, DbEvent, DbBase):
-    id = db.Column(db.Integer, primary_key=True)
-    device_id = db.Column(db.Integer)
-    latitude = db.Column(db.String(20))
-    longitude = db.Column(db.String(20))
-    altitude = db.Column(db.Float)
-    hspeed = db.Column(db.Float)
-    vspeed = db.Column(db.Float)
-    hprecision = db.Column(db.Integer)
-    vprecision = db.Column(db.Integer)
-    battery = db.Column(db.Integer)
-    satellite = db.Column(db.Integer)
-    satellite_valid = db.Column(db.Integer)
-    updated_on = db.Column(db.DateTime())
+class Position(Base, DbEvent, DbBase):
+    __tablename__ = 'position'
+    id = Column(Integer, primary_key=True)
+    device_id = Column(Integer)
+    latitude = Column(String(20))
+    longitude = Column(String(20))
+    altitude = Column(Float)
+    hspeed = Column(Float)
+    vspeed = Column(Float)
+    hprecision = Column(Integer)
+    vprecision = Column(Integer)
+    battery = Column(Integer)
+    satellite = Column(Integer)
+    satellite_valid = Column(Integer)
+    updated_on = Column(DateTime())
 
 
-class Music(db.Model, DbEvent, DbBase):
-    id = db.Column(db.Integer, primary_key=True)
-    zone_name = db.Column(db.String(50))  # unique name
-    state = db.Column(db.String(50))
-    volume = db.Column(db.Integer)
-    position = db.Column(db.Integer)  # percent
-    title = db.Column(db.String(100))
-    artist = db.Column(db.String(100))
-    song = db.Column(db.String(200))
-    album = db.Column(db.String(100))
+class Music(Base, DbEvent, DbBase):
+    __tablename__ = 'music'
+    id = Column(Integer, primary_key=True)
+    zone_name = Column(String(50))  # unique name
+    state = Column(String(50))
+    volume = Column(Integer)
+    position = Column(Integer)  # percent
+    title = Column(String(100))
+    artist = Column(String(100))
+    song = Column(String(200))
+    album = Column(String(100))
 
-    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
+    updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now)
 
     def __init__(self, zone_name=None):
         super(Music, self).__init__()
@@ -1017,10 +1055,11 @@ class Music(db.Model, DbEvent, DbBase):
         return '{} {} {} {}'.format(self.id, self.zone_name, self.state, self.song)
 
 
-class MusicLoved(db.Model, DbEvent, DbBase):
-    id = db.Column(db.Integer, primary_key=True)
-    lastfmloved = db.Column(db.Boolean, default=False)
-    lastfmsong = db.Column(db.String(200))
+class MusicLoved(Base, DbEvent, DbBase):
+    __tablename__ = 'music_loved'
+    id = Column(Integer, primary_key=True)
+    lastfmloved = Column(Boolean, default=False)
+    lastfmsong = Column(String(200))
 
     def __init__(self, lastfmsong=None):
         super(MusicLoved, self).__init__()
@@ -1030,15 +1069,16 @@ class MusicLoved(db.Model, DbEvent, DbBase):
         return '{} {} {}'.format(self.id, self.lastfmsong, self.lastfmloved)
 
 
-class Pwm(db.Model, DbEvent, DbBase):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50))
-    frequency = db.Column(db.Integer)
-    duty_cycle = db.Column(db.Integer)  # 0-1e6
-    gpio_pin_code = db.Column(db.Integer)
-    host_name = db.Column(db.String(50))
-    is_started = db.Column(db.Boolean, default=False)
-    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
+class Pwm(Base, DbEvent, DbBase):
+    __tablename__ = 'pwm'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50))
+    frequency = Column(Integer)
+    duty_cycle = Column(Integer)  # 0-1e6
+    gpio_pin_code = Column(Integer)
+    host_name = Column(String(50))
+    is_started = Column(Boolean, default=False)
+    updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now)
 
     def __init__(self, id=None):
         super(Pwm, self).__init__()
@@ -1060,125 +1100,125 @@ column names must match the source model names as save is done automatically
 '''
 
 
-class NodeHistory(db.Model, DbBase):
+class NodeHistory(Base, DbBase):
     __bind_key__ = 'reporting'
     __tablename__ = 'node_history'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50))
-    master_overall_cycles = db.Column(db.Integer)  # count of update cycles while node was master
-    run_overall_cycles = db.Column(db.Integer)  # count of total update cycles
-    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
-    source_host_ = db.Column(db.String(50))
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50))
+    master_overall_cycles = Column(Integer)  # count of update cycles while node was master
+    run_overall_cycles = Column(Integer)  # count of total update cycles
+    updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
+    source_host_ = Column(String(50))
 
     def __repr__(self):
         return '{} {}'.format(self.id, self.name)
 
 
-class SensorHistory(db.Model, DbBase):
+class SensorHistory(Base, DbBase):
     __bind_key__ = 'reporting'
     __tablename__ = 'sensor_history'
-    id = db.Column(db.Integer, primary_key=True)
-    sensor_name = db.Column(db.String(50), index=True)
-    address = db.Column(db.String(50))
-    temperature = db.Column(db.Float)
-    humidity = db.Column(db.Float)
-    pressure = db.Column(db.Float)
-    counters_a = db.Column(db.BigInteger)
-    counters_b = db.Column(db.BigInteger)
-    delta_counters_a = db.Column(db.BigInteger)
-    delta_counters_b = db.Column(db.BigInteger)
-    iad = db.Column(db.Float)
-    vdd = db.Column(db.Float)
-    vad = db.Column(db.Float)
-    pio_a = db.Column(db.Integer)
-    pio_b = db.Column(db.Integer)
-    sensed_a = db.Column(db.Integer)
-    sensed_b = db.Column(db.Integer)
-    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
-    added_on = db.Column(db.DateTime(), default=datetime.now)
-    source_host_ = db.Column(db.String(50))
+    id = Column(Integer, primary_key=True)
+    sensor_name = Column(String(50), index=True)
+    address = Column(String(50))
+    temperature = Column(Float)
+    humidity = Column(Float)
+    pressure = Column(Float)
+    counters_a = Column(BigInteger)
+    counters_b = Column(BigInteger)
+    delta_counters_a = Column(BigInteger)
+    delta_counters_b = Column(BigInteger)
+    iad = Column(Float)
+    vdd = Column(Float)
+    vad = Column(Float)
+    pio_a = Column(Integer)
+    pio_b = Column(Integer)
+    sensed_a = Column(Integer)
+    sensed_b = Column(Integer)
+    updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
+    added_on = Column(DateTime(), default=datetime.now)
+    source_host_ = Column(String(50))
 
     def __repr__(self):
         return '{} {} adr={} t={} ca={} cb={}'.format(self.id, self.sensor_name, self.address, self.temperature,
                                                       self.counters_a, self.counters_b)
 
 
-class SensorErrorHistory(db.Model, DbBase):
+class SensorErrorHistory(Base, DbBase):
     __bind_key__ = 'reporting'
     __tablename__ = 'sensor_error_history'
-    id = db.Column(db.Integer, primary_key=True)
-    sensor_name = db.Column(db.String(50), index=True)
-    error_type = db.Column(db.Integer)  # 0=not found, 1=other err
-    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
+    id = Column(Integer, primary_key=True)
+    sensor_name = Column(String(50), index=True)
+    error_type = Column(Integer)  # 0=not found, 1=other err
+    updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
 
     def __repr__(self):
         return '{} {}'.format(self.id, self.sensor_name)
 
 
-class SystemMonitorHistory(db.Model, DbBase):
+class SystemMonitorHistory(Base, DbBase):
     __bind_key__ = 'reporting'
     __tablename__ = 'systemmonitor_history'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), index=True)
-    cpu_usage_percent = db.Column(db.Float)
-    cpu_temperature = db.Column(db.Float)
-    memory_available_percent = db.Column(db.Float)
-    uptime_days = db.Column(db.Integer)
-    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
-    source_host_ = db.Column(db.String(50))
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50), index=True)
+    cpu_usage_percent = Column(Float)
+    cpu_temperature = Column(Float)
+    memory_available_percent = Column(Float)
+    uptime_days = Column(Integer)
+    updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
+    source_host_ = Column(String(50))
 
     def __repr__(self):
         return '{} {} {}'.format(self.id, self.name, self.updated_on)
 
 
-class UpsHistory(db.Model, DbBase):
+class UpsHistory(Base, DbBase):
     __bind_key__ = 'reporting'
     __tablename__ = 'ups_history'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50))
-    system_name = db.Column(db.String(50))
-    port = db.Column(db.String(50))
-    input_voltage = db.Column(db.Float)
-    remaining_minutes = db.Column(db.Float)
-    output_voltage = db.Column(db.Float)
-    load_percent = db.Column(db.Float)
-    power_frequency = db.Column(db.Float)
-    battery_voltage = db.Column(db.Float)
-    temperature = db.Column(db.Float)
-    power_failed = db.Column(db.Boolean(), default=False)
-    beeper_on = db.Column(db.Boolean(), default=False)
-    test_in_progress = db.Column(db.Boolean(), default=False)
-    other_status = db.Column(db.String(50))
-    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
-    source_host_ = db.Column(db.String(50))
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50))
+    system_name = Column(String(50))
+    port = Column(String(50))
+    input_voltage = Column(Float)
+    remaining_minutes = Column(Float)
+    output_voltage = Column(Float)
+    load_percent = Column(Float)
+    power_frequency = Column(Float)
+    battery_voltage = Column(Float)
+    temperature = Column(Float)
+    power_failed = Column(Boolean(), default=False)
+    beeper_on = Column(Boolean(), default=False)
+    test_in_progress = Column(Boolean(), default=False)
+    other_status = Column(String(50))
+    updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
+    source_host_ = Column(String(50))
 
     def __repr__(self):
         return '{} {} {}'.format(self.id, self.name, self.updated_on)
 
 
-class SystemDiskHistory(db.Model, DbBase):
+class SystemDiskHistory(Base, DbBase):
     __bind_key__ = 'reporting'
     __tablename__ = 'systemdisk_history'  # convention: append '_history' -> 'History' to source table name
-    id = db.Column(db.Integer, primary_key=True)
-    serial = db.Column(db.String(50))
-    system_name = db.Column(db.String(50))
-    hdd_name = db.Column(db.String(50))  # netbook /dev/sda
-    hdd_device = db.Column(db.String(50))  # usually empty?
-    hdd_disk_dev = db.Column(db.String(50))  # /dev/sda
-    temperature = db.Column(db.Float)
-    sector_error_count = db.Column(db.Integer)
-    smart_status = db.Column(db.String(50))
-    power_status = db.Column(db.Integer)
-    load_cycle_count = db.Column(db.Integer)
-    start_stop_count = db.Column(db.Integer)
-    last_reads_completed_count = db.Column(db.Float)
-    last_reads_datetime = db.Column(db.DateTime())
-    last_writes_completed_count = db.Column(db.Float)
-    last_writes_datetime = db.Column(db.DateTime())
-    last_reads_elapsed = db.Column(db.Float)
-    last_writes_elapsed = db.Column(db.Float)
-    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
-    source_host_ = db.Column(db.String(50))
+    id = Column(Integer, primary_key=True)
+    serial = Column(String(50))
+    system_name = Column(String(50))
+    hdd_name = Column(String(50))  # netbook /dev/sda
+    hdd_device = Column(String(50))  # usually empty?
+    hdd_disk_dev = Column(String(50))  # /dev/sda
+    temperature = Column(Float)
+    sector_error_count = Column(Integer)
+    smart_status = Column(String(50))
+    power_status = Column(Integer)
+    load_cycle_count = Column(Integer)
+    start_stop_count = Column(Integer)
+    last_reads_completed_count = Column(Float)
+    last_reads_datetime = Column(DateTime())
+    last_writes_completed_count = Column(Float)
+    last_writes_datetime = Column(DateTime())
+    last_reads_elapsed = Column(Float)
+    last_writes_elapsed = Column(Float)
+    updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
+    source_host_ = Column(String(50))
 
     def __init__(self):
         super(SystemDiskHistory, self).__init__()
@@ -1188,84 +1228,84 @@ class SystemDiskHistory(db.Model, DbBase):
         return '{} {} {} {} {}'.format(self.id, self.serial, self.system_name, self.hdd_name, self.hdd_disk_dev)
 
 
-class PresenceHistory(db.Model, DbBase):
+class PresenceHistory(Base, DbBase):
     __bind_key__ = 'reporting'
     __tablename__ = 'presence_history'  # convention: append '_history' -> 'History' to source table name
-    id = db.Column(db.Integer, primary_key=True)
-    zone_name = db.Column(db.String(50))
-    sensor_name = db.Column(db.String(50))
-    event_type = db.Column(db.String(25)) # cam, pir, contact, wifi, bt
-    event_camera_date = db.Column(db.DateTime(), default=None)
-    event_alarm_date = db.Column(db.DateTime(), default=None)
-    event_io_date = db.Column(db.DateTime(), default=None)
-    # event_wifi_date = db.Column(db.DateTime(), default=None)
-    # event_bt_date = db.Column(db.DateTime(), default=None)
-    is_connected = db.Column(db.Boolean, default=False)  # pin connected? true on unarmed sensors, false on alarm/move
-    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
-    source_host_ = db.Column(db.String(50))
+    id = Column(Integer, primary_key=True)
+    zone_name = Column(String(50))
+    sensor_name = Column(String(50))
+    event_type = Column(String(25)) # cam, pir, contact, wifi, bt
+    event_camera_date = Column(DateTime(), default=None)
+    event_alarm_date = Column(DateTime(), default=None)
+    event_io_date = Column(DateTime(), default=None)
+    # event_wifi_date = Column(DateTime(), default=None)
+    # event_bt_date = Column(DateTime(), default=None)
+    is_connected = Column(Boolean, default=False)  # pin connected? true on unarmed sensors, false on alarm/move
+    updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
+    source_host_ = Column(String(50))
 
     def __repr__(self):
         return 'PresenceHistory zone {} sensor {} connected {} type {}'.format(
             self.zone_name, self.sensor_name, self.is_connected, self.event_type)
 
 
-class UtilityHistory(db.Model, DbBase):
+class UtilityHistory(Base, DbBase):
     __bind_key__ = 'reporting'
     __tablename__ = 'utility_history'  # convention: append '_history' -> 'History' to source table name
-    id = db.Column(db.Integer, primary_key=True)
-    utility_name = db.Column(db.String(50), index=True)
-    sensor_name = db.Column(db.String(50), index=True)
-    units_total = db.Column(db.Float)  # total number of units measured
-    units_delta = db.Column(db.Float)  # total number of units measured since last measurement
-    units_2_delta = db.Column(db.Float)  # total number of units measured since last measurement
-    ticks_delta = db.Column(db.BigInteger)
-    cost = db.Column(db.Float)
-    unit_name = db.Column(db.String(50))  # kwh, liter etc.
-    unit_2_name = db.Column(db.String(50))  # watt
-    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
-    source_host_ = db.Column(db.String(50))
+    id = Column(Integer, primary_key=True)
+    utility_name = Column(String(50), index=True)
+    sensor_name = Column(String(50), index=True)
+    units_total = Column(Float)  # total number of units measured
+    units_delta = Column(Float)  # total number of units measured since last measurement
+    units_2_delta = Column(Float)  # total number of units measured since last measurement
+    ticks_delta = Column(BigInteger)
+    cost = Column(Float)
+    unit_name = Column(String(50))  # kwh, liter etc.
+    unit_2_name = Column(String(50))  # watt
+    updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now, index=True)
+    source_host_ = Column(String(50))
 
 
-class ZoneHeatRelayHistory(db.Model, DbBase):
+class ZoneHeatRelayHistory(Base, DbBase):
     __bind_key__ = 'reporting'
     __tablename__ = 'zoneheatrelay_history'  # convention: append '_history' -> 'History' to source table name
-    id = db.Column(db.Integer, primary_key=True)
-    heat_pin_name = db.Column(db.String(50))
-    gpio_host_name = db.Column(db.String(50))
-    heat_is_on = db.Column(db.Boolean, default=False)
-    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
+    id = Column(Integer, primary_key=True)
+    heat_pin_name = Column(String(50))
+    gpio_host_name = Column(String(50))
+    heat_is_on = Column(Boolean, default=False)
+    updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now)
 
 
-class ZoneCustomRelayHistory(db.Model, DbBase):
+class ZoneCustomRelayHistory(Base, DbBase):
     __bind_key__ = 'reporting'
     __tablename__ = 'zonecustomrelay_history'  # convention: append '_history' -> 'History' to source table name
-    id = db.Column(db.Integer, primary_key=True)
-    relay_pin_name = db.Column(db.String(50))
-    gpio_host_name = db.Column(db.String(50))
-    relay_is_on = db.Column(db.Boolean, default=False)
-    relay_type = db.Column(db.String(20))
-    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
+    id = Column(Integer, primary_key=True)
+    relay_pin_name = Column(String(50))
+    gpio_host_name = Column(String(50))
+    relay_is_on = Column(Boolean, default=False)
+    relay_type = Column(String(20))
+    updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now)
 
 
-class PowerMonitorHistory(db.Model, DbBase):
+class PowerMonitorHistory(Base, DbBase):
     __bind_key__ = 'reporting'
     __tablename__ = 'powermonitor_history'  # convention: append '_history' -> 'History' to source table name
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50))
-    type = db.Column(db.String(50))  # INA, etc
-    host_name = db.Column(db.String(50))
-    voltage = db.Column(db.Float)  # volts
-    current = db.Column(db.Float)  # miliamps
-    power = db.Column(db.Float)
-    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50))
+    type = Column(String(50))  # INA, etc
+    host_name = Column(String(50))
+    voltage = Column(Float)  # volts
+    current = Column(Float)  # miliamps
+    power = Column(Float)
+    updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now)
 
 
-class DustSensorHistory(db.Model, DbBase):
+class DustSensorHistory(Base, DbBase):
     __bind_key__ = 'reporting'
     __tablename__ = 'dustsensor_history'  # convention: append '_history' -> 'History' to source table name
-    id = db.Column(db.Integer, primary_key=True)
-    address = db.Column(db.String(50))
-    pm_1 = db.Column(db.Integer)
-    pm_2_5 = db.Column(db.Integer)
-    pm_10 = db.Column(db.Integer)
-    updated_on = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now)
+    id = Column(Integer, primary_key=True)
+    address = Column(String(50))
+    pm_1 = Column(Integer)
+    pm_2_5 = Column(Integer)
+    pm_10 = Column(Integer)
+    updated_on = Column(DateTime(), default=datetime.now, onupdate=datetime.now)

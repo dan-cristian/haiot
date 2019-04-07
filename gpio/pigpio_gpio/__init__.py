@@ -6,7 +6,7 @@ from main import L
 from main.admin import models
 from main.admin.model_helper import commit
 from common import Constant, utils
-from main import thread_pool
+from main import thread_pool, dbs, db
 from gpio.io_common import GpioBase
 
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
@@ -173,7 +173,7 @@ def input_event(gpio, level, tick):
                 lock.release()
 
 
-class Pwm(GpioBase):
+class PwmIo(GpioBase):
 
     key_ok = 0
 
@@ -181,15 +181,22 @@ class Pwm(GpioBase):
     def get_db_record(key):
         # m = models.Pwm
         # rec = m().query_filter_first(m.name == 'boiler2')
-        rec = models.Pwm.query.filter_by(name=key).first()
-        if rec is not None and rec.name == key:
-            Pwm.key_ok = Pwm.key_ok + 1
-            L.l.info("KEY found ok {}, count={}".format(key, Pwm.key_ok))
+
+        # rec = models.Pwm.query.filter_by(name=key).first()
+        rec = models.Pwm.query.get(key)
+        # rec = dbs.session.query(models.Pwm).filter(models.Pwm.name == key).first()
+        # db.session.remove()
+        # rec = db.session.query(models.Pwm).filter(models.Pwm.name == key).first()
+
+        if rec is not None and rec.id == key:
+            PwmIo.key_ok = PwmIo.key_ok + 1
+            L.l.info("KEY found ok {}, count={}".format(key, PwmIo.key_ok))
             return rec
         # recs = models.Pwm.query.all()
         # if recs is not None:
         #    for rec in recs:
         #        if rec.name == key:
+        #            L.l.info("KEY found ok {}, count={}".format(key, PwmIo.key_ok))
         #            return rec
         L.l.error('No key retrieved for pwm {}, got {}'.format(key, rec))
         return None
@@ -211,10 +218,10 @@ class Pwm(GpioBase):
 
     @staticmethod
     def sync_2_db(key):
-        pwm = Pwm.get_db_record(key=key)
+        pwm = PwmIo.get_db_record(key=key)
         if pwm is not None:
             if pwm.host_name == Constant.HOST_NAME:
-                pwm.is_started, pwm.frequency, pwm.duty_cycle = Pwm._get_pwm_attrib(pwm.gpio_pin_code)
+                pwm.is_started, pwm.frequency, pwm.duty_cycle = PwmIo._get_pwm_attrib(pwm.gpio_pin_code)
                 pwm.commit_record_to_db_notify()
         else:
             L.l.warning("Cannot find pwm {} to sync2db".format(key))
@@ -223,13 +230,14 @@ class Pwm(GpioBase):
     def _init_pwm():
         pwm_list = models.Pwm.query.filter_by(host_name=Constant.HOST_NAME).all()
         for pwm in pwm_list:
-            Pwm.sync_2_db(pwm.name)
+            PwmIo.sync_2_db(pwm.id)
+        pass
 
     @staticmethod
     def set(key, **kwargs):
-        pwm = Pwm.get_db_record(key=key)
+        pwm = PwmIo.get_db_record(key=key)
         if pwm is not None:
-            new_pwm = models.Pwm(id=pwm.id)
+            new_pwm = models.Pwm(id=0)
             new_pwm.name = pwm.name
             for name, value in kwargs.items():
                 if name == 'frequency':
@@ -248,15 +256,15 @@ class Pwm(GpioBase):
                     P.pi.hardware_PWM(pwm.gpio_pin_code, pwm.frequency, 0)
             L.l.info("Saving status PWM {} {} to frequency {} duty old={} new={}".format(
                 key, pwm.gpio_pin_code, new_pwm.frequency, pwm.duty_cycle, new_pwm.duty_cycle))
-            models.db.session.refresh(pwm)
             new_pwm.save_changed_fields(
-                current_record=pwm, new_record=new_pwm, notify_transport_enabled=True, debug=False)
+                current_record=pwm, new_record=new_pwm, notify_transport_enabled=True, force_dirty=False, debug=False)
+            db.session.flush()
         else:
             L.l.warning("Cannot find pwm {} to set".format(key))
 
     @staticmethod
     def save(key, **kwargs):
-        pwm = Pwm.get_db_record(key=key)
+        pwm = PwmIo.get_db_record(key=key)
         if pwm is not None:
             for key, value in kwargs.items():
                 if key == 'frequency':
@@ -271,19 +279,23 @@ class Pwm(GpioBase):
 
     @staticmethod
     def get(key):
-        pwm = Pwm.get_db_record(key=key)
+        pwm = PwmIo.get_db_record(key=key)
         if pwm is not None:
             if pwm.host_name == Constant.HOST_NAME:
-                pwm.is_started, pwm.frequency, pwm.duty_cycle = Pwm._get_pwm_attrib(pwm.gpio_pin_code)
-            return pwm.is_started, pwm.frequency, pwm.duty_cycle
+                return PwmIo._get_pwm_attrib(pwm.gpio_pin_code)
+            else:
+                return pwm.is_started, pwm.frequency, pwm.duty_cycle
         else:
             L.l.warning("Cannot find pwm {} on get".format(key))
             return None, None, None
 
     @staticmethod
     def get_current_record(record):
-        record = Pwm.get_db_record(key=record.name)
-        return record, record.name
+        rec = PwmIo.get_db_record(key=record.id)
+        if rec is not None:
+            return rec, rec.id
+        else:
+            return None, None
 
     @staticmethod
     def unload():
@@ -296,7 +308,7 @@ class Pwm(GpioBase):
 
     def __init__(self, obj):
         GpioBase.__init__(self, obj)
-        Pwm._init_pwm()
+        # PwmIo._init_pwm()
 
 
 def pwm_record_update(json_object):
@@ -348,7 +360,7 @@ def unload():
 
 
 def init():
-    P.pwm = Pwm(obj=models.Pwm)
+    P.pwm = PwmIo(obj=models.Pwm)
 
     L.l.info('PiGpio initialising')
     if P.import_ok:
