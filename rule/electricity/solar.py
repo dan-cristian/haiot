@@ -277,21 +277,22 @@ class P:
 
 
 def _update_devices():
-    P.grid_importing = (P.grid_watts > P.MIN_WATTS_THRESHOLD)
-    P.grid_exporting = (P.grid_watts < -P.MIN_WATTS_THRESHOLD)
-    # let all devices know grid status and make power changes
-    dev_list = []
-    if P.grid_exporting:
-        dev_list = P.device_list.values()
-    if P.grid_importing:
-        dev_list = reversed(P.device_list.values())
-    for device in dev_list:
-        changed = device.grid_updated(P.grid_watts)
-        if changed:  # exit to allow main meter to update and recheck if more power changes are needed
-            if P.emulate_export is True:
-                pass
-            else:
-                break
+    if P.grid_watts is not None:
+        P.grid_importing = (P.grid_watts > P.MIN_WATTS_THRESHOLD)
+        P.grid_exporting = (P.grid_watts < -P.MIN_WATTS_THRESHOLD)
+        # let all devices know grid status and make power changes
+        dev_list = []
+        if P.grid_exporting:
+            dev_list = P.device_list.values()
+        if P.grid_importing:
+            dev_list = reversed(P.device_list.values())
+        for device in dev_list:
+            changed = device.grid_updated(P.grid_watts)
+            if changed:  # exit to allow main meter to update and recheck if more power changes are needed
+                if P.emulate_export is True:
+                    pass
+                else:
+                    break
 
 
 # energy rule
@@ -318,7 +319,7 @@ def thread_run():
         P.grid_watts = random.randint(-800, -300)
     else:
         main_rec = models.Utility.query.filter_by(utility_name='power main mono').first()
-        if main_rec is not None:
+        if main_rec is not None and main_rec.units_2_delta is not None:
             P.grid_watts = main_rec.units_2_delta
     _update_devices()
 
