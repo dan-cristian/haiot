@@ -13,6 +13,7 @@
 
   "Parameter": [
     {"name": "MZP_SERVER_URL", "value":"http://192.168.0.10"},
+    {"name": "DB_TYPE", "value":"tinydb", "description": "database to use, can be sqlite or tinydb"},
     {"name": "DB_PATH", "value":"/var/ram/database.db", "description": "sqlite application database to persist config and app state"},
     {"name": "PERF_FILE_PATH", "value":"/var/ram/perf.log", "description": "file for performance stat dumps"},
     {"name": "OWSERVER_HOST_1", "value": "127.0.0.1"},
@@ -509,8 +510,8 @@
   ],
 
   "Pwm": [
-    {"id": 3, "name": "boiler", "frequency": "55", "duty_cycle": "100000", "gpio_pin_code": "18", "host_name": "pizero1"},
-    {"id": 4, "name": "boiler2", "frequency": "55", "duty_cycle": "100000", "gpio_pin_code": "18", "host_name": "netbook"}
+    {"id": 3, "name": "boiler", "frequency": 55, "duty_cycle": 100000, "gpio_pin_code": 18, "host_name": "pizero1"},
+    {"id": 4, "name": "boiler2", "frequency": 55, "duty_cycle": 100000, "gpio_pin_code": 18, "host_name": "netbook"}
   ],
 
   "_ZoneAlarmComments": [
