@@ -1,4 +1,5 @@
 import socket
+import logging
 
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
@@ -9,7 +10,7 @@ class L:
 
     l = None
     # KEY setting, this filters out message priority from being logged
-    LOGGING_LEVEL = None
+    LOGGING_LEVEL = logging.INFO
     LOG_FILE = None
     # logging output will go to syslog
     LOG_TO_SYSLOG = False
@@ -25,7 +26,6 @@ class L:
 
     @staticmethod
     def init_logging():
-        import logging
         import logging.handlers
 
         class ContextFilter(logging.Filter):

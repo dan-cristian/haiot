@@ -4,6 +4,8 @@ import socket
 from uuid import getnode as get_mac
 import json
 import utils
+import sys
+import subprocess
 
 
 class Constant:
@@ -78,6 +80,7 @@ class Constant:
     SCRIPT_RESPONSE_NOTOK = 'RESULTNOTOK'
 
     P_DB_PATH="DB_PATH"
+    P_DB_TYPE = "DB_TYPE"
     P_MZP_SERVER_URL = 'MZP_SERVER_URL'
     P_MQTT_HOST_1 = 'MQTT_HOST_1'
     P_MQTT_PORT_1 = 'MQTT_PORT_1'
@@ -183,6 +186,26 @@ class Constant:
     LOG_SENSOR_INACTIVE = ''
 
     DB_REPORTING_ID = 'reporting'
+
+
+def _install(package):
+    print('Installing missing module {}'.format(package))
+    return subprocess.call([sys.executable, "-m", "pip", "install", package])
+
+
+def fix_module(error_message):
+    try:
+        mod_err = error_message.split('No module named ')
+        if len(mod_err) == 2:
+            res = _install(mod_err[1])
+            print('Install returned {}'.format(res))
+            return True
+        else:
+            msg = 'Unable to split, unexpected len {}'.format(len(mod_err))
+    except Exception as ex:
+        msg = 'Exception err={}'.format(ex)
+    print(msg)
+    return False
 
 
 def load_config_json():
