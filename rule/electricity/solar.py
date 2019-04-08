@@ -234,11 +234,12 @@ class P:
             P.device_list[relay] = obj
             P.utility_list[utility] = obj
 
-            #relay = 'boiler'
-            #utility = 'power boiler'
-            #obj = PwmHeater(relay_name=relay, relay_id=3, utility_name=utility, max_watts=2400)
-            #P.device_list[relay] = obj
-            #P.utility_list[utility] = obj
+            if False:
+                relay = 'boiler'
+                utility = 'power boiler'
+                obj = PwmHeater(relay_name=relay, relay_id=3, utility_name=utility, max_watts=2400)
+                P.device_list[relay] = obj
+                P.utility_list[utility] = obj
 
         relay = 'washing_relay'
         utility = 'power washing'
@@ -256,8 +257,6 @@ class P:
         P.device_list[relay] = Upscharger(relay_name=relay, avg_consumption=200)
         relay = 'blackwater_pump_relay'
         P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=50, supports_breaks=True)
-
-
 
         if not P.emulate_export:
             relay = 'boiler2'
@@ -325,8 +324,9 @@ def thread_run():
 
 
 def init():
-    # P.emulate_export = True
-    P.init_dev()
-    current_module = sys.modules[__name__]
-    rule.init_sub_rule(thread_run_func=thread_run, rule_module=current_module)
-    L.l.info("Initialised solar rules with {} devices".format(len(P.device_list)))
+    if False:
+        P.emulate_export = True
+        P.init_dev()
+        current_module = sys.modules[__name__]
+        rule.init_sub_rule(thread_run_func=thread_run, rule_module=current_module)
+        L.l.info("Initialised solar rules with {} devices".format(len(P.device_list)))
