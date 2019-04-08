@@ -129,7 +129,7 @@ class DbBase:
                 kwargs = {unique_key_name: unique_key_value}
                 new_record.updated_on = utils.get_base_location_now_date()
                 current_record = self.query.filter_by(**kwargs).first()
-                self.save_changed_fields(current_record=current_record, new_record=new_record,
+                self.save_changed_fields(current_record=current_record, new_record=new_record, debug=debug,
                                          notify_transport_enabled=False, save_to_graph=False)
                 # db.session.commit()
             else:
@@ -1069,10 +1069,10 @@ class MusicLoved(Base, DbEvent, DbBase):
         return '{} {} {}'.format(self.id, self.lastfmsong, self.lastfmloved)
 
 
-class Pwm(Base, DbEvent, DbBase):
+class Pwm(Base, DbEvent, DbBase, graphs.BaseGraph):
     __tablename__ = 'pwm'
     id = Column(Integer, primary_key=True)
-    name = Column(String(50))
+    name = Column(String(50), unique=True)
     frequency = Column(Integer)
     duty_cycle = Column(Integer)  # 0-1e6
     gpio_pin_code = Column(Integer)
