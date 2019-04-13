@@ -3,11 +3,14 @@ import os
 import threading
 import time
 from datetime import datetime
+from tinydb_serialization import Serializer
 from main import logger_helper
 from common import utils
+import random
 while True:
     try:
         from tinydb import TinyDB, Query, where
+        from tinydb.storages import MemoryStorage
         from tinyrecord import transaction
         from flask_admin import Admin
         from flask import Flask
@@ -16,10 +19,35 @@ while True:
         from flask_admin.model.fields import InlineFieldList, InlineFormField
         from wtforms import fields, form
         from tinymongo import TinyMongoClient
+        from tinymongo.serializers import DateTimeSerializer
+        from tinydb_serialization import SerializationMiddleware
         break
     except ImportError as iex:
         if not common.fix_module(iex.message):
             break
+
+
+class DatetimeSerializer(Serializer):
+    OBJ_CLASS = datetime
+
+    def __init__(self, format='%Y-%m-%dT%H:%M:%S', *args, **kwargs):
+        super(DatetimeSerializer, self).__init__(*args, **kwargs)
+        self._format = format
+
+    def encode(self, obj):
+        return obj.strftime(self._format)
+
+    def decode(self, s):
+        return datetime.strptime(s, self._format)
+
+
+class CustomTinyMongoClient(TinyMongoClient):
+    @property
+    def _storage(self):
+        serialization = SerializationMiddleware()
+        serialization.register_serializer(DateTimeSerializer(), 'TinyDate')
+        # register other custom serializers
+        return serialization
 
 
 class TinyBase(ModelView):
@@ -93,12 +121,10 @@ class UserView(ModelView):
     can_set_page_size = True
 
 
-
-
-
 app = Flask(__name__)
 admin = None
-
+threadLock = threading.Lock()
+globalCounter = 0
 
 # Flask views
 @app.route('/')
@@ -107,28 +133,39 @@ def index():
 
 
 def insertfew():
-    time.sleep(10)
-    #pwm_table = db.tinydb.table('pwm')
-    pwm = Pwm()
-    # pwm.id = 3
-    pwm_table = pwm.coll.table
-    pwm.name = 'boiler'
-    pwm.frequency = 55
-    pwm.duty_cycle = 100000
-    pwm.gpio_pin_code = 18
-    pwm.host_name = 'pizero1'
-    try:
-        with transaction(pwm_table) as tr:
-            # tr.insert({"id": 3, "name": "boiler", "frequency": 55, "duty_cycle": 100000, "gpio_pin_code": 18, "host_name": "pizero1"})
-            tr.insert(pwm.dictx())
-    except Exception as ex:
-        print ex
+    global globalCounter, threadLock
+    time.sleep(3)
+    i = random.randint(1, 100)
+    while True:
+        # pwm_table = db.tinydb.table('pwm')
+        pwm = Pwm()
+        i = i + 1
+        pwm.id = i
+        # pwm_table = pwm.coll.table
+        pwm.name = 'boiler {}'.format(random.randint(1, 100))
+        pwm.frequency = random.randint(10, 800)
+        pwm.duty_cycle = random.randint(1, 1000000)
+        pwm.gpio_pin_code = random.randint(1, 40)
+        pwm.host_name = 'pizero1'
+        try:
+            # with transaction(pwm_table) as tr:
+            #    res = tr.insert(pwm.dictx())
+            #    print res
+            with transaction(pwm.coll.table):
+                res = pwm.coll.insert_one(pwm.dictx(), bypass_document_validation=True)
+                # print res.inserted_id
+            with threadLock:
+                globalCounter += 1
+            print globalCounter
+        except Exception as ex:
+            print ex
 
 
 def _init_tinydb(data_file):
     global db
     data_path = os.path.dirname(data_file)
-    conn = TinyMongoClient(foldername=data_path)
+    conn = CustomTinyMongoClient(foldername=data_path)
+    #conn = CustomTinyMongoClient(storage=MemoryStorage)
     db = conn.haiot
 
 
@@ -143,6 +180,8 @@ def _init_flask(data_path):
     admin.add_view(p)
 
     threading.Thread(target=insertfew).start()
+    #threading.Thread(target=insertfew).start()
+    #threading.Thread(target=insertfew).start()
 
     app.run(debug=False)
 
