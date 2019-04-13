@@ -1,10 +1,16 @@
-from main.logger_helper import L
+import threading
+from tinydb import Query
 import common
 from common import Constant
-
+from main.logger_helper import L
+from main import system_info
+import transport
+from main import thread_pool
+from common.utils import Struct
 
 class P:
     init_mod_list = []
+    shutting_down = False
 
     def __init__(self):
         pass
@@ -70,27 +76,26 @@ def unload_module(module_name):
 
 
 def init_modules(init_mod=None):
-    m = admin.models.Module
-    # http://docs.sqlalchemy.org/en/rel_0_9/core/sqlelement.html
-    # keep host name default to '' rather than None (which does not work on filter in)
-    # get the unique/distinct list of all modules defined in config, generic or host specific ones
-    module_list = m.query.filter(m.host_name.in_([Constant.HOST_NAME, ""])).group_by(m.start_order).all()
-    for mod in module_list:
-        # Log.logger.info("Processing host specific module definition {} {}".format(mod.name, mod.active))
-        assert isinstance(mod, admin.models.Module)
+    from tinydb_app import db
+    from tinydb_model import Module
+    # m = Module.coll.find_one(host_name='')
+    m = Module.t.search(Query().host_name == '')
+    q2 = Query()
+    for mod_dict in m:
+        mod = Struct(**mod_dict)
         if mod.name != 'main':
             # check if there is a host specific module and use it with priority over generic one
-            mod_host_specific = m().query_filter_first(m.host_name.in_([Constant.HOST_NAME]), m.name.in_([mod.name]))
-            # mod_host_specific = m.query.filter(m.host_name.in_([constant.HOST_NAME]), m.name.in_([mod.name]))
-            if mod_host_specific:
-                # Log.logger.info("Initialising host specific module definition {} {}".format(
-                #    mod_host_specific.name, mod_host_specific.active))
+            mod_host_spec = Module.t.search((q2.host_name == Constant.HOST_NAME) & (q2.name == mod.name))
+            if len(mod_host_spec) == 1:
+                mod_host_specific = Struct(**mod_host_spec[0])
                 mod_name = mod_host_specific.name
                 mod_active = mod_host_specific.active
-            else:
-                # Log.logger.info("Initialising generic mod definition name={} active={}".format(mod.name, mod.active))
+            elif len(mod_host_spec) == 0:
                 mod_name = mod.name
                 mod_active = mod.active
+            else:
+                L.l.warning('Unexpected nr of modules for {} host {}'.format(mod.name, Constant.HOST_NAME))
+                break
             if init_mod is True:
                 init_module(mod_name, mod_active)
             elif init_mod is False and mod_active is True:
@@ -115,16 +120,40 @@ def unload_modules():
     init_modules(init_mod=False)
 
 
+def _init_debug():
+    try:
+        import ptvsd
+        ptvsd.enable_attach(address=('0.0.0.0', 5678), redirect_output=True)
+        print('Enabled remote debugging, waiting 15 seconds for client to attach')
+        ptvsd.wait_for_attach(timeout=15)
+    except Exception as ex:
+        print("Error in remote debug: {}".format(ex))
+
+
 def unload():
     L.l.info('Main module is unloading, application will exit')
     import main.thread_pool
-
-    global shutting_down
-    shutting_down = True
+    P.shutting_down = True
     main.thread_pool.P.tpool = False
     unload_modules()
 
 
-def init():
+def init(arg_list):
     L.init_logging()
     common.load_config_json()
+    common.init_simple()
+    if 'debug_remote' in arg_list:
+        _init_debug()
+    system_info.init()
+    common.init()
+    import flask_app
+    import main.tinydb_app
+    main.tinydb_app.init(arg_list)
+    if 'standalone' not in arg_list:
+        transport.init()
+    t = threading.Thread(target=thread_pool.run_thread_pool)
+    t.daemon = True
+    t.start()
+    init_modules(init_mod=True)
+    init_post_modules()
+
