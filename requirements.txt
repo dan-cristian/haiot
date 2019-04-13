@@ -34,3 +34,4 @@ thingspeak
 tzlocal
 recordtype
 enum34
+ujson

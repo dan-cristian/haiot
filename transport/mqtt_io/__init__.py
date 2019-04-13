@@ -5,8 +5,9 @@ import threading
 from pydispatch import dispatcher
 from main import thread_pool
 from main.logger_helper import L
-from main.admin import model_helper
+# from main.admin import model_helper
 from common import Constant, utils
+import common
 
 
 class P:
@@ -143,12 +144,12 @@ def init():
             return False
         host_list = [
             #[model_helper.get_param(Constant.P_MQTT_HOST_3), int(model_helper.get_param(Constant.P_MQTT_PORT_3))],
-            [model_helper.get_param(Constant.P_MQTT_HOST_1), int(model_helper.get_param(Constant.P_MQTT_PORT_1))],
+            [common.get_json_param(common.Constant.P_MQTT_HOST_1), int(common.get_json_param(Constant.P_MQTT_PORT_1))],
             #[model_helper.get_param(Constant.P_MQTT_HOST_2), int(model_helper.get_param(Constant.P_MQTT_PORT_2))]
             #[model_helper.get_param(constant.P_MQTT_HOST_3), int(model_helper.get_param(constant.P_MQTT_PORT_3))]
             ]
-        P.topic = str(model_helper.get_param(Constant.P_MQTT_TOPIC))
-        P.topic_main = str(model_helper.get_param(Constant.P_MQTT_TOPIC_MAIN))
+        P.topic = str(common.get_json_param(Constant.P_MQTT_TOPIC))
+        P.topic_main = str(common.get_json_param(Constant.P_MQTT_TOPIC_MAIN))
         if P.mqtt_paho_exists:
             P.mqtt_client = mqtt.Client(client_id=Constant.HOST_NAME)
         elif P.mqtt_mosquitto_exists:
