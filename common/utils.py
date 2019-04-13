@@ -192,3 +192,7 @@ def json2obj_v2(data):
     return json.loads(data, object_hook=_json_object_hook)
 
 
+# https://stackoverflow.com/questions/1305532/convert-nested-python-dict-to-object
+class Struct:
+    def __init__(self, **entries):
+        self.__dict__.update(entries)

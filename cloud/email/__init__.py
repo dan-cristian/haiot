@@ -1,7 +1,5 @@
 from main.logger_helper import L
-from common import Constant
-from main.admin import model_helper
-from main import thread_pool
+from common import Constant, get_json_param
 import smtplib
 import json
 from pydispatch import dispatcher
@@ -15,14 +13,14 @@ __notif_dest = None
 
 
 def _get_pass(email=None):
-    config_file = model_helper.get_param(Constant.P_GMAIL_CREDENTIAL_FILE)
+    config_file = get_json_param(Constant.P_GMAIL_CREDENTIAL_FILE)
     try:
         with open(config_file , 'r') as f:
             config_list = json.load(f)
             if email in config_list.keys():
                 record = config_list[email]
                 return record['password']
-    except Exception, ex:
+    except Exception as ex:
         L.l.warning("Could not read credential email file {}".format(config_file))
     return None
 
@@ -48,7 +46,7 @@ def send_notification(subject=None, body=None):
             server.sendmail(sent_from, to, email_text)
             server.close()
             return True
-        except Exception, ex:
+        except Exception as ex:
             L.l.warning("Email not sent, err={}".format(ex))
     else:
         L.l.warning("Could not get credential for email {}".format(sent_from))
@@ -66,12 +64,9 @@ def init():
     L.l.debug('Email module initialising')
     dispatcher.connect(send_notification, signal=Constant.SIGNAL_EMAIL_NOTIFICATION, sender=dispatcher.Any)
     global __notif_from, __notif_pass, __notif_dest
-    __notif_from = model_helper.get_param(Constant.P_GMAIL_NOTIFY_FROM_EMAIL)
-    __notif_dest = model_helper.get_param(Constant.P_NOTIFY_EMAIL_RECIPIENT)
+    __notif_from = get_json_param(Constant.P_GMAIL_NOTIFY_FROM_EMAIL)
+    __notif_dest = get_json_param(Constant.P_NOTIFY_EMAIL_RECIPIENT)
     __notif_pass = _get_pass(__notif_from)
-
-    #if send_notification("Starting haiot", "Host is {}".format(Constant.HOST_NAME)):
-    #    Log.logger.info("Init email sent OK")
     global initialised
     initialised = True
 
