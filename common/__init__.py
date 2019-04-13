@@ -231,7 +231,14 @@ def get_json_param(name):
     return value
 
 
+def get_table(table_name):
+    json = Constant.db_values_json[table_name]
+    return json
+
+
 def init():
+    Constant.OS = os.name
+    Constant.HOST_NAME = socket.gethostname()
     from main.logger_helper import L
     try:
         mac = get_mac()

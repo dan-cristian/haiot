@@ -4,16 +4,15 @@ import threading
 import time
 from datetime import datetime
 from tinydb_serialization import Serializer
-from main import logger_helper
-from common import utils
-import random
+from flask_app import app, admin
+from main.logger_helper import L
+
+
 while True:
     try:
         from tinydb import TinyDB, Query, where
         from tinydb.storages import MemoryStorage
         from tinyrecord import transaction
-        from flask_admin import Admin
-        from flask import Flask
         from flask_admin.contrib.pymongo import ModelView, filters
         from flask_admin.form import Select2Widget
         from flask_admin.model.fields import InlineFieldList, InlineFormField
@@ -25,6 +24,8 @@ while True:
     except ImportError as iex:
         if not common.fix_module(iex.message):
             break
+
+db = None
 
 
 class DatetimeSerializer(Serializer):
@@ -44,152 +45,55 @@ class DatetimeSerializer(Serializer):
 class CustomTinyMongoClient(TinyMongoClient):
     @property
     def _storage(self):
+        # serialization = SerializationMiddleware(MemoryStorage)
         serialization = SerializationMiddleware()
         serialization.register_serializer(DateTimeSerializer(), 'TinyDate')
         # register other custom serializers
         return serialization
 
 
-class TinyBase(ModelView):
-    column_list = ()
-    column_sortable_list = ()
-    form = None
-    page_size = 20
-    can_set_page_size = True
-
-    def __str__(self):
-        return '{}'.format(self.__dict__)
-
-    def dictx(self):
-        attr_dict = {}
-        for column in self.column_list:
-            attr_dict[column] = getattr(self, column)
-        return attr_dict
-
-    def __init__(self, obj_fields):
-        attr_dict = {}
-        for attr in obj_fields:
-            attr_type = type(getattr(self, attr))
-            if attr_type is int:
-                fld = fields.IntegerField(attr)
-            elif attr_type is str:
-                fld = fields.StringField(attr)
-            elif attr_type is bool:
-                fld = fields.BooleanField(attr)
-            elif attr_type is datetime:
-                fld = fields.DateTimeField(attr)
-            else:
-                fld = fields.StringField(attr)
-            attr_dict[attr] = fld
-            self.column_list = self.column_list + (attr,)
-            self.column_sortable_list = self.column_sortable_list + (attr,)
-        # http://jelly.codes/articles/python-dynamically-creating-classes/
-        self.form = type(type(self).__name__ + 'Form', (form.Form,), attr_dict)
-
-        ModelView.__init__(self, getattr(db, type(self).__name__.lower()), type(self).__name__)
-
-
-
-class Pwm(TinyBase):
-    def __init__(self):
-        self.id = None
-        self.name = ''
-        self.frequency = 0
-        self.duty_cycle = 0
-        self.gpio_pin_code = 0
-        self.host_name = ''
-        self.update_on = datetime.now()
-
-        TinyBase.__init__(self, dict(self.__dict__))
-
-
-
-
-
-class UserForm(form.Form):
-    foo = fields.StringField('foo')
-    name = fields.StringField('Name')
-    email = fields.StringField('Email')
-    password = fields.StringField('Password')
-
-
-class UserView(ModelView):
-    column_list = ('name', 'email', 'password', 'foo')
-    column_sortable_list = ('name', 'email', 'password')
-    form = UserForm
-    page_size = 20
-    can_set_page_size = True
-
-
-app = Flask(__name__)
-admin = None
-threadLock = threading.Lock()
-globalCounter = 0
-
-# Flask views
-@app.route('/')
-def index():
-    return '<a href="/admin/">Click me to get to Admin!</a>'
-
-
-def insertfew():
-    global globalCounter, threadLock
-    time.sleep(3)
-    i = random.randint(1, 100)
-    while True:
-        # pwm_table = db.tinydb.table('pwm')
-        pwm = Pwm()
-        i = i + 1
-        pwm.id = i
-        # pwm_table = pwm.coll.table
-        pwm.name = 'boiler {}'.format(random.randint(1, 100))
-        pwm.frequency = random.randint(10, 800)
-        pwm.duty_cycle = random.randint(1, 1000000)
-        pwm.gpio_pin_code = random.randint(1, 40)
-        pwm.host_name = 'pizero1'
-        try:
-            # with transaction(pwm_table) as tr:
-            #    res = tr.insert(pwm.dictx())
-            #    print res
-            with transaction(pwm.coll.table):
-                res = pwm.coll.insert_one(pwm.dictx(), bypass_document_validation=True)
-                # print res.inserted_id
-            with threadLock:
-                globalCounter += 1
-            print globalCounter
-        except Exception as ex:
-            print ex
-
-
-def _init_tinydb(data_file):
+def _init_tinydb():
     global db
+    data_file = common.get_json_param(common.Constant.P_DB_PATH)
     data_path = os.path.dirname(data_file)
+    # TinyDB.DEFAULT_STORAGE = MemoryStorage
     conn = CustomTinyMongoClient(foldername=data_path)
-    #conn = CustomTinyMongoClient(storage=MemoryStorage)
+    # conn = CustomTinyMongoClient(storage=MemoryStorage)
     db = conn.haiot
 
 
-def _init_flask(data_path):
-    app.config['SECRET_KEY'] = '123456790'
-    global admin
-    admin = Admin(app, name='Haiot')
-    app.config.update(DEBUG=False, SQLALCHEMY_ECHO=False)
-    u = UserView(db.user, 'User')
-    p = Pwm()
-    admin.add_view(u)
-    admin.add_view(p)
+def _populate_db(cls_name, obj):
+    rec_list = common.get_table(cls_name)
+    i = 0
+    Q = Query()
+    res = None
+    for rec in rec_list:
+        # exist = obj.coll.find({'id': rec['id']})
+        exist = obj.coll.table.contains(Q.id == rec['id'])
+        if not exist: #.count() == 0:
+            res = obj.coll.insert_one(rec)
+        else:
+            res = None
+            # res = obj.coll.update
+        if res is not None:
+            i += 1
+    L.l.info('Loaded {} rows in {}'.format(i, cls_name))
 
-    threading.Thread(target=insertfew).start()
-    #threading.Thread(target=insertfew).start()
-    #threading.Thread(target=insertfew).start()
 
-    app.run(debug=False)
+def _init_flask_admin():
+    import tinydb_model
+    from tinydb_helper import TinyBase
+    cls_dict = dict([(name, cls) for name, cls in tinydb_model.__dict__.items() if isinstance(cls, type)])
+    for cls_name in cls_dict:
+        cls = tinydb_model.__dict__[cls_name]
+        if cls_name is not 'TinyBase' and issubclass(cls, TinyBase):
+            obj = cls()
+            admin.add_view(obj)
+            _populate_db(cls_name, obj)
+
+    # app.run(debug=False)
 
 
 def init(arg_list):
-    common.init_simple()
-    data_file = common.get_json_param(common.Constant.P_DB_PATH)
-    _init_tinydb(data_file)
-    _init_flask(os.path.dirname(data_file))
-
-
+    _init_tinydb()
+    _init_flask_admin()
