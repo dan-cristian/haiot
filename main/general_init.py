@@ -1,12 +1,18 @@
 import threading
-from tinydb import Query
-import common
-from common import Constant
+from common import Constant, fix_module
 from main.logger_helper import L
 from main import system_info
 import transport
 from main import thread_pool
-from common.utils import Struct
+
+while True:
+    try:
+        from tinydb import Query
+        break
+    except ImportError as iex:
+        if not fix_module(iex):
+            break
+
 
 class P:
     init_mod_list = []
@@ -76,30 +82,35 @@ def unload_module(module_name):
 
 
 def init_modules(init_mod=None):
-    from tinydb_app import db
-    from tinydb_model import Module
-    # m = Module.coll.find_one(host_name='')
-    m = Module.t.search(Query().host_name == '')
-    q2 = Query()
-    for mod_dict in m:
-        mod = Struct(**mod_dict)
-        if mod.name != 'main':
-            # check if there is a host specific module and use it with priority over generic one
-            mod_host_spec = Module.t.search((q2.host_name == Constant.HOST_NAME) & (q2.name == mod.name))
-            if len(mod_host_spec) == 1:
-                mod_host_specific = Struct(**mod_host_spec[0])
-                mod_name = mod_host_specific.name
-                mod_active = mod_host_specific.active
-            elif len(mod_host_spec) == 0:
-                mod_name = mod.name
-                mod_active = mod.active
-            else:
-                L.l.warning('Unexpected nr of modules for {} host {}'.format(mod.name, Constant.HOST_NAME))
-                break
-            if init_mod is True:
-                init_module(mod_name, mod_active)
-            elif init_mod is False and mod_active is True:
-                unload_module(mod_name)
+    from main.tinydb_app import db
+    from main.tinydb_model import Module
+    m = Module.find(filter={Module.host_name: ''}, sort=[(Module.start_order, 1)])
+    # m = Module.coll.find(filter={Module.host_name: ''}, sort=[(Module.start_order, 1)])
+    # m = Module.coll.find(filter={'host_name': ''}, sort=[('start_order', 1)])
+    # m = Module.t.search(Query().host_name == '')
+    if len(m) == 0:
+        L.l.error('No modules to initialise')
+    else:
+        q2 = Query()
+        for mod in m:
+            # mod = Struct(**mod_dict)
+            # mod = Module({**mod_dict})
+            if mod.name != 'main':
+                # check if there is a host specific module and use it with priority over generic one
+                # mod_host_spec = Module.t.search((q2.host_name == Constant.HOST_NAME) & (q2.name == mod.name))
+                # mod_host_spec = Module.coll.find_one({Module.host_name: Constant.HOST_NAME, Module.name: mod.name})
+                mod_host_specific = Module.find_one({Module.host_name: Constant.HOST_NAME, Module.name: mod.name})
+                if mod_host_specific is not None:
+                    # mod_host_specific = Module({**mod_host_spec})
+                    mod_name = mod_host_specific.name
+                    mod_active = mod_host_specific.active
+                else:
+                    mod_name = mod.name
+                    mod_active = mod.active
+                if init_mod is True:
+                    init_module(mod_name, mod_active)
+                elif init_mod is False and mod_active is True:
+                    unload_module(mod_name)
 
 
 def init_post_modules():
@@ -139,14 +150,10 @@ def unload():
 
 
 def init(arg_list):
-    L.init_logging()
-    common.load_config_json()
-    common.init_simple()
     if 'debug_remote' in arg_list:
         _init_debug()
     system_info.init()
-    common.init()
-    import flask_app
+    from main import flask_app  # required to init flask, DO NOT DELETE
     import main.tinydb_app
     main.tinydb_app.init(arg_list)
     if 'standalone' not in arg_list:

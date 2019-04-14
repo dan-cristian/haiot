@@ -17,7 +17,8 @@ class P:
 
 
 def __get_print_name_callable(func):
-    return func.func_globals['__name__'] + '.' + func.func_name
+    # return func.func_globals['__name__'] + '.' + func.func_name
+    return func.__globals__['__name__'] + '.' + func.__name__
 
 
 def add_interval_callable(func, run_interval_second):  # , *args):
