@@ -3,7 +3,8 @@ import time
 import threading
 import random
 import common
-from tinydb_app import db
+from common import utils
+from main.tinydb_app import db
 
 while True:
     try:
@@ -12,7 +13,7 @@ while True:
         from tinyrecord import transaction
         break
     except ImportError as iex:
-        if not common.fix_module(iex.message):
+        if not common.fix_module(iex):
             break
 
 
@@ -35,30 +36,57 @@ class TinyBase(ModelView):
     def t(self):
         return self.coll.table
 
-    def __init__(self, obj_fields):
-        attr_dict = {}
-        for attr in obj_fields:
-            attr_type = type(getattr(self, attr))
-            if attr_type is int:
-                fld = fields.IntegerField(attr)
-            elif attr_type is float:
-                fld = fields.FloatField(attr)
-            elif attr_type is str:
-                fld = fields.StringField(attr)
-            elif attr_type is bool:
-                fld = fields.BooleanField(attr)
-            elif attr_type is datetime:
-                fld = fields.DateTimeField(attr)
-            else:
-                fld = fields.StringField(attr)
-            attr_dict[attr] = fld
-            self.column_list = self.column_list + (attr,)
-            self.column_sortable_list = self.column_sortable_list + (attr,)
-        # http://jelly.codes/articles/python-dynamically-creating-classes/
-        self.form = type(type(self).__name__ + 'Form', (form.Form,), attr_dict)
-        collx = getattr(db, type(self).__name__.lower())
-        ModelView.__init__(self, collx, type(self).__name__)
-        TinyBase.t = self.coll.table
+    # def to_obj(self, **entries):
+    #    return self.__dict__.update(entries)
+    @classmethod
+    def find(cls, filter=None, sort=None, skip=None, limit=None, *args, **kwargs):
+        recs = cls.coll.find(filter=filter, sort=sort, skip=skip, limit=limit, *args, **kwargs)
+        ret = []
+        for r in recs:
+            ret.append(cls({**r}))
+        return ret
+
+    @classmethod
+    def find_one(cls, filter=None):
+        r = cls.coll.find_one(filter=filter)
+        if r is not None:
+            return cls({**r})
+        else:
+            return None
+
+    def __init__(self, cls, copy=None):
+        obj_fields = dict(cls.__dict__)
+        if not hasattr(cls, 'tinydb_initialised'):
+            attr_dict = {}
+            for attr in obj_fields:
+                if utils.is_primitive(attr, obj_fields[attr]):
+                    attr_type = type(getattr(self, attr))
+                    if attr_type is int:
+                        fld = fields.IntegerField(attr)
+                    elif attr_type is float:
+                        fld = fields.FloatField(attr)
+                    elif attr_type is bool:
+                        fld = fields.BooleanField(attr)
+                    elif attr_type is datetime:
+                        fld = fields.DateTimeField(attr)
+                    elif attr_type is str:
+                        fld = fields.StringField(attr)
+                    else:
+                        fld = fields.StringField(attr)
+                    attr_dict[attr] = fld
+                    self.column_list = self.column_list + (attr,)
+                    self.column_sortable_list = self.column_sortable_list + (attr,)
+                    setattr(cls, attr, attr)
+            # http://jelly.codes/articles/python-dynamically-creating-classes/
+            self.form = type(type(self).__name__ + 'Form', (form.Form,), attr_dict)
+            collx = getattr(db, type(self).__name__.lower())
+            ModelView.__init__(self, collx, type(self).__name__)
+            cls.t = self.coll.table
+            cls.coll = self.coll
+            cls.tinydb_initialised = True
+        if copy is not None:
+            for fld in copy:
+                setattr(self, fld, copy[fld])
 
 
 threadLock = threading.Lock()
@@ -88,9 +116,9 @@ def insertfew():
                 # print res.inserted_id
             with threadLock:
                 globalCounter += 1
-            print globalCounter
+            print(globalCounter)
         except Exception as ex:
-            print ex
+            print(ex)
 
 def init():
     threading.Thread(target=insertfew).start()

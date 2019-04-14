@@ -3,26 +3,26 @@ import os
 import threading
 import time
 from datetime import datetime
-from tinydb_serialization import Serializer
-from flask_app import app, admin
+from main.flask_app import app, admin
 from main.logger_helper import L
 
-
+from common import fix_module
 while True:
     try:
         from tinydb import TinyDB, Query, where
         from tinydb.storages import MemoryStorage
         from tinyrecord import transaction
+        import pymongo
         from flask_admin.contrib.pymongo import ModelView, filters
         from flask_admin.form import Select2Widget
         from flask_admin.model.fields import InlineFieldList, InlineFormField
         from wtforms import fields, form
         from tinymongo import TinyMongoClient
-        from tinymongo.serializers import DateTimeSerializer
+        from tinymongo.serializers import DateTimeSerializer, Serializer
         from tinydb_serialization import SerializationMiddleware
         break
     except ImportError as iex:
-        if not common.fix_module(iex.message):
+        if not fix_module(iex):
             break
 
 db = None
@@ -65,24 +65,28 @@ def _init_tinydb():
 def _populate_db(cls_name, obj):
     rec_list = common.get_table(cls_name)
     i = 0
-    Q = Query()
-    res = None
-    for rec in rec_list:
-        # exist = obj.coll.find({'id': rec['id']})
-        exist = obj.coll.table.contains(Q.id == rec['id'])
-        if not exist: #.count() == 0:
-            res = obj.coll.insert_one(rec)
-        else:
-            res = None
-            # res = obj.coll.update
-        if res is not None:
-            i += 1
+    if rec_list is not None:
+        Q = Query()
+        res = None
+        for rec in rec_list:
+            # exist = obj.coll.find({'id': rec['id']})
+            if 'id' in rec:
+                exist = obj.coll.table.contains(Q.id == rec['id'])
+                if not exist:  # .count() == 0:
+                    res = obj.coll.insert_one(rec)
+                else:
+                    res = None
+                    # res = obj.coll.update
+                if res is not None:
+                    i += 1
+            else:
+                pass
     L.l.info('Loaded {} rows in {}'.format(i, cls_name))
 
 
 def _init_flask_admin():
-    import tinydb_model
-    from tinydb_helper import TinyBase
+    from main import tinydb_model
+    from main.tinydb_helper import TinyBase
     cls_dict = dict([(name, cls) for name, cls in tinydb_model.__dict__.items() if isinstance(cls, type)])
     for cls_name in cls_dict:
         cls = tinydb_model.__dict__[cls_name]

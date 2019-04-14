@@ -1,17 +1,15 @@
 import os
-from flask import request, render_template, redirect, url_for, send_from_directory, send_file
 from main.logger_helper import L
-from main import app, BIND_IP, BIND_PORT
-from main.admin import model_helper
-from common import Constant
-import helpers
-import traceback
-
-__author__ = 'Dan Cristian<dan.cristian@gmail.com>'
+from main.flask_app import app
+from common import Constant, get_json_param
+from webui import helpers
 
 
-initialised = False
-flask_thread = None
+class P:
+    initialised = False
+
+    def __init__(self):
+        pass
 
 
 class ReverseProxied(object):
@@ -50,93 +48,17 @@ class ReverseProxied(object):
         return self.app(environ, start_response)
 
 
-@app.route('/exit', methods=['POST'])
-def exit_module():
-    L.l.info('WebUI module unloading')
-    try:
-        if not app.testing:
-            L.l.warning('Unable to shutdown werk if not in testing mode')
-        else:
-            #with app.app_context():
-                func = request.environ.get('werkzeug.server.shutdown')
-                if func is None:
-                    L.l.warning('unable to unload webui, not running with the Werkzeug Server')
-                else:
-                    L.l.info('shuting down werkzeug')
-                    func()
-                global initialised
-                initialised = False
-                return 'werkzeug exited'
-    except Exception as ex:
-        L.l.warning('Unable to shutdown werkzeug, err {}'.format(ex))
-    return 'werkzeug not exited'
-
-
-def unload():
-    L.l.info('Webui module unloading')
-    # response = app.test_client().post('/exit')
-
-
 def init():
-    L.l.debug('WebUI module initialising')
-    # thread_pool.add_callable(webui.thread_run, run_interval_second=60)
-    from crud import admin, user
-    crud.init_crud()
-    app.register_blueprint(admin, url_prefix='/admin')
-    app.register_blueprint(user, url_prefix='/user')
-    global initialised, flask_thread
-    if BIND_IP is not None and BIND_PORT is not None:
-        host = BIND_IP
-        port = BIND_PORT
-    else:
-        # otherwise listen on all interfaces
-        host = '0.0.0.0'
-        port = int(model_helper.get_param(Constant.P_FLASK_WEB_PORT))
+    L.l.debug('FlaskAdmin UI module initialising')
     app.wsgi_app = ReverseProxied(app.wsgi_app)
     app.config['STATIC_FOLDER'] = os.path.join(os.path.dirname(__file__), 'static')
+    host = '0.0.0.0'
+    port = int(get_json_param(Constant.P_FLASK_WEB_PORT))
     flask_thread = helpers.FlaskInThread(app, host=host, port=port, debug=True, use_reloader=False)
-    initialised = True
+    P.initialised = True
     flask_thread.start()
-    from webui.api import api_v1
-    # app.run(debug=True, use_reloader=False, host='0.0.0.0')
 
 
 @app.route('/')
-def home():
-    # return '<a href="user/node">Node</a>'
-    return redirect(url_for('user.node'))
-
-
-@app.route('/favicon.ico')
-def favicon():
-    return send_file("../webui/static/favicon.ico", mimetype='image/ico')
-
-
-@app.before_request
-def log_before_request():
-    # if app.config.get('LOG_REQUESTS'):
-    L.l.debug('HTTP Request START: {}'.format(request))
-
-
-@app.after_request
-def log_after_request(response):
-    # if app.config.get('LOG_REQUESTS'):
-    L.l.debug('HTTP Request END: {} ARG={}'.format(request, response))
-    return response
-
-
-@app.errorhandler(Exception)
-def exceptions(e):
-    tb = traceback.format_exc()
-    L.l.error('%s %s %s %s 5xx INTERNAL SERVER ERROR\n%s',
-              request.remote_addr, request.method, request.scheme, request.full_path, tb)
-    if hasattr(e, 'status_code'):
-        return e.status_code
-    else:
-        return e
-
-
-@app.errorhandler(404)
-def page_not_found(e):
-    L.l.error('Error {} [{}]'.format(e, request.path))
-    return render_template('404.html'), 404
+def index():
+    return '<a href="/admin/">Click me to get to Admin!</a>'
