@@ -1,7 +1,10 @@
-from main import db
+from main import sqlitedb
+from main.tinydb_app import db
 from main.logger_helper import L
 from common import utils, Constant
-from main.admin import models
+if sqlitedb:
+    from main.admin import models
+from main.tinydb_model import Sensor, ZoneSensor
 
 __author__ = 'dcristian'
 
@@ -15,9 +18,13 @@ def record_update(obj):
             address = utils.get_object_field_value(obj, 'address')
             n_address = utils.get_object_field_value(obj, 'n_address')
             sensor_type = utils.get_object_field_value(obj, 'type')
-            record = models.Sensor(address=address)
-            assert isinstance(record, models.Sensor)
-            zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=address).first()
+            if sqlitedb:
+                record = models.Sensor(address=address)
+                zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=address).first()
+            else:
+                record = Sensor()
+                record.address = address
+                zone_sensor = ZoneSensor.find_one({ZoneSensor.sensor_address: address})
             if zone_sensor is not None:
                 record.sensor_name = zone_sensor.sensor_name
             else:
@@ -42,7 +49,10 @@ def record_update(obj):
             if obj.has_key('sensed_a'): record.sensed_a = utils.get_object_field_value(obj, 'sensed_a')
             if obj.has_key('sensed_b'): record.sensed_b = utils.get_object_field_value(obj, 'sensed_b')
 
-            current_record = models.Sensor.query.filter_by(address=address).first()
+            if sqlitedb:
+                current_record = models.Sensor.query.filter_by(address=address).first()
+            else:
+                current_record = Sensor.find_one({Sensor.address: address})
             # force field changed detection for delta_counters
             if current_record:
                 current_record.delta_counters_a = 0

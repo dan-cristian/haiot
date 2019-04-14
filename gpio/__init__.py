@@ -1,21 +1,22 @@
 __author__ = 'dcristian'
+from main import sqlitedb
 from datetime import datetime, timedelta
 from main.logger_helper import L
 from common import Constant
 from common import utils
-#from main.admin import models
-from main import tinydb_model
+if sqlitedb:
+    from main.admin import models
+from main.tinydb_model import GpioPin
 from main import thread_pool
 from sensor import sonoff
-import io_common
-import std_gpio
-import piface
-import pcf8574_gpio
+from gpio import io_common
+from gpio import std_gpio
+from gpio import piface
+from gpio import pcf8574_gpio
 import threading
 import prctl
-import rpi_gpio
-import pigpio_gpio
-
+from gpio import rpi_gpio
+from gpio import pigpio_gpio
 
 class P:
     initialised = False
@@ -40,7 +41,10 @@ def relay_update(gpio_pin_code=None, pin_value=None, from_web=False):
     # return pin value after state set
     try:
         L.l.debug('Received relay state update pin {}'.format(gpio_pin_code))
-        gpiopin_list = models.GpioPin.query.filter_by(pin_code=gpio_pin_code, host_name=Constant.HOST_NAME).all()
+        if sqlitedb:
+            gpiopin_list = models.GpioPin.query.filter_by(pin_code=gpio_pin_code, host_name=Constant.HOST_NAME).all()
+        else:
+            gpiopin_list = GpioPin.find(filter={GpioPin.pin_code: gpio_pin_code, GpioPin.host_name: Constant.HOST_NAME})
         if gpiopin_list is not None:
             lenpin = len(gpiopin_list)
             if lenpin > 1:
@@ -127,8 +131,12 @@ def gpio_record_update(json_object):
         host_name = utils.get_object_field_value(json_object, 'name')
         # L.l.info('Received gpio state update from {} json={}'.format(host_name, json_object))
         if host_name != Constant.HOST_NAME:
-            models.GpioPin().save_changed_fields_from_json_object(debug=False,
-                json_object=json_object, notify_transport_enabled=False, save_to_graph=False)
+            if sqlitedb:
+                models.GpioPin().save_changed_fields_from_json_object(debug=False,
+                    json_object=json_object, notify_transport_enabled=False, save_to_graph=False)
+            else:
+                #fixme: add
+                pass
     except Exception as ex:
         L.l.warning('Error on gpio state update, err {}'.format(ex))
 
@@ -200,8 +208,11 @@ def zone_custom_relay_record_update(json_object):
                         # fixme: what to do here?
                         L.l.info("Warning - pcf what should I do, event from other host?")
                 else:
-                    gpio_record = models.GpioPin.query.filter_by(pin_code=gpio_pin_code,
-                                                                 host_name=Constant.HOST_NAME).first()
+                    if sqlitedb:
+                        gpio_record = models.GpioPin.query.filter_by(pin_code=gpio_pin_code,
+                                                                     host_name=Constant.HOST_NAME).first()
+                    else:
+                        gpio_record = GpioPin.find_one({GpioPin.pin_code: gpio_pin_code, GpioPin.host_name: Constant.HOST_NAME})
                     if gpio_record is not None:
                         # if source_host != Constant.HOST_NAME:
                         #    L.l.info('Event received from other host, event={}'.format(json_object))

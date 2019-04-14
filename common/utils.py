@@ -5,11 +5,19 @@ import datetime, time
 import calendar
 import math
 import importlib
+import urllib.request
 from collections import namedtuple
 import pytz
-import urllib2
+from common import fix_module
 import _strptime #  workaround to fix this issue: https://www.raspberrypi.org/forums/viewtopic.php?t=166912
 from main.logger_helper import L
+
+while True:
+    try:
+        break
+    except ImportError as iex:
+        if not fix_module(iex):
+            break
 
 __author__ = 'dcristian'
 
@@ -116,10 +124,6 @@ def get_base_location_now_date():
     return local_date_as_base
 
 
-def get_app_root_path():
-    return os.getcwd() + '/'
-
-
 # http://stackoverflow.com/questions/1176136/convert-string-to-python-class-object
 def class_for_name(module_name, class_name):
     # load the module, will raise ImportError if module cannot be loaded
@@ -150,7 +154,7 @@ def json_to_record(table, json_object):
 
 
 def parse_http(url, start_key, end_key, end_first=False):
-    text = urllib2.urlopen(url).read()
+    text = urllib.request.urlopen(url).read()
     end = text.find(end_key)
     if end_first:
         start = text.rfind(start_key, 0, end)
@@ -184,6 +188,10 @@ def get_primitives(obj):
     return attr_list
 
 
+def is_primitive(name, obj):
+    return not name.startswith('_') and not callable(obj) and not hasattr(obj, '__dict__')
+
+
 def _json_object_hook(d):
     return namedtuple('X', d.keys())(*d.values())
 
@@ -196,3 +204,21 @@ def json2obj_v2(data):
 class Struct:
     def __init__(self, **entries):
         self.__dict__.update(entries)
+
+
+def multikeysort(items, columns):
+    from operator import itemgetter
+    comparers = [((itemgetter(col[1:].strip()), -1) if col.startswith('-') else (itemgetter(col.strip()), 1))
+                 for col in columns]
+
+    def cmp_x(a, b):
+        return (a > b) - (a < b)
+
+    def comparer(left, right):
+        for fn, mult in comparers:
+            result = cmp_x(fn(left), fn(right))
+            if result:
+                return mult * result
+            else:
+                return 0
+    return sorted(items, cmp=comparer)
