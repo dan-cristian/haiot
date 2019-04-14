@@ -1,0 +1,7 @@
+{
+  "Package":
+[
+  {"module": "pydispatch", "package": "PyDispatcher"},
+  {"module": "paho", "package": "paho-mqtt"}
+]
+}

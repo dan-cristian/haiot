@@ -247,7 +247,7 @@ def populate_tables(model_auto_update=False):
                 commit()
                 L.l.info('Populating default {} GpioPins on {} '.format(node.machine_type, node.name))
                 for rail in range(8, 10):  # last range is not part of the loop
-                    for pin in range(01, 47):
+                    for pin in range(1, 47):
                         gpio = models.GpioPin()
                         gpio.pin_type = Constant.GPIO_PIN_TYPE_BBB
                         gpio.host_name = node.name

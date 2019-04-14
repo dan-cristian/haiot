@@ -13,6 +13,12 @@ def signal_handler(signal_name, frame):
 if __name__ == '__main__':
     signal.signal(signal.SIGTERM, signal_handler)
 
+    from main.logger_helper import L
+    L.init_logging()
+
+    import common
+    common.init()
+
     import main.general_init
     main.general_init.init(sys.argv[1:])
 

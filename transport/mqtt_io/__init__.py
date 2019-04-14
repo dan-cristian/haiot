@@ -1,13 +1,18 @@
 import time
 import socket
-import prctl
-import threading
-from pydispatch import dispatcher
-from main import thread_pool
 from main.logger_helper import L
-# from main.admin import model_helper
 from common import Constant, utils
 import common
+
+from common import fix_module
+while True:
+    try:
+        from pydispatch import dispatcher
+        import paho.mqtt.client as mqtt
+        break
+    except ImportError as iex:
+        if not fix_module(iex):
+            break
 
 
 class P:
@@ -93,9 +98,10 @@ def on_message(client, userdata, msg):
         #                                                                           userdata, msg.topic,
         #                                                                           utils.get_base_location_now_date()))
         # locate json string
-        start = msg.payload.find('{')
-        end = msg.payload.rfind('}')
-        json = msg.payload[start:end + 1]
+        payload = str(msg.payload)
+        start = payload.find('{')
+        end = payload.rfind('}')
+        json = payload[start:end + 1]
         if '"source_host_": "{}"'.format(Constant.HOST_NAME) not in json:  # or Constant.HOST_NAME == 'netbook': #debug
             # ignore messages sent by this host
             x = utils.json2obj(json)

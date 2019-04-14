@@ -1,4 +1,4 @@
-import common
+from common import fix_module
 
 while True:
     try:
@@ -6,7 +6,7 @@ while True:
         from flask_admin import Admin
         break
     except ImportError as iex:
-        if not common.fix_module(iex.message):
+        if not fix_module(iex):
             break
 
 app = None
@@ -16,6 +16,6 @@ app.config.update(DEBUG=True, SQLALCHEMY_ECHO=False)
 admin = Admin(app, name='Haiot')
 
 
-@app.route('/')
-def index():
-    return '<a href="/admin/">Click me to get to Admin!</a>'
+# @app.route('/')
+# def index():
+#    return '<a href="/admin/">Click me to get to Admin!</a>'

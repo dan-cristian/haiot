@@ -3,13 +3,13 @@ import os
 import socket
 from uuid import getnode as get_mac
 import json
-import utils
 import sys
 import subprocess
 
 
 class Constant:
     db_values_json = None
+    db_auto_module_json = None
 
     def __init__(self):
         pass
@@ -193,11 +193,16 @@ def _install(package):
     return subprocess.call([sys.executable, "-m", "pip", "install", package])
 
 
-def fix_module(error_message):
+def fix_module(ex):
     try:
+        error_message = '{}'.format(ex)
         mod_err = error_message.split('No module named ')
         if len(mod_err) == 2:
-            res = _install(mod_err[1])
+            mod_name = mod_err[1].replace("'", "")
+            package_name = get_package_name(mod_name)
+            if package_name is None:
+                package_name = mod_name
+            res = _install(package_name)
             print('Install returned {}'.format(res))
             return True
         else:
@@ -208,15 +213,31 @@ def fix_module(error_message):
     return False
 
 
+def get_app_root_path():
+    return os.getcwd() + '/'
+
+
 def load_config_json():
     from main.logger_helper import L
     try:
-        var_path = utils.get_app_root_path() + 'scripts/config/default_db_values.json'
+        var_path = get_app_root_path() + 'scripts/config/default_db_values.json'
         L.l.info('Loading variables from config file [{}]'.format(var_path))
         with open(var_path, 'r') as f:
             Constant.db_values_json = json.load(f)
     except Exception as ex:
         L.l.error('Cannot load config json, ex={}'.format(ex))
+        exit(2)
+
+
+def load_auto_module_json():
+    from main.logger_helper import L
+    try:
+        var_path = get_app_root_path() + 'auto_module.json'
+        L.l.info('Loading module mapping from config file [{}]'.format(var_path))
+        with open(var_path, 'r') as f:
+            Constant.db_auto_module_json = json.load(f)
+    except Exception as ex:
+        L.l.error('Cannot load module config json, ex={}'.format(ex))
         exit(2)
 
 
@@ -231,14 +252,29 @@ def get_json_param(name):
     return value
 
 
+def get_package_name(module_name):
+    """ retrieves parameter value from json config file"""
+    param_fields = Constant.db_auto_module_json["Package"]
+    value = None
+    for config_record in param_fields:
+        if config_record["module"] == module_name:
+            value = config_record["package"]
+            break
+    return value
+
+
 def get_table(table_name):
-    json = Constant.db_values_json[table_name]
-    return json
+    if table_name in Constant.db_values_json:
+        return Constant.db_values_json[table_name]
+    else:
+        return None
 
 
 def init():
     Constant.OS = os.name
     Constant.HOST_NAME = socket.gethostname()
+    load_config_json()
+    load_auto_module_json()
     from main.logger_helper import L
     try:
         mac = get_mac()
@@ -266,3 +302,4 @@ def init():
 def init_simple():
     Constant.OS = os.name
     Constant.HOST_NAME = socket.gethostname()
+
