@@ -42,7 +42,7 @@ def init():
                     words = line.split(':')
                     if len(words) > 1:
                         sysinfo[words[0].strip().lower()] = words[1].strip()
-                except Exception, ex:
+                except Exception as ex:
                     L.l.debug('get sysinfo line split error [{}] line [{}]'.format(ex, line))
             global description_model_name, description_machine, description_system_type, description_hardware, \
                 description_revision, description_cpu_model
