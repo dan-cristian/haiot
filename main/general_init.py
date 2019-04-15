@@ -1,10 +1,11 @@
 import threading
-from common import Constant, fix_module
+from common import Constant
 from main.logger_helper import L
 from main import system_info
 import transport
 from main import thread_pool
 
+from common import fix_module
 while True:
     try:
         from tinydb import Query

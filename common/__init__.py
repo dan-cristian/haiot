@@ -7,6 +7,10 @@ import sys
 import subprocess
 
 
+class P:
+    module_failed = {}
+
+
 class Constant:
     db_values_json = None
     db_auto_module_json = None
@@ -202,13 +206,20 @@ def fix_module(ex):
             package_name = get_package_name(mod_name)
             if package_name is None:
                 package_name = mod_name
-            res = _install(package_name)
-            print('Install returned {}'.format(res))
-            return True
+            if package_name not in P.module_failed:
+                res = _install(package_name)
+                print('Install package {} returned {}'.format(package_name, res))
+                if res != 0:
+                    P.module_failed[package_name] = res
+                    return False
+                else:
+                    return True
+            print('Not retrying a failed package install for {}'.format(package_name))
+            return False
         else:
             msg = 'Unable to split, unexpected len {}'.format(len(mod_err))
     except Exception as ex:
-        msg = 'Exception err={}'.format(ex)
+        msg = 'Fixmodule exception err={}'.format(ex)
     print(msg)
     return False
 

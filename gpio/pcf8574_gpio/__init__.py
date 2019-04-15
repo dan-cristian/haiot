@@ -1,8 +1,11 @@
+from main import sqlitedb
 from main.logger_helper import L
-from main.admin import models
+if sqlitedb:
+    from main.admin import models
 from common import Constant
 from gpio import io_common
-import time
+from main.tinydb_model import ZoneCustomRelay
+
 
 class P:
     pcf = None
@@ -15,11 +18,15 @@ class P:
         pass
 
 
-try:
-    from pcf8574 import PCF8574
-    P.import_module_exist = True
-except ImportError:
-    L.l.info('Module PCF8574 is not installed, module will not be initialised')
+from common import fix_module
+while True:
+    try:
+        from pcf8574 import PCF8574
+        P.import_module_exist = True
+        break
+    except ImportError as iex:
+        if not fix_module(iex):
+            break
 
 
 def _not_initialised(message):
@@ -51,8 +58,12 @@ def set_pin_value(pin_index, pin_value):
 def post_init():
     if P.initialised:
         L.l.info('Running post_init pcf')
-        relays = models.ZoneCustomRelay.query.filter_by(
-            gpio_host_name=Constant.HOST_NAME, relay_type=Constant.GPIO_PIN_TYPE_PI_PCF8574).all()
+        if sqlitedb:
+            relays = models.ZoneCustomRelay.query.filter_by(
+                gpio_host_name=Constant.HOST_NAME, relay_type=Constant.GPIO_PIN_TYPE_PI_PCF8574).all()
+        else:
+            relays = ZoneCustomRelay.find({ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME,
+                                           ZoneCustomRelay.relay_type: Constant.GPIO_PIN_TYPE_PI_PCF8574})
         for relay in relays:
             L.l.info('Reading pcf pin {}'.format(relay.gpio_pin_code))
             pin_index = int(relay.gpio_pin_code)

@@ -1,17 +1,22 @@
 __author__ = 'dcristian'
 import os
 from main.logger_helper import L
-from main import db
+from main import sqlitedb
+# from main import db
 from common import Constant
-from main.admin import models
-from main.admin.model_helper import commit
+# from main.admin import models
+#from main.admin.model_helper import commit
+from main.tinydb_model import GpioPin
 
 initialised = False
 __pins_setup_list = []
 
 
 def __get_gpio_db_pin(bcm_id=None):
-    gpio_pin = models.GpioPin.query.filter_by(pin_index_bcm=bcm_id, host_name=Constant.HOST_NAME).first()
+    if sqlitedb:
+        gpio_pin = models.GpioPin.query.filter_by(pin_index_bcm=bcm_id, host_name=Constant.HOST_NAME).first()
+    else:
+        gpio_pin = GpioPin.find_one({GpioPin.pin_index_bcm: bcm_id, GpioPin.host_name: Constant.HOST_NAME})
     return gpio_pin
 
 
@@ -25,7 +30,7 @@ def __write_to_file_as_root(file, value):
                 return True
             else:
                 L.l.warning('Error writing value [{}] to file {} result={}'.format(value, file, res))
-    except Exception, ex:
+    except Exception as ex:
         L.l.warning('Exception writing value [{}] to file {} err='.format(value, file, ex))
 
 
@@ -45,7 +50,7 @@ def __setup_pin(bcm_id=''):
                 L.l.warning('Unable to find gpio pin with bcmid={} to mark as active'.format(bcm_id))
         else:
             L.l.warning('Trying to add an existing pin {} in setup list'.format(bcm_id))
-    except Exception, ex:
+    except Exception as ex:
         L.l.critical('Unexpected error on pin {} setup, err {}'.format(bcm_id, ex))
 
 
@@ -60,9 +65,9 @@ def __set_pin_dir_out(bcm_id=''):
             gpio_pin = __get_gpio_db_pin(bcm_id)
             if gpio_pin:
                 gpio_pin.pin_direction = 'out'
-                commit()
+                # commit()
         return True
-    except Exception, ex:
+    except Exception as ex:
         L.l.warning('Unexpected exception on pin {} direction OUT set, err {}'.format(bcm_id, ex))
         return False
 
@@ -78,9 +83,9 @@ def __set_pin_dir_in(bcm_id=''):
             gpio_pin = __get_gpio_db_pin(bcm_id)
             if gpio_pin:
                 gpio_pin.pin_direction = 'in'
-                commit()
+                # commit()
         return True
-    except Exception, ex:
+    except Exception as ex:
         L.l.warning('Unexpected exception on pin {} direction IN set, err {}'.format(bcm_id, ex))
         return False
 
@@ -98,7 +103,7 @@ def __unsetup_pin(bcm_id=''):
             gpio_pin.is_active = False
         else:
             L.l.warning('Unable to find gpio pin with bcmid={} to mark as inactive'.format(bcm_id))
-    except Exception, ex:
+    except Exception as ex:
         L.l.critical('Unexpected error on pin {} un-setup, err {}'.format(bcm_id, ex))
 
 
@@ -115,9 +120,9 @@ def __is_pin_setup(bcm_id=''):
         return True
     except IOError:
         return False
-    except Exception, ex:
+    except Exception as ex:
         L.l.warning('Unexpected exception on pin setup check, err {}'.format(ex))
-        db.session.rollback()
+        # db.session.rollback()
         return False
 
 
@@ -129,7 +134,7 @@ def __is_pin_setup_out(bcm_id=''):
         return dir.replace('\n', '') == 'out'
     except IOError:
         return False
-    except Exception, ex:
+    except Exception as ex:
         L.l.warning('Unexpected exception on pin setup check, err {}'.format(ex))
         return False
 
@@ -139,7 +144,7 @@ def __read_line(bcm_id=''):
         file = open('/sys/class/gpio/gpio{}/value'.format(bcm_id), 'r')
         value = file.readline().replace('\n', '')
         return int(value)
-    except Exception, ex:
+    except Exception as ex:
         L.l.critical('Unexpected general exception on pin {} value read, err {}'.format(bcm_id, ex))
         return None
 
@@ -151,7 +156,7 @@ def __write_line(bcm_id='', pin_value=''):
         # file.close()
         L.l.info('Write bcm pin={} value={}'.format(bcm_id, pin_value))
         __write_to_file_as_root(file='/sys/class/gpio/gpio{}/value'.format(bcm_id), value=pin_value)
-    except Exception, ex:
+    except Exception as ex:
         L.l.critical('Unexpected general exception on pin {} write, err {}'.format(bcm_id, ex))
         return None
 
