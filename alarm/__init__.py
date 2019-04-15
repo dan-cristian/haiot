@@ -1,7 +1,6 @@
 from pydispatch import dispatcher
 from main.logger_helper import L
-from main.admin import models
-from main import thread_pool
+# from main.admin import models
 from common import Constant, utils
 from main.admin.model_helper import commit
 

@@ -4,15 +4,22 @@ import os
 import threading
 import prctl
 from pydispatch import dispatcher
-from apscheduler.schedulers.background import BackgroundScheduler
 from main.logger_helper import L
 from main import thread_pool
 from main.admin import models
 from common import Constant
-from electricity import solar
-import rule_common
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
+
+from common import fix_module
+while True:
+    try:
+        from apscheduler.schedulers.background import BackgroundScheduler
+        break
+    except ImportError as iex:
+        if not fix_module(iex):
+            break
+
 
 scheduler = None
 try:

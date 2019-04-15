@@ -10,13 +10,14 @@ from main.tinydb_model import GpioPin
 from main import thread_pool
 from sensor import sonoff
 from gpio import io_common
-from gpio import std_gpio
+# from gpio import std_gpio
 from gpio import piface
 from gpio import pcf8574_gpio
 import threading
 import prctl
 from gpio import rpi_gpio
 from gpio import pigpio_gpio
+
 
 class P:
     initialised = False
@@ -72,8 +73,8 @@ def relay_get(gpio_pin_obj=None, from_web=False):
     if gpio_pin_obj.pin_type in [Constant.GPIO_PIN_TYPE_PI_STDGPIO, Constant.GPIO_PIN_TYPE_BBB]:
         if rpi_gpio.P.initialised:
             pin_value = rpi_gpio.get_pin_bcm(bcm_id=int(gpio_pin_obj.pin_index_bcm))
-        else:
-            pin_value = std_gpio.get_pin_bcm(bcm_id=gpio_pin_obj.pin_index_bcm)
+        # else:
+        #    pin_value = std_gpio.get_pin_bcm(bcm_id=gpio_pin_obj.pin_index_bcm)
     elif gpio_pin_obj.pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
         # todo: check if pin index is bcm type indeed for piface
         pin_value = piface.get_out_pin_value(
@@ -105,8 +106,8 @@ def relay_set(gpio_pin_index_bcm=None, gpio_pin_type=None, gpio_board_index=None
     if gpio_pin_type in [Constant.GPIO_PIN_TYPE_PI_STDGPIO, Constant.GPIO_PIN_TYPE_BBB]:
         if rpi_gpio.P.initialised:
             pin_value = rpi_gpio.set_pin_bcm(bcm_id=int(gpio_pin_index_bcm), pin_value=int(value))
-        else:
-            pin_value = std_gpio.set_pin_bcm(gpio_pin_index_bcm, value)
+        # else:
+        #    pin_value = std_gpio.set_pin_bcm(gpio_pin_index_bcm, value)
     elif gpio_pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
         pin_value = piface.set_pin_value(pin_index=int(gpio_pin_index_bcm), pin_value=int(value),
                                          board_index=int(gpio_board_index))
@@ -283,7 +284,7 @@ def thread_run():
 def unload():
     try:
         L.l.info('Unloading gpio pins')
-        std_gpio.unload()
+        # std_gpio.unload()
         piface.unload()
         # bbb_io.unload()
         rpi_gpio.unload()
@@ -307,9 +308,9 @@ def init():
         piface.init()
         rpi_gpio.init()
         pigpio_gpio.init()
-    if Constant.IS_MACHINE_BEAGLEBONE:
+    # if Constant.IS_MACHINE_BEAGLEBONE:
         # bbb_io.init()
-        std_gpio.init()
+        # std_gpio.init()
     if Constant.IS_OS_WINDOWS():
         pigpio_gpio.init()
     thread_pool.add_interval_callable(thread_run, run_interval_second=1)

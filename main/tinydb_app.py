@@ -62,26 +62,31 @@ def _init_tinydb():
     db = conn.haiot
 
 
-def _populate_db(cls_name, obj):
-    rec_list = common.get_table(cls_name)
+def _populate_db(cls, obj):
+    # rec_list = common.get_table(cls_name)
+    rec_list = common.get_table(cls.__name__)
     i = 0
     if rec_list is not None:
-        Q = Query()
+        # Q = Query()
         res = None
         for rec in rec_list:
             # exist = obj.coll.find({'id': rec['id']})
-            if 'id' in rec:
-                exist = obj.coll.table.contains(Q.id == rec['id'])
-                if not exist:  # .count() == 0:
-                    res = obj.coll.insert_one(rec)
-                else:
-                    res = None
-                    # res = obj.coll.update
-                if res is not None:
-                    i += 1
+            if 'id' not in rec:
+                # L.l.info('No id in class {}, record {}'.format(cls.__name__, rec))
+                first = next(iter(rec))
+                key = {first: rec[first]}
             else:
-                pass
-    L.l.info('Loaded {} rows in {}'.format(i, cls_name))
+                key = {cls.id: rec['id']}
+            # exist = obj.coll.table.contains(Q.id == rec['id'])
+            exist = cls.find_one(key)
+            if exist is None:  # .count() == 0:
+                res = obj.coll.insert_one(rec)
+            else:
+                res = None
+                # res = obj.coll.update
+            if res is not None:
+                i += 1
+    L.l.info('Loaded {} rows in {}'.format(i, cls.__name__))
 
 
 def _init_flask_admin():
@@ -93,7 +98,8 @@ def _init_flask_admin():
         if cls_name is not 'TinyBase' and issubclass(cls, TinyBase):
             obj = cls()
             admin.add_view(obj)
-            _populate_db(cls_name, obj)
+            # _populate_db(cls_name, obj)
+            _populate_db(cls, obj)
 
     # app.run(debug=False)
 

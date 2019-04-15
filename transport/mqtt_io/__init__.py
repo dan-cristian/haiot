@@ -97,8 +97,8 @@ def on_message(client, userdata, msg):
         #L.l.debug('Received from client [{}] userdata [{}] msg [{}] at {} '.format(client._client_id,
         #                                                                           userdata, msg.topic,
         #                                                                           utils.get_base_location_now_date()))
-        # locate json string
-        payload = str(msg.payload)
+        # locate json string and clean escape chars
+        payload = str(msg.payload).replace('\\', '')
         start = payload.find('{')
         end = payload.rfind('}')
         json = payload[start:end + 1]
