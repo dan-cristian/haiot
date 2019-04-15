@@ -5,6 +5,7 @@ import random
 import common
 from common import utils
 from main.tinydb_app import db
+from main.logger_helper import L
 
 while True:
     try:
@@ -54,6 +55,49 @@ class TinyBase(ModelView):
         else:
             return None
 
+    @classmethod
+    def insert_one(cls, doc):
+        r = cls.coll.insert_one(doc=doc)
+        if r is not None:
+            return cls({**r})
+        else:
+            return None
+
+    def save_changed_fields(self, current=None, broadcast=False, persist=False, *args, **kwargs):
+        if current is None:
+            current = kwargs['current_record']
+        if broadcast is None:
+            broadcast = kwargs['notify_transport_enabled']
+        if persist is None:
+            persist = kwargs['save_to_graph']
+        update = {}
+        key = None
+        for fld in self.__class__.column_list:
+            if current is not None and hasattr(current, fld):
+                curr_val = getattr(current, fld)
+            else:
+                curr_val = None
+            if hasattr(self, fld):
+                new_val = getattr(self, fld)
+            if curr_val != new_val:
+                if new_val is not None:
+                    update[fld] = new_val
+                else:
+                    update[fld] = curr_val
+                if key is None:
+                    key = {fld: update[fld]}
+        if len(update) > 0:
+            if key is not None:
+                exist = self.__class__.coll.find_one(filter=key)
+                if exist is not None:
+                    res = self.__class__.coll.update_one(query=key, doc={"$set": update})
+                    L.l.info('Updated key {}={} with content {}'.format(key, res.raw_result[0], update))
+                else:
+                    res = self.__class__.coll.insert_one(update)
+                    L.l.info('Inserted key {} with eid={}/{} content={}'.format(key, res.eid, res.inserted_id, update))
+            else:
+                L.l.error('Cannot save changed fields, key is missing')
+
     def __init__(self, cls, copy=None):
         obj_fields = dict(cls.__dict__)
         if not hasattr(cls, 'tinydb_initialised'):
@@ -76,6 +120,7 @@ class TinyBase(ModelView):
                     attr_dict[attr] = fld
                     self.column_list = self.column_list + (attr,)
                     self.column_sortable_list = self.column_sortable_list + (attr,)
+                    cls.column_list = cls.column_list + (attr,)
                     setattr(cls, attr, attr)
             # http://jelly.codes/articles/python-dynamically-creating-classes/
             self.form = type(type(self).__name__ + 'Form', (form.Form,), attr_dict)
@@ -84,6 +129,9 @@ class TinyBase(ModelView):
             cls.t = self.coll.table
             cls.coll = self.coll
             cls.tinydb_initialised = True
+        else:
+            for attr in obj_fields:
+                setattr(self, attr, None)
         if copy is not None:
             for fld in copy:
                 setattr(self, fld, copy[fld])
@@ -94,7 +142,7 @@ globalCounter = 0
 
 
 def insertfew():
-    import tinydb_model
+    from main import tinydb_model
     global globalCounter, threadLock
     time.sleep(3)
     while True:

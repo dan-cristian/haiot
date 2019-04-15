@@ -1,7 +1,7 @@
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
 from pydispatch import dispatcher
-from main import L
+from main.logger_helper import L
 from common import Constant
 from gpio import io_common
 
