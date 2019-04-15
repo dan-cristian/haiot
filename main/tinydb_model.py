@@ -87,3 +87,76 @@ class ZoneSensor(TinyBase):
 
     def __init__(self, copy=None):
         TinyBase.__init__(self, ZoneSensor, copy)
+
+
+class ZoneCustomRelay(TinyBase):
+    id = 0
+    relay_pin_name = ''
+    zone_id = 0
+    gpio_pin_code = ''
+    gpio_host_name = ''
+    relay_is_on = False
+    relay_type = ''
+    expire = 0  # after how many seconds state goes back to original state
+    updated_on = datetime.now()
+
+    def __init__(self, copy=None):
+        TinyBase.__init__(self, ZoneCustomRelay, copy)
+
+
+class Zone(TinyBase):
+    id = 0
+    name = ''
+    # active_heat_schedule_pattern_id = Column(Integer)
+    # heat_is_on = Column(Boolean, default=False)
+    # last_heat_status_update = Column(DateTime(), default=None)
+    # heat_target_temperature = Column(Integer)
+    is_indoor_heated = False
+    is_indoor = False
+    is_outdoor = False
+    is_outdoor_heated = False
+
+    def __init__(self, copy=None):
+        TinyBase.__init__(self, Zone, copy)
+
+
+class DustSensor(TinyBase):
+    id = 0
+    address = ''
+    pm_1 = 0
+    pm_2_5 = 0
+    pm_10 = 0
+    p_0_3 = 0
+    p_0_5 = 0
+    p_1 = 0
+    p_2_5 = 0
+    p_5 = 0
+    p_10 = 0
+    updated_on = datetime.now()
+
+    def __init__(self, copy=None):
+        TinyBase.__init__(self, DustSensor, copy)
+
+
+class PowerMonitor(TinyBase):
+    id = 0
+    name = ''
+    type = ''  # INA, etc
+    host_name = ''
+    voltage = 0.0  # volts, estimated voltage when using divider and batteries in series
+    current = 0.0  # miliamps
+    power = 0.0
+    raw_voltage = 0.0  # volts, read from sensor without
+    max_voltage = 0.0
+    warn_voltage = 0.0
+    critical_voltage = 0.0
+    min_voltage = 0.0
+    warn_current = 0.0
+    critical_current = 0.0
+    i2c_addr = ''
+    voltage_divider_ratio = 0.0  # divider (0.5 etc)
+    subtracted_sensor_id_list = ''  # comma separated sensor ids, total voltage to be subtracted
+    updated_on = datetime.now()
+
+    def __init__(self, copy=None):
+        TinyBase.__init__(self, PowerMonitor, copy)
