@@ -2,6 +2,7 @@
   "Package":
 [
   {"module": "pydispatch", "package": "PyDispatcher"},
-  {"module": "paho", "package": "paho-mqtt"}
+  {"module": "paho", "package": "paho-mqtt"},
+  {"module": "request", "package": "urllib3"}
 ]
 }
