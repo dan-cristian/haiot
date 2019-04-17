@@ -139,6 +139,7 @@ def _process_message(msg):
                         new_relay = models.ZoneCustomRelay(gpio_pin_code=sensor_name, gpio_host_name=Constant.HOST_NAME)
                     else:
                         new_relay = ZoneCustomRelay()
+                        new_relay.relay_pin_name = current_relay.relay_pin_name
                         new_relay.gpio_pin_code = sensor_name
                         new_relay.gpio_host_name = Constant.HOST_NAME
                     new_relay.relay_is_on = power_is_on
@@ -147,8 +148,7 @@ def _process_message(msg):
                         models.ZoneCustomRelay().save_changed_fields(current_record=current_relay, new_record=new_relay,
                                                                      notify_transport_enabled=True, save_to_graph=True)
                     else:
-                        #fixme: add
-                        pass
+                        new_relay.save_changed_fields(current=current_relay, broadcast=True, persist=True)
                 else:
                     L.l.error("ZoneCustomRelay with code {} does not exist in database".format(sensor_name))
             if 'COUNTER' in obj:
@@ -196,6 +196,7 @@ def _process_message(msg):
                         new = models.PowerMonitor()
                     else:
                         new = PowerMonitor()
+                        new.id = sensor.id
                     new.voltage = voltage
                     new.save_changed_fields(current_record = sensor, notify_transport_enabled=True, save_to_graph=True)
                 else:
@@ -225,8 +226,7 @@ def _process_message(msg):
                 new_sensor.p_2_5 = pms['PB2.5']
                 new_sensor.p_5 = pms['PB5']
                 new_sensor.p_10 = pms['PB10']
-                new_sensor.save_changed_fields(current_record=sensor, notify_transport_enabled=True,
-                                               save_to_graph=True)
+                new_sensor.save_changed_fields(current_record=sensor, notify_transport_enabled=True, save_to_graph=True)
         else:
             L.l.warning("Invalid sensor topic {}".format(msg.topic))
 
