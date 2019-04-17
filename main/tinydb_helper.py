@@ -79,13 +79,19 @@ class TinyBase(ModelView):
                 curr_val = None
             if hasattr(self, fld):
                 new_val = getattr(self, fld)
+            else:
+                new_val = None
             if curr_val != new_val:
                 if new_val is not None:
                     update[fld] = new_val
                 else:
                     update[fld] = curr_val
-                if key is None:
-                    key = {fld: update[fld]}
+            # set key as the first field in the new record that is not none
+            if key is None and new_val is not None:
+                if fld == 'voltage':
+                    L.l.info('debug')
+                key = {fld: new_val}
+
         if len(update) > 0:
             if key is not None:
                 exist = self.__class__.coll.find_one(filter=key)
@@ -94,9 +100,11 @@ class TinyBase(ModelView):
                     L.l.info('Updated key {}={} with content {}'.format(key, res.raw_result[0], update))
                 else:
                     res = self.__class__.coll.insert_one(update)
+                    if 'vad' in key:
+                        L.l.info('debug')
                     L.l.info('Inserted key {} with eid={}/{} content={}'.format(key, res.eid, res.inserted_id, update))
             else:
-                L.l.error('Cannot save changed fields, key is missing')
+                L.l.error('Cannot save changed fields, key is missing for {}'.format(self))
 
     def __init__(self, cls, copy=None):
         obj_fields = dict(cls.__dict__)
