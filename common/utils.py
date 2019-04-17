@@ -5,15 +5,15 @@ import datetime, time
 import calendar
 import math
 import importlib
-import urllib.request
 from collections import namedtuple
-import pytz
 from common import fix_module
 import _strptime #  workaround to fix this issue: https://www.raspberrypi.org/forums/viewtopic.php?t=166912
 from main.logger_helper import L
 
 while True:
     try:
+        import pytz
+        import urllib.request
         break
     except ImportError as iex:
         if not fix_module(iex):
