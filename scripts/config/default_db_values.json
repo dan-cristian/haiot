@@ -25,7 +25,7 @@
     {"name": "MQTT_TOPIC_OPENHAB_SEND", "value": "iot/openhab", "description": "openhab integration mqtt channel for sending to openhab"},
     {"name": "MQTT_TOPIC_OPENHAB_RECEIVE", "value": "iot/openhab/cmd/#", "description": "openhab integration mqtt channel for receiving"},
     {"name": "MQTT_TOPIC_SONOFF_1", "value": "iot/sonoff/#", "description": "sonoff-tasmota integration mqtt channel"},
-    {"name": "MQTT_HOST_2", "value": "192.168.0.1"},
+    {"name": "MQTT_HOST_2", "value": "127.0.0.1"},
     {"name": "MQTT_PORT_2", "value": "1883"},
     {"name": "DDNS_RACKSPACE_CONFIG_FILE", "value": ".credentials/.rackspace.ddnsupdate.config.json",
             "description":"conf for ddns, stored in user home. uses http://ip-api.com/docs/api:json"},
@@ -68,11 +68,11 @@
   "Module": [
     {"id":1,  "active":true, "start_order": 1, "name":"main", "host_name":""},
     {"id":2,  "active":true, "start_order": 2, "name":"cloud.email", "host_name":""},
-    {"id":3,  "active":true, "start_order": 3, "name":"health_monitor", "host_name":""},
+    {"id":3,  "active":false, "start_order": 3, "name":"health_monitor", "host_name":""},
     
     {"id":5, "active":true, "start_order":5, "name":"webui", "host_name":""},
 
-    {"id":7,  "active":false, "start_order": 7, "name":"gpio", "host_name":""},
+    {"id":7,  "active":true, "start_order": 7, "name":"gpio", "host_name":""},
     {"id":9,  "active":false, "start_order":9, "name":"heat", "host_name":""},
     {"id":11, "active":false, "start_order":11, "name":"alarm", "host_name":""},
     {"id":13, "active":false, "start_order":13, "name":"cloud.graph_plotly", "host_name":""},

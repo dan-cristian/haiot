@@ -9,9 +9,6 @@ class Module(TinyBase):
     active = False
     host_name = ''
 
-    def __init__(self, copy=None):
-        TinyBase.__init__(self, Module, copy)
-
 
 class Pwm(TinyBase):
     id = 0
@@ -21,9 +18,6 @@ class Pwm(TinyBase):
     gpio_pin_code = 0
     host_name = ''
     update_on = datetime.now()
-
-    def __init__(self, copy=None):
-        TinyBase.__init__(self, Pwm, copy)
 
 
 class GpioPin(TinyBase):
@@ -38,9 +32,6 @@ class GpioPin(TinyBase):
     description = ''
     is_active = False  # if pin was setup(exported) through this app. will be unexported when app exit
     updated_on = datetime.now
-
-    def __init__(self, copy=None):
-        TinyBase.__init__(self, GpioPin, copy)
 
 
 class Sensor(TinyBase):
@@ -71,9 +62,6 @@ class Sensor(TinyBase):
     alt_address = ''  # alternate address format, use for 1-wire, better readability
     comment = ''
 
-    def __init__(self, copy=None):
-        TinyBase.__init__(self, Sensor, copy)
-
 
 class ZoneSensor(TinyBase):
     id = 0
@@ -84,9 +72,6 @@ class ZoneSensor(TinyBase):
     target_material = ''  # what material is being measured, water, air, etc
     alt_address = ''
     is_main = False  # is main temperature sensor for heat reference
-
-    def __init__(self, copy=None):
-        TinyBase.__init__(self, ZoneSensor, copy)
 
 
 class ZoneCustomRelay(TinyBase):
@@ -100,9 +85,6 @@ class ZoneCustomRelay(TinyBase):
     expire = 0  # after how many seconds state goes back to original state
     updated_on = datetime.now()
 
-    def __init__(self, copy=None):
-        TinyBase.__init__(self, ZoneCustomRelay, copy)
-
 
 class Zone(TinyBase):
     id = 0
@@ -115,9 +97,6 @@ class Zone(TinyBase):
     is_indoor = False
     is_outdoor = False
     is_outdoor_heated = False
-
-    def __init__(self, copy=None):
-        TinyBase.__init__(self, Zone, copy)
 
 
 class DustSensor(TinyBase):
@@ -133,9 +112,6 @@ class DustSensor(TinyBase):
     p_5 = 0
     p_10 = 0
     updated_on = datetime.now()
-
-    def __init__(self, copy=None):
-        TinyBase.__init__(self, DustSensor, copy)
 
 
 class PowerMonitor(TinyBase):
@@ -158,5 +134,35 @@ class PowerMonitor(TinyBase):
     subtracted_sensor_id_list = ''  # comma separated sensor ids, total voltage to be subtracted
     updated_on = datetime.now()
 
-    def __init__(self, copy=None):
-        TinyBase.__init__(self, PowerMonitor, copy)
+
+class SystemDisk(TinyBase):
+    id = 0
+    serial = ''
+    system_name = ''
+    hdd_name = ''  # netbook /dev/sda
+    hdd_device = ''  # usually empty?
+    hdd_disk_dev = ''  # /dev/sda
+    temperature = 0.0
+    sector_error_count = 0
+    smart_status = ''
+    power_status = 0
+    load_cycle_count = 0
+    start_stop_count = 0
+    last_reads_completed_count = 0.0
+    last_reads_datetime = datetime.now()
+    last_writes_completed_count = 0.0
+    last_writes_datetime = datetime.now()
+    last_reads_elapsed = 0.0
+    last_writes_elapsed = 0.0
+    updated_on = datetime.now()
+
+
+class SystemMonitor(TinyBase):
+    id = 0
+    name = ''
+    cpu_usage_percent = 0.0
+    cpu_temperature = 0.0
+    memory_available_percent = 0.0
+    uptime_days = 0
+    updated_on = datetime.now()
+

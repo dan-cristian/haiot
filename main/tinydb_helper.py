@@ -106,7 +106,8 @@ class TinyBase(ModelView):
             else:
                 L.l.error('Cannot save changed fields, key is missing for {}'.format(self))
 
-    def __init__(self, cls, copy=None):
+    def __init__(self, copy=None):
+        cls = self.__class__
         obj_fields = dict(cls.__dict__)
         if not hasattr(cls, 'tinydb_initialised'):
             attr_dict = {}
