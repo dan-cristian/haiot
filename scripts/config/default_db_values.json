@@ -73,7 +73,7 @@
     {"id":5, "active":true, "start_order":5, "name":"webui", "host_name":""},
 
     {"id":7,  "active":true, "start_order": 7, "name":"gpio", "host_name":""},
-    {"id":9,  "active":false, "start_order":9, "name":"heat", "host_name":""},
+    {"id":9,  "active":true, "start_order":9, "name":"heat", "host_name":""},
     {"id":11, "active":false, "start_order":11, "name":"alarm", "host_name":""},
     {"id":13, "active":false, "start_order":13, "name":"cloud.graph_plotly", "host_name":""},
     {"id":19, "active":false, "start_order":19, "name":"ddns", "host_name":""},
