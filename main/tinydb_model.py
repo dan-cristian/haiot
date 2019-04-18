@@ -166,3 +166,65 @@ class SystemMonitor(TinyBase):
     uptime_days = 0
     updated_on = datetime.now()
 
+
+class ZoneThermostat(TinyBase):
+    id = 0
+    zone_id = 0
+    zone_name = ''
+    active_heat_schedule_pattern_id = 0
+    heat_is_on = False
+    last_heat_status_update = datetime.now()
+    heat_target_temperature = 0.0
+    mode_presence_auto = False  # fixme: not used yet
+    last_presence_set = datetime.now()
+    is_mode_manual = False
+    manual_duration_min = 0  # period to keep heat on for manual mode
+    manual_temp_target = 0.0
+    last_manual_set = datetime.now()
+
+
+class HeatSchedule(TinyBase):
+    id = 0
+    zone_id = 0
+    # zone = db.relationship('Zone', backref=db.backref('heat schedule zone', lazy='dynamic'))
+    pattern_week_id = 0
+    pattern_weekend_id = 0
+    ''' temp pattern if there is move in a zone, to ensure there is heat if someone is at home unplanned'''
+    pattern_id_presence = 0
+    ''' temp pattern if there is no move, to preserve energy'''
+    pattern_id_no_presence = 0
+    season = ''  # season name when this schedule will apply
+    # active = True
+
+
+class SchedulePattern(TinyBase):
+    id = 0
+    name = ''
+    pattern = ''
+    keep_warm = False  # keep the zone warm, used for cold floors
+    keep_warm_pattern = ''  # pattern, 5 minutes increments of on/off: 100001000100
+    activate_on_condition = False  # activate heat only if relay state condition is meet
+    activate_condition_relay = ''  # the relay that must be on to activate this schedule pattern
+    season_name = ''  # season name when this will apply
+    main_source_needed = True  # main source must be on as well (i.e. gas heater)
+
+
+class TemperatureTarget(TinyBase):
+    id = 0
+    code = ''
+    target = 0.0
+
+
+class ZoneHeatRelay(TinyBase):
+    id = 0
+    # friendly display name for pin mapping
+    heat_pin_name = ''
+    zone_id = 0
+    gpio_pin_code = ''  # user friendly format, e.g. P8_11
+    gpio_host_name = ''
+    heat_is_on = False
+    is_main_heat_source = False
+    is_alternate_source_switch = False  # switch to alternate source
+    is_alternate_heat_source = False  # used for low cost/eco main heat sources
+    temp_sensor_name = ''  # temperature sensor name for heat sources to check for heat limit
+    updated_on = datetime.now()

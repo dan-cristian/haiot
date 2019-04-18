@@ -64,11 +64,11 @@ class TinyBase(ModelView):
             return None
 
     def save_changed_fields(self, current=None, broadcast=False, persist=False, *args, **kwargs):
-        if current is None:
+        if current is None and 'current_record' in kwargs:
             current = kwargs['current_record']
-        if broadcast is None:
+        if broadcast is None and 'notify_transport_enabled' in kwargs:
             broadcast = kwargs['notify_transport_enabled']
-        if persist is None:
+        if persist is None and 'save_to_graph' in kwargs:
             persist = kwargs['save_to_graph']
         update = {}
         key = None
@@ -88,8 +88,6 @@ class TinyBase(ModelView):
                     update[fld] = curr_val
             # set key as the first field in the new record that is not none
             if key is None and new_val is not None:
-                if fld == 'voltage':
-                    L.l.info('debug')
                 key = {fld: new_val}
 
         if len(update) > 0:
