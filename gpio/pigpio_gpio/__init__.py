@@ -2,12 +2,15 @@ import socket
 import time
 from threading import Thread, Lock
 from pydispatch import dispatcher
-from main import L
-from main.admin import models
-from main.admin.model_helper import commit
-from common import Constant, utils
-from main import thread_pool, dbs, db
+from main.logger_helper import L
+from common import Constant
+from main import sqlitedb
+from main import thread_pool
+if sqlitedb:
+    from main.admin import models
+    from main.admin.model_helper import commit
 from gpio.io_common import GpioBase
+from main.tinydb_model import Pwm, GpioPin
 
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
@@ -174,7 +177,6 @@ def input_event(gpio, level, tick):
 
 
 class PwmIo(GpioBase):
-
     key_ok = 0
 
     @staticmethod
@@ -183,7 +185,10 @@ class PwmIo(GpioBase):
         # rec = m().query_filter_first(m.name == 'boiler2')
 
         # rec = models.Pwm.query.filter_by(name=key).first()
-        rec = models.Pwm.query.get(key)
+        if sqlitedb:
+            rec = models.Pwm.query.get(key)
+        else:
+            rec = Pwm.find_one({Pwm.name: key})
         # rec = dbs.session.query(models.Pwm).filter(models.Pwm.name == key).first()
         # db.session.remove()
         # rec = db.session.query(models.Pwm).filter(models.Pwm.name == key).first()
@@ -228,7 +233,10 @@ class PwmIo(GpioBase):
 
     @staticmethod
     def _init_pwm():
-        pwm_list = models.Pwm.query.filter_by(host_name=Constant.HOST_NAME).all()
+        if sqlitedb:
+            pwm_list = models.Pwm.query.filter_by(host_name=Constant.HOST_NAME).all()
+        else:
+            pwm_list = Pwm.find({Pwm.host_name: Constant.HOST_NAME})
         for pwm in pwm_list:
             PwmIo.sync_2_db(pwm.id)
         pass
@@ -237,7 +245,10 @@ class PwmIo(GpioBase):
     def set(key, **kwargs):
         pwm = PwmIo.get_db_record(key=key)
         if pwm is not None:
-            new_pwm = models.Pwm(id=0)
+            if sqlitedb:
+                new_pwm = models.Pwm(id=0)
+            else:
+                new_pwm = Pwm()
             new_pwm.name = pwm.name
             for name, value in kwargs.items():
                 if name == 'frequency':
@@ -258,7 +269,6 @@ class PwmIo(GpioBase):
                 key, pwm.gpio_pin_code, new_pwm.frequency, pwm.duty_cycle, new_pwm.duty_cycle))
             new_pwm.save_changed_fields(
                 current_record=pwm, new_record=new_pwm, notify_transport_enabled=True, force_dirty=False, debug=False)
-            db.session.flush()
         else:
             L.l.warning("Cannot find pwm {} to set".format(key))
 
@@ -299,7 +309,10 @@ class PwmIo(GpioBase):
 
     @staticmethod
     def unload():
-        pwm_list = models.Pwm.query.filter_by(host_name=Constant.HOST_NAME).all()
+        if sqlitedb:
+            pwm_list = models.Pwm.query.filter_by(host_name=Constant.HOST_NAME).all()
+        else:
+            pwm_list = Pwm.find({Pwm.host_name: Constant.HOST_NAME})
         for pwm in pwm_list:
             try:
                 P.pi.hardware_PWM(pwm.gpio_pin_code, 0, 0)
@@ -333,11 +346,21 @@ def _setup_in_ports(gpio_pin_list):
                         P.pi.set_pull_up_down(int(gpio_pin.pin_index_bcm), pigpio.PUD_UP)
                         P.callback.append(P.pi.callback(user_gpio=int(gpio_pin.pin_index_bcm),
                                                         edge=pigpio.EITHER_EDGE, func=input_event))
-                        gpio_pin_record = models.GpioPin().query_filter_first(
-                            models.GpioPin.pin_code.in_([gpio_pin.pin_code]),
-                            models.GpioPin.host_name.in_([Constant.HOST_NAME]))
+                        if sqlitedb:
+                            gpio_pin_record = models.GpioPin().query_filter_first(
+                                models.GpioPin.pin_code.in_([gpio_pin.pin_code]),
+                                models.GpioPin.host_name.in_([Constant.HOST_NAME]))
+                        else:
+                            curr_rec = GpioPin.find_one({GpioPin.pin_code: gpio_pin.pin_code,
+                                                         GpioPin.host_name: Constant.HOST_NAME})
+                            gpio_pin_record = GpioPin()
+                            if curr_rec is not None:
+                                gpio_pin_record.pin_code = curr_rec.pin_code
                         gpio_pin_record.pin_direction = Constant.GPIO_PIN_DIRECTION_IN
-                        commit()
+                        if sqlitedb:
+                            commit()
+                        else:
+                            gpio_pin_record.save_changed_fields(current=curr_rec, broadcast=False, persist=True)
                     except Exception as ex1:
                         L.l.critical('Unable to setup pigpio_gpio pin, er={}'.format(ex1))
                 else:
@@ -360,8 +383,10 @@ def unload():
 
 
 def init():
-    P.pwm = PwmIo(obj=models.Pwm)
-
+    if sqlitedb:
+        P.pwm = PwmIo(obj=models.Pwm)
+    else:
+        P.pwm = PwmIo(obj=Pwm)
     L.l.info('PiGpio initialising')
     if P.import_ok:
         try:
