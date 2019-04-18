@@ -2,7 +2,6 @@ import subprocess
 import os
 import threading
 import prctl
-import cStringIO
 import shutil
 import time
 import math
@@ -10,13 +9,24 @@ import datetime
 from pydispatch import dispatcher
 from collections import OrderedDict
 from main.logger_helper import L
-from common import Constant, utils
-from main.admin import model_helper, models
+from common import Constant, utils, get_json_param
 from main import logger_helper
-from ina219 import INA219
-from ina219 import DeviceRangeError
+from main import sqlitedb
+if sqlitedb:
+    from main.admin import model_helper, models
+from main.tinydb_model import SystemDisk, SystemMonitor, PowerMonitor
 
 __author__ = 'dcristian'
+
+from common import fix_module
+while True:
+    try:
+        from ina219 import INA219, DeviceRangeError
+        import cStringIO
+        break
+    except ImportError as iex:
+        if not fix_module(iex):
+            break
 
 try:
     import psutil
@@ -32,6 +42,7 @@ try:
 except Exception as ex:
     #Log.logger.info('pywin / wmi module not available')
     import_module_wmi_ok = False
+
 
 ERR_TEXT_NO_DEV = 'failed: No such device'
 ERR_TEXT_NO_DEV_2 = 'HDIO_GET_32BIT failed: Invalid argument'
@@ -58,7 +69,10 @@ class P:
 
 
 def _read_all_hdd_smart():
-    output = cStringIO.StringIO()
+    try:
+        output = cStringIO.StringIO()
+    except NameError:
+        return False
     current_disk_valid = True
     disk_letter = 'a'
     disk_count = 1
@@ -66,9 +80,11 @@ def _read_all_hdd_smart():
     if import_module_psutil_exist:
         while current_disk_valid and disk_count < 64:
             try:
-                record = models.SystemDisk()
+                if sqlitedb:
+                    record = models.SystemDisk()
+                else:
+                    record = SystemDisk()
                 record.system_name = Constant.HOST_NAME
-                assert isinstance(record, models.SystemDisk)
                 record.hdd_disk_dev = Constant.DISK_DEV_MAIN + disk_letter
                 L.l.debug('Processing disk {}'.format(record.hdd_disk_dev))
                 try:
@@ -76,7 +92,7 @@ def _read_all_hdd_smart():
                 except Exception as ex1:
                     record.power_status = None
                 try:
-                    use_sudo = bool(model_helper.get_param(Constant.P_USESUDO_DISKTOOLS))
+                    use_sudo = bool(get_json_param(Constant.P_USESUDO_DISKTOOLS))
                     if Constant.OS in Constant.OS_LINUX and use_sudo:
                         smart_out = subprocess.check_output(['sudo', 'smartctl', '-a', record.hdd_disk_dev,
                                                              '-n', 'sleep'], stderr=subprocess.STDOUT)
@@ -140,8 +156,12 @@ def _read_all_hdd_smart():
                     record.serial = 'serial not available {} {}'.format(Constant.HOST_NAME, record.hdd_disk_dev)
                 else:
                     record.hdd_name = '{} {} {}'.format(record.system_name, record.hdd_device, record.hdd_disk_dev)
-                    current_record = models.SystemDisk.query.filter_by(hdd_disk_dev=record.hdd_disk_dev,
-                                                                       system_name=record.system_name).first()
+                    if sqlitedb:
+                        current_record = models.SystemDisk.query.filter_by(
+                            hdd_disk_dev=record.hdd_disk_dev, system_name=record.system_name).first()
+                    else:
+                        current_record = SystemDisk.find_one({SystemDisk.hdd_disk_dev: record.hdd_disk_dev,
+                                                              SystemDisk.system_name: record.system_name})
                     record.save_changed_fields(current_record=current_record, new_record=record,
                                                notify_transport_enabled=True, save_to_graph=True)
                 disk_letter = chr(ord(disk_letter) + 1)
@@ -174,7 +194,7 @@ def __read_hddparm(disk_dev=''):
     try:
         if import_module_psutil_exist:
             try:
-                use_sudo = bool(model_helper.get_param(Constant.P_USESUDO_DISKTOOLS))
+                use_sudo = bool(get_json_param(Constant.P_USESUDO_DISKTOOLS))
                 if Constant.OS in Constant.OS_LINUX and use_sudo:
                     hddparm_out = subprocess.check_output(['sudo', 'hdparm', '-C', disk_dev], stderr=subprocess.STDOUT)
                 else:
@@ -372,7 +392,10 @@ def __get_cpu_temperature():
 def _read_system_attribs():
     global import_module_psutil_exist, progress_status
     try:
-        record = models.SystemMonitor()
+        if sqlitedb:
+            record = models.SystemMonitor()
+        else:
+            record = SystemMonitor()
         if import_module_psutil_exist:
             record.cpu_usage_percent = psutil.cpu_percent(interval=1)
             record.memory_available_percent = psutil.virtual_memory().percent
@@ -383,7 +406,10 @@ def _read_system_attribs():
                 record.uptime_days = int(__get_uptime_win_days())
             import_module_psutil_exist = True
         else:
-            output = cStringIO.StringIO()
+            try:
+                output = cStringIO.StringIO()
+            except NameError:
+                return
             if Constant.OS in Constant.OS_WINDOWS:
                 # fixme: no backup impl in Windows
                 return
@@ -393,15 +419,16 @@ def _read_system_attribs():
                 record.cpu_usage_percent = __get_cpu_utilisation_linux()
                 record.uptime_days = int(__get_uptime_linux_days())
                 record.cpu_temperature = __get_cpu_temperature()
-                L.l.debug(
-                    'Read mem free {} cpu% {} cpu_temp {} uptime {}'.format(record.memory_available_percent,
-                                                                            record.cpu_usage_percent,
-                                                                            record.cpu_temperature,
-                                                                            record.uptime_days))
+                L.l.debug('Read mem free {} cpu% {} cpu_temp {} uptime {}'.format(
+                    record.memory_available_percent, record.cpu_usage_percent,
+                    record.cpu_temperature,record.uptime_days))
         progress_status = 'Saving mem cpu uptime to db'
         record.name = Constant.HOST_NAME
         record.updated_on = utils.get_base_location_now_date()
-        current_record = models.SystemMonitor.query.filter_by(name=record.name).first()
+        if sqlitedb:
+            current_record = models.SystemMonitor.query.filter_by(name=record.name).first()
+        else:
+            current_record = SystemMonitor.find_one({SystemMonitor.name: record.name})
         progress_status = 'Saving mem cpu before save fields'
         record.save_changed_fields(current_record=current_record, new_record=record,
                                    notify_transport_enabled=False, save_to_graph=True)
@@ -478,15 +505,21 @@ def _read_disk_stats():
 
                     reads_completed = utils.round_sensor_value(words[3])
                     writes_completed = utils.round_sensor_value(words[7])
-                    record = models.SystemDisk()
+                    if sqlitedb:
+                        record = models.SystemDisk()
+                    else:
+                        record = SystemDisk()
                     record.hdd_disk_dev = '/dev/' + device_name
                     record.last_reads_completed_count = reads_completed
                     record.last_writes_completed_count = writes_completed
                     record.system_name = Constant.HOST_NAME
                     record.updated_on = utils.get_base_location_now_date()
-
-                    current_record = models.SystemDisk.query.filter_by(hdd_disk_dev=record.hdd_disk_dev,
-                                                                       system_name=record.system_name).first()
+                    if sqlitedb:
+                        current_record = models.SystemDisk.query.filter_by(
+                            hdd_disk_dev=record.hdd_disk_dev, system_name=record.system_name).first()
+                    else:
+                        current_record = SystemDisk.find_one({SystemDisk.hdd_disk_dev: record.hdd_disk_dev,
+                                                              SystemDisk.system_name: record.system_name})
                     # save read/write date time only if count changes
                     if current_record:
                         if current_record.serial is None or current_record.serial == '':
@@ -504,16 +537,15 @@ def _read_disk_stats():
                         else:
                             record.last_writes_datetime = current_record.last_writes_datetime
                         if current_record.last_reads_datetime:
-                            read_elapsed = (
-                            utils.get_base_location_now_date() - record.last_reads_datetime).total_seconds()
+                            read_elapsed = (utils.get_base_location_now_date()
+                                            - record.last_reads_datetime).total_seconds()
                             record.last_reads_elapsed = utils.round_sensor_value(read_elapsed)
                         if current_record.last_writes_datetime:
-                            write_elapsed = (
-                            utils.get_base_location_now_date() - record.last_writes_datetime).total_seconds()
+                            write_elapsed = (utils.get_base_location_now_date()
+                                             - record.last_writes_datetime).total_seconds()
                             record.last_writes_elapsed = utils.round_sensor_value(write_elapsed)
-                        L.l.debug('Disk {} elapsed read {}s write {}s'.format(device_name,
-                                                                              int(read_elapsed),
-                                                                              int(write_elapsed)))
+                        L.l.debug('Disk {} elapsed read {}s write {}s'.format(
+                            device_name, int(read_elapsed), int(write_elapsed)))
                     else:
                         record.last_reads_datetime = utils.get_base_location_now_date()
                         record.last_writes_datetime = utils.get_base_location_now_date()
@@ -530,7 +562,10 @@ def _get_total_subtracted_voltage(id_list):
     if id_list is not None:
         id_atoms = id_list.split(',')
         for pow_id in id_atoms:
-            power_rec = models.PowerMonitor.query.filter_by(id=pow_id).first()
+            if sqlitedb:
+                power_rec = models.PowerMonitor.query.filter_by(id=pow_id).first()
+            else:
+                power_rec = PowerMonitor.find_one({PowerMonitor.id: pow_id})
             voltage += power_rec.voltage
     return voltage
 
@@ -547,9 +582,15 @@ def _read_battery_power():
                 power = round(ina.power(), 0)
                 dispatcher.send(signal=Constant.SIGNAL_BATTERY_STAT, battery_name=addr[0],
                                 voltage=voltage, current=current, power=power)
-                power_rec = models.PowerMonitor.query.filter_by(name=addr[0]).first()
+                if sqlitedb:
+                    power_rec = models.PowerMonitor.query.filter_by(name=addr[0]).first()
+                else:
+                    power_rec = PowerMonitor.find_one({PowerMonitor.name: addr[0]})
                 if power_rec is not None:
-                    new_rec = models.PowerMonitor()
+                    if sqlitedb:
+                        new_rec = models.PowerMonitor()
+                    else:
+                        new_rec = PowerMonitor()
                     new_rec.raw_voltage = voltage
                     total_subtracted_voltage = _get_total_subtracted_voltage(power_rec.subtracted_sensor_id_list)
                     if power_rec.voltage_divider_ratio is not None:
@@ -571,7 +612,10 @@ def _read_battery_power():
 
 
 def init():
-    power_list = models.PowerMonitor().query_all()
+    if sqlitedb:
+        power_list = models.PowerMonitor().query_all()
+    else:
+        power_list = PowerMonitor.find()
     for power in power_list:
         if power.host_name == Constant.HOST_NAME:
             if "ina" in power.type:

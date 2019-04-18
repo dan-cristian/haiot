@@ -1,10 +1,12 @@
+import time
 from pydispatch import dispatcher
 from main.logger_helper import L
 from common import Constant
-from main.admin import models
+from main import sqlitedb
+if sqlitedb:
+    from main.admin import models
 from gpio import io_common
-import time
-
+from main.tinydb_model import ZoneCustomRelay
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 
@@ -150,8 +152,12 @@ def setup_in_ports(gpio_pin_list):
 def post_init():
     if P.initialised:
         L.l.info('Running post_init rpi_gpio')
-        relays = models.ZoneCustomRelay.query.filter_by(
-            gpio_host_name=Constant.HOST_NAME, relay_type=Constant.GPIO_PIN_TYPE_PI_STDGPIO).all()
+        if sqlitedb:
+            relays = models.ZoneCustomRelay.query.filter_by(
+                gpio_host_name=Constant.HOST_NAME, relay_type=Constant.GPIO_PIN_TYPE_PI_STDGPIO).all()
+        else:
+            relays = ZoneCustomRelay.find({ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME,
+                                           ZoneCustomRelay.relay_type: Constant.GPIO_PIN_TYPE_PI_STDGPIO})
         for relay in relays:
             L.l.info('Reading gpio pin {}'.format(relay.gpio_pin_code))
             if len(relay.gpio_pin_code) <= 2:  # run this only for gpio bcm pins (piface has longer size)
