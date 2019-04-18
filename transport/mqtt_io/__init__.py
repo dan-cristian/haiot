@@ -66,6 +66,7 @@ def on_disconnect(client, userdata, rc):
 
 def on_subscribe(client, userdata, mid, granted_qos):
     P.client_connected = True
+    L.l.info("Mqtt subscribed")
 
 
 # def on_subscribe(client, userdata, mid, granted_qos):
@@ -145,9 +146,10 @@ def init():
     # not a good ideea to set a timeout as it will crash pigpio_gpio callback
     # socket.setdefaulttimeout(10)
     try:
-        if P.client_connecting:
+        if P.client_connecting is True:
             L.l.warning('Mqtt client already in connection process, skipping attempt to connect until done')
             return False
+        P.client_connecting = True
         host_list = [
             #[model_helper.get_param(Constant.P_MQTT_HOST_3), int(model_helper.get_param(Constant.P_MQTT_PORT_3))],
             [common.get_json_param(common.Constant.P_MQTT_HOST_1), int(common.get_json_param(Constant.P_MQTT_PORT_1))],
@@ -162,11 +164,9 @@ def init():
             P.mqtt_client = mqtt.Mosquitto(client_id=Constant.HOST_NAME)
 
         for host_port in host_list:
-            P.client_connecting = True
             host = host_port[0]
             port = host_port[1]
             L.l.info('MQTT publisher module initialising, host={} port={}'.format(host, port))
-            P.client_connected = False
             retry_count = 0
             while (not P.client_connected) and (retry_count < Constant.ERROR_CONNECT_MAX_RETRY_COUNT):
                 try:
@@ -208,6 +208,8 @@ def init():
             L.l.critical('MQTT connection not available, all connect attempts failed')
     except Exception as ex:
         L.l.error('Exception on mqtt init, err={}'.format(ex))
+    finally:
+        P.client_connected = False
 
 
 def _send_message(txt, topic=None):
