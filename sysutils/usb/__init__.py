@@ -18,7 +18,7 @@ class P:
 
 
 def _check_usb_change():
-    if Constant.IS_OS_LINUX():
+    if Constant.is_os_linux():
         out = subprocess.check_output(['lsusb']).split('\n')
         if P.last_usb_out is not None and P.last_usb_out != out:
             P.last_usb_out = out
@@ -27,6 +27,7 @@ def _check_usb_change():
             return False
     else:
         # todo: implement a Windows version
+        # https://stackoverflow.com/questions/4273252/detect-inserted-usb-on-windows
         return False
 
 

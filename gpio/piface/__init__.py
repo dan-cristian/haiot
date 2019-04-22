@@ -2,7 +2,7 @@ __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
 from pydispatch import dispatcher
 from main.logger_helper import L
-from common import Constant
+from common import Constant, fix_module
 from gpio import io_common
 
 
@@ -19,6 +19,13 @@ class P:
     def __init__(self):
         pass
 
+
+while True:
+    try:
+        break
+    except ImportError as iex:
+        if not fix_module(iex):
+            break
 
 try:
     import pifacedigitalio as pfio

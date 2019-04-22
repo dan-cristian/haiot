@@ -6,8 +6,11 @@ import prctl
 from pydispatch import dispatcher
 from main.logger_helper import L
 from main import thread_pool
-from main.admin import models
+from main import sqlitedb
+if sqlitedb:
+    from main.admin import models
 from common import Constant
+from main.tinydb_model import Rule
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
@@ -31,7 +34,7 @@ except Exception as ex:
     L.l.warning('Cannot initialise apscheduler er={}'.format(ex))
 
 if scheduler:
-    import rules_run, rule_common
+    from rule import rules_run, rule_common
 
 
 class P:
@@ -62,12 +65,12 @@ def parse_rules(obj, change):
         for func_list in P.func.values():
             if func_list:
                 for func in func_list:
-                    if func[1].func_defaults and len(func[1].func_defaults) > 0:
-                        first_param = func[1].func_defaults[0]
+                    if func[1].__defaults__ and len(func[1].__defaults__) > 0:
+                        first_param = func[1].__defaults__[0]
                         # find rule methods for queued execution with first param type equal to passed object type
                         if type(obj) == type(first_param):
                             record = Obj()
-                            for attr, value in obj.__dict__.iteritems():
+                            for attr, value in obj.__dict__.items():
                                 setattr(record, attr, value)
                             P.event_list.append([record, func[0], field_changed_list])
                             # optimises CPU, but ensure each function name is unique in rule file
@@ -81,7 +84,7 @@ def _process_events():
     for obj in list(P.event_list):
         try:
             for rule_mod in P.rules_modules:
-                #result = getattr(rules_run, obj[1])(obj=obj[0], field_changed_list=obj[2])
+                # result = getattr(rules_run, obj[1])(obj=obj[0], field_changed_list=obj[2])
                 if hasattr(rule_mod, obj[1]):
                     result = getattr(rule_mod, obj[1])(obj=obj[0], field_changed_list=obj[2])
                     L.l.debug('Rule returned {}'.format(result))
@@ -119,7 +122,10 @@ def __load_rules_from_db():
     # keep host name default to '' rather than None (which does not work on filter in_)
     try:
         # rule_list = models.Rule.query.filter(models.Rule.host_name.in_([constant.HOST_NAME, ""])).all()
-        rule_list = models.Rule().query_filter_all(models.Rule.host_name.in_([Constant.HOST_NAME, ""]))
+        if sqlitedb:
+            rule_list = models.Rule().query_filter_all(models.Rule.host_name.in_([Constant.HOST_NAME, ""]))
+        else:
+            rule_list = Rule.find({Rule.host_name: Constant.HOST_NAME})
         scheduler.remove_all_jobs()
         for rule in rule_list:
             method_to_call = getattr(rules_run, rule.command)
@@ -148,11 +154,14 @@ def add_rules_into_db(module):
         P.func[module] = getmembers(module, isfunction)
         if P.func[module]:
             for func in P.func[module]:
-                if not func[1].func_defaults and not func[1].func_name.startswith('_'):
+                if not func[1].__defaults__ and not func[1].__name__.startswith('_'):
                     # add this to DB
-                    record = models.Rule()
-                    record.name = func[1].func_name
-                    record.command = func[1].func_name
+                    if sqlitedb:
+                        record = models.Rule()
+                    else:
+                        record = Rule()
+                    record.name = func[1].__name__
+                    record.command = func[1].__name__
                     record.host_name = Constant.HOST_NAME
                     comment = func[1].__doc__
                     if comment:
@@ -200,7 +209,8 @@ def add_rules_into_db(module):
                                               max_instances=1, misfire_grace_time=None)
                             L.l.info("Adding rule {}:{} to scheduler {}".format(record.name, record.command,
                                                                                 record.is_active))
-                    record.add_commit_record_to_db()
+                    if sqlitedb:
+                        record.add_commit_record_to_db()
     except Exception as ex:
         L.l.exception('Error adding rules into db {}'.format(ex), exc_info=1)
 
@@ -249,10 +259,12 @@ def init():
     global scheduler
     L.l.info('Rules module initialising')
     if scheduler:
+        from rule import electricity
         P.rules_modules.append(rules_run)
-        P.rules_modules.append(electricity.solar)
+        P.rules_modules.append(electricity)
         scheduler.remove_all_jobs()
-        models.Rule().delete()
+        if sqlitedb:
+            models.Rule().delete()
         add_rules_into_db(module=rules_run)
 
         # __load_rules_from_db()

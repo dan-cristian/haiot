@@ -3,15 +3,26 @@ import prctl
 from datetime import datetime
 from main.logger_helper import L
 from common import Constant, variable
-from main.admin import models
-from main import thread_pool
+from main import thread_pool, sqlitedb
+if sqlitedb:
+    from main.admin import models
 import time
 import six
-if six.PY3:
-    from pydispatch import dispatcher
-else:
-    from louie import dispatcher
 from pydispatch import dispatcher as haiot_dispatch
+from main.tinydb_model import Sensor, ZoneSensor, ZoneCustomRelay
+
+from common import fix_module
+while True:
+    try:
+        import openzwave
+        if six.PY3:
+            from pydispatch import dispatcher
+        else:
+            from louie import dispatcher
+        break
+    except ImportError as iex:
+        if not fix_module(iex):
+            break
 
 
 class P:
@@ -35,7 +46,6 @@ class P:
 
 
 try:
-    import openzwave
     from openzwave.node import ZWaveNode
     from openzwave.value import ZWaveValue
     from openzwave.scene import ZWaveScene
@@ -96,16 +106,25 @@ def louie_node_update(network, node):
 
 def _set_custom_relay_state(sensor_address, state):
     # pin_code = '{}:{}'.format(sensor_name, node_id)
-    current_relay = models.ZoneCustomRelay.query.filter_by(gpio_pin_code=sensor_address,
-                                                           gpio_host_name=Constant.HOST_NAME).first()
+    if sqlitedb:
+        current_relay = models.ZoneCustomRelay.query.filter_by(
+            gpio_pin_code=sensor_address, gpio_host_name=Constant.HOST_NAME).first()
+    else:
+        current_relay = ZoneCustomRelay.find_one({
+            ZoneCustomRelay.gpio_pin_code: sensor_address, ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME})
     if current_relay is not None:
-        new_relay = models.ZoneCustomRelay(gpio_pin_code=sensor_address, gpio_host_name=Constant.HOST_NAME)
+        if sqlitedb:
+            new_relay = models.ZoneCustomRelay(gpio_pin_code=sensor_address, gpio_host_name=Constant.HOST_NAME)
+        else:
+            new_relay = ZoneCustomRelay()
+            new_relay.gpio_pin_code = sensor_address
+            new_relay.gpio_host_name = Constant.HOST_NAME
         new_relay.relay_is_on = state
         current_relay.is_event_external = True
-        models.ZoneCustomRelay().save_changed_fields(
-            current_record=current_relay, new_record=new_relay, notify_transport_enabled=True, save_to_graph=True)
+        new_relay.save_changed_fields(
+            current_record=current_relay, notify_transport_enabled=True, save_to_graph=True)
     else:
-        L.l.error("ZoneCustomRelay with code {} does not exist in database".format(sensor_address))
+        L.l.info("ZoneCustomRelay with code {} not defined in database".format(sensor_address))
 
 
 # Qubino Meter Values
@@ -121,7 +140,10 @@ def set_value(network, node, value):
     try:
         # L.l.info('Louie signal: Node={} Value={}'.format(node, value))
         sensor_address = "{}_{}".format(node.product_name, node.node_id)
-        zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=sensor_address).first()
+        if sqlitedb:
+            zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=sensor_address).first()
+        else:
+            zone_sensor = ZoneSensor.find_one({ZoneSensor.sensor_address: sensor_address})
         if zone_sensor is not None:
             sensor_name = zone_sensor.sensor_name
             P.last_value_received = datetime.now()
@@ -143,7 +165,10 @@ def set_value(network, node, value):
             else:
                 # skip controller node
                 if node.node_id > 1:
-                    current_record = models.Sensor.query.filter_by(address=sensor_address).first()
+                    if sqlitedb:
+                        current_record = models.Sensor.query.filter_by(address=sensor_address).first()
+                    else:
+                        current_record = Sensor.find_one({Sensor.address: sensor_address})
                     if current_record is None:
                         sensor_name = zone_sensor.sensor_name
                         delta_last_save = 0
@@ -154,27 +179,33 @@ def set_value(network, node, value):
                         # current_record.vdd = 0
                         sensor_name = current_record.sensor_name
                         delta_last_save = (datetime.now() - current_record.updated_on).total_seconds()
-                    record = models.Sensor(address=sensor_address, sensor_name=sensor_name)
+                    if sqlitedb:
+                        record = models.Sensor(address=sensor_address, sensor_name=sensor_name)
+                    else:
+                        record = Sensor()
+                        record.address = sensor_address
+                        record.sensor_name = sensor_name
                     record.is_event_external = True
                     if delta_last_save > P.DELTA_SAVE_SECONDS and value.label == "Voltage":
                         record.vad = round(value.data, 0)
-                        record.save_changed_fields(current_record=current_record, new_record=record,
+                        record.save_changed_fields(current_record=current_record,
                                                    notify_transport_enabled=True, save_to_graph=True, debug=False)
                         # L.l.info("Saving voltage {} {}".format(sensor_name, value.data))
                     elif delta_last_save > P.DELTA_SAVE_SECONDS and value.label == "Current":
                         record.iad = round(value.data, 1)
-                        record.save_changed_fields(current_record=current_record, new_record=record,
+                        record.save_changed_fields(current_record=current_record,
                                                    notify_transport_enabled=True, save_to_graph=True, debug=False)
                         # L.l.info("Saving current {} {}".format(sensor_name, value.data))
                     elif delta_last_save > P.DELTA_SAVE_SECONDS and value.label == "Power Factor":
                         record.vdd = round(value.data, 1)
-                        record.save_changed_fields(current_record=current_record, new_record=record,
+                        record.save_changed_fields(current_record=current_record,
                                                    notify_transport_enabled=True, save_to_graph=True, debug=False)
                         # L.l.info("Saving power factor {} {}".format(sensor_name, value.data))
-                    if current_record is not None:
-                        current_record.commit_record_to_db()
-                    else:
-                        record.add_commit_record_to_db()
+                    if sqlitedb:
+                        if current_record is not None:
+                            current_record.commit_record_to_db()
+                        else:
+                            record.add_commit_record_to_db()
         else:
             L.l.info("Cannot find zonesensor definition in db, address={}".format(sensor_address))
     except Exception as ex:
@@ -360,6 +391,14 @@ def switch_all_on():
             time.sleep(10)
             L.l.info("Dectivate switch {} on node {}".format(P.network.nodes[node].values[val].label, node))
             P.network.nodes[node].set_switch(val, False)
+
+
+def get_node_id_from_txt(gpio_pin_code):
+    vals = gpio_pin_code.split('_')
+    if len(vals) == 2:
+        node_id = int(vals[1])
+        return node_id
+    return None
 
 
 def set_switch_state(node_id, state):

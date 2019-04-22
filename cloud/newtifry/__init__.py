@@ -23,12 +23,12 @@
 # 1 - HTTP error
 # 2 - Backend error
 
-import urllib
-import urllib2
+import urllib.request
+# import urllib2
 import json
 from main.logger_helper import L
-from common import Constant, utils
-from main.admin import model_helper
+from common import Constant, utils, get_json_param
+# from main.admin import model_helper
 from pydispatch import dispatcher
 from main import thread_pool
 import threading
@@ -82,7 +82,7 @@ def _send_queue():
                 params['image'] = item.image_url
         # Prepare our request
         try:
-            response = urllib2.urlopen(BACKEND, urllib.urlencode(params), timeout=Constant.URL_OPEN_TIMEOUT)
+            response = urllib.request.urlopen(BACKEND, urllib.urlencode(params), timeout=Constant.URL_OPEN_TIMEOUT)
             # Read the body
             body = response.read()
             # It's JSON - parse it
@@ -93,7 +93,7 @@ def _send_queue():
                 L.l.info("Newtifry message sent OK. Size: %d." % contents['size'])
                 del _message_queue[:]
                 _last_send_date = utils.get_base_location_now_date()
-        except urllib2.URLError, ex:
+        except urllib.request.URLError as ex:
             L.l.warning("Newtifry failed to make request to the server: " + str(ex))
     finally:
         __queue_lock.release()
@@ -157,7 +157,7 @@ def unload():
 def init():
     L.l.debug('Newtifry module initialising')
     global _source_key
-    _source_key = model_helper.get_param(Constant.P_NEWTIFY_KEY)
+    _source_key = get_json_param(Constant.P_NEWTIFY_KEY)
     dispatcher.connect(send_message, signal=Constant.SIGNAL_PUSH_NOTIFICATION, sender=dispatcher.Any)
     # send_message(title="Initialising", message="Module initialising", priority=1)
     # send_message(title="Initialised", message="Module initialised")

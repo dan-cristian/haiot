@@ -1,4 +1,5 @@
 import os
+import uuid
 import json
 import re
 import datetime, time
@@ -6,7 +7,7 @@ import calendar
 import math
 import importlib
 from collections import namedtuple
-from common import fix_module
+from common import fix_module, Constant
 import _strptime #  workaround to fix this issue: https://www.raspberrypi.org/forums/viewtopic.php?t=166912
 from main.logger_helper import L
 
@@ -74,7 +75,8 @@ def get_object_field_value(obj=None, field_name=None):
     # field_name = str(field_obj).split('.')[1]
     if not obj:
         obj = {}
-    if obj.has_key(field_name):
+    #if obj.has_key(field_name):
+    if field_name in obj:
         return obj[field_name]
     else:
         return None
@@ -154,7 +156,7 @@ def json_to_record(table, json_object):
 
 
 def parse_http(url, start_key, end_key, end_first=False):
-    text = urllib.request.urlopen(url).read()
+    text = str(urllib.request.urlopen(url).read())
     end = text.find(end_key)
     if end_first:
         start = text.rfind(start_key, 0, end)
@@ -222,3 +224,4 @@ def multikeysort(items, columns):
             else:
                 return 0
     return sorted(items, cmp=comparer)
+

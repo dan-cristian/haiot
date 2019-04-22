@@ -1,9 +1,12 @@
 import os
 from pydispatch import dispatcher
 from flask import abort, send_file, render_template, request
-from main import app, db
+from main import sqlitedb
+from main.flask_app import app
 from main.logger_helper import L
-from main.admin.model_helper import commit
+if sqlitedb:
+    from main import app, db
+    from main.admin.model_helper import commit
 from common import Constant, utils
 import cloud.alexa.mpd_run
 from cloud import lastfm
@@ -25,29 +28,30 @@ def generic_db_update(model_name, filter_name, filter_value, field_name, field_v
     try:
         L.l.info("Execute API generic_db_update model={} filter={} filtervalue={} field={} fieldvalue={}"
                  .format(model_name, filter_name, filter_value, field_name, field_value))
-        table = utils.class_for_name('main.admin.models', model_name)
-        # http://stackoverflow.com/questions/19506105/flask-sqlalchemy-query-with-keyword-as-variable
-        kwargs = {filter_name: filter_value}
-        # avoid getting "This session is in 'committed' state; no further SQL can be emitted within this transaction"
-        db.session.remove()
-        # db.session = db.create_scoped_session()
-        record = table.query.filter_by(**kwargs).first()
-        if record:
-            if hasattr(record, field_name):
-                setattr(record, field_name, field_value)
-                db.session.add(record)
-                commit()
-                # dispatch as UI action otherwise change actions are not triggered
-                dispatcher.send(signal=Constant.SIGNAL_UI_DB_POST, model=table, row=record)
-                return '%s: %s' % (Constant.SCRIPT_RESPONSE_OK, record)
+        if sqlitedb:
+            table = utils.class_for_name('main.admin.models', model_name)
+            # http://stackoverflow.com/questions/19506105/flask-sqlalchemy-query-with-keyword-as-variable
+            kwargs = {filter_name: filter_value}
+            # avoid getting "This session is in 'committed' state; no further SQL can be emitted within this transaction"
+            db.session.remove()
+            # db.session = db.create_scoped_session()
+            record = table.query.filter_by(**kwargs).first()
+            if record:
+                if hasattr(record, field_name):
+                    setattr(record, field_name, field_value)
+                    db.session.add(record)
+                    commit()
+                    # dispatch as UI action otherwise change actions are not triggered
+                    dispatcher.send(signal=Constant.SIGNAL_UI_DB_POST, model=table, row=record)
+                    return '%s: %s' % (Constant.SCRIPT_RESPONSE_OK, record)
+                else:
+                    msg = 'Field {} not found in record {}'.format(field_name, record)
+                    L.l.warning(msg)
+                    return '%s: %s' % (Constant.SCRIPT_RESPONSE_NOTOK, msg)
             else:
-                msg = 'Field {} not found in record {}'.format(field_name, record)
+                msg = 'No records returned for filter_name={} and filter_value={}'.format(filter_name, filter_value)
                 L.l.warning(msg)
                 return '%s: %s' % (Constant.SCRIPT_RESPONSE_NOTOK, msg)
-        else:
-            msg = 'No records returned for filter_name={} and filter_value={}'.format(filter_name, filter_value)
-            L.l.warning(msg)
-            return '%s: %s' % (Constant.SCRIPT_RESPONSE_NOTOK, msg)
     except Exception as ex:
         msg = 'Exception on /apiv1/db_update: {}'.format(ex)
         L.l.error(msg, exc_info=1)

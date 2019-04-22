@@ -1,9 +1,12 @@
 import threading
 import prctl
-from common import Constant, utils
+from common import Constant
 from main.logger_helper import L
-from main.admin import models
+from main import sqlitedb
+if sqlitedb:
+    from main.admin import models
 from main import thread_pool
+from main.tinydb_model import ZoneSensor, Sensor
 
 
 class P:
@@ -27,12 +30,20 @@ def _read_bmp280():
     temperature = P.obj_bmp280.get_temperature()
     pressure = P.obj_bmp280.get_pressure()
     sensor_address = Constant.HOST_NAME + '_bmp280'
-    zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=sensor_address).first()
+    if sqlitedb:
+        zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=sensor_address).first()
+    else:
+        zone_sensor = ZoneSensor.find_one({ZoneSensor.sensor_address: sensor_address})
     if zone_sensor is not None:
         sensor_name = zone_sensor.sensor_name
-        current_record = models.Sensor.query.filter_by(address=sensor_address).first()
-        sensor_name = zone_sensor.sensor_name
-        record = models.Sensor(address=sensor_address, sensor_name=sensor_name)
+        if sqlitedb:
+            current_record = models.Sensor.query.filter_by(address=sensor_address).first()
+            record = models.Sensor(address=sensor_address, sensor_name=sensor_name)
+        else:
+            current_record = Sensor.find_one({Sensor.address: sensor_address})
+            record = Sensor()
+            record.address = sensor_address
+            record.sensor_name = sensor_name
         if current_record is None:
             record.type = 'BMP280'
         record.temperature = round(temperature, 1)

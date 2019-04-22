@@ -83,26 +83,16 @@ def unload_module(module_name):
 
 
 def init_modules(init_mod=None):
-    from main.tinydb_app import db
     from main.tinydb_model import Module
     m = Module.find(filter={Module.host_name: ''}, sort=[(Module.start_order, 1)])
-    # m = Module.coll.find(filter={Module.host_name: ''}, sort=[(Module.start_order, 1)])
-    # m = Module.coll.find(filter={'host_name': ''}, sort=[('start_order', 1)])
-    # m = Module.t.search(Query().host_name == '')
     if len(m) == 0:
         L.l.error('No modules to initialise')
     else:
-        q2 = Query()
         for mod in m:
-            # mod = Struct(**mod_dict)
-            # mod = Module({**mod_dict})
             if mod.name != 'main':
                 # check if there is a host specific module and use it with priority over generic one
-                # mod_host_spec = Module.t.search((q2.host_name == Constant.HOST_NAME) & (q2.name == mod.name))
-                # mod_host_spec = Module.coll.find_one({Module.host_name: Constant.HOST_NAME, Module.name: mod.name})
                 mod_host_specific = Module.find_one({Module.host_name: Constant.HOST_NAME, Module.name: mod.name})
                 if mod_host_specific is not None:
-                    # mod_host_specific = Module({**mod_host_spec})
                     mod_name = mod_host_specific.name
                     mod_active = mod_host_specific.active
                 else:
@@ -159,9 +149,11 @@ def init(arg_list):
     main.tinydb_app.init(arg_list)
     if 'standalone' not in arg_list:
         transport.init()
+    from main import event_tinydb
+    event_tinydb.init()
+    init_modules(init_mod=True)
+    init_post_modules()
     t = threading.Thread(target=thread_pool.run_thread_pool)
     t.daemon = True
     t.start()
-    init_modules(init_mod=True)
-    init_post_modules()
 

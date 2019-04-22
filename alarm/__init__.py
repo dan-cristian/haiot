@@ -1,23 +1,37 @@
 from pydispatch import dispatcher
 from main.logger_helper import L
-# from main.admin import models
 from common import Constant, utils
-from main.admin.model_helper import commit
-
+from main import sqlitedb
+if sqlitedb:
+    from main.admin import models
+    from main.admin.model_helper import commit
+from main.tinydb_model import ZoneAlarm, ZoneArea, Area, GpioPin, Zone
 __author__ = 'dcristian'
 
 initialised = False
 
 
 def handle_event_alarm(gpio_pin_code='', direction='', pin_value='', pin_connected=None):
-    zonealarm = models.ZoneAlarm.query.filter_by(gpio_pin_code=gpio_pin_code, gpio_host_name=Constant.HOST_NAME).first()
+    if sqlitedb:
+        zonealarm = models.ZoneAlarm.query.filter_by(gpio_pin_code=gpio_pin_code, gpio_host_name=Constant.HOST_NAME).first()
+    else:
+        zonealarm = ZoneAlarm.find_one({ZoneAlarm.gpio_pin_code: Constant.HOST_NAME})
     if zonealarm is not None:
-        zonearea = models.ZoneArea().query_filter_first(models.ZoneArea.zone_id == zonealarm.zone_id)
+        if sqlitedb:
+            zonearea = models.ZoneArea().query_filter_first(models.ZoneArea.zone_id == zonealarm.zone_id)
+        else:
+            zonearea = ZoneArea.find_one({ZoneArea.zone_id: zonealarm.zone_id})
         if zonearea is not None:
-            area = models.Area().query_filter_first(models.Area.id == zonearea.area_id)
+            if sqlitedb:
+                area = models.Area().query_filter_first(models.Area.id == zonearea.area_id)
+            else:
+                area = Area.find_one({Area.id: zonearea.area_id})
             if area is not None:
                 zonealarm.start_alarm = area.is_armed
-                zone = models.Zone.query.filter_by(id=zonealarm.zone_id).first()
+                if sqlitedb:
+                    zone = models.Zone.query.filter_by(id=zonealarm.zone_id).first()
+                else:
+                    zone = Zone.find_one({Zone.id: zonealarm.zone_id})
                 if zone is not None:
                     dispatcher.send(signal=Constant.SIGNAL_ALARM, zone_name=zone.name,
                                     alarm_pin_name=zonealarm.alarm_pin_name, pin_connected=pin_connected)
@@ -30,8 +44,10 @@ def handle_event_alarm(gpio_pin_code='', direction='', pin_value='', pin_connect
                         "Could not find zone for gpio pin {}, trigger actions could be missed".format(gpio_pin_code))
                 zonealarm.alarm_pin_triggered = not pin_connected
                 zonealarm.updated_on = utils.get_base_location_now_date()
-                zonealarm.notify_transport_enabled = True
-                commit()
+                if sqlitedb:
+                    commit()
+                else:
+                    zonealarm.save_changed_fields(broadcast=True)
             else:
                 L.l.warning('Zone {} is mapped to missing area' % zonealarm.zone_id)
         else:
@@ -55,11 +71,17 @@ def init():
     dispatcher.connect(handle_event_alarm, signal=Constant.SIGNAL_GPIO, sender=dispatcher.Any)
     # get list of input gpio ports and communicate them to gpio modules for proper port setup as "IN"
     port_list = []
-    local_alarms = models.ZoneAlarm().query_filter_all(models.ZoneAlarm.gpio_host_name.in_([Constant.HOST_NAME]))
+    if sqlitedb:
+        local_alarms = models.ZoneAlarm().query_filter_all(models.ZoneAlarm.gpio_host_name.in_([Constant.HOST_NAME]))
+    else:
+        local_alarms = ZoneAlarm.find({ZoneAlarm.gpio_host_name: Constant.HOST_NAME})
     for alarm in local_alarms:
         # L.l.info("Processing zone alarm {} for host {}".format(alarm, Constant.HOST_NAME))
-        gpio_pin = models.GpioPin().query_filter_first(models.GpioPin.pin_code.in_([alarm.gpio_pin_code]),
-                                                       models.GpioPin.host_name.in_([Constant.HOST_NAME]))
+        if sqlitedb:
+            gpio_pin = models.GpioPin().query_filter_first(
+                models.GpioPin.pin_code.in_([alarm.gpio_pin_code]), models.GpioPin.host_name.in_([Constant.HOST_NAME]))
+        else:
+            gpio_pin = GpioPin.find_one({GpioPin.pin_code: alarm.gpio_pin_code, GpioPin.host_name: Constant.HOST_NAME})
         if gpio_pin is not None:
             # Log.logger.info('Schedule setup alarm port pin={} type={}'.format(gpio_pin.pin_code, gpio_pin.pin_type))
             gpio_pin.contact_type = alarm.sensor_type
