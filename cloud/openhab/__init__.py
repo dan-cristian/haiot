@@ -1,11 +1,11 @@
 from main.logger_helper import L
 from main import thread_pool
 from pydispatch import dispatcher
-from common import Constant
-from main.admin import model_helper
+from common import Constant, get_json_param
+# from main.admin import model_helper
 from inspect import getmembers, isfunction
 from transport import mqtt_io
-import rules
+from cloud.openhab import rules
 import threading
 import prctl
 from music import mpd
@@ -37,28 +37,32 @@ def parse_rules(obj, change):
     L.l.debug('Received openhab obj={} change={} for rule parsing'.format(obj, change))
     if hasattr(obj, Constant.JSON_PUBLISH_SOURCE_HOST):
         source = getattr(obj, Constant.JSON_PUBLISH_SOURCE_HOST)
-        # process only local initiated changes
-        if source == Constant.HOST_NAME or source is None:
-            try:
-                # extract only changed fields
-                if hasattr(obj, Constant.JSON_PUBLISH_FIELDS_CHANGED):
-                    field_changed_list = obj.last_commit_field_changed_list
-                else:
-                    field_changed_list = []
-                if P.func_list:
-                    for func in P.func_list:
-                        if func[1].func_defaults and len(func[1].func_defaults) > 0:
-                            first_param = func[1].func_defaults[0]
-                            # calling rule methods with first param type equal to passed object type
-                            if type(obj) == type(first_param):
-                                record = Obj()
-                                for attr, value in obj.__dict__.iteritems():
-                                    setattr(record, attr, value)
-                                P.event_list.append([record, func[0], field_changed_list])
-                                # optimise CPU, but ensure each function name is unique in rule file
-                                break
-            except Exception as ex:
-                L.l.exception('Error parsing openhab rules, ex={}'.format(ex))
+    elif hasattr(obj, Constant.JSON_PUBLISH_SRC_HOST):
+        source = getattr(obj, Constant.JSON_PUBLISH_SRC_HOST)
+    else:
+        source = 'unknown'
+    # process only local initiated changes
+    if source == Constant.HOST_NAME or source is None:
+        try:
+            # extract only changed fields
+            if hasattr(obj, Constant.JSON_PUBLISH_FIELDS_CHANGED):
+                field_changed_list = obj.last_commit_field_changed_list
+            else:
+                field_changed_list = change
+            if P.func_list:
+                for func in P.func_list:
+                    if func[1].__defaults__ and len(func[1].__defaults__) > 0:
+                        first_param = func[1].__defaults__[0]
+                        # calling rule methods with first param type equal to passed object type
+                        if type(obj) == type(first_param):
+                            record = Obj()
+                            for attr, value in obj.__dict__.items():
+                                setattr(record, attr, value)
+                            P.event_list.append([record, func[0], field_changed_list])
+                            # optimise CPU, but ensure each function name is unique in rule file
+                            break
+        except Exception as ex:
+            L.l.exception('Error parsing openhab rules, ex={}'.format(ex))
 
 
 def mqtt_on_message(client, userdata, msg):
@@ -146,8 +150,8 @@ def unload():
 
 def init():
     L.l.info('Openhab module initialising')
-    rules.P.openhab_topic = str(model_helper.get_param(Constant.P_MQTT_TOPIC_OPENHAB_SEND))
-    P.mqtt_topic_receive = str(model_helper.get_param(Constant.P_MQTT_TOPIC_OPENHAB_RECEIVE))
+    rules.P.openhab_topic = str(get_json_param(Constant.P_MQTT_TOPIC_OPENHAB_SEND))
+    P.mqtt_topic_receive = str(get_json_param(Constant.P_MQTT_TOPIC_OPENHAB_RECEIVE))
     P.mqtt_topic_receive_prefix = P.mqtt_topic_receive.replace('#', '')
     mqtt_io.P.mqtt_client.message_callback_add(P.mqtt_topic_receive, mqtt_on_message)
     __load_rules()

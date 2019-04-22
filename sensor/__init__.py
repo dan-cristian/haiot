@@ -9,7 +9,7 @@ from main.tinydb_model import Sensor, ZoneSensor
 __author__ = 'dcristian'
 
 
-def record_update(obj):
+def not_used_record_update(obj):
     # save sensor state to db, except for current node
     try:
         sensor_host_name = utils.get_object_field_value(obj, Constant.JSON_PUBLISH_SOURCE_HOST)
@@ -33,21 +33,23 @@ def record_update(obj):
             setattr(record, Constant.JSON_PUBLISH_SOURCE_HOST, sensor_host_name)
             record.type = utils.get_object_field_value(obj, 'type')
             record.updated_on = utils.get_base_location_now_date()
-            if obj.has_key('counters_a'): record.counters_a = utils.get_object_field_value(obj, 'counters_a')
-            if obj.has_key('counters_b'): record.counters_b = utils.get_object_field_value(obj, 'counters_b')
-            if obj.has_key('delta_counters_a'):
+            if 'counters_a' in obj:
+                record.counters_a = utils.get_object_field_value(obj, 'counters_a')
+            if 'counters_b' in obj:
+                record.counters_b = utils.get_object_field_value(obj, 'counters_b')
+            if 'delta_counters_a' in obj:
                 record.delta_counters_a = utils.get_object_field_value(obj, 'delta_counters_a')
-            if obj.has_key('delta_counters_b'):
+            if 'delta_counters_b' in obj:
                 record.delta_counters_b = utils.get_object_field_value(obj, 'delta_counters_b')
-            if obj.has_key('temperature'): record.temperature = utils.get_object_field_value(obj, 'temperature')
-            if obj.has_key('humidity'): record.humidity = utils.get_object_field_value(obj, 'humidity')
-            if obj.has_key('iad'): record.iad = utils.get_object_field_value(obj, 'iad')
-            if obj.has_key('vad'): record.vad = utils.get_object_field_value(obj, 'vad')
-            if obj.has_key('vdd'): record.vdd = utils.get_object_field_value(obj, 'vdd')
-            if obj.has_key('pio_a'): record.pio_a = utils.get_object_field_value(obj, 'pio_a')
-            if obj.has_key('pio_b'): record.pio_b = utils.get_object_field_value(obj, 'pio_b')
-            if obj.has_key('sensed_a'): record.sensed_a = utils.get_object_field_value(obj, 'sensed_a')
-            if obj.has_key('sensed_b'): record.sensed_b = utils.get_object_field_value(obj, 'sensed_b')
+            if 'temperature' in obj: record.temperature = utils.get_object_field_value(obj, 'temperature')
+            if 'humidity' in obj: record.humidity = utils.get_object_field_value(obj, 'humidity')
+            if 'iad' in obj: record.iad = utils.get_object_field_value(obj, 'iad')
+            if 'vad' in obj: record.vad = utils.get_object_field_value(obj, 'vad')
+            if 'vdd' in obj: record.vdd = utils.get_object_field_value(obj, 'vdd')
+            if 'pio_a' in obj: record.pio_a = utils.get_object_field_value(obj, 'pio_a')
+            if 'pio_b' in obj: record.pio_b = utils.get_object_field_value(obj, 'pio_b')
+            if 'sensed_a' in obj: record.sensed_a = utils.get_object_field_value(obj, 'sensed_a')
+            if 'sensed_b' in obj: record.sensed_b = utils.get_object_field_value(obj, 'sensed_b')
 
             if sqlitedb:
                 current_record = models.Sensor.query.filter_by(address=address).first()
@@ -70,4 +72,5 @@ def record_update(obj):
             #                    sampling_period_seconds=owsensor_loop.sampling_period_seconds)
     except Exception as ex:
         L.l.error('Error on sensor update, err {}'.format(ex), exc_info=True)
-        db.session.rollback()
+        if sqlitedb:
+            db.session.rollback()

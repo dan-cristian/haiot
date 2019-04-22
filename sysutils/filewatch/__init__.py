@@ -7,7 +7,7 @@ try:
     from watchdog.observers import Observer
     from watchdog.events import LoggingEventHandler, FileSystemEventHandler
     __inotify_import_ok = True
-except Exception, ex:
+except Exception as ex:
     __inotify_import_ok = False
 from pydispatch import dispatcher
 from main.logger_helper import L

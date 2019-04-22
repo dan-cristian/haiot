@@ -2,7 +2,6 @@ __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
 import sys
 import glob
-import serial
 import os
 try:
     from main.logger_helper import L
@@ -15,6 +14,15 @@ except ImportError as ie:
             def warning(msg): print(msg)
             @staticmethod
             def error(msg): print(msg)
+
+from common import fix_module
+while True:
+    try:
+        import serial
+        break
+    except ImportError as iex:
+        if not fix_module(iex):
+            break
 
 
 class P:
@@ -60,7 +68,7 @@ def get_standard_serial_device_list():
             A list of the serial ports available on the system
     """
     if sys.platform.startswith('win'):
-        ports = ['COM%s' % (i + 1) for i in range(256)]
+        ports = ['COM%s' % (i + 1) for i in range(24)]
     elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
         # this excludes your current terminal "/dev/tty"
         ports = glob.glob('/dev/tty[A-Za-z]*')

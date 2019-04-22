@@ -7,7 +7,7 @@ from main.logger_helper import L
 initialised=False
 
 
-def powermonitor_record_update(obj):
+def not_used_powermonitor_record_update(obj):
     pass
 
 

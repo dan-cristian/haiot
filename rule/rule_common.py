@@ -1,15 +1,18 @@
 import subprocess
-#from webui.api import api_v1
 from main.logger_helper import L
-from main.admin import models, model_helper
+from main import sqlitedb
+if sqlitedb:
+    from main.admin import models
 from common import Constant
 from pydispatch import dispatcher
-# import mpd
-from main.admin.model_helper import get_param
+from main.tinydb_model import ZoneCustomRelay
 
 
 def update_custom_relay(relay_pin_name, power_is_on):
-    current_relay = models.ZoneCustomRelay.query.filter_by(relay_pin_name=relay_pin_name).first()
+    if sqlitedb:
+        current_relay = models.ZoneCustomRelay.query.filter_by(relay_pin_name=relay_pin_name).first()
+    else:
+        current_relay = ZoneCustomRelay.find_one({ZoneCustomRelay.relay_pin_name: relay_pin_name})
     if current_relay is not None:
         L.l.info("Update relay {} on rule common to {}".format(relay_pin_name, power_is_on))
         current_relay.relay_is_on = power_is_on
@@ -19,21 +22,16 @@ def update_custom_relay(relay_pin_name, power_is_on):
 
 
 def get_custom_relay(relay_pin_name):
-    current_relay = models.ZoneCustomRelay.query.filter_by(relay_pin_name=relay_pin_name).first()
+    if sqlitedb:
+        current_relay = models.ZoneCustomRelay.query.filter_by(relay_pin_name=relay_pin_name).first()
+    else:
+        current_relay = ZoneCustomRelay.find_one({ZoneCustomRelay.relay_pin_name: relay_pin_name})
     if current_relay is not None:
         state = current_relay.relay_is_on
     else:
         L.l.info("Cannot find relay {} on rule common get custom relay".format(relay_pin_name))
         state = None
     return state
-
-
-def update_command_override_relay(relay_pin_name, is_rule, is_gui):
-    m = models.ZoneCustomRelay
-    relay_row = m().query_filter_first(m.host_name.in_([Constant.HOST_NAME]), m.relay_pin_name.in_([relay_pin_name]))
-
-    m = models.CommandOverrideRelay
-    override_row = m().query_filter_first(m.host_name.in_([Constant.HOST_NAME]), m.relay_pin_name.in_([relay_pin_name]))
 
 
 def play_bell_local(sound_file):

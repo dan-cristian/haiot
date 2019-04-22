@@ -72,11 +72,11 @@ class Constant:
     URL_OPEN_TIMEOUT = 10
 
     @staticmethod
-    def IS_OS_WINDOWS():
+    def is_os_windows():
         return Constant.OS in Constant.OS_WINDOWS
 
     @staticmethod
-    def IS_OS_LINUX():
+    def is_os_linux():
         return Constant.OS in Constant.OS_LINUX
 
     DB_FIELD_UPDATE = 'updated_on'
@@ -153,6 +153,7 @@ class Constant:
     # JSON_PUBLISH_RECORD_OPERATION='operation_'
     JSON_PUBLISH_OPERATION_UPDATE = 'update'
     JSON_PUBLISH_SOURCE_HOST = 'source_host_'
+    JSON_PUBLISH_SRC_HOST = 'source_host'
     JSON_PUBLISH_TARGET_HOST = 'target_host_'
     JSON_PUBLISH_VALUE_TARGET_HOST_ALL = '*'
     JSON_PUBLISH_GRAPH_X = 'graph_x_'
@@ -305,9 +306,8 @@ def init():
         except Exception as ex2:
             L.l.warning('Cannot obtain main IP, no DNS available?, ex={}'.format(ex2))
             Constant.HOST_MAIN_IP = '127.0.0.1'
-    L.l.info('Running on OS={} HOST={} IP={} MACHINE={}'.format(Constant.OS, Constant.HOST_NAME,
-                                                                Constant.HOST_MAIN_IP,
-                                                                Constant.HOST_MACHINE_TYPE))
+    L.l.info('Running on OS={} HOST={} IP={} MACHINE={}'.format(
+        Constant.OS, Constant.HOST_NAME, Constant.HOST_MAIN_IP, Constant.HOST_MACHINE_TYPE))
 
 
 def init_simple():
