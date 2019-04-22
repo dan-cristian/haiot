@@ -8,6 +8,7 @@ from main import thread_pool
 from common import fix_module
 while True:
     try:
+        import wheel  # needed for auto install/compile
         from tinydb import Query
         break
     except ImportError as iex:
