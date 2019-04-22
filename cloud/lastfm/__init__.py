@@ -1,19 +1,26 @@
-from urllib import addinfo
-
-import pylast
-from main.admin.model_helper import get_param
-from common import Constant
+# from urllib import addinfo
+# from main.admin.model_helper import get_param
+from common import Constant, get_json_param
 import music.mpd
 from music import gmusicproxy
 from main.logger_helper import L
 import json
+
+from common import fix_module
+while True:
+    try:
+        import pylast
+        break
+    except ImportError as iex:
+        if not fix_module(iex):
+            break
 
 USERNAME = None
 _network = None
 
 
 def init():
-    config_file = get_param(Constant.P_LASTFM_CONFIG_FILE)
+    config_file = get_json_param(Constant.P_LASTFM_CONFIG_FILE)
     with open(config_file, 'r') as f:
         config_list = json.load(f)
     global _network, USERNAME
@@ -33,7 +40,7 @@ def init():
 def _multify(text):
     every = 18
     lines = []
-    for i in xrange(0, len(text), every):
+    for i in range(0, len(text), every):
         lines.append(text[i:i + every])
     return '\n'.join(lines)
 

@@ -8,7 +8,7 @@ import thingspeak
 import datetime
 import traceback
 import tzlocal
-import urllib2
+import urllib.request
 import threading
 import prctl
 import logging
@@ -50,7 +50,7 @@ def _upload_field(model, fields, ch_index):
                 if err:
                     L.l.info("Error recovered in attempt {}".format(i))
                 break
-        except Exception, ex:
+        except Exception as ex:
             L.l.warning("Error when uploading things, ex={}".format(ex))
             err = True
     # L.l.info("res={}".format(res))
@@ -104,7 +104,7 @@ def _handle_record(new_record=None, current_record=None):
                         fields['created_at'] = created_at
                     _upload_field(model, fields, ch_index)
                     ch_index += 1
-        except Exception, ex:
+        except Exception as ex:
             L.l.error("Unable to handle record, ex={}, record={}".format(ex, new_record))
         finally:
             _channel_lock.release()
@@ -118,7 +118,7 @@ def _get_channel(chid, read_api, write_api):
         try:
             params = ch.get({'results': 0, 'metadata': 'true'})
             break
-        except Exception, ex:
+        except Exception as ex:
             L.l.warning("Error while getting cloud data, ex={}".format(ex))
     if params is None:
         L.l.error('Unable to read cloud data')
@@ -210,7 +210,7 @@ def _check_def_change():
                     _get_channel(chid=ch['id'], read_api=ch['api_read'], write_api=ch['api_write'])
                 else:
                     L.l.info("Found non-uploadable channel {}, ignoring".format(ch['name']))
-    except Exception, ex:
+    except Exception as ex:
         L.l.error("Unable to get channels definitions, ex={}".format(ex))
     finally:
         _channel_lock.release()
@@ -253,7 +253,7 @@ def _upload_bulk():
             uploaded += 1
             if len(P.record_list) > P.max_buffer_size:
                 L.l.warning("Thingspeak large buffer size={}, uploaded={}".format(len(P.record_list), uploaded))
-    except Exception, ex:
+    except Exception as ex:
         L.l.warning("Unable to upload bulk, itemcount={}, item=P{}, err={}".format(len(P.record_list), record, ex))
     finally:
         P.is_uploading = False

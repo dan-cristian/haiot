@@ -1,5 +1,5 @@
 from main.logger_helper import L
-import wemo_run
+from cloud.alexa import wemo_run
 
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'

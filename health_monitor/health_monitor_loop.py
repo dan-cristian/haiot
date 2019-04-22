@@ -6,6 +6,7 @@ import shutil
 import time
 import math
 import datetime
+import io
 from pydispatch import dispatcher
 from collections import OrderedDict
 from main.logger_helper import L
@@ -22,7 +23,7 @@ from common import fix_module
 while True:
     try:
         from ina219 import INA219, DeviceRangeError
-        import cStringIO
+        # import cStringIO
         break
     except ImportError as iex:
         if not fix_module(iex):
@@ -70,7 +71,7 @@ class P:
 
 def _read_all_hdd_smart():
     try:
-        output = cStringIO.StringIO()
+        output = io.StringIO()
     except NameError:
         return False
     current_disk_valid = True
@@ -188,7 +189,7 @@ def get_device_name_linux_style(dev):
 
 
 def __read_hddparm(disk_dev=''):
-    output = cStringIO.StringIO()
+    output = io.StringIO()
     hddparm_out = "None"
     global ERR_TEXT_NO_DEV
     try:
@@ -350,7 +351,7 @@ def __get_cpu_utilisation_linux():
 
 def __get_cpu_temperature():
     temp = -1
-    if Constant.IS_OS_WINDOWS():
+    if Constant.is_os_windows():
         # http://stackoverflow.com/questions/3262603/accessing-cpu-temperature-in-python
         global import_module_wmi_ok
         if import_module_wmi_ok:
@@ -407,7 +408,7 @@ def _read_system_attribs():
             import_module_psutil_exist = True
         else:
             try:
-                output = cStringIO.StringIO()
+                output = io.StringIO()
             except NameError:
                 return
             if Constant.OS in Constant.OS_WINDOWS:
@@ -491,7 +492,7 @@ Description:
 
 
 def _read_disk_stats():
-    if Constant.IS_OS_LINUX():
+    if Constant.is_os_linux():
         with open('/proc/diskstats') as f:
             for line in f:
                 words = line.split()

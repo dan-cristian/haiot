@@ -4,7 +4,7 @@ from main.logger_helper import L
 from main import thread_pool
 import prctl
 import threading
-import mpd
+from music import mpd
 
 initialised = False
 

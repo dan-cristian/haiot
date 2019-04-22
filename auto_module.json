@@ -3,6 +3,9 @@
 [
   {"module": "pydispatch", "package": "PyDispatcher"},
   {"module": "paho", "package": "paho-mqtt"},
-  {"module": "request", "package": "urllib3"}
+  {"module": "ina219", "package": "pi-ina219"},
+  {"module": "mpd", "package": "python-mpd2"},
+  {"module": "serial", "package": "pyserial"},
+  {"module": "dateutil", "package": "python-dateutil"}
 ]
 }

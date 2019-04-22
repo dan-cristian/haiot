@@ -17,7 +17,7 @@ import threading
 import prctl
 from gpio import rpi_gpio
 from gpio import pigpio_gpio
-
+from main.tinydb_model import ZoneCustomRelay
 
 class P:
     initialised = False
@@ -127,7 +127,7 @@ def relay_set(gpio_pin_index_bcm=None, gpio_pin_type=None, gpio_board_index=None
 
 #  save relay io state to db, except for current node
 #  carefull not to trigger infinite recursion updates
-def gpio_record_update(json_object):
+def not_used_gpio_record_update(json_object):
     try:
         host_name = utils.get_object_field_value(json_object, 'name')
         # L.l.info('Received gpio state update from {} json={}'.format(host_name, json_object))
@@ -251,10 +251,66 @@ def zone_custom_relay_record_update(json_object):
                     else:
                         L.l.warning('Could not find gpio record for custom relay pin code={}'.format(gpio_pin_code))
         # todo: check if for zwave we get multiple redundant db saves
-        models.ZoneCustomRelay().save_changed_fields_from_json_object(
-            json_object=json_object, notify_transport_enabled=False, save_to_graph=False)
+        if sqlitedb:
+            models.ZoneCustomRelay().save_changed_fields_from_json_object(
+                json_object=json_object, notify_transport_enabled=False, save_to_graph=False)
+        else:
+            # fixme: ?
+            pass
     except Exception as ex:
         L.l.error('Error on zone custom relay update, err={}'.format(ex), exc_info=True)
+
+
+def zone_custom_relay_upsert_listener(record, changed_fields):
+    assert isinstance(record, ZoneCustomRelay)
+    if record.gpio_host_name != Constant.HOST_NAME:
+        return
+    if record.relay_type == Constant.GPIO_PIN_TYPE_SONOFF:
+        pin_code = record.gpio_pin_code
+        expired_relay_is_on = not record.relay_is_on
+        sonoff.set_relay_state(relay_name=pin_code, relay_is_on=record.relay_is_on)
+        expire_func = (sonoff.set_relay_state, record.gpio_pin_code, expired_relay_is_on)
+    elif record.relay_type == Constant.GPIO_PIN_TYPE_PI_PCF8574:
+        pin_code = record.gpio_pin_code
+        # pcf on state is reversed!
+        expired_relay_is_on = record.relay_is_on
+        pcf8574_gpio.set_pin_value(pin_index=pin_code, pin_value=not record.relay_is_on)
+        expire_func = (pcf8574_gpio.set_pin_value, record.gpio_pin_code, expired_relay_is_on)
+    elif P.has_zwave and record.relay_type == Constant.GPIO_PIN_TYPE_ZWAVE:
+        pin_code = record.gpio_pin_code
+        node_id = zwave.get_node_id_from_txt(pin_code)
+        expired_relay_is_on = not record.relay_is_on
+        zwave.set_switch_state(node_id=node_id, state=record.relay_is_on)
+        expire_func = (zwave.set_switch_state, node_id, expired_relay_is_on)
+    elif record.relay_type in [Constant.GPIO_PIN_TYPE_PI_STDGPIO, Constant.GPIO_PIN_TYPE_PI_FACE_SPI]:
+        value = 1 if record.relay_is_on else 0
+        expired_relay_is_on = not (bool(record.relay_is_on))
+        gpio_record = GpioPin.find_one({GpioPin.pin_code: record.gpio_pin_code, GpioPin.host_name: Constant.HOST_NAME})
+        relay_set(gpio_pin_index_bcm=gpio_record.pin_index_bcm, gpio_pin_type=gpio_record.pin_type,
+                  gpio_board_index=gpio_record.board_index, value=value, from_web=False)
+        if record.pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
+            pin_code = piface.format_pin_code(
+                board_index=gpio_record.board_index, pin_direction=Constant.GPIO_PIN_DIRECTION_OUT,
+                pin_index=gpio_record.pin_index_bcm)
+        else:
+            pin_code = gpio_record.pin_index_bcm
+        expire_func = (relay_set, pin_code, gpio_record.pin_type, gpio_record.board_index, expired_relay_is_on, False)
+    else:
+        L.l.warning('Unknown relay type {}'.format(record.relay_type))
+        expire_func = None
+        pin_code = None
+        expired_relay_is_on = None
+
+    if record.expire is not None:
+        # revert back to initial state
+        expire_time = datetime.now() + timedelta(seconds=record.expire)
+        if expire_time not in P.expire_func_list.keys():
+            P.expire_func_list[expire_time] = expire_func
+            func_update = (io_common.update_custom_relay, pin_code, expired_relay_is_on, True)
+            P.expire_func_list[expire_time + timedelta(microseconds=1)] = func_update
+        else:
+            L.l.error("Duplicate zwave key in list")
+            exit(999)
 
 
 # https://stackoverflow.com/questions/26881396/how-to-add-a-function-call-to-a-list
@@ -311,8 +367,9 @@ def init():
     # if Constant.IS_MACHINE_BEAGLEBONE:
         # bbb_io.init()
         # std_gpio.init()
-    if Constant.IS_OS_WINDOWS():
+    if Constant.is_os_windows():
         pigpio_gpio.init()
+    ZoneCustomRelay.add_upsert_listener(zone_custom_relay_upsert_listener)
     thread_pool.add_interval_callable(thread_run, run_interval_second=1)
     P.initialised = True
 

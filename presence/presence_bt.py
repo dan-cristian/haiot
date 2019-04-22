@@ -5,7 +5,10 @@ import threading
 import prctl
 from pydispatch import dispatcher
 from common import utils, Constant
-from main.admin import models
+from main import sqlitedb
+from main.tinydb_model import Device, PeopleDevice, People
+if sqlitedb:
+    from main.admin import models
 
 
 class P:
@@ -80,7 +83,10 @@ class BluetoothRSSI(object):
 
 
 def _check_presence():
-    devs = models.Device().query_filter_all()
+    if sqlitedb:
+        devs = models.Device().query_filter_all()
+    else:
+        devs = Device.find()
     for dev in devs:
         if dev.bt_address is not None:
             result = None
@@ -95,12 +101,21 @@ def _check_presence():
                     #    btrssi = BluetoothRSSI(addr=dev.bt_address.upper())
                     dev.last_bt_active = utils.get_base_location_now_date()
                     dev.last_active = utils.get_base_location_now_date()
-                    models.commit()
-                    pd = models.PeopleDevice
-                    peopledev = pd().query_filter_first(pd.device_id == dev.id)
+                    if sqlitedb:
+                        models.commit()
+                    else:
+                        dev.save_changed_fields()
+                    if sqlitedb:
+                        pd = models.PeopleDevice
+                        peopledev = pd().query_filter_first(pd.device_id == dev.id)
+                    else:
+                        peopledev = PeopleDevice.find_one({PeopleDevice.device_id: dev.id})
                     if peopledev is not None and peopledev.give_presence:
-                        p = models.People
-                        people = p().query_filter_first(p.id == peopledev.people_id)
+                        if sqlitedb:
+                            p = models.People
+                            people = p().query_filter_first(p.id == peopledev.people_id)
+                        else:
+                            people = People.find({People.id: peopledev.people_id})
                         if people is not None:
                             dispatcher.send(Constant.SIGNAL_PRESENCE, device=dev.name, people=people.name)
                             #if btrssi is not None:
@@ -124,7 +139,3 @@ def thread_run():
         _check_presence()
     return 'Processed presence_run'
 
-
-if __name__ == '__main__':
-    _list_all()
-    thread_run()

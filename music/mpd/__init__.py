@@ -1,10 +1,20 @@
 import unicodedata
-from mpd import MPDClient
 from main.logger_helper import L
-from main.admin.model_helper import get_param
-from common import Constant
-from main.admin import models
+from common import Constant, get_json_param
+from main import sqlitedb
+# from main.admin import models
 from cloud import lastfm
+from main.tinydb_model import Music, MusicLoved
+
+from common import fix_module
+while True:
+    try:
+        from mpd import MPDClient
+        break
+    except ImportError as iex:
+        if not fix_module(iex):
+            break
+
 
 class P:
     zone_port = {}
@@ -17,7 +27,7 @@ class P:
 def _multify(text):
     every = 18
     lines = []
-    for i in xrange(0, len(text), every):
+    for i in range(0, len(text), every):
         lines.append(text[i:i + every])
     return '\n'.join(lines)
 
@@ -33,7 +43,7 @@ def _get_client(port=None):
     client = MPDClient()
     client.timeout = 5
     if port is not None:
-        client.connect(get_param(Constant.P_MPD_SERVER), port)
+        client.connect(get_json_param(Constant.P_MPD_SERVER), port)
     return client
 
 
@@ -43,7 +53,7 @@ def _close_client(client):
 
 
 def get_first_active_mpd():
-    port_config = get_param(Constant.P_MPD_PORT_ZONE).split(',')
+    port_config = get_json_param(Constant.P_MPD_PORT_ZONE).split(',')
     first_port = None
     alt_port = None
     alt_zone = None
@@ -56,7 +66,7 @@ def get_first_active_mpd():
         if first_port is None:
             first_port = port_val
         zone_val = pair.split('=')[0]
-        client.connect(get_param(Constant.P_MPD_SERVER), port_val)
+        client.connect(get_json_param(Constant.P_MPD_SERVER), port_val)
         if client.status()['state'] == 'play':
             port_list_play.append(port_val)
             alt_zone = zone_val
@@ -66,10 +76,10 @@ def get_first_active_mpd():
         alt_port = port_list_play[0]
         zone = alt_zone
     if alt_port is not None:
-        client.connect(get_param(Constant.P_MPD_SERVER), alt_port)
+        client.connect(get_json_param(Constant.P_MPD_SERVER), alt_port)
         return client
     else:
-        client.connect(get_param(Constant.P_MPD_SERVER), first_port)
+        client.connect(get_json_param(Constant.P_MPD_SERVER), first_port)
         return client
 
 
@@ -172,7 +182,7 @@ def populate(zone_name, default_dir=None):
 
 
 def _read_port_config():
-    port_config = get_param(Constant.P_MPD_PORT_ZONE).split(',')
+    port_config = get_json_param(Constant.P_MPD_PORT_ZONE).split(',')
     for pair in port_config:
         split = pair.split('=')
         names = split[0]
@@ -189,7 +199,7 @@ def _read_port_config():
 
 def _normalise(uni):
     if isinstance(uni, str):
-        uni = unicode(uni, "utf-8")
+        uni = str(uni, 'utf-8')
     return unicodedata.normalize('NFKD', uni).encode('ascii', 'ignore')
 
 
@@ -201,8 +211,13 @@ def _normalise(uni):
 # 'artist': 'Soul Lifters', 'pos': '19', 'last-modified': '2018-11-02T18:44:57Z',
 # 'file': '_New/recent/asot888/20. Soul Lifters - Destiny.mp3', 'time': '287', 'id': '116'}
 def _save_status(zone, status_json, song):
-    cur_rec = models.Music.query.filter_by(zone_name=zone).first()
-    rec = models.Music(zone_name=zone)
+    if sqlitedb:
+        cur_rec = models.Music.query.filter_by(zone_name=zone).first()
+        rec = models.Music(zone_name=zone)
+    else:
+        cur_rec = Music.find_one({Music.zone_name: zone})
+        rec = Music()
+        rec.zone_name = zone
     rec.state = status_json['state']
     if rec.state == 'stop':
         rec.title = ''
@@ -227,8 +242,17 @@ def _save_status(zone, status_json, song):
 def save_lastfm():
     lastfmloved = lastfm.iscurrent_loved()
     lastfmsong = lastfm.get_current_song()
-    cur_rec = models.MusicLoved.query.first()
-    rec = models.MusicLoved(lastfmsong=lastfmsong)
+    if sqlitedb:
+        cur_rec = models.MusicLoved.query.first()
+        rec = models.MusicLoved(lastfmsong=lastfmsong)
+    else:
+        cur_recs = MusicLoved.find()
+        if len(cur_recs) > 0:
+            cur_rec = cur_recs[0]
+        else:
+            cur_rec = None
+        rec = MusicLoved()
+        rec.lastfmsong = lastfmsong
     if lastfmloved is None:
         lastfmloved = False
     rec.lastfmloved = lastfmloved

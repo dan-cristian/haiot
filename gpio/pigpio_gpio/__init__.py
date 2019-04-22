@@ -324,8 +324,12 @@ class PwmIo(GpioBase):
         # PwmIo._init_pwm()
 
 
-def pwm_record_update(json_object):
+def not_used_pwm_record_update(json_object):
     P.pwm.record_update(json_object)
+
+
+def _pwm_upsert_listener(record):
+    P.pwm.record_update(record)
 
 
 def _setup_in_ports(gpio_pin_list):
@@ -397,6 +401,7 @@ def init():
                 # setup this to receive list of ports that must be set as "IN" and have callbacks defined
                 # dispatcher.connect(setup_in_ports, signal=Constant.SIGNAL_GPIO_INPUT_PORT_LIST, sender=dispatcher.Any)
             P.initialised = True
+            Pwm.add_upsert_listener(_pwm_upsert_listener)
             thread_pool.add_interval_callable(thread_run, run_interval_second=30)
             L.l.info('PiGpio initialised OK')
         except Exception as ex1:

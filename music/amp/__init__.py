@@ -1,11 +1,14 @@
-from main.admin.model_helper import get_param, commit
-from common import Constant
+from common import Constant, get_json_param
 import socket
 import time
 import binascii
-from main.admin import models
+from main import sqlitedb
+if sqlitedb:
+    from main.admin.model_helper import commit
+    from main.admin import models
 from main.logger_helper import L
 from pydispatch import dispatcher
+from main.tinydb_model import ZoneCustomRelay
 
 _AMP_ON = "\x0207A1D\x03"
 _AMP_OFF = "\x0207A1E\x03"
@@ -27,10 +30,13 @@ class AMP_YMH:
     ZONE2_ON = None
     ZONE3_ON = None
 
+    def __init__(self):
+        pass
+
 
 def connect_socket():
-    host = get_param(Constant.P_AMP_SERIAL_HOST)
-    port = int(get_param(Constant.P_AMP_SERIAL_PORT))
+    host = get_json_param(Constant.P_AMP_SERIAL_HOST)
+    port = int(get_json_param(Constant.P_AMP_SERIAL_PORT))
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     L.l.debug("Connecting socket")
     s.settimeout(2)
@@ -101,14 +107,20 @@ def amp_zone_power(on, zone_index):
 
 def set_amp_power(power_state, relay_name, amp_zone_index):
     try:
-        relay = models.ZoneCustomRelay.query.filter_by(relay_pin_name=relay_name).first()
+        if sqlitedb:
+            relay = models.ZoneCustomRelay.query.filter_by(relay_pin_name=relay_name).first()
+        else:
+            relay = ZoneCustomRelay.find_one({ZoneCustomRelay.relay_pin_name: relay_name})
         power_state = bool(power_state)
         if relay is not None:
             initial_relay_state = relay.relay_is_on
             # power on main relay for amp or on/off if there is no zone
             if power_state is True or amp_zone_index == 0:
                 relay.relay_is_on = power_state
-                commit()
+                if sqlitedb:
+                    commit()
+                else:
+                    relay.save_changed_fields()
                 # dispatch as UI action otherwise change actions are not triggered
                 dispatcher.send(signal=Constant.SIGNAL_UI_DB_POST, model=models.ZoneCustomRelay, row=relay)
                 msg = "Set relay {} to state {} zone_index={}\n".format(relay_name, power_state, amp_zone_index)

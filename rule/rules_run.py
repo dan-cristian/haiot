@@ -1,10 +1,14 @@
 import time
 import sys
-import thread
+import threading
 import datetime
 from main.logger_helper import L
-from main.admin import models
-import rule_common
+from main import sqlitedb
+if sqlitedb:
+    from main.admin import models
+else:
+    from main import tinydb_model as models
+from rule import rule_common
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
@@ -50,7 +54,8 @@ def execute_macro(obj=models.Rule(), field_changed_list=None, force_exec=False):
         # obj.commit_record_to_db()
         func = getattr(sys.modules[__name__], obj.command)
         if obj.is_async:
-            thread.start_new_thread(func, ())
+            threading.Thread(target=func).start()
+            # thread.start_new_thread(func, ())
             result = "rule started async"
         else:
             result = func()
@@ -75,7 +80,8 @@ def rule_alarm(obj=models.ZoneAlarm(), field_changed_list=None):
             rule_common.notify_via_all(title=msg, message=msg, priority=3)
         if obj.alarm_pin_name == 'sonerie':
             if (datetime.datetime.now() - P.last_bell).total_seconds() > 5:
-                thread.start_new_thread(rule_common.play_bell_local, ('SonnetteBasse.wav', ))
+                threading.Thread(target=rule_common.play_bell_local,args=('SonnetteBasse.wav', )).start()
+                # thread.start_new_thread(rule_common.play_bell_local, ('SonnetteBasse.wav', ))
                 rule_common.notify_via_all(title="Sonerie", message="Sonerie", priority=1)
                 P.last_bell = datetime.datetime.now()
                 # rule_common.send_notification(title="Sonerie", priority=2)
@@ -88,7 +94,8 @@ def rule_alarm(obj=models.ZoneAlarm(), field_changed_list=None):
             # rule_common.send_notification(title="Gate Open", priority=2)
             # rule_common.send_chat(message="Gate Open", notify=True)
         elif obj.alarm_pin_name == 'portita':
-            thread.start_new_thread(rule_common.play_bell_local, ('121798__boss-music__bird.wav',))
+            # thread.start_new_thread(rule_common.play_bell_local, ('121798__boss-music__bird.wav',))
+            threading.Thread(target=rule_common.play_bell_local, args=('121798__boss-music__bird.wav',)).start()
             rule_common.send_notification(title="Portita Open", priority=2)
             rule_common.send_chat(message="Portita Open", notify=True)
         elif obj.alarm_pin_name == 'car vibrate':
@@ -132,11 +139,17 @@ class TempStore:
 # catch sudden changes or extremes (fire or cold)
 def rule_sensor_temp_extreme(obj=models.Sensor(), field_changed_list=None):
     if hasattr(obj, 'temperature') and obj.temperature is not None:
-        m = models.ZoneSensor
-        zonesensor = m().query_filter_first(m.sensor_name == obj.sensor_name)
+        if sqlitedb:
+            m = models.ZoneSensor
+            zonesensor = m().query_filter_first(m.sensor_name == obj.sensor_name)
+        else:
+            zonesensor = models.ZoneSensor.find_one({models.ZoneSensor.sensor_name: obj.sensor_name})
         if zonesensor is not None and zonesensor.target_material is not None:
-            m = models.Zone
-            zone = m().query_filter_first(m.id == zonesensor.zone_id)
+            if sqlitedb:
+                m = models.Zone
+                zone = m().query_filter_first(m.id == zonesensor.zone_id)
+            else:
+                zone = models.Zone.find_one({models.Zone.id: zonesensor.zone_id})
             if zone is not None:
                 max = min = None
                 if zone.is_indoor:
@@ -152,12 +165,12 @@ def rule_sensor_temp_extreme(obj=models.Sensor(), field_changed_list=None):
                     return False
 
                 max_temp = TempStore.max_temp[location]
-                if max_temp.has_key(zonesensor.target_material):
+                if zonesensor.target_material in max_temp:
                     max = max_temp[zonesensor.target_material]
                 else:
                     L.l.warning("Unknown max target material {}".format(zonesensor.target_material))
                 min_temp = TempStore.min_temp[location]
-                if min_temp.has_key(zonesensor.target_material):
+                if zonesensor.target_material in min_temp:
                     min = min_temp[zonesensor.target_material]
                 else:
                     L.l.warning("Unknown min target material {}".format(zonesensor.target_material))
@@ -175,7 +188,7 @@ def rule_sensor_temp_extreme(obj=models.Sensor(), field_changed_list=None):
 
 # ups rule
 def rule_ups_power(obj=models.Ups(), field_changed_list=None):
-    #Log.logger.info("changed list is {}".format(field_changed_list))
+    # Log.logger.info("changed list is {}".format(field_changed_list))
     if field_changed_list is not None:
         if 'power_failed' in field_changed_list:
             if obj.power_failed:
@@ -224,7 +237,8 @@ def toggle_gate():
 def morning_alarm_dormitor():
     """day_of_week=1-5;hour=7;minute=15;is_active=true"""
     L.l.info('Rule: morning alarm dormitor')
-    execfile("~/PYC/scripts/audio/mpc-play.sh 6603 music")
+    # execfile("~/PYC/scripts/audio/mpc-play.sh 6603 music")
+    exec(open("~/PYC/scripts/audio/mpc-play.sh 6603 music").read())
 
 
 def water_all_3_minute():
@@ -344,9 +358,6 @@ def water_back_main_off():
     rule_common.update_custom_relay('front_main_valve_relay', False)
     rule_common.update_custom_relay('back_valve_relay', False)
 
-
-def main_heat_on():
-    rule_common.update_command_override_relay('main_heat_relay')
 
 
 def front_lights_on():

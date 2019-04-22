@@ -4,14 +4,15 @@ from pydispatch import dispatcher
 from main.logger_helper import L
 # from sensor.rfxcom.RFXtrx import PySerialTransport
 # L.l.error("Unable to import package, err={}".format(ex), exc_info=True)
-from main.admin import models
+# from main.admin import models
 from common import Constant, utils, variable
 import threading
 import prctl
-from main import thread_pool
+from main import thread_pool, sqlitedb
 from sensor import serial_common
 from sensor.rfxcom import RFXtrx
 from sensor.rfxcom.RFXtrx import PySerialTransport
+from main.tinydb_model import Sensor, ZoneSensor
 
 
 class P:
@@ -58,9 +59,14 @@ def __save_relay_db(p_id='', p_type='', value_list=None):
 def __save_sensor_db(p_id='', p_type='', value_list=None):
     if not value_list:
         value_list = []
-    record = models.Sensor(address=p_id)
-    assert isinstance(record, models.Sensor)
-    zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=p_id).first()
+    if sqlitedb:
+        record = models.Sensor(address=p_id)
+        assert isinstance(record, models.Sensor)
+        zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=p_id).first()
+    else:
+        record = Sensor()
+        record.address = p_id
+        zone_sensor = ZoneSensor.find_one({Sensor.sensor_address: p_id})
     if zone_sensor:
         record.sensor_name = zone_sensor.sensor_name
     else:
@@ -75,7 +81,10 @@ def __save_sensor_db(p_id='', p_type='', value_list=None):
         record.battery_level = value_list['Battery numeric']
     if 'Rssi numeric' in value_list:
         record.rssi = value_list['Rssi numeric']
-    current_record = models.Sensor.query.filter_by(address=p_id).first()
+    if sqlitedb:
+        current_record = models.Sensor.query.filter_by(address=p_id).first()
+    else:
+        current_record = Sensor.find_one({Sensor.address: p_id})
     record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
                                save_to_graph=True, ignore_only_updated_on_change=True)
 

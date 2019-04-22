@@ -37,8 +37,8 @@ import prctl
 from inspect import getmembers, isfunction
 from main.logger_helper import L
 from main import thread_pool
-from main.admin.model_helper import get_param
-from common import Constant
+# from main.admin.model_helper import get_param
+from common import Constant, get_json_param
 import rule
 import rule.alexa
 
@@ -148,7 +148,7 @@ class upnp_device(object):
 
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         if self.port == 0:
-            self.port = (int)(get_param(Constant.P_ALEXA_WEMO_LISTEN_PORT)) + index
+            self.port = (int)(get_json_param(Constant.P_ALEXA_WEMO_LISTEN_PORT)) + index
             #self.port = self.socket.getsockname()[1]
         self.socket.bind((self.ip_address, self.port))
         self.socket.listen(5)
