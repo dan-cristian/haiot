@@ -1,8 +1,15 @@
+from main.logger_helper import L
+from common import fix_module
+while True:
+    try:
+        import prctl
+        break
+    except ImportError as iex:
+        if not fix_module(iex):
+            break
 import threading
-import prctl
 import transport.mqtt_io
 from common import utils
-from main.logger_helper import L
 from transport import mqtt_io
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
