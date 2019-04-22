@@ -57,7 +57,7 @@ class Sensor(TinyBase):
     updated_on = datetime.now
     added_on = datetime.now
     # FIXME: now filled manually, try relations
-    # zone_name = Column(String(50))
+    # zone_name = ''
     sensor_name = ''
     alt_address = ''  # alternate address format, use for 1-wire, better readability
     comment = ''
@@ -90,8 +90,8 @@ class Zone(TinyBase):
     id = 0
     name = ''
     # active_heat_schedule_pattern_id = Column(Integer)
-    # heat_is_on = Column(Boolean, default=False)
-    # last_heat_status_update = Column(DateTime(), default=None)
+    # heat_is_on = False
+    # last_heat_status_update = datetime.now()
     # heat_target_temperature = Column(Integer)
     is_indoor_heated = False
     is_indoor = False
@@ -227,4 +227,181 @@ class ZoneHeatRelay(TinyBase):
     is_alternate_source_switch = False  # switch to alternate source
     is_alternate_heat_source = False  # used for low cost/eco main heat sources
     temp_sensor_name = ''  # temperature sensor name for heat sources to check for heat limit
+    updated_on = datetime.now()
+
+
+class Presence(TinyBase):
+    id = 0
+    zone_id = 0
+    zone_name = ''
+    sensor_name = ''
+    event_type = ''  # cam, pir, contact, wifi, bt
+    event_camera_date = datetime.now()
+    event_alarm_date = datetime.now()
+    event_io_date = datetime.now()
+    event_wifi_date = datetime.now()
+    event_bt_date = datetime.now()
+    is_connected = False  # pin connected? true on unarmed sensors, false on alarm/move
+    updated_on = datetime.now()
+
+
+class ZoneArea(TinyBase):
+    id = 0
+    area_id = 0
+    zone_id = 0
+
+
+class Area(TinyBase):
+    id = 0
+    name = ''
+    is_armed = False
+
+
+class ZoneAlarm(TinyBase):
+    """not all gpios are alarm events, some are contacts, some are movement sensors"""
+    # fixme: should be more generic, i.e. ZoneContact (with types = sensor, contact)
+    id = 0
+    # friendly display name for pin mapping
+    alarm_pin_name = ''
+    zone_id = 0  # , ForeignKey('zone.id'))
+    # zone = db.relationship('Zone', backref=db.backref('ZoneAlarm(zone)', lazy='dynamic'))
+    # gpio_pin_code = Column(String(50), ForeignKey('gpio_pin.pin_code'))
+    gpio_pin_code = ''
+    gpio_host_name = ''
+    sensor_type = ''
+    # gpio_pin = db.relationship('GpioPin', backref=db.backref('ZoneAlarm(gpiopincode)', lazy='dynamic'))
+    alarm_pin_triggered = False  # True if alarm sensor is connected (move detected)
+    is_false_alarm_prone = False  # True if sensor can easily trigger false alarms (gate move by wind)
+    start_alarm = False  # True if alarm must start (because area/zone is armed)
+    updated_on = datetime.now()
+
+
+class Node(TinyBase):
+    id = 0
+    name = ''
+    ip = ''
+    mac = ''
+    os_type = ''
+    machine_type = ''
+    app_start_time = datetime.now()
+    is_master_overall = False
+    is_master_db_archive = False
+    is_master_graph = False
+    is_master_rule = False
+    is_master_logging = False
+    priority = 0  # used to decide who becomes main master in case several hosts are active
+    master_overall_cycles = 0  # count of update cycles while node was master
+    run_overall_cycles = 0  # count of total update cycles
+    execute_command = ''
+    updated_on = datetime.now()
+
+
+class Utility(TinyBase):
+    id = 0
+    utility_name = ''  # unique name, can be different than sensor name for dual counter
+    sensor_name = ''
+    sensor_index = 0  # 0 for counter_a, 1 for counter_b
+    units_total = 0.0  # total number of units measured
+    units_delta = 0.0  # total number of units measured since last measurement
+    units_2_delta = 0.0  # total number of units measured since last measurement
+    ticks_delta = 0
+    ticks_per_unit = 0.0  # number of counter ticks in a unit (e.g. 10 for a watt)
+    unit_name = ''  # kwh, liter etc.
+    unit_2_name = ''  # 2nd unit type, optional, i.e. watts
+    unit_cost = 0.0
+    cost = 0.0
+    utility_type = ''  # water, electricity, gas
+    updated_on = datetime.now()
+
+
+class Device(TinyBase):
+    id = 0
+    name = ''
+    type = ''
+    bt_address = ''
+    wifi_address = ''
+    bt_signal = 0
+    wifi_signal = 0
+    last_bt_active = datetime.now()
+    last_wifi_active = datetime.now()
+    last_active = datetime.now()
+    updated_on = datetime.now()
+
+
+class People(TinyBase):
+    id = 0
+    name = ''  # unique name
+    email = ''
+    updated_on = datetime.now()
+
+
+class PeopleDevice(TinyBase):
+    id = 0
+    people_id = 0
+    device_id = 0
+    give_presence = False
+    updated_on = datetime.now()
+
+
+class Rule(TinyBase):
+    id = 0
+    host_name = ''
+    name = ''
+    command = ''
+    hour = ''
+    minute = ''
+    second = ''
+    day_of_week = ''
+    week = ''
+    day = ''
+    month = ''
+    year = ''
+    start_date = datetime.now()
+    execute_now = False
+    is_async = False
+    is_active = False
+
+
+class ZoneMusic(TinyBase):
+    id = 0
+    zone_id = 0
+    server_ip = ''
+    server_port = 0
+
+
+class Music(TinyBase):
+    id = 0
+    zone_name = ''  # unique name
+    state = ''
+    volume = 0
+    position = 0  # percent
+    title = ''
+    artist = ''
+    song = ''
+    album = ''
+    updated_on = datetime.now()
+
+
+class MusicLoved(TinyBase):
+    id = 0
+    lastfmloved = False
+    lastfmsong = ''
+
+
+class Ups(TinyBase):
+    id = 0
+    name = ''
+    system_name = ''
+    port = ''
+    input_voltage = 0.0
+    remaining_minutes = 0
+    output_voltage = 0
+    load_percent = 0.0
+    power_frequency = 0.0
+    battery_voltage = 0.0
+    temperature = 0.0
+    power_failed = False
+    beeper_on = False
+    test_in_progress = False
+    other_status = ''
     updated_on = datetime.now()

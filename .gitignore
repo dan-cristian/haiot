@@ -10,3 +10,5 @@ prctl.py
 openzwave/*
 openzwave/__init__.py
 test/__init__.pyc
+pcf8574/*
+pcf8574/__init__.py

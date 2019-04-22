@@ -42,11 +42,20 @@ class DatetimeSerializer(Serializer):
         return datetime.strptime(s, self._format)
 
 
-class CustomTinyMongoClient(TinyMongoClient):
+class CustomFileTinyMongoClient(TinyMongoClient):
     @property
     def _storage(self):
-        # serialization = SerializationMiddleware(MemoryStorage)
         serialization = SerializationMiddleware()
+        serialization.register_serializer(DateTimeSerializer(), 'TinyDate')
+        # register other custom serializers
+        return serialization
+
+
+class CustomMemoryTinyMongoClient(TinyMongoClient):
+    @property
+    def _storage(self):
+        serialization = SerializationMiddleware(MemoryStorage)
+        # serialization = SerializationMiddleware()
         serialization.register_serializer(DateTimeSerializer(), 'TinyDate')
         # register other custom serializers
         return serialization
@@ -56,9 +65,8 @@ def _init_tinydb():
     global db
     data_file = common.get_json_param(common.Constant.P_DB_PATH)
     data_path = os.path.dirname(data_file)
-    # TinyDB.DEFAULT_STORAGE = MemoryStorage
-    conn = CustomTinyMongoClient(foldername=data_path)
-    # conn = CustomTinyMongoClient(storage=MemoryStorage)
+    # conn = CustomFileTinyMongoClient(foldername=data_path)
+    conn = CustomMemoryTinyMongoClient()
     db = conn.haiot
 
 

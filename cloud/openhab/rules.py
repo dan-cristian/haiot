@@ -1,12 +1,17 @@
 import transport.mqtt_io
 from main.logger_helper import L
-from main.admin import models
+from main import sqlitedb
+if sqlitedb:
+    from main.admin import models
+else:
+    from main import tinydb_model as models
 import transport
 from common import Constant, utils
 
 
 class P:
     openhab_topic = None
+    ignored_fields = ['updated_on', '_id']
 
     def __init__(self):
         pass
@@ -46,11 +51,12 @@ def rule_openhab_dustsensor(obj=models.DustSensor(), field_changed_list=None):
     if field_changed_list is not None:
         address = obj.address
         for key in field_changed_list:
-            if key not in ['updated_on'] and hasattr(obj, key):
-                val = getattr(obj, key)
-                send_mqtt_openhab(subtopic='dustsensor_' + key + '_' + address, payload=val)
-            else:
-                L.l.warning('Field {} in dustsensor change list but not in obj={}'.format(key, obj))
+            if key not in P.ignored_fields:
+                if hasattr(obj, key):
+                    val = getattr(obj, key)
+                    send_mqtt_openhab(subtopic='dustsensor_' + key + '_' + address, payload=val)
+                else:
+                    L.l.warning('Field {} in dustsensor change list but not in obj={}'.format(key, obj))
 
 
 def rule_openhab_utility(obj=models.Utility(), field_changed_list=None):
@@ -58,11 +64,11 @@ def rule_openhab_utility(obj=models.Utility(), field_changed_list=None):
         # L.l.info("PROCESSING utility {}".format(obj.utility_type))
         key = 'electricity'
         if obj.utility_type == key:
-                if obj.units_2_delta is not None:
-                    send_mqtt_openhab(subtopic=key + "_" + obj.utility_name, payload=obj.units_2_delta)
-                if obj.units_delta is not None and obj.units_delta != 0:
-                    send_mqtt_openhab(subtopic=key + "_" + obj.unit_name + "_" + obj.utility_name,
-                                      payload=obj.units_delta)
+            if obj.units_2_delta is not None:
+                send_mqtt_openhab(subtopic=key + "_" + obj.utility_name, payload=obj.units_2_delta)
+            if obj.units_delta is not None and obj.units_delta != 0:
+                send_mqtt_openhab(subtopic=key + "_" + obj.unit_name + "_" + obj.utility_name,
+                                  payload=obj.units_delta)
         key = 'water'
         if obj.utility_type == key and obj.units_delta is not None:
             send_mqtt_openhab(subtopic=key + "_" + obj.utility_name, payload=obj.units_delta)
@@ -143,44 +149,50 @@ def rule_openhab_music(obj=models.Music(), field_changed_list=None):
     if field_changed_list is not None:
         zone = obj.zone_name
         for key in field_changed_list:
-            if key not in ['updated_on'] and hasattr(obj, key):
-                val = getattr(obj, key)
-                send_mqtt_openhab(subtopic='mpd_' + key + '_' + zone, payload=val)
-            else:
-                L.l.warning('Field {} in music change list but not in obj={}'.format(key, obj))
+            if key not in P.ignored_fields:
+                if hasattr(obj, key):
+                    val = getattr(obj, key)
+                    send_mqtt_openhab(subtopic='mpd_' + key + '_' + zone, payload=val)
+                else:
+                    L.l.warning('Field {} in music change list but not in obj={}'.format(key, obj))
 
 
 def rule_openhab_powermonitor(obj=models.PowerMonitor(), field_changed_list=None):
     if field_changed_list is not None:
         name = obj.name
         for key in field_changed_list:
-            if key not in ['updated_on'] and hasattr(obj, key):
-                val = getattr(obj, key)
-                send_mqtt_openhab(subtopic='powermonitor_' + key + '_' + name, payload=val)
-            else:
-                L.l.warning('Field {} in power change list but not in obj={}'.format(key, obj))
+            if key not in P.ignored_fields:
+                if hasattr(obj, key):
+                    val = getattr(obj, key)
+                    send_mqtt_openhab(subtopic='powermonitor_' + key + '_' + name, payload=val)
+                else:
+                    L.l.warning('Field {} in power change list but not in obj={}'.format(key, obj))
 
 
 def rule_openhab_musicloved(obj=models.MusicLoved(), field_changed_list=None):
     if field_changed_list is not None:
         for key in field_changed_list:
-            if hasattr(obj, key):
-                val = getattr(obj, key)
-                if key == 'lastfmloved':
-                    if val is True:
-                        val = 'ON'
-                    else:
-                        val = 'OFF'
-                send_mqtt_openhab(subtopic='mpd_' + key, payload=val)
-            else:
-                L.l.warning('Field musicloved {} in change list but not in obj={}'.format(key, obj))
+            if key not in P.ignored_fields:
+                if hasattr(obj, key):
+                    val = getattr(obj, key)
+                    if key == 'lastfmloved':
+                        if val is True:
+                            val = 'ON'
+                        else:
+                            val = 'OFF'
+                    send_mqtt_openhab(subtopic='mpd_' + key, payload=val)
+                else:
+                    L.l.warning('Field musicloved {} in change list but not in obj={}'.format(key, obj))
 
 
 # INBOUD RULES START
 def custom_relay(name, value):
     # L.l.info("Try to set custom relay {} to {}".format(name, value))
-    t = models.ZoneCustomRelay
-    relay = t().query_filter_first(t.relay_pin_name == name)
+    if sqlitedb:
+        t = models.ZoneCustomRelay
+        relay = t().query_filter_first(t.relay_pin_name == name)
+    else:
+        relay = models.ZoneCustomRelay.find_one({models.ZoneCustomRelay.relay_pin_name: name})
     if relay is not None:
         if relay.gpio_host_name == Constant.HOST_NAME:
             L.l.info("OK setting custom relay {} to {} from openhab".format(name, value))
@@ -189,8 +201,11 @@ def custom_relay(name, value):
 
 
 def heat_relay(name, value):
-    t = models.ZoneHeatRelay
-    relay = t().query_filter_first(t.heat_pin_name == name)
+    if sqlitedb:
+        t = models.ZoneHeatRelay
+        relay = t().query_filter_first(t.heat_pin_name == name)
+    else:
+        relay = models.ZoneHeatRelay.find_one({models.ZoneHeatRelay.heat_pin_name: name})
     if relay is not None:
         if relay.gpio_host_name == Constant.HOST_NAME:
             L.l.info("OK setting heat relay {} to {} from openhab".format(name, value))

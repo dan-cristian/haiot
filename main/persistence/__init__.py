@@ -1,6 +1,6 @@
 from common import Constant
 from common import utils
-from main import L
+from main.logger_helper import L
 
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 

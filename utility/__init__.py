@@ -1,20 +1,27 @@
-from sqlalchemy import desc
 from main.logger_helper import L
-from main import thread_pool
 from common import Constant, utils
 from pydispatch import dispatcher
-from main.admin import models, model_helper
-
+from main import sqlitedb
+if sqlitedb:
+    from main.admin import models, model_helper
+    from sqlalchemy import desc
+from main.tinydb_model import Utility
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 
 initialised = False
 
 
-def record_update(obj, source_host):
-    utility_rec = utils.json_to_record(models.Utility(), obj)
+def not_used_record_update(obj, source_host):
+    if sqlitedb:
+        utility_rec = utils.json_to_record(models.Utility(), obj)
+    else:
+        utility_rec = Utility()
     if source_host != Constant.HOST_NAME:
-        current_rec = models.Utility.query.filter_by(utility_name=utility_rec.utility_name).first()
+        if sqlitedb:
+            current_rec = models.Utility.query.filter_by(utility_name=utility_rec.utility_name).first()
+        else:
+            current_rec = Utility.find_one({Utility.utility_name: utility_rec.utility_name})
         utility_rec.save_changed_fields(current_record=current_rec, notify_transport_enabled=False, save_to_graph=False)
 
 
@@ -22,16 +29,30 @@ def record_update(obj, source_host):
 def __utility_update_ex(sensor_name, value, unit=None, index=None):
     try:
         if value is not None:
-            record = models.Utility(sensor_name=sensor_name)
-            if index is None:
-                current_record = models.Utility.query.filter_by(sensor_name=sensor_name).first()
+            if sqlitedb:
+                record = models.Utility(sensor_name=sensor_name)
             else:
-                current_record = models.Utility.query.filter_by(sensor_name=sensor_name, sensor_index=index).first()
+                record = Utility()
+                record.sensor_name = sensor_name
+            if sqlitedb:
+                if index is None:
+                    current_record = models.Utility.query.filter_by(sensor_name=sensor_name).first()
+                else:
+                    current_record = models.Utility.query.filter_by(sensor_name=sensor_name, sensor_index=index).first()
+            else:
+                if index is None:
+                    current_record = Utility.find_one({Utility.sensor_name: sensor_name})
+                else:
+                    current_record = Utility.find_one({Utility.sensor_name: sensor_name, Utility.sensor_index: index})
             if current_record is not None:
                 if current_record.units_total is None:
                     # need to get
-                    last_rec = models.UtilityHistory.query.filter_by(
-                        utility_name=record.utility_name).order_by(desc(models.UtilityHistory.id)).first()
+                    if sqlitedb:
+                        last_rec = models.UtilityHistory.query.filter_by(
+                            utility_name=record.utility_name).order_by(desc(models.UtilityHistory.id)).first()
+                    else:
+                        # fixme
+                        last_rec = None
                     if last_rec is not None:
                         current_record.units_total = last_rec.units_total
                     else:
@@ -79,9 +100,10 @@ def __utility_update_ex(sensor_name, value, unit=None, index=None):
                 L.l.info("Utility ex sensor {} index {} not defined in Utility table".format(sensor_name, index))
     except Exception as ex:
         L.l.error("Error saving utility ex update {}".format(ex), exc_info=True)
-        if "Bind '" + Constant.DB_REPORTING_ID + "' is not specified" in ex.message:
-            L.l.info('Try to connect to reporting DB, connection seems down')
-            model_helper.init_reporting()
+        if sqlitedb:
+            if "Bind '" + Constant.DB_REPORTING_ID + "' is not specified" in ex.message:
+                L.l.info('Try to connect to reporting DB, connection seems down')
+                model_helper.init_reporting()
 
 
 def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, total_units_b, sampling_period_seconds):
@@ -91,8 +113,13 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
         ignore_save = False
         for delta in [units_delta_a, units_delta_b]:
             if delta is not None: # and delta != 0:
-                record = models.Utility(sensor_name=sensor_name)
-                current_record = models.Utility.query.filter_by(sensor_name=sensor_name, sensor_index=index).first()
+                if sqlitedb:
+                    record = models.Utility(sensor_name=sensor_name)
+                    current_record = models.Utility.query.filter_by(sensor_name=sensor_name, sensor_index=index).first()
+                else:
+                    record = Utility()
+                    record.sensor_name = sensor_name
+                    current_record = Utility.find_one({Utility.sensor_name: sensor_name, Utility.sensor_index: index})
                 if current_record is not None:
                     record.sensor_index = index
                     record.utility_name = current_record.utility_name
@@ -127,8 +154,12 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
                     # todo: read previous value from history
                     if current_record.units_total is None:
                         # get val from history db
-                        last_rec = models.UtilityHistory.query.filter_by(
-                            utility_name=record.utility_name).order_by(desc(models.UtilityHistory.id)).first()
+                        if sqlitedb:
+                            last_rec = models.UtilityHistory.query.filter_by(
+                                utility_name=record.utility_name).order_by(desc(models.UtilityHistory.id)).first()
+                        else:
+                            # fixme:
+                            pass
                         if last_rec is not None:
                             current_record.units_total = last_rec.units_total
                         else:
@@ -159,6 +190,5 @@ def init():
     L.l.debug('Utility module initialising')
     dispatcher.connect(__utility_update, signal=Constant.SIGNAL_UTILITY, sender=dispatcher.Any)
     dispatcher.connect(__utility_update_ex, signal=Constant.SIGNAL_UTILITY_EX, sender=dispatcher.Any)
-    # thread_pool.add_interval_callable(template_run.thread_run, run_interval_second=60)
     global initialised
     initialised = True

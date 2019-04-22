@@ -20,7 +20,7 @@ class P:
     topic_main = 'no_main_topic_defined'
     mqtt_client = None
     client_connected = False
-    client_connecting = False
+    is_client_connecting = False
     mqtt_msg_count_per_minute = 0
     last_connect_attempt = None
     mqtt_mosquitto_exists = False
@@ -103,8 +103,10 @@ def on_message(client, userdata, msg):
         start = payload.find('{')
         end = payload.rfind('}')
         json = payload[start:end + 1]
-        if '"source_host_": "{}"'.format(Constant.HOST_NAME) not in json:  # or Constant.HOST_NAME == 'netbook': #debug
-            # ignore messages sent by this host
+        # ignore messages sent by this host
+        if '"source_host_": "{}"'.format(Constant.HOST_NAME) not in json \
+                and '"source_host": "{}"'.format(Constant.HOST_NAME) not in json \
+                and len(json) > 0:  # or Constant.HOST_NAME == 'netbook': #debug
             x = utils.json2obj(json)
             # if x[Constant.JSON_PUBLISH_SOURCE_HOST] != str(Constant.HOST_NAME):
             start = utils.get_base_location_now_date()
@@ -146,10 +148,10 @@ def init():
     # not a good ideea to set a timeout as it will crash pigpio_gpio callback
     # socket.setdefaulttimeout(10)
     try:
-        if P.client_connecting is True:
+        if P.is_client_connecting is True:
             L.l.warning('Mqtt client already in connection process, skipping attempt to connect until done')
             return False
-        P.client_connecting = True
+        P.is_client_connecting = True
         host_list = [
             #[model_helper.get_param(Constant.P_MQTT_HOST_3), int(model_helper.get_param(Constant.P_MQTT_PORT_3))],
             [common.get_json_param(common.Constant.P_MQTT_HOST_1), int(common.get_json_param(Constant.P_MQTT_PORT_1))],
@@ -189,7 +191,6 @@ def init():
                         P.mqtt_client.on_disconnect = on_disconnect
                         # thread_pool.add_interval_callable(thread_run, run_interval_second=10)
                         P.initialised = True
-                        P.client_connecting = False
                     else:
                         L.l.warning('Timeout connecting to mqtt')
                         retry_count += 1
@@ -198,9 +199,9 @@ def init():
                     retry_count += 1
                     time.sleep(Constant.ERROR_CONNECT_PAUSE_SECOND)
                 finally:
-                    P.client_connecting = False
                     P.last_connect_attempt = utils.get_base_location_now_date()
             if P.client_connected:
+                L.l.info('Noticed mqtt connected, init')
                 break
             else:
                 L.l.warning('Unable to connect to mqtt server {}:{}'.format(host, port))
@@ -209,7 +210,7 @@ def init():
     except Exception as ex:
         L.l.error('Exception on mqtt init, err={}'.format(ex))
     finally:
-        P.client_connected = False
+        P.is_client_connecting = False
 
 
 def _send_message(txt, topic=None):
