@@ -6,6 +6,7 @@
   {"module": "ina219", "package": "pi-ina219"},
   {"module": "mpd", "package": "python-mpd2"},
   {"module": "serial", "package": "pyserial"},
-  {"module": "dateutil", "package": "python-dateutil"}
+  {"module": "dateutil", "package": "python-dateutil"},
+  {"module": "prctl", "package": "python-prctl"}
 ]
 }
