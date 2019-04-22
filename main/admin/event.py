@@ -141,24 +141,24 @@ def _process_obj(obj):
                 # if heat.initialised:
                 heat.record_update(obj)
             elif table == utils.get_table_name(models.Sensor):
-                sensor.record_update(obj)
+                sensor.not_used_record_update(obj)
             elif table == utils.get_table_name(models.DustSensor):
                 pass
             elif table == utils.get_table_name(models.ZoneCustomRelay):
                 gpio.zone_custom_relay_record_update(obj)
             elif table == utils.get_table_name(models.GpioPin):
-                gpio.gpio_record_update(obj)
+                gpio.not_used_gpio_record_update(obj)
             # elif table == utils.get_table_name(models.Rule):
             #    rule.record_update(obj)
             elif table == utils.get_table_name(models.Presence):
-                presence.record_update(obj)
+                presence.not_used_record_update(obj)
             # elif table == utils.get_table_name(models.PlotlyCache):
             #    graph_plotly.record_update(obj)
             elif table == utils.get_table_name(models.ZoneAlarm):
                 # no processing (no local save)
                 pass
             elif table == utils.get_table_name(models.Utility):
-                utility.record_update(obj, source_host)
+                utility.not_used_record_update(obj, source_host)
             elif table == utils.get_table_name(models.Ups):
                 # no additional processing
                 pass
@@ -172,11 +172,11 @@ def _process_obj(obj):
                 # no additional processing
                 pass
             elif table == utils.get_table_name(models.PowerMonitor):
-                health_monitor.powermonitor_record_update(obj)
+                health_monitor.not_used_powermonitor_record_update(obj)
             elif table == utils.get_table_name(models.ZoneThermostat):
                 heat.zone_thermo_record_update(obj)
             elif table == utils.get_table_name(models.Pwm):
-                gpio.pigpio_gpio.pwm_record_update(obj)
+                gpio.pigpio_gpio.not_used_pwm_record_update(obj)
             else:
                 L.l.warning('Table %s content from %s is not mqtt processed' % (table, source_host))
 

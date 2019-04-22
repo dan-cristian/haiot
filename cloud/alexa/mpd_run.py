@@ -1,7 +1,7 @@
 from mpd import MPDClient
 from main.logger_helper import L
-from main.admin.model_helper import get_param
-from common import Constant
+# from main.admin.model_helper import get_param
+from common import Constant, get_json_param
 
 
 def mpd(request):
@@ -29,7 +29,7 @@ def mpd(request):
                         elif name == 'Zone':
                             if 'value' in value.keys():
                                 zone = value['value']
-                port_config = get_param(Constant.P_MPD_PORT_ZONE).split(',')
+                port_config = get_json_param(Constant.P_MPD_PORT_ZONE).split(',')
                 alt_port = None
                 client = MPDClient()
                 client.timeout = 5
@@ -40,7 +40,7 @@ def mpd(request):
                     for pair in port_config:
                         port_val = int(pair.split('=')[1])
                         zone_val = pair.split('=')[0]
-                        client.connect(get_param(Constant.P_MPD_SERVER), port_val)
+                        client.connect(get_json_param(Constant.P_MPD_SERVER), port_val)
                         if client.status()['state'] == 'play':
                             port_list_play.append(port_val)
                             alt_zone = zone_val
@@ -59,7 +59,7 @@ def mpd(request):
                     if port is None:
                         port = alt_port
                     if port is not None:
-                        client.connect(get_param(Constant.P_MPD_SERVER), port)
+                        client.connect(get_json_param(Constant.P_MPD_SERVER), port)
                         status = client.status()
                         outcome = 'not available'
                         if cmd == 'next':

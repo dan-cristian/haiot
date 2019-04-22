@@ -1,16 +1,19 @@
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
 import time
+from datetime import datetime
 import serial
 import threading
 import prctl
 from pydispatch import dispatcher
 from main.logger_helper import L
+from main import sqlitedb
 from common import Constant, utils, variable
 from sensor import serial_common
-from main.admin import models
+if sqlitedb:
+    from main.admin import models
 from main import thread_pool
-import traceback
+from main.tinydb_model import Ups
 
 
 class P:
@@ -19,6 +22,11 @@ class P:
     ups = None
     interval = 30
     port_pattern = 'ttyUSB'
+    last_init = datetime.min
+    retry_pause_sec = 300  # seconds
+
+    def __init__(self):
+        pass
 
 
 class LegrandUps:
@@ -113,7 +121,10 @@ def __read_ups_status():
                 P.ups.TestInProgress = (P.ups.OtherStatus[5] == '1')
                 P.ups.BeeperOn = (P.ups.OtherStatus[7] == '1')
 
-            record = models.Ups()
+            if sqlitedb:
+                record = models.Ups()
+            else:
+                record = Ups()
             record.name = P.ups.Name
             record.system_name = Constant.HOST_NAME
             record.input_voltage = P.ups.InputVoltage
@@ -127,7 +138,10 @@ def __read_ups_status():
             record.other_status = P.ups.OtherStatus
             record.power_failed = P.ups.PowerFailed
             record.updated_on = utils.get_base_location_now_date()
-            current_record = models.Ups.query.filter_by(system_name=Constant.HOST_NAME).first()
+            if sqlitedb:
+                current_record = models.Ups.query.filter_by(system_name=Constant.HOST_NAME).first()
+            else:
+                current_record = Ups.find_one({Ups.system_name: Constant.HOST_NAME})
             record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
                                        save_to_graph=True)
 
@@ -146,9 +160,13 @@ def _quiet():
 
 def _create_dummy_entry():
     name = "dummy UPS"
-    record = models.Ups()
+    if sqlitedb:
+        record = models.Ups()
+        current_record = models.Ups.query.filter_by(name=name).first()
+    else:
+        record = Ups()
+        current_record = Ups.find_one({Ups.name: name})
     record.name = name
-    current_record = models.Ups.query.filter_by(name=name).first()
     if current_record is None:
         record.save_changed_fields(current_record=current_record, new_record=record)
     else:
@@ -159,6 +177,10 @@ def _create_dummy_entry():
 
 
 def _init_comm():
+    delta = (datetime.now() - P.last_init).total_seconds()
+    if delta < P.retry_pause_sec:
+        return
+    P.last_init = datetime.now()
     P.initialised = False
     try:
         # if constant.OS in constant.OS_LINUX:

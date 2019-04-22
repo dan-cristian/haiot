@@ -14,7 +14,7 @@ description_cpu_model = None
 
 
 def init():
-    if Constant.IS_OS_LINUX():
+    if Constant.is_os_linux():
         sysinfo = OrderedDict()
         with open('/proc/cpuinfo') as f:
             for line in f:
@@ -75,7 +75,7 @@ def init():
                 L.l.info("Machine is INTEL")
         if Constant.HOST_MACHINE_TYPE == Constant.NOT_INIT:
             L.l.error("Unknown machine type")
-    elif Constant.IS_OS_WINDOWS():
+    elif Constant.is_os_windows():
         import platform
         Constant.HOST_MACHINE_TYPE = platform.machine()
     else:

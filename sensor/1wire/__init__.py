@@ -2,13 +2,15 @@ import traceback
 import threading
 import prctl
 import time
-import pyownet.protocol
 from pydispatch import dispatcher
 import datetime
-try:
-    from common import Constant, utils
-    from main.logger_helper import L
+from main import sqlitedb
+if sqlitedb:
     from main.admin import model_helper, models
+from main.tinydb_model import Sensor, ZoneSensor
+try:
+    from common import Constant, utils, get_json_param
+    from main.logger_helper import L
     from main import thread_pool
 except Exception as ex:
     print("Exception importing key modules, probably started via main")
@@ -18,6 +20,16 @@ except Exception as ex:
             def info(msg): print(msg)
             @staticmethod
             def warning(msg): print(msg)
+
+
+from common import fix_module
+while True:
+    try:
+        import pyownet.protocol
+        break
+    except ImportError as iex:
+        if not fix_module(iex):
+            break
 
 '''
 Created on Mar 9, 2015
@@ -98,10 +110,16 @@ def save_to_db(dev):
     try:
         delta_time_counters = None
         address = dev['address']
-        record = models.Sensor(address=address)
-        assert isinstance(record, models.Sensor)
-        zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=address).first()
-        current_record = models.Sensor.query.filter_by(address=address).first()
+        if sqlitedb:
+            record = models.Sensor(address=address)
+            assert isinstance(record, models.Sensor)
+            zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=address).first()
+            current_record = models.Sensor.query.filter_by(address=address).first()
+        else:
+            record = Sensor()
+            record.address = address
+            zone_sensor = ZoneSensor.find_one({ZoneSensor.sensor_address: address})
+            current_record = Sensor.find_one({Sensor.address: address})
         if zone_sensor:
             record.sensor_name = zone_sensor.sensor_name
         else:
@@ -235,8 +253,12 @@ def get_io(sensor, dev, ow):
 
 def check_inactive():
     """check for inactive sensors not read recently but in database"""
-    sensor_list = models.Sensor().query_all()
-    defined_sensor_list = models.ZoneSensor().query_all()
+    if sqlitedb:
+        sensor_list = models.Sensor().query_all()
+        defined_sensor_list = models.ZoneSensor().query_all()
+    else:
+        sensor_list = Sensor.find()
+        defined_sensor_list = ZoneSensor().find()
     ref_list = []
     delta = (datetime.datetime.now() - P.last_warning).total_seconds()
     log_warn = (delta > 60 * 15)
@@ -295,8 +317,8 @@ def _init_comm():
     ohost = "none"
     oport = "none"
     try:
-        ohost = model_helper.get_param(Constant.P_OWSERVER_HOST_1)
-        oport = str(model_helper.get_param(Constant.P_OWSERVER_PORT_1))
+        ohost = get_json_param(Constant.P_OWSERVER_HOST_1)
+        oport = str(get_json_param(Constant.P_OWSERVER_PORT_1))
         _get_bus_list(ohost, oport)
         P.initialised = True
         P.warning_issued = False

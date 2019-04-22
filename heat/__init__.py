@@ -12,8 +12,8 @@ if sqlitedb:
     from main.admin.model_helper import commit, get_param
 from common import utils, Constant, get_json_param
 import gpio
-from main.tinydb_model import ZoneThermostat, TemperatureTarget, SchedulePattern, ZoneHeatRelay, \
-    Zone, HeatSchedule, ZoneSensor, Sensor, GpioPin
+from main.tinydb_model import ZoneThermostat, TemperatureTarget, SchedulePattern
+from main.tinydb_model import ZoneHeatRelay, Zone, HeatSchedule, ZoneSensor, Sensor, GpioPin
 
 
 class P:
@@ -135,7 +135,8 @@ def __save_heat_state_db(zone, heat_is_on):
             zone_thermo = ZoneThermostat()
         zone_thermo.zone_id = zone.id
         zone_thermo.zone_name = zone.name
-        zone_thermo.add_record_to_session()
+        if sqlitedb:
+            zone_thermo.add_record_to_session()
     if zone_heat_relay is not None:
         zone_heat_relay.heat_is_on = heat_is_on
         zone_heat_relay.updated_on = utils.get_base_location_now_date()
@@ -207,13 +208,13 @@ def _get_temp_target(pattern_id):
     if len(pattern) == 24:
         temp_code = pattern[hour]
         if sqlitedb:
-            temp_target = models.TemperatureTarget.query.filter_by(code=temp_code).first()
+            temp_target = float(models.TemperatureTarget.query.filter_by(code=temp_code).first().target)
         else:
-            temp_target = TemperatureTarget.find_one({TemperatureTarget.code: temp_code})
+            temp_target = float(TemperatureTarget.find_one({TemperatureTarget.code: temp_code}).target)
     else:
         L.l.warning('Incorrect temp pattern [{}] in zone {}, length is not 24'.format(pattern, schedule_pattern.name))
         temp_target = None
-    return temp_target.target, temp_code
+    return temp_target, temp_code
 
 
 # provide heat pattern
@@ -328,7 +329,8 @@ def _update_zone_heat(zone, heat_schedule, sensor):
             zone_thermo = ZoneThermostat()
         zone_thermo.zone_id = zone.id
         zone_thermo.zone_name = zone.name
-        zone_thermo.add_record_to_session()
+        if sqlitedb:
+            zone_thermo.add_record_to_session()
     try:
         schedule_pattern = _get_schedule_pattern(heat_schedule)
         if schedule_pattern:
@@ -418,7 +420,7 @@ def loop_zones():
             if heatrelay_main_source is None:
                 heatrelay_main_source = ZoneHeatRelay.find_one({ZoneHeatRelay.is_main_heat_source: 1})
         if heatrelay_main_source is not None:
-            L.l.info("Main heat relay={}".format(heatrelay_main_source))
+            # L.l.info("Main heat relay={}".format(heatrelay_main_source))
             if sqlitedb:
                 main_source_zone = models.Zone.query.filter_by(id=heatrelay_main_source.zone_id).first()
                 main_thermo = models.ZoneThermostat.query.filter_by(zone_id=main_source_zone.id).first()
@@ -431,7 +433,7 @@ def loop_zones():
                 # check when thermo is none
                 if main_thermo is None or (main_thermo.heat_is_on != heat_is_on or update_age_mins >=
                                            int(get_json_param(Constant.P_HEAT_STATE_REFRESH_PERIOD))):
-                    L.l.info("Setting main heat on={}, zone={}".format(heat_is_on, main_source_zone))
+                    L.l.info("Setting main heat on={}, zone={}".format(heat_is_on, main_source_zone.name))
                     __save_heat_state_db(zone=main_source_zone, heat_is_on=heat_is_on)
                     P.last_main_heat_update = utils.get_base_location_now_date()
             else:
@@ -497,8 +499,8 @@ def set_main_heat_source():
     if sqlitedb:
         heat_source_relay_list = models.ZoneHeatRelay.query.filter(models.ZoneHeatRelay.temp_sensor_name is not None).all()
     else:
-        #fixme: negated query
-        heat_source_relay_list = ZoneHeatRelay.find({'$not', {ZoneHeatRelay.temp_sensor_name: None}})
+        # fixme: negated query
+        heat_source_relay_list = ZoneHeatRelay.find({'$not': {ZoneHeatRelay.temp_sensor_name: None}})
     up_limit = P.temp_limit + P.threshold
     for heat_source_relay in heat_source_relay_list:
         # is there is a temp sensor defined, consider this source as possible alternate source
@@ -583,6 +585,33 @@ def _handle_presence(zone_name=None, zone_id=None):
             L.l.info("No heat thermo for zone {}".format(zone_name))
 
 
+def _zoneheatrelay_upsert_listener(record, updated_fields):
+    # copy to help with recursion prevention
+    if record.heat_is_on:
+        pin_value = 1
+    else:
+        pin_value = 0
+    # set pin only on pins owned by this host
+    if record.gpio_host_name == Constant.HOST_NAME:
+        L.l.info("Setting heat pin {} to {}".format(record.gpio_pin_code, pin_value))
+        pin_state = gpio.relay_update(gpio_pin_code=record.gpio_pin_code, pin_value=pin_value)
+        if pin_state == pin_value:
+            pin_state = (pin_state == 1)
+            record.heat_is_on = pin_state
+            record.save_changed_fields()
+        else:
+            L.l.warning(
+                'Heat state zone_id {} unexpected val={} after setval={}'.format(record.zone_id, pin_state, pin_value))
+
+
+def _zonethermostat_upsert_listener(record, updated_fields):
+    # activate manual mode if set by user in UI
+    if hasattr(record, ZoneThermostat.is_mode_manual) and record.is_mode_manual is True:
+        record.last_manual_set = datetime.datetime.now()
+        record.save_changed_fields()
+        L.l.info('Set thermostat active={} zone={}'.format(record.is_mode_manual, record.zone_name))
+
+
 progress_status = None
 
 
@@ -624,5 +653,7 @@ def init():
     # dispatcher.connect(handle_event_heat, signal=Constant.SIGNAL_HEAT, sender=dispatcher.Any)
     thread_pool.add_interval_callable(thread_run, 30)
     P.initialised = True
+    ZoneHeatRelay.add_upsert_listener(_zoneheatrelay_upsert_listener)
+    ZoneThermostat.add_upsert_listener(_zonethermostat_upsert_listener)
     # P.debug = True
 

@@ -114,14 +114,11 @@ def _process_message(msg):
                             record.sensor_name = zone_sensor.sensor_name
                         if voltage is not None:
                             record.vad = round(voltage, 0)
-                            record.save_changed_fields(current_record=current_record, new_record=record,
-                                                       notify_transport_enabled=True, save_to_graph=True, debug=False)
                         if current is not None:
                             record.iad = round(current, 1)
-                            record.save_changed_fields(current_record=current_record, new_record=record,
-                                                       notify_transport_enabled=True, save_to_graph=True, debug=False)
                         if factor is not None:
                             record.vdd = round(factor, 1)
+                        if voltage is not None or current is not None or factor is not None:
                             record.save_changed_fields(current_record=current_record, new_record=record,
                                                        notify_transport_enabled=True, save_to_graph=True, debug=False)
                 # dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=current, unit='kWh')
@@ -198,7 +195,7 @@ def _process_message(msg):
                         new = PowerMonitor()
                         new.id = sensor.id
                     new.voltage = voltage
-                    new.save_changed_fields(current_record = sensor, notify_transport_enabled=True, save_to_graph=True)
+                    new.save_changed_fields(current_record=sensor, notify_transport_enabled=True, save_to_graph=True)
                 else:
                     L.l.warning('Sensor INA on {} not defined in db'.format(sensor_name))
             if 'ANALOG' in obj:
@@ -235,7 +232,7 @@ def mqtt_on_message(client, userdata, msg):
     try:
         _process_message(msg)
     except Exception as ex:
-        L.l.error("Error processing sonoff mqtt {}, err={}".format(msg.topic, ex), exc_info=True)
+        L.l.error("Error processing sonoff mqtt {}, err={}, msg={}".format(msg.topic, ex, msg), exc_info=True)
 
 
 # iot/sonoff/stat/sonoff-basic-5/POWER = ON/OFF

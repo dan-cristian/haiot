@@ -2,25 +2,28 @@ from datetime import datetime
 import time
 import threading
 import random
-import common
-from common import utils
+from common import Constant, utils, fix_module
 from main.tinydb_app import db
 from main.logger_helper import L
+import transport
+from main import persistence
 
 while True:
     try:
+        from pydispatch import dispatcher
         from flask_admin.contrib.pymongo import ModelView
         from wtforms import fields, form
         from tinyrecord import transaction
         break
     except ImportError as iex:
-        if not common.fix_module(iex):
+        if not fix_module(iex):
             break
 
 
 class TinyBase(ModelView):
     column_list = ()
     column_sortable_list = ()
+    upsert_listener_list = {}
     form = None
     page_size = 20
     can_set_page_size = True
@@ -63,51 +66,129 @@ class TinyBase(ModelView):
         else:
             return None
 
-    def save_changed_fields(self, current=None, broadcast=False, persist=False, *args, **kwargs):
-        if current is None and 'current_record' in kwargs:
-            current = kwargs['current_record']
-        if broadcast is None and 'notify_transport_enabled' in kwargs:
-            broadcast = kwargs['notify_transport_enabled']
-        if persist is None and 'save_to_graph' in kwargs:
-            persist = kwargs['save_to_graph']
-        update = {}
-        key = None
-        for fld in self.__class__.column_list:
-            if current is not None and hasattr(current, fld):
-                curr_val = getattr(current, fld)
-            else:
-                curr_val = None
-            if hasattr(self, fld):
-                new_val = getattr(self, fld)
-            else:
-                new_val = None
-            if curr_val != new_val:
-                if new_val is not None:
-                    update[fld] = new_val
-                else:
-                    update[fld] = curr_val
-            # set key as the first field in the new record that is not none
-            if key is None and new_val is not None:
-                key = {fld: new_val}
+    @staticmethod
+    def _persist(record, update, class_name):
+        record[Constant.JSON_PUBLISH_TABLE] = class_name
+        dispatcher.send(signal=Constant.SIGNAL_STORABLE_RECORD, new_record=record)
+        # persistence.save_to_history_db(record)
 
-        if len(update) > 0:
-            if key is not None:
-                exist = self.__class__.coll.find_one(filter=key)
-                if exist is not None:
-                    res = self.__class__.coll.update_one(query=key, doc={"$set": update})
-                    L.l.info('Updated key {}={} with content {}'.format(key, res.raw_result[0], update))
+    @staticmethod
+    def _broadcast(record, update, class_name):
+        try:
+            record[Constant.JSON_PUBLISH_SOURCE_HOST] = str(Constant.HOST_NAME)
+            record[Constant.JSON_PUBLISH_TABLE] = class_name
+            record[Constant.JSON_PUBLISH_FIELDS_CHANGED] = list(update.keys())
+            js = utils.safeobj2json(record)
+            transport.send_message_json(json=js)
+        except Exception as ex:
+            L.l.error('Unable to broadcast {} rec={}'.format(class_name, record))
+            exit(112)
+
+    def save_changed_fields(self, current=None, broadcast=None, persist=None, listeners=True, *args, **kwargs):
+        cls = self.__class__
+        potential_recursion = hasattr(self, '_id')
+        try:
+            if current is None and 'current_record' in kwargs:
+                current = kwargs['current_record']
+            if broadcast is None and 'notify_transport_enabled' in kwargs:
+                broadcast = kwargs['notify_transport_enabled']
+            if persist is None and 'save_to_graph' in kwargs:
+                persist = kwargs['save_to_graph']
+            update = {}
+            key = None
+            for fld in cls.column_list:
+                if current is not None and hasattr(current, fld):
+                    curr_val = getattr(current, fld)
                 else:
-                    res = self.__class__.coll.insert_one(update)
-                    if 'vad' in key:
-                        L.l.info('debug')
-                    L.l.info('Inserted key {} with eid={}/{} content={}'.format(key, res.eid, res.inserted_id, update))
-            else:
-                L.l.error('Cannot save changed fields, key is missing for {}'.format(self))
+                    curr_val = None
+                if fld == 'updated_on':
+                    self.updated_on = datetime.now()
+                if hasattr(self, fld):
+                    new_val = getattr(self, fld)
+                else:
+                    new_val = None
+                if curr_val != new_val:
+                    if new_val is not None:
+                        update[fld] = new_val
+                    else:
+                        update[fld] = curr_val
+                # set key as the first field in the new record that is not none
+                if key is None and new_val is not None:
+                    key = {fld: new_val}
+
+            if len(update) > 0:
+                if key is not None:
+                    exist = cls.coll.find_one(filter=key)
+                    if exist is not None:
+                        res = cls.coll.update_one(query=key, doc={"$set": update})
+                        if res.raw_result is not None:
+                            k = res.raw_result[0]
+                        else:
+                            k = 'n/a'
+                        # L.l.info('Updated key {}, {}={}'.format(self.__repr__(), key, k))
+                    else:
+                        res = cls.coll.insert_one(update)
+                        # L.l.info('Inserted key {}, {} with eid={}'.format(self.__repr__(), key, res.eid))
+                    # execute listener
+                    if cls.__name__ in cls.upsert_listener_list:
+                        has_listener = True
+                    else:
+                        has_listener = False
+                    record = cls.coll.find_one(filter=key)
+                    rec_clone = cls(copy=record)
+                    change_list = list(update.keys())
+                    if persist is True or broadcast is True or has_listener is True:
+                        if record is None:
+                            L.l.error('No record in db after insert/update for cls {} key {}'.format(cls.__name__, key))
+                            L.l.error('update was {}, rec={}'.format(update, record))
+                            exit(111)
+                        if persist is True:
+                            self._persist(record=record, update=update, class_name=cls.__name__)
+                        elif broadcast is True:
+                            self._broadcast(record=record, update=update, class_name=cls.__name__)
+                        if listeners and has_listener and not hasattr(self, '_listener_executed'):
+                            if potential_recursion:
+                                L.l.warning('Potential recursion, self has id set already')
+                            rec_clone._listener_executed = True
+                            cls.upsert_listener_list[cls.__name__](
+                                record=rec_clone, updated_fields=change_list)
+                    dispatcher.send(Constant.SIGNAL_DB_CHANGE_FOR_RULES, obj=rec_clone, change=change_list)
+                else:
+                    L.l.error('Cannot save changed fields, key is missing for {}'.format(self))
+        except Exception as ex:
+            L.l.info('Exception saving fields, class {} ex={}'.format(cls.__name__, ex), exc_info=True)
+
+    # save fields from remote updates
+    @classmethod
+    def save(cls, obj):
+        # L.l.info('Saving remote record {}'.format(cls.__name__))
+        new_obj = cls(copy=obj)
+        new_obj.save_changed_fields()
+
+    @classmethod
+    def add_upsert_listener(cls, func):
+        if cls.__name__ in cls.upsert_listener_list:
+            L.l.warning('Listener for {} already in list, overwriting!'.format(cls.__name__))
+        cls.upsert_listener_list[cls.__name__] = func
+
+    def __repr__(self):
+        cls = self.__class__
+        if cls.column_list is not None:
+            rep = '[{}] '.format(cls.__name__)
+            i = 0
+            for fld in cls.column_list:
+                rep = '{}{}:{} '.format(rep, fld, getattr(self, fld))
+                i += 1
+                if i > 3:
+                    break
+            return rep
+        else:
+            return '(obj)' + cls.__name__
 
     def __init__(self, copy=None):
         cls = self.__class__
         obj_fields = dict(cls.__dict__)
-        if not hasattr(cls, 'tinydb_initialised'):
+        if not hasattr(cls, '_tinydb_initialised'):
             attr_dict = {}
             for attr in obj_fields:
                 if utils.is_primitive(attr, obj_fields[attr]):
@@ -135,13 +216,16 @@ class TinyBase(ModelView):
             ModelView.__init__(self, collx, type(self).__name__)
             cls.t = self.coll.table
             cls.coll = self.coll
-            cls.tinydb_initialised = True
+            cls._tinydb_initialised = True
         else:
             for attr in obj_fields:
                 setattr(self, attr, None)
+        self.source_host = Constant.HOST_NAME
         if copy is not None:
             for fld in copy:
-                setattr(self, fld, copy[fld])
+                if hasattr(self, fld):
+                    setattr(self, fld, copy[fld])
+                self._listener_executed = None
 
 
 threadLock = threading.Lock()
