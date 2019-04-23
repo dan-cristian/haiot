@@ -82,7 +82,6 @@ class TinyBase(ModelView):
             transport.send_message_json(json=js)
         except Exception as ex:
             L.l.error('Unable to broadcast {} rec={}'.format(class_name, record))
-            exit(112)
 
     def save_changed_fields(self, current=None, broadcast=None, persist=None, listeners=True, *args, **kwargs):
         cls = self.__class__
@@ -125,23 +124,31 @@ class TinyBase(ModelView):
                             k = res.raw_result[0]
                         else:
                             k = 'n/a'
-                        L.l.info('Updated key {}, {}={}'.format(self.__repr__(), key, k))
+                        L.l.info('Updated key {}, {}'.format(key, self.__repr__()))
                     else:
                         res = cls.coll.insert_one(update)
-                        L.l.info('Inserted key {}, {} with eid={}'.format(self.__repr__(), key, res.eid))
+                        L.l.info('Inserted key {}, {} with eid={}'.format(key, self.__repr__(), res.eid))
                     # execute listener
                     if cls.__name__ in cls.upsert_listener_list:
                         has_listener = True
                     else:
                         has_listener = False
-                    record = cls.coll.find_one(filter=key)
+                    record = None
+                    i = 0
+                    while record is None and i < 10:
+                        record = cls.coll.find_one(filter=key)
+                        i += 1
+                    if i > 1:
+                        L.l.error('Found record {} with key {} after {} tries'.format(cls.__name__, key, i))
                     rec_clone = cls(copy=record)
                     change_list = list(update.keys())
                     if persist is True or broadcast is True or has_listener is True:
                         if record is None:
                             L.l.error('No record in db after insert/update for cls {} key {}'.format(cls.__name__, key))
-                            L.l.error('update was {}, rec={}'.format(update, record))
-                            exit(111)
+                            L.l.info('Error self is {}'.format(self))
+                            L.l.info('Error update was {}, rec={}'.format(update, record))
+                            L.l.info('Error col list is {}'.format(cls.column_list))
+                            return
                         if persist is True:
                             self._persist(record=record, update=update, class_name=cls.__name__)
                         elif broadcast is True:
