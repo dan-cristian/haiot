@@ -377,7 +377,7 @@ def get_alexawemo_rules():
     func_list = getmembers(rule.alexa, isfunction)
     if func_list:
         for func in func_list:
-            if not func[1].func_defaults and not func[1].func_name.startswith('_'):
+            if not func[1].__defaults__ and not func[1].__name__.startswith('_'):
                 # add this to DB
                 func_name = func[0]
                 if func_name.startswith(ALEXA_RULE_PREFIX):
