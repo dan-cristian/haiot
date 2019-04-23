@@ -265,22 +265,24 @@ def check_inactive():
     for zone_sensor in defined_sensor_list:
         ref_list.append(zone_sensor.sensor_address)
     for sensor in sensor_list:
-        elapsed = round((utils.get_base_location_now_date() - sensor.updated_on).total_seconds() / 60, 0)
-        if sensor.address not in ref_list:
-            L.l.warning('Sensor {} {} not defined'.format(sensor.address, sensor.sensor_name))
-            #current_record = models.SensorError.query.filter_by(sensor_address=sensor.address).first()
-            #record = models.SensorError()
-            #record.sensor_name = sensor.sensor_name
-            #if current_record is not None:
-            #    record.error_count = current_record.error_count
-            #else:
-            #    record.error_count = 0
-            #record.error_count += 1
-            #record.error_type = 0
-            #record.save_changed_fields(current_record=None, new_record=record, save_to_graph=True, save_all_fields=True)
-        if log_warn and elapsed > 2 * P.sampling_period_seconds:
-            L.l.warning('Sensor {} type {} not updated since {} min'.format(sensor.sensor_name, sensor.type, elapsed))
-            P.last_warning = datetime.datetime.now()
+        if sensor.updated_on is not None:
+            elapsed = round((utils.get_base_location_now_date() - sensor.updated_on).total_seconds() / 60, 0)
+            if sensor.address not in ref_list:
+                L.l.warning('Sensor {} {} not defined'.format(sensor.address, sensor.sensor_name))
+                #current_record = models.SensorError.query.filter_by(sensor_address=sensor.address).first()
+                #record = models.SensorError()
+                #record.sensor_name = sensor.sensor_name
+                #if current_record is not None:
+                #    record.error_count = current_record.error_count
+                #else:
+                #    record.error_count = 0
+                #record.error_count += 1
+                #record.error_type = 0
+                #record.save_changed_fields(current_record=None, new_record=record, save_to_graph=True, save_all_fields=True)
+            if log_warn and elapsed > 2 * P.sampling_period_seconds:
+                L.l.warning('Sensor {} type {} not updated since {} min'.format(
+                    sensor.sensor_name, sensor.type, elapsed))
+                P.last_warning = datetime.datetime.now()
 
 
 def get_unknown(sensor, dev, ow):
