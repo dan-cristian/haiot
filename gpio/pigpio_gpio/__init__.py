@@ -381,7 +381,7 @@ def _setup_in_ports(gpio_pin_list):
 
 
 def thread_run():
-    pass
+    P.pi.get_current_tick()
 
 
 def unload():
