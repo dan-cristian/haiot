@@ -68,7 +68,7 @@ def __write_read_port(ser, command):
         try:
             ser.flushInput()
             ser.flushOutput()
-            ser.write(command)
+            ser.write(command.encode())
             time.sleep(1)
             response = str(ser.readline()).replace('\n', '')
         except Exception as ex:
