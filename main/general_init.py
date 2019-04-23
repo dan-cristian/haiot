@@ -9,7 +9,7 @@ from common import fix_module
 while True:
     try:
         import wheel  # needed for auto install/compile
-        import uson
+        import ujson
         from tinydb import Query
         break
     except ImportError as iex:
