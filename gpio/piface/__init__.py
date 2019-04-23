@@ -4,7 +4,14 @@ from pydispatch import dispatcher
 from main.logger_helper import L
 from common import Constant, fix_module
 from gpio import io_common
-
+while True:
+    try:
+        if Constant.is_os_linux():
+            import pifacedigitalio as pfio
+        break
+    except ImportError as iex:
+        if not fix_module(iex):
+            break
 
 # https://piface.github.io/pifacedigitalio/example.html
 class P:
@@ -20,15 +27,8 @@ class P:
         pass
 
 
-while True:
-    try:
-        break
-    except ImportError as iex:
-        if not fix_module(iex):
-            break
-
 try:
-    import pifacedigitalio as pfio
+    # import pifacedigitalio as pfio
     from pifacedigitalio.core import NoPiFaceDigitalDetectedError
     from pifacecommon.spi import SPIInitError
     P.import_ok = True
