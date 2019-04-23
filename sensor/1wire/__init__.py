@@ -67,7 +67,7 @@ def do_device(ow, path):
                 try:
                     dev = {}
                     dev['path'] = path
-                    sensortype = ow.read(sensor + 'type')
+                    sensortype = str(ow.read(sensor + 'type'))
                     if sensortype == 'DS2423':
                         dev = get_counter(sensor, dev, ow)
                     elif sensortype == 'DS2413':
@@ -81,7 +81,7 @@ def do_device(ow, path):
                     else:
                         dev = get_unknown(sensor, dev, ow)
                     sensor_dict[dev['address']] = dev
-                    if 'DS2401' not in sensortype:
+                    if sensortype == 'DS2401':
                         save_to_db(dev)
                         last_sensor = dev['address']
                         count += 1
