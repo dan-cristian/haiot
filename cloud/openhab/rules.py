@@ -24,6 +24,9 @@ def send_mqtt_openhab(subtopic, payload):
 
 
 def rule_openhab_sensor(obj=models.Sensor(), field_changed_list=None):
+    if obj.sensor_name is None:
+        L.l.warning('Got empty openhab sensor name {}'.format(obj))
+        return
     key = 'temperature'
     if hasattr(obj, key) and obj.temperature is not None:
         # if obj.sensor_name == 'curte fata':
@@ -60,7 +63,7 @@ def rule_openhab_dustsensor(obj=models.DustSensor(), field_changed_list=None):
 
 
 def rule_openhab_utility(obj=models.Utility(), field_changed_list=None):
-    if hasattr(obj, 'utility_type') and obj.utility_name is not None:
+    if hasattr(obj, 'utility_type') and hasattr(obj, 'utility_name') and obj.utility_name is not None:
         # L.l.info("PROCESSING utility {}".format(obj.utility_type))
         key = 'electricity'
         if obj.utility_type == key:
@@ -77,7 +80,8 @@ def rule_openhab_utility(obj=models.Utility(), field_changed_list=None):
             send_mqtt_openhab(subtopic=key + "_" + obj.utility_name, payload=obj.units_delta)
     else:
         # L.l.info("NO UTILITY TYPE in {}".format(obj))
-        pass
+        if obj.utility_name is None:
+            L.l.warning('Got empty openhab utility name {}'.format(obj))
 
 
 def rule_openhab_alarm(obj=models.ZoneAlarm(), field_changed_list=None):
