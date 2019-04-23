@@ -11,7 +11,6 @@ from main import thread_pool
 from sensor import sonoff
 from gpio import io_common
 # from gpio import std_gpio
-from gpio import piface
 from gpio import pcf8574_gpio
 import threading
 import prctl
@@ -19,10 +18,12 @@ from gpio import rpi_gpio
 from gpio import pigpio_gpio
 from main.tinydb_model import ZoneCustomRelay
 
+
 class P:
     initialised = False
     expire_func_list = {}
     has_zwave = False
+    has_piface = False
 
     def __init__(self):
         pass
@@ -31,9 +32,14 @@ class P:
 try:
     from sensor import zwave
     P.has_zwave = True
-except ImportError as ie:
-    L.l.info("Zwave module cannot be imported")
+except ImportError:
+    pass
 
+try:
+    from gpio import piface
+    P.has_piface = True
+except ImportError:
+    pass
 
 
 # update hardware pin state and record real pin value in local DB only
@@ -67,6 +73,7 @@ def relay_update(gpio_pin_code=None, pin_value=None, from_web=False):
 
 # parameter is GpioPin model, not the pin index!
 def relay_get(gpio_pin_obj=None, from_web=False):
+    pin_value = None
     message = 'Get relay state for pin {}'.format(gpio_pin_obj)
     # if Constant.HOST_MACHINE_TYPE in [Constant.MACHINE_TYPE_RASPBERRY, Constant.MACHINE_TYPE_BEAGLEBONE,
     #                                  Constant.MACHINE_TYPE_ODROID]:
@@ -77,13 +84,15 @@ def relay_get(gpio_pin_obj=None, from_web=False):
         #    pin_value = std_gpio.get_pin_bcm(bcm_id=gpio_pin_obj.pin_index_bcm)
     elif gpio_pin_obj.pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
         # todo: check if pin index is bcm type indeed for piface
-        pin_value = piface.get_out_pin_value(
-            pin_index=gpio_pin_obj.pin_index_bcm, board_index=gpio_pin_obj.board_index)
+        if P.has_piface:
+            pin_value = piface.get_out_pin_value(
+                pin_index=gpio_pin_obj.pin_index_bcm, board_index=gpio_pin_obj.board_index)
+        else:
+            L.l.error('Piface not initialised so cannot get relay pin')
     elif gpio_pin_obj.pin_type == Constant.GPIO_PIN_TYPE_PI_PCF8574:
         pin_value = pcf8574_gpio.get_pin(pin_index=int(gpio_pin_obj.pin_index_bcm))
     else:
         L.l.warning('Cannot select gpio method for pin={}'.format(gpio_pin_obj))
-        pin_value = None
     # else:
     #    message += ' error not running on gpio enabled devices'
     #    pin_value = None
@@ -109,8 +118,11 @@ def relay_set(gpio_pin_index_bcm=None, gpio_pin_type=None, gpio_board_index=None
         # else:
         #    pin_value = std_gpio.set_pin_bcm(gpio_pin_index_bcm, value)
     elif gpio_pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
-        pin_value = piface.set_pin_value(pin_index=int(gpio_pin_index_bcm), pin_value=int(value),
-                                         board_index=int(gpio_board_index))
+        if P.has_piface:
+            pin_value = piface.set_pin_value(pin_index=int(gpio_pin_index_bcm), pin_value=int(value),
+                                             board_index=int(gpio_board_index))
+        else:
+            L.l.error('Piface not initialised so cannot set relay pin')
     elif gpio_pin_type == Constant.GPIO_PIN_TYPE_PI_PCF8574:
         pin_value = pcf8574_gpio.set_pin_value(pin_index=int(gpio_pin_index_bcm), pin_value=value)
     else:
@@ -136,7 +148,7 @@ def not_used_gpio_record_update(json_object):
                 models.GpioPin().save_changed_fields_from_json_object(debug=False,
                     json_object=json_object, notify_transport_enabled=False, save_to_graph=False)
             else:
-                #fixme: add
+                # fixme: add
                 pass
     except Exception as ex:
         L.l.warning('Error on gpio state update, err {}'.format(ex))
@@ -286,14 +298,14 @@ def zone_custom_relay_upsert_listener(record, changed_fields):
         value = 1 if record.relay_is_on else 0
         expired_relay_is_on = not (bool(record.relay_is_on))
         gpio_record = GpioPin.find_one({GpioPin.pin_code: record.gpio_pin_code, GpioPin.host_name: Constant.HOST_NAME})
-        relay_set(gpio_pin_index_bcm=gpio_record.pin_index_bcm, gpio_pin_type=gpio_record.pin_type,
-                  gpio_board_index=gpio_record.board_index, value=value, from_web=False)
         if record.pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
             pin_code = piface.format_pin_code(
                 board_index=gpio_record.board_index, pin_direction=Constant.GPIO_PIN_DIRECTION_OUT,
                 pin_index=gpio_record.pin_index_bcm)
         else:
             pin_code = gpio_record.pin_index_bcm
+        relay_set(gpio_pin_index_bcm=gpio_record.pin_index_bcm, gpio_pin_type=gpio_record.pin_type,
+                  gpio_board_index=gpio_record.board_index, value=value, from_web=False)
         expire_func = (relay_set, pin_code, gpio_record.pin_type, gpio_record.board_index, expired_relay_is_on, False)
     else:
         L.l.warning('Unknown relay type {}'.format(record.relay_type))
@@ -327,11 +339,6 @@ def _process_expire():
 def thread_run():
     prctl.set_name("gpio")
     threading.current_thread().name = "gpio"
-    # pigpio_gpio.thread_run()
-    # piface.thread_run()
-    # bbb_io.thread_run()
-    # std_gpio.thread_run()
-    # rpi_gpio.thread_run()
     _process_expire()
     prctl.set_name("idle")
     threading.current_thread().name = "idle"
@@ -341,10 +348,11 @@ def unload():
     try:
         L.l.info('Unloading gpio pins')
         # std_gpio.unload()
-        piface.unload()
         # bbb_io.unload()
+        piface.unload()
         rpi_gpio.unload()
         pigpio_gpio.unload()
+        pcf8574_gpio.unload()
     except Exception as ex:
         L.l.error('Error unloading gpio, ex={}'.format(ex), exc_info=True)
     P.initialised = False
@@ -354,7 +362,6 @@ def post_init():
     piface.post_init()
     rpi_gpio.post_init()
     pcf8574_gpio.post_init()
-    sonoff.post_init()
 
 
 def init():
