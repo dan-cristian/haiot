@@ -14,6 +14,7 @@ from main.tinydb_model import Pwm, GpioPin
 
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
+
 # http://abyz.co.uk/rpi/pigpio/download.html
 # http://abyz.co.uk/rpi/pigpio/python.html
 # https://ms-iot.github.io/content/images/PinMappings/RP2_Pinout.png
@@ -33,6 +34,17 @@ class P:
         pass
 
 
+from common import fix_module
+while True:
+    try:
+        import pigpio
+        P.import_ok = True
+        break
+    except ImportError as iex:
+        if not fix_module(iex):
+            break
+
+
 class Logx:
     def __init__(self):
         pass
@@ -47,13 +59,6 @@ class Logx:
 
     logger = Logger()
 
-
-try:
-    import pigpio
-    P.import_ok = True
-except Exception as ex:
-    P.import_ok = False
-    L.l.info('Not importing pigpio_gpio, message={}'.format(ex))
 
 '''
 http://abyz.co.uk/rpi/pigpio_gpio/index.html
