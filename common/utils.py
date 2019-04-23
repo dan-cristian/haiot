@@ -45,8 +45,12 @@ def date_serialised(obj):
 
 
 def json2obj(data):
-    # return json.loads(data, object_pairs_hook=date_deserialiser)
-    return json.loads(data)
+    try:
+        # return json.loads(data, object_pairs_hook=date_deserialiser)
+        return json.loads(data)
+    except Exception as ex:
+        L.l.error('json2obj error, ex={} data={}'.format(ex, data), exc_info=True)
+        return None
 
 
 # this function takes objects that can be safely serialised

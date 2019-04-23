@@ -7,6 +7,7 @@
   {"module": "mpd", "package": "python-mpd2"},
   {"module": "serial", "package": "pyserial"},
   {"module": "dateutil", "package": "python-dateutil"},
-  {"module": "prctl", "package": "python-prctl"}
+  {"module": "prctl", "package": "python-prctl"},
+  {"module": "RPi", "package": "RPi.GPIO"}
 ]
 }
