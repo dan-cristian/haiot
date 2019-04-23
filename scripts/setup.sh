@@ -5,10 +5,15 @@
 source venv/bin/activate
 if [ "$?" != "0" ]; then
     echo "detected that venv is not installed"
+    #python 2.7 install
     #sudo pip install --upgrade pip
-    sudo pip install virtualenv
+    #sudo pip install virtualenv
+    #virtualenv --system-site-packages venv
+
+    #python3 install
     #https://raspberrypi.stackexchange.com/questions/9246/how-to-install-smbus-to-virtualenv
-    virtualenv --system-site-packages venv
+    sudo pip install python3-venv
+    python3 -m venv
     source venv/bin/activate
 fi
 
