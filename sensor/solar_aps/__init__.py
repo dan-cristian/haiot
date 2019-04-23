@@ -100,12 +100,12 @@ def thread_run():
                     record.unit_name = current_record.unit_name
                     record.units_2_delta = last_power
                     record.unit_2_name = current_record.unit_2_name
+                    if current_record.unit_cost is None:
+                        current_record.unit_cost = 0.0
+                    record.cost = 1.0 * record.units_delta * current_record.unit_cost
                 else:
                     record.units_delta = production
                     record.units_total = production
-                if current_record.unit_cost is None:
-                    current_record.unit_cost = 0.0
-                record.cost = 1.0 * record.units_delta * current_record.unit_cost
                 record.save_changed_fields(current_record=current_record, new_record=record, debug=False,
                                            notify_transport_enabled=True, save_to_graph=True, save_all_fields=False)
         except Exception as ex:
