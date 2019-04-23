@@ -70,7 +70,8 @@ def _process_message(msg):
         topic_clean = P.sonoff_topic.replace('#', '')
         if topic_clean in msg.topic:
             sensor_name = msg.topic.split(topic_clean)[1].split('/')[1]
-            obj = utils.json2obj(str(msg.payload))
+            mqtt_data = str(msg.payload)
+            obj = utils.json2obj()
             if 'ENERGY' in obj:
                 energy = obj['ENERGY']
                 power = float(energy['Power'])
