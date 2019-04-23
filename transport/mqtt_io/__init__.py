@@ -86,6 +86,15 @@ def subscribe():
     P.mqtt_client.subscribe(topic=P.topic, qos=0)
 
 
+def payload2json(payload):
+    # locate json string and clean escape chars
+    res = str(payload).replace('\\', '')
+    start = res.find('{')
+    end = res.rfind('}')
+    res = res[start:end + 1]
+    return res
+
+
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
     json = msg
@@ -98,11 +107,7 @@ def on_message(client, userdata, msg):
         #L.l.debug('Received from client [{}] userdata [{}] msg [{}] at {} '.format(client._client_id,
         #                                                                           userdata, msg.topic,
         #                                                                           utils.get_base_location_now_date()))
-        # locate json string and clean escape chars
-        payload = str(msg.payload).replace('\\', '')
-        start = payload.find('{')
-        end = payload.rfind('}')
-        json = payload[start:end + 1]
+        json = payload2json(msg.payload)
         # ignore messages sent by this host
         if '"source_host_": "{}"'.format(Constant.HOST_NAME) not in json \
                 and '"source_host": "{}"'.format(Constant.HOST_NAME) not in json \
