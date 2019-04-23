@@ -90,7 +90,7 @@
     {"id":47, "active":true, "start_order":47, "name":"sensor.rfxcom", "host_name":""},
     {"id":49, "active":true, "start_order":49, "name":"sensor.ups_legrand", "host_name":""},
     {"id":51, "active":true, "start_order":51, "name":"sensor.solar_aps", "host_name":""},
-    {"id":53, "active":true, "start_order":53, "name":"sensor.zwave", "host_name":""},
+    {"id":53, "active":false, "start_order":53, "name":"sensor.zwave", "host_name":""},
     {"id":55, "active":true, "start_order":55, "name":"sensor.1wire", "host_name":""},
     {"id":57, "active":true, "start_order":57, "name":"sensor.sonoff", "host_name":""},
     {"id":59, "active":true, "start_order":59, "name":"sensor.i2c", "host_name":""},
