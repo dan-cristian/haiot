@@ -209,7 +209,7 @@ class TinyBase(ModelView, metaclass=OrderedClassMembers):
 
     def __init__(self, copy=None):
         cls = self.__class__
-        obj_fields = collections.OrderedDict(cls.__dict__)
+        obj_fields = dict(cls.__dict__)
         if not hasattr(cls, '_tinydb_initialised'):
             attr_dict = {}
             cls.column_list = ()
@@ -221,7 +221,9 @@ class TinyBase(ModelView, metaclass=OrderedClassMembers):
                 if utils.is_primitive(attr, obj_fields[attr]):
                     if first_check:
                         if attr != 'id':
-                            L.l.error('First key is not id, but {}'.format(attr))
+                            L.l.error('First key is not id, but {}. list is {}'.format(attr, cls.__dict__))
+                            L.l.info('dict={}'.format(dict(cls.__dict__)))
+                            L.l.info('ordered={}'.format(collections.OrderedDict(cls.__dict__)))
                         first_check = False
                     attr_type = type(getattr(self, attr))
                     if attr_type is int:
