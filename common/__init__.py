@@ -218,7 +218,7 @@ def fix_module(ex):
             print('Not retrying a failed package install for {}'.format(package_name))
             return False
         else:
-            msg = 'Unable to split, unexpected len {}'.format(len(mod_err))
+            msg = 'Unable to split {}, unexpected len {}'.format(error_message, len(mod_err))
     except Exception as ex:
         msg = 'Fixmodule exception err={}'.format(ex)
     print(msg)
