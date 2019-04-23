@@ -10,16 +10,17 @@ from common import fix_module
 while True:
     try:
         from tinydb import TinyDB, Query, where
-        from tinydb.storages import MemoryStorage
+        from tinydb.storages import MemoryStorage, JSONStorage
         from tinyrecord import transaction
         import pymongo
         from flask_admin.contrib.pymongo import ModelView, filters
         from flask_admin.form import Select2Widget
         from flask_admin.model.fields import InlineFieldList, InlineFormField
         from wtforms import fields, form
-        from tinymongo import TinyMongoClient
+        from tinymongo import TinyMongoClient, TinyMongoDatabase
         from tinymongo.serializers import DateTimeSerializer, Serializer
         from tinydb_serialization import SerializationMiddleware
+        from tinydb_smartcache import SmartCacheTable
         break
     except ImportError as iex:
         if not fix_module(iex):
@@ -51,7 +52,37 @@ class CustomFileTinyMongoClient(TinyMongoClient):
         return serialization
 
 
-class CustomMemoryTinyMongoClient(TinyMongoClient):
+class CustomTinyMongoDatabase(TinyMongoDatabase):
+    """Representation of a Pymongo database"""
+    def __init__(self, database, foldername, storage):
+        """Initialize a TinyDB file named as the db name in the given folder
+        """
+        self._foldername = foldername
+        TinyDB.table_class = SmartCacheTable
+        if issubclass(storage._storage_cls, JSONStorage):
+            self.tinydb = TinyDB(
+                path=os.path.join(foldername, database + u".json"),
+                storage=storage
+            )
+        else:
+            # for memory storage path argument is not required
+            self.tinydb = TinyDB(
+                storage=storage
+            )
+
+
+class CustomTinyMongoClient(TinyMongoClient):
+
+    def __getitem__(self, key):
+        """Gets a new or existing database based in key"""
+        return CustomTinyMongoDatabase(key, self._foldername, self._storage)
+
+    def __getattr__(self, name):
+        """Gets a new or existing database based in attribute"""
+        return CustomTinyMongoDatabase(name, self._foldername, self._storage)
+
+
+class CustomMemoryTinyMongoClient(CustomTinyMongoClient):
     @property
     def _storage(self):
         serialization = SerializationMiddleware(MemoryStorage)

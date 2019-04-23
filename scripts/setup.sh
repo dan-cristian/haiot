@@ -12,8 +12,8 @@ if [ "$?" != "0" ]; then
 
     #python3 install
     #https://raspberrypi.stackexchange.com/questions/9246/how-to-install-smbus-to-virtualenv
-    sudo pip install python3-venv
-    python3 -m venv
+    sudo apt install python3-venv
+    python3 -m venv venv
     source venv/bin/activate
 fi
 
