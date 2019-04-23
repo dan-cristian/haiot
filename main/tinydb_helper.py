@@ -40,6 +40,7 @@ class TinyBase(ModelView, metaclass=OrderedClassMembers):
     form = None
     page_size = 20
     can_set_page_size = True
+    ignore_save_change_fields = ['updated_on']
 
     def __str__(self):
         return '{}'.format(self.__dict__)
@@ -109,24 +110,27 @@ class TinyBase(ModelView, metaclass=OrderedClassMembers):
             update = {}
             key = None
             for fld in cls.column_list:
-                if current is not None and hasattr(current, fld):
-                    curr_val = getattr(current, fld)
-                else:
-                    curr_val = None
-                if fld == 'updated_on':
-                    self.updated_on = datetime.now()
-                if hasattr(self, fld):
-                    new_val = getattr(self, fld)
-                else:
-                    new_val = None
-                if curr_val != new_val:
-                    if new_val is not None:
-                        update[fld] = new_val
+                if fld not in cls.ignore_save_change_fields:
+                    if fld == 'updated_on' and self.updated_on is None:
+                        self.updated_on = datetime.now()
+                    if hasattr(self, fld):
+                        new_val = getattr(self, fld)
                     else:
-                        update[fld] = curr_val
-                # set key as the first field in the new record that is not none
-                if key is None and new_val is not None:
-                    key = {fld: new_val}
+                        new_val = None
+                    if current is not None and hasattr(current, fld):
+                        curr_val = getattr(current, fld)
+                    else:
+                        curr_val = None
+                    if curr_val != new_val:
+                        if new_val is not None:
+                            update[fld] = new_val
+                        elif curr_val is not None:
+                            update[fld] = curr_val
+                        else:
+                            L.l.info('what?')
+                    # set key as the first field in the new record that is not none
+                    if key is None and new_val is not None:
+                        key = {fld: new_val}
 
             if len(update) > 0:
                 if key is not None:
@@ -139,7 +143,7 @@ class TinyBase(ModelView, metaclass=OrderedClassMembers):
                             k = 'n/a'
                         L.l.info('Updated key {}, {}'.format(key, self.__repr__()))
                     else:
-                        res = cls.coll.insert_one(update)
+                        res = cls.coll.insert_one(update, bypass_document_validation=True)
                         L.l.info('Inserted key {}, {} with eid={}'.format(key, self.__repr__(), res.eid))
                     # execute listener
                     if cls.__name__ in cls.upsert_listener_list:
