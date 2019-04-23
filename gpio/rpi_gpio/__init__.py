@@ -19,15 +19,15 @@ class P:
         pass
 
 
-try:
-    import RPi.GPIO as GPIO
-    P.import_module_exist = True
-except ImportError:
-    L.l.info('Module RPI.GPIO is not installed, module will not be initialised')
-    P.import_module_exist = False
-except RuntimeError as re:
-    L.l.info('Cannot import RPI.GPIO, module will not be initialised, err={}'.format(re))
-    P.import_module_exist = False
+from common import fix_module
+while True:
+    try:
+        import RPi.GPIO as GPIO
+        P.import_module_exist = True
+        break
+    except ImportError as iex:
+        if not fix_module(iex):
+            break
 
 
 # https://sourceforge.net/p/raspberry-gpio-python/wiki/Checking%20function%20of%20GPIO%20channels/
