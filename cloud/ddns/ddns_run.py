@@ -7,7 +7,7 @@ import threading
 import prctl
 import json
 import socket
-import requests
+import urllib.requests
 # from main.admin import model_helper
 from common import Constant, utils, get_json_param, fix_module
 while True:
@@ -40,7 +40,7 @@ def __update_ddns_rackspace():
         ip_json_test = ''
         try:
             #ip_json_test = requests.get('http://ip-api.com/json').text
-            ip_json_test = requests.get('http://ipinfo.io').text
+            ip_json_test = urllib.requests.get('http://ipinfo.io').text
             ip_json_obj = utils.json2obj(ip_json_test)
             #public_ip = ip_json_obj['query']
             #public_isp = ip_json_obj['isp']
@@ -82,7 +82,7 @@ def __update_ddns_rackspace():
                 authData = {'auth': {'RAX-KSKEY:apiKeyCredentials': {'username': config['username'],
                                                                      'apiKey': config['api_key']}}}
                 authHeaders = {'Accept': 'application/json','Content-type': 'application/json'}
-                auth = requests.post(authUrl, data=json.dumps(authData), headers=authHeaders)
+                auth = urllib.requests.post(authUrl, data=json.dumps(authData), headers=authHeaders)
                 auth = utils.json2obj(auth.text)
                 cache['auth']['expires'] = auth['access']['token']['expires']
                 cache['auth']['token'] = auth['access']['token']['id']
@@ -93,7 +93,7 @@ def __update_ddns_rackspace():
             data = {'ttl': config['record_ttl'], 'name': config['record_name'], 'data': public_ip}
             headers = {'Accept': 'application/json', 'Content-type': 'application/json',
                        'X-Auth-Token': cache['auth']['token']}
-            result = requests.put(url, data=json.dumps(data), headers=headers)
+            result = urllib.requests.put(url, data=json.dumps(data), headers=headers)
             if result.ok:
                 L.l.info('Updated IP address for {} to {}'.format(config['record_name'], public_ip))
             else:
