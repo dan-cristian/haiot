@@ -422,7 +422,7 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
 
     echo "Install mandatory requirements from folder: " `pwd`
     # needed for python-prctl, other packages
-    apt-get install -y libcap2-dev libffi-dev python-dev libssl-dev
+    apt-get install -y libcap2-dev libffi-dev python-dev python3-dev libssl-dev
     pip install -r requirements.txt
 
     echo "Install RPI requirements. I am in folder:" `pwd`
