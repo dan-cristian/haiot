@@ -1,17 +1,16 @@
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
-from main.logger_helper import L
-
 import pytz
 import threading
 import prctl
 import json
 import socket
-import urllib.requests
+from main.logger_helper import L
 # from main.admin import model_helper
 from common import Constant, utils, get_json_param, fix_module
 while True:
     try:
+        import requests
         from dateutil import parser
         break
     except ImportError as iex:
@@ -40,7 +39,7 @@ def __update_ddns_rackspace():
         ip_json_test = ''
         try:
             #ip_json_test = requests.get('http://ip-api.com/json').text
-            ip_json_test = urllib.requests.get('http://ipinfo.io').text
+            ip_json_test = requests.get('http://ipinfo.io').text
             ip_json_obj = utils.json2obj(ip_json_test)
             #public_ip = ip_json_obj['query']
             #public_isp = ip_json_obj['isp']
@@ -82,7 +81,7 @@ def __update_ddns_rackspace():
                 authData = {'auth': {'RAX-KSKEY:apiKeyCredentials': {'username': config['username'],
                                                                      'apiKey': config['api_key']}}}
                 authHeaders = {'Accept': 'application/json','Content-type': 'application/json'}
-                auth = urllib.requests.post(authUrl, data=json.dumps(authData), headers=authHeaders)
+                auth = requests.post(authUrl, data=json.dumps(authData), headers=authHeaders)
                 auth = utils.json2obj(auth.text)
                 cache['auth']['expires'] = auth['access']['token']['expires']
                 cache['auth']['token'] = auth['access']['token']['id']
@@ -93,7 +92,7 @@ def __update_ddns_rackspace():
             data = {'ttl': config['record_ttl'], 'name': config['record_name'], 'data': public_ip}
             headers = {'Accept': 'application/json', 'Content-type': 'application/json',
                        'X-Auth-Token': cache['auth']['token']}
-            result = urllib.requests.put(url, data=json.dumps(data), headers=headers)
+            result = requests.put(url, data=json.dumps(data), headers=headers)
             if result.ok:
                 L.l.info('Updated IP address for {} to {}'.format(config['record_name'], public_ip))
             else:
