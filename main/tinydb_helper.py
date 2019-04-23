@@ -209,16 +209,16 @@ class TinyBase(ModelView, metaclass=OrderedClassMembers):
 
     def __init__(self, copy=None):
         cls = self.__class__
-        obj_fields = dict(cls.__dict__)
+        obj_fields = list(cls.__dict__['__ordered__'])
         if not hasattr(cls, '_tinydb_initialised'):
             attr_dict = {}
             cls.column_list = ()
             cls.column_sortable_list = ()
-            obj_fields['source_host'] = None  # add this field to all instances
-            self.source_host = Constant.HOST_NAME
+            obj_fields.append('source_host')  # add this field to all instances
+            cls.source_host = Constant.HOST_NAME
             first_check = True
             for attr in obj_fields:
-                if utils.is_primitive(attr, obj_fields[attr]):
+                if utils.is_primitive(attr, getattr(cls, attr)):
                     if first_check:
                         if attr != 'id':
                             L.l.error('First key is not id, but {}. list is {}'.format(attr, cls.__dict__))
@@ -251,10 +251,9 @@ class TinyBase(ModelView, metaclass=OrderedClassMembers):
             cls.coll = self.coll
             cls._tinydb_initialised = True
         else:
-            self.source_host = Constant.HOST_NAME
             for attr in obj_fields:
                 setattr(self, attr, None)
-
+            self.source_host = Constant.HOST_NAME
         if copy is not None:
             for fld in copy:
                 if hasattr(self, fld):
