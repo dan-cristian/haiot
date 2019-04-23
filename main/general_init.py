@@ -1,20 +1,19 @@
 import threading
+from common import fix_module
+while True:
+    try:
+        import wheel  # needed for auto install/compile
+        import ujson
+        break
+    except ImportError as iex:
+        if not fix_module(iex):
+            break
 from common import Constant
 from main.logger_helper import L
 from main import system_info
 import transport
 from main import thread_pool
 
-from common import fix_module
-while True:
-    try:
-        import wheel  # needed for auto install/compile
-        import ujson
-        from tinydb import Query
-        break
-    except ImportError as iex:
-        if not fix_module(iex):
-            break
 
 
 class P:
