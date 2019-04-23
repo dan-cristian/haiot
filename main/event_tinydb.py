@@ -7,6 +7,7 @@ from main import thread_pool
 from common import Constant
 import main.persistence
 from main.tinydb_model import Node
+from main import general_init
 
 
 class P:
@@ -67,6 +68,8 @@ def mqtt_thread_run():
             _process_obj(obj)
             if len(P.mqtt_event_list) > last_count:
                 L.l.debug('Not keeping up with {} mqtt events'.format(len(P.mqtt_event_list)))
+            if general_init.P.shutting_down is True:
+                break
     except Exception as ex:
         L.l.error("General error processing mqtt: {}".format(ex), exc_info=True)
     finally:
