@@ -11,19 +11,6 @@ import six
 from pydispatch import dispatcher as haiot_dispatch
 from main.tinydb_model import Sensor, ZoneSensor, ZoneCustomRelay
 
-from common import fix_module
-while True:
-    try:
-        import openzwave
-        if six.PY3:
-            from pydispatch import dispatcher
-        else:
-            from louie import dispatcher
-        break
-    except ImportError as iex:
-        if not fix_module(iex):
-            break
-
 
 class P:
     network = None
@@ -46,6 +33,11 @@ class P:
 
 
 try:
+    import openzwave
+    if six.PY3:
+        from pydispatch import dispatcher
+    else:
+        from louie import dispatcher
     from openzwave.node import ZWaveNode
     from openzwave.value import ZWaveValue
     from openzwave.scene import ZWaveScene
