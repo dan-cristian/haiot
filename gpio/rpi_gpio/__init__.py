@@ -22,8 +22,9 @@ class P:
 from common import fix_module
 while True:
     try:
-        import RPi.GPIO as GPIO
-        P.import_module_exist = True
+        if Constant.is_os_linux():
+            import RPi.GPIO as GPIO
+            P.import_module_exist = True
         break
     except ImportError as iex:
         if not fix_module(iex):

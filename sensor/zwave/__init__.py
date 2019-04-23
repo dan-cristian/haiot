@@ -436,7 +436,7 @@ def _set_param(node_id, param_name, value):
 def _initial_node_init():
     if not P.init_done:
         _set_param(2, 'Power reporting in Watts on power change',  1)
-        _set_param(2, 'Power reporting in Watts by time interval', 0)
+        _set_param(2, 'Power reporting in Watts by time interval', 600)
         P.init_done = True
         node = P.network.nodes[2]
         configs = node.get_configs()
@@ -464,7 +464,6 @@ def thread_run():
                     if not P.thread_run_at_init:
                         L.l.info("Request state for node {}".format(node))
                     node.request_state()
-
             if not P.thread_run_at_init:
                 P.thread_run_at_init = True
             sec = (datetime.now() - P.last_value_received).total_seconds()
@@ -496,3 +495,4 @@ def init():
     if P.module_imported:
         thread_pool.add_interval_callable(thread_run, run_interval_second=P.interval)
         dispatcher.connect(_init_recovery, signal=Constant.SIGNAL_USB_DEVICE_CHANGE, sender=dispatcher.Any)
+

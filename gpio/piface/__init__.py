@@ -13,6 +13,7 @@ while True:
         if not fix_module(iex):
             break
 
+
 # https://piface.github.io/pifacedigitalio/example.html
 class P:
     import_ok = False
