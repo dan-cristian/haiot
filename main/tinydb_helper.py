@@ -216,8 +216,13 @@ class TinyBase(ModelView, metaclass=OrderedClassMembers):
             cls.column_sortable_list = ()
             obj_fields['source_host'] = None  # add this field to all instances
             self.source_host = Constant.HOST_NAME
+            first_check = True
             for attr in obj_fields:
                 if utils.is_primitive(attr, obj_fields[attr]):
+                    if first_check:
+                        if attr != 'id':
+                            L.l.error('First key is not id, but {}'.format(attr))
+                        first_check = False
                     attr_type = type(getattr(self, attr))
                     if attr_type is int:
                         fld = fields.IntegerField(attr)
