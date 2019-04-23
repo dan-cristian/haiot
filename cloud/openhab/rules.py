@@ -60,7 +60,7 @@ def rule_openhab_dustsensor(obj=models.DustSensor(), field_changed_list=None):
 
 
 def rule_openhab_utility(obj=models.Utility(), field_changed_list=None):
-    if hasattr(obj, 'utility_type'):
+    if hasattr(obj, 'utility_type') and obj.utility_name is not None:
         # L.l.info("PROCESSING utility {}".format(obj.utility_type))
         key = 'electricity'
         if obj.utility_type == key:
