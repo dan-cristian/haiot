@@ -85,12 +85,15 @@ def rule_openhab_utility(obj=models.Utility(), field_changed_list=None):
 
 
 def rule_openhab_alarm(obj=models.ZoneAlarm(), field_changed_list=None):
-    key = 'contact'
-    if obj.alarm_pin_triggered is True:
-        state = "OPEN"
+    if obj.alarm_pin_name is not None:
+        key = 'contact'
+        if obj.alarm_pin_triggered is True:
+            state = "OPEN"
+        else:
+            state = "CLOSED"
+        send_mqtt_openhab(subtopic=key + "_" + obj.alarm_pin_name, payload=state)
     else:
-        state = "CLOSED"
-    send_mqtt_openhab(subtopic=key + "_" + obj.alarm_pin_name, payload=state)
+        L.l.warning('Got empty alarm pin name {}'.format(obj))
 
 
 def rule_openhab_ups(obj=models.Ups(), field_changed_list=None):
@@ -123,12 +126,15 @@ def rule_openhab_custom_relay(obj=models.ZoneCustomRelay(), field_changed_list=N
 
 
 def rule_openhab_heat_relay(obj=models.ZoneHeatRelay(), field_changed_list=None):
-    if field_changed_list is not None:
-        if obj.heat_is_on:
-            state = "ON"
-        else:
-            state = "OFF"
-        send_mqtt_openhab(subtopic="heat_" + obj.heat_pin_name, payload=state)
+    if obj.heat_pin_name is not None:
+        if field_changed_list is not None:
+            if obj.heat_is_on:
+                state = "ON"
+            else:
+                state = "OFF"
+            send_mqtt_openhab(subtopic="heat_" + obj.heat_pin_name, payload=state)
+    else:
+        L.l.warning('Got empty heat relay pin name {}'.format(obj))
 
 
 def rule_openhab_thermo(obj=models.ZoneThermostat(), field_changed_list=None):
