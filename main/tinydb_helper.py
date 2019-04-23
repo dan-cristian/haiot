@@ -125,10 +125,10 @@ class TinyBase(ModelView):
                             k = res.raw_result[0]
                         else:
                             k = 'n/a'
-                        # L.l.info('Updated key {}, {}={}'.format(self.__repr__(), key, k))
+                        L.l.info('Updated key {}, {}={}'.format(self.__repr__(), key, k))
                     else:
                         res = cls.coll.insert_one(update)
-                        # L.l.info('Inserted key {}, {} with eid={}'.format(self.__repr__(), key, res.eid))
+                        L.l.info('Inserted key {}, {} with eid={}'.format(self.__repr__(), key, res.eid))
                     # execute listener
                     if cls.__name__ in cls.upsert_listener_list:
                         has_listener = True
