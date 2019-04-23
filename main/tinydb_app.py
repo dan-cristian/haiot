@@ -106,9 +106,8 @@ def _init_flask_admin():
         if cls_name is not 'TinyBase' and issubclass(cls, TinyBase):
             obj = cls()
             admin.add_view(obj)
-            # _populate_db(cls_name, obj)
             _populate_db(cls, obj)
-
+            cls.reset_usage()
     # app.run(debug=False)
 
 

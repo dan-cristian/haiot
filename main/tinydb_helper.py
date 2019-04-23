@@ -41,6 +41,7 @@ class TinyBase(ModelView, metaclass=OrderedClassMembers):
     page_size = 20
     can_set_page_size = True
     ignore_save_change_fields = ['updated_on']
+    is_used_in_module = False
 
     def __str__(self):
         return '{}'.format(self.__dict__)
@@ -58,6 +59,8 @@ class TinyBase(ModelView, metaclass=OrderedClassMembers):
     #    return self.__dict__.update(entries)
     @classmethod
     def find(cls, filter=None, sort=None, skip=None, limit=None, *args, **kwargs):
+        if not cls.is_used_in_module:
+            cls.is_used_in_module = True
         recs = cls.coll.find(filter=filter, sort=sort, skip=skip, limit=limit, *args, **kwargs)
         ret = []
         for r in recs:
@@ -66,6 +69,8 @@ class TinyBase(ModelView, metaclass=OrderedClassMembers):
 
     @classmethod
     def find_one(cls, filter=None):
+        if not cls.is_used_in_module:
+            cls.is_used_in_module = True
         r = cls.coll.find_one(filter=filter)
         if r is not None:
             return cls({**r})
@@ -74,11 +79,17 @@ class TinyBase(ModelView, metaclass=OrderedClassMembers):
 
     @classmethod
     def insert_one(cls, doc):
+        if not cls.is_used_in_module:
+            cls.is_used_in_module = True
         r = cls.coll.insert_one(doc=doc)
         if r is not None:
             return cls({**r})
         else:
             return None
+
+    @classmethod
+    def reset_usage(cls):
+        cls.is_used_in_module = False
 
     @staticmethod
     def _persist(record, update, class_name):
@@ -99,6 +110,8 @@ class TinyBase(ModelView, metaclass=OrderedClassMembers):
 
     def save_changed_fields(self, current=None, broadcast=None, persist=None, listeners=True, *args, **kwargs):
         cls = self.__class__
+        if not cls.is_used_in_module:
+            cls.is_used_in_module = True
         potential_recursion = hasattr(self, '_id')
         try:
             if current is None and 'current_record' in kwargs:

@@ -6,7 +6,12 @@ import prctl
 import threading
 from music import mpd
 
-initialised = False
+
+class P:
+    initialised = False
+
+    def __init__(self):
+        pass
 
 
 def thread_run():
@@ -21,13 +26,11 @@ def unload():
     L.l.info('Music module unloading')
     # ...
     thread_pool.remove_callable(thread_run)
-    global initialised
-    initialised = False
+    P.initialised = False
 
 
 def init():
     L.l.info('Music module initialising')
     thread_pool.add_interval_callable(thread_run, run_interval_second=10)
     mpd.init()
-    global initialised
-    initialised = True
+    P.initialised = True
