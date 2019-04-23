@@ -19,7 +19,7 @@ class P:
 
 def _check_usb_change():
     if Constant.is_os_linux():
-        out = subprocess.check_output(['lsusb']).split('\n')
+        out = str(subprocess.check_output(['lsusb'])).split('\n')
         if P.last_usb_out is not None and P.last_usb_out != out:
             P.last_usb_out = out
             return True
