@@ -17,11 +17,10 @@ while True:
         from flask_admin.form import Select2Widget
         from flask_admin.model.fields import InlineFieldList, InlineFormField
         from wtforms import fields, form
-        import tinymongo
         from tinymongo import TinyMongoClient, TinyMongoDatabase
         from tinymongo.serializers import DateTimeSerializer, Serializer
         from tinydb_serialization import SerializationMiddleware
-        from tinydb_smartcache import SmartCacheTable
+        # from tinydb_smartcache import SmartCacheTable
         break
     except ImportError as iex:
         if not fix_module(iex):
@@ -59,7 +58,7 @@ class CustomTinyMongoDatabase(TinyMongoDatabase):
         """Initialize a TinyDB file named as the db name in the given folder
         """
         self._foldername = foldername
-        TinyDB.table_class = SmartCacheTable
+        # TinyDB.table_class = SmartCacheTable
         if issubclass(storage._storage_cls, JSONStorage):
             self.tinydb = TinyDB(
                 path=os.path.join(foldername, database + u".json"),
