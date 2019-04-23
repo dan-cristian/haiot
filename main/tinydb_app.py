@@ -17,6 +17,7 @@ while True:
         from flask_admin.form import Select2Widget
         from flask_admin.model.fields import InlineFieldList, InlineFormField
         from wtforms import fields, form
+        import tinymongo
         from tinymongo import TinyMongoClient, TinyMongoDatabase
         from tinymongo.serializers import DateTimeSerializer, Serializer
         from tinydb_serialization import SerializationMiddleware
