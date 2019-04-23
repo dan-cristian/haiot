@@ -55,6 +55,10 @@ def set_pin_value(pin_index, pin_value):
         return _not_initialised('set_pin_value')
 
 
+def unload():
+    pass
+
+
 def post_init():
     if P.initialised:
         L.l.info('Running post_init pcf')
