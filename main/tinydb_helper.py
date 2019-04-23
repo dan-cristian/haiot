@@ -2,6 +2,7 @@ from datetime import datetime
 import time
 import threading
 import random
+import collections
 from common import Constant, utils, fix_module
 from main.tinydb_app import db
 from main.logger_helper import L
@@ -20,7 +21,19 @@ while True:
             break
 
 
-class TinyBase(ModelView):
+# https://stackoverflow.com/questions/4459531/how-to-read-class-attributes-in-the-same-order-as-declared
+class OrderedClassMembers(type(ModelView)):
+    @classmethod
+    def __prepare__(self, name, bases):
+        return collections.OrderedDict()
+
+    def __new__(self, name, bases, classdict):
+        classdict['__ordered__'] = [key for key in classdict.keys()
+                if key not in ('__module__', '__qualname__')]
+        return type.__new__(self, name, bases, classdict)
+
+
+class TinyBase(ModelView, metaclass=OrderedClassMembers):
     column_list = ()
     column_sortable_list = ()
     upsert_listener_list = {}
@@ -137,8 +150,10 @@ class TinyBase(ModelView):
                     i = 0
                     while record is None and i < 10:
                         record = cls.coll.find_one(filter=key)
-                        i += 1
-                    if i > 1:
+                        if record is None:
+                            time.sleep(0.1)  # fixme!!!!
+                            i += 1
+                    if i > 1 and record is not None:
                         L.l.error('Found record {} with key {} after {} tries'.format(cls.__name__, key, i))
                     rec_clone = cls(copy=record)
                     change_list = list(update.keys())
@@ -197,6 +212,10 @@ class TinyBase(ModelView):
         obj_fields = dict(cls.__dict__)
         if not hasattr(cls, '_tinydb_initialised'):
             attr_dict = {}
+            self.column_list = ()
+            self.column_sortable_list = ()
+            obj_fields['source_host'] = None  # add this field to all instances
+            self.source_host = Constant.HOST_NAME
             for attr in obj_fields:
                 if utils.is_primitive(attr, obj_fields[attr]):
                     attr_type = type(getattr(self, attr))
@@ -225,9 +244,10 @@ class TinyBase(ModelView):
             cls.coll = self.coll
             cls._tinydb_initialised = True
         else:
+            self.source_host = Constant.HOST_NAME
             for attr in obj_fields:
                 setattr(self, attr, None)
-        self.source_host = Constant.HOST_NAME
+
         if copy is not None:
             for fld in copy:
                 if hasattr(self, fld):
