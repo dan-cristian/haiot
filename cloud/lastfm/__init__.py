@@ -1,5 +1,6 @@
 # from urllib import addinfo
 # from main.admin.model_helper import get_param
+import os
 from common import Constant, get_json_param
 import music.mpd
 from music import gmusicproxy
@@ -15,26 +16,13 @@ while True:
         if not fix_module(iex):
             break
 
-USERNAME = None
-_network = None
 
+class P:
+    USERNAME = None
+    network = None
 
-def init():
-    config_file = get_json_param(Constant.P_LASTFM_CONFIG_FILE)
-    with open(config_file, 'r') as f:
-        config_list = json.load(f)
-    global _network, USERNAME
-    API_KEY = config_list['lastfm_api']
-    API_SECRET = config_list['lastfm_secret']
-    USERNAME = config_list['lastfm_user']
-    PASSWORD = config_list['lastfm_pass']
-    # In order to perform a write operation you need to authenticate yourself
-    password_hash = pylast.md5(PASSWORD)
-    try:
-        _network = pylast.LastFMNetwork(api_key=API_KEY, api_secret=API_SECRET,
-                                        username=USERNAME, password_hash=password_hash)
-    except Exception as ex:
-        L.l.error("Cannot init lastfm, ex={}".format(ex))
+    def __init__(self):
+        pass
 
 
 def _multify(text):
@@ -46,13 +34,12 @@ def _multify(text):
 
 
 def _get_current():
-    global _network, USERNAME
     track = None
-    if _network is None:
+    if P.network is None:
         init()
-    if _network is not None:
+    if P.network is not None:
         try:
-            track = _network.get_user(USERNAME).get_now_playing()
+            track = P.network.get_user(P.USERNAME).get_now_playing()
         except Exception as ex:
             L.l.warning("Unable to get current lastfm play, err={}".format(ex))
     return track
@@ -168,18 +155,42 @@ def _add_to_playlist(tracks):
 
 
 def get_by_tag(tag):
-    global _network, USERNAME
-    if _network is None:
+    if P.network is None:
         init()
-    tracks = _network.get_user(USERNAME).get_tagged_tracks(tag)
-    result = _add_to_playlist(tracks)
+    if P.network is not None:
+        tracks = P.network.get_user(P.USERNAME).get_tagged_tracks(tag)
+        result = _add_to_playlist(tracks)
+    else:
+        result = 'not init'
     return '{"result": "' + _multify(result) + '"}'
 
 
 def get_loved_tracks_to_mpd():
-    global _network, USERNAME
-    if _network is None:
+    if P.network is None:
         init()
-    loved_tracks = _network.get_user(USERNAME).get_loved_tracks(limit=None)
-    result = _add_to_playlist(loved_tracks)
+    if P.network is not None:
+        loved_tracks = P.network.get_user(P.USERNAME).get_loved_tracks(limit=None)
+        result = _add_to_playlist(loved_tracks)
+    else:
+        result = 'not init'
     return '{"result": "' + _multify(result) + '"}'
+
+
+def init():
+    config_file = get_json_param(Constant.P_LASTFM_CONFIG_FILE)
+    if os.path.isfile(config_file):
+        with open(config_file, 'r') as f:
+            config_list = json.load(f)
+        API_KEY = config_list['lastfm_api']
+        API_SECRET = config_list['lastfm_secret']
+        P.USERNAME = config_list['lastfm_user']
+        PASSWORD = config_list['lastfm_pass']
+        # In order to perform a write operation you need to authenticate yourself
+        password_hash = pylast.md5(PASSWORD)
+        try:
+            P.network = pylast.LastFMNetwork(
+                api_key=API_KEY, api_secret=API_SECRET, username=P.USERNAME, password_hash=password_hash)
+        except Exception as ex:
+            L.l.error("Cannot init lastfm, ex={}".format(ex))
+    else:
+        L.l.info('Missing config file for lastfm')
