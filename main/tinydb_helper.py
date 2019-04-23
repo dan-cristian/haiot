@@ -46,7 +46,7 @@ class TinyBase(ModelView, metaclass=OrderedClassMembers):
 
     def dictx(self):
         attr_dict = {}
-        for column in self.column_list:
+        for column in self.__class__.column_list:
             attr_dict[column] = getattr(self, column)
         return attr_dict
 
@@ -153,7 +153,7 @@ class TinyBase(ModelView, metaclass=OrderedClassMembers):
                         if record is None:
                             time.sleep(0.1)  # fixme!!!!
                             i += 1
-                    if i > 1 and record is not None:
+                    if i > 0 and record is not None:
                         L.l.error('Found record {} with key {} after {} tries'.format(cls.__name__, key, i))
                     rec_clone = cls(copy=record)
                     change_list = list(update.keys())
@@ -209,11 +209,11 @@ class TinyBase(ModelView, metaclass=OrderedClassMembers):
 
     def __init__(self, copy=None):
         cls = self.__class__
-        obj_fields = dict(cls.__dict__)
+        obj_fields = collections.OrderedDict(cls.__dict__)
         if not hasattr(cls, '_tinydb_initialised'):
             attr_dict = {}
-            self.column_list = ()
-            self.column_sortable_list = ()
+            cls.column_list = ()
+            cls.column_sortable_list = ()
             obj_fields['source_host'] = None  # add this field to all instances
             self.source_host = Constant.HOST_NAME
             for attr in obj_fields:
@@ -232,10 +232,10 @@ class TinyBase(ModelView, metaclass=OrderedClassMembers):
                     else:
                         fld = fields.StringField(attr)
                     attr_dict[attr] = fld
-                    self.column_list = self.column_list + (attr,)
-                    self.column_sortable_list = self.column_sortable_list + (attr,)
+                    # self.column_list = self.column_list + (attr,)
+                    # self.column_sortable_list = self.column_sortable_list + (attr,)
                     cls.column_list = cls.column_list + (attr,)
-                    setattr(cls, attr, attr)
+                    setattr(cls, attr, attr)  # set class field values to equal names, for ORM autocompletion
             # http://jelly.codes/articles/python-dynamically-creating-classes/
             self.form = type(type(self).__name__ + 'Form', (form.Form,), attr_dict)
             collx = getattr(db, type(self).__name__.lower())
@@ -278,8 +278,9 @@ def insertfew():
             #    res = tr.insert(pwm.dictx())
             #    print res
             with transaction(pwm.coll.table):
-                res = pwm.coll.insert_one(pwm.dictx(), bypass_document_validation=True)
+                # res = pwm.coll.insert_one(pwm.dictx(), bypass_document_validation=True)
                 # print res.inserted_id
+                pass
             with threadLock:
                 globalCounter += 1
             print(globalCounter)
