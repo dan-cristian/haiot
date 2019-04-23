@@ -4,6 +4,7 @@ while True:
     try:
         import wheel  # needed for auto install/compile
         import ujson
+        import requests
         break
     except ImportError as iex:
         if not fix_module(iex):
