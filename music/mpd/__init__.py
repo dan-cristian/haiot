@@ -247,12 +247,14 @@ def save_lastfm():
         rec = models.MusicLoved(lastfmsong=lastfmsong)
     else:
         cur_recs = MusicLoved.find()
+        rec = MusicLoved()
         if len(cur_recs) > 0:
             cur_rec = cur_recs[0]
+            rec.id = cur_rec.id
         else:
             cur_rec = None
-        rec = MusicLoved()
         rec.lastfmsong = lastfmsong
+
     if lastfmloved is None:
         lastfmloved = False
     rec.lastfmloved = lastfmloved
