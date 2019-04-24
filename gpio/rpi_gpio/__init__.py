@@ -160,7 +160,8 @@ def post_init_relay_value(gpio_pin_code):
 def post_init_alarm_value(gpio_pin_code):
     pin_index_bcm = int(gpio_pin_code)
     GPIO.setup(int(pin_index_bcm), GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    return get_pin_bcm(pin_index_bcm)
+    # fixme check pin_connected value
+    return get_pin_bcm(pin_index_bcm) == 1
 
 
 def post_init():
