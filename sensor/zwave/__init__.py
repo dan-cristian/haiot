@@ -131,7 +131,7 @@ def _set_custom_relay_state(sensor_address, state):
 # https://github.com/OpenZWave/python-openzwave/blob/master/examples/api_demo.py
 def set_value(network, node, value):
     try:
-        L.l.info('Louie signal: Node={} Value={}'.format(node, value))
+        # L.l.info('Louie signal: Node={} Value={}'.format(node, value))
         sensor_address = "{}_{}".format(node.product_name, node.node_id)
         if sqlitedb:
             zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=sensor_address).first()
