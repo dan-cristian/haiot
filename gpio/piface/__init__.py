@@ -172,8 +172,11 @@ def post_init_relay_value(gpio_pin_code):
 def post_init_alarm_value(gpio_pin_code):
     board, direction, pin = io_common.decode_piface_pin(gpio_pin_code)
     pin_val = _get_in_pin_value(pin_index=pin, board_index=board)
-    pin_connected = (pin_val == 1)
-    return pin_connected
+    if pin_val is not None:
+        pin_connected = (pin_val == 1)
+        return pin_connected
+    else:
+        return None
 
 
 def post_init():
