@@ -278,6 +278,7 @@ def zone_custom_relay_record_update(json_object):
 def zone_custom_relay_upsert_listener(record, changed_fields):
     assert isinstance(record, ZoneCustomRelay)
     if record.gpio_host_name != Constant.HOST_NAME:
+        L.l.error('Got unexpected alien relay {}'.format(record))
         return
     L.l.info('Upsert listener {} pin {}'.format(record.relay_type, record.gpio_pin_code))
     if record.relay_type == Constant.GPIO_PIN_TYPE_SONOFF:
@@ -300,7 +301,7 @@ def zone_custom_relay_upsert_listener(record, changed_fields):
     elif record.relay_type in [Constant.GPIO_PIN_TYPE_PI_STDGPIO, Constant.GPIO_PIN_TYPE_PI_FACE_SPI]:
         value = 1 if record.relay_is_on else 0
         pin_code = record.gpio_pin_code
-        expired_relay_is_on = not (bool(record.relay_is_on))
+        expired_relay_is_on = not record.relay_is_on
         # gpio_record = GpioPin.find_one({GpioPin.pin_code: record.gpio_pin_code, GpioPin.host_name: Constant.HOST_NAME})
         if record.relay_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
             piface.set_pin_code_value(pin_code=record.gpio_pin_code, pin_value=value)
@@ -361,9 +362,10 @@ def unload():
 
 
 def post_init():
-    if Constant.is_os_windows():
+    # if Constant.is_os_windows():
         # not supported
-        return
+    #    return
+
     # init relay (out) pins
     relays = ZoneCustomRelay.find({ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME})
     for relay in relays:
@@ -383,7 +385,7 @@ def post_init():
             func = rpi_gpio.post_init_relay_value
         if func is not None:
             relay_value = func(gpio_pin_code=gpio_pin_code)
-            if relay_value is not None:
+            if relay_value is not None or Constant.HOST_NAME=='netbook':
                 relay.relay_is_on = relay_value
                 # skip listeners to avoid relay triggering?
                 relay.save_changed_fields(broadcast=True, persist=True, listeners=False)
@@ -409,7 +411,7 @@ def post_init():
             pin_connected = func(gpio_pin_code=gpio_pin_code)
             if pin_connected is not None:
                 alarm.alarm_pin_triggered = not pin_connected
-                alarm.save_changed_fields(broadcast=True, persist=True)
+                alarm.save_changed_fields(broadcast=True, persist=True, listeners=False)
 
     # piface.post_init()
     # rpi_gpio.post_init()
@@ -428,7 +430,7 @@ def init():
         # std_gpio.init()
     if Constant.is_os_windows():
         pigpio_gpio.init()
-    #ZoneCustomRelay.add_upsert_listener(zone_custom_relay_upsert_listener)
+    ZoneCustomRelay.add_upsert_listener(zone_custom_relay_upsert_listener)
     thread_pool.add_interval_callable(thread_run, run_interval_second=1)
     P.initialised = True
 

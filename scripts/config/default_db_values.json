@@ -123,7 +123,7 @@
     {"id":541, "active":false, "start_order":41, "name":"cloud.alexa", "host_name":"netbook"},
     {"id":557, "active":false, "start_order":57, "name":"sensor.sonoff", "host_name":"netbook"},
     {"id":559, "active":false, "start_order":59, "name":"sensor.i2c", "host_name":"netbook"},
-    {"id":565, "active":false, "start_order":65, "name":"gpio", "host_name":"netbook"},
+    {"id":565, "active":true, "start_order":65, "name":"gpio", "host_name":"netbook"},
     {"id":567, "active":false, "start_order":67, "name":"alarm", "host_name":"netbook"},
     {"id":570, "active":false, "start_order":70, "name":"music", "host_name":"netbook"},
     {"id":503, "active":false, "start_order":3, "name":"health_monitor", "host_name":"netbook"},
@@ -278,13 +278,13 @@
     {"relay_pin_name": "living_sub_relay", "zone_id": "2", "gpio_pin_code": "17", "gpio_host_name": "pi-face", "relay_type": "gpio"},
     {"relay_pin_name": "puffer_pump_heat_relay", "zone_id": "38", "gpio_pin_code": "22", "gpio_host_name": "pi-face", "relay_type": "gpio"},
     {"relay_pin_name": "puffer_pump_water_relay", "zone_id": "38", "gpio_pin_code": "5", "gpio_host_name": "pi-face", "relay_type": "gpio"},
-    {"relay_pin_name": "pump_recirculation_relay", "zone_id": "29", "gpio_pin_code": "27", "gpio_host_name": "pi-face", "relay_type": "gpio", "expire":60},
+    {"relay_pin_name": "pump_recirculation_relay", "zone_id": "29", "gpio_pin_code": "27", "gpio_host_name": "pi-face", "relay_type": "gpio"},
     {"relay_pin_name": "other_heat_relay", "zone_id": "29", "gpio_pin_code": "26", "gpio_host_name": "pi-face", "relay_type": "gpio"},
-    {"relay_pin_name": "front_lights_relay", "zone_id": "14", "gpio_pin_code": "6", "gpio_host_name": "pi-face", "relay_type": "gpio", "expire":1800},
+    {"relay_pin_name": "front_lights_relay", "zone_id": "14", "gpio_pin_code": "6", "gpio_host_name": "pi-face", "relay_type": "gpio"},
     {"relay_pin_name": "puffer_gas_valve_relay", "zone_id": "38", "gpio_pin_code": "13", "gpio_host_name": "pi-face", "relay_type": "gpio"},
     {"relay_pin_name": "unused_beci_relay", "zone_id": "14", "gpio_pin_code": "19", "gpio_host_name": "pi-face", "relay_type": "gpio"},
 
-    {"relay_pin_name": "front_gate_relay", "zone_id": "7", "gpio_pin_code": "0:out:1", "gpio_host_name": "pi-face", "relay_type": "piface", "expire":1},
+    {"relay_pin_name": "front_gate_relay", "zone_id": "7", "gpio_pin_code": "0:out:1", "gpio_host_name": "pi-face", "relay_type": "piface"},
     {"relay_pin_name": "beci_contactor_relay", "zone_id": "10", "gpio_pin_code": "0:out:2", "gpio_host_name": "pi-face", "relay_type": "piface"},
     {"relay_pin_name": "beci_upscharge_relay", "zone_id": "10", "gpio_pin_code": "0:out:3", "gpio_host_name": "pi-face", "relay_type": "piface"},
     {"relay_pin_name": "beci_extra_relay", "zone_id": "10", "gpio_pin_code": "0:out:4", "gpio_host_name": "pi-face", "relay_type": "piface"},
@@ -334,7 +334,9 @@
     {"relay_pin_name": "odroid_1_2", "zone_id": "7", "gpio_pin_code": "1:out:2", "gpio_host_name": "pizero2", "relay_type": "piface"},
     {"relay_pin_name": "odroid_pcf_0", "zone_id": "7", "gpio_pin_code": "0", "gpio_host_name": "pizero2", "relay_type": "pcf8574"},
     {"relay_pin_name": "odroid_pcf_1", "zone_id": "7", "gpio_pin_code": "1", "gpio_host_name": "pizero2", "relay_type": "pcf8574"},
-    {"relay_pin_name": "odroid_pcf_7", "zone_id": "7", "gpio_pin_code": "7", "gpio_host_name": "pizero2", "relay_type": "pcf8574"}
+    {"relay_pin_name": "odroid_pcf_7", "zone_id": "7", "gpio_pin_code": "7", "gpio_host_name": "pizero2", "relay_type": "pcf8574"},
+
+    {"relay_pin_name": "front_gate_relay_test", "zone_id": "7", "gpio_pin_code": "0:out:1", "gpio_host_name": "netbook", "relay_type": "piface"}
   ],
 
   "PowerMonitor": [
