@@ -190,8 +190,9 @@ class TinyBase(ModelView, metaclass=OrderedClassMembers):
                         elif broadcast is True:
                             self._broadcast(record=record, update=update, class_name=cls_name)
                         if listeners and has_listener and not hasattr(self, '_listener_executed'):
-                            if hasattr(self, 'is_device_event') and getattr(self, 'is_device_event') is True:
-                                L.l.info('No listener on device events for {}'.format(cls_name))
+                            if hasattr(self, 'is_device_event') and self.is_device_event is True:
+                                # L.l.info('No listener on device events for {}'.format(cls_name))
+                                pass
                             else:
                                 rec_clone._listener_executed = True
                                 cls.upsert_listener_list[cls_name](record=rec_clone, changed_fields=change_list)
