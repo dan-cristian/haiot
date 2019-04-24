@@ -189,8 +189,10 @@ class TinyBase(ModelView, metaclass=OrderedClassMembers):
                             self._persist(record=record, update=update, class_name=cls_name)
                         if broadcast is True:
                             self._broadcast(record=record, update=update, class_name=cls_name)
-                        if listeners and has_listener and not hasattr(self, '_listener_executed'):
-                            if hasattr(self, 'is_device_event') and self.is_device_event is True:
+                        if listeners and has_listener:
+                            if hasattr(self, '_listener_executed') and self._listener_executed is True:
+                                pass
+                            elif hasattr(self, 'is_device_event') and self.is_device_event is True:
                                 # L.l.info('No listener on device events for {}'.format(cls_name))
                                 pass
                             else:
