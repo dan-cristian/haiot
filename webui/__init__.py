@@ -7,6 +7,7 @@ from webui import helpers
 
 class P:
     initialised = False
+    flask_thread = None
 
     def __init__(self):
         pass
@@ -48,15 +49,20 @@ class ReverseProxied(object):
         return self.app(environ, start_response)
 
 
+def unload():
+    if P.flask_thread is not None:
+        P.flask_thread.shutdown()
+
+
 def init():
     L.l.debug('FlaskAdmin UI module initialising')
     app.wsgi_app = ReverseProxied(app.wsgi_app)
     app.config['STATIC_FOLDER'] = os.path.join(os.path.dirname(__file__), 'static')
     host = '0.0.0.0'
     port = int(get_json_param(Constant.P_FLASK_WEB_PORT))
-    flask_thread = helpers.FlaskInThread(app, host=host, port=port, debug=True, use_reloader=False)
+    P.flask_thread = helpers.FlaskInThread(app, host=host, port=port, debug=True, use_reloader=False)
     P.initialised = True
-    flask_thread.start()
+    P.flask_thread.start()
 
 
 @app.route('/')

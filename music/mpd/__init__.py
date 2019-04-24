@@ -199,7 +199,7 @@ def _read_port_config():
 
 def _normalise(uni):
     if isinstance(uni, str):
-        uni = str(uni, 'utf-8')
+        uni = uni.decode('utf-8')
     return unicodedata.normalize('NFKD', uni).encode('ascii', 'ignore')
 
 
@@ -242,25 +242,25 @@ def _save_status(zone, status_json, song):
 def save_lastfm():
     lastfmloved = lastfm.iscurrent_loved()
     lastfmsong = lastfm.get_current_song()
-    if sqlitedb:
-        cur_rec = models.MusicLoved.query.first()
-        rec = models.MusicLoved(lastfmsong=lastfmsong)
-    else:
-        cur_recs = MusicLoved.find()
-        rec = MusicLoved()
-        if len(cur_recs) > 0:
-            cur_rec = cur_recs[0]
-            rec.id = cur_rec.id
+    if lastfmsong is not None:
+        if sqlitedb:
+            cur_rec = models.MusicLoved.query.first()
+            rec = models.MusicLoved(lastfmsong=lastfmsong)
         else:
-            cur_rec = None
+            cur_recs = MusicLoved.find()
+            rec = MusicLoved()
+            if len(cur_recs) > 0:
+                cur_rec = cur_recs[0]
+                rec.id = cur_rec.id
+            else:
+                cur_rec = None
+            rec.lastfmsong = lastfmsong
+        if lastfmloved is None:
+            lastfmloved = False
+        rec.lastfmloved = lastfmloved
         rec.lastfmsong = lastfmsong
-
-    if lastfmloved is None:
-        lastfmloved = False
-    rec.lastfmloved = lastfmloved
-    rec.lastfmsong = lastfmsong
-    # notify all as loved state might not change
-    rec.save_changed_fields(current_record=cur_rec, notify_transport_enabled=True, save_all_fields=True)
+        # notify all as loved state might not change
+        rec.save_changed_fields(current_record=cur_rec, notify_transport_enabled=True, save_all_fields=True)
 
 
 def update_state(zone_name):
