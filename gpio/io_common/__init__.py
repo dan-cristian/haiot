@@ -13,15 +13,13 @@ from common import utils
 def update_custom_relay(pin_code, pin_value, notify=False, ignore_missing=False):
     if sqlitedb:
         gpio = models.GpioPin.query.filter_by(pin_code=pin_code, host_name=Constant.HOST_NAME).first()
-    else:
-        GpioPin.find_one({GpioPin.pin_code: pin_code, GpioPin.host_name: Constant.HOST_NAME})
-    if gpio is not None:
-        gpio.pin_value = int(pin_value)
-        gpio.notify_transport_enabled = notify
-        gpio.commit_record_to_db()
-    else:
-        if not ignore_missing:
-            L.l.warning('Unable to find gpio pin {}'.format(pin_code))
+        if gpio is not None:
+            gpio.pin_value = int(pin_value)
+            gpio.notify_transport_enabled = notify
+            gpio.commit_record_to_db()
+        else:
+            if not ignore_missing:
+                L.l.warning('Unable to find gpio pin {}'.format(pin_code))
     if sqlitedb:
         relay = models.ZoneCustomRelay.query.filter_by(gpio_pin_code=pin_code, gpio_host_name=Constant.HOST_NAME).first()
     else:
@@ -29,8 +27,11 @@ def update_custom_relay(pin_code, pin_value, notify=False, ignore_missing=False)
                                           ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME})
     if relay is not None:
         relay.relay_is_on = pin_value
-        relay.notify_transport_enabled = notify
-        relay.commit_record_to_db()
+        if sqlitedb:
+            relay.notify_transport_enabled = notify
+            relay.commit_record_to_db()
+        else:
+            relay.save_changed_fields(broadcast=notify)
         L.l.info('Updated relay {} val={}'.format(pin_code, pin_value))
     else:
         if not ignore_missing:
