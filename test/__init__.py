@@ -1,9 +1,10 @@
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
-from main import L, thread_pool
-from main import thread_pool
-from main.admin import models
+from main.logger_helper import L
 import random
+from common import Constant
+from pydispatch import dispatcher
+
 initialised = False
 
 
@@ -39,6 +40,9 @@ def init():
     # current_record = models.Sensor.query.filter_by(address=sensor_address).first()
     # thread_pool.add_interval_callable(test_run.thread_run, run_interval_second=60)
     global initialised
+    Constant.HOST_NAME = 'pi-face'
+    dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code='0:in:2', direction=Constant.GPIO_PIN_DIRECTION_IN,
+                    pin_value=1, pin_connected=False)
     initialised = True
 
 
