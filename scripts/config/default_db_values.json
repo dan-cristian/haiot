@@ -179,9 +179,9 @@
   ],
 
   "PeopleDevice": [
-    {"id":1, "people_id":"1", "device_id":"1", "give_presence":true},
-    {"id":2, "people_id":"2", "device_id":"2", "give_presence":true},
-    {"id":3, "people_id":"100", "device_id":"100", "give_presence":true}
+    {"id":1, "people_id":1, "device_id":1, "give_presence":true},
+    {"id":2, "people_id":2, "device_id":2, "give_presence":true},
+    {"id":3, "people_id":100, "device_id":100, "give_presence":true}
   ],
 
   "Zone": [
