@@ -387,15 +387,15 @@ def post_init():
     alarms = ZoneAlarm.find({ZoneAlarm.gpio_host_name: Constant.HOST_NAME})
     for alarm in alarms:
         gpio_pin_code = alarm.gpio_pin_code
-        sensor_type = alarm.sensor_type
-        if sensor_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
+        relay_type = alarm.relay_type
+        if relay_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
             func = piface.post_init_alarm_value
-        elif sensor_type == Constant.GPIO_PIN_TYPE_PI_PCF8574:
+        elif relay_type == Constant.GPIO_PIN_TYPE_PI_PCF8574:
             func = pcf8574_gpio.post_init_alarm_value
-        elif sensor_type == Constant.GPIO_PIN_TYPE_SONOFF:
+        elif relay_type == Constant.GPIO_PIN_TYPE_SONOFF:
             # handled in sonoff module
             func = None
-        elif sensor_type == Constant.GPIO_PIN_TYPE_ZWAVE:
+        elif relay_type == Constant.GPIO_PIN_TYPE_ZWAVE:
             # handled in zwave module
             func = None
         else:
