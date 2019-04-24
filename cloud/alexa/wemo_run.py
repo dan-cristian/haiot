@@ -105,7 +105,7 @@ class poller:
                 if target:
                     target.do_read(one_ready[0])
         except Exception as ex:
-            L.l.error("Error in wemo poll: {}".format(ex))
+            L.l.error("Error in wemo poll: {}".format(ex), exc_info=True)
         prctl.set_name("idle")
         threading.current_thread().name = "idle"
 
