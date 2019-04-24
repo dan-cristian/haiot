@@ -70,7 +70,7 @@ def __write_read_port(ser, command):
             ser.flushOutput()
             ser.write(command.encode())
             time.sleep(1)
-            response = str(ser.readline()).replace('\n', '')
+            response = ser.readline().decode('utf-8').replace('\n', '')
         except Exception as ex:
             L.l.warning('Error writing to serial {}, err={}'.format(ser.port, ex))
     else:
@@ -91,7 +91,7 @@ def __search_ups(port_name):
                 L.l.info('Found UPS [{}] on port {}'.format(response, port_name))
                 P.serial = ser
                 P.ups = LegrandUps()
-                P.ups.Id = str(response).replace(' ', '').replace('\r', '')
+                P.ups.Id = response.decode('utf-8').replace(' ', '').replace('\r', '')
                 P.ups.Name = 'Legrand Nicky ' + P.ups.Id
                 P.ups.Port = port_name
                 break
