@@ -8,6 +8,7 @@
   {"module": "serial", "package": "pyserial"},
   {"module": "dateutil", "package": "python-dateutil"},
   {"module": "prctl", "package": "python-prctl"},
-  {"module": "RPi", "package": "RPi.GPIO"}
+  {"module": "RPi", "package": "RPi.GPIO"},
+  {"module": "openzwave", "package": "python_openzwave"}
 ]
 }
