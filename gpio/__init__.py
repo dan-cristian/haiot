@@ -278,7 +278,6 @@ def zone_custom_relay_record_update(json_object):
 def zone_custom_relay_upsert_listener(record, changed_fields):
     assert isinstance(record, ZoneCustomRelay)
     if record.gpio_host_name != Constant.HOST_NAME:
-        L.l.error('Got unexpected alien relay {}'.format(record))
         return
     L.l.info('Upsert listener {} pin {}'.format(record.relay_type, record.gpio_pin_code))
     if record.relay_type == Constant.GPIO_PIN_TYPE_SONOFF:
