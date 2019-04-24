@@ -61,13 +61,14 @@ def do_device(ow, path):
         count = 0
         last_sensor = ''
         for sensor in sensors:
-            # L.l.info("process sensor {}".format(sensor))
+            L.l.info("process sensor {}".format(sensor))
             if not ('interface' in sensor or 'simultaneous' in sensor or 'alarm' in sensor):
                 # start = datetime.datetime.now()
                 try:
                     dev = {}
                     dev['path'] = path
                     sensortype = ow.read(sensor + 'type').decode('utf-8')
+                    L.l.info('Reading s={} type={}'.format(sensor, sensortype))
                     if sensortype == 'DS2423':
                         dev = get_counter(sensor, dev, ow)
                     elif sensortype == 'DS2413':
