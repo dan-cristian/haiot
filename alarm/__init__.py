@@ -58,12 +58,6 @@ def handle_event_alarm(gpio_pin_code='', direction='', pin_value='', pin_connect
         L.l.info('Mising zone alarm for gpio code {} host {}'.format(gpio_pin_code, Constant.HOST_NAME))
 
 
-# 0:in:2 (piface board:direction:pincode)
-# 23 (pi pin)
-def _pin_decode(pin_code):
-
-
-
 def unload():
     L.l.info('Alarm module unloading')
     global initialised
