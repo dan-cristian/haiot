@@ -15,7 +15,8 @@ def handle_event_alarm(gpio_pin_code='', direction='', pin_value='', pin_connect
     if sqlitedb:
         zonealarm = models.ZoneAlarm.query.filter_by(gpio_pin_code=gpio_pin_code, gpio_host_name=Constant.HOST_NAME).first()
     else:
-        zonealarm = ZoneAlarm.find_one({ZoneAlarm.gpio_pin_code: Constant.HOST_NAME})
+        zonealarm = ZoneAlarm.find_one({ZoneAlarm.gpio_pin_code: gpio_pin_code,
+                                        ZoneAlarm.gpio_host_name: Constant.HOST_NAME})
     if zonealarm is not None:
         if sqlitedb:
             zonearea = models.ZoneArea().query_filter_first(models.ZoneArea.zone_id == zonealarm.zone_id)
