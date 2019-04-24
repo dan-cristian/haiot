@@ -139,7 +139,7 @@ def setup_in_ports(gpio_pin_list):
                                           bouncetime=500)
                     L.l.info('OK callback set on rpi {} pin {}'.format(gpio_pin.pin_code, gpio_pin.pin_index_bcm))
                     _event_detected_reversed_both(int(gpio_pin.pin_code))
-                else:
+                else:  # for PIR and CONTACT_NC
                     GPIO.add_event_detect(int(gpio_pin.pin_code), GPIO.BOTH, callback=_event_detected_both,
                                           bouncetime=500)
                     L.l.info('OK callback rev set on rpi {} pin {}'.format(gpio_pin.pin_code, gpio_pin.pin_index_bcm))

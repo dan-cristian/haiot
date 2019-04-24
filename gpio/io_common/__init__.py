@@ -123,3 +123,17 @@ class GpioBase:
 
     def __init__(self, obj):
         self.obj = obj
+
+
+def format_piface_pin_code(board_index, pin_direction, pin_index):
+    return str(board_index) + ":" + str(pin_direction) + ":" + str(pin_index)
+
+
+#  port format is x:direction:y, e.g. 0:in:3, x=board, direction=in/out, y=pin index (0 based)
+def decode_piface_pin(pin_code):
+    ar = pin_code.split(':')
+    if len(ar) == 3:
+        return ar[0], ar[1], ar[2]
+    else:
+        L.l.error('Invalid piface pin code {}'.format(pin_code))
+        return None, None, None
