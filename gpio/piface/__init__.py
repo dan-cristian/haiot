@@ -57,6 +57,11 @@ def get_out_pin_value(pin_index, board_index):
         return None
 
 
+def set_pin_code_value(pin_code, pin_value):
+    pin, direction, board = io_common.decode_piface_pin(pin_code)
+    return set_pin_value(pin_index=pin, pin_value=pin_value, board_index=board)
+
+
 # http://www.farnell.com/datasheets/1881551.pdf
 def set_pin_value(pin_index, pin_value, board_index):
     L.l.info('Set piface pin {} value {} board {}'.format(pin_index, pin_value, board_index))
