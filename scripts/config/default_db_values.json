@@ -143,6 +143,7 @@
     {"id":655, "active":true, "start_order":55, "name":"sensor.1wire", "host_name":"pi-face"},
     {"id":657, "active":true, "start_order":57, "name":"sensor.sonoff", "host_name":"pi-face"},
     {"id":659, "active":true, "start_order":59, "name":"sensor.i2c", "host_name":"pi-face"},
+    {"id":665, "active":true, "start_order":65, "name":"gpio", "host_name":"pi-face"},
     {"id":667, "active":true, "start_order":67, "name":"alarm", "host_name":"pi-face"},
     {"id":670, "active":true, "start_order":70, "name":"music", "host_name":"pi-face"},
 
