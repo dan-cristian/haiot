@@ -31,6 +31,7 @@ class GpioPin(TinyBase):
     board_index = 0  # 0 to n (max 3 for piface)
     description = ''
     is_active = False  # if pin was setup(exported) through this app. will be unexported when app exit
+    contact_type = ''
     updated_on = datetime.now
 
 
