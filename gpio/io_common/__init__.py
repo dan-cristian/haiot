@@ -130,13 +130,10 @@ def format_piface_pin_code(board_index, pin_direction, pin_index):
 
 
 #  port format is x:direction:y, e.g. 0:in:3, x=board, direction=in/out, y=pin index (0 based)
-'''
-aaa bbb
-'''
 def decode_piface_pin(pin_code):
     ar = pin_code.split(':')
     if len(ar) == 3:
-        return ar[0], ar[1], ar[2]
+        return int(ar[0]), ar[1], int(ar[2])
     else:
         L.l.error('Invalid piface pin code {}'.format(pin_code))
         return None, None, None
