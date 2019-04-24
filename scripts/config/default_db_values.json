@@ -70,7 +70,6 @@
     {"id":2,  "active":true, "start_order": 2, "name":"cloud.email", "host_name":""},
     {"id":3,  "active":false, "start_order": 3, "name":"health_monitor", "host_name":""},
     {"id":9,  "active":false, "start_order":9, "name":"heat", "host_name":""},
-
     {"id":13, "active":false, "start_order":13, "name":"cloud.graph_plotly", "host_name":""},
     {"id":19, "active":false, "start_order":19, "name":"cloud.ddns", "host_name":""},
     {"id":21, "active":false, "start_order":21, "name":"cloud.youtube", "host_name":""},
@@ -117,24 +116,21 @@
 
     {"id":501, "active":false, "start_order":50, "name":"apps.dashcam", "host_name":"netbook"},
     {"id":509, "active":true, "start_order":9, "name":"heat", "host_name":"netbook"},
-    {"id":525, "active":true, "start_order":25, "name":"rule", "host_name":"netbook"},
-    {"id":526, "active":true, "start_order":26, "name":"rule.electricity", "host_name":"netbook"},
-    {"id":527, "active":true, "start_order":27, "name":"node", "host_name":"netbook"},
-    {"id":535, "active":true, "start_order":35, "name":"cloud.newtifry", "host_name":"netbook"},
+    {"id":525, "active":false, "start_order":25, "name":"rule", "host_name":"netbook"},
+    {"id":526, "active":false, "start_order":26, "name":"rule.electricity", "host_name":"netbook"},
+    {"id":527, "active":false, "start_order":27, "name":"node", "host_name":"netbook"},
+    {"id":535, "active":false, "start_order":35, "name":"cloud.newtifry", "host_name":"netbook"},
     {"id":541, "active":false, "start_order":41, "name":"cloud.alexa", "host_name":"netbook"},
-    {"id":557, "active":true, "start_order":57, "name":"sensor.sonoff", "host_name":"netbook"},
-    {"id":559, "active":true, "start_order":59, "name":"sensor.i2c", "host_name":"netbook"},
-    {"id":565, "active":true, "start_order":65, "name":"gpio", "host_name":"netbook"},
-    {"id":567, "active":true, "start_order":67, "name":"alarm", "host_name":"netbook"},
-    {"id":570, "active":true, "start_order":70, "name":"music", "host_name":"netbook"},
-    {"id":503, "active":true, "start_order":3, "name":"health_monitor", "host_name":"netbook"},
-    {"id":620, "active":true, "start_order":120, "name":"test", "host_name":"netbook"},
-
-
+    {"id":557, "active":false, "start_order":57, "name":"sensor.sonoff", "host_name":"netbook"},
+    {"id":559, "active":false, "start_order":59, "name":"sensor.i2c", "host_name":"netbook"},
+    {"id":565, "active":false, "start_order":65, "name":"gpio", "host_name":"netbook"},
+    {"id":567, "active":false, "start_order":67, "name":"alarm", "host_name":"netbook"},
+    {"id":570, "active":false, "start_order":70, "name":"music", "host_name":"netbook"},
+    {"id":503, "active":false, "start_order":3, "name":"health_monitor", "host_name":"netbook"},
+    {"id":620, "active":false, "start_order":120, "name":"test", "host_name":"netbook"},
 
 
     {"id":609, "active":true, "start_order":9, "name":"heat", "host_name":"pi-face"},
-
     {"id":619, "active":true, "start_order":19, "name":"ddns", "host_name":"pi-face"},
     {"id":626, "active":true, "start_order":26, "name":"rule.electricity", "host_name":"pi-face"},
     {"id":641, "active":true, "start_order":41, "name":"cloud.alexa", "host_name":"pi-face"},
