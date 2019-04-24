@@ -46,7 +46,10 @@ def _get_in_pin_value(pin_index, board_index):
 
 
 def get_out_pin_value(pin_index, board_index):
-    return P.pfd[board_index].output_pins[pin_index].value
+    try:
+        return P.pfd[board_index].output_pins[pin_index].value
+    except Exception as ex:
+        L.l.error('out pin val error, board={}, index={}, err={}'.format(board_index, pin_index, ex))
 
 
 # http://www.farnell.com/datasheets/1881551.pdf
