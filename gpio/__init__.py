@@ -361,6 +361,9 @@ def unload():
 
 
 def post_init():
+    if Constant.is_os_windows():
+        # not supported
+        return
     # init relay (out) pins
     relays = ZoneCustomRelay.find({ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME})
     for relay in relays:
