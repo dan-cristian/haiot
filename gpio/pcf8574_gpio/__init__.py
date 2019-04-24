@@ -59,6 +59,16 @@ def unload():
     pass
 
 
+def post_init_relay_value(gpio_pin_code):
+    pin_index = int(gpio_pin_code)
+    return get_pin(pin_index)
+
+
+def post_init_alarm_value(gpio_pin_code):
+    pin_index = int(gpio_pin_code)
+    return get_pin(pin_index)
+
+
 def post_init():
     if P.initialised:
         L.l.info('Running post_init pcf')

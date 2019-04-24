@@ -60,10 +60,11 @@ def get_pin_bcm(bcm_id):
     try:
         res = GPIO.input(bcm_id)
     except RuntimeError as rex:
-        L.l.warning('Error reading input rpi.gpio pin {} err={}. Setting as OUT and retry.'.format(bcm_id, rex))
-        GPIO.setup(bcm_id, GPIO.OUT)
+        L.l.warning('Error reading input rpi.gpio pin {} err={}'.format(bcm_id, rex))
+        res = None
+        # GPIO.setup(bcm_id, GPIO.OUT)
         # retry read
-        res = GPIO.input(bcm_id)
+        # res = GPIO.input(bcm_id)
     return res
 
 
@@ -148,6 +149,18 @@ def setup_in_ports(gpio_pin_list):
             except Exception as ex:
                 L.l.critical('Unable to setup rpi.gpio callback pin={} err={}'.format(gpio_pin.pin_index_bcm, ex))
             P.pool_pin_codes.append(gpio_pin.pin_index_bcm)
+
+
+def post_init_relay_value(gpio_pin_code):
+    pin_index_bcm = int(gpio_pin_code)
+    GPIO.setup(pin_index_bcm, GPIO.OUT)
+    return get_pin_bcm(pin_index_bcm)
+
+
+def post_init_alarm_value(gpio_pin_code):
+    pin_index_bcm = int(gpio_pin_code)
+    GPIO.setup(int(pin_index_bcm), GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    return get_pin_bcm(pin_index_bcm)
 
 
 def post_init():
