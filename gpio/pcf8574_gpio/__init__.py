@@ -66,7 +66,8 @@ def post_init_relay_value(gpio_pin_code):
 
 def post_init_alarm_value(gpio_pin_code):
     pin_index = int(gpio_pin_code)
-    return get_pin(pin_index)
+    # fixme check pin_connected status
+    return get_pin(pin_index) == 1
 
 
 def post_init():

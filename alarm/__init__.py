@@ -53,7 +53,7 @@ def handle_event_alarm(gpio_pin_code='', direction='', pin_value='', pin_connect
             else:
                 L.l.warning('Zone {} is mapped to missing area' % zonealarm.zone_id)
         else:
-            L.l.warning('Zone %s not mapped to an area' % zonealarm.zone_id)
+            L.l.warning('Zone {} not mapped to an area, pin={}'.format(zonealarm.zone_id, gpio_pin_code))
     else:
         L.l.info('Mising zone alarm for gpio code {} host {}'.format(gpio_pin_code, Constant.HOST_NAME))
 
