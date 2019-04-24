@@ -416,9 +416,9 @@ def loop_zones():
             if heatrelay_main_source is None:
                 heatrelay_main_source = models.ZoneHeatRelay.query.filter_by(is_main_heat_source=1).first()
         else:
-            heatrelay_main_source = ZoneHeatRelay.find_one({ZoneHeatRelay.is_alternate_heat_source: 1})
+            heatrelay_main_source = ZoneHeatRelay.find_one({ZoneHeatRelay.is_alternate_heat_source: True})
             if heatrelay_main_source is None:
-                heatrelay_main_source = ZoneHeatRelay.find_one({ZoneHeatRelay.is_main_heat_source: 1})
+                heatrelay_main_source = ZoneHeatRelay.find_one({ZoneHeatRelay.is_main_heat_source: True})
         if heatrelay_main_source is not None:
             # L.l.info("Main heat relay={}".format(heatrelay_main_source))
             if sqlitedb:
