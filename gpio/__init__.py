@@ -428,7 +428,7 @@ def init():
         # std_gpio.init()
     if Constant.is_os_windows():
         pigpio_gpio.init()
-    ZoneCustomRelay.add_upsert_listener(zone_custom_relay_upsert_listener)
+    #ZoneCustomRelay.add_upsert_listener(zone_custom_relay_upsert_listener)
     thread_pool.add_interval_callable(thread_run, run_interval_second=1)
     P.initialised = True
 

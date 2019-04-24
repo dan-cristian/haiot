@@ -653,7 +653,7 @@ def init():
     # dispatcher.connect(handle_event_heat, signal=Constant.SIGNAL_HEAT, sender=dispatcher.Any)
     thread_pool.add_interval_callable(thread_run, 30)
     P.initialised = True
-    ZoneHeatRelay.add_upsert_listener(_zoneheatrelay_upsert_listener)
-    ZoneThermostat.add_upsert_listener(_zonethermostat_upsert_listener)
+    #ZoneHeatRelay.add_upsert_listener(_zoneheatrelay_upsert_listener)
+    #ZoneThermostat.add_upsert_listener(_zonethermostat_upsert_listener)
     # P.debug = True
 
