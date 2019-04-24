@@ -24,6 +24,7 @@ class FlaskInThread(threading.Thread):
         self.daemon = True
         self._debug = debug
         self._use_reloader = use_reloader
+        self.thread = None
 
     def run(self):
         """
@@ -31,6 +32,7 @@ class FlaskInThread(threading.Thread):
         """
         prctl.set_name("flask")
         threading.current_thread().name = "flask"
+        self.thread = threading.current_thread()
         while not general_init.P.shutting_down:
             try:
                 L.l.info('Starting flask web ui on host {} port {}'.format(self._host, self._port))
@@ -56,6 +58,6 @@ class FlaskInThread(threading.Thread):
             * module `Flask <http://flask.pocoo.org/>`_ returns this instance in
               method `app.Flask.run <https://github.com/mitsuhiko/flask/blob/master/flask/app.py>`_
         """
-        raise NotImplementedError()
-        # self.server.shutdown()
+        # raise NotImplementedError()
+        self.thread.terminate()
         # self.server.server_close()

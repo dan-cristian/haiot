@@ -357,5 +357,5 @@ def unload():
 
 def init():
     L.l.info('1wire module initialising')
-    _init_comm()
+    # _init_comm()
     thread_pool.add_interval_callable(thread_run, P.check_period)
