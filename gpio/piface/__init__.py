@@ -68,7 +68,7 @@ def _input_event(event):
     gpio_pin_code = format_piface_pin_code(board_index=board_index, pin_direction=Constant.GPIO_PIN_DIRECTION_IN,
                                            pin_index=pin_num)
     # if gpio_pin_code == 7:
-    # L.l.info('Event piface gpio={} direction={} altval={}'.format(gpio_pin_code, direction, pin_val))
+    L.l.info('Event piface gpio={} direction={} altval={}'.format(gpio_pin_code, direction, pin_val))
     dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio_pin_code, direction=Constant.GPIO_PIN_DIRECTION_IN,
                     pin_value=pin_val, pin_connected=(pin_val == 1))
 
@@ -81,6 +81,7 @@ def _setup_in_ports_pif(gpio_pin_list):
         if gpio_pin.pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
             # Log.logger.info('Set piface code={} type={} index={}'.format(
             #    gpio_pin.pin_code,gpio_pin.pin_type, gpio_pin.pin_index_bcm))
+            board = None
             try:
                 # i = gpio_pin.pin_code.split(":")[2]
                 # Log.logger.info("Piface registering input pin {}".format(gpio_pin.pin_index_bcm))
@@ -94,7 +95,7 @@ def _setup_in_ports_pif(gpio_pin_list):
             except Exception as ex:
                 L.l.critical('Unable to setup piface listener board={} pin={} err={}'.format(
                     board, gpio_pin.pin_code, ex))
-    L.l.info('Activating listeners')
+    # L.l.info('Activating listeners')
     for li in P.listener.values():
         li.activate()
     L.l.info('Activating listeners done')
