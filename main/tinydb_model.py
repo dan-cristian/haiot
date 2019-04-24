@@ -175,6 +175,7 @@ class ZoneThermostat(TinyBase):
     active_heat_schedule_pattern_id = 0
     heat_is_on = False
     last_heat_status_update = datetime.now()
+    heat_actual_temperature = 0.0
     heat_target_temperature = 0.0
     mode_presence_auto = False  # fixme: not used yet
     last_presence_set = datetime.now()
