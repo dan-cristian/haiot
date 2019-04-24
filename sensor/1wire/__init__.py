@@ -82,7 +82,7 @@ def do_device(ow, path):
                     else:
                         dev = get_unknown(sensor, dev, ow)
                     sensor_dict[dev['address']] = dev
-                    if sensortype == 'DS2401':
+                    if sensortype != 'DS2401':
                         save_to_db(dev)
                         last_sensor = dev['address']
                         count += 1
@@ -313,8 +313,8 @@ def _get_bus_list(ohost, oport):
             P.func_list.append(func)
             # start all threads sequentially to avoid peak cpu usage
             time.sleep(P.sampling_period_seconds / len(owitems))
-        else:
-            L.l.info('Ignoring {}'.format(owitem))
+        # else:
+        #    L.l.info('Ignoring {}'.format(owitem))
     L.l.info("Found {} owfs busses and initialised {} threads".format(len(P.ow_conn_list), len(P.func_list)))
 
 
