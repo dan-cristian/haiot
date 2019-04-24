@@ -125,8 +125,8 @@ def setup_in_ports(gpio_pin_list):
             try:
                 # http://razzpisampler.oreilly.com/ch07.html
                 # one wire connected to GPIO, another to GROUND. Use relays next to PI for long wires.
-                GPIO.setup(int(gpio_pin.pin_code), GPIO.IN, pull_up_down=GPIO.PUD_UP)  # PUD_DOWN:no contact detection
-                GPIO.remove_event_detect(int(gpio_pin.pin_code))
+                GPIO.setup(int(gpio_pin.pin_index_bcm), GPIO.IN, pull_up_down=GPIO.PUD_UP)  # PUD_DOWN:no contact detection
+                GPIO.remove_event_detect(int(gpio_pin.pin_index_bcm))
                 # GPIO.add_event_detect(int(gpio_pin.pin_code), GPIO.RISING, callback=_event_detected_rising,
                 #                      bouncetime=500)
                 # Log.logger.info('Added rising on rpi.gpio'.format(gpio_pin.pin_code))
@@ -135,19 +135,19 @@ def setup_in_ports(gpio_pin_list):
                 # Log.logger.info('Added falling on rpi.gpio'.format(gpio_pin.pin_code))
                 if gpio_pin.contact_type == Constant.CONTACT_TYPE_NO:
                     # L.l.info("Added input with reverse contact (NO) on pin {}".format(gpio_pin))
-                    GPIO.add_event_detect(int(gpio_pin.pin_code), GPIO.BOTH, callback=_event_detected_reversed_both,
-                                          bouncetime=500)
+                    GPIO.add_event_detect(
+                        int(gpio_pin.pin_index_bcm), GPIO.BOTH, callback=_event_detected_reversed_both, bouncetime=500)
                     L.l.info('OK callback set on rpi {} pin {}'.format(gpio_pin.pin_code, gpio_pin.pin_index_bcm))
-                    _event_detected_reversed_both(int(gpio_pin.pin_code))
+                    _event_detected_reversed_both(int(gpio_pin.pin_index_bcm))
                 else:  # for PIR and CONTACT_NC
-                    GPIO.add_event_detect(int(gpio_pin.pin_code), GPIO.BOTH, callback=_event_detected_both,
-                                          bouncetime=500)
+                    GPIO.add_event_detect(
+                        int(gpio_pin.pin_index_bcm), GPIO.BOTH, callback=_event_detected_both, bouncetime=500)
                     L.l.info('OK callback rev set on rpi {} pin {}'.format(gpio_pin.pin_code, gpio_pin.pin_index_bcm))
-                    _event_detected_both(int(gpio_pin.pin_code))
+                    _event_detected_both(int(gpio_pin.pin_index_bcm))
                 # L.l.info('OK callback set on rpi.gpio'.format(gpio_pin.pin_code))
             except Exception as ex:
-                L.l.critical('Unable to setup rpi.gpio callback pin={} err={}'.format(gpio_pin.pin_code, ex))
-            P.pool_pin_codes.append(gpio_pin.pin_code)
+                L.l.critical('Unable to setup rpi.gpio callback pin={} err={}'.format(gpio_pin.pin_index_bcm, ex))
+            P.pool_pin_codes.append(gpio_pin.pin_index_bcm)
 
 
 def post_init():
@@ -162,17 +162,17 @@ def post_init():
         for relay in relays:
             L.l.info('Reading gpio pin {}'.format(relay.gpio_pin_code))
             if len(relay.gpio_pin_code) <= 2:  # run this only for gpio bcm pins (piface has longer size)
-                pin_bcm = int(relay.gpio_pin_code)
-                GPIO.setup(pin_bcm, GPIO.OUT)
-                pin_val = get_pin_bcm(pin_bcm)
-                io_common.update_custom_relay(pin_code=pin_bcm, pin_value=pin_val, notify=True)
+                pin_index_bcm = int(relay.gpio_pin_code)
+                GPIO.setup(pin_index_bcm, GPIO.OUT)
+                pin_val = get_pin_bcm(pin_index_bcm)
+                io_common.update_custom_relay(pin_code=pin_index_bcm, pin_value=pin_val, notify=True)
 
 
 def unload():
-    for gpio_pin in P.pool_pin_codes:
-        if isinstance(gpio_pin, int):
-            GPIO.remove_event_detect(gpio_pin)
-    time.sleep(1)
+    for gpio_pin_index_bcm in P.pool_pin_codes:
+        if isinstance(gpio_pin_index_bcm, int):
+            GPIO.remove_event_detect(gpio_pin_index_bcm)
+    time.sleep(0.1)
     GPIO.cleanup()
     P.initialised = False
 
