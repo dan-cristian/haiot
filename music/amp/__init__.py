@@ -57,7 +57,7 @@ def _amp_bi_set_yamaha(on, sock):
     else:
         sock.send(_AMP_BI_OFF)
     data = sock.recv(1024)
-    if "already in use" in data:
+    if bytes("already in use", 'utf-8') in data:
         msg = "Error, {}\n".format(data)
         L.l.warning(msg)
         return msg
