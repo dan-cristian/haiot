@@ -187,7 +187,7 @@ class TinyBase(ModelView, metaclass=OrderedClassMembers):
                             return
                         if persist is True:
                             self._persist(record=record, update=update, class_name=cls_name)
-                        elif broadcast is True:
+                        if broadcast is True:
                             self._broadcast(record=record, update=update, class_name=cls_name)
                         if listeners and has_listener and not hasattr(self, '_listener_executed'):
                             if hasattr(self, 'is_device_event') and self.is_device_event is True:
