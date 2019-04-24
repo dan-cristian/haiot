@@ -35,6 +35,6 @@ if __name__ == '__main__':
         exit_code = 1
     except Exception as ex:
         print('Main exit with exception {}'.format(ex))
-
+    main.general_init.unload()
     print('App EXIT')
     # main.run(sys.argv[1:])
