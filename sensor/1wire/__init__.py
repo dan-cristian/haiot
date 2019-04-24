@@ -67,7 +67,7 @@ def do_device(ow, path):
                 try:
                     dev = {}
                     dev['path'] = path
-                    sensortype = str(ow.read(sensor + 'type'))
+                    sensortype = ow.read(sensor + 'type').decode('utf-8')
                     if sensortype == 'DS2423':
                         dev = get_counter(sensor, dev, ow)
                     elif sensortype == 'DS2413':
