@@ -383,8 +383,9 @@ def post_init():
             func = rpi_gpio.post_init_relay_value
         if func is not None:
             relay_value = func(gpio_pin_code=gpio_pin_code)
-            relay.relay_is_on = relay_value
-            relay.save_changed_fields(broadcast=True, persist=True)
+            if relay_value is not None:
+                relay.relay_is_on = relay_value
+                relay.save_changed_fields(broadcast=True, persist=True)
 
     # init pir/contact (in) pins
     alarms = ZoneAlarm.find({ZoneAlarm.gpio_host_name: Constant.HOST_NAME})
@@ -405,8 +406,9 @@ def post_init():
             func = rpi_gpio.post_init_alarm_value
         if func is not None:
             pin_connected = func(gpio_pin_code=gpio_pin_code)
-            alarm.alarm_pin_triggered = not pin_connected
-            alarm.save_changed_fields(broadcast=True, persist=True)
+            if pin_connected is not None:
+                alarm.alarm_pin_triggered = not pin_connected
+                alarm.save_changed_fields(broadcast=True, persist=True)
 
     # piface.post_init()
     # rpi_gpio.post_init()
