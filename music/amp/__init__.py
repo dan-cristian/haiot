@@ -10,19 +10,19 @@ from main.logger_helper import L
 from pydispatch import dispatcher
 from main.tinydb_model import ZoneCustomRelay
 
-_AMP_ON = "\x0207A1D\x03"
-_AMP_OFF = "\x0207A1E\x03"
+_AMP_ON = bytes("\x0207A1D\x03", 'utf-8')
+_AMP_OFF = bytes("\x0207A1E\x03", 'utf-8')
 
-_AMP_MUTE_ON = "\x0207EA2\x03"
-_AMP_MUTE_OFF = "\x0207EA3\x03"
+_AMP_MUTE_ON = bytes("\x0207EA2\x03", 'utf-8')
+_AMP_MUTE_OFF = bytes("\x0207EA3\x03", 'utf-8')
 
-_AMP_BI_ON = "\x022BB00\x03"
-_AMP_BI_OFF = "\x022BB01\x03"
+_AMP_BI_ON = bytes("\x022BB00\x03", 'utf-8')
+_AMP_BI_OFF = bytes("\x022BB01\x03", 'utf-8')
 
-_AMP_ZONE2_POWER_ON = "\x0207EBA\x03"
-_AMP_ZONE2_POWER_OFF = "\x0207EBB\x03"
-_AMP_ZONE3_POWER_ON = "\x0207AED\x03"
-_AMP_ZONE3_POWER_OFF = "\x0207AEE\x03"
+_AMP_ZONE2_POWER_ON = bytes("\x0207EBA\x03", 'utf-8')
+_AMP_ZONE2_POWER_OFF = bytes("\x0207EBB\x03", 'utf-8')
+_AMP_ZONE3_POWER_ON = bytes("\x0207AED\x03", 'utf-8')
+_AMP_ZONE3_POWER_OFF = bytes("\x0207AEE\x03", 'utf-8')
 
 
 class AMP_YMH:
