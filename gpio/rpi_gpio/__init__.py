@@ -161,7 +161,11 @@ def post_init_alarm_value(gpio_pin_code):
     pin_index_bcm = int(gpio_pin_code)
     GPIO.setup(int(pin_index_bcm), GPIO.IN, pull_up_down=GPIO.PUD_UP)
     # fixme check pin_connected value
-    return get_pin_bcm(pin_index_bcm) == 1
+    pin_val = get_pin_bcm(pin_index_bcm)
+    if pin_val is not None:
+        return pin_val == 1
+    else:
+        return None
 
 
 def post_init():
