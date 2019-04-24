@@ -106,7 +106,7 @@ def _populate_db(cls, obj):
     i = 0
     if rec_list is not None:
         for rec in rec_list:
-            res = cls.insert_one(rec)
+            res = cls.insert_one(rec, bypass_document_validation=True)
             if res is not None:
                 i += 1
     L.l.info('Loaded {} rows in {}'.format(i, cls.__name__))
