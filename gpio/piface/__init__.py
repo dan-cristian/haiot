@@ -65,11 +65,15 @@ def set_pin_code_value(pin_code, pin_value):
 # http://www.farnell.com/datasheets/1881551.pdf
 def set_pin_value(pin_index, pin_value, board_index):
     L.l.info('Set piface pin {} value {} board {}'.format(pin_index, pin_value, board_index))
-    pfio.digital_write(pin_num=pin_index, value=pin_value, hardware_addr=board_index)
-    act_value = get_out_pin_value(pin_index=pin_index, board_index=board_index)
-    if pin_value != act_value:
-        L.l.warning("Piface set pin {} failed, actual value={}".format(pin_index, act_value))
-    return act_value
+    try:
+        pfio.digital_write(pin_num=pin_index, value=pin_value, hardware_addr=board_index)
+        act_value = get_out_pin_value(pin_index=pin_index, board_index=board_index)
+        if pin_value != act_value:
+            L.l.warning("Piface set pin {} failed, actual value={}".format(pin_index, act_value))
+        return act_value
+    except Exception as ex:
+        L.l.error('Unable to set pin {}:{}, ex={}'.format(pin_index, board_index, ex))
+        return None
 
 
 def _input_event(event):
