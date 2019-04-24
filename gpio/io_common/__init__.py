@@ -130,6 +130,9 @@ def format_piface_pin_code(board_index, pin_direction, pin_index):
 
 
 #  port format is x:direction:y, e.g. 0:in:3, x=board, direction=in/out, y=pin index (0 based)
+'''
+aaa bbb
+'''
 def decode_piface_pin(pin_code):
     ar = pin_code.split(':')
     if len(ar) == 3:
