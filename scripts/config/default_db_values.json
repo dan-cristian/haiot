@@ -93,7 +93,6 @@
     {"id":55, "active":false, "start_order":55, "name":"sensor.1wire", "host_name":""},
     {"id":57, "active":false, "start_order":57, "name":"sensor.sonoff", "host_name":""},
     {"id":59, "active":false, "start_order":59, "name":"sensor.i2c", "host_name":""},
-
     {"id":65,  "active":false, "start_order": 65, "name":"gpio", "host_name":""},
     {"id":67, "active":false, "start_order":67, "name":"alarm", "host_name":""},
     {"id":70, "active":false, "start_order":70, "name":"music", "host_name":""},
@@ -122,10 +121,11 @@
     {"id":527, "active":true, "start_order":27, "name":"node", "host_name":"netbook"},
     {"id":535, "active":true, "start_order":35, "name":"cloud.newtifry", "host_name":"netbook"},
     {"id":599, "active":false, "start_order":99, "name":"test", "host_name":"netbook"},
-    {"id":511, "active":true, "start_order":11, "name":"alarm", "host_name":"netbook"},
     {"id":541, "active":false, "start_order":41, "name":"cloud.alexa", "host_name":"netbook"},
     {"id":557, "active":true, "start_order":57, "name":"sensor.sonoff", "host_name":"netbook"},
     {"id":559, "active":true, "start_order":59, "name":"sensor.i2c", "host_name":"netbook"},
+    {"id":565, "active":true, "start_order":65, "name":"gpio", "host_name":"netbook"},
+    {"id":567, "active":true, "start_order":67, "name":"alarm", "host_name":"netbook"},
     {"id":570, "active":true, "start_order":70, "name":"music", "host_name":"netbook"},
     {"id":503,  "active":true, "start_order":3, "name":"health_monitor", "host_name":"netbook"},
 

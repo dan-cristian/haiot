@@ -384,8 +384,8 @@ class Music(TinyBase):
 
 class MusicLoved(TinyBase):
     id = 0
-    lastfmloved = False
     lastfmsong = ''
+    lastfmloved = False
 
 
 class Ups(TinyBase):
