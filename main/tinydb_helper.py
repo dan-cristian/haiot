@@ -190,11 +190,11 @@ class TinyBase(ModelView, metaclass=OrderedClassMembers):
                         elif broadcast is True:
                             self._broadcast(record=record, update=update, class_name=cls_name)
                         if listeners and has_listener and not hasattr(self, '_listener_executed'):
-                            if hasattr(self, 'is_device_event') and getattr(self, 'is_device_event') is not True:
+                            if hasattr(self, 'is_device_event') and getattr(self, 'is_device_event') is True:
+                                L.l.info('No listener on device events for {}'.format(cls_name))
+                            else:
                                 rec_clone._listener_executed = True
                                 cls.upsert_listener_list[cls_name](record=rec_clone, changed_fields=change_list)
-                            else:
-                                L.l.info('No listener on device events for {}'.format(cls_name))
                     dispatcher.send(Constant.SIGNAL_DB_CHANGE_FOR_RULES, obj=rec_clone, change=change_list)
                 else:
                     L.l.error('Cannot save changed fields, key is missing for {}'.format(self))
