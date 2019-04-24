@@ -58,7 +58,7 @@ def get_out_pin_value(pin_index, board_index):
 
 
 def set_pin_code_value(pin_code, pin_value):
-    pin, direction, board = io_common.decode_piface_pin(pin_code)
+    board, direction, pin = io_common.decode_piface_pin(pin_code)
     return set_pin_value(pin_index=pin, pin_value=pin_value, board_index=board)
 
 
