@@ -113,6 +113,7 @@ class TinyBase(ModelView, metaclass=OrderedClassMembers):
 
     def save_changed_fields(self, current=None, broadcast=None, persist=None, listeners=True, *args, **kwargs):
         cls = self.__class__
+        cls_name = cls.__name__
         if not cls.is_used_in_module:
             cls.is_used_in_module = True
         potential_recursion = hasattr(self, '_id')
@@ -162,7 +163,7 @@ class TinyBase(ModelView, metaclass=OrderedClassMembers):
                         res = cls.coll.insert_one(update, bypass_document_validation=True)
                         L.l.info('Inserted key {}, {} with eid={}'.format(key, self.__repr__(), res.eid))
                     # execute listener
-                    if cls.__name__ in cls.upsert_listener_list:
+                    if cls_name in cls.upsert_listener_list:
                         has_listener = True
                     else:
                         has_listener = False
@@ -174,31 +175,31 @@ class TinyBase(ModelView, metaclass=OrderedClassMembers):
                             time.sleep(0.1)  # fixme!!!!
                             i += 1
                     if i > 0 and record is not None:
-                        L.l.error('Found record {} with key {} after {} tries'.format(cls.__name__, key, i))
+                        L.l.error('Found record {} with key {} after {} tries'.format(cls_name, key, i))
                     rec_clone = cls(copy=record)
                     change_list = list(update.keys())
                     if persist is True or broadcast is True or has_listener is True:
                         if record is None:
-                            L.l.error('No record in db after insert/update for cls {} key {}'.format(cls.__name__, key))
+                            L.l.error('No record in db after insert/update for cls {} key {}'.format(cls_name, key))
                             L.l.info('Error self is {}'.format(self))
                             L.l.info('Error update was {}, rec={}'.format(update, record))
                             L.l.info('Error col list is {}'.format(cls.column_list))
                             return
                         if persist is True:
-                            self._persist(record=record, update=update, class_name=cls.__name__)
+                            self._persist(record=record, update=update, class_name=cls_name)
                         elif broadcast is True:
-                            self._broadcast(record=record, update=update, class_name=cls.__name__)
+                            self._broadcast(record=record, update=update, class_name=cls_name)
                         if listeners and has_listener and not hasattr(self, '_listener_executed'):
-                            if potential_recursion:
-                                L.l.warning('Potential recursion, self has id set already')
-                            rec_clone._listener_executed = True
-                            cls.upsert_listener_list[cls.__name__](
-                                record=rec_clone, changed_fields=change_list)
+                            if hasattr(self, 'is_device_event') and getattr(self, 'is_device_event') is not True:
+                                rec_clone._listener_executed = True
+                                cls.upsert_listener_list[cls_name](record=rec_clone, changed_fields=change_list)
+                            else:
+                                L.l.info('No listener on device events for {}'.format(cls_name))
                     dispatcher.send(Constant.SIGNAL_DB_CHANGE_FOR_RULES, obj=rec_clone, change=change_list)
                 else:
                     L.l.error('Cannot save changed fields, key is missing for {}'.format(self))
         except Exception as ex:
-            L.l.info('Exception saving fields, class {} ex={}'.format(cls.__name__, ex), exc_info=True)
+            L.l.info('Exception saving fields, class {} ex={}'.format(cls_name, ex), exc_info=True)
 
     # save fields from remote updates
     @classmethod
