@@ -409,7 +409,6 @@
     {"zone_id":52,"heat_pin_name":"puffer boiler", "gpio_pin_code":"5", "gpio_host_name":"pi-face"},
     {"zone_id":50,"heat_pin_name":"puffer heat", "gpio_pin_code":"22", "gpio_host_name":"pi-face", "temp_sensor_name":"puffer sus"},
     {"zone_id":51,"heat_pin_name":"puffer gas valve", "gpio_pin_code":"13", "gpio_host_name":"pi-face", "is_alternate_source_switch":true, "temp_sensor_name":"puffer sus"},
-
     {"zone_id":19,"heat_pin_name":"gas heat", "gpio_pin_code":"0:out:0", "gpio_host_name":"pizero2", "is_main_heat_source":true}
   ],
 
@@ -417,10 +416,10 @@
     {"zone_id":34 , "sensor_address": "5C000004F344F828", "sensor_name": "horn", "target_material": "air", "alt_address": "28.F844F3040000"},
     {"zone_id":3 ,  "sensor_address": "95000003BDF98428", "sensor_name": "beci mic", "alt_address": ""},
     {"zone_id":48 , "sensor_address": "D9000004F3BFA428", "sensor_name": "solar jos", "target_material": "glicol", "alt_address": "28.A4BFF3040000"},
-    {"zone_id":38 , "sensor_address": "AE000003BDFFB928", "sensor_name": "puffer sus", "target_material": "water", "alt_address": ""},
-    {"zone_id":38 , "sensor_address": "04000004F3DE2128", "sensor_name": "puffer mijloc", "target_material": "water", "alt_address": "28.21DEF3040000"},
-    {"zone_id":38 , "sensor_address": "12000004F3428528", "sensor_name": "puffer jos", "target_material": "water", "alt_address": ""},
-    {"zone_id":19 , "sensor_address": "4C000003BDD49D28", "sensor_name": "gas heater", "target_material": "water", "alt_address": ""},
+    {"sensor_address": "AE000003BDFFB928", "sensor_name": "puffer sus", "zone_id":38 , "target_material": "water", "alt_address": ""},
+    {"sensor_address": "04000004F3DE2128", "sensor_name": "puffer mijloc", "zone_id":38 , "target_material": "water", "alt_address": "28.21DEF3040000"},
+    {"sensor_address": "12000004F3428528", "sensor_name": "puffer jos", "zone_id":38 , "target_material": "water", "alt_address": ""},
+    {"sensor_address": "4C000003BDD49D28", "sensor_name": "gas heater", "zone_id":19 , "target_material": "water", "alt_address": ""},
     {"zone_id":19 , "sensor_address": "B9000003BE088E28", "sensor_name": "gas boiler", "target_material": "water", "alt_address": ""},
     {"zone_id":52 , "sensor_address": "96000003BDFE5D28", "sensor_name": "boiler sus", "target_material": "water", "alt_address": ""},
     {"zone_id":25 , "sensor_address": "53000004F296DD28", "sensor_name": "boiler mijloc", "target_material": "water", "alt_address": ""},

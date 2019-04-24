@@ -102,27 +102,11 @@ def _init_tinydb():
 
 
 def _populate_db(cls, obj):
-    # rec_list = common.get_table(cls_name)
     rec_list = common.get_table(cls.__name__)
     i = 0
     if rec_list is not None:
-        # Q = Query()
-        res = None
         for rec in rec_list:
-            # exist = obj.coll.find({'id': rec['id']})
-            if 'id' not in rec:
-                # L.l.info('No id in class {}, record {}'.format(cls.__name__, rec))
-                first = next(iter(rec))
-                key = {first: rec[first]}
-            else:
-                key = {cls.id: rec['id']}
-            # exist = obj.coll.table.contains(Q.id == rec['id'])
-            exist = cls.find_one(key)
-            if exist is None:  # .count() == 0:
-                res = obj.coll.insert_one(rec)
-            else:
-                res = None
-                # res = obj.coll.update
+            res = cls.insert_one(rec)
             if res is not None:
                 i += 1
     L.l.info('Loaded {} rows in {}'.format(i, cls.__name__))

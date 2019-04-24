@@ -52,6 +52,9 @@ class TinyBase(ModelView, metaclass=OrderedClassMembers):
             attr_dict[column] = getattr(self, column)
         return attr_dict
 
+    #@classmethod
+    #def to_dictx(cls, ):
+
     def t(self):
         return self.coll.table
 
@@ -83,7 +86,7 @@ class TinyBase(ModelView, metaclass=OrderedClassMembers):
             cls.is_used_in_module = True
         r = cls.coll.insert_one(doc=doc)
         if r is not None:
-            return cls({**r})
+            return r.inserted_id
         else:
             return None
 
