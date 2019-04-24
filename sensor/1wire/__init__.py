@@ -184,9 +184,9 @@ def save_to_db(dev):
 
 
 def get_prefix(sensor, dev, ow):
-    dev['address'] = str(ow.read(sensor + 'r_address'))
-    dev['type'] = str(ow.read(sensor + 'type'))
-    dev['n_address'] = str(ow.read(sensor + 'address'))
+    dev['address'] = ow.read(sensor + 'r_address').decode('utf-8')
+    dev['type'] = ow.read(sensor + 'type').decode('utf-8')
+    dev['n_address'] = ow.read(sensor + 'address').decode('utf-8')
     return dev
 
 
@@ -208,7 +208,7 @@ def get_temperature(sensor, dev, ow):
         #        P.failed_temp = False
         #        P.failed_temp_count = 0
         # if val is None:
-        val = utils.round_sensor_value(ow.read(sensor + 'temperature'))
+        val = utils.round_sensor_value(ow.read(sensor + 'temperature').decode('utf-8'))
         P.failed_temp_count = 0
         P.failed_temp = False
         if val != P.IGNORED_TEMPERATURE:
@@ -222,32 +222,32 @@ def get_temperature(sensor, dev, ow):
 
 def get_humidity(sensor, dev, ow):
     dev = get_prefix(sensor, dev, ow)
-    dev['humidity'] = utils.round_sensor_value(ow.read(sensor + 'humidity'))
+    dev['humidity'] = utils.round_sensor_value(ow.read(sensor + 'humidity').decode('utf-8'))
     return dev
 
 
 def get_voltage(sensor, dev, ow):
     dev = get_prefix(sensor, dev, ow)
-    dev['iad'] = float(ow.read(sensor + 'IAD'))
-    dev['vad'] = float(ow.read(sensor + 'VAD'))
-    dev['vdd'] = float(ow.read(sensor + 'VDD'))
+    dev['iad'] = float(ow.read(sensor + 'IAD').decode('utf-8'))
+    dev['vad'] = float(ow.read(sensor + 'VAD').decode('utf-8'))
+    dev['vdd'] = float(ow.read(sensor + 'VDD').decode('utf-8'))
     return dev
 
 
 def get_counter(sensor, dev, ow):
     dev = get_prefix(sensor, dev, ow)
-    dev['counters_a'] = int(ow.read(sensor + 'counters.A'))
-    dev['counters_b'] = int(ow.read(sensor + 'counters.B'))
+    dev['counters_a'] = int(ow.read(sensor + 'counters.A').decode('utf-8'))
+    dev['counters_b'] = int(ow.read(sensor + 'counters.B').decode('utf-8'))
     return dev
 
 
 def get_io(sensor, dev, ow):
     # IMPORTANT: do not use . in field names as it throws error on JSON, only use "_"
     dev = get_prefix(sensor, dev, ow)
-    dev['pio_a'] = str(ow.read(sensor + 'PIO.A')).strip()
-    dev['pio_b'] = str(ow.read(sensor + 'PIO.B')).strip()
-    dev['sensed_a'] = str(ow.read(sensor + 'sensed.A')).strip()
-    dev['sensed_b'] = str(ow.read(sensor + 'sensed.B')).strip()
+    dev['pio_a'] = ow.read(sensor + 'PIO.A').decode('utf-8').strip()
+    dev['pio_b'] = ow.read(sensor + 'PIO.B').decode('utf-8').strip()
+    dev['sensed_a'] = ow.read(sensor + 'sensed.A').decode('utf-8').strip()
+    dev['sensed_b'] = ow.read(sensor + 'sensed.B').decode('utf-8').strip()
     return dev
 
 
@@ -347,7 +347,7 @@ def unload():
     thread_pool.remove_callable(thread_run)
     for func in P.func_list:
         thread_pool.remove_callable(func)
-    #for ow in P.ow_conn_list:
+    # for ow in P.ow_conn_list:
     #    P.ow_conn_list[ow].close_connection()
     P.initialised = False
 
