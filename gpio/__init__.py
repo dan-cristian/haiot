@@ -18,7 +18,7 @@ import threading
 import prctl
 from gpio import rpi_gpio
 from gpio import pigpio_gpio
-from main.tinydb_model import ZoneCustomRelay
+from main.tinydb_model import ZoneCustomRelay, ZoneAlarm, ZoneHeatRelay
 
 
 class P:
@@ -361,9 +361,53 @@ def unload():
 
 
 def post_init():
-    piface.post_init()
-    rpi_gpio.post_init()
-    pcf8574_gpio.post_init()
+    # init relay (out) pins
+    relays = ZoneCustomRelay.find({ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME})
+    for relay in relays:
+        gpio_pin_code = relay.gpio_pin_code
+        relay_type = relay.relay_type
+        if relay_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
+            func = piface.post_init_relay_value
+        elif relay_type == Constant.GPIO_PIN_TYPE_PI_PCF8574:
+            func = pcf8574_gpio.post_init_relay_value
+        elif relay_type == Constant.GPIO_PIN_TYPE_SONOFF:
+            # handled in sonoff module
+            func = None
+        elif relay_type == Constant.GPIO_PIN_TYPE_ZWAVE:
+            # handled in zwave module
+            func = None
+        else:
+            func = rpi_gpio.post_init_relay_value
+        if func is not None:
+            relay_value = func(gpio_pin_code=gpio_pin_code)
+            relay.relay_is_on = relay_value
+            relay.save_changed_fields(broadcast=True, persist=True)
+
+    # init pir/contact (in) pins
+    alarms = ZoneAlarm.find({ZoneAlarm.gpio_host_name: Constant.HOST_NAME})
+    for alarm in alarms:
+        gpio_pin_code = alarm.gpio_pin_code
+        sensor_type = alarm.sensor_type
+        if sensor_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
+            func = piface.post_init_alarm_value
+        elif sensor_type == Constant.GPIO_PIN_TYPE_PI_PCF8574:
+            func = pcf8574_gpio.post_init_alarm_value
+        elif sensor_type == Constant.GPIO_PIN_TYPE_SONOFF:
+            # handled in sonoff module
+            func = None
+        elif sensor_type == Constant.GPIO_PIN_TYPE_ZWAVE:
+            # handled in zwave module
+            func = None
+        else:
+            func = rpi_gpio.post_init_alarm_value
+        if func is not None:
+            pin_connected = func(gpio_pin_code=gpio_pin_code)
+            alarm.alarm_pin_triggered = not pin_connected
+            alarm.save_changed_fields(broadcast=True, persist=True)
+
+    # piface.post_init()
+    # rpi_gpio.post_init()
+    # pcf8574_gpio.post_init()
 
 
 def init():
