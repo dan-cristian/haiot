@@ -193,7 +193,7 @@ class TinyBase(ModelView, metaclass=OrderedClassMembers):
                                 L.l.warning('Potential recursion, self has id set already')
                             rec_clone._listener_executed = True
                             cls.upsert_listener_list[cls.__name__](
-                                record=rec_clone, updated_fields=change_list)
+                                record=rec_clone, changed_fields=change_list)
                     dispatcher.send(Constant.SIGNAL_DB_CHANGE_FOR_RULES, obj=rec_clone, change=change_list)
                 else:
                     L.l.error('Cannot save changed fields, key is missing for {}'.format(self))
