@@ -385,7 +385,8 @@ def post_init():
             relay_value = func(gpio_pin_code=gpio_pin_code)
             if relay_value is not None:
                 relay.relay_is_on = relay_value
-                relay.save_changed_fields(broadcast=True, persist=True)
+                # skip listeners to avoid relay triggering?
+                relay.save_changed_fields(broadcast=True, persist=True, listeners=False)
 
     # init pir/contact (in) pins
     alarms = ZoneAlarm.find({ZoneAlarm.gpio_host_name: Constant.HOST_NAME})
