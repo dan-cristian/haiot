@@ -67,7 +67,7 @@ def parse_rules(obj, change):
 
 def mqtt_on_message(client, userdata, msg):
     item = msg.topic.split(P.mqtt_topic_receive_prefix)
-    payload = msg.payload.lower()
+    payload = msg.payload.decode('utf-8').lower()
     if len(item) == 2:
         name = item[1]
         switch_state = None
