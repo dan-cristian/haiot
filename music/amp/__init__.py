@@ -119,12 +119,13 @@ def set_amp_power(power_state, relay_name, amp_zone_index):
                 relay.relay_is_on = power_state
                 if sqlitedb:
                     commit()
+                    # dispatch as UI action otherwise change actions are not triggered
+                    dispatcher.send(signal=Constant.SIGNAL_UI_DB_POST, model=models.ZoneCustomRelay, row=relay)
                 else:
                     relay.save_changed_fields()
-                # dispatch as UI action otherwise change actions are not triggered
-                dispatcher.send(signal=Constant.SIGNAL_UI_DB_POST, model=models.ZoneCustomRelay, row=relay)
+                    # fixme: set amp
+                    L.l.error('check if fix me set amp relay')
                 msg = "Set relay {} to state {} zone_index={}\n".format(relay_name, power_state, amp_zone_index)
-                #L.l.debug(msg)
             else:
                 msg = "Not changed relay state for {}\n".format(relay_name)
         else:
