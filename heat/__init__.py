@@ -155,7 +155,7 @@ def __save_heat_state_db(zone, heat_is_on):
             zone_heat_relay.save_changed_fields()
             zone_thermo.save_changed_fields()
     else:
-        L.l.warning('No heat relay found in zone {}'.format(zone.name))
+        L.l.warning('No heat relay found in zone {} id {}'.format(zone.name, zone.id))
 
 
 # triggers heat status update if heat changed

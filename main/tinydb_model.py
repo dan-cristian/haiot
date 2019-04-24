@@ -66,10 +66,10 @@ class Sensor(TinyBase):
 
 class ZoneSensor(TinyBase):
     id = 0
+    sensor_address = ''
     sensor_name = ''
     zone_id = 0
     # zone = db.relationship('Zone', backref=db.backref('ZoneSensor(zone)', lazy='dynamic'))
-    sensor_address = ''
     target_material = ''  # what material is being measured, water, air, etc
     alt_address = ''
     is_main = False  # is main temperature sensor for heat reference
