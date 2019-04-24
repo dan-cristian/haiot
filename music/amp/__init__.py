@@ -124,7 +124,7 @@ def set_amp_power(power_state, relay_name, amp_zone_index):
                 else:
                     relay.save_changed_fields()
                     # fixme: set amp
-                    L.l.error('check if fix me set amp relay')
+                    # L.l.error('check if fix me set amp relay')
                 msg = "Set relay {} to state {} zone_index={}\n".format(relay_name, power_state, amp_zone_index)
             else:
                 msg = "Not changed relay state for {}\n".format(relay_name)
