@@ -275,7 +275,7 @@ def zone_custom_relay_record_update(json_object):
         L.l.error('Error on zone custom relay update, err={}'.format(ex), exc_info=True)
 
 
-def zone_custom_relay_upsert_listener(record, changed_fields):
+def zone_custom_relay_upsert_listener(record, updated_fields):
     assert isinstance(record, ZoneCustomRelay)
     if record.gpio_host_name != Constant.HOST_NAME:
         return
