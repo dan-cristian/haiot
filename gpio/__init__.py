@@ -299,17 +299,16 @@ def zone_custom_relay_upsert_listener(record, changed_fields):
         expire_func = (zwave.set_switch_state, node_id, expired_relay_is_on)
     elif record.relay_type in [Constant.GPIO_PIN_TYPE_PI_STDGPIO, Constant.GPIO_PIN_TYPE_PI_FACE_SPI]:
         value = 1 if record.relay_is_on else 0
+        pin_code = record.gpio_pin_code
         expired_relay_is_on = not (bool(record.relay_is_on))
-        gpio_record = GpioPin.find_one({GpioPin.pin_code: record.gpio_pin_code, GpioPin.host_name: Constant.HOST_NAME})
-        if record.pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
-            pin_code = gpio.io_common.format_piface_pin_code(
-                board_index=gpio_record.board_index, pin_direction=Constant.GPIO_PIN_DIRECTION_OUT,
-                pin_index=gpio_record.pin_index_bcm)
+        # gpio_record = GpioPin.find_one({GpioPin.pin_code: record.gpio_pin_code, GpioPin.host_name: Constant.HOST_NAME})
+        if record.relay_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
+            piface.set_pin_code_value(pin_code=record.gpio_pin_code, pin_value=value)
+            expire_func = (piface.set_pin_code_value, record.gpio_pin_code, value)
         else:
-            pin_code = gpio_record.pin_index_bcm
-        relay_set(gpio_pin_index_bcm=gpio_record.pin_index_bcm, gpio_pin_type=gpio_record.pin_type,
-                  gpio_board_index=gpio_record.board_index, value=value, from_web=False)
-        expire_func = (relay_set, pin_code, gpio_record.pin_type, gpio_record.board_index, expired_relay_is_on, False)
+            bcm_id = int(record.gpio_pin_code)
+            rpi_gpio.set_pin_bcm(bcm_id=bcm_id, pin_value=value)
+            expire_func = (rpi_gpio.set_pin_bcm, bcm_id, value)
     else:
         L.l.warning('Unknown relay type {}'.format(record.relay_type))
         expire_func = None
