@@ -355,6 +355,7 @@ def _update_zone_heat(zone, heat_schedule, sensor):
                     L.l.debug('Pattern {} is {}, target={}'.format(zone.name, schedule_pattern.name, act_temp_target))
                     zone_thermo.active_heat_schedule_pattern_id = schedule_pattern.id
                 zone_thermo.heat_target_temperature = std_temp_target
+                zone_thermo.heat_actual_temperature = sensor.temperature
                 if sqlitedb:
                     commit()
                 else:
@@ -653,7 +654,7 @@ def init():
     # dispatcher.connect(handle_event_heat, signal=Constant.SIGNAL_HEAT, sender=dispatcher.Any)
     thread_pool.add_interval_callable(thread_run, 30)
     P.initialised = True
-    #ZoneHeatRelay.add_upsert_listener(_zoneheatrelay_upsert_listener)
-    #ZoneThermostat.add_upsert_listener(_zonethermostat_upsert_listener)
+    ZoneHeatRelay.add_upsert_listener(_zoneheatrelay_upsert_listener)
+    ZoneThermostat.add_upsert_listener(_zonethermostat_upsert_listener)
     # P.debug = True
 
