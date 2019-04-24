@@ -6,6 +6,7 @@ if sqlitedb:
     from main.admin import models
     from main.admin.model_helper import commit
 from main.tinydb_model import ZoneAlarm, ZoneArea, Area, GpioPin, Zone
+from gpio import io_common
 __author__ = 'dcristian'
 
 initialised = False
@@ -57,6 +58,12 @@ def handle_event_alarm(gpio_pin_code='', direction='', pin_value='', pin_connect
         L.l.info('Mising zone alarm for gpio code {} host {}'.format(gpio_pin_code, Constant.HOST_NAME))
 
 
+# 0:in:2 (piface board:direction:pincode)
+# 23 (pi pin)
+def _pin_decode(pin_code):
+
+
+
 def unload():
     L.l.info('Alarm module unloading')
     global initialised
@@ -75,21 +82,31 @@ def init():
     if sqlitedb:
         local_alarms = models.ZoneAlarm().query_filter_all(models.ZoneAlarm.gpio_host_name.in_([Constant.HOST_NAME]))
     else:
-        local_alarms = ZoneAlarm.find()  # {ZoneAlarm.gpio_host_name: Constant.HOST_NAME})
+        local_alarms = ZoneAlarm.find({ZoneAlarm.gpio_host_name: Constant.HOST_NAME})
     for alarm in local_alarms:
         # L.l.info("Processing zone alarm {} for host {}".format(alarm, Constant.HOST_NAME))
         if sqlitedb:
             gpio_pin = models.GpioPin().query_filter_first(
                 models.GpioPin.pin_code.in_([alarm.gpio_pin_code]), models.GpioPin.host_name.in_([Constant.HOST_NAME]))
         else:
-            # fixme: gpio is empty
-            gpio_pin = GpioPin.find_one({GpioPin.pin_code: alarm.gpio_pin_code, GpioPin.host_name: Constant.HOST_NAME})
-        if gpio_pin is not None:
-            # Log.logger.info('Schedule setup alarm port pin={} type={}'.format(gpio_pin.pin_code, gpio_pin.pin_type))
+            # gpio_pin = GpioPin.find_one({GpioPin.pin_code: alarm.gpio_pin_code, GpioPin.host_name: Constant.HOST_NAME})
+            gpio_pin = GpioPin()
+            gpio_pin.host_name = Constant.HOST_NAME
             gpio_pin.contact_type = alarm.sensor_type
-            port_list.append(gpio_pin)
-        else:
-            L.l.warning('Unexpected empty gpio pin response for alarm setup {}'.format(alarm))
+            if ':' in alarm.gpio_pin_code:
+                gpio_pin.board_index, gpio_pin.pin_direction, gpio_pin.pin_index_bcm = io_common.decode_piface_pin(
+                    alarm.gpio_pin_code)
+                gpio_pin.pin_type = Constant.GPIO_PIN_TYPE_PI_FACE_SPI
+            else:
+                gpio_pin.pin_type = Constant.GPIO_PIN_TYPE_PI_STDGPIO
+                gpio_pin.pin_code = alarm.gpio_pin_code
+                gpio_pin.pin_index_bcm = int(alarm.gpio_pin_code)
+        # if gpio_pin is not None:
+            #gpio_pin.contact_type = alarm.sensor_type
+            #port_list.append(gpio_pin)
+        # else:
+        #    L.l.warning('Unexpected empty gpio pin response for alarm setup {}'.format(alarm))
+        port_list.append(gpio_pin)
     dispatcher.send(signal=Constant.SIGNAL_GPIO_INPUT_PORT_LIST, gpio_pin_list=port_list)
     # just for test on netbook
     # import gpio.rpi_gpio
