@@ -320,7 +320,7 @@ def _init_comm():
     oport = "none"
     try:
         ohost = get_json_param(Constant.P_OWSERVER_HOST_1)
-        oport = str(get_json_param(Constant.P_OWSERVER_PORT_1))
+        oport = int(get_json_param(Constant.P_OWSERVER_PORT_1))
         _get_bus_list(ohost, oport)
         P.initialised = True
         P.warning_issued = False
