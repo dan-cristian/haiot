@@ -274,6 +274,7 @@ class ZoneAlarm(TinyBase):
     alarm_pin_triggered = False  # True if alarm sensor is connected (move detected)
     is_false_alarm_prone = False  # True if sensor can easily trigger false alarms (gate move by wind)
     start_alarm = False  # True if alarm must start (because area/zone is armed)
+    relay_type = ''
     updated_on = datetime.now()
 
 
