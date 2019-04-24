@@ -312,6 +312,8 @@ def _get_bus_list(ohost, oport):
             P.func_list.append(func)
             # start all threads sequentially to avoid peak cpu usage
             time.sleep(P.sampling_period_seconds / len(owitems))
+        else:
+            L.l.info('Ignoring {}'.format(owitem))
     L.l.info("Found {} owfs busses and initialised {} threads".format(len(P.ow_conn_list), len(P.func_list)))
 
 
