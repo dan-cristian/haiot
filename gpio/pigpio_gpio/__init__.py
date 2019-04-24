@@ -381,7 +381,8 @@ def _setup_in_ports(gpio_pin_list):
 
 
 def thread_run():
-    P.pi.get_current_tick()
+    if P.pi is not None:
+        P.pi.get_current_tick()
 
 
 def unload():
