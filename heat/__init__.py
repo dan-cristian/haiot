@@ -585,7 +585,7 @@ def _handle_presence(zone_name=None, zone_id=None):
             L.l.info("No heat thermo for zone {}".format(zone_name))
 
 
-def _zoneheatrelay_upsert_listener(record, updated_fields):
+def _zoneheatrelay_upsert_listener(record, changed_fields):
     # copy to help with recursion prevention
     if record.heat_is_on:
         pin_value = 1
@@ -604,7 +604,7 @@ def _zoneheatrelay_upsert_listener(record, updated_fields):
                 'Heat state zone_id {} unexpected val={} after setval={}'.format(record.zone_id, pin_state, pin_value))
 
 
-def _zonethermostat_upsert_listener(record, updated_fields):
+def _zonethermostat_upsert_listener(record, changed_fields):
     # activate manual mode if set by user in UI
     if hasattr(record, ZoneThermostat.is_mode_manual) and record.is_mode_manual is True:
         record.last_manual_set = datetime.datetime.now()
