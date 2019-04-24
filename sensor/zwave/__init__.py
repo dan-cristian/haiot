@@ -113,6 +113,7 @@ def _set_custom_relay_state(sensor_address, state):
             new_relay.gpio_host_name = Constant.HOST_NAME
         new_relay.relay_is_on = state
         current_relay.is_event_external = True
+        new_relay.is_device_event = True
         new_relay.save_changed_fields(
             current_record=current_relay, notify_transport_enabled=True, save_to_graph=True)
     else:
