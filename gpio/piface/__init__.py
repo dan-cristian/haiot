@@ -3,6 +3,7 @@ from pydispatch import dispatcher
 from main.logger_helper import L
 from common import Constant, fix_module
 from gpio import io_common
+
 while True:
     try:
         if Constant.is_os_linux():
@@ -156,10 +157,22 @@ def unload():
         # pfio.deinit_board()
 
 
+def post_init_relay_value(gpio_pin_code):
+    board, direction, pin = io_common.decode_piface_pin(gpio_pin_code)
+    return get_out_pin_value(pin_index=pin, board_index=board)
+
+
+def post_init_alarm_value(gpio_pin_code):
+    board, direction, pin = io_common.decode_piface_pin(gpio_pin_code)
+    pin_val = _get_in_pin_value(pin_index=pin, board_index=board)
+    pin_connected = (pin_val == 1)
+    return pin_connected
+
+
 def post_init():
     if P.initialised:
         L.l.info('Running post_init piface')
-        # relays = models.ZoneCustomRelay.query.filter_by(
+        # relays = ZoneCustomRelay.query.filter_by(
         #    gpio_host_name=Constant.HOST_NAME, relay_type=Constant.GPIO_PIN_TYPE_PI_FACE_SPI).all()
         # for relay in relays:
         #    L.l.info('Reading piface relay{}'.format(relay.gpio_pin_code))
@@ -176,7 +189,6 @@ def post_init():
                 gpio_pin_code = format_piface_pin_code(board_index=board, pin_direction=Constant.GPIO_PIN_DIRECTION_IN,
                                                        pin_index=pin)
                 pin_in_val = _get_in_pin_value(pin_index=pin, board_index=board)
-                # alt_pin_in = P.pfd[board].input_pins[pin].value
                 L.l.info('Read input pin {} value={}'.format(gpio_pin_code, pin_in_val))
                 io_common.update_custom_relay(
                     pin_code=gpio_pin_code, pin_value=pin_in_val, notify=True, ignore_missing=True)
@@ -193,7 +205,8 @@ def init():
             _setup_board()
             if P.board_init:
                 # thread_pool.add_interval_callable(thread_run, run_interval_second=10)
-                dispatcher.connect(_setup_in_ports_pif, signal=Constant.SIGNAL_GPIO_INPUT_PORT_LIST, sender=dispatcher.Any)
+                dispatcher.connect(_setup_in_ports_pif, signal=Constant.SIGNAL_GPIO_INPUT_PORT_LIST,
+                                   sender=dispatcher.Any)
                 P.initialised = True
                 L.l.info('Piface initialised OK')
         except Exception as ex1:
