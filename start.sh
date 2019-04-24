@@ -3,7 +3,8 @@
 function run_app {
     ${DIR}/scripts/stopserver.sh
     echo Starting app with parameter $1 $2 $3 $4 $5 $6 $7 $8 $9
-    source ${DIR}/venv/bin/activate
+    #source ${DIR}/venv/bin/activate
+    source ${DIR}/3venv/bin/activate
     python ${DIR}/haiot.py $1 $2 $3 $4 $5 $6 $7 $8 $9 2>&1
     exit_code=$?
     echo "Program exit with code $exit_code"
