@@ -81,10 +81,10 @@ class TinyBase(ModelView, metaclass=OrderedClassMembers):
             return None
 
     @classmethod
-    def insert_one(cls, doc):
+    def insert_one(cls, doc, bypass_document_validation=False):
         if not cls.is_used_in_module:
             cls.is_used_in_module = True
-        r = cls.coll.insert_one(doc=doc)
+        r = cls.coll.insert_one(doc=doc, bypass_document_validation=bypass_document_validation)
         if r is not None:
             return r.inserted_id
         else:
