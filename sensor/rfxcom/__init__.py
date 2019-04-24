@@ -66,7 +66,7 @@ def __save_sensor_db(p_id='', p_type='', value_list=None):
     else:
         record = Sensor()
         record.address = p_id
-        zone_sensor = ZoneSensor.find_one({Sensor.sensor_address: p_id})
+        zone_sensor = ZoneSensor.find_one({Sensor.address: p_id})
     if zone_sensor:
         record.sensor_name = zone_sensor.sensor_name
     else:

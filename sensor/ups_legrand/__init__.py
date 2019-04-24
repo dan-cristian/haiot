@@ -91,7 +91,7 @@ def __search_ups(port_name):
                 L.l.info('Found UPS [{}] on port {}'.format(response, port_name))
                 P.serial = ser
                 P.ups = LegrandUps()
-                P.ups.Id = response.decode('utf-8').replace(' ', '').replace('\r', '')
+                P.ups.Id = response.replace(' ', '').replace('\r', '')
                 P.ups.Name = 'Legrand Nicky ' + P.ups.Id
                 P.ups.Port = port_name
                 break
