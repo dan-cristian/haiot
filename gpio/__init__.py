@@ -1,3 +1,5 @@
+import gpio.io_common
+
 __author__ = 'dcristian'
 from main import sqlitedb
 from datetime import datetime, timedelta
@@ -247,7 +249,7 @@ def zone_custom_relay_record_update(json_object):
                                 func = (relay_set, pin_code, pin_type, board, init_val, False)
                                 # set notify to true to inform openhab on state change
                                 if pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
-                                    pin_code_ok = piface.format_pin_code(
+                                    pin_code_ok = gpio.io_common.format_piface_pin_code(
                                         board_index=board, pin_direction=Constant.GPIO_PIN_DIRECTION_OUT,
                                         pin_index=pin_code)
                                 else:
@@ -299,7 +301,7 @@ def zone_custom_relay_upsert_listener(record, changed_fields):
         expired_relay_is_on = not (bool(record.relay_is_on))
         gpio_record = GpioPin.find_one({GpioPin.pin_code: record.gpio_pin_code, GpioPin.host_name: Constant.HOST_NAME})
         if record.pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
-            pin_code = piface.format_pin_code(
+            pin_code = gpio.io_common.format_piface_pin_code(
                 board_index=gpio_record.board_index, pin_direction=Constant.GPIO_PIN_DIRECTION_OUT,
                 pin_index=gpio_record.pin_index_bcm)
         else:
