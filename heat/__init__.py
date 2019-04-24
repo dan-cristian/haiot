@@ -152,7 +152,7 @@ def __save_heat_state_db(zone, heat_is_on):
         if sqlitedb:
             commit()
         else:
-            zone_heat_relay.save_changed_fields()
+            zone_heat_relay.save_changed_fields(broadcast=True, persist=True)
             zone_thermo.save_changed_fields()
     else:
         L.l.warning('No heat relay found in zone {} id {}'.format(zone.name, zone.id))
