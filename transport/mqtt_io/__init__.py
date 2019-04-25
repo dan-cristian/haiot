@@ -1,4 +1,3 @@
-from datetime import datetime
 import time
 import socket
 from main.logger_helper import L
@@ -28,6 +27,7 @@ class P:
     mqtt_paho_exists = False
     last_rec = utils.get_base_location_now_date()
     last_minute = 0
+    received_mqtt_list = []
 
     def __init__(self):
         pass
@@ -116,11 +116,17 @@ def on_message(client, userdata, msg):
                 delta = (start - utils.parse_to_date(x['_sent_on'])).total_seconds()
                 L.l.info('Mqtt age={}'.format(delta))
             x['is_event_external'] = True
-            dispatcher.send(
-                signal=Constant.SIGNAL_MQTT_RECEIVED, client=client, userdata=userdata, topic=msg.topic, obj=x)
+            P.received_mqtt_list.append(x)
+            # dispatcher.send(
+            #    signal=Constant.SIGNAL_MQTT_RECEIVED, client=client, userdata=userdata, topic=msg.topic, obj=x)
             elapsed = (utils.get_base_location_now_date() - start).total_seconds()
             if elapsed > 1:
                 L.l.warning('Command mqtt received took {} seconds'.format(elapsed))
+        else:
+            x = utils.json2obj(json)
+            if '_sent_on' in x:
+                delta = (start - utils.parse_to_date(x['_sent_on'])).total_seconds()
+                L.l.info('Mqtt own age={}'.format(delta))
     except AttributeError as ex:
         L.l.warning('Unknown attribute error in msg {} err {}'.format(json, ex))
     except ValueError as e:

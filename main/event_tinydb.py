@@ -24,14 +24,8 @@ def _handle_internal_event(obj):
 
 
 # executed on every mqqt message received (except those sent by this host)
-def handle_event_mqtt_received(client, userdata, topic, obj):
-    # global __mqtt_lock
-    # __mqtt_lock.acquire()
-    try:
-        P.mqtt_event_list.append(obj)
-    finally:
-        # __mqtt_lock.release()
-        pass
+def handle_event_mqtt_received(obj):
+    P.mqtt_event_list.append(obj)
 
 
 # runs periodically and executes received mqqt messages from queue
