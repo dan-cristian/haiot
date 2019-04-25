@@ -68,6 +68,7 @@ def parse_rules(obj, change):
 def mqtt_on_message(client, userdata, msg):
     item = msg.topic.split(P.mqtt_topic_receive_prefix)
     payload = msg.payload.decode('utf-8').lower()
+    L.l.info('Got openhab mqtt {}={}'.format(msg.topic, payload))
     if len(item) == 2:
         name = item[1]
         switch_state = None
@@ -150,8 +151,8 @@ def unload():
 
 def init():
     L.l.info('Openhab module initialising')
-    rules.P.openhab_topic = str(get_json_param(Constant.P_MQTT_TOPIC_OPENHAB_SEND))
-    P.mqtt_topic_receive = str(get_json_param(Constant.P_MQTT_TOPIC_OPENHAB_RECEIVE))
+    rules.P.openhab_topic = get_json_param(Constant.P_MQTT_TOPIC_OPENHAB_SEND)
+    P.mqtt_topic_receive = get_json_param(Constant.P_MQTT_TOPIC_OPENHAB_RECEIVE)
     P.mqtt_topic_receive_prefix = P.mqtt_topic_receive.replace('#', '')
     mqtt_io.P.mqtt_client.message_callback_add(P.mqtt_topic_receive, mqtt_on_message)
     __load_rules()
