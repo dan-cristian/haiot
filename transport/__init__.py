@@ -77,6 +77,7 @@ def thread_run_recv():
         L.l.error('Error on mqtt receive process, err={}, obj={}'.format(ex, obj))
 
 
+
 def unload():
     from main import thread_pool
     L.l.info('Transport unloading')
@@ -91,4 +92,5 @@ def init():
     thread_pool.add_interval_callable(thread_run_send, run_interval_second=1)
     thread_pool.add_interval_callable(thread_run_recv, run_interval_second=1)
     mqtt_io.init()
+    utils.init_debug()
     P.initialised = True
