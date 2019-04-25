@@ -116,7 +116,8 @@ def _init_flask_admin():
     from main import tinydb_model
     from main.tinydb_helper import TinyBase
     cls_dict = dict([(name, cls) for name, cls in tinydb_model.__dict__.items() if isinstance(cls, type)])
-    for cls_name in cls_dict:
+    sorted_keys = sorted(cls_dict)
+    for cls_name in sorted_keys:
         cls = tinydb_model.__dict__[cls_name]
         if cls_name is not 'TinyBase' and issubclass(cls, TinyBase):
             obj = cls()
