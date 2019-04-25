@@ -206,7 +206,7 @@ def custom_relay(name, value):
     if relay is not None:
         if relay.gpio_host_name == Constant.HOST_NAME:
             L.l.info("OK setting custom relay {} to {} from openhab".format(name, value))
-            relay.relay_is_on = value
+            relay.relay_is_on = bool(value)
             if sqlitedb:
                 relay.save_changed_fields(new_record=relay, notify_transport_enabled=True, save_all_fields=True)
             else:
