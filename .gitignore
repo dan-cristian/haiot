@@ -1,5 +1,6 @@
 /database.db
 venv/
+3venv/
 *.pyc
 .idea/*
 nohup.out
