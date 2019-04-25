@@ -59,5 +59,5 @@ class FlaskInThread(threading.Thread):
               method `app.Flask.run <https://github.com/mitsuhiko/flask/blob/master/flask/app.py>`_
         """
         # raise NotImplementedError()
-        self.thread.terminate()
+        print('Shutdown flask not implemented')
         # self.server.server_close()
