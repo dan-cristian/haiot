@@ -155,10 +155,6 @@ class TinyBase(ModelView, metaclass=OrderedClassMembers):
                     exist = cls.coll.find_one(filter=key)
                     if exist is not None:
                         res = cls.coll.update_one(query=key, doc={"$set": update})
-                        if res.raw_result is not None:
-                            k = res.raw_result[0]
-                        else:
-                            k = 'n/a'
                         # L.l.info('Updated key {}, {}'.format(key, self.__repr__()))
                     else:
                         res = cls.coll.insert_one(update, bypass_document_validation=True)
