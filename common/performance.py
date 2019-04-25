@@ -88,4 +88,4 @@ def thread_run():
 
 def init(log_file):
     P.log_file = log_file
-    thread_pool.add_interval_callable_progress(thread_run, run_interval_second=5)
+    thread_pool.add_interval_callable(thread_run, run_interval_second=5)
