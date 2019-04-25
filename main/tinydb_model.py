@@ -223,6 +223,7 @@ class ZoneHeatRelay(TinyBase):
     heat_pin_name = ''
     zone_id = 0
     gpio_pin_code = ''  # user friendly format, e.g. P8_11
+    relay_type = ''
     gpio_host_name = ''
     heat_is_on = False
     is_main_heat_source = False
