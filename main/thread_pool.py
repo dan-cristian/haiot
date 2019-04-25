@@ -60,7 +60,7 @@ def run_thread_pool():
     P.tpool = True
     # https://docs.python.org/3.3/library/concurrent.futures.html
     P.ff = {}
-    P.executor = concurrent.futures.ThreadPoolExecutor(max_workers=20)
+    P.executor = concurrent.futures.ThreadPoolExecutor(max_workers=30)
     #with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
     while P.tpool:
         if len(P.cl) != len(P.ff):
@@ -103,6 +103,6 @@ def run_thread_pool():
 
 
 # immediately runs submitted job using a thread pool
-#def do_job(f):
+# def do_job(f):
 #    global __immediate_executor
 #    __immediate_executor.submit(f)
