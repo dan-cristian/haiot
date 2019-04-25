@@ -79,7 +79,8 @@ def __utility_update_ex(sensor_name, value, unit=None, index=None):
                         record.units_total = value
                         record.units_delta = value - current_record.units_total
                         current_record.units_total = value
-                        current_record.commit_record_to_db()
+                        if sqlitedb:
+                            current_record.commit_record_to_db()
                 elif current_record.utility_type == Constant.UTILITY_TYPE_GAS:
                     new_value = value / (current_record.ticks_per_unit * 1.0)
                     delta = max(0, new_value - current_record.units_total)
@@ -101,7 +102,7 @@ def __utility_update_ex(sensor_name, value, unit=None, index=None):
     except Exception as ex:
         L.l.error("Error saving utility ex update {}".format(ex), exc_info=True)
         if sqlitedb:
-            if "Bind '" + Constant.DB_REPORTING_ID + "' is not specified" in ex.message:
+            if "Bind '" + Constant.DB_REPORTING_ID + "' is not specified" in str(ex):
                 L.l.info('Try to connect to reporting DB, connection seems down')
                 model_helper.init_reporting()
 
@@ -159,6 +160,7 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
                                 utility_name=record.utility_name).order_by(desc(models.UtilityHistory.id)).first()
                         else:
                             # fixme:
+                            last_rec = None
                             pass
                         if last_rec is not None:
                             current_record.units_total = last_rec.units_total
