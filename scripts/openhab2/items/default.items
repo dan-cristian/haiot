@@ -43,6 +43,9 @@ Switch relay_front_gate "Front gate" <switch> [ "Switchable" ]                {m
 Switch relay_fan_bucatarie_relay "Fan bucatarie" <switch> [ "Switchable" ]    {mqtt="<[mosquitto:iot/openhab/relay_fan_bucatarie_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_fan_bucatarie_relay:command:*:default]", autoupdate="false"}
 Switch relay_fan_baie_parter_relay "Fan baie parter" <switch> [ "Switchable" ]  {mqtt="<[mosquitto:iot/openhab/relay_fan_baie_parter_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_fan_baie_parter_relay:command:*:default]", autoupdate="false"}
 
+
+Switch relay_front_gate_test "Front gate test" <switch> [ "Switchable" ]                {mqtt="<[mosquitto:iot/openhab/relay_front_gate_relay_test:state:default],>[mosquitto:iot/openhab/cmd/relay_front_gate_relay_test:command:*:default]", autoupdate="false"}
+
 Switch relay_beci_contactor "Contactor beci" <switch>                       {mqtt="<[mosquitto:iot/openhab/relay_beci_contactor_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_beci_contactor_relay:command:*:default]", autoupdate="false"}
 Switch relay_beci_upscharge "Ups beci charge" <switch>                      {mqtt="<[mosquitto:iot/openhab/relay_beci_upscharge_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_beci_upscharge_relay:command:*:default]", autoupdate="false"}
 Switch relay_beci_extra_relay "Beci extra" <switch>                         {mqtt="<[mosquitto:iot/openhab/relay_beci_extra_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_beci_extra_relay:command:*:default]", autoupdate="false"}
