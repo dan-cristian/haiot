@@ -597,7 +597,8 @@ def _zoneheatrelay_upsert_listener(record, changed_fields):
         L.l.info("Setting heat pin {}:{} to {}".format(record.heat_pin_name, record.gpio_pin_code, pin_value))
         pin_state = gpio.set_relay_state(
             pin_code=record.gpio_pin_code, relay_is_on=record.heat_is_on, relay_type=record.relay_type)
-        L.l.info("Setting heat pin {} to {} returned {}".format(record.gpio_pin_code, pin_value, pin_state))
+        L.l.info("Setting heat pin {}:{} to {} returned {}".format(
+            record.heat_pin_name, record.gpio_pin_code, pin_value, pin_state))
 
 
 def _zonethermostat_upsert_listener(record, changed_fields):
