@@ -205,12 +205,12 @@ def custom_relay(name, value):
         relay = models.ZoneCustomRelay.find_one({models.ZoneCustomRelay.relay_pin_name: name})
     if relay is not None:
         if relay.gpio_host_name == Constant.HOST_NAME:
-            L.l.info("OK setting custom relay {} to {} from openhab".format(name, value))
-            relay.relay_is_on = bool(value)
+            relay.relay_is_on = value
             if sqlitedb:
                 relay.save_changed_fields(new_record=relay, notify_transport_enabled=True, save_all_fields=True)
             else:
                 relay.save_changed_fields(broadcast=True, persist=True)
+            L.l.info("OK setting custom relay {} to {} from openhab".format(name, value))
 
 
 def heat_relay(name, value):

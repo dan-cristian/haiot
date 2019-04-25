@@ -97,6 +97,7 @@ def payload2json(payload):
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
+    start = utils.get_base_location_now_date()
     json = msg
     try:
         if utils.get_base_location_now_date().minute != P.last_minute:
@@ -104,28 +105,18 @@ def on_message(client, userdata, msg):
             P.mqtt_msg_count_per_minute = 0
         P.mqtt_msg_count_per_minute += 1
         P.last_rec = utils.get_base_location_now_date()
-        #L.l.debug('Received from client [{}] userdata [{}] msg [{}] at {} '.format(client._client_id,
-        #                                                                           userdata, msg.topic,
-        #                                                                           utils.get_base_location_now_date()))
         json = payload2json(msg.payload)
         # ignore messages sent by this host
         if '"source_host_": "{}"'.format(Constant.HOST_NAME) not in json \
                 and '"source_host": "{}"'.format(Constant.HOST_NAME) not in json \
                 and len(json) > 0:  # or Constant.HOST_NAME == 'netbook': #debug
             x = utils.json2obj(json)
-            # if x[Constant.JSON_PUBLISH_SOURCE_HOST] != str(Constant.HOST_NAME):
-            start = utils.get_base_location_now_date()
             x['is_event_external'] = True
-            dispatcher.send(signal=Constant.SIGNAL_MQTT_RECEIVED, client=client, userdata=userdata, topic=msg.topic, obj=x)
+            dispatcher.send(
+                signal=Constant.SIGNAL_MQTT_RECEIVED, client=client, userdata=userdata, topic=msg.topic, obj=x)
             elapsed = (utils.get_base_location_now_date() - start).total_seconds()
-            if elapsed > 5:
-                L.l.warning('Command received took {} seconds'.format(elapsed))
-            if False:
-                if hasattr(x, 'command') and hasattr(x, 'command_id') and hasattr(x, 'host_target'):
-                    if x.host_target == Constant.HOST_NAME:
-                        L.l.info('Executing command {}'.format(x.command))
-                    else:
-                        L.l.info("Received command {} for other host {}".format(x, x.host_target))
+            if elapsed > 1:
+                L.l.warning('Command mqtt received took {} seconds'.format(elapsed))
     except AttributeError as ex:
         L.l.warning('Unknown attribute error in msg {} err {}'.format(json, ex))
     except ValueError as e:
