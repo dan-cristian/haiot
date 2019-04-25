@@ -275,39 +275,53 @@ def zone_custom_relay_record_update(json_object):
         L.l.error('Error on zone custom relay update, err={}'.format(ex), exc_info=True)
 
 
+def set_relay_state(pin_code, relay_is_on, relay_type):
+    if relay_type == Constant.GPIO_PIN_TYPE_SONOFF:
+        res = sonoff.set_relay_state(relay_name=pin_code, relay_is_on=relay_is_on)
+    elif relay_type == Constant.GPIO_PIN_TYPE_PI_PCF8574:
+        res = pcf8574_gpio.set_pin_value(pin_index=pin_code, pin_value=not relay_is_on)
+    elif P.has_zwave and relay_type == Constant.GPIO_PIN_TYPE_ZWAVE:
+        node_id = zwave.get_node_id_from_txt(pin_code)
+        res = zwave.set_switch_state(node_id=node_id, state=relay_is_on)
+    elif relay_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
+        value = 1 if relay_is_on else 0
+        res = piface.set_pin_code_value(pin_code=pin_code, pin_value=value)
+    elif relay_type == Constant.GPIO_PIN_TYPE_PI_STDGPIO:
+            bcm_id = int(pin_code)
+            value = 1 if relay_is_on else 0
+            res = rpi_gpio.set_pin_bcm(bcm_id=bcm_id, pin_value=value)
+    else:
+        L.l.error('Unexpected relay type {}'.format(relay_type))
+        res = None
+    return res
+
+
 def zone_custom_relay_upsert_listener(record, changed_fields):
     assert isinstance(record, ZoneCustomRelay)
     if record.gpio_host_name != Constant.HOST_NAME:
         return
     L.l.info('Upsert listener {} pin {}'.format(record.relay_type, record.gpio_pin_code))
+    set_relay_state(record.gpio_pin_code, record.relay_is_on, record.relay_type)
+    pin_code = record.gpio_pin_code
     if record.relay_type == Constant.GPIO_PIN_TYPE_SONOFF:
-        pin_code = record.gpio_pin_code
         expired_relay_is_on = not record.relay_is_on
-        sonoff.set_relay_state(relay_name=pin_code, relay_is_on=record.relay_is_on)
         expire_func = (sonoff.set_relay_state, record.gpio_pin_code, expired_relay_is_on)
     elif record.relay_type == Constant.GPIO_PIN_TYPE_PI_PCF8574:
-        pin_code = record.gpio_pin_code
         # pcf on state is reversed!
         expired_relay_is_on = record.relay_is_on
-        pcf8574_gpio.set_pin_value(pin_index=pin_code, pin_value=not record.relay_is_on)
         expire_func = (pcf8574_gpio.set_pin_value, record.gpio_pin_code, expired_relay_is_on)
     elif P.has_zwave and record.relay_type == Constant.GPIO_PIN_TYPE_ZWAVE:
-        pin_code = record.gpio_pin_code
         node_id = zwave.get_node_id_from_txt(pin_code)
         expired_relay_is_on = not record.relay_is_on
         zwave.set_switch_state(node_id=node_id, state=record.relay_is_on)
         expire_func = (zwave.set_switch_state, node_id, expired_relay_is_on)
     elif record.relay_type in [Constant.GPIO_PIN_TYPE_PI_STDGPIO, Constant.GPIO_PIN_TYPE_PI_FACE_SPI]:
         value = 1 if record.relay_is_on else 0
-        pin_code = record.gpio_pin_code
         expired_relay_is_on = not record.relay_is_on
-        # gpio_record = GpioPin.find_one({GpioPin.pin_code: record.gpio_pin_code, GpioPin.host_name: Constant.HOST_NAME})
         if record.relay_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
-            piface.set_pin_code_value(pin_code=record.gpio_pin_code, pin_value=value)
             expire_func = (piface.set_pin_code_value, record.gpio_pin_code, value)
         else:
             bcm_id = int(record.gpio_pin_code)
-            rpi_gpio.set_pin_bcm(bcm_id=bcm_id, pin_value=value)
             expire_func = (rpi_gpio.set_pin_bcm, bcm_id, value)
     else:
         L.l.warning('Unknown relay type {}'.format(record.relay_type))

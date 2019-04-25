@@ -595,14 +595,17 @@ def _zoneheatrelay_upsert_listener(record, changed_fields):
     # set pin only on pins owned by this host
     if record.gpio_host_name == Constant.HOST_NAME:
         L.l.info("Setting heat pin {} to {}".format(record.gpio_pin_code, pin_value))
-        pin_state = gpio.relay_update(gpio_pin_code=record.gpio_pin_code, pin_value=pin_value)
-        if pin_state == pin_value:
-            pin_state = (pin_state == 1)
-            record.heat_is_on = pin_state
-            record.save_changed_fields()
+        pin_state = gpio.set_relay_state(
+            pin_code=record.gpio_pin_code, relay_is_on=record.heat_is_on, relay_type=record.relay_type)
+        if pin_state != pin_value:
+            L.l.warning(
+                'Heat state zone {} unexpected retval={}, setval={}'.format(record.zone_id, pin_state, pin_value))
+            # pin_state = (pin_state == 1)
+            #record.heat_is_on = pin_state
+            # record.save_changed_fields()
         else:
             L.l.warning(
-                'Heat state zone_id {} unexpected val={} after setval={}'.format(record.zone_id, pin_state, pin_value))
+                'Heat state zone {} unexpected retval={}, setval={}'.format(record.zone_id, pin_state, pin_value))
 
 
 def _zonethermostat_upsert_listener(record, changed_fields):

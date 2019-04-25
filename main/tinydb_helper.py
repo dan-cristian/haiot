@@ -158,10 +158,10 @@ class TinyBase(ModelView, metaclass=OrderedClassMembers):
                             k = res.raw_result[0]
                         else:
                             k = 'n/a'
-                        L.l.info('Updated key {}, {}'.format(key, self.__repr__()))
+                        # L.l.info('Updated key {}, {}'.format(key, self.__repr__()))
                     else:
                         res = cls.coll.insert_one(update, bypass_document_validation=True)
-                        L.l.info('Inserted key {}, {} with eid={}'.format(key, self.__repr__(), res.eid))
+                        # L.l.info('Inserted key {}, {} with eid={}'.format(key, self.__repr__(), res.eid))
                     # execute listener
                     if cls_name in cls.upsert_listener_list:
                         has_listener = True
