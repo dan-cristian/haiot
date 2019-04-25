@@ -28,6 +28,7 @@ class P:
     AWAY_SEC = 60 * 60 * 6  # no of secs after no move to be considered away
     initialised = False
     debug = False
+    thread_pool_status = None
 
     def __init__(self):
         pass
@@ -381,7 +382,7 @@ def loop_zones():
             zone_list = Zone.find()
         global progress_status
         for zone in zone_list:
-            progress_status = 'do zone {}'.format(zone.name)
+            P.thread_pool_status = 'do zone {}'.format(zone.name)
             if sqlitedb:
                 heat_schedule = models.HeatSchedule.query.filter_by(zone_id=zone.id, season=P.season).first()
                 zonesensor_list = models.ZoneSensor.query.filter_by(zone_id=zone.id, is_main=True).all()
@@ -497,6 +498,7 @@ def loop_heat_relay():
 
 # set which is the main heat source relay that must be set on
 def set_main_heat_source():
+    P.thread_pool_status = 'set main source'
     if sqlitedb:
         heat_source_relay_list = models.ZoneHeatRelay.query.filter(models.ZoneHeatRelay.temp_sensor_name is not None).all()
     else:
@@ -609,20 +611,9 @@ def _zonethermostat_upsert_listener(record, changed_fields):
         L.l.info('Set thermostat active={} zone={}'.format(record.is_mode_manual, record.zone_name))
 
 
-progress_status = None
-
-
-def get_progress():
-    global progress_status
-    return progress_status
-
-
 def thread_run():
     prctl.set_name("heat")
     threading.current_thread().name = "heat"
-    global progress_status
-    L.l.debug('Processing heat')
-    progress_status = 'Looping zones'
     if P.threshold is None:
         P.threshold = float(get_json_param(Constant.P_TEMPERATURE_THRESHOLD))
         P.temp_limit = float(get_json_param(Constant.P_HEAT_SOURCE_MIN_TEMP))

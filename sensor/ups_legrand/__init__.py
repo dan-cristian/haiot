@@ -24,6 +24,7 @@ class P:
     port_pattern = 'ttyUSB'
     last_init = datetime.min
     retry_pause_sec = 300  # seconds
+    thread_pool_status = None
 
     def __init__(self):
         pass
@@ -196,6 +197,7 @@ def _init_comm():
             if len(serial_list) > 0:
                 L.l.info('Looking for Legrand UPS on {} serial ports'.format(len(serial_list)))
                 for port_name in serial_list:
+                    P.thread_pool_status = 'init port {}'.format(port_name)
                     if port_name not in variable.USB_PORTS_IN_USE and P.port_pattern in port_name:
                         __search_ups(port_name)
                         if P.serial is not None:
@@ -217,8 +219,10 @@ def thread_run():
     prctl.set_name("ups_legrand")
     threading.current_thread().name = "ups_legrand"
     if not P.initialised:
+        P.thread_pool_status = 'init comm'
         _init_comm()
     if P.initialised and P.serial is not None:
+        P.thread_pool_status = 'read status'
         __read_ups_status()
     prctl.set_name("idle")
     threading.current_thread().name = "idle"

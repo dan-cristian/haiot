@@ -49,7 +49,8 @@ def _process_obj(obj):
                 if cls.is_used_in_module:
                     cls.save(obj)
                 else:
-                    L.l.info('Ignoring save for {}'.format(cls.__name__))
+                    # L.l.info('Ignoring save for {}'.format(cls.__name__))
+                    pass
         else:
             L.l.error('mqtt message sent from me to me!')
     except Exception as ex:
