@@ -183,9 +183,9 @@ def init():
                     P.mqtt_client.on_subscribe = on_subscribe
                     P.mqtt_client.on_unsubscribe = on_unsubscribe
                     # mqtt_client.username_pw_set('user', 'pass')
-                    P.mqtt_client.connect(host=host, port=port, keepalive=60)
                     P.mqtt_client.max_inflight_messages_set(100)
                     P.mqtt_client.max_queued_messages_set(0)
+                    P.mqtt_client.connect(host=host, port=port, keepalive=60)
                     P.mqtt_client.loop_start()
                     seconds_lapsed = 0
                     while not P.client_connected and seconds_lapsed < 10:
