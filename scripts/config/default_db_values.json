@@ -121,7 +121,7 @@
     {"id":527, "active":false, "start_order":27, "name":"node", "host_name":"netbook"},
     {"id":535, "active":false, "start_order":35, "name":"cloud.newtifry", "host_name":"netbook"},
     {"id":541, "active":false, "start_order":41, "name":"cloud.alexa", "host_name":"netbook"},
-    {"id":557, "active":false, "start_order":57, "name":"sensor.sonoff", "host_name":"netbook"},
+    {"id":557, "active":true, "start_order":57, "name":"sensor.sonoff", "host_name":"netbook"},
     {"id":559, "active":false, "start_order":59, "name":"sensor.i2c", "host_name":"netbook"},
     {"id":565, "active":true, "start_order":65, "name":"gpio", "host_name":"netbook"},
     {"id":567, "active":false, "start_order":67, "name":"alarm", "host_name":"netbook"},

@@ -242,6 +242,7 @@ def set_relay_state(relay_name, relay_is_on):
     else:
         payload = 'OFF'
     topic = P.sonoff_topic.replace('#', '')
+    L.l.info('Set sonoff relay {} to {}'.format(relay_name, relay_is_on))
     transport.send_message_topic(payload, topic + 'cmnd/' + relay_name + '/POWER')
     return relay_is_on
 
