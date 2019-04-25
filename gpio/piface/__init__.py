@@ -64,7 +64,7 @@ def set_pin_code_value(pin_code, pin_value):
 
 # http://www.farnell.com/datasheets/1881551.pdf
 def set_pin_value(pin_index, pin_value, board_index):
-    L.l.info('Set piface pin {} value {} board {}'.format(pin_index, pin_value, board_index))
+    L.l.info('Set piface pin {} to value={}, board {}'.format(pin_index, pin_value, board_index))
     try:
         pfio.digital_write(pin_num=pin_index, value=pin_value, hardware_addr=board_index)
         act_value = get_out_pin_value(pin_index=pin_index, board_index=board_index)
