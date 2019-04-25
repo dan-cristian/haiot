@@ -201,9 +201,21 @@ def _install(package):
 def fix_module(ex):
     try:
         error_message = '{}'.format(ex)
-        mod_err = error_message.split('No module named ')
-        if len(mod_err) == 2:
-            mod_name = mod_err[1].replace("'", "")
+        mod_err = None
+        if 'No module named ' in error_message: 
+            ar = error_message.split('No module named ')
+            if len(ar) == 2:
+                mod_err = ar[1]    
+            else:
+                msg = 'Unable to split {}, unexpected len {}'.format(error_message, len(ar))
+        elif 'cannot import name' in error_message:
+            key = "from '"
+            start = error_message.find(key)
+            start = start + len(key)
+            end = error_message.find("'", start)
+            mod_err = error_message[start:end]
+        if mod_err is not None:
+            mod_name = mod_err.replace("'", "")
             package_name = get_package_name(mod_name)
             if package_name is None:
                 package_name = mod_name
@@ -217,8 +229,6 @@ def fix_module(ex):
                     return True
             print('Not retrying a failed package install for {}'.format(package_name))
             return False
-        else:
-            msg = 'Unable to split {}, unexpected len {}'.format(error_message, len(mod_err))
     except Exception as ex:
         msg = 'Fixmodule exception err={}'.format(ex)
     print(msg)

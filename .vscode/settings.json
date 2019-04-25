@@ -1,5 +1,5 @@
 // Place your settings in this file to overwrite default and user settings.
 {
-    "python.pythonPath": "C:\\Python27\\python.exe",
+    "python.pythonPath": "venv\\Scripts\\python.exe",
     "python.linting.pylintArgs": ["--load-plugins", "pylint_flask pylint-sqlalchemy"]
 }
