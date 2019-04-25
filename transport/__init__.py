@@ -75,7 +75,9 @@ def thread_run_recv():
             dispatcher.send(signal=Constant.SIGNAL_MQTT_RECEIVED, obj=obj)
     except Exception as ex:
         L.l.error('Error on mqtt receive process, err={}, obj={}'.format(ex, obj))
-
+    finally:
+        prctl.set_name("idle")
+        threading.current_thread().name = "idle"
 
 
 def unload():
