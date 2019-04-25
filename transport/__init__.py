@@ -42,6 +42,7 @@ def thread_run_send():
     try:
         if mqtt_io.P.client_connected:
             start_len = len(P.send_json_queue)
+            L.l.info('Mqtt SEND len={}'.format(len(mqtt_io.P.received_mqtt_list)))
             # FIXME: complete this, will potentially accumulate too many requests
             for [json, topic] in list(P.send_json_queue):
                 res = transport.mqtt_io._send_message(json, topic)
@@ -68,7 +69,7 @@ def thread_run_recv():
     threading.current_thread().name = "mqtt_recv"
     obj = None
     try:
-        L.l.info('Mqtt recv len={}'.format(len(mqtt_io.P.received_mqtt_list)))
+        L.l.info('Mqtt RECV len={}'.format(len(mqtt_io.P.received_mqtt_list)))
         for obj in list(mqtt_io.P.received_mqtt_list):
             mqtt_io.P.received_mqtt_list.remove(obj)
             dispatcher.send(signal=Constant.SIGNAL_MQTT_RECEIVED, obj=obj)
@@ -87,7 +88,7 @@ def unload():
 def init():
     from main import thread_pool
     L.l.info('Transport initialising')
-    thread_pool.add_interval_callable(thread_run_send, run_interval_second=0.2)
+    thread_pool.add_interval_callable(thread_run_send, run_interval_second=1)
     thread_pool.add_interval_callable(thread_run_recv, run_interval_second=1)
     mqtt_io.init()
     P.initialised = True
