@@ -71,7 +71,7 @@ def _handle_internal_event(obj):
 
 
 # executed on every mqqt message received (except those sent by this host)
-def handle_event_mqtt_received(client, userdata, topic, obj):
+def handle_event_mqtt_received(obj):
     # global __mqtt_lock
     # __mqtt_lock.acquire()
     try:

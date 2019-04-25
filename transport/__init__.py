@@ -3,13 +3,15 @@ from common import fix_module
 while True:
     try:
         import prctl
+        from pydispatch import dispatcher
         break
     except ImportError as iex:
         if not fix_module(iex):
             break
 import threading
 import transport.mqtt_io
-from common import utils
+from pydispatch import dispatcher
+from common import utils, Constant
 from transport import mqtt_io
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
@@ -33,9 +35,9 @@ def send_message_topic(json='', topic=None):
     P.send_json_queue.append([json, topic])
 
 
-def thread_run():
-    prctl.set_name("transport")
-    threading.current_thread().name = "transport"
+def thread_run_send():
+    prctl.set_name("mqtt_send")
+    threading.current_thread().name = "mqtt_send"
     P.mqtt_lock.acquire()
     try:
         if mqtt_io.P.client_connected:
@@ -61,17 +63,31 @@ def thread_run():
     threading.current_thread().name = "idle"
 
 
+def thread_run_recv():
+    prctl.set_name("mqtt_recv")
+    threading.current_thread().name = "mqtt_recv"
+    obj = None
+    try:
+        L.l.info('Mqtt recv len={}'.format(len(mqtt_io.P.received_mqtt_list)))
+        for obj in list(mqtt_io.P.received_mqtt_list):
+            mqtt_io.P.received_mqtt_list.remove(obj)
+            dispatcher.send(signal=Constant.SIGNAL_MQTT_RECEIVED, obj=obj)
+    except Exception as ex:
+        L.l.error('Error on mqtt receive process, err={}, obj={}'.format(ex, obj))
+
+
 def unload():
     from main import thread_pool
     L.l.info('Transport unloading')
     # ...
-    thread_pool.remove_callable(thread_run)
+    thread_pool.remove_callable(thread_run_send)
     P.initialised = False
 
 
 def init():
     from main import thread_pool
     L.l.info('Transport initialising')
-    thread_pool.add_interval_callable(thread_run, run_interval_second=0.2)
+    thread_pool.add_interval_callable(thread_run_send, run_interval_second=0.2)
+    thread_pool.add_interval_callable(thread_run_recv, run_interval_second=1)
     mqtt_io.init()
     P.initialised = True
