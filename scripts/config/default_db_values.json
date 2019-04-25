@@ -132,8 +132,8 @@
 
     {"id":609, "active":false, "start_order":9, "name":"heat", "host_name":"pi-face"},
     {"id":619, "active":false, "start_order":19, "name":"ddns", "host_name":"pi-face"},
-    {"id":626, "active":false, "start_order":26, "name":"rule.electricity", "host_name":"pi-face"},
-    {"id":641, "active":false, "start_order":41, "name":"cloud.alexa", "host_name":"pi-face"},
+    {"id":626, "active":true, "start_order":26, "name":"rule.electricity", "host_name":"pi-face"},
+    {"id":641, "active":true, "start_order":41, "name":"cloud.alexa", "host_name":"pi-face"},
     {"id":647, "active":true, "start_order":47, "name":"sensor.rfxcom", "host_name":"pi-face"},
     {"id":649, "active":true, "start_order":49, "name":"sensor.ups_legrand", "host_name":"pi-face"},
     {"id":651, "active":true, "start_order":51, "name":"sensor.solar_aps", "host_name":"pi-face"},
@@ -148,9 +148,9 @@
     {"id":757, "active":true, "start_order":57, "name":"sensor.sonoff", "host_name":"EN610668"},
 
 
-    {"id":903, "active":false, "start_order":3, "name":"health_monitor", "host_name":"pizero1"},
-    {"id":955, "active":false, "start_order":55, "name":"sensor.1wire", "host_name":"pizero1"},
-    {"id":959, "active":false, "start_order":59, "name":"sensor.i2c", "host_name":"pizero1"},
+    {"id":903, "active":true, "start_order":3, "name":"health_monitor", "host_name":"pizero1"},
+    {"id":955, "active":true, "start_order":55, "name":"sensor.1wire", "host_name":"pizero1"},
+    {"id":959, "active":true, "start_order":59, "name":"sensor.i2c", "host_name":"pizero1"},
     {"id":965, "active":true, "start_order":65, "name":"gpio", "host_name":"pizero1"},
     {"id":967, "active":false, "start_order":67, "name":"alarm", "host_name":"pizero1"}
   ],
