@@ -42,7 +42,8 @@ def thread_run_send():
     try:
         if mqtt_io.P.client_connected:
             start_len = len(P.send_json_queue)
-            L.l.info('Mqtt SEND len={}'.format(start_len))
+            if start_len > 10:
+                L.l.info('Mqtt SEND len={}'.format(start_len))
             # FIXME: complete this, will potentially accumulate too many requests
             for [json, topic] in list(P.send_json_queue):
                 res = transport.mqtt_io._send_message(json, topic)
@@ -69,7 +70,8 @@ def thread_run_recv():
     threading.current_thread().name = "mqtt_recv"
     obj = None
     try:
-        L.l.info('Mqtt RECV len={}'.format(len(mqtt_io.P.received_mqtt_list)))
+        if len(mqtt_io.P.received_mqtt_list) > 10:
+            L.l.info('Mqtt RECV len={}'.format(len(mqtt_io.P.received_mqtt_list)))
         for obj in list(mqtt_io.P.received_mqtt_list):
             mqtt_io.P.received_mqtt_list.remove(obj)
             dispatcher.send(signal=Constant.SIGNAL_MQTT_RECEIVED, obj=obj)
