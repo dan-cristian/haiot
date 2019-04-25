@@ -67,6 +67,6 @@ def unload():
 def init():
     from main import thread_pool
     L.l.info('Transport initialising')
-    thread_pool.add_interval_callable(thread_run, run_interval_second=1)
+    thread_pool.add_interval_callable(thread_run, run_interval_second=0.2)
     mqtt_io.init()
     P.initialised = True

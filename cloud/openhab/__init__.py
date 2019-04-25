@@ -73,9 +73,9 @@ def mqtt_on_message(client, userdata, msg):
         name = item[1]
         switch_state = None
         if payload == 'on':
-            switch_state = 1
+            switch_state = True
         elif payload == 'off':
-            switch_state = 0
+            switch_state = False
         if name.startswith("relay_"):
             vals = name.split("relay_")
             rules.custom_relay(vals[1], switch_state)
