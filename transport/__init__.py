@@ -42,7 +42,7 @@ def thread_run_send():
     try:
         if mqtt_io.P.client_connected:
             start_len = len(P.send_json_queue)
-            L.l.info('Mqtt SEND len={}'.format(len(mqtt_io.P.received_mqtt_list)))
+            L.l.info('Mqtt SEND len={}'.format(start_len))
             # FIXME: complete this, will potentially accumulate too many requests
             for [json, topic] in list(P.send_json_queue):
                 res = transport.mqtt_io._send_message(json, topic)
