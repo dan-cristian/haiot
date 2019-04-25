@@ -4,11 +4,12 @@ from pydispatch import dispatcher
 from main.logger_helper import L
 # from sensor.rfxcom.RFXtrx import PySerialTransport
 # L.l.error("Unable to import package, err={}".format(ex), exc_info=True)
-# from main.admin import models
 from common import Constant, utils, variable
 import threading
 import prctl
 from main import thread_pool, sqlitedb
+if sqlitedb:
+    from main.admin import models
 from sensor import serial_common
 from sensor.rfxcom import RFXtrx
 from sensor.rfxcom.RFXtrx import PySerialTransport
@@ -25,6 +26,7 @@ class P:
     MAX_MINUTES_SILENCE = 10
     init_failed_count = 0
     MAX_FAILED_RETRY = 10
+    thread_pool_status = None
 
 
 # 0x0a 0x52 0x01 0x00 0xcc 0x01 0x00 0x09 0x27 0x02 0x59
@@ -173,6 +175,10 @@ def thread_run():
     threading.current_thread().name = "idle"
 
 
+def get_progress():
+    return P.thread_pool_status
+
+
 def unload():
     thread_pool.remove_callable(thread_run)
     if P.initialised:
@@ -189,5 +195,5 @@ def _init_recovery():
 
 
 def init():
-    thread_pool.add_interval_callable(thread_run, run_interval_second=P.interval)
+    thread_pool.add_interval_callable(thread_run, run_interval_second=P.interval, progress_func=get_progress)
     dispatcher.connect(_init_recovery, signal=Constant.SIGNAL_USB_DEVICE_CHANGE, sender=dispatcher.Any)

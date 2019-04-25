@@ -8,7 +8,7 @@ from main.logger_helper import L
 
 class P:
     cl = []  # list with callables
-    cpl = {} # list with callables progress
+    # cpl = {} # list with callables progress
     eil = {}  # exec_interval_list
     eldl = {}  # exec_last_date_list
     tpool = True  # thread pool is enabled?
@@ -17,11 +17,10 @@ class P:
 
 
 def __get_print_name_callable(func):
-    # return func.func_globals['__name__'] + '.' + func.func_name
     return func.__globals__['__name__'] + '.' + func.__name__
 
 
-def add_interval_callable(func, run_interval_second):  # , *args):
+def add_interval_callable(func, run_interval_second, progress_func=None):  # , *args):
     print_name = __get_print_name_callable(func)
     if func not in P.cl:
         # L.l.info("Added callable {},{}".format(print_name, run_interval_second))
@@ -34,11 +33,8 @@ def add_interval_callable(func, run_interval_second):  # , *args):
             P.ff[P.executor.submit(func)] = func
     else:
         L.l.warning('Callable {} not added, already there'.format(print_name))
-
-
-def add_interval_callable_progress(func, run_interval_second=60, progress_func=None):
-    add_interval_callable(func, run_interval_second=run_interval_second)
-    P.cpl[func] = progress_func
+    # if progress_func is not None:
+    #    P.cpl[func] = progress_func
 
 
 def remove_callable(func):
@@ -92,8 +88,8 @@ def run_thread_pool():
             elif future_obj.running():
                 if elapsed_seconds > 1*20:
                     L.l.info('Threaded func{} is long running for {} seconds'.format(print_name, elapsed_seconds))
-                    if func in P.cpl:
-                        progress_status = P.cpl[func].__globals__['progress_status']
+                    if 'P' in func.__globals__ and hasattr(func.__globals__['P'], 'thread_pool_status'):
+                        progress_status = func.__globals__['P'].thread_pool_status
                         L.l.warning('Progress Status since {} sec is [{}]'.format(elapsed_seconds, progress_status))
         time.sleep(0.1)
     P.executor.shutdown()
