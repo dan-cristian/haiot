@@ -1,3 +1,4 @@
+from datetime import datetime
 import time
 import socket
 from main.logger_helper import L
@@ -111,6 +112,9 @@ def on_message(client, userdata, msg):
                 and '"source_host": "{}"'.format(Constant.HOST_NAME) not in json \
                 and len(json) > 0:  # or Constant.HOST_NAME == 'netbook': #debug
             x = utils.json2obj(json)
+            if hasattr(x, '_sent_on'):
+                delta = (start - x['_sent_on']).total_seconds()
+                L.l.info('Mqtt age={}'.format(delta))
             x['is_event_external'] = True
             dispatcher.send(
                 signal=Constant.SIGNAL_MQTT_RECEIVED, client=client, userdata=userdata, topic=msg.topic, obj=x)

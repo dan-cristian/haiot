@@ -77,11 +77,9 @@ def mqtt_on_message(client, userdata, msg):
         elif payload == 'off':
             switch_state = False
         if name.startswith("relay_"):
-            vals = name.split("relay_")
-            rules.custom_relay(vals[1], switch_state)
+            rules.custom_relay(name[len('relay_'):], switch_state)
         elif name.startswith("heat_"):
-            vals = name.split("heat_")
-            rules.heat_relay(vals[1], switch_state)
+            rules.heat_relay(name[len('heat_'):], switch_state)
         elif name.startswith("mpd_"):
             vals = name.split("mpd_")
             items = vals[1].split('_')
