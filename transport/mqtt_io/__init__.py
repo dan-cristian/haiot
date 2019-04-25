@@ -117,8 +117,6 @@ def on_message(client, userdata, msg):
                 L.l.info('Mqtt age={}'.format(delta))
             x['is_event_external'] = True
             P.received_mqtt_list.append(x)
-            # dispatcher.send(
-            #    signal=Constant.SIGNAL_MQTT_RECEIVED, client=client, userdata=userdata, topic=msg.topic, obj=x)
             elapsed = (utils.get_base_location_now_date() - start).total_seconds()
             if elapsed > 1:
                 L.l.warning('Command mqtt received took {} seconds'.format(elapsed))
@@ -127,10 +125,8 @@ def on_message(client, userdata, msg):
             if '_sent_on' in x:
                 delta = (start - utils.parse_to_date(x['_sent_on'])).total_seconds()
                 L.l.info('Mqtt own age={}'.format(delta))
-    except AttributeError as ex:
+    except Exception as ex:
         L.l.warning('Unknown attribute error in msg {} err {}'.format(json, ex))
-    except ValueError as e:
-        L.l.warning('Invalid JSON on mqtt, error={}, json={}'.format(e, json))
 
 
 def unload():
