@@ -49,6 +49,7 @@ class P:
     IGNORED_TEMPERATURE = 85  # ignore this temp value, usually is an error
     failed_temp = False
     failed_temp_count = 0
+    thread_pool_status = None
 
 
 def do_device(ow, path):
@@ -253,6 +254,7 @@ def get_io(sensor, dev, ow):
 
 
 def check_inactive():
+    P.thread_pool_status = 'check inactive'
     """check for inactive sensors not read recently but in database"""
     if sqlitedb:
         sensor_list = models.Sensor().query_all()
@@ -306,6 +308,7 @@ def _get_bus_list(ohost, oport):
     owitems = ow.dir('/', slash=False, bus=True)
     for owitem in owitems:
         if 'bus' in owitem:
+            P.thread_pool_status = 'init bus {}'.format(owitem)
             ow_proxy = pyownet.protocol.proxy(host=ohost, port=oport, flags=pyownet.protocol.FLG_UNCACHED)
             P.ow_conn_list[owitem] = ow_proxy
             func = _dynamic_thread_run(ow_conn=ow_proxy, ow_bus=owitem)
@@ -319,6 +322,7 @@ def _get_bus_list(ohost, oport):
 
 
 def _init_comm():
+    P.thread_pool_status = 'init ows bus list'
     ohost = "none"
     oport = "none"
     try:
