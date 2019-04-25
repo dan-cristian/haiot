@@ -61,15 +61,13 @@ def run_thread_pool():
     # https://docs.python.org/3.3/library/concurrent.futures.html
     P.ff = {}
     P.executor = concurrent.futures.ThreadPoolExecutor(max_workers=30)
-    #with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
+    # with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
     while P.tpool:
         if len(P.cl) != len(P.ff):
-            # L.l.info('Initialising threads up to {} functions'.format(len(P.cl)))
             P.ff = {P.executor.submit(call_obj): call_obj for call_obj in P.cl}
         i = 1
         for future_obj in dict(P.ff):
             func = P.ff[future_obj]
-            # print_name = func.func_globals['__name__'] + '.' + func.func_name
             print_name = __get_print_name_callable(func)
             exec_interval = P.eil.get(func, None)
             if not exec_interval:
@@ -93,11 +91,11 @@ def run_thread_pool():
                     P.eldl[func] = datetime.now()
             elif future_obj.running():
                 if elapsed_seconds > 1*20:
-                    # L.l.info('Threaded func{} is long running for {} seconds'.format(print_name, elapsed_seconds))
+                    L.l.info('Threaded func{} is long running for {} seconds'.format(print_name, elapsed_seconds))
                     if func in P.cpl:
-                        progress_status = P.cpl[func].func_globals['progress_status']
+                        progress_status = P.cpl[func].__globals__['progress_status']
                         L.l.warning('Progress Status since {} sec is [{}]'.format(elapsed_seconds, progress_status))
-        time.sleep(1)
+        time.sleep(0.1)
     P.executor.shutdown()
     L.l.info('Interval thread pool processor exit')
 
