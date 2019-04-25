@@ -407,6 +407,8 @@ def set_switch_state(node_id, state):
             break
     if not found:
         L.l.error("Switch with id={} not found in zwave network".format(node_id))
+    else:
+        return state
 
 
 # https://hk.saowen.com/a/b5d414ca130fafc1f306a46dc0e2f13ec54876d9070ff3122a0a93a956b1fa2f
