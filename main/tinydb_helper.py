@@ -106,7 +106,7 @@ class TinyBase(ModelView, metaclass=OrderedClassMembers):
             record[Constant.JSON_PUBLISH_SOURCE_HOST] = str(Constant.HOST_NAME)
             record[Constant.JSON_PUBLISH_TABLE] = class_name
             record[Constant.JSON_PUBLISH_FIELDS_CHANGED] = list(update.keys())
-            record._sent_on = utils.get_base_location_now_date()
+            record['_sent_on'] = utils.get_base_location_now_date()
             js = utils.safeobj2json(record)
             transport.send_message_json(json=js)
         except Exception as ex:
