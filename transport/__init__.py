@@ -39,12 +39,17 @@ def thread_run():
     P.mqtt_lock.acquire()
     try:
         if mqtt_io.P.client_connected:
+            start_len = len(P.send_json_queue)
             # FIXME: complete this, will potentially accumulate too many requests
             for [json, topic] in list(P.send_json_queue):
-                if transport.mqtt_io._send_message(json, topic):
+                res = transport.mqtt_io._send_message(json, topic)
+                if res:
                     P.send_json_queue.remove([json, topic])
-            if len(P.send_json_queue) > 20:
-                L.l.warning("{} messages are pending in transport send queue".format(len(P.send_json_queue)))
+                else:
+                    L.l.info('Failed to send mqtt message, res={}'.format(res))
+            end_len = len(P.send_json_queue)
+            if end_len > 10:
+                L.l.warning("{} messages are pending for transport, start was {}".format(end_len, start_len))
         else:
             elapsed = (utils.get_base_location_now_date() - mqtt_io.P.last_connect_attempt).total_seconds()
             if elapsed > 10:
