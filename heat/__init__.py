@@ -326,7 +326,7 @@ def _update_zone_heat(zone, heat_schedule, sensor):
         if sqlitedb:
             zone_thermo = models.ZoneThermostat()
         else:
-            L.l.info('Adding zone thermo {}"{}'.format(zone.name, zone.id))
+            L.l.info('Adding zone thermo {}:{}'.format(zone.name, zone.id))
             zone_thermo = m.ZoneThermostat()
         zone_thermo.zone_id = zone.id
         zone_thermo.zone_name = zone.name
