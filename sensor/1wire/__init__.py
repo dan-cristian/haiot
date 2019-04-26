@@ -7,7 +7,7 @@ import datetime
 from main import sqlitedb
 if sqlitedb:
     from storage.sqalc import models
-from storage.tiny.tinydb_model import Sensor, ZoneSensor
+from storage.model import m
 try:
     from common import Constant, utils, get_json_param
     from main.logger_helper import L
@@ -118,10 +118,10 @@ def save_to_db(dev):
             zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=address).first()
             current_record = models.Sensor.query.filter_by(address=address).first()
         else:
-            record = Sensor()
+            record = m.Sensor()
             record.address = address
-            zone_sensor = ZoneSensor.find_one({ZoneSensor.sensor_address: address})
-            current_record = Sensor.find_one({Sensor.address: address})
+            zone_sensor = m.ZoneSensor.find_one({m.ZoneSensor.sensor_address: address})
+            current_record = m.Sensor.find_one({m.Sensor.address: address})
         if zone_sensor:
             record.sensor_name = zone_sensor.sensor_name
         else:
@@ -260,8 +260,8 @@ def check_inactive():
         sensor_list = models.Sensor().query_all()
         defined_sensor_list = models.ZoneSensor().query_all()
     else:
-        sensor_list = Sensor.find()
-        defined_sensor_list = ZoneSensor().find()
+        sensor_list = m.Sensor.find()
+        defined_sensor_list = m.ZoneSensor().find()
     ref_list = []
     delta = (datetime.datetime.now() - P.last_warning).total_seconds()
     log_warn = (delta > 60 * 15)
