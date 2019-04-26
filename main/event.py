@@ -5,10 +5,8 @@ import prctl
 from main.logger_helper import L
 from main import thread_pool
 from common import Constant
-import main.persistence
-from main.tinydb_model import Node
 from main import general_init
-
+from storage.model import m
 
 class P:
     mqtt_event_list = []
@@ -45,8 +43,9 @@ def _process_obj(obj):
         if source_host != Constant.HOST_NAME:
             if Constant.JSON_PUBLISH_TABLE in obj:
                 table = str(obj[Constant.JSON_PUBLISH_TABLE])
-                cls = getattr(sys.modules[main.tinydb_model.__name__], table)
-                if cls.is_used_in_module:
+                # cls = getattr(sys.modules[tinydb_model.__name__], table)
+                cls = getattr(m, table)
+                if cls._is_used_in_module:
                     cls.save(obj)
                 else:
                     # L.l.info('Ignoring save for {}'.format(cls.__name__))

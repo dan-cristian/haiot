@@ -9,11 +9,11 @@ import threading
 import prctl
 from main import thread_pool, sqlitedb
 if sqlitedb:
-    from main.admin import models
+    from storage.sqalc import models
 from sensor import serial_common
 from sensor.rfxcom import RFXtrx
 from sensor.rfxcom.RFXtrx import PySerialTransport
-from main.tinydb_model import Sensor, ZoneSensor
+from storage.tiny.tinydb_model import Sensor, ZoneSensor
 
 
 class P:

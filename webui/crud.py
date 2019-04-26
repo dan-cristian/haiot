@@ -2,11 +2,10 @@ from flask import Blueprint, request, redirect, url_for, render_template
 from flask.views import MethodView
 from wtforms.ext.sqlalchemy.orm import model_form
 from main import db
-from main.admin import models
+from storage.sqalc import models
 from main.logger_helper import L
 from common import Constant
 from pydispatch import dispatcher
-from sqlalchemy import desc, asc
 
 admin = Blueprint('admin', __name__, template_folder='templates')
 user = Blueprint('user', __name__, template_folder='templates')
@@ -78,7 +77,7 @@ class CRUDView(MethodView):
             obj = self.model.query.all()
         return self.render_list(obj=obj)
 
-    # copy object to a dict
+    # copy object to a dicts
     def _copy_obj(self, obj):
         dict_res = {}
         attr_list = [a for a in dir(obj) if not a.startswith('_') and not callable(getattr(obj, a))
@@ -159,10 +158,10 @@ def init_crud():
         'active': lambda model: model.query.filter_by(is_active=True).all()
     }
 
-    from main.admin.models import Area, Zone, ZoneArea, Presence, SchedulePattern, HeatSchedule, Sensor
-    from main.admin.models import Module, Parameter, TemperatureTarget, ZoneSensor, Node, Ups  # , GraphPlotly
-    from main.admin.models import SystemMonitor, SystemDisk, GpioPin, ZoneAlarm, ZoneHeatRelay, ZoneCustomRelay, Rule
-    from main.admin.models import CommandOverrideRelay, SensorError
+    from storage.sqalc.models import Area, Zone, ZoneArea, Presence, SchedulePattern, HeatSchedule, Sensor
+    from storage.sqalc.models import Module, Parameter, TemperatureTarget, ZoneSensor, Node, Ups  # , GraphPlotly
+    from storage.sqalc.models import SystemMonitor, SystemDisk, GpioPin, ZoneAlarm, ZoneHeatRelay, ZoneCustomRelay, Rule
+    from storage.sqalc.models import CommandOverrideRelay, SensorError
 
     register_crud(admin, '/', 'main-entry', Module, filters=simple_filters)
     register_crud(admin, '/module', 'module', Module, filters=simple_filters)

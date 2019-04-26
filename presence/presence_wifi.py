@@ -4,10 +4,10 @@ import prctl
 from main.logger_helper import L
 from main import sqlitedb
 if sqlitedb:
-    from main.admin import models
+    from storage.sqalc import models
 from pydispatch import dispatcher
 from common import utils, Constant
-from main.tinydb_model import Device, PeopleDevice
+from storage.model import m
 
 
 def _get_wlan():
@@ -46,7 +46,7 @@ def _check_wifi(test=False):
                     d = models.Device
                     dev = d().query_filter_first(d.wifi_address == ssid)
                 else:
-                    dev = Device.find_one({Device.wifi_address: ssid})
+                    dev = m.Device.find_one({m.Device.wifi_address: ssid})
                 if dev is not None:
                     dev.last_wifi_active = utils.get_base_location_now_date()
                     dev.last_active = utils.get_base_location_now_date()
@@ -59,7 +59,7 @@ def _check_wifi(test=False):
                         pd = models.PeopleDevice
                         peopledev = pd().query_filter_first(pd.device_id == dev.id)
                     else:
-                        peopledev = PeopleDevice.find_one({PeopleDevice.device_id: dev.id})
+                        peopledev = m.PeopleDevice.find_one({m.PeopleDevice.device_id: dev.id})
                     if peopledev is not None and peopledev.give_presence:
                         dispatcher.send(Constant.SIGNAL_PRESENCE, device=dev.name)
 

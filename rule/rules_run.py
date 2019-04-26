@@ -5,9 +5,9 @@ import datetime
 from main.logger_helper import L
 from main import sqlitedb
 if sqlitedb:
-    from main.admin import models
+    from storage.sqalc import models
 else:
-    from main import tinydb_model as models
+    from storage.model import m
 from rule import rule_common
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
@@ -47,7 +47,7 @@ except ImportError:
 # first parameter must have an object type equal to the object for which you get events in case there are DB changes
 # 2nd parameter will contain list of fields changed
 
-def execute_macro(obj=models.Rule(), field_changed_list=None, force_exec=False):
+def execute_macro(obj=m.Rule(), field_changed_list=None, force_exec=False):
     if obj.execute_now or force_exec:
         L.l.info('Execute macro {} as execute_now is True'.format(obj.command))
         # obj.execute_now = False
@@ -65,13 +65,13 @@ def execute_macro(obj=models.Rule(), field_changed_list=None, force_exec=False):
     return result
 
 
-def rule_node(obj=models.Node(), field_changed_list=None):
+def rule_node(obj=m.Node(), field_changed_list=None):
     if not field_changed_list:
         field_changed_list = []
     return 'rule node ok'
 
 
-def rule_alarm(obj=models.ZoneAlarm(), field_changed_list=None):
+def rule_alarm(obj=m.ZoneAlarm(), field_changed_list=None):
     # Log.logger.info('Rule Alarm: obj={} fields={}'.format(obj, field_changed_list))
     if obj.alarm_pin_triggered:
         if obj.start_alarm:
@@ -117,7 +117,7 @@ def rule_alarm(obj=models.ZoneAlarm(), field_changed_list=None):
 
 
 # min & max temperatures
-def rule_sensor_temp_target(obj=models.Sensor(), field_changed_list=None):
+def rule_sensor_temp_target(obj=m.Sensor(), field_changed_list=None):
     if not field_changed_list:
         field_changed_list = []
     #temp = obj.temperature
@@ -137,19 +137,19 @@ class TempStore:
 
 
 # catch sudden changes or extremes (fire or cold)
-def rule_sensor_temp_extreme(obj=models.Sensor(), field_changed_list=None):
+def rule_sensor_temp_extreme(obj=m.Sensor(), field_changed_list=None):
     if hasattr(obj, 'temperature') and obj.temperature is not None:
         if sqlitedb:
-            m = models.ZoneSensor
+            # m = ZoneSensor()
             zonesensor = m().query_filter_first(m.sensor_name == obj.sensor_name)
         else:
-            zonesensor = models.ZoneSensor.find_one({models.ZoneSensor.sensor_name: obj.sensor_name})
+            zonesensor = m.ZoneSensor.find_one({m.ZoneSensor.sensor_name: obj.sensor_name})
         if zonesensor is not None and zonesensor.target_material is not None:
             if sqlitedb:
-                m = models.Zone
+                # m = m.Zone
                 zone = m().query_filter_first(m.id == zonesensor.zone_id)
             else:
-                zone = models.Zone.find_one({models.Zone.id: zonesensor.zone_id})
+                zone = m.Zone.find_one({m.Zone.id: zonesensor.zone_id})
             if zone is not None:
                 max = min = None
                 if zone.is_indoor:
@@ -187,7 +187,7 @@ def rule_sensor_temp_extreme(obj=models.Sensor(), field_changed_list=None):
 
 
 # ups rule
-def rule_ups_power(obj=models.Ups(), field_changed_list=None):
+def rule_ups_power(obj=m.Ups(), field_changed_list=None):
     # Log.logger.info("changed list is {}".format(field_changed_list))
     if field_changed_list is not None:
         if 'power_failed' in field_changed_list:

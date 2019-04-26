@@ -85,15 +85,15 @@ def unload_module(module_name):
 
 
 def init_modules(init_mod=None):
-    from main.tinydb_model import Module
-    m = Module.find(filter={Module.host_name: ''}, sort=[(Module.start_order, 1)])
-    if len(m) == 0:
+    from storage.model import m
+    mods = m.Module.find(filter={m.Module.host_name: ''}, sort=[(m.Module.start_order, 1)])
+    if len(mods) == 0:
         L.l.error('No modules to initialise')
     else:
-        for mod in m:
+        for mod in mods:
             if mod.name != 'main':
                 # check if there is a host specific module and use it with priority over generic one
-                mod_host_specific = Module.find_one({Module.host_name: Constant.HOST_NAME, Module.name: mod.name})
+                mod_host_specific = m.Module.find_one({m.Module.host_name: Constant.HOST_NAME, m.Module.name: mod.name})
                 if mod_host_specific is not None:
                     mod_name = mod_host_specific.name
                     mod_active = mod_host_specific.active
@@ -146,13 +146,14 @@ def init(arg_list):
     if 'debug_remote' in arg_list:
         _init_debug()
     system_info.init()
-    from main import flask_app  # required to init flask, DO NOT DELETE
-    import main.tinydb_app
-    main.tinydb_app.init(arg_list)
+    # import storage.tiny.tinydb_app
+    # storage.tiny.tinydb_app.init(arg_list)
+    import storage.model
+    storage.model.init(arg_list)
     if 'standalone' not in arg_list:
         transport.init()
-    from main import event_tinydb
-    event_tinydb.init()
+    from main import event
+    event.init()
     init_modules(init_mod=True)
     init_post_modules()
     t = threading.Thread(target=thread_pool.run_thread_pool)

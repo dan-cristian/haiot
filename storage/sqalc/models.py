@@ -10,7 +10,7 @@ from common import Constant
 import graphs
 from common import utils, performance
 from pydispatch import dispatcher
-from main.admin.model_helper import commit
+from storage.sqalc.model_helper import commit
 from sqlalchemy.orm import attributes
 
 Column = db.Column

@@ -3,7 +3,7 @@ __author__ = 'dcristian'
 import os
 from main.logger_helper import L
 from common import Constant, utils
-from main.admin import model_helper, models
+from storage.sqalc import model_helper, models
 from main import thread_pool
 
 #fixme: make it work without plotly

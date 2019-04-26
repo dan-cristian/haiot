@@ -4,11 +4,11 @@ import time
 import binascii
 from main import sqlitedb
 if sqlitedb:
-    from main.admin.model_helper import commit
-    from main.admin import models
+    from storage.sqalc.model_helper import commit
+    from storage.sqalc import models
 from main.logger_helper import L
 from pydispatch import dispatcher
-from main.tinydb_model import ZoneCustomRelay
+from storage.model import m
 
 _AMP_ON = bytes("\x0207A1D\x03", 'utf-8')
 _AMP_OFF = bytes("\x0207A1E\x03", 'utf-8')
@@ -110,7 +110,7 @@ def set_amp_power(power_state, relay_name, amp_zone_index):
         if sqlitedb:
             relay = models.ZoneCustomRelay.query.filter_by(relay_pin_name=relay_name).first()
         else:
-            relay = ZoneCustomRelay.find_one({ZoneCustomRelay.relay_pin_name: relay_name})
+            relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.relay_pin_name: relay_name})
         power_state = bool(power_state)
         if relay is not None:
             initial_relay_state = relay.relay_is_on

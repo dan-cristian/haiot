@@ -2,8 +2,8 @@ from common import Constant
 
 from main import sqlitedb
 if sqlitedb:
-    from main.admin import models
-from main.tinydb_model import GpioPin, ZoneCustomRelay
+    from storage.sqalc import models
+from storage.model import m
 from main.logger_helper import L
 import abc
 from common import utils
@@ -23,8 +23,8 @@ def update_custom_relay(pin_code, pin_value, notify=False, ignore_missing=False)
     if sqlitedb:
         relay = models.ZoneCustomRelay.query.filter_by(gpio_pin_code=pin_code, gpio_host_name=Constant.HOST_NAME).first()
     else:
-        relay = ZoneCustomRelay.find_one({ZoneCustomRelay.gpio_pin_code: pin_code,
-                                          ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME})
+        relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.gpio_pin_code: pin_code,
+                                            m.ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME})
     if relay is not None:
         relay.relay_is_on = pin_value
         if sqlitedb:

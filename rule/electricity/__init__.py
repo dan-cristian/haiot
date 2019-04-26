@@ -4,12 +4,11 @@ import collections
 import random
 import sys
 from main.logger_helper import L
-from main import sqlitedb
 # from main.admin import models
 from rule import rule_common
 import rule
 from gpio import pigpio_gpio
-from main.tinydb_model import Utility
+from storage.model import m
 
 
 class DeviceState(Enum):
@@ -296,7 +295,7 @@ def _update_devices():
 
 
 # energy rule
-def rule_energy_export(obj=Utility(), field_changed_list=None):
+def rule_energy_export(obj=m.Utility(), field_changed_list=None):
     if field_changed_list is not None and 'units_2_delta' in field_changed_list:
         if obj.utility_name == 'power main mono':
             if P.emulate_export is True:
@@ -319,7 +318,7 @@ def thread_run():
         P.grid_watts = random.randint(-800, -300)
     else:
         # main_rec = models.Utility.query.filter_by(utility_name='power main mono').first()
-        main_rec = Utility.find_one({Utility.utility_name: 'power main mono'})
+        main_rec = m.Utility.find_one({m.Utility.utility_name: 'power main mono'})
         if main_rec is not None and main_rec.units_2_delta is not None:
             P.grid_watts = main_rec.units_2_delta
     _update_devices()

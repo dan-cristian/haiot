@@ -6,8 +6,8 @@ from pydispatch import dispatcher
 import datetime
 from main import sqlitedb
 if sqlitedb:
-    from main.admin import model_helper, models
-from main.tinydb_model import Sensor, ZoneSensor
+    from storage.sqalc import models
+from storage.tiny.tinydb_model import Sensor, ZoneSensor
 try:
     from common import Constant, utils, get_json_param
     from main.logger_helper import L

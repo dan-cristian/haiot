@@ -4,7 +4,7 @@ import requests
 import json
 from main.logger_helper import L
 from common import Constant
-from main.admin import model_helper
+from storage.sqalc import model_helper
 from pydispatch import dispatcher
 
 _token = None
