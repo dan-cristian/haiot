@@ -326,6 +326,7 @@ def _update_zone_heat(zone, heat_schedule, sensor):
         if sqlitedb:
             zone_thermo = models.ZoneThermostat()
         else:
+            L.l.info('Adding zone thermo {}"{}'.format(zone.name, zone.id))
             zone_thermo = m.ZoneThermostat()
         zone_thermo.zone_id = zone.id
         zone_thermo.zone_name = zone.name
@@ -586,7 +587,7 @@ def _handle_presence(zone_name=None, zone_id=None):
         if heat_thermo is not None:
             heat_thermo.last_presence_set = datetime.datetime.now()
         else:
-            L.l.info("No heat thermo for zone {}".format(zone_name))
+            L.l.info("No heat thermo for zone {}:{}".format(zone_name, zone_id))
 
 
 def _zoneheatrelay_upsert_listener(record, changed_fields):
