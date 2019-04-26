@@ -1,9 +1,7 @@
 import common
 import os
-import threading
-import time
 from datetime import datetime
-from main.flask_app import app, admin
+from main.flask_app import admin
 from main.logger_helper import L
 
 from common import fix_module
@@ -92,15 +90,6 @@ class CustomMemoryTinyMongoClient(CustomTinyMongoClient):
         return serialization
 
 
-def _init_tinydb():
-    global db
-    data_file = common.get_json_param(common.Constant.P_DB_PATH)
-    data_path = os.path.dirname(data_file)
-    # conn = CustomFileTinyMongoClient(foldername=data_path)
-    conn = CustomMemoryTinyMongoClient()
-    db = conn.haiot
-
-
 def _populate_db(cls, obj):
     rec_list = common.get_table(cls.__name__)
     i = 0
@@ -113,8 +102,8 @@ def _populate_db(cls, obj):
 
 
 def _init_flask_admin():
-    from main import tinydb_model
-    from main.tinydb_helper import TinyBase
+    from storage.tiny import tinydb_model
+    from storage.tiny.tinydb_helper import TinyBase
     cls_dict = dict([(name, cls) for name, cls in tinydb_model.__dict__.items() if isinstance(cls, type)])
     sorted_keys = sorted(cls_dict)
     for cls_name in sorted_keys:
@@ -127,6 +116,15 @@ def _init_flask_admin():
     # app.run(debug=False)
 
 
-def init(arg_list):
-    _init_tinydb()
+def load_db():
+    global db
+    data_file = common.get_json_param(common.Constant.P_DB_PATH)
+    data_path = os.path.dirname(data_file)
+    # conn = CustomFileTinyMongoClient(foldername=data_path)
+    conn = CustomMemoryTinyMongoClient()
+    db = conn.haiot
     _init_flask_admin()
+
+
+def init(arg_list):
+    load_db()

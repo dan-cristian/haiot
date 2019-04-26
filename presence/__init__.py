@@ -2,11 +2,11 @@ from main.logger_helper import L
 from pydispatch import dispatcher
 from main import thread_pool, sqlitedb
 if sqlitedb:
-    from main.admin import models
-from common import Constant, utils
+    from storage.sqalc import models
+from common import Constant
 from presence import presence_bt
 from presence import presence_wifi
-from main.tinydb_model import ZoneAlarm, Zone, Presence
+from storage.model import m
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 initialised = False
@@ -32,8 +32,8 @@ def handle_event_presence_io(gpio_pin_code='', direction='', pin_value='', pin_c
                 models.ZoneAlarm.gpio_host_name.in_([Constant.HOST_NAME]),
                 models.ZoneAlarm.gpio_pin_code.in_([gpio_pin_code]))
         else:
-            zonealarm = ZoneAlarm.find_one({ZoneAlarm.gpio_host_name: Constant.HOST_NAME,
-                                            ZoneAlarm.gpio_pin_code: gpio_pin_code})
+            zonealarm = m.ZoneAlarm.find_one({m.ZoneAlarm.gpio_host_name: Constant.HOST_NAME,
+                                              m.ZoneAlarm.gpio_pin_code: gpio_pin_code})
         # zone_id = None
         # fixme: for now zonealarm holds gpio to zone mapping, should be made more generic
         if zonealarm is not None:
@@ -42,7 +42,7 @@ def handle_event_presence_io(gpio_pin_code='', direction='', pin_value='', pin_c
                 if sqlitedb:
                     zone = models.Zone().query_filter_first(models.Zone.id == zone_id)
                 else:
-                    zone = Zone.find_one({Zone.id: zone_id})
+                    zone = m.Zone.find_one({m.Zone.id: zone_id})
                 if zone is not None:
                     zone_name = zone.name
                 else:
@@ -52,8 +52,8 @@ def handle_event_presence_io(gpio_pin_code='', direction='', pin_value='', pin_c
                     current_record = models.Presence().query_filter_first(models.Presence.zone_id == zone_id)
                     record = models.Presence()
                 else:
-                    current_record = Presence.find_one({Presence.zone_id: zone_id})
-                    record = Presence()
+                    current_record = m.Presence.find_one({m.Presence.zone_id: zone_id})
+                    record = m.Presence()
                 record.event_type = zonealarm.sensor_type
                 record.zone_id = zone_id
                 record.zone_name = zone_name
@@ -75,14 +75,14 @@ def handle_event_presence_cam(zone_name, cam_name, has_move):
     if sqlitedb:
         zone = models.Zone().query_filter_first(models.Zone.name == zone_name)
     else:
-        zone = Zone.find_one({Zone.name: zone_name})
+        zone = m.Zone.find_one({m.Zone.name: zone_name})
     if zone is not None:
         if sqlitedb:
             current_record = models.Presence().query_filter_first(models.Presence.zone_id == zone.id)
             record = models.Presence()
         else:
-            current_record = Presence().find_one({Presence.zone_id: zone.id})
-            record = Presence()
+            current_record = m.Presence().find_one({m.Presence.zone_id: zone.id})
+            record = m.Presence()
         record.event_type = Constant.PRESENCE_TYPE_CAM
         record.zone_id = zone.id
         record.zone_name = zone_name

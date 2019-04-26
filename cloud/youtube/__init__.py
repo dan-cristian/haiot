@@ -17,7 +17,7 @@ from oauth2client.tools import argparser, run_flow
 from pydispatch import dispatcher
 from main.logger_helper import L
 from common import Constant, utils
-from main.admin import model_helper
+from storage.sqalc import model_helper
 from main import thread_pool
 
 initialised = False

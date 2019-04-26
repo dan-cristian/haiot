@@ -4,8 +4,8 @@ from main.logger_helper import L
 from common import Constant, utils, get_json_param
 from main import thread_pool, sqlitedb
 if sqlitedb:
-    from main.admin import models
-from main.tinydb_model import Sensor, ZoneSensor, Utility
+    from storage.sqalc import models
+from storage.tiny.tinydb_model import Sensor, ZoneSensor, Utility
 
 
 class P:

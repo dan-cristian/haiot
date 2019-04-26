@@ -2,11 +2,11 @@ import transport.mqtt_io
 from main.logger_helper import L
 from main import sqlitedb
 if sqlitedb:
-    from main.admin import models
+    from storage.sqalc import models
 else:
-    from main import tinydb_model as models
+    from storage.model import m
 import transport
-from common import Constant, utils
+from common import Constant
 
 
 class P:
@@ -23,7 +23,7 @@ def send_mqtt_openhab(subtopic, payload):
 #  OUTBOUND RULES START
 
 
-def rule_openhab_sensor(obj=models.Sensor(), field_changed_list=None):
+def rule_openhab_sensor(obj=m.Sensor(), field_changed_list=None):
     if obj.sensor_name is None:
         L.l.warning('Got empty openhab sensor name {}'.format(obj))
         return
@@ -50,7 +50,7 @@ def rule_openhab_sensor(obj=models.Sensor(), field_changed_list=None):
         send_mqtt_openhab(subtopic=key + "_" + obj.sensor_name, payload=obj.iad)
 
 
-def rule_openhab_dustsensor(obj=models.DustSensor(), field_changed_list=None):
+def rule_openhab_dustsensor(obj=m.DustSensor(), field_changed_list=None):
     if field_changed_list is not None:
         address = obj.address
         for key in field_changed_list:
@@ -62,7 +62,7 @@ def rule_openhab_dustsensor(obj=models.DustSensor(), field_changed_list=None):
                     L.l.warning('Field {} in dustsensor change list but not in obj={}'.format(key, obj))
 
 
-def rule_openhab_utility(obj=models.Utility(), field_changed_list=None):
+def rule_openhab_utility(obj=m.Utility(), field_changed_list=None):
     if hasattr(obj, 'utility_type') and hasattr(obj, 'utility_name') and obj.utility_name is not None:
         # L.l.info("PROCESSING utility {}".format(obj.utility_type))
         key = 'electricity'
@@ -84,7 +84,7 @@ def rule_openhab_utility(obj=models.Utility(), field_changed_list=None):
             L.l.warning('Got empty openhab utility name {}'.format(obj))
 
 
-def rule_openhab_alarm(obj=models.ZoneAlarm(), field_changed_list=None):
+def rule_openhab_alarm(obj=m.ZoneAlarm(), field_changed_list=None):
     if obj.alarm_pin_name is not None:
         key = 'contact'
         if obj.alarm_pin_triggered is True:
@@ -96,7 +96,7 @@ def rule_openhab_alarm(obj=models.ZoneAlarm(), field_changed_list=None):
         L.l.warning('Got empty alarm pin name {}'.format(obj))
 
 
-def rule_openhab_ups(obj=models.Ups(), field_changed_list=None):
+def rule_openhab_ups(obj=m.Ups(), field_changed_list=None):
     if field_changed_list is not None:
         key = 'power_failed'
         if key in field_changed_list:
@@ -116,7 +116,7 @@ def rule_openhab_ups(obj=models.Ups(), field_changed_list=None):
             send_mqtt_openhab(subtopic="ups_" + key, payload=obj.input_voltage)
 
 
-def rule_openhab_custom_relay(obj=models.ZoneCustomRelay(), field_changed_list=None):
+def rule_openhab_custom_relay(obj=m.ZoneCustomRelay(), field_changed_list=None):
     if field_changed_list is not None:
         if obj.relay_is_on:
             state = "ON"
@@ -125,7 +125,7 @@ def rule_openhab_custom_relay(obj=models.ZoneCustomRelay(), field_changed_list=N
         send_mqtt_openhab(subtopic="relay_" + obj.relay_pin_name, payload=state)
 
 
-def rule_openhab_heat_relay(obj=models.ZoneHeatRelay(), field_changed_list=None):
+def rule_openhab_heat_relay(obj=m.ZoneHeatRelay(), field_changed_list=None):
     if obj.heat_pin_name is not None:
         if field_changed_list is not None:
             if obj.heat_is_on:
@@ -137,7 +137,7 @@ def rule_openhab_heat_relay(obj=models.ZoneHeatRelay(), field_changed_list=None)
         L.l.warning('Got empty heat relay pin name {}'.format(obj))
 
 
-def rule_openhab_thermo(obj=models.ZoneThermostat(), field_changed_list=None):
+def rule_openhab_thermo(obj=m.ZoneThermostat(), field_changed_list=None):
     # if field_changed_list is not None and len(field_changed_list) > 0:
     #if 'heat_target_temperature' in field_changed_list:
     if hasattr(obj, 'heat_target_temperature'):
@@ -155,7 +155,7 @@ def rule_openhab_thermo(obj=models.ZoneThermostat(), field_changed_list=None):
     send_mqtt_openhab(subtopic='temperature_mode_' + zone, payload=state)
 
 
-def rule_openhab_music(obj=models.Music(), field_changed_list=None):
+def rule_openhab_music(obj=m.Music(), field_changed_list=None):
     if field_changed_list is not None:
         zone = obj.zone_name
         for key in field_changed_list:
@@ -167,7 +167,7 @@ def rule_openhab_music(obj=models.Music(), field_changed_list=None):
                     L.l.warning('Field {} in music change list but not in obj={}'.format(key, obj))
 
 
-def rule_openhab_powermonitor(obj=models.PowerMonitor(), field_changed_list=None):
+def rule_openhab_powermonitor(obj=m.PowerMonitor(), field_changed_list=None):
     if field_changed_list is not None:
         name = obj.name
         for key in field_changed_list:
@@ -179,7 +179,7 @@ def rule_openhab_powermonitor(obj=models.PowerMonitor(), field_changed_list=None
                     L.l.warning('Field {} in power change list but not in obj={}'.format(key, obj))
 
 
-def rule_openhab_musicloved(obj=models.MusicLoved(), field_changed_list=None):
+def rule_openhab_musicloved(obj=m.MusicLoved(), field_changed_list=None):
     if field_changed_list is not None:
         for key in field_changed_list:
             if key not in P.ignored_fields:

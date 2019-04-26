@@ -4,8 +4,6 @@ import ssl
 import time
 import threading
 import prctl
-import gps
-import datetime
 import json
 import os
 from collections import namedtuple
@@ -13,7 +11,7 @@ from main.logger_helper import L
 from pydispatch import dispatcher
 try:
     from common import Constant
-    from main.admin import models
+    from storage.sqalc import models
 except Exception as ex:
     print "Exception {} on gps import".format(ex)
 

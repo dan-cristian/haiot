@@ -6,7 +6,7 @@ from main import sqlitedb
 if sqlitedb:
     from main.admin import models
 from main import thread_pool
-from main.tinydb_model import ZoneSensor, Sensor
+from storage.tiny.tinydb_model import ZoneSensor, Sensor
 
 
 class P:
