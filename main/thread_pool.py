@@ -23,18 +23,13 @@ def __get_print_name_callable(func):
 def add_interval_callable(func, run_interval_second, progress_func=None):  # , *args):
     print_name = __get_print_name_callable(func)
     if func not in P.cl:
-        # L.l.info("Added callable {},{}".format(print_name, run_interval_second))
         P.cl.append(func)
-        # __callable_args.append(*args)
         P.eldl[func] = datetime.now()
         P.eil[func] = run_interval_second
         if len(P.ff) > 0 and P.executor is not None:  # run the function already is thread pool is started
-            # L.l.info('Initialising additional thread {}'.format(print_name))
             P.ff[P.executor.submit(func)] = func
     else:
         L.l.warning('Callable {} not added, already there'.format(print_name))
-    # if progress_func is not None:
-    #    P.cpl[func] = progress_func
 
 
 def remove_callable(func):
@@ -56,7 +51,7 @@ def run_thread_pool():
     P.tpool = True
     # https://docs.python.org/3.3/library/concurrent.futures.html
     P.ff = {}
-    P.executor = concurrent.futures.ThreadPoolExecutor(max_workers=30)
+    P.executor = concurrent.futures.ThreadPoolExecutor(max_workers=20)
     # with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
     while P.tpool:
         if len(P.cl) != len(P.ff):
@@ -75,14 +70,11 @@ def run_thread_pool():
             if future_obj.done():
                 try:
                     result = future_obj.result()
-                    # L.l.info('Thread end {}={}'.format(print_name, result))
                 except Exception as exc:
                     L.l.error('Exception {} in {}'.format(exc, print_name), exc_info=True)
-                # print('%s=%s' % (print_name, future_obj.result()))
                 # run the function again at given interval
                 if elapsed_seconds and elapsed_seconds > exec_interval:
                     del P.ff[future_obj]
-                    # L.l.info("Starting thread {},{}".format(print_name, exec_interval))
                     P.ff[P.executor.submit(func)] = func
                     P.eldl[func] = datetime.now()
             elif future_obj.running():
@@ -94,9 +86,3 @@ def run_thread_pool():
         time.sleep(0.1)
     P.executor.shutdown()
     L.l.info('Interval thread pool processor exit')
-
-
-# immediately runs submitted job using a thread pool
-# def do_job(f):
-#    global __immediate_executor
-#    __immediate_executor.submit(f)
