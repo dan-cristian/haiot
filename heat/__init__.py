@@ -385,17 +385,17 @@ def loop_zones():
             P.thread_pool_status = 'do zone {}'.format(zone.name)
             if sqlitedb:
                 heat_schedule = models.HeatSchedule.query.filter_by(zone_id=zone.id, season=P.season).first()
-                m.ZoneSensor_list = models.ZoneSensor.query.filter_by(zone_id=zone.id, is_main=True).all()
+                zonesensor_list = models.ZoneSensor.query.filter_by(zone_id=zone.id, is_main=True).all()
             else:
                 heat_schedule = m.HeatSchedule.find_one({m.HeatSchedule.zone_id: zone.id, m.HeatSchedule.season: P.season})
-                m.ZoneSensor_list = m.ZoneSensor.find({m.ZoneSensor.zone_id: zone.id, m.ZoneSensor.is_main: True})
+                zonesensor_list = m.ZoneSensor.find({m.ZoneSensor.zone_id: zone.id, m.ZoneSensor.is_main: True})
             sensor_processed = {}
-            for zonesensor in m.ZoneSensor_list:
-                if heat_schedule is not None and m.ZoneSensor is not None:
+            for zonesensor in zonesensor_list:
+                if heat_schedule is not None and zonesensor is not None:
                     if sqlitedb:
                         sensor = models.Sensor.query.filter_by(address=zonesensor.sensor_address).first()
                     else:
-                        sensor = m.Sensor.find_one({m.Sensor.address: m.ZoneSensor.sensor_address})
+                        sensor = m.Sensor.find_one({m.Sensor.address: zonesensor.sensor_address})
                     if sensor is not None:
                         # sensor_last_update_seconds = (utils.get_base_location_now_date() - sensor.updated_on).total_seconds()
                         # if sensor_last_update_seconds > 120 * 60:
@@ -404,10 +404,10 @@ def loop_zones():
                         heat_state, main_source_needed = _update_zone_heat(zone, heat_schedule, sensor)
                         if not heat_is_on:
                             heat_is_on = main_source_needed and heat_state
-                        if m.ZoneSensor.zone_id in sensor_processed:
+                        if zonesensor.zone_id in sensor_processed:
                             prev_sensor = sensor_processed[zonesensor.zone_id]
                             L.l.warning('Already processed temp sensor {} in zone {}, duplicate?'.format(
-                                prev_sensor, m.ZoneSensor.zone_id))
+                                prev_sensor, zonesensor.zone_id))
                         else:
                             sensor_processed[zonesensor.zone_id] = sensor.sensor_name
 
@@ -444,57 +444,6 @@ def loop_zones():
             L.l.critical('No heat main source is defined in db')
     except Exception as ex:
         L.l.error('Error loop_zones, err={}'.format(ex), exc_info=True)
-
-
-# check actual heat relay status in db in case relay pin was modified externally
-# todo: check as might introduce state change miss
-def loop_heat_relay():
-    if sqlitedb:
-        heat_relay_list = models.ZoneHeatRelay().query_filter_all(
-            models.ZoneHeatRelay.gpio_host_name.in_([Constant.HOST_NAME]))
-    else:
-        heat_relay_list = m.ZoneHeatRelay.find({m.ZoneHeatRelay.gpio_host_name: Constant.HOST_NAME})
-    for heat_relay in heat_relay_list:
-        gpio_pin = None
-        try:
-            if sqlitedb:
-                gpiopin_list = models.GpioPin.query.filter_by(
-                    pin_code=heat_relay.gpio_pin_code, host_name=Constant.HOST_NAME).all()
-            else:
-                # gpiopin_list = GpioPin.find({GpioPin.pin_code: heat_relay.gpio_pin_code,
-                #                             GpioPin.host_name: Constant.HOST_NAME})
-                pass
-            if len(gpiopin_list) == 0:
-                L.l.warning("Cannot find gpiopin_bcm for heat relay={} zone={}".format(
-                    heat_relay.gpio_pin_code, heat_relay.heat_pin_name))
-            else:
-                if len(gpiopin_list) > 1:
-                    L.l.warning("Multiple unexpected pins on heat loop code {}".format(heat_relay.gpio_pin_code))
-                for gpio_pin in gpiopin_list:
-                    # gpio_pin = models.GpioPin().query_filter_first(models.GpioPin.host_name.in_([Constant.HOST_NAME]),
-                    #                                               models.GpioPin.pin_code.in_([heat_relay.gpio_pin_code]))
-                    pin_state_int = gpio.relay_get(gpio_pin_obj=gpio_pin)
-                    pin_state = (pin_state_int == 1)
-                    if sqlitedb:
-                        zone = models.Zone().query_filter_first(models.Zone.id.in_([heat_relay.zone_id]))
-                    else:
-                        zone = m.Zone.find_one({m.Zone.id: heat_relay.zone_id})
-                    relay_inconsistency = heat_relay.heat_is_on != pin_state
-                    zone_inconsistency = zone.heat_is_on != heat_relay.heat_is_on
-                    if relay_inconsistency:
-                        L.l.warning("Inconsistent heat status relay={} db_relay_status={} pin_status={}".format(
-                            heat_relay.heat_pin_name, heat_relay.heat_is_on, pin_state_int))
-                    if zone_inconsistency:
-                        L.l.warning("Inconsistent zone heat zone={}  db_relay_status={}".format(
-                            zone.name, heat_relay.heat_is_on))
-                    if relay_inconsistency or zone_inconsistency:
-                        # fixme: we got flip of states due to inconsistency messages
-                        # __save_heat_state_db(zone=zone, heat_is_on=pin_state)
-                        __save_heat_state_db(zone=zone, heat_is_on=heat_relay.heat_is_on)
-                    # else:
-                    #    Log.logger.info("Heat pin {} status equal to gpio status {}".format(heat_relay.heat_is_on, pin_state_int))
-        except Exception as ex:
-            L.l.exception('Error processing heat relay=[{}] pin=[{}] err={}'.format(heat_relay, gpio_pin, ex))
 
 
 # set which is the main heat source relay that must be set on
