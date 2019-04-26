@@ -1,10 +1,10 @@
 from main import sqlitedb
 from main.logger_helper import L
 if sqlitedb:
-    from main.admin import models
+    from storage.sqalc import models
 from common import Constant
 from gpio import io_common
-from main.tinydb_model import ZoneCustomRelay
+from storage.model import m
 
 
 class P:
@@ -78,8 +78,8 @@ def post_init():
             relays = models.ZoneCustomRelay.query.filter_by(
                 gpio_host_name=Constant.HOST_NAME, relay_type=Constant.GPIO_PIN_TYPE_PI_PCF8574).all()
         else:
-            relays = ZoneCustomRelay.find({ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME,
-                                           ZoneCustomRelay.relay_type: Constant.GPIO_PIN_TYPE_PI_PCF8574})
+            relays = m.ZoneCustomRelay.find({m.ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME,
+                                            m.ZoneCustomRelay.relay_type: Constant.GPIO_PIN_TYPE_PI_PCF8574})
         for relay in relays:
             L.l.info('Reading pcf pin {}'.format(relay.gpio_pin_code))
             pin_index = int(relay.gpio_pin_code)

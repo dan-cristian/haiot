@@ -773,7 +773,7 @@ class Connect:
 
     def sensors(self):
         """ Return all found sensors.
-        :return: dict of :class:`Sensor` instances.
+        :return: dicts of :class:`Sensor` instances.
         """
         return self._sensors
 

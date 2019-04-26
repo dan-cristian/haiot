@@ -74,7 +74,7 @@ def save_to_history_db(obj):
         # save to local history DB, append history to source table name
         dest_table = str(table) + 'History'
         # L.l.debug('Saving to local db table {} obj={}'.format(dest_table, obj))
-        from main.admin import models
+        from storage.sqalc import models
         # http://stackoverflow.com/questions/4030982/initialise-class-object-by-name
         try:
             class_table = getattr(models, dest_table)

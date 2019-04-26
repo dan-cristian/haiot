@@ -7,10 +7,10 @@ from common import Constant
 from main import sqlitedb
 from main import thread_pool
 if sqlitedb:
-    from main.admin import models
-    from main.admin.model_helper import commit
+    from storage.sqalc import models
+    from storage.sqalc.model_helper import commit
 from gpio.io_common import GpioBase
-from main.tinydb_model import Pwm, GpioPin
+from storage.model import m
 
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
@@ -193,7 +193,7 @@ class PwmIo(GpioBase):
         if sqlitedb:
             rec = models.Pwm.query.get(key)
         else:
-            rec = Pwm.find_one({Pwm.name: key})
+            rec = m.Pwm.find_one({m.Pwm.name: key})
         # rec = dbs.session.query(models.Pwm).filter(models.Pwm.name == key).first()
         # db.session.remove()
         # rec = db.session.query(models.Pwm).filter(models.Pwm.name == key).first()
@@ -241,7 +241,7 @@ class PwmIo(GpioBase):
         if sqlitedb:
             pwm_list = models.Pwm.query.filter_by(host_name=Constant.HOST_NAME).all()
         else:
-            pwm_list = Pwm.find({Pwm.host_name: Constant.HOST_NAME})
+            pwm_list = m.Pwm.find({m.Pwm.host_name: Constant.HOST_NAME})
         for pwm in pwm_list:
             PwmIo.sync_2_db(pwm.id)
         pass
@@ -253,7 +253,7 @@ class PwmIo(GpioBase):
             if sqlitedb:
                 new_pwm = models.Pwm(id=0)
             else:
-                new_pwm = Pwm()
+                new_pwm = m.Pwm()
             new_pwm.name = pwm.name
             for name, value in kwargs.items():
                 if name == 'frequency':
@@ -317,7 +317,7 @@ class PwmIo(GpioBase):
         if sqlitedb:
             pwm_list = models.Pwm.query.filter_by(host_name=Constant.HOST_NAME).all()
         else:
-            pwm_list = Pwm.find({Pwm.host_name: Constant.HOST_NAME})
+            pwm_list = m.Pwm.find({m.Pwm.host_name: Constant.HOST_NAME})
         for pwm in pwm_list:
             try:
                 P.pi.hardware_PWM(pwm.gpio_pin_code, 0, 0)
@@ -360,16 +360,18 @@ def _setup_in_ports(gpio_pin_list):
                                 models.GpioPin.pin_code.in_([gpio_pin.pin_code]),
                                 models.GpioPin.host_name.in_([Constant.HOST_NAME]))
                         else:
-                            curr_rec = GpioPin.find_one({GpioPin.pin_code: gpio_pin.pin_code,
-                                                         GpioPin.host_name: Constant.HOST_NAME})
-                            gpio_pin_record = GpioPin()
-                            if curr_rec is not None:
-                                gpio_pin_record.pin_code = curr_rec.pin_code
+                            # curr_rec = GpioPin.find_one({GpioPin.pin_code: gpio_pin.pin_code,
+                            #                             GpioPin.host_name: Constant.HOST_NAME})
+                            #gpio_pin_record = GpioPin()
+                            #if curr_rec is not None:
+                            #    gpio_pin_record.pin_code = curr_rec.pin_code
+                            pass
                         gpio_pin_record.pin_direction = Constant.GPIO_PIN_DIRECTION_IN
                         if sqlitedb:
                             commit()
                         else:
-                            gpio_pin_record.save_changed_fields(current=curr_rec, broadcast=False, persist=True)
+                            # gpio_pin_record.save_changed_fields(current=curr_rec, broadcast=False, persist=True)
+                            pass
                     except Exception as ex1:
                         L.l.critical('Unable to setup pigpio_gpio pin, er={}'.format(ex1))
                 else:
@@ -396,7 +398,7 @@ def init():
     if sqlitedb:
         P.pwm = PwmIo(obj=models.Pwm)
     else:
-        P.pwm = PwmIo(obj=Pwm)
+        P.pwm = PwmIo(obj=m.Pwm)
     L.l.info('PiGpio initialising')
     if P.import_ok:
         try:
@@ -407,7 +409,7 @@ def init():
                 # setup this to receive list of ports that must be set as "IN" and have callbacks defined
                 # dispatcher.connect(setup_in_ports, signal=Constant.SIGNAL_GPIO_INPUT_PORT_LIST, sender=dispatcher.Any)
             P.initialised = True
-            Pwm.add_upsert_listener(_pwm_upsert_listener)
+            m.Pwm.add_upsert_listener(_pwm_upsert_listener)
             thread_pool.add_interval_callable(thread_run, run_interval_second=30)
             L.l.info('PiGpio initialised OK')
         except Exception as ex1:

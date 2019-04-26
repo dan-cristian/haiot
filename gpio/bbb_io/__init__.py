@@ -7,7 +7,6 @@ from pydispatch import dispatcher
 from main import thread_pool
 from main.logger_helper import L
 from common import Constant
-from main.admin import models
 from gpio import std_gpio
 
 initialised = False

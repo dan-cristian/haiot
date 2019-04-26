@@ -1,14 +1,11 @@
-import json
-from urllib2 import urlopen  # python 2 syntax
 import pygal
 from datetime import datetime, timedelta
-from flask import render_template, request, send_file
+from flask import render_template, request
 from sqlalchemy import func, extract
 from main import app, db
 from main.logger_helper import L
-from main.admin import models
-from common import Constant, utils
-import dashboard
+from storage.sqalc import models
+from common import utils
 
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 

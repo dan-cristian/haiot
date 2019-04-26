@@ -7,8 +7,8 @@ from main.logger_helper import L
 from common import Constant
 from common import utils
 if sqlitedb:
-    from main.admin import models
-from main.tinydb_model import GpioPin
+    from storage.sqalc import models
+# from storage.tiny.tinydb_model import GpioPin
 from main import thread_pool
 from sensor import sonoff
 from gpio import io_common
@@ -18,7 +18,7 @@ import threading
 import prctl
 from gpio import rpi_gpio
 from gpio import pigpio_gpio
-from main.tinydb_model import ZoneCustomRelay, ZoneAlarm, ZoneHeatRelay
+from storage.model import m
 
 
 class P:
@@ -53,7 +53,8 @@ def relay_update(gpio_pin_code=None, pin_value=None, from_web=False):
         if sqlitedb:
             gpiopin_list = models.GpioPin.query.filter_by(pin_code=gpio_pin_code, host_name=Constant.HOST_NAME).all()
         else:
-            gpiopin_list = GpioPin.find(filter={GpioPin.pin_code: gpio_pin_code, GpioPin.host_name: Constant.HOST_NAME})
+            # gpiopin_list = GpioPin.find(filter={GpioPin.pin_code: gpio_pin_code, GpioPin.host_name: Constant.HOST_NAME})
+            pass
         if gpiopin_list is not None:
             lenpin = len(gpiopin_list)
             if lenpin > 1:
@@ -148,7 +149,7 @@ def not_used_gpio_record_update(json_object):
         if host_name != Constant.HOST_NAME:
             if sqlitedb:
                 models.GpioPin().save_changed_fields_from_json_object(debug=False,
-                    json_object=json_object, notify_transport_enabled=False, save_to_graph=False)
+                                                                      json_object=json_object, notify_transport_enabled=False, save_to_graph=False)
             else:
                 # fixme: add
                 pass
@@ -227,7 +228,8 @@ def zone_custom_relay_record_update(json_object):
                         gpio_record = models.GpioPin.query.filter_by(pin_code=gpio_pin_code,
                                                                      host_name=Constant.HOST_NAME).first()
                     else:
-                        gpio_record = GpioPin.find_one({GpioPin.pin_code: gpio_pin_code, GpioPin.host_name: Constant.HOST_NAME})
+                        # gpio_record = GpioPin.find_one({GpioPin.pin_code: gpio_pin_code, GpioPin.host_name: Constant.HOST_NAME})
+                        pass
                     if gpio_record is not None:
                         # if source_host != Constant.HOST_NAME:
                         #    L.l.info('Event received from other host, event={}'.format(json_object))
@@ -297,7 +299,7 @@ def set_relay_state(pin_code, relay_is_on, relay_type):
 
 
 def zone_custom_relay_upsert_listener(record, changed_fields):
-    assert isinstance(record, ZoneCustomRelay)
+    assert isinstance(record, m.ZoneCustomRelay)
     if record.gpio_host_name != Constant.HOST_NAME:
         return
     L.l.info('Upsert listener {} pin {}'.format(record.relay_type, record.gpio_pin_code))
@@ -378,7 +380,7 @@ def post_init():
     #    return
 
     # init relay (out) pins
-    relays = ZoneCustomRelay.find({ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME})
+    relays = m.ZoneCustomRelay.find({m.ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME})
     for relay in relays:
         gpio_pin_code = relay.gpio_pin_code
         relay_type = relay.relay_type
@@ -402,7 +404,7 @@ def post_init():
                 relay.save_changed_fields(broadcast=True, persist=True, listeners=False)
 
     # init pir/contact (in) pins
-    alarms = ZoneAlarm.find({ZoneAlarm.gpio_host_name: Constant.HOST_NAME})
+    alarms = m.ZoneAlarm.find({m.ZoneAlarm.gpio_host_name: Constant.HOST_NAME})
     for alarm in alarms:
         gpio_pin_code = alarm.gpio_pin_code
         relay_type = alarm.relay_type
@@ -441,7 +443,7 @@ def init():
         # std_gpio.init()
     if Constant.is_os_windows():
         pigpio_gpio.init()
-    ZoneCustomRelay.add_upsert_listener(zone_custom_relay_upsert_listener)
+    m.ZoneCustomRelay.add_upsert_listener(zone_custom_relay_upsert_listener)
     thread_pool.add_interval_callable(thread_run, run_interval_second=1)
     P.initialised = True
 

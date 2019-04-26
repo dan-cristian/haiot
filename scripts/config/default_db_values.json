@@ -67,8 +67,8 @@
   ],
   "Module": [
     {"id":1,  "active":true, "start_order": 1, "name":"main", "host_name":""},
-    {"id":2,  "active":true, "start_order": 2, "name":"cloud.email", "host_name":""},
-    {"id":3,  "active":false, "start_order": 3, "name":"health_monitor", "host_name":""},
+    {"id":2,  "active":true, "start_order": 3, "name":"cloud.email", "host_name":""},
+    {"id":3,  "active":false, "start_order": 2, "name":"health_monitor", "host_name":""},
     {"id":9,  "active":false, "start_order":9, "name":"heat", "host_name":""},
     {"id":13, "active":false, "start_order":13, "name":"cloud.graph_plotly", "host_name":""},
     {"id":19, "active":false, "start_order":19, "name":"cloud.ddns", "host_name":""},

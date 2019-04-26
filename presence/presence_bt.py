@@ -6,9 +6,9 @@ import prctl
 from pydispatch import dispatcher
 from common import utils, Constant
 from main import sqlitedb
-from main.tinydb_model import Device, PeopleDevice, People
+from storage.model import m
 if sqlitedb:
-    from main.admin import models
+    from storage.sqalc import models
 
 
 class P:
@@ -86,7 +86,7 @@ def _check_presence():
     if sqlitedb:
         devs = models.Device().query_filter_all()
     else:
-        devs = Device.find()
+        devs = m.Device.find()
     for dev in devs:
         if dev.bt_address is not None:
             result = None
@@ -109,13 +109,13 @@ def _check_presence():
                         pd = models.PeopleDevice
                         peopledev = pd().query_filter_first(pd.device_id == dev.id)
                     else:
-                        peopledev = PeopleDevice.find_one({PeopleDevice.device_id: dev.id})
+                        peopledev = m.PeopleDevice.find_one({m.PeopleDevice.device_id: dev.id})
                     if peopledev is not None and peopledev.give_presence:
                         if sqlitedb:
                             p = models.People
                             people = p().query_filter_first(p.id == peopledev.people_id)
                         else:
-                            people = People.find({People.id: peopledev.people_id})
+                            people = m.People.find({m.People.id: peopledev.people_id})
                         if people is not None:
                             dispatcher.send(Constant.SIGNAL_PRESENCE, device=dev.name, people=people.name)
                             #if btrssi is not None:

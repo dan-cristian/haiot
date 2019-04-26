@@ -2,9 +2,10 @@ import unicodedata
 from main.logger_helper import L
 from common import Constant, get_json_param
 from main import sqlitedb
-# from main.admin import models
+if sqlitedb:
+    from main.admin import models
 from cloud import lastfm
-from main.tinydb_model import Music, MusicLoved
+from storage.model import m
 
 from common import fix_module
 while True:
@@ -215,8 +216,8 @@ def _save_status(zone, status_json, song):
         cur_rec = models.Music.query.filter_by(zone_name=zone).first()
         rec = models.Music(zone_name=zone)
     else:
-        cur_rec = Music.find_one({Music.zone_name: zone})
-        rec = Music()
+        cur_rec = m.Music.find_one({m.Music.zone_name: zone})
+        rec = m.Music()
         rec.zone_name = zone
     rec.state = status_json['state']
     if rec.state == 'stop':
@@ -247,8 +248,8 @@ def save_lastfm():
             cur_rec = models.MusicLoved.query.first()
             rec = models.MusicLoved(lastfmsong=lastfmsong)
         else:
-            cur_recs = MusicLoved.find()
-            rec = MusicLoved()
+            cur_recs = m.MusicLoved.find()
+            rec = m.MusicLoved()
             if len(cur_recs) > 0:
                 cur_rec = cur_recs[0]
                 rec.id = cur_rec.id

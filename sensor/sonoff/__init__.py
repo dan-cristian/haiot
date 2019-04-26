@@ -9,7 +9,7 @@ if sqlitedb:
     from main.admin import models
 from main import thread_pool
 from transport import mqtt_io
-from main.tinydb_model import ZoneSensor, Sensor, DustSensor, ZoneCustomRelay, PowerMonitor
+from storage.model import m
 
 
 class P:
@@ -25,7 +25,7 @@ def _get_zone_sensor(sensor_address, sensor_type):
     if sqlitedb:
         zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=sensor_address).first()
     else:
-        zone_sensor = ZoneSensor.find_one({ZoneSensor.sensor_address: sensor_address})
+        zone_sensor = m.ZoneSensor.find_one({m.ZoneSensor.sensor_address: sensor_address})
     if zone_sensor is None:
         actual_sensor_name = 'N/A {} {}'.format(sensor_address, sensor_type)
     else:
@@ -39,8 +39,8 @@ def _get_sensor(sensor_address, sensor_type):
         sensor = models.Sensor.query.filter_by(address=sensor_address).first()
         new_sensor = models.Sensor(address=sensor_address, sensor_name=actual_sensor_name)
     else:
-        sensor = Sensor.find_one({Sensor.address: sensor_address})
-        new_sensor = Sensor()
+        sensor = m.Sensor.find_one({m.Sensor.address: sensor_address})
+        new_sensor = m.Sensor()
         new_sensor.address = sensor_address
         new_sensor.sensor_name = actual_sensor_name
     return zone_sensor, sensor, new_sensor
@@ -52,8 +52,8 @@ def _get_dust_sensor(sensor_address, sensor_type):
         sensor = models.DustSensor.query.filter_by(address=sensor_address).first()
         new_sensor = models.DustSensor()
     else:
-        sensor = DustSensor.find_one({DustSensor.address: sensor_address})
-        new_sensor = DustSensor()
+        sensor = m.DustSensor.find_one({m.DustSensor.address: sensor_address})
+        new_sensor = m.DustSensor()
     new_sensor.address = sensor_address
     return zone_sensor, sensor, new_sensor
 
@@ -93,12 +93,12 @@ def _process_message(msg):
                     if sqlitedb:
                         zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=sensor_name).first()
                     else:
-                        zone_sensor = ZoneSensor.find_one({ZoneSensor.sensor_address: sensor_name})
+                        zone_sensor = m.ZoneSensor.find_one({m.ZoneSensor.sensor_address: sensor_name})
                     if zone_sensor is not None:
                         if sqlitedb:
                             current_record = models.Sensor.query.filter_by(address=sensor_name).first()
                         else:
-                            current_record = Sensor.find_one({Sensor.address: sensor_name})
+                            current_record = m.Sensor.find_one({m.Sensor.address: sensor_name})
                         if current_record is None:
                             pass
                         else:
@@ -109,7 +109,7 @@ def _process_message(msg):
                             record = models.Sensor(address=sensor_name, sensor_name=zone_sensor.sensor_name)
                             record.is_event_external = True
                         else:
-                            record = Sensor()
+                            record = m.Sensor()
                             record.address = sensor_name
                             record.sensor_name = zone_sensor.sensor_name
                         if voltage is not None:
@@ -128,14 +128,14 @@ def _process_message(msg):
                     current_relay = models.ZoneCustomRelay.query.filter_by(
                         gpio_pin_code=sensor_name, gpio_host_name=Constant.HOST_NAME).first()
                 else:
-                    current_relay = ZoneCustomRelay.find_one({ZoneCustomRelay.gpio_pin_code: sensor_name,
-                                                              ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME})
+                    current_relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.gpio_pin_code: sensor_name,
+                                                                m.ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME})
                 if current_relay is not None:
                     L.l.info("Got relay {} state={}".format(sensor_name, power_is_on))
                     if sqlitedb:
                         new_relay = models.ZoneCustomRelay(gpio_pin_code=sensor_name, gpio_host_name=Constant.HOST_NAME)
                     else:
-                        new_relay = ZoneCustomRelay()
+                        new_relay = m.ZoneCustomRelay()
                         new_relay.relay_pin_name = current_relay.relay_pin_name
                         new_relay.gpio_pin_code = sensor_name
                         new_relay.gpio_host_name = Constant.HOST_NAME
@@ -187,12 +187,12 @@ def _process_message(msg):
                 if sqlitedb:
                     sensor = models.PowerMonitor.query.filter_by(host_name=sensor_name).first()
                 else:
-                    sensor = PowerMonitor.find_one({PowerMonitor.host_name: sensor_name})
+                    sensor = m.PowerMonitor.find_one({m.PowerMonitor.host_name: sensor_name})
                 if sensor is not None:
                     if sqlitedb:
                         new = models.PowerMonitor()
                     else:
-                        new = PowerMonitor()
+                        new = m.PowerMonitor()
                         new.id = sensor.id
                     new.voltage = voltage
                     new.save_changed_fields(current_record=sensor, notify_transport_enabled=True, save_to_graph=True)
@@ -259,8 +259,8 @@ def post_init():
             relays = models.ZoneCustomRelay.query.filter_by(
                 gpio_host_name=Constant.HOST_NAME, relay_type=Constant.GPIO_PIN_TYPE_SONOFF).all()
         else:
-            relays = ZoneCustomRelay.find({ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME,
-                                           ZoneCustomRelay.relay_type: Constant.GPIO_PIN_TYPE_SONOFF})
+            relays = m.ZoneCustomRelay.find({m.ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME,
+                                            m.ZoneCustomRelay.relay_type: Constant.GPIO_PIN_TYPE_SONOFF})
         for relay in relays:
             L.l.info('Reading sonoff sensor {}'.format(relay.gpio_pin_code))
             _get_relay_status(relay.gpio_pin_code)

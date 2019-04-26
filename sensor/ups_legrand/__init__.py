@@ -11,9 +11,9 @@ from main import sqlitedb
 from common import Constant, utils, variable
 from sensor import serial_common
 if sqlitedb:
-    from main.admin import models
+    from storage.sqalc import models
 from main import thread_pool
-from main.tinydb_model import Ups
+from storage.tiny.tinydb_model import Ups
 
 
 class P:

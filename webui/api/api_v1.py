@@ -6,7 +6,7 @@ from main.flask_app import app
 from main.logger_helper import L
 if sqlitedb:
     from main import app, db
-    from main.admin.model_helper import commit
+    from storage.sqalc.model_helper import commit
 from common import Constant, utils
 import cloud.alexa.mpd_run
 from cloud import lastfm

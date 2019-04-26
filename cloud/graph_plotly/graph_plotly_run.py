@@ -13,9 +13,7 @@ from requests import HTTPError
 from common import utils
 from common import Constant
 from main.logger_helper import L
-from main.admin import models
-
-
+from storage.sqalc import models
 
 #list of series unique identifier used to determine trace order remote, key is graph name
 #each trace id list starts with a standard reference element used to get graph url, not ideal!
@@ -77,7 +75,7 @@ def populate_trace_for_append(x=None, y=None, graph_legend_item_name='', trace_u
     L.l.debug('Appending new graph serie {} {}'.format(graph_legend_item_name, trace_unique_id))
     return trace_list
 
-#check if graph exists in memory. Used this function rather than checking graph dict variable directly
+#check if graph exists in memory. Used this function rather than checking graph dicts variable directly
 #as this function enables archiving in different folders
 def graph_url_exists_in_memory(graph_unique_name=''):
     global g_graph_url_list
