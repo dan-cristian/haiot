@@ -39,8 +39,11 @@ class DictTable:
         self.index[new_key] = {}
         for rec in newlist:
             key = rec[1]
-            key_val = rec[1][new_key]
-            self.index[new_key][key_val] = key
+            if new_key in rec[1]:
+                key_val = rec[1][new_key]
+                self.index[new_key][key_val] = key
+            else:
+                L.l.error('New key {} not in index {}'.format(new_key, rec[1]))
 
     def find(self, filter=None, sort=None, skip=None, limit=None, *args, **kwargs):
         res = []
@@ -126,7 +129,7 @@ class DictTable:
                     if doc[key] in indexed_recs:
                         good_key_val = indexed_recs[doc[key]][self.model_class._main_key]
                     else:
-                        L.l.error('Key not in index')
+                        L.l.error('Key {} not in index {}'.format(key, cls_name))
                         return None
                 else:
                     new_key = list(doc)[0]
