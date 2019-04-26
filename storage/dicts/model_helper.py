@@ -114,6 +114,7 @@ class DictTable:
         return {'inserted_id': doc['id']}
 
     def update_one(self, key, doc):
+        cls_name = self.model_class.__name__
         try:
             if key == self.model_class._column_list[0]:
                 good_key_val = doc[key]
@@ -126,6 +127,7 @@ class DictTable:
                         good_key_val = indexed_recs[doc[key]][self.model_class._main_key]
                     else:
                         L.l.error('Key not in index')
+                        return None
                 else:
                     new_key = list(doc)[0]
                     good_key_val = None
@@ -139,12 +141,15 @@ class DictTable:
 
             for fld in doc:
                 if fld not in self.model_class._column_list:
-                    L.l.warning('Unexpected new field {} on updating {}'.format(fld, self.model_class.__name__))
-                if fld in self.table[good_key_val] and self.table[good_key_val][fld] != doc[fld]:
-                    if fld in self.index:
-                        L.l.info('Invalidating index on update{}'.format(self.model_class.__name__))
-                        self.index.pop(key, None)  # delete key from index
-                    self.table[good_key_val][fld] = doc[fld]
+                    L.l.warning('Unexpected new field {} on updating {}'.format(fld, cls_name))
+                if good_key_val in self.table:
+                    if fld in self.table[good_key_val] and self.table[good_key_val][fld] != doc[fld]:
+                        if fld in self.index:
+                            L.l.info('Invalidating index on update{}'.format(cls_name))
+                            self.index.pop(key, None)  # delete key from index
+                        self.table[good_key_val][fld] = doc[fld]
+                else:
+                    L.l.error('Key {} not in table {}'.format(good_key_val, cls_name))
             if self.model_class._main_key in doc:
                 return doc[self.model_class._main_key]
             else:
