@@ -6,7 +6,7 @@ from main import sqlitedb
 if sqlitedb:
     from main.admin import models
 from main import thread_pool
-from storage.tiny.tinydb_model import ZoneSensor, Sensor
+from storage.model import m
 
 
 class P:
@@ -33,15 +33,15 @@ def _read_bmp280():
     if sqlitedb:
         zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=sensor_address).first()
     else:
-        zone_sensor = ZoneSensor.find_one({ZoneSensor.sensor_address: sensor_address})
+        zone_sensor = m.ZoneSensor.find_one({m.ZoneSensor.sensor_address: sensor_address})
     if zone_sensor is not None:
         sensor_name = zone_sensor.sensor_name
         if sqlitedb:
             current_record = models.Sensor.query.filter_by(address=sensor_address).first()
             record = models.Sensor(address=sensor_address, sensor_name=sensor_name)
         else:
-            current_record = Sensor.find_one({Sensor.address: sensor_address})
-            record = Sensor()
+            current_record = m.Sensor.find_one({m.Sensor.address: sensor_address})
+            record = m.Sensor()
             record.address = sensor_address
             record.sensor_name = sensor_name
         if current_record is None:

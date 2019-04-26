@@ -13,7 +13,7 @@ from sensor import serial_common
 if sqlitedb:
     from storage.sqalc import models
 from main import thread_pool
-from storage.tiny.tinydb_model import Ups
+from storage.model import m
 
 
 class P:
@@ -125,7 +125,7 @@ def __read_ups_status():
             if sqlitedb:
                 record = models.Ups()
             else:
-                record = Ups()
+                record = m.Ups()
             record.name = P.ups.Name
             record.system_name = Constant.HOST_NAME
             record.input_voltage = P.ups.InputVoltage
@@ -142,7 +142,7 @@ def __read_ups_status():
             if sqlitedb:
                 current_record = models.Ups.query.filter_by(system_name=Constant.HOST_NAME).first()
             else:
-                current_record = Ups.find_one({Ups.system_name: Constant.HOST_NAME})
+                current_record = m.Ups.find_one({m.Ups.system_name: Constant.HOST_NAME})
             record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
                                        save_to_graph=True)
 
@@ -165,8 +165,8 @@ def _create_dummy_entry():
         record = models.Ups()
         current_record = models.Ups.query.filter_by(name=name).first()
     else:
-        record = Ups()
-        current_record = Ups.find_one({Ups.name: name})
+        record = m.Ups()
+        current_record = m.Ups.find_one({m.Ups.name: name})
     record.name = name
     if current_record is None:
         record.save_changed_fields(current_record=current_record, new_record=record)

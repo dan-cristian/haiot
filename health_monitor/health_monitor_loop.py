@@ -16,7 +16,6 @@ from main import sqlitedb
 if sqlitedb:
     from storage.sqalc import models
 from storage.model import m
-# from storage.tiny.tinydb_model import SystemDisk, SystemMonitor, PowerMonitor
 
 __author__ = 'dcristian'
 

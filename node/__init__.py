@@ -158,12 +158,13 @@ def announce_node_state():
         node.run_overall_cycles += 1
         node.os_type = Constant.OS
         node.machine_type = Constant.HOST_MACHINE_TYPE
+        node.priority = current_record.priority
         node.notify_transport_enabled = True
         progress_status = 'Announce node status before save fields'
         node.save_changed_fields(current_record=current_record, new_record=node, notify_transport_enabled=True,
                                  save_to_graph=True, graph_save_frequency=120)
     except Exception as ex:
-        L.l.error('Unable to announce my state, err={}'.format(ex))
+        L.l.error('Unable to announce my state, err={}'.format(ex), exc_info=True)
 
 
 def get_progress():
