@@ -4,10 +4,9 @@ import threading
 import random
 import collections
 from common import Constant, utils, fix_module
-from main.tinydb_app import db
+from storage.tiny.tinydb_app import db
 from main.logger_helper import L
 import transport
-from main import persistence
 
 while True:
     try:
@@ -243,7 +242,7 @@ class TinyBase(ModelView, metaclass=OrderedClassMembers):
                     if first_check:
                         if attr != 'id':
                             L.l.error('First key is not id, but {}. list is {}'.format(attr, cls.__dict__))
-                            L.l.info('dict={}'.format(dict(cls.__dict__)))
+                            L.l.info('dicts={}'.format(dict(cls.__dict__)))
                             L.l.info('ordered={}'.format(collections.OrderedDict(cls.__dict__)))
                         first_check = False
                     attr_type = type(getattr(self, attr))
@@ -287,7 +286,7 @@ globalCounter = 0
 
 
 def insertfew():
-    from main import tinydb_model
+    from storage.tiny import tinydb_model
     global globalCounter, threadLock
     time.sleep(3)
     while True:

@@ -1,6 +1,5 @@
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
-from main.logger_helper import L
 from main import thread_pool, IS_STANDALONE_MODE, sqlitedb
 import time
 import datetime
@@ -10,10 +9,10 @@ import prctl
 from main.logger_helper import L
 from common import Constant, variable, utils
 if sqlitedb:
-    from main.admin import models
-    from main.admin.model_helper import commit
+    from storage.sqalc import models
+    from storage.sqalc.model_helper import commit
 from transport import mqtt_io
-from main.tinydb_model import Node
+from storage.model import m
 
 initialised=False
 first_run = True
@@ -56,7 +55,7 @@ def check_if_no_masters_overall():
     if sqlitedb:
         node_masters = models.Node.query.filter_by(is_master_overall=True).all()
     else:
-        node_masters = Node.find({Node.is_master_overall: True})
+        node_masters = m.Node.find({m.Node.is_master_overall: True})
     return len(node_masters) == 0
 
 
@@ -68,7 +67,7 @@ def update_master_state():
         if sqlitedb:
             node_list = models.Node.query.order_by(models.Node.priority).all()
         else:
-            node_list = Node.find(sort=[(Node.priority, 1)], filter={})
+            node_list = m.Node.find(sort=[(m.Node.priority, 1)], filter={})
         for node in node_list:
             # if recently alive, in order of id prio
             if node.updated_on is None:
@@ -135,8 +134,8 @@ def announce_node_state():
             node = models.Node()
             current_record = models.Node().query_filter_first(models.Node.name.in_([Constant.HOST_NAME, ""]))
         else:
-            node = Node()
-            current_record = Node.find_one({Node.name: Constant.HOST_NAME})
+            node = m.Node()
+            current_record = m.Node.find_one({m.Node.name: Constant.HOST_NAME})
         node.name = Constant.HOST_NAME
         if not current_record:
             node.priority = random.randint(1, 100) # todo: clarify why 1 -100?

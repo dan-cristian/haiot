@@ -1,10 +1,10 @@
 from main import sqlitedb
-from main.tinydb_app import db
+from storage.tiny.tinydb_app import db
 from main.logger_helper import L
 from common import utils, Constant
 if sqlitedb:
-    from main.admin import models
-from main.tinydb_model import Sensor, ZoneSensor
+    from storage.sqalc import models
+from storage.model import m
 
 __author__ = 'dcristian'
 
@@ -22,9 +22,9 @@ def not_used_record_update(obj):
                 record = models.Sensor(address=address)
                 zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=address).first()
             else:
-                record = Sensor()
+                record = m.Sensor()
                 record.address = address
-                zone_sensor = ZoneSensor.find_one({ZoneSensor.sensor_address: address})
+                zone_sensor = m.ZoneSensor.find_one({m.ZoneSensor.sensor_address: address})
             if zone_sensor is not None:
                 record.sensor_name = zone_sensor.sensor_name
             else:
@@ -54,7 +54,7 @@ def not_used_record_update(obj):
             if sqlitedb:
                 current_record = models.Sensor.query.filter_by(address=address).first()
             else:
-                current_record = Sensor.find_one({Sensor.address: address})
+                current_record = m.Sensor.find_one({m.Sensor.address: address})
             # force field changed detection for delta_counters
             if current_record:
                 current_record.delta_counters_a = 0

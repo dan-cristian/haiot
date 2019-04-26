@@ -1,4 +1,4 @@
-from main.admin import model_helper
+from storage.sqalc import model_helper
 import json
 from common import Constant
 from main.logger_helper import L
@@ -8,7 +8,6 @@ import thingspeak
 import datetime
 import traceback
 import tzlocal
-import urllib.request
 import threading
 import prctl
 import logging

@@ -14,8 +14,9 @@ from common import Constant, utils, get_json_param
 from main import logger_helper
 from main import sqlitedb
 if sqlitedb:
-    from main.admin import model_helper, models
-from main.tinydb_model import SystemDisk, SystemMonitor, PowerMonitor
+    from storage.sqalc import models
+from storage.model import m
+# from storage.tiny.tinydb_model import SystemDisk, SystemMonitor, PowerMonitor
 
 __author__ = 'dcristian'
 
@@ -84,7 +85,7 @@ def _read_all_hdd_smart():
                 if sqlitedb:
                     record = models.SystemDisk()
                 else:
-                    record = SystemDisk()
+                    record = m.SystemDisk()
                 record.system_name = Constant.HOST_NAME
                 record.hdd_disk_dev = Constant.DISK_DEV_MAIN + disk_letter
                 L.l.debug('Processing disk {}'.format(record.hdd_disk_dev))
@@ -161,8 +162,8 @@ def _read_all_hdd_smart():
                         current_record = models.SystemDisk.query.filter_by(
                             hdd_disk_dev=record.hdd_disk_dev, system_name=record.system_name).first()
                     else:
-                        current_record = SystemDisk.find_one({SystemDisk.hdd_disk_dev: record.hdd_disk_dev,
-                                                              SystemDisk.system_name: record.system_name})
+                        current_record = m.SystemDisk.find_one({m.SystemDisk.hdd_disk_dev: record.hdd_disk_dev,
+                                                              m.SystemDisk.system_name: record.system_name})
                     record.save_changed_fields(current_record=current_record, new_record=record,
                                                notify_transport_enabled=True, save_to_graph=True)
                 disk_letter = chr(ord(disk_letter) + 1)
@@ -396,7 +397,7 @@ def _read_system_attribs():
         if sqlitedb:
             record = models.SystemMonitor()
         else:
-            record = SystemMonitor()
+            record = m.SystemMonitor()
         if import_module_psutil_exist:
             record.cpu_usage_percent = psutil.cpu_percent(interval=1)
             record.memory_available_percent = psutil.virtual_memory().percent
@@ -429,7 +430,7 @@ def _read_system_attribs():
         if sqlitedb:
             current_record = models.SystemMonitor.query.filter_by(name=record.name).first()
         else:
-            current_record = SystemMonitor.find_one({SystemMonitor.name: record.name})
+            current_record = m.SystemMonitor.find_one({m.SystemMonitor.name: record.name})
         progress_status = 'Saving mem cpu before save fields'
         record.save_changed_fields(current_record=current_record, new_record=record,
                                    notify_transport_enabled=False, save_to_graph=True)
@@ -509,7 +510,7 @@ def _read_disk_stats():
                     if sqlitedb:
                         record = models.SystemDisk()
                     else:
-                        record = SystemDisk()
+                        record = m.SystemDisk()
                     record.hdd_disk_dev = '/dev/' + device_name
                     record.last_reads_completed_count = reads_completed
                     record.last_writes_completed_count = writes_completed
@@ -519,8 +520,8 @@ def _read_disk_stats():
                         current_record = models.SystemDisk.query.filter_by(
                             hdd_disk_dev=record.hdd_disk_dev, system_name=record.system_name).first()
                     else:
-                        current_record = SystemDisk.find_one({SystemDisk.hdd_disk_dev: record.hdd_disk_dev,
-                                                              SystemDisk.system_name: record.system_name})
+                        current_record = m.SystemDisk.find_one({m.SystemDisk.hdd_disk_dev: record.hdd_disk_dev,
+                                                              m.SystemDisk.system_name: record.system_name})
                     # save read/write date time only if count changes
                     if current_record:
                         if current_record.serial is None or current_record.serial == '':
@@ -566,7 +567,7 @@ def _get_total_subtracted_voltage(id_list):
             if sqlitedb:
                 power_rec = models.PowerMonitor.query.filter_by(id=pow_id).first()
             else:
-                power_rec = PowerMonitor.find_one({PowerMonitor.id: pow_id})
+                power_rec = m.PowerMonitor.find_one({m.PowerMonitor.id: pow_id})
             voltage += power_rec.voltage
     return voltage
 
@@ -586,12 +587,12 @@ def _read_battery_power():
                 if sqlitedb:
                     power_rec = models.PowerMonitor.query.filter_by(name=addr[0]).first()
                 else:
-                    power_rec = PowerMonitor.find_one({PowerMonitor.name: addr[0]})
+                    power_rec = m.PowerMonitor.find_one({m.PowerMonitor.name: addr[0]})
                 if power_rec is not None:
                     if sqlitedb:
                         new_rec = models.PowerMonitor()
                     else:
-                        new_rec = PowerMonitor()
+                        new_rec = m.PowerMonitor()
                     new_rec.raw_voltage = voltage
                     total_subtracted_voltage = _get_total_subtracted_voltage(power_rec.subtracted_sensor_id_list)
                     if power_rec.voltage_divider_ratio is not None:
@@ -616,7 +617,7 @@ def init():
     if sqlitedb:
         power_list = models.PowerMonitor().query_all()
     else:
-        power_list = PowerMonitor.find()
+        power_list = m.PowerMonitor.find()
     for power in power_list:
         if power.host_name == Constant.HOST_NAME:
             if "ina" in power.type:

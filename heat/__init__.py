@@ -8,12 +8,11 @@ import prctl
 from main.logger_helper import L
 from main import sqlitedb
 if sqlitedb:
-    from main.admin import models
-    from main.admin.model_helper import commit, get_param
+    from storage.sqalc import models
+    from storage.sqalc.model_helper import commit
 from common import utils, Constant, get_json_param
 import gpio
-from main.tinydb_model import ZoneThermostat, TemperatureTarget, SchedulePattern
-from main.tinydb_model import ZoneHeatRelay, Zone, HeatSchedule, ZoneSensor, Sensor, GpioPin
+from storage.model import m
 
 
 class P:
@@ -46,9 +45,9 @@ def record_update(obj_dict=None):
                 obj_dict, utils.get_model_field_name(models.ZoneHeatRelay.heat_pin_name))
             is_on = utils.get_object_field_value(obj_dict, utils.get_model_field_name(models.ZoneHeatRelay.heat_is_on))
         else:
-            zone_id = utils.get_object_field_value(obj_dict, ZoneHeatRelay.zone_id)
-            pin_name = utils.get_object_field_value(obj_dict, ZoneHeatRelay.heat_pin_name)
-            is_on = utils.get_object_field_value(obj_dict, ZoneHeatRelay.heat_is_on)
+            zone_id = utils.get_object_field_value(obj_dict, m.ZoneHeatRelay.zone_id)
+            pin_name = utils.get_object_field_value(obj_dict, m.ZoneHeatRelay.heat_pin_name)
+            is_on = utils.get_object_field_value(obj_dict, m.ZoneHeatRelay.heat_is_on)
         # fixme: remove hard reference to object field
         sent_on = utils.get_object_field_value(obj_dict, "event_sent_datetime")
         if P.debug:
@@ -57,14 +56,14 @@ def record_update(obj_dict=None):
         if sqlitedb:
             zone_heat_relay = models.ZoneHeatRelay.query.filter_by(zone_id=zone_id).first()
         else:
-            zone_heat_relay = ZoneHeatRelay.find_one({ZoneHeatRelay.zone_id: zone_id})
+            zone_heat_relay = m.ZoneHeatRelay.find_one({m.ZoneHeatRelay.zone_id: zone_id})
         if zone_heat_relay:
             gpio_host_name = zone_heat_relay.gpio_host_name
             if sqlitedb:
                 cmd_heat_is_on = utils.get_object_field_value(
                     obj_dict, utils.get_model_field_name(models.ZoneHeatRelay.heat_is_on))
             else:
-                cmd_heat_is_on = utils.get_object_field_value(obj_dict, ZoneHeatRelay.heat_is_on)
+                cmd_heat_is_on = utils.get_object_field_value(obj_dict, m.ZoneHeatRelay.heat_is_on)
             if P.debug:
                 L.l.info('Local heat state zone_id {} must be changed to {} on pin {}'.format(
                     zone_id, cmd_heat_is_on, zone_heat_relay.gpio_pin_code))
@@ -103,15 +102,15 @@ def zone_thermo_record_update(obj_dict=None):
             is_mode_manual = utils.get_object_field_value(
                 changes, utils.get_model_field_name(models.ZoneThermostat.is_mode_manual))
         else:
-            is_mode_manual = utils.get_object_field_value(changes, ZoneThermostat.is_mode_manual)
+            is_mode_manual = utils.get_object_field_value(changes, m.ZoneThermostat.is_mode_manual)
         # activate manual mode if set by user in UI
         if is_mode_manual is not None:
             if sqlitedb:
                 thermo_id = utils.get_object_field_value(obj_dict, utils.get_model_field_name(models.ZoneThermostat.id))
                 thermo_rec = models.ZoneThermostat.query.filter_by(id=thermo_id).first()
             else:
-                thermo_id = utils.get_object_field_value(obj_dict, ZoneThermostat.id)
-                thermo_rec = ZoneThermostat.find_one({ZoneThermostat.id: thermo_id})
+                thermo_id = utils.get_object_field_value(obj_dict, m.ZoneThermostat.id)
+                thermo_rec = m.ZoneThermostat.find_one({m.ZoneThermostat.id: thermo_id})
             if thermo_rec is not None and is_mode_manual:
                 thermo_rec.last_manual_set = datetime.datetime.now()
                 if sqlitedb:
@@ -127,13 +126,13 @@ def __save_heat_state_db(zone, heat_is_on):
         zone_heat_relay = models.ZoneHeatRelay.query.filter_by(zone_id=zone.id).first()
         zone_thermo = models.ZoneThermostat.query.filter_by(zone_id=zone.id).first()
     else:
-        zone_heat_relay = ZoneHeatRelay.find_one({ZoneHeatRelay.zone_id: zone.id})
-        zone_thermo = ZoneThermostat.find_one({ZoneThermostat.zone_id: zone.id})
+        zone_heat_relay = m.ZoneHeatRelay.find_one({m.ZoneHeatRelay.zone_id: zone.id})
+        zone_thermo = m.ZoneThermostat.find_one({m.ZoneThermostat.zone_id: zone.id})
     if zone_thermo is None:
         if sqlitedb:
             zone_thermo = models.ZoneThermostat()
         else:
-            zone_thermo = ZoneThermostat()
+            zone_thermo = m.ZoneThermostat()
         zone_thermo.zone_id = zone.id
         zone_thermo.zone_name = zone.name
         if sqlitedb:
@@ -202,7 +201,7 @@ def _get_temp_target(pattern_id):
     if sqlitedb:
         schedule_pattern = models.SchedulePattern.query.filter_by(id=pattern_id).first()
     else:
-        schedule_pattern = SchedulePattern.find_one({SchedulePattern.id: pattern_id})
+        schedule_pattern = m.SchedulePattern.find_one({m.SchedulePattern.id: pattern_id})
     # strip formatting characters that are not used to represent target temperature
     pattern = str(schedule_pattern.pattern).replace('-', '').replace(' ', '')
     # check pattern validity
@@ -211,7 +210,7 @@ def _get_temp_target(pattern_id):
         if sqlitedb:
             temp_target = float(models.TemperatureTarget.query.filter_by(code=temp_code).first().target)
         else:
-            temp_target = float(TemperatureTarget.find_one({TemperatureTarget.code: temp_code}).target)
+            temp_target = float(m.TemperatureTarget.find_one({m.TemperatureTarget.code: temp_code}).target)
     else:
         L.l.warning('Incorrect temp pattern [{}] in zone {}, length is not 24'.format(pattern, schedule_pattern.name))
         temp_target = None
@@ -224,7 +223,7 @@ def _get_schedule_pattern(heat_schedule):
     if sqlitedb:
         heat_thermo = models.ZoneThermostat.query.filter_by(zone_id=heat_schedule.zone_id).first()
     else:
-        heat_thermo = ZoneThermostat.find_one({ZoneThermostat.zone_id: heat_schedule.zone_id})
+        heat_thermo = m.ZoneThermostat.find_one({m.ZoneThermostat.zone_id: heat_schedule.zone_id})
     schedule_pattern = None
     if heat_thermo is not None and heat_thermo.last_presence_set is not None:
         delta = (datetime.datetime.now() - heat_thermo.last_presence_set).total_seconds()
@@ -234,14 +233,14 @@ def _get_schedule_pattern(heat_schedule):
             if sqlitedb:
                 schedule_pattern = models.SchedulePattern.query.filter_by(id=heat_schedule.pattern_id_presence).first()
             else:
-                schedule_pattern = SchedulePattern.find_one({SchedulePattern.id: heat_schedule.pattern_id_presence})
+                schedule_pattern = m.SchedulePattern.find_one({m.SchedulePattern.id: heat_schedule.pattern_id_presence})
         if delta >= P.AWAY_SEC and heat_schedule.pattern_id_no_presence is not None:
             # no move for a while, switch to away
             L.l.info("No move detected, set away heat pattern in zone id {}".format(heat_schedule.zone_id))
             if sqlitedb:
                 schedule_pattern = models.SchedulePattern.query.filter_by(id=heat_schedule.pattern_id_no_presence).first()
             else:
-                schedule_pattern = SchedulePattern.find_one({SchedulePattern.id: heat_schedule.pattern_id_no_presence})
+                schedule_pattern = m.SchedulePattern.find_one({m.SchedulePattern.id: heat_schedule.pattern_id_no_presence})
     # if no recent move or away detected, set normal schedule
     if schedule_pattern is None:
         if weekday <= 4:  # Monday=0
@@ -251,7 +250,7 @@ def _get_schedule_pattern(heat_schedule):
         if sqlitedb:
             schedule_pattern = models.SchedulePattern.query.filter_by(id=patt_id).first()
         else:
-            schedule_pattern = SchedulePattern.find_one({SchedulePattern.id: patt_id})
+            schedule_pattern = m.SchedulePattern.find_one({m.SchedulePattern.id: patt_id})
     return schedule_pattern
 
 
@@ -262,7 +261,7 @@ def _get_heat_off_condition(schedule_pattern):
     if sqlitedb:
         zone_heat_relay = models.ZoneHeatRelay.query.filter_by(heat_pin_name=relay_name).first()
     else:
-        zone_heat_relay = ZoneHeatRelay.find_one({ZoneHeatRelay.heat_pin_name: relay_name})
+        zone_heat_relay = m.ZoneHeatRelay.find_one({m.ZoneHeatRelay.heat_pin_name: relay_name})
     if zone_heat_relay is not None:
         force_off = zone_heat_relay.heat_is_on is False
         # if force_off:
@@ -322,12 +321,12 @@ def _update_zone_heat(zone, heat_schedule, sensor):
     if sqlitedb:
         zone_thermo = models.ZoneThermostat.query.filter_by(zone_id=zone.id).first()
     else:
-        zone_thermo = ZoneThermostat.find_one({ZoneThermostat.zone_id: zone.id})
+        zone_thermo = m.ZoneThermostat.find_one({m.ZoneThermostat.zone_id: zone.id})
     if zone_thermo is None:
         if sqlitedb:
             zone_thermo = models.ZoneThermostat()
         else:
-            zone_thermo = ZoneThermostat()
+            zone_thermo = m.ZoneThermostat()
         zone_thermo.zone_id = zone.id
         zone_thermo.zone_name = zone.name
         if sqlitedb:
@@ -379,23 +378,23 @@ def loop_zones():
         if sqlitedb:
             zone_list = models.Zone().query_all()
         else:
-            zone_list = Zone.find()
+            zone_list = m.Zone.find()
         global progress_status
         for zone in zone_list:
             P.thread_pool_status = 'do zone {}'.format(zone.name)
             if sqlitedb:
                 heat_schedule = models.HeatSchedule.query.filter_by(zone_id=zone.id, season=P.season).first()
-                zonesensor_list = models.ZoneSensor.query.filter_by(zone_id=zone.id, is_main=True).all()
+                m.ZoneSensor_list = models.ZoneSensor.query.filter_by(zone_id=zone.id, is_main=True).all()
             else:
-                heat_schedule = HeatSchedule.find_one({HeatSchedule.zone_id: zone.id, HeatSchedule.season: P.season})
-                zonesensor_list = ZoneSensor.find({ZoneSensor.zone_id: zone.id, ZoneSensor.is_main: True})
+                heat_schedule = m.HeatSchedule.find_one({m.HeatSchedule.zone_id: zone.id, m.HeatSchedule.season: P.season})
+                m.ZoneSensor_list = m.ZoneSensor.find({m.ZoneSensor.zone_id: zone.id, m.ZoneSensor.is_main: True})
             sensor_processed = {}
-            for zonesensor in zonesensor_list:
-                if heat_schedule is not None and zonesensor is not None:
+            for zonesensor in m.ZoneSensor_list:
+                if heat_schedule is not None and m.ZoneSensor is not None:
                     if sqlitedb:
                         sensor = models.Sensor.query.filter_by(address=zonesensor.sensor_address).first()
                     else:
-                        sensor = Sensor.find_one({Sensor.address: zonesensor.sensor_address})
+                        sensor = m.Sensor.find_one({m.Sensor.address: m.ZoneSensor.sensor_address})
                     if sensor is not None:
                         # sensor_last_update_seconds = (utils.get_base_location_now_date() - sensor.updated_on).total_seconds()
                         # if sensor_last_update_seconds > 120 * 60:
@@ -404,10 +403,10 @@ def loop_zones():
                         heat_state, main_source_needed = _update_zone_heat(zone, heat_schedule, sensor)
                         if not heat_is_on:
                             heat_is_on = main_source_needed and heat_state
-                        if zonesensor.zone_id in sensor_processed:
+                        if m.ZoneSensor.zone_id in sensor_processed:
                             prev_sensor = sensor_processed[zonesensor.zone_id]
                             L.l.warning('Already processed temp sensor {} in zone {}, duplicate?'.format(
-                                prev_sensor, zonesensor.zone_id))
+                                prev_sensor, m.ZoneSensor.zone_id))
                         else:
                             sensor_processed[zonesensor.zone_id] = sensor.sensor_name
 
@@ -418,17 +417,17 @@ def loop_zones():
             if heatrelay_main_source is None:
                 heatrelay_main_source = models.ZoneHeatRelay.query.filter_by(is_main_heat_source=1).first()
         else:
-            heatrelay_main_source = ZoneHeatRelay.find_one({ZoneHeatRelay.is_alternate_heat_source: True})
+            heatrelay_main_source = m.ZoneHeatRelay.find_one({m.ZoneHeatRelay.is_alternate_heat_source: True})
             if heatrelay_main_source is None:
-                heatrelay_main_source = ZoneHeatRelay.find_one({ZoneHeatRelay.is_main_heat_source: True})
+                heatrelay_main_source = m.ZoneHeatRelay.find_one({m.ZoneHeatRelay.is_main_heat_source: True})
         if heatrelay_main_source is not None:
             # L.l.info("Main heat relay={}".format(heatrelay_main_source))
             if sqlitedb:
                 main_source_zone = models.Zone.query.filter_by(id=heatrelay_main_source.zone_id).first()
                 main_thermo = models.ZoneThermostat.query.filter_by(zone_id=main_source_zone.id).first()
             else:
-                main_source_zone = Zone.find_one({Zone.id: heatrelay_main_source.zone_id})
-                main_thermo = ZoneThermostat.find_one({ZoneThermostat.zone_id: main_source_zone.id})
+                main_source_zone = m.Zone.find_one({m.Zone.id: heatrelay_main_source.zone_id})
+                main_thermo = m.ZoneThermostat.find_one({m.ZoneThermostat.zone_id: main_source_zone.id})
             if main_source_zone is not None:
                 update_age_mins = (utils.get_base_location_now_date() - P.last_main_heat_update).total_seconds() / 60
                 # # avoid setting relay state too often but do periodic refreshes every x minutes
@@ -453,7 +452,7 @@ def loop_heat_relay():
         heat_relay_list = models.ZoneHeatRelay().query_filter_all(
             models.ZoneHeatRelay.gpio_host_name.in_([Constant.HOST_NAME]))
     else:
-        heat_relay_list = ZoneHeatRelay.find({ZoneHeatRelay.gpio_host_name: Constant.HOST_NAME})
+        heat_relay_list = m.ZoneHeatRelay.find({m.ZoneHeatRelay.gpio_host_name: Constant.HOST_NAME})
     for heat_relay in heat_relay_list:
         gpio_pin = None
         try:
@@ -461,8 +460,9 @@ def loop_heat_relay():
                 gpiopin_list = models.GpioPin.query.filter_by(
                     pin_code=heat_relay.gpio_pin_code, host_name=Constant.HOST_NAME).all()
             else:
-                gpiopin_list = GpioPin.find({GpioPin.pin_code: heat_relay.gpio_pin_code,
-                                             GpioPin.host_name: Constant.HOST_NAME})
+                # gpiopin_list = GpioPin.find({GpioPin.pin_code: heat_relay.gpio_pin_code,
+                #                             GpioPin.host_name: Constant.HOST_NAME})
+                pass
             if len(gpiopin_list) == 0:
                 L.l.warning("Cannot find gpiopin_bcm for heat relay={} zone={}".format(
                     heat_relay.gpio_pin_code, heat_relay.heat_pin_name))
@@ -477,7 +477,7 @@ def loop_heat_relay():
                     if sqlitedb:
                         zone = models.Zone().query_filter_first(models.Zone.id.in_([heat_relay.zone_id]))
                     else:
-                        zone = Zone.find_one({Zone.id: heat_relay.zone_id})
+                        zone = m.Zone.find_one({m.Zone.id: heat_relay.zone_id})
                     relay_inconsistency = heat_relay.heat_is_on != pin_state
                     zone_inconsistency = zone.heat_is_on != heat_relay.heat_is_on
                     if relay_inconsistency:
@@ -500,10 +500,11 @@ def loop_heat_relay():
 def set_main_heat_source():
     P.thread_pool_status = 'set main source'
     if sqlitedb:
-        heat_source_relay_list = models.ZoneHeatRelay.query.filter(models.ZoneHeatRelay.temp_sensor_name is not None).all()
+        heat_source_relay_list = models.ZoneHeatRelay.query.filter(
+            models.ZoneHeatRelay.temp_sensor_name is not None).all()
     else:
         # fixme: negated query
-        heat_source_relay_list = ZoneHeatRelay.find({'$not': {ZoneHeatRelay.temp_sensor_name: None}})
+        heat_source_relay_list = m.ZoneHeatRelay.find({'$not': {m.ZoneHeatRelay.temp_sensor_name: None}})
     up_limit = P.temp_limit + P.threshold
     for heat_source_relay in heat_source_relay_list:
         # is there is a temp sensor defined, consider this source as possible alternate source
@@ -512,7 +513,7 @@ def set_main_heat_source():
                 temp_rec = models.Sensor().query_filter_first(
                     models.Sensor.sensor_name.in_([heat_source_relay.temp_sensor_name]))
             else:
-                temp_rec = Sensor.find_one({Sensor.sensor_name: heat_source_relay.temp_sensor_name})
+                temp_rec = m.Sensor.find_one({m.Sensor.sensor_name: heat_source_relay.temp_sensor_name})
             # if alternate source is valid
             # fixok: add temp threshold to avoid quick on/offs
             if temp_rec is not None \
@@ -524,14 +525,14 @@ def set_main_heat_source():
                         heatrelay_main_source = models.ZoneHeatRelay.query.filter_by(is_main_heat_source=1).first()
                         main_source_zone = models.Zone.query.filter_by(id=heatrelay_main_source.zone_id).first()
                     else:
-                        heatrelay_main_source = ZoneHeatRelay.find_one({ZoneHeatRelay.is_main_heat_source: 1})
-                        main_source_zone = Zone.find_one({Zone.id: heatrelay_main_source.zone_id})
+                        heatrelay_main_source = m.ZoneHeatRelay.find_one({m.ZoneHeatRelay.is_main_heat_source: 1})
+                        main_source_zone = m.Zone.find_one({m.Zone.id: heatrelay_main_source.zone_id})
                     __save_heat_state_db(zone=main_source_zone, heat_is_on=False)
                     # turn switch valve on to alternate position
                     if sqlitedb:
                         switch_source_zone = models.Zone.query.filter_by(id=heat_source_relay.zone_id).first()
                     else:
-                        switch_source_zone = Zone.find_one({Zone.id: heat_source_relay.zone_id})
+                        switch_source_zone = m.Zone.find_one({m.Zone.id: heat_source_relay.zone_id})
                     __save_heat_state_db(zone=switch_source_zone, heat_is_on=True)
                 else:
                     # mark this source as active, to be started when there is heat need
@@ -554,7 +555,7 @@ def set_main_heat_source():
                     if sqlitedb:
                         switch_source_zone = models.Zone.query.filter_by(id=heat_source_relay.zone_id).first()
                     else:
-                        switch_source_zone = Zone.find_one({Zone.id: heat_source_relay.zone_id})
+                        switch_source_zone = m.Zone.find_one({m.Zone.id: heat_source_relay.zone_id})
                     __save_heat_state_db(zone=switch_source_zone, heat_is_on=False)
                 else:
                     # mark this source as inactive, let main source to start
@@ -563,7 +564,7 @@ def set_main_heat_source():
                         if sqlitedb:
                             alt_source_zone = models.Zone.query.filter_by(id=heat_source_relay.zone_id).first()
                         else:
-                            alt_source_zone = Zone.find_one({Zone.id: heat_source_relay.zone_id})
+                            alt_source_zone = m.Zone.find_one({m.Zone.id: heat_source_relay.zone_id})
                         __save_heat_state_db(zone=alt_source_zone, heat_is_on=False)
                         # todo: sleep needed to allow for valve return
                     if heat_source_relay.is_alternate_heat_source is True:
@@ -581,7 +582,7 @@ def _handle_presence(zone_name=None, zone_id=None):
         if sqlitedb:
             heat_thermo = models.ZoneThermostat.query.filter_by(zone_id=zone_id).first()
         else:
-            heat_thermo = ZoneThermostat.find_one({ZoneThermostat.zone_id: zone_id})
+            heat_thermo = m.ZoneThermostat.find_one({m.ZoneThermostat.zone_id: zone_id})
         if heat_thermo is not None:
             heat_thermo.last_presence_set = datetime.datetime.now()
         else:
@@ -605,7 +606,7 @@ def _zoneheatrelay_upsert_listener(record, changed_fields):
 
 def _zonethermostat_upsert_listener(record, changed_fields):
     # activate manual mode if set by user in UI
-    if hasattr(record, ZoneThermostat.is_mode_manual) and record.is_mode_manual is True:
+    if hasattr(record, m.ZoneThermostat.is_mode_manual) and record.is_mode_manual is True:
         record.last_manual_set = datetime.datetime.now()
         record.save_changed_fields()
         L.l.info('Set thermostat active={} zone={}'.format(record.is_mode_manual, record.zone_name))
@@ -641,7 +642,7 @@ def init():
     # dispatcher.connect(handle_event_heat, signal=Constant.SIGNAL_HEAT, sender=dispatcher.Any)
     thread_pool.add_interval_callable(thread_run, 30)
     P.initialised = True
-    ZoneHeatRelay.add_upsert_listener(_zoneheatrelay_upsert_listener)
-    ZoneThermostat.add_upsert_listener(_zonethermostat_upsert_listener)
+    m.ZoneHeatRelay.add_upsert_listener(_zoneheatrelay_upsert_listener)
+    m.ZoneThermostat.add_upsert_listener(_zonethermostat_upsert_listener)
     # P.debug = True
 

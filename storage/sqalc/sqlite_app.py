@@ -103,10 +103,8 @@ def unload_module(module_name):
 
 
 def init_modules(init_mod=None):
-    import admin.models
     import admin.model_helper
     from common import Constant
-    from main.logger_helper import L
 
     m = admin.models.Module
     # http://docs.sqlalchemy.org/en/rel_0_9/core/sqlelement.html
@@ -236,7 +234,6 @@ def init():
     db = SQLAlchemy(app)
 
     L.l.info('Checking main db tables')
-    import admin.models
     import admin.model_helper
     global MODEL_AUTO_UPDATE
 
@@ -311,7 +308,7 @@ def init():
     # trap all DB changes and propagate to event.py
     @models_committed.connect_via(app)
     def on_models_committed(sender, changes):
-        from main.admin import event
+        from storage.sqalc import event
         # L.l.debug('Model commit detected sender {} change {}'.format(sender, changes))
         event.on_models_committed(sender, changes)
         # pass
@@ -352,7 +349,6 @@ def run(arg_list):
         except Exception as ex:
             print("Error in remote debug: {}".format(ex))
     import logging
-    from main import logger_helper
     if 'debug' in arg_list:
         L.LOGGING_LEVEL = logging.DEBUG
     elif 'warning' in arg_list:

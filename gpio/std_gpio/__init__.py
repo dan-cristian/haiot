@@ -6,7 +6,7 @@ from main import sqlitedb
 from common import Constant
 # from main.admin import models
 #from main.admin.model_helper import commit
-from main.tinydb_model import GpioPin
+from storage.tiny.tinydb_model import GpioPin
 
 initialised = False
 __pins_setup_list = []

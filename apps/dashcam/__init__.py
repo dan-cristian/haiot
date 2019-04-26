@@ -1,7 +1,6 @@
 from main.logger_helper import L
 from main import thread_pool
 from common import Constant
-import ui
 import threading
 import prctl
 from pydispatch import dispatcher
@@ -10,8 +9,8 @@ import recorder
 from recorder import uploader
 import gps
 import accel
-from collections import namedtuple
-from main.admin import models
+from storage.sqalc import models
+
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 initialised = False

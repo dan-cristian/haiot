@@ -9,7 +9,7 @@ if sqlitedb:
 import time
 import six
 from pydispatch import dispatcher as haiot_dispatch
-from main.tinydb_model import Sensor, ZoneSensor, ZoneCustomRelay
+from storage.model import m
 
 
 class P:
@@ -102,13 +102,13 @@ def _set_custom_relay_state(sensor_address, state):
         current_relay = models.ZoneCustomRelay.query.filter_by(
             gpio_pin_code=sensor_address, gpio_host_name=Constant.HOST_NAME).first()
     else:
-        current_relay = ZoneCustomRelay.find_one({
-            ZoneCustomRelay.gpio_pin_code: sensor_address, ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME})
+        current_relay = m.ZoneCustomRelay.find_one({
+            m.ZoneCustomRelay.gpio_pin_code: sensor_address, m.ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME})
     if current_relay is not None:
         if sqlitedb:
             new_relay = models.ZoneCustomRelay(gpio_pin_code=sensor_address, gpio_host_name=Constant.HOST_NAME)
         else:
-            new_relay = ZoneCustomRelay()
+            new_relay = m.ZoneCustomRelay()
             new_relay.gpio_pin_code = sensor_address
             new_relay.gpio_host_name = Constant.HOST_NAME
         new_relay.relay_is_on = state
@@ -136,7 +136,7 @@ def set_value(network, node, value):
         if sqlitedb:
             zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=sensor_address).first()
         else:
-            zone_sensor = ZoneSensor.find_one({ZoneSensor.sensor_address: sensor_address})
+            zone_sensor = m.ZoneSensor.find_one({m.ZoneSensor.sensor_address: sensor_address})
         if zone_sensor is not None:
             sensor_name = zone_sensor.sensor_name
             P.last_value_received = datetime.now()
@@ -161,7 +161,7 @@ def set_value(network, node, value):
                     if sqlitedb:
                         current_record = models.Sensor.query.filter_by(address=sensor_address).first()
                     else:
-                        current_record = Sensor.find_one({Sensor.address: sensor_address})
+                        current_record = m.Sensor.find_one({m.Sensor.address: sensor_address})
                     if current_record is None:
                         sensor_name = zone_sensor.sensor_name
                         delta_last_save = 0
@@ -175,7 +175,7 @@ def set_value(network, node, value):
                     if sqlitedb:
                         record = models.Sensor(address=sensor_address, sensor_name=sensor_name)
                     else:
-                        record = Sensor()
+                        record = m.Sensor()
                         record.address = sensor_address
                         record.sensor_name = sensor_name
                     record.is_event_external = True
