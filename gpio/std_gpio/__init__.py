@@ -4,9 +4,10 @@ from main.logger_helper import L
 from main import sqlitedb
 # from main import db
 from common import Constant
-# from main.admin import models
-#from main.admin.model_helper import commit
-from storage.tiny.tinydb_model import GpioPin
+if sqlitedb:
+    from storage.sqalc import models
+    from storage.sqalc.model_helper import commit
+from storage.model import m
 
 initialised = False
 __pins_setup_list = []
@@ -16,7 +17,7 @@ def __get_gpio_db_pin(bcm_id=None):
     if sqlitedb:
         gpio_pin = models.GpioPin.query.filter_by(pin_index_bcm=bcm_id, host_name=Constant.HOST_NAME).first()
     else:
-        gpio_pin = GpioPin.find_one({GpioPin.pin_index_bcm: bcm_id, GpioPin.host_name: Constant.HOST_NAME})
+        gpio_pin = m.GpioPin.find_one({m.GpioPin.pin_index_bcm: bcm_id, m.GpioPin.host_name: Constant.HOST_NAME})
     return gpio_pin
 
 
@@ -98,7 +99,10 @@ def __unsetup_pin(bcm_id=''):
         if __write_to_file_as_root('/sys/class/gpio/unexport', bcm_id):
             L.l.info('Pin {} unexport OK'.format(bcm_id))
         __pins_setup_list.remove(bcm_id)
-        gpio_pin = models.GpioPin.query.filter_by(pin_index_bcm=bcm_id, host_name=Constant.HOST_NAME).first()
+        if sqlitedb:
+            gpio_pin = models.GpioPin.query.filter_by(pin_index_bcm=bcm_id, host_name=Constant.HOST_NAME).first()
+        else:
+            pass
         if gpio_pin:
             gpio_pin.is_active = False
         else:
@@ -111,12 +115,16 @@ def __is_pin_setup(bcm_id=''):
     try:
         file = open('/sys/class/gpio/gpio{}/value'.format(bcm_id), 'r')
         file.close()
-        gpio_pin = models.GpioPin.query.filter_by(pin_index_bcm=bcm_id, host_name=Constant.HOST_NAME).first()
+        if sqlitedb:
+            gpio_pin = models.GpioPin.query.filter_by(pin_index_bcm=bcm_id, host_name=Constant.HOST_NAME).first()
+        else:
+            pass
         if gpio_pin and not gpio_pin.is_active:
             L.l.warning(
                 'Gpio pin={} is used not via me, conflict with ext. apps or unclean stop?'.format(bcm_id))
             gpio_pin.is_active = True
-            commit()
+            if sqlitedb:
+                commit()
         return True
     except IOError:
         return False
@@ -167,10 +175,14 @@ def get_pin_bcm(bcm_id=''):
         __set_pin_dir_in(bcm_id)
     if __is_pin_setup(bcm_id):
         pin_value = __read_line(bcm_id)
-        gpio_pin = models.GpioPin.query.filter_by(pin_index_bcm=bcm_id, host_name=Constant.HOST_NAME).first()
+        if sqlitedb:
+            gpio_pin = models.GpioPin.query.filter_by(pin_index_bcm=bcm_id, host_name=Constant.HOST_NAME).first()
+        else:
+            pass
         if gpio_pin:
             gpio_pin.pin_value = pin_value
-            commit()
+            if sqlitedb:
+                commit()
         return pin_value
     else:
         L.l.critical('Unable to get pin bcm {}'.format(bcm_id))
