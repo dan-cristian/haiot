@@ -97,6 +97,7 @@ class DictTable:
         if bypass_document_validation is False:
             if key in doc:
                 if doc[key] in self.table:
+                    L.l.error('Cannot insert, record exist')
                     return None
             else:
                 if key != 'id':
@@ -106,43 +107,50 @@ class DictTable:
         if 'id' not in doc or doc['id'] is None:
             self.id += 1
             doc['id'] = self.id
-        if key in self.index:
+        if len(self.index) > 0:
             L.l.info('Invalidating index on insert {}'.format(self.model_class.__name__))
-            self.index.pop(key, None)  # delete key from index
+            self.index.clear()  # delete key from index
         self.table[doc[key]] = doc
         return {'inserted_id': doc['id']}
 
     def update_one(self, key, doc):
-        if key == self.model_class._column_list[0]:
-            good_key_val = doc[key]
-        else:
-            if key not in self.index:
-                self._add_index(new_key=key)
-            if key in self.index:
-                indexed_recs = self.index[key]
-                good_key_val = indexed_recs[doc[key]][self.model_class._main_key]
+        try:
+            if key == self.model_class._column_list[0]:
+                good_key_val = doc[key]
             else:
-                new_key = list(doc)[0]
-                good_key_val = None
-                for rec in self.table:
-                    if new_key in self.table[rec] and self.table[rec][new_key] == doc[new_key]:
-                        good_key_val = rec
-                        break
-                if good_key_val is None:
-                    L.l.error('Failed to find record for update by key {}'.format(key))
-                    return None
+                if key not in self.index:
+                    self._add_index(new_key=key)
+                if key in self.index:
+                    indexed_recs = self.index[key]
+                    if doc[key] in indexed_recs:
+                        good_key_val = indexed_recs[doc[key]][self.model_class._main_key]
+                    else:
+                        L.l.error('Key not in index')
+                else:
+                    new_key = list(doc)[0]
+                    good_key_val = None
+                    for rec in self.table:
+                        if new_key in self.table[rec] and self.table[rec][new_key] == doc[new_key]:
+                            good_key_val = rec
+                            break
+                    if good_key_val is None:
+                        L.l.error('Failed to find record for update by key {}'.format(key))
+                        return None
 
-        for fld in doc:
-            if fld not in self.model_class._column_list:
-                L.l.warning('Unexpected new field {} on updating {}'.format(fld, self.model_class.__name__))
-            if fld in self.table[good_key_val] and self.table[good_key_val][fld] != doc[fld]:
-                if fld in self.index:
-                    L.l.info('Invalidating index on update{}'.format(self.model_class.__name__))
-                    self.index.pop(key, None)  # delete key from index
-                self.table[good_key_val][fld] = doc[fld]
-        if self.model_class._main_key in doc:
-            return doc[self.model_class._main_key]
-        else:
+            for fld in doc:
+                if fld not in self.model_class._column_list:
+                    L.l.warning('Unexpected new field {} on updating {}'.format(fld, self.model_class.__name__))
+                if fld in self.table[good_key_val] and self.table[good_key_val][fld] != doc[fld]:
+                    if fld in self.index:
+                        L.l.info('Invalidating index on update{}'.format(self.model_class.__name__))
+                        self.index.pop(key, None)  # delete key from index
+                    self.table[good_key_val][fld] = doc[fld]
+            if self.model_class._main_key in doc:
+                return doc[self.model_class._main_key]
+            else:
+                return None
+        except KeyError as ke:
+            L.l.error('Key error {}'.format(ke), exc_info=True)
             return None
 
 
@@ -262,18 +270,14 @@ class ModelBase(metaclass=OrderedClassMembers):
 
         if len(update) > 0:
             if key is not None:
-                exist = cls.find_one(filter=key)
-                if exist is not None:
+                if cls.find_one(filter=key) is not None:
                     res = cls.update_one(query=key, doc={"$set": update})
                     # L.l.info('Updated key {}, {}'.format(key, self.__repr__()))
                 else:
                     res = cls.insert_one(update, bypass_document_validation=True)
                     # L.l.info('Inserted key {}, {} with eid={}'.format(key, self.__repr__(), res.eid))
                 # execute listener
-                if cls_name in cls._upsert_listener_list:
-                    has_listener = True
-                else:
-                    has_listener = False
+                has_listener = cls_name in cls._upsert_listener_list
                 record = cls.find_one(filter=key)
                 rec_clone = cls(copy=record.__dict__)
                 change_list = list(update.keys())
