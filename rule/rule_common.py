@@ -2,17 +2,17 @@ import subprocess
 from main.logger_helper import L
 from main import sqlitedb
 if sqlitedb:
-    from main.admin import models
+    from storage.sqalc import models
 from common import Constant
 from pydispatch import dispatcher
-from main.tinydb_model import ZoneCustomRelay
+from storage.model import m
 
 
 def update_custom_relay(relay_pin_name, power_is_on):
     if sqlitedb:
         current_relay = models.ZoneCustomRelay.query.filter_by(relay_pin_name=relay_pin_name).first()
     else:
-        current_relay = ZoneCustomRelay.find_one({ZoneCustomRelay.relay_pin_name: relay_pin_name})
+        current_relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.relay_pin_name: relay_pin_name})
     if current_relay is not None:
         L.l.info("Update relay {} on rule common to {}".format(relay_pin_name, power_is_on))
         current_relay.relay_is_on = power_is_on
@@ -25,7 +25,7 @@ def get_custom_relay(relay_pin_name):
     if sqlitedb:
         current_relay = models.ZoneCustomRelay.query.filter_by(relay_pin_name=relay_pin_name).first()
     else:
-        current_relay = ZoneCustomRelay.find_one({ZoneCustomRelay.relay_pin_name: relay_pin_name})
+        current_relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.relay_pin_name: relay_pin_name})
     if current_relay is not None:
         state = current_relay.relay_is_on
     else:

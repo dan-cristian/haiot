@@ -1,5 +1,5 @@
 from datetime import datetime
-from main.tinydb_helper import TinyBase
+from storage.tiny.tinydb_helper import TinyBase
 
 
 class Module(TinyBase):

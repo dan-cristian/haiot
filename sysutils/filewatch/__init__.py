@@ -1,7 +1,5 @@
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
-import sys
-import time
 import os
 try:
     from watchdog.observers import Observer
@@ -11,7 +9,7 @@ except Exception as ex:
     __inotify_import_ok = False
 from pydispatch import dispatcher
 from main.logger_helper import L
-from main.admin import model_helper
+from storage.sqalc import model_helper
 from common import Constant
 
 initialised = False

@@ -1,7 +1,7 @@
 import pygal
 from pygal import style
 from flask import render_template, request
-from main.admin import models
+from storage.sqalc import models
 from main import app
 from common import utils
 import time
@@ -19,7 +19,8 @@ def __config_graph():
 def render_dashboard():
 
     #sensors = models.Sensor().query_filter_all(models.Sensor.temperature.isnot(None))
-    sensors = models.Sensor.query.order_by(models.Sensor.sensor_name).filter(models.Sensor.temperature.isnot(None)).all()
+    sensors = models.Sensor.query.order_by(models.Sensor.sensor_name).filter(
+        models.Sensor.temperature.isnot(None)).all()
     config = __config_graph()
     config.height = 400
     config.explicit_size = True

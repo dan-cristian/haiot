@@ -3,9 +3,9 @@ from common import Constant, utils
 from pydispatch import dispatcher
 from main import sqlitedb
 if sqlitedb:
-    from main.admin import models, model_helper
+    from storage.sqalc import model_helper, models
     from sqlalchemy import desc
-from main.tinydb_model import Utility
+from storage.model import m
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 
@@ -16,12 +16,12 @@ def not_used_record_update(obj, source_host):
     if sqlitedb:
         utility_rec = utils.json_to_record(models.Utility(), obj)
     else:
-        utility_rec = Utility()
+        utility_rec = m.Utility()
     if source_host != Constant.HOST_NAME:
         if sqlitedb:
             current_rec = models.Utility.query.filter_by(utility_name=utility_rec.utility_name).first()
         else:
-            current_rec = Utility.find_one({Utility.utility_name: utility_rec.utility_name})
+            current_rec = m.Utility.find_one({m.Utility.utility_name: utility_rec.utility_name})
         utility_rec.save_changed_fields(current_record=current_rec, notify_transport_enabled=False, save_to_graph=False)
 
 
@@ -32,7 +32,7 @@ def __utility_update_ex(sensor_name, value, unit=None, index=None):
             if sqlitedb:
                 record = models.Utility(sensor_name=sensor_name)
             else:
-                record = Utility()
+                record = m.Utility()
                 record.sensor_name = sensor_name
             if sqlitedb:
                 if index is None:
@@ -41,9 +41,10 @@ def __utility_update_ex(sensor_name, value, unit=None, index=None):
                     current_record = models.Utility.query.filter_by(sensor_name=sensor_name, sensor_index=index).first()
             else:
                 if index is None:
-                    current_record = Utility.find_one({Utility.sensor_name: sensor_name})
+                    current_record = m.Utility.find_one({m.Utility.sensor_name: sensor_name})
                 else:
-                    current_record = Utility.find_one({Utility.sensor_name: sensor_name, Utility.sensor_index: index})
+                    current_record = m.Utility.find_one({m.Utility.sensor_name: sensor_name, 
+                                                         m.Utility.sensor_index: index})
             if current_record is not None:
                 if current_record.units_total is None:
                     # need to get
@@ -118,9 +119,10 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
                     record = models.Utility(sensor_name=sensor_name)
                     current_record = models.Utility.query.filter_by(sensor_name=sensor_name, sensor_index=index).first()
                 else:
-                    record = Utility()
+                    record = m.Utility()
                     record.sensor_name = sensor_name
-                    current_record = Utility.find_one({Utility.sensor_name: sensor_name, Utility.sensor_index: index})
+                    current_record = m.Utility.find_one({m.Utility.sensor_name: sensor_name, 
+                                                         m.Utility.sensor_index: index})
                 if current_record is not None:
                     record.sensor_index = index
                     record.utility_name = current_record.utility_name

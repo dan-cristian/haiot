@@ -3,9 +3,9 @@ from main.logger_helper import L
 from common import Constant, utils
 from main import sqlitedb
 if sqlitedb:
-    from main.admin import models
-    from main.admin.model_helper import commit
-from main.tinydb_model import ZoneAlarm, ZoneArea, Area, GpioPin, Zone
+    from storage.sqalc import models
+    from storage.sqalc.model_helper import commit
+from storage.model import m
 from gpio import io_common
 __author__ = 'dcristian'
 
@@ -17,24 +17,24 @@ def handle_event_alarm(gpio_pin_code='', direction='', pin_value='', pin_connect
         zonealarm = models.ZoneAlarm.query.filter_by(
             gpio_pin_code=gpio_pin_code, gpio_host_name=Constant.HOST_NAME).first()
     else:
-        zonealarm = ZoneAlarm.find_one(
-            {ZoneAlarm.gpio_pin_code: gpio_pin_code,ZoneAlarm.gpio_host_name: Constant.HOST_NAME})
+        zonealarm = m.ZoneAlarm.find_one(
+            {m.ZoneAlarm.gpio_pin_code: gpio_pin_code, m.ZoneAlarm.gpio_host_name: Constant.HOST_NAME})
     if zonealarm is not None:
         if sqlitedb:
             zonearea = models.ZoneArea().query_filter_first(models.ZoneArea.zone_id == zonealarm.zone_id)
         else:
-            zonearea = ZoneArea.find_one({ZoneArea.zone_id: zonealarm.zone_id})
+            zonearea = m.ZoneArea.find_one({m.ZoneArea.zone_id: zonealarm.zone_id})
         if zonearea is not None:
             if sqlitedb:
                 area = models.Area().query_filter_first(models.Area.id == zonearea.area_id)
             else:
-                area = Area.find_one({Area.id: zonearea.area_id})
+                area = m.Area.find_one({m.Area.id: zonearea.area_id})
             if area is not None:
                 zonealarm.start_alarm = area.is_armed
                 if sqlitedb:
                     zone = models.Zone.query.filter_by(id=zonealarm.zone_id).first()
                 else:
-                    zone = Zone.find_one({Zone.id: zonealarm.zone_id})
+                    zone = m.Zone.find_one({m.Zone.id: zonealarm.zone_id})
                 if zone is not None:
                     dispatcher.send(signal=Constant.SIGNAL_ALARM, zone_name=zone.name,
                                     alarm_pin_name=zonealarm.alarm_pin_name, pin_connected=pin_connected)
@@ -77,7 +77,7 @@ def init():
     if sqlitedb:
         local_alarms = models.ZoneAlarm().query_filter_all(models.ZoneAlarm.gpio_host_name.in_([Constant.HOST_NAME]))
     else:
-        local_alarms = ZoneAlarm.find({ZoneAlarm.gpio_host_name: Constant.HOST_NAME})
+        local_alarms = m.ZoneAlarm.find({m.ZoneAlarm.gpio_host_name: Constant.HOST_NAME})
     for alarm in local_alarms:
         # L.l.info("Processing zone alarm {} for host {}".format(alarm, Constant.HOST_NAME))
         if sqlitedb:
@@ -85,7 +85,7 @@ def init():
                 models.GpioPin.pin_code.in_([alarm.gpio_pin_code]), models.GpioPin.host_name.in_([Constant.HOST_NAME]))
         else:
             # gpio_pin = GpioPin.find_one({GpioPin.pin_code: alarm.gpio_pin_code, GpioPin.host_name: Constant.HOST_NAME})
-            gpio_pin = GpioPin()
+            gpio_pin = m.GpioPin()
             gpio_pin.host_name = Constant.HOST_NAME
             gpio_pin.contact_type = alarm.sensor_type
             if alarm.relay_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
