@@ -5,7 +5,7 @@ from common import Constant, utils, get_json_param
 from main import thread_pool, sqlitedb
 if sqlitedb:
     from storage.sqalc import models
-from storage.tiny.tinydb_model import Sensor, ZoneSensor, Utility
+from storage.model import m
 
 
 class P:
@@ -56,16 +56,16 @@ def thread_run():
                 if sqlitedb:
                     zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=panel_id).first()
                 else:
-                    zone_sensor = ZoneSensor.find_one({ZoneSensor.sensor_address: panel_id})
+                    zone_sensor = m.ZoneSensor.find_one({m.ZoneSensor.sensor_address: panel_id})
                 if zone_sensor is None:
                     L.l.warning('Solar panel id {} is not defined in zone sensor list'.format(panel_id))
                 if sqlitedb:
                     record = models.Sensor(address=panel_id)
                     current_record = models.Sensor.query.filter_by(address=panel_id).first()
                 else:
-                    record = Sensor()
+                    record = m.Sensor()
                     record.address = panel_id
-                    current_record = Sensor.find_one({Sensor.address: panel_id})
+                    current_record = m.Sensor.find_one({m.Sensor.address: panel_id})
                 record.type = 'solar'
                 if current_record is not None:
                     record.sensor_name = current_record.sensor_name
@@ -85,8 +85,8 @@ def thread_run():
                     record = models.Utility()
                     current_record = models.Utility.query.filter_by(utility_name=utility_name).first()
                 else:
-                    record = Utility()
-                    current_record = Utility.find_one({Utility.utility_name: utility_name})
+                    record = m.Utility()
+                    current_record = m.Utility.find_one({m.Utility.utility_name: utility_name})
                 record.utility_name = utility_name
                 if current_record is not None:
                     if current_record.units_total is None:

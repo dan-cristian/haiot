@@ -1,5 +1,4 @@
 from main import sqlitedb
-from storage.tiny.tinydb_app import db
 from main.logger_helper import L
 from common import utils, Constant
 if sqlitedb:
@@ -72,5 +71,4 @@ def not_used_record_update(obj):
             #                    sampling_period_seconds=owsensor_loop.sampling_period_seconds)
     except Exception as ex:
         L.l.error('Error on sensor update, err {}'.format(ex), exc_info=True)
-        if sqlitedb:
-            db.session.rollback()
+        

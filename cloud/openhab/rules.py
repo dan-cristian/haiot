@@ -11,7 +11,7 @@ from common import Constant
 
 class P:
     openhab_topic = None
-    ignored_fields = ['updated_on', '_id']
+    ignored_fields = ['updated_on', 'id']
 
     def __init__(self):
         pass

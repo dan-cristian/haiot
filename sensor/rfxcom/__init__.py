@@ -13,7 +13,7 @@ if sqlitedb:
 from sensor import serial_common
 from sensor.rfxcom import RFXtrx
 from sensor.rfxcom.RFXtrx import PySerialTransport
-from storage.tiny.tinydb_model import Sensor, ZoneSensor
+from storage.model import m
 
 
 class P:
@@ -66,9 +66,9 @@ def __save_sensor_db(p_id='', p_type='', value_list=None):
         assert isinstance(record, models.Sensor)
         zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=p_id).first()
     else:
-        record = Sensor()
+        record = m.Sensor()
         record.address = p_id
-        zone_sensor = ZoneSensor.find_one({Sensor.address: p_id})
+        zone_sensor = m.ZoneSensor.find_one({m.Sensor.address: p_id})
     if zone_sensor:
         record.sensor_name = zone_sensor.sensor_name
     else:
@@ -86,7 +86,7 @@ def __save_sensor_db(p_id='', p_type='', value_list=None):
     if sqlitedb:
         current_record = models.Sensor.query.filter_by(address=p_id).first()
     else:
-        current_record = Sensor.find_one({Sensor.address: p_id})
+        current_record = m.Sensor.find_one({m.Sensor.address: p_id})
     record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
                                save_to_graph=True, ignore_only_updated_on_change=True)
 
@@ -110,13 +110,13 @@ def __save_sensor_db(p_id='', p_type='', value_list=None):
 
 def elro_relay_on():
     pkt = None
-    pkt.packettype = sensor.lib.RFXtrx.lowlevel.Lighting4
+    pkt.packettype = RFXtrx.lowlevel.Lighting4
     pkt.subtype = 'PT2262'
     pkt.cmd = 451451
     #pkt.type_string = 1
     #pkt.id_string = 1
     #event = RFXtrx.LightingDevice()
-    event = sensor.lib.RFXtrx.lowlevel.Lighting4()
+    event = RFXtrx.lowlevel.Lighting4()
     event.set_transmit()
 
 
