@@ -74,8 +74,8 @@ class ZoneSensor(ModelBase):
 
 
 class ZoneCustomRelay(ModelBase):
-    id = 0
     relay_pin_name = ''
+    id = 0
     zone_id = 0
     gpio_pin_code = ''
     gpio_host_name = ''
@@ -86,8 +86,8 @@ class ZoneCustomRelay(ModelBase):
 
 
 class Zone(ModelBase):
-    id = 0
     name = ''
+    id = 0
     # active_heat_schedule_pattern_id = Column(Integer)
     # heat_is_on = False
     # last_heat_status_update = datetime.now()

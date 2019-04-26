@@ -31,6 +31,6 @@ def unload():
 
 def init():
     L.l.info('Music module initialising')
-    thread_pool.add_interval_callable(thread_run, run_interval_second=10)
+    thread_pool.add_interval_callable(thread_run, run_interval_second=60)
     mpd.init()
     P.initialised = True
