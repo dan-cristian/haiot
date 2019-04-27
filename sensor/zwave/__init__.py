@@ -101,14 +101,9 @@ def _set_custom_relay_state(sensor_address, state):
     current_relay = m.ZoneCustomRelay.find_one({
         m.ZoneCustomRelay.gpio_pin_code: sensor_address, m.ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME})
     if current_relay is not None:
-        #new_relay = m.ZoneCustomRelay()
         current_relay.relay_is_on = state
-        #new_relay.gpio_pin_code = sensor_address
-        #new_relay.gpio_host_name = Constant.HOST_NAME
-        #new_relay.relay_is_on = state
         current_relay.is_event_external = True
         current_relay.is_device_event = True
-        #new_relay.is_device_event = True
         current_relay.save_changed_fields(broadcast=True, persist=True)
     else:
         L.l.info("ZoneCustomRelay with code {} not defined in database".format(sensor_address))

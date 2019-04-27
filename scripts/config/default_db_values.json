@@ -115,7 +115,7 @@
     {"id":443, "active":false, "start_order":43, "name":"cloud.thingspeak", "host_name":"pidash"},
 
     {"id":501, "active":false, "start_order":50, "name":"apps.dashcam", "host_name":"netbook"},
-    {"id":509, "active":true, "start_order":9, "name":"heat", "host_name":"netbook"},
+    {"id":509, "active":false, "start_order":9, "name":"heat", "host_name":"netbook"},
     {"id":525, "active":true, "start_order":25, "name":"rule", "host_name":"netbook"},
     {"id":526, "active":true, "start_order":26, "name":"rule.electricity", "host_name":"netbook"},
     {"id":527, "active":true, "start_order":27, "name":"node", "host_name":"netbook"},
