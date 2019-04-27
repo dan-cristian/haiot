@@ -2,6 +2,7 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 import signal
 import sys
 import time
+import threading
 
 
 # http://www.tutorialspoint.com/python/python_command_line_arguments.htm
@@ -40,4 +41,5 @@ if __name__ == '__main__':
         print('Main exit with exception {}'.format(ex))
     main.general_init.unload()
     print('App EXIT')
-    # main.run(sys.argv[1:])
+    for thread in threading.enumerate():
+        print(thread.name)

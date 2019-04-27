@@ -339,15 +339,20 @@ class ModelBase(metaclass=OrderedClassMembers):
         if not hasattr(cls, '_class_initialised'):
             cls._table_list[cls.__name__] = DictTable(cls)
             for attr in obj_fields:
-                cls._column_type_list[attr] = type(getattr(cls, attr))
-                setattr(cls, attr, attr)
-                cls._column_list = cls._column_list + (attr,)
+                if attr is not '__doc__':
+                    cls._column_type_list[attr] = type(getattr(cls, attr))
+                    setattr(cls, attr, attr)
+                    cls._column_list = cls._column_list + (attr,)
             cls.source_host = 'source_host'
             cls._class_initialised = True
-            cls._main_key = obj_fields[0]
+            if cls.__doc__ is not None and 'key=' in cls.__doc__:
+                cls._main_key = cls.__doc__.split('key=')[1]
+            else:
+                cls._main_key = obj_fields[0]
 
         for attr in obj_fields:
-            setattr(self, attr, None)
+            if attr is not '__doc__':
+                setattr(self, attr, None)
         self.source_host = Constant.HOST_NAME
 
         if copy is not None:
