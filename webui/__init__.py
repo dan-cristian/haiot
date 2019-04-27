@@ -60,7 +60,7 @@ def init():
     app.config['STATIC_FOLDER'] = os.path.join(os.path.dirname(__file__), 'static')
     host = '0.0.0.0'
     port = int(get_json_param(Constant.P_FLASK_WEB_PORT))
-    P.flask_thread = helpers.FlaskInThread(app, host=host, port=port, debug=True, use_reloader=False)
+    P.flask_thread = helpers.FlaskInThread(app, host=host, port=port, debug=False, use_reloader=False)
     P.initialised = True
     P.flask_thread.start()
 
