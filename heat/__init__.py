@@ -363,9 +363,8 @@ def _zonethermostat_upsert_listener(record, changed_fields):
 def thread_run():
     prctl.set_name("heat")
     threading.current_thread().name = "heat"
-    L.init_history(force=True)
-    if Constant.is_os_linux():
-        pudb.set_trace()
+    # if Constant.is_os_linux():
+    #    pudb.set_trace()
     if P.threshold is None:
         P.threshold = float(get_json_param(Constant.P_TEMPERATURE_THRESHOLD))
         P.temp_limit = float(get_json_param(Constant.P_HEAT_SOURCE_MIN_TEMP))
