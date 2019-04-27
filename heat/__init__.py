@@ -315,7 +315,7 @@ def _set_main_heat_source():
                     if heat_source_relay.is_alternate_heat_source is True:
                         L.l.info('Alternate heat source is now inactive, temp source is {}'.format(temp_rec))
                     heat_source_relay.is_alternate_heat_source = False
-                heat_source_relay.save_changed_fields()
+                    heat_source_relay.save_changed_fields()
 
 
 # start/stop heat based on user movement/presence
