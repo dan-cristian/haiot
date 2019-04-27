@@ -36,14 +36,14 @@ def add_interval_callable(func, run_interval_second, long_running=False):  # , *
     print_name = __get_print_name_callable(func)
     #if func not in P.cl:
 
-    if print_name not in P.thread_func_list:
+    if func not in P.thread_func_list:
         f = ThreadFunc()
         f.name = print_name
         f.func = func
         f.interval = run_interval_second
         f.last_exec = datetime.now()
         f.long_running = long_running
-        P.thread_func_list[print_name] = f
+        P.thread_func_list[func] = f
 
         #P.cl.append(func)
         #P.eldl[func] = datetime.now()
@@ -91,7 +91,7 @@ def run_thread_pool():
         for future_obj in dict(P.ff):
             func = P.ff[future_obj]
             print_name = __get_print_name_callable(func)
-            tf = P.thread_func_list[print_name]
+            tf = P.thread_func_list[func]
             #exec_interval = P.eil.get(func, None)
             exec_interval = tf.interval
             if exec_interval is None:

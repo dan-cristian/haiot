@@ -61,6 +61,7 @@ def unload():
 
 
 def init():
+    L.l.info('Email start')
     dispatcher.connect(send_notification, signal=Constant.SIGNAL_EMAIL_NOTIFICATION, sender=dispatcher.Any)
     global __notif_from, __notif_pass, __notif_dest
     __notif_from = get_json_param(Constant.P_GMAIL_NOTIFY_FROM_EMAIL)
@@ -68,4 +69,5 @@ def init():
     __notif_pass = _get_pass(__notif_from)
     global initialised
     initialised = True
+    L.l.info('Email done')
 
