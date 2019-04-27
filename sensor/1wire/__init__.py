@@ -4,7 +4,7 @@ import prctl
 import time
 from pydispatch import dispatcher
 import datetime
-from main import sqlitedb
+from main import general_init, sqlitedb
 if sqlitedb:
     from storage.sqalc import models
 from storage.model import m
@@ -63,6 +63,8 @@ def do_device(ow, path):
         last_sensor = ''
         for sensor in sensors:
             # L.l.info("process sensor {}".format(sensor))
+            if general_init.P.shutting_down:
+                break
             if not ('interface' in sensor or 'simultaneous' in sensor or 'alarm' in sensor):
                 # start = datetime.datetime.now()
                 try:
