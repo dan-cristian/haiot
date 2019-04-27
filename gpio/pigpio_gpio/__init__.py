@@ -187,28 +187,11 @@ class PwmIo(GpioBase):
 
     @staticmethod
     def get_db_record(key):
-        # m = models.Pwm
-        # rec = m().query_filter_first(m.name == 'boiler2')
-
-        # rec = models.Pwm.query.filter_by(name=key).first()
-        if sqlitedb:
-            rec = models.Pwm.query.get(key)
-        else:
-            rec = m.Pwm.find_one({m.Pwm.name: key})
-        # rec = dbs.session.query(models.Pwm).filter(models.Pwm.name == key).first()
-        # db.session.remove()
-        # rec = db.session.query(models.Pwm).filter(models.Pwm.name == key).first()
-
+        rec = m.Pwm.find_one({m.Pwm.name: key})
         if rec is not None and rec.id == key:
             # PwmIo.key_ok = PwmIo.key_ok + 1
             # L.l.info("KEY found ok {}, count={}".format(key, PwmIo.key_ok))
             return rec
-        # recs = models.Pwm.query.all()
-        # if recs is not None:
-        #    for rec in recs:
-        #        if rec.name == key:
-        #            L.l.info("KEY found ok {}, count={}".format(key, PwmIo.key_ok))
-        #            return rec
         L.l.error('No key retrieved for pwm {}, got {}'.format(key, rec))
         return None
 
