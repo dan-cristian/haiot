@@ -90,28 +90,18 @@ def _process_message(msg):
                 dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=power, unit='watt')
                 # todo: save total energy utility
                 if voltage or factor or current:
-                    if sqlitedb:
-                        zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=sensor_name).first()
-                    else:
-                        zone_sensor = m.ZoneSensor.find_one({m.ZoneSensor.sensor_address: sensor_name})
+                    zone_sensor = m.ZoneSensor.find_one({m.ZoneSensor.sensor_address: sensor_name})
                     if zone_sensor is not None:
-                        if sqlitedb:
-                            current_record = models.Sensor.query.filter_by(address=sensor_name).first()
-                        else:
-                            current_record = m.Sensor.find_one({m.Sensor.address: sensor_name})
+                        current_record = m.Sensor.find_one({m.Sensor.address: sensor_name})
                         if current_record is None:
                             pass
                         else:
                             current_record.vad = None
                             current_record.iad = None
                             current_record.vdd = None
-                        if sqlitedb:
-                            record = models.Sensor(address=sensor_name, sensor_name=zone_sensor.sensor_name)
-                            record.is_event_external = True
-                        else:
-                            record = m.Sensor()
-                            record.address = sensor_name
-                            record.sensor_name = zone_sensor.sensor_name
+                        record = m.Sensor()
+                        record.address = sensor_name
+                        record.sensor_name = zone_sensor.sensor_name
                         if voltage is not None:
                             record.vad = round(voltage, 0)
                         if current is not None:
@@ -124,12 +114,8 @@ def _process_message(msg):
                 # dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=current, unit='kWh')
             if 'POWER' in obj:
                 power_is_on = obj['POWER'] == 'ON'
-                if sqlitedb:
-                    current_relay = models.ZoneCustomRelay.query.filter_by(
-                        gpio_pin_code=sensor_name, gpio_host_name=Constant.HOST_NAME).first()
-                else:
-                    current_relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.gpio_pin_code: sensor_name,
-                                                                m.ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME})
+                current_relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.gpio_pin_code: sensor_name,
+                                                            m.ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME})
                 if current_relay is not None:
                     L.l.info("Got relay {} state={}".format(sensor_name, power_is_on))
                     if sqlitedb:

@@ -243,14 +243,14 @@ class P:
 
         relay = 'washing_relay'
         utility = 'power washing'
-        obj = Washingmachine(relay_name=relay, utility_name=utility, avg_consumption=70)
-        P.device_list[relay] = obj
-        P.utility_list[utility] = obj
+        # obj = Washingmachine(relay_name=relay, utility_name=utility, avg_consumption=70)
+        # P.device_list[relay] = obj
+        # P.utility_list[utility] = obj
         relay = 'plug_1'
         utility = 'power plug 1'
-        obj = Dishwasher(relay_name=relay, utility_name=utility, avg_consumption=80)
-        P.device_list[relay] = obj
-        P.utility_list[utility] = obj
+        # obj = Dishwasher(relay_name=relay, utility_name=utility, avg_consumption=80)
+        # P.device_list[relay] = obj
+        # P.utility_list[utility] = obj
         relay = 'big_battery_relay'
         P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=50, supports_breaks=True)
         relay = 'beci_upscharge_relay'
@@ -295,8 +295,8 @@ def _update_devices():
 
 
 # energy rule
-def rule_energy_export(obj=m.Utility(), field_changed_list=None):
-    if field_changed_list is not None and 'units_2_delta' in field_changed_list:
+def rule_energy_export(obj=m.Utility(), change=None):
+    if change is not None and 'units_2_delta' in change:
         if obj.utility_name == 'power main mono':
             if P.emulate_export is True:
                 P.grid_watts = random.randint(-800, -300)
@@ -325,8 +325,8 @@ def thread_run():
 
 
 def init():
-    if False:
-        P.emulate_export = True
+    if True:
+        P.emulate_export = False
         P.init_dev()
         current_module = sys.modules[__name__]
         rule.init_sub_rule(thread_run_func=thread_run, rule_module=current_module)

@@ -29,22 +29,13 @@ def not_used_record_update(obj, source_host):
 def __utility_update_ex(sensor_name, value, unit=None, index=None):
     try:
         if value is not None:
-            if sqlitedb:
-                record = models.Utility(sensor_name=sensor_name)
+            record = m.Utility()
+            record.sensor_name = sensor_name
+            if index is None:
+                current_record = m.Utility.find_one({m.Utility.sensor_name: sensor_name})
             else:
-                record = m.Utility()
-                record.sensor_name = sensor_name
-            if sqlitedb:
-                if index is None:
-                    current_record = models.Utility.query.filter_by(sensor_name=sensor_name).first()
-                else:
-                    current_record = models.Utility.query.filter_by(sensor_name=sensor_name, sensor_index=index).first()
-            else:
-                if index is None:
-                    current_record = m.Utility.find_one({m.Utility.sensor_name: sensor_name})
-                else:
-                    current_record = m.Utility.find_one({m.Utility.sensor_name: sensor_name, 
-                                                         m.Utility.sensor_index: index})
+                current_record = m.Utility.find_one({m.Utility.sensor_name: sensor_name,
+                                                     m.Utility.sensor_index: index})
             if current_record is not None:
                 if current_record.units_total is None:
                     # need to get
@@ -80,8 +71,6 @@ def __utility_update_ex(sensor_name, value, unit=None, index=None):
                         record.units_total = value
                         record.units_delta = value - current_record.units_total
                         current_record.units_total = value
-                        if sqlitedb:
-                            current_record.commit_record_to_db()
                 elif current_record.utility_type == Constant.UTILITY_TYPE_GAS:
                     new_value = value / (current_record.ticks_per_unit * 1.0)
                     delta = max(0, new_value - current_record.units_total)
@@ -95,9 +84,7 @@ def __utility_update_ex(sensor_name, value, unit=None, index=None):
                 #    is_debug = True
                 # else:
                 #    is_debug = False
-                record.save_changed_fields(current_record=current_record, new_record=record, debug=False,
-                                           notify_transport_enabled=True, save_to_graph=True, save_all_fields=False)
-
+                record.save_changed_fields(broadcast=True, persist=True)
             else:
                 L.l.info("Utility ex sensor {} index {} not defined in Utility table".format(sensor_name, index))
     except Exception as ex:
