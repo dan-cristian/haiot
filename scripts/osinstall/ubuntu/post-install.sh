@@ -650,6 +650,9 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     systemctl start mpdscribble@6600
     systemctl start mpdscribble@6601
     systemctl start mpdscribble@6602
+    systemctl start mpdscribble@6603
+    systemctl start mpdscribble@6604
+    systemctl start mpdscribble@6605
 
     echo "Configuring additional music scripts"
     cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/activate-audio-amp.service /lib/systemd/system/
