@@ -33,93 +33,6 @@ class P:
         pass
 
 
-# execute when heat status change is signaled. changes gpio pin status if pin is local
-def record_update(obj_dict=None):
-    if not obj_dict:
-        obj_dict = {}
-    try:
-        source_host_name = utils.get_object_field_value(obj_dict, Constant.JSON_PUBLISH_SOURCE_HOST)
-        if sqlitedb:
-            zone_id = utils.get_object_field_value(obj_dict, utils.get_model_field_name(models.ZoneHeatRelay.zone_id))
-            pin_name = utils.get_object_field_value(
-                obj_dict, utils.get_model_field_name(models.ZoneHeatRelay.heat_pin_name))
-            is_on = utils.get_object_field_value(obj_dict, utils.get_model_field_name(models.ZoneHeatRelay.heat_is_on))
-        else:
-            zone_id = utils.get_object_field_value(obj_dict, m.ZoneHeatRelay.zone_id)
-            pin_name = utils.get_object_field_value(obj_dict, m.ZoneHeatRelay.heat_pin_name)
-            is_on = utils.get_object_field_value(obj_dict, m.ZoneHeatRelay.heat_is_on)
-        # fixme: remove hard reference to object field
-        sent_on = utils.get_object_field_value(obj_dict, "event_sent_datetime")
-        if P.debug:
-            L.l.info('Received heat relay update from {} zoneid={} pin={} is_on={} sent={}'.format(
-                source_host_name, zone_id, pin_name, is_on, sent_on))
-        if sqlitedb:
-            zone_heat_relay = models.ZoneHeatRelay.query.filter_by(zone_id=zone_id).first()
-        else:
-            zone_heat_relay = m.ZoneHeatRelay.find_one({m.ZoneHeatRelay.zone_id: zone_id})
-        if zone_heat_relay:
-            gpio_host_name = zone_heat_relay.gpio_host_name
-            if sqlitedb:
-                cmd_heat_is_on = utils.get_object_field_value(
-                    obj_dict, utils.get_model_field_name(models.ZoneHeatRelay.heat_is_on))
-            else:
-                cmd_heat_is_on = utils.get_object_field_value(obj_dict, m.ZoneHeatRelay.heat_is_on)
-            if P.debug:
-                L.l.info('Local heat state zone_id {} must be changed to {} on pin {}'.format(
-                    zone_id, cmd_heat_is_on, zone_heat_relay.gpio_pin_code))
-            if cmd_heat_is_on:
-                pin_value = 1
-            else:
-                pin_value = 0
-            # set pin only on pins owned by this host
-            if zone_heat_relay and gpio_host_name == Constant.HOST_NAME:
-                L.l.info("Setting heat pin {} to {}".format(zone_heat_relay.gpio_pin_code, pin_value))
-                pin_state = gpio.relay_update(gpio_pin_code=zone_heat_relay.gpio_pin_code, pin_value=pin_value)
-            else:
-                pin_state = pin_value
-            if pin_state == pin_value:
-                pin_state = (pin_state == 1)
-                zone_heat_relay.heat_is_on = pin_state
-                zone_heat_relay.notify_transport_enabled = False
-                if sqlitedb:
-                    commit()
-                else:
-                    zone_heat_relay.save_changed_fields()
-            else:
-                L.l.warning('Heat state zone_id {} unexpected val={} after setval={}'.format(
-                    zone_id, pin_state, pin_value))
-        else:
-            L.l.warning('No heat relay defined for zone {}, db data issue?'.format(zone_id))
-    except Exception as ex:
-        L.l.warning('Error updating heat relay state, err {}'.format(ex))
-
-
-# when db changes via UI
-def zone_thermo_record_update(obj_dict=None):
-    if Constant.JSON_PUBLISH_FIELDS_CHANGED in obj_dict.keys():
-        changes = obj_dict[Constant.JSON_PUBLISH_FIELDS_CHANGED]
-        if sqlitedb:
-            is_mode_manual = utils.get_object_field_value(
-                changes, utils.get_model_field_name(models.ZoneThermostat.is_mode_manual))
-        else:
-            is_mode_manual = utils.get_object_field_value(changes, m.ZoneThermostat.is_mode_manual)
-        # activate manual mode if set by user in UI
-        if is_mode_manual is not None:
-            if sqlitedb:
-                thermo_id = utils.get_object_field_value(obj_dict, utils.get_model_field_name(models.ZoneThermostat.id))
-                thermo_rec = models.ZoneThermostat.query.filter_by(id=thermo_id).first()
-            else:
-                thermo_id = utils.get_object_field_value(obj_dict, m.ZoneThermostat.id)
-                thermo_rec = m.ZoneThermostat.find_one({m.ZoneThermostat.id: thermo_id})
-            if thermo_rec is not None and is_mode_manual:
-                thermo_rec.last_manual_set = datetime.datetime.now()
-                if sqlitedb:
-                    thermo_rec.commit_record_to_db()
-                else:
-                    thermo_rec.save_changed_fields()
-            L.l.info('Set thermostat active={} zone={}'.format(is_mode_manual, thermo_rec.zone_name))
-
-
 # save heat status and announce to all nodes.
 def __save_heat_state_db(zone, heat_is_on):
     if sqlitedb:
@@ -214,6 +127,7 @@ def _get_temp_target(pattern_id):
     else:
         L.l.warning('Incorrect temp pattern [{}] in zone {}, length is not 24'.format(pattern, schedule_pattern.name))
         temp_target = None
+        temp_code = None
     return temp_target, temp_code
 
 
@@ -540,18 +454,13 @@ def _handle_presence(zone_name=None, zone_id=None):
 
 
 def _zoneheatrelay_upsert_listener(record, changed_fields):
-    # copy to help with recursion prevention
-    if record.heat_is_on:
-        pin_value = 1
-    else:
-        pin_value = 0
     # set pin only on pins owned by this host
     if record.gpio_host_name == Constant.HOST_NAME:
         # L.l.info("Setting heat pin {}:{} to {}".format(record.heat_pin_name, record.gpio_pin_code, pin_value))
         pin_state = gpio.set_relay_state(
             pin_code=record.gpio_pin_code, relay_is_on=record.heat_is_on, relay_type=record.relay_type)
-        L.l.info("Setting heat pin {}:{} to {} returned {}".format(
-            record.heat_pin_name, record.gpio_pin_code, pin_value, pin_state))
+        L.l.info("Setting heat pin {}:{}:{} to {} returned {}".format(
+            record.heat_pin_name, record.gpio_pin_code, record.relay_type, record.heat_is_on, pin_state))
 
 
 def _zonethermostat_upsert_listener(record, changed_fields):
@@ -559,7 +468,7 @@ def _zonethermostat_upsert_listener(record, changed_fields):
     if hasattr(record, m.ZoneThermostat.is_mode_manual) and record.is_mode_manual is True:
         record.last_manual_set = datetime.datetime.now()
         record.save_changed_fields()
-        L.l.info('Set thermostat active={} zone={}'.format(record.is_mode_manual, record.zone_name))
+        L.l.info('Set thermostat manual to active={} zone={}'.format(record.is_mode_manual, record.zone_name))
 
 
 def thread_run():
