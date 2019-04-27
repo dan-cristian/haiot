@@ -1,3 +1,4 @@
+import os
 import socket
 import time
 from threading import Thread, Lock
@@ -394,6 +395,16 @@ def unload():
         P.pi.stop()
 
 
+def _try_connect():
+    try:
+        host = os.getenv("PIGPIO_ADDR", 'localhost')
+        port = os.getenv("PIGPIO_PORT", 8888)
+        s = socket.create_connection((host, port), None)
+        return True
+    except Exception as ex:
+        return False
+
+
 def init():
     if sqlitedb:
         P.pwm = PwmIo(obj=models.Pwm)
@@ -402,16 +413,18 @@ def init():
     L.l.info('PiGpio initialising')
     if P.import_ok:
         try:
-            if Constant.HOST_NAME != 'netbook':  # debug
+            if _try_connect():
                 P.pi = pigpio.pi()
                 # test if daemon is on
                 P.pi.get_current_tick()
                 # setup this to receive list of ports that must be set as "IN" and have callbacks defined
                 # dispatcher.connect(setup_in_ports, signal=Constant.SIGNAL_GPIO_INPUT_PORT_LIST, sender=dispatcher.Any)
-            P.initialised = True
-            m.Pwm.add_upsert_listener(_pwm_upsert_listener)
-            thread_pool.add_interval_callable(thread_run, run_interval_second=30)
-            L.l.info('PiGpio initialised OK')
+                P.initialised = True
+                m.Pwm.add_upsert_listener(_pwm_upsert_listener)
+                thread_pool.add_interval_callable(thread_run, run_interval_second=30)
+                L.l.info('PiGpio initialised OK')
+            else:
+                L.l.info('Unable to initialise pigpio, cannot connect')
         except Exception as ex1:
             L.l.info('Unable to initialise PiGpio, err={}'.format(ex1))
             P.pi = None
