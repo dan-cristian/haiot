@@ -86,7 +86,7 @@ def _process_events():
             for rule_mod in P.rules_modules:
                 # result = getattr(rules_run, obj[1])(obj=obj[0], field_changed_list=obj[2])
                 if hasattr(rule_mod, obj[1]):
-                    result = getattr(rule_mod, obj[1])(obj=obj[0], field_changed_list=obj[2])
+                    result = getattr(rule_mod, obj[1])(obj=obj[0], change=obj[2])
                     L.l.debug('Rule returned {}'.format(result))
                     P.event_list.remove(obj)
         except Exception as ex:
