@@ -130,6 +130,7 @@ def _init_debug():
         ptvsd.enable_attach(address=('0.0.0.0', 5678), redirect_output=True)
         print('Enabled remote debugging, waiting 15 seconds for client to attach')
         ptvsd.wait_for_attach(timeout=15)
+        breakpoint()
     except Exception as ex:
         print("Error in remote debug: {}".format(ex))
 
@@ -144,9 +145,10 @@ def unload():
 
 def init(arg_list):
     if 'debug_remote' in arg_list:
-        if Constant.is_os_linux():
-            from pudb import set_trace
-            set_trace(paused=False)
+        _init_debug()
+        # if Constant.is_os_linux():
+        #    from pudb import set_trace
+        #    set_trace(paused=False)
     system_info.init()
     # import storage.tiny.tinydb_app
     # storage.tiny.tinydb_app.init(arg_list)
