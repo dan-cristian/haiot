@@ -1,10 +1,7 @@
 import transport.mqtt_io
 from main.logger_helper import L
 from main import sqlitedb
-if sqlitedb:
-    from storage.sqalc import models
-else:
-    from storage.model import m
+from storage.model import m
 import transport
 from common import Constant
 
@@ -198,11 +195,7 @@ def rule_openhab_musicloved(obj=m.MusicLoved(), field_changed_list=None):
 # INBOUD RULES START
 def custom_relay(name, value):
     # L.l.info("Try to set custom relay {} to {}".format(name, value))
-    if sqlitedb:
-        t = models.ZoneCustomRelay
-        relay = t().query_filter_first(t.relay_pin_name == name)
-    else:
-        relay = models.ZoneCustomRelay.find_one({models.ZoneCustomRelay.relay_pin_name: name})
+    relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.relay_pin_name: name})
     if relay is not None:
         if relay.gpio_host_name == Constant.HOST_NAME:
             relay.relay_is_on = value
@@ -214,11 +207,7 @@ def custom_relay(name, value):
 
 
 def heat_relay(name, value):
-    if sqlitedb:
-        t = models.ZoneHeatRelay
-        relay = t().query_filter_first(t.heat_pin_name == name)
-    else:
-        relay = models.ZoneHeatRelay.find_one({models.ZoneHeatRelay.heat_pin_name: name})
+    relay = m.ZoneHeatRelay.find_one({m.ZoneHeatRelay.heat_pin_name: name})
     if relay is not None:
         if relay.gpio_host_name == Constant.HOST_NAME:
             L.l.info("OK setting heat relay {} to {} from openhab".format(name, value))
