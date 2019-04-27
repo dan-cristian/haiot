@@ -3,6 +3,7 @@ from storage.dicts.model_helper import ModelBase
 
 
 class Module(ModelBase):
+    """key=name"""
     id = 0
     name = ''
     start_order = 0
@@ -247,12 +248,14 @@ class Presence(ModelBase):
 
 
 class ZoneArea(ModelBase):
+    """key=id"""
     id = 0
     area_id = 0
     zone_id = 0
 
 
 class Area(ModelBase):
+    """key=name"""
     name = ''
     id = 0
     is_armed = False
@@ -372,8 +375,8 @@ class ZoneMusic(ModelBase):
 
 
 class Music(ModelBase):
-    id = 0
     zone_name = ''  # unique name
+    id = 0
     state = ''
     volume = 0
     position = 0  # percent
