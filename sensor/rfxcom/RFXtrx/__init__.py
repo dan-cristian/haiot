@@ -622,6 +622,7 @@ class PySerialTransport(RFXtrxTransport):
     """ Implementation of a transport using PySerial """
 
     def __init__(self, port, debug=False):
+        self.shutdown = False
         self.debug = debug
         self.port = port
         self.serial = None
@@ -643,18 +644,19 @@ class PySerialTransport(RFXtrxTransport):
     def receive_blocking(self):
         """ Wait until a packet is received and return with an RFXtrxEvent """
         data = None
-        while self._run_event.is_set():
+        while self._run_event.is_set() and not self.shutdown:
             try:
                 data = self.serial.read()
             except TypeError:
                 continue
             except serial.serialutil.SerialException:
-                import time
-                try:
-                    self.connect()
-                except serial.serialutil.SerialException:
-                    time.sleep(5)
-                    continue
+                if not self.shutdown:
+                    import time
+                    try:
+                        self.connect()
+                    except serial.serialutil.SerialException:
+                        time.sleep(5)
+                        continue
             if not data or data == '\x00':
                 continue
             pkt = bytearray(data)
@@ -684,6 +686,7 @@ class PySerialTransport(RFXtrxTransport):
 
     def close(self):
         """ close connection to rfxtrx device """
+        self.shutdown = True
         self._run_event.clear()
         self.serial.close()
 
