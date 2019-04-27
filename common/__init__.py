@@ -12,6 +12,7 @@ class P:
 
 
 class Constant:
+    debug_dummy = False
     db_values_json = None
     db_auto_module_json = None
 

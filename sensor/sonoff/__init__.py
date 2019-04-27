@@ -147,7 +147,7 @@ def _process_message(msg):
                     else:
                         new_relay.save_changed_fields(current=current_relay, broadcast=True, persist=True)
                 else:
-                    L.l.error("ZoneCustomRelay with code {} does not exist in database".format(sensor_name))
+                    L.l.warning("ZoneCustomRelay {} not defined in db".format(sensor_name))
             if 'COUNTER' in obj:
                 # TelePeriod 60
                 counter = obj['COUNTER']
