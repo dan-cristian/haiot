@@ -3,7 +3,7 @@ from storage.dicts.model_helper import ModelBase
 
 
 class Module(ModelBase):
-    """key=name"""
+    """key=id"""
     id = 0
     name = ''
     start_order = 0
