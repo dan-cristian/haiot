@@ -252,6 +252,7 @@ class ModelBase(metaclass=OrderedClassMembers):
     def save_changed_fields(self, current=None, broadcast=None, persist=None, listeners=True, *args, **kwargs):
         cls = self.__class__
         cls_name = cls.__name__
+        L.add_history(cls_name)
         if not cls._is_used_in_module:
             cls._is_used_in_module = True
         update = {}
