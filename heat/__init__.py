@@ -47,7 +47,6 @@ def _save_heat_state_db(zone, heat_is_on):
         zone_thermo.heat_is_on = heat_is_on
         zone_thermo.last_heat_status_update = utils.get_base_location_now_date()
         zone_heat_relay.save_changed_fields(broadcast=True, persist=True)
-        L.add_history('thermo')
         zone_thermo.save_changed_fields()
     else:
         L.l.warning('No heat relay found in zone {} id {}'.format(zone.name, zone.id))
@@ -284,16 +283,18 @@ def _set_main_heat_source():
                          or (temp_rec.temperature >= P.temp_limit and heat_source_relay.is_alternate_source_switch)):
                 if heat_source_relay.is_alternate_source_switch:
                     # stop main heat source
-                    heatrelay_main_source = m.ZoneHeatRelay.find_one({m.ZoneHeatRelay.is_main_heat_source: 1})
+                    heatrelay_main_source = m.ZoneHeatRelay.find_one({m.ZoneHeatRelay.is_main_heat_source: True})
                     main_source_zone = m.Zone.find_one({m.Zone.id: heatrelay_main_source.zone_id})
+                    L.l.info('Stop main heat source {}'.format(main_source_zone))
                     _save_heat_state_db(zone=main_source_zone, heat_is_on=False)
                     # turn switch valve on to alternate position
                     switch_source_zone = m.Zone.find_one({m.Zone.id: heat_source_relay.zone_id})
+                    L.l.info('Switch valve {} to on'.format(switch_source_zone))
                     _save_heat_state_db(zone=switch_source_zone, heat_is_on=True)
                 else:
                     # mark this source as active, to be started when there is heat need
-                    if heat_source_relay.is_alternate_heat_source is False:
-                        L.l.info('Alternate heat source is active with temp={}'.format(temp_rec.temperature))
+                    # if heat_source_relay.is_alternate_heat_source is False:
+                    L.l.info('Alternate heat source is active with temp={}'.format(temp_rec.temperature))
                     heat_source_relay.is_alternate_heat_source = True
                 heat_source_relay.save_changed_fields()
             else:
@@ -306,12 +307,14 @@ def _set_main_heat_source():
                     #    __save_heat_state_db(zone=alt_source_zone, heat_is_on=False)
                     # turn valve back to main position
                     switch_source_zone = m.Zone.find_one({m.Zone.id: heat_source_relay.zone_id})
+                    L.l.info('Switch valve {} back'.format(switch_source_zone))
                     _save_heat_state_db(zone=switch_source_zone, heat_is_on=False)
                 else:
                     # mark this source as inactive, let main source to start
                     if heat_source_relay.is_alternate_heat_source:
                         # force alt source shutdown if was on
                         alt_source_zone = m.Zone.find_one({m.Zone.id: heat_source_relay.zone_id})
+                        L.l.info('Force alt source {} off'.format(alt_source_zone))
                         _save_heat_state_db(zone=alt_source_zone, heat_is_on=False)
                         # todo: sleep needed to allow for valve return
                     if heat_source_relay.is_alternate_heat_source is True:
