@@ -98,6 +98,8 @@ class Relaydevice:
             else:
                 current_watts = self.AVG_CONSUMPTION
             # only trigger power off if over treshold
+            if current_watts is None:
+                L.l.warning('Device {} watts={} avg={}'.format(self.RELAY_NAME, self.watts, self.AVG_CONSUMPTION))
             if current_watts > P.IDLE_WATTS:
                 if import_watts > P.MIN_WATTS_THRESHOLD and current_watts < grid_watts and self.is_power_on():
                     L.l.info("Should auto stop device {} state={} consuming={} surplus={}".format(
