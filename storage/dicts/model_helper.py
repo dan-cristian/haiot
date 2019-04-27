@@ -25,6 +25,9 @@ class OrderedClassMembers(type):
 
 
 class DictTable:
+    id = 0
+    key = None
+
     def __init__(self, model_class):
         self.table = {}
         self.index = {}
@@ -174,6 +177,12 @@ class ModelBase(metaclass=OrderedClassMembers):
     _ignore_save_change_fields = ['updated_on']
     _is_used_in_module = False
 
+    def __repr__(self):
+        cls = self.__class__
+        tbl = cls._table_list[cls.__name__]
+        rec_key = getattr(self, tbl.key)
+        return str(tbl.table[rec_key])
+
     @classmethod
     def reset_usage(cls):
         cls._is_used_in_module = False
@@ -252,7 +261,6 @@ class ModelBase(metaclass=OrderedClassMembers):
     def save_changed_fields(self, current=None, broadcast=None, persist=None, listeners=True, *args, **kwargs):
         cls = self.__class__
         cls_name = cls.__name__
-        L.add_history(cls_name)
         if not cls._is_used_in_module:
             cls._is_used_in_module = True
         update = {}
