@@ -227,9 +227,13 @@ class ModelBase(metaclass=OrderedClassMembers):
             doc = doc[u"$set"]
         key = cls._main_key
         if key not in doc:
+            L.l.warning('Update main key={} not in record={}'.format(key, doc))
             key = cls.__dict__['__ordered__'][1]
             if key not in doc:
                 key = list(doc)[0]
+                L.l.warning('Using record 1st field as key={}'.format(key))
+            else:
+                L.l.warning('Using model 2nd field as key={}'.format(key))
         r = table.update_one(key=key, doc=doc)
         return r
 
