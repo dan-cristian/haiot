@@ -100,6 +100,7 @@ class Zone(ModelBase):
 
 
 class DustSensor(ModelBase):
+    """key=address"""
     id = 0
     address = ''
     pm_1 = 0

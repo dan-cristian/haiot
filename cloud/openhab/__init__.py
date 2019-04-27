@@ -46,9 +46,9 @@ def parse_rules(obj, change):
         try:
             # extract only changed fields
             if hasattr(obj, Constant.JSON_PUBLISH_FIELDS_CHANGED):
-                field_changed_list = obj.last_commit_field_changed_list
+                change = obj.last_commit_field_changed_list
             else:
-                field_changed_list = change
+                change = change
             if P.func_list:
                 for func in P.func_list:
                     if func[1].__defaults__ and len(func[1].__defaults__) > 0:
@@ -58,7 +58,7 @@ def parse_rules(obj, change):
                             record = Obj()
                             for attr, value in obj.__dict__.items():
                                 setattr(record, attr, value)
-                            P.event_list.append([record, func[0], field_changed_list])
+                            P.event_list.append([record, func[0], change])
                             # optimise CPU, but ensure each function name is unique in rule file
                             break
         except Exception as ex:
@@ -132,7 +132,7 @@ def thread_run():
     threading.current_thread().name = "openhab"
     for obj in list(P.event_list):
         try:
-            result = getattr(rules, obj[1])(obj=obj[0], field_changed_list=obj[2])
+            result = getattr(rules, obj[1])(obj=obj[0], change=obj[2])
             L.l.debug('Rule returned {}'.format(result))
             P.event_list.remove(obj)
         except Exception as ex:
