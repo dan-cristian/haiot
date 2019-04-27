@@ -36,8 +36,8 @@ class GpioPin(ModelBase):
 
 
 class Sensor(ModelBase):
-    id = 0
     address = ''
+    id = 0
     type = ''
     temperature = 0.0
     humidity = 0.0
@@ -279,8 +279,8 @@ class ZoneAlarm(ModelBase):
 
 
 class Node(ModelBase):
-    id = 0
     name = ''
+    id = 0
     ip = ''
     mac = ''
     os_type = ''
@@ -299,8 +299,8 @@ class Node(ModelBase):
 
 
 class Utility(ModelBase):
-    id = 0
     utility_name = ''  # unique name, can be different than sensor name for dual counter
+    id = 0
     sensor_name = ''
     sensor_index = 0  # 0 for counter_a, 1 for counter_b
     units_total = 0.0  # total number of units measured
