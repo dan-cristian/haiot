@@ -56,7 +56,6 @@ def run_thread_pool():
     while P.tpool:
         if len(P.cl) != len(P.ff):
             P.ff = {P.executor.submit(call_obj): call_obj for call_obj in P.cl}
-        i = 1
         for future_obj in dict(P.ff):
             func = P.ff[future_obj]
             print_name = __get_print_name_callable(func)
