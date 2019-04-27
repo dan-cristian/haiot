@@ -646,6 +646,7 @@ class PySerialTransport(RFXtrxTransport):
         data = None
         while self._run_event.is_set() and not self.shutdown:
             try:
+
                 data = self.serial.read()
             except TypeError:
                 continue

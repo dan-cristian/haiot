@@ -270,9 +270,9 @@ def _set_main_heat_source():
     heat_source_relay_list = m.ZoneHeatRelay.find({'$not': {m.ZoneHeatRelay.temp_sensor_name: None}})
     up_limit = P.temp_limit + P.threshold
     for heat_source_relay in heat_source_relay_list:
-        if heat_source_relay.heat_pin_name == 'puffer gas valve':
-            traceback.print_stack()
-            L.l.info('Debug 1 {}'.format(heat_source_relay))
+        # if heat_source_relay.heat_pin_name == 'puffer gas valve':
+        #    traceback.print_stack()
+        #    L.l.info('Debug 1 {}'.format(heat_source_relay))
         # is there is a temp sensor defined, consider this source as possible alternate source
         if heat_source_relay.temp_sensor_name is not None:
             temp_rec = m.Sensor.find_one({m.Sensor.sensor_name: heat_source_relay.temp_sensor_name})
@@ -337,9 +337,9 @@ def _zoneheatrelay_upsert_listener(record, changed_fields):
     # set pin only on pins owned by this host
     if record.gpio_host_name == Constant.HOST_NAME and record.heat_is_on is not None:
         # L.l.info("Setting heat pin {}:{} to {}".format(record.heat_pin_name, record.gpio_pin_code, pin_value))
-        if record.heat_pin_name == 'puffer gas valve':
-            traceback.print_stack()
-            L.l.info('Debug 2 {} ---- {}'.format(record, changed_fields))
+        # if record.heat_pin_name == 'puffer gas valve':
+        #    traceback.print_stack()
+        #    L.l.info('Debug 2 {} ---- {}'.format(record, changed_fields))
         pin_state = gpio.set_relay_state(
             pin_code=record.gpio_pin_code, relay_is_on=record.heat_is_on, relay_type=record.relay_type)
         L.l.info("Setting heat pin {}:{}:{} to {} returned {}".format(
