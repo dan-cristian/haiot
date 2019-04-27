@@ -133,8 +133,9 @@ def set_relay_state(pin_code, relay_is_on, relay_type):
 
 def zone_custom_relay_upsert_listener(record, changed_fields):
     assert isinstance(record, m.ZoneCustomRelay)
-    if record.gpio_host_name != Constant.HOST_NAME:
+    if record.gpio_host_name != Constant.HOST_NAME or m.ZoneCustomRelay.relay_is_on not in changed_fields:
         return
+
     L.l.info('Upsert listener {} pin {}'.format(record.relay_type, record.gpio_pin_code))
     set_relay_state(record.gpio_pin_code, record.relay_is_on, record.relay_type)
     if record.expire is not None:
