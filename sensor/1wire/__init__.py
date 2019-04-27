@@ -109,21 +109,13 @@ def do_device(ow, path):
 
 
 def save_to_db(dev):
-    # global db_lock
-    # db_lock.acquire()
     try:
         delta_time_counters = None
         address = dev['address']
-        if sqlitedb:
-            record = models.Sensor(address=address)
-            assert isinstance(record, models.Sensor)
-            zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=address).first()
-            current_record = models.Sensor.query.filter_by(address=address).first()
-        else:
-            record = m.Sensor()
-            record.address = address
-            zone_sensor = m.ZoneSensor.find_one({m.ZoneSensor.sensor_address: address})
-            current_record = m.Sensor.find_one({m.Sensor.address: address})
+        record = m.Sensor()
+        record.address = address
+        zone_sensor = m.ZoneSensor.find_one({m.ZoneSensor.sensor_address: address})
+        current_record = m.Sensor.find_one({m.Sensor.address: address})
         if zone_sensor:
             record.sensor_name = zone_sensor.sensor_name
         else:
@@ -172,8 +164,7 @@ def save_to_db(dev):
                 current_record.delta_counters_a = 0
             if record.delta_counters_b != 0:
                 current_record.delta_counters_b = 0
-        record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
-                                   save_to_graph=True, debug=False)
+        record.save_changed_fields(current_record=current_record, new_record=record, broadcast=True, persist=True)
         if record.delta_counters_a is not None or record.delta_counters_b is not None:
             dispatcher.send(Constant.SIGNAL_UTILITY, sensor_name=record.sensor_name,
                             units_delta_a=record.delta_counters_a, units_delta_b=record.delta_counters_b,
@@ -183,8 +174,6 @@ def save_to_db(dev):
             dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=record.sensor_name, value=record.vad)
     except Exception as ex:
         L.l.error('Error saving sensor to DB, err {}'.format(ex), exc_info=True)
-        # finally:
-        #    db_lock.release()
 
 
 def get_prefix(sensor, dev, ow):
