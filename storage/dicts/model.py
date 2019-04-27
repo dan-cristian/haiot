@@ -394,6 +394,7 @@ class MusicLoved(ModelBase):
 
 
 class Ups(ModelBase):
+    """key=name"""
     id = 0
     name = ''
     system_name = ''
