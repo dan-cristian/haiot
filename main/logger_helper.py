@@ -26,40 +26,6 @@ class L:
     SYSLOG_PORT = None
     # reduce amount of logging when running in LIVE prod
     RUN_IN_LIVE = False
-    _thread_local = {}
-
-
-    @classmethod
-    def init_history(cls, force=False):
-        th_name = threading.current_thread().getName()
-        if th_name not in cls._thread_local or force is True:
-            cls.l.info('Init hist for {}'.format(th_name))
-            loc = threading.local()
-            loc.func_history = '{}-{}='.format(str(datetime.now()), th_name)
-            cls._thread_local[th_name] = loc
-
-    @classmethod
-    def add_history(cls, msg=''):
-        th_name = threading.current_thread().getName()
-        cls.init_history()
-        th_loc = cls._thread_local[th_name]
-        # a = inspect.currentframe().f_back
-        if not hasattr(th_loc, 'func_history'):
-            cls.init_history(force=True)
-        if hasattr(th_loc, 'func_history'):
-            th_loc.func_history += '{}[{}]: '.format(inspect.currentframe().f_back.f_code.co_name, msg)
-        else:
-            L.l.warning('history missing for {}'.format(th_name))
-        # print(inspect.currentframe().f_code.co_name)
-        # print(inspect.stack()[0][3])
-        # print(sys._getframe().f_code.co_name)
-
-    @classmethod
-    def func_history(cls):
-        th_name = threading.current_thread().getName()
-        if th_name in cls._thread_local:
-            return cls._thread_local[th_name].func_history
-        return None
 
     @staticmethod
     def init_logging():
