@@ -15,6 +15,7 @@ while True:
 
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
+
 # https://piface.github.io/pifacedigitalio/example.html
 class P:
     import_ok = False
@@ -58,6 +59,7 @@ def get_out_pin_value(pin_index, board_index):
 
 
 def set_pin_code_value(pin_code, pin_value):
+    if Constant.debug_dummy: return pin_value
     board, direction, pin = io_common.decode_piface_pin(pin_code)
     return set_pin_value(pin_index=pin, pin_value=pin_value, board_index=board)
 
@@ -65,6 +67,7 @@ def set_pin_code_value(pin_code, pin_value):
 # http://www.farnell.com/datasheets/1881551.pdf
 def set_pin_value(pin_index, pin_value, board_index):
     L.l.info('Set piface pin {} to value={}, board {}'.format(pin_index, pin_value, board_index))
+    if Constant.debug_dummy: return pin_value
     try:
         pfio.digital_write(pin_num=pin_index, value=pin_value, hardware_addr=board_index)
         act_value = get_out_pin_value(pin_index=pin_index, board_index=board_index)
