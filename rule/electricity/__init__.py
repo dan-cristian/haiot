@@ -96,19 +96,19 @@ class Relaydevice:
             if power_on and self.watts is not None:
                 current_watts = self.watts
             else:
+                # pwm device has no AVG consumption so check for none below
                 current_watts = self.AVG_CONSUMPTION
-            # only trigger power off if over treshold
-            if current_watts is None:
-                L.l.warning('Device {} watts={} avg={}'.format(self.RELAY_NAME, self.watts, self.AVG_CONSUMPTION))
-            if current_watts > P.IDLE_WATTS:
-                if import_watts > P.MIN_WATTS_THRESHOLD and current_watts < grid_watts and self.is_power_on():
-                    L.l.info("Should auto stop device {} state={} consuming={} surplus={}".format(
-                        self.RELAY_NAME, self.state, current_watts, grid_watts))
-                    self.set_power_status(power_is_on=False)
-                    changed_relay_status = True
-                else:
-                    L.l.debug("Keep device {} consumption {} with import power {} and power_on={}".format(
-                        self.RELAY_NAME, current_watts, grid_watts, self.is_power_on()))
+            # only trigger power off if over treshold.
+            if current_watts is not None:
+                if current_watts > P.IDLE_WATTS:
+                    if import_watts > P.MIN_WATTS_THRESHOLD and current_watts < grid_watts and self.is_power_on():
+                        L.l.info("Should auto stop device {} state={} consuming={} surplus={}".format(
+                            self.RELAY_NAME, self.state, current_watts, grid_watts))
+                        self.set_power_status(power_is_on=False)
+                        changed_relay_status = True
+                    else:
+                        L.l.debug("Keep device {} consumption {} with import power {} and power_on={}".format(
+                            self.RELAY_NAME, current_watts, grid_watts, self.is_power_on()))
         self.update_job_finished()
         return changed_relay_status
 
