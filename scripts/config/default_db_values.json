@@ -130,7 +130,7 @@
     {"id":620, "active":false, "start_order":120, "name":"test", "host_name":"netbook"},
 
 
-    {"id":609, "active":false, "start_order":9, "name":"heat", "host_name":"pi-face"},
+    {"id":609, "active":true, "start_order":9, "name":"heat", "host_name":"pi-face"},
     {"id":619, "active":true, "start_order":19, "name":"ddns", "host_name":"pi-face"},
     {"id":626, "active":true, "start_order":26, "name":"rule.electricity", "host_name":"pi-face"},
     {"id":641, "active":true, "start_order":41, "name":"cloud.alexa", "host_name":"pi-face"},

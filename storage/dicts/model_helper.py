@@ -111,7 +111,7 @@ class DictTable:
             self.id += 1
             doc['id'] = self.id
         if len(self.index) > 0:
-            L.l.info('Invalidating index on insert {}'.format(self.model_class.__name__))
+            L.l.info('Invalidating all indexes {} on insert'.format(self.model_class.__name__))
             self.index.clear()  # delete key from index
         self.table[doc[key]] = doc
         return {'inserted_id': doc['id']}
@@ -145,14 +145,17 @@ class DictTable:
             for fld in doc:
                 if fld not in self.model_class._column_list:
                     L.l.warning('Unexpected new field {} on updating {}'.format(fld, cls_name))
-                if good_key_val in self.table:
-                    if fld in self.table[good_key_val] and self.table[good_key_val][fld] != doc[fld]:
+                # if good_key_val in self.table:
+                if fld in self.table[good_key_val]:
+                    if self.table[good_key_val][fld] != doc[fld]:
                         if fld in self.index:
-                            L.l.info('Invalidating index on update{}'.format(cls_name))
-                            self.index.pop(key, None)  # delete key from index
+                            L.l.info('Invalidating index {}:{} on update'.format(cls_name, fld))
+                            self.index[fld].clear()  # delete key from index
                         self.table[good_key_val][fld] = doc[fld]
+                elif fld in self.model_class._column_list:
+                    self.table[good_key_val][fld] = doc[fld]
                 else:
-                    L.l.error('Key {} not in table {}'.format(good_key_val, cls_name))
+                    L.l.error('Trying to update an alien field {} for {}'.format(fld, cls_name))
             if self.model_class._main_key in doc:
                 return doc[self.model_class._main_key]
             else:
