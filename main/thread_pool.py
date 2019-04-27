@@ -84,8 +84,10 @@ def run_thread_pool():
         #if len(P.cl) != len(P.ff):
         #    P.ff = {P.executor.submit(call_obj): call_obj
         #            for call_obj in P.cl}
+
         if len(P.thread_func_list) != len(P.ff):
-            for tf in P.thread_func_list:
+            # copy list as can change
+            for tf in dict(P.thread_func_list):
                 P.ff[P.executor.submit(tf)] = P.thread_func_list[tf].func
 
         for future_obj in dict(P.ff):
