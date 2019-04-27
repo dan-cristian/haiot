@@ -61,7 +61,6 @@ def unload():
 
 
 def init():
-    L.l.debug('Email module initialising')
     dispatcher.connect(send_notification, signal=Constant.SIGNAL_EMAIL_NOTIFICATION, sender=dispatcher.Any)
     global __notif_from, __notif_pass, __notif_dest
     __notif_from = get_json_param(Constant.P_GMAIL_NOTIFY_FROM_EMAIL)
