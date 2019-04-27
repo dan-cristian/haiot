@@ -159,6 +159,7 @@ class SystemDisk(ModelBase):
 
 
 class SystemMonitor(ModelBase):
+    """key=name"""
     id = 0
     name = ''
     cpu_usage_percent = 0.0
