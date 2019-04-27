@@ -85,8 +85,8 @@ def run_thread_pool():
         #    P.ff = {P.executor.submit(call_obj): call_obj
         #            for call_obj in P.cl}
         if len(P.thread_func_list) != len(P.ff):
-            for tf in P.thread_func_list.values():
-                P.ff[P.executor.submit(tf.func)] = tf.func
+            for tf in P.thread_func_list:
+                P.ff[P.executor.submit(tf)] = P.thread_func_list[tf].func
 
         for future_obj in dict(P.ff):
             func = P.ff[future_obj]
@@ -118,6 +118,6 @@ def run_thread_pool():
                     if 'P' in func.__globals__ and hasattr(func.__globals__['P'], 'thread_pool_status'):
                         progress_status = func.__globals__['P'].thread_pool_status
                         L.l.warning('Progress Status since {} sec is [{}]'.format(elapsed_seconds, progress_status))
-        time.sleep(1)
+        time.sleep(0.2)
     P.executor.shutdown()
     L.l.info('Interval thread pool processor exit')
