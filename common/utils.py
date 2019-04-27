@@ -230,13 +230,13 @@ def multikeysort(items, columns):
     return sorted(items, cmp=comparer)
 
 
-
 def init_debug():
     try:
         import ptvsd
         ptvsd.enable_attach(address=('0.0.0.0', 5678), redirect_output=True)
         print('Enabled remote debugging, waiting 15 seconds for client to attach')
         ptvsd.wait_for_attach(timeout=15)
+        breakpoint()
     except Exception as ex:
         print("Error in remote debug: {}".format(ex))
 
