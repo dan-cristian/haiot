@@ -98,7 +98,6 @@ def _get_temp_target(pattern_id):
 
 # provide heat pattern
 def _get_schedule_pattern(heat_schedule):
-
     weekday = datetime.datetime.today().weekday()
     heat_thermo = m.ZoneThermostat.find_one({m.ZoneThermostat.zone_id: heat_schedule.zone_id})
     schedule_pattern = None
@@ -124,7 +123,6 @@ def _get_schedule_pattern(heat_schedule):
 
 # turn heat source off in some cases, for alternate heat sources, when switching from solar to gas etc.
 def _get_heat_off_condition(schedule_pattern):
-
     force_off = False
     relay_name = schedule_pattern.activate_condition_relay
     zone_heat_relay = m.ZoneHeatRelay.find_one({m.ZoneHeatRelay.heat_pin_name: relay_name})
@@ -137,7 +135,6 @@ def _get_heat_off_condition(schedule_pattern):
 
 # check if we need forced heat on, if for this hour temp has a upper target than min
 def _get_heat_on_keep_warm(schedule_pattern, temp_code, temp_target, temp_actual):
-
     force_on = False
     if schedule_pattern.keep_warm and temp_actual is not None:
         minute = utils.get_base_location_now_date().minute
@@ -159,7 +156,6 @@ def _get_heat_on_keep_warm(schedule_pattern, temp_code, temp_target, temp_actual
 
 # check if temp target is manually overridden
 def _get_heat_on_manual(zone_thermo):
-
     force_on = False
     manual_temp_target = None
     if zone_thermo.last_manual_set is not None and zone_thermo.is_mode_manual:
@@ -179,7 +175,6 @@ def _get_heat_on_manual(zone_thermo):
 # set and return the required heat state in a zone (True - on, False - off).
 # Also return if main source is needed, usefull if you only heat a boiler from alternate heat source
 def _update_zone_heat(zone, heat_schedule, sensor):
-
     heat_is_on = False
     main_source_needed = True
     zone_thermo = m.ZoneThermostat.find_one({m.ZoneThermostat.zone_id: zone.id})
@@ -224,7 +219,6 @@ def _update_zone_heat(zone, heat_schedule, sensor):
 # iterate zones and decide heat state for each zone and also for master zone (main heat system)
 # if one zone requires heat master zone will be on
 def _loop_zones():
-
     try:
         heat_is_on = False
         zone_list = m.Zone.find()
@@ -273,7 +267,6 @@ def _loop_zones():
 
 # set which is the main heat source relay that must be set on
 def _set_main_heat_source():
-
     P.thread_pool_status = 'set main source'
     heat_source_relay_list = m.ZoneHeatRelay.find({'$not': {m.ZoneHeatRelay.temp_sensor_name: None}})
     up_limit = P.temp_limit + P.threshold
@@ -329,7 +322,6 @@ def _set_main_heat_source():
 
 # start/stop heat based on user movement/presence
 def _handle_presence(zone_name=None, zone_id=None):
-
     if zone_id is not None:
         heat_thermo = m.ZoneThermostat.find_one({m.ZoneThermostat.zone_id: zone_id})
         if heat_thermo is not None:
