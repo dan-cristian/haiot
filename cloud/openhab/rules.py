@@ -20,7 +20,7 @@ def send_mqtt_openhab(subtopic, payload):
 #  OUTBOUND RULES START
 
 
-def rule_openhab_sensor(obj=m.Sensor(), field_changed_list=None):
+def rule_openhab_sensor(obj=m.Sensor(), change=None):
     if obj.sensor_name is None:
         L.l.warning('Got empty openhab sensor name {}'.format(obj))
         return
@@ -47,10 +47,10 @@ def rule_openhab_sensor(obj=m.Sensor(), field_changed_list=None):
         send_mqtt_openhab(subtopic=key + "_" + obj.sensor_name, payload=obj.iad)
 
 
-def rule_openhab_dustsensor(obj=m.DustSensor(), field_changed_list=None):
-    if field_changed_list is not None:
+def rule_openhab_dustsensor(obj=m.DustSensor(), change=None):
+    if change is not None:
         address = obj.address
-        for key in field_changed_list:
+        for key in change:
             if key not in P.ignored_fields:
                 if hasattr(obj, key):
                     val = getattr(obj, key)
@@ -59,7 +59,7 @@ def rule_openhab_dustsensor(obj=m.DustSensor(), field_changed_list=None):
                     L.l.warning('Field {} in dustsensor change list but not in obj={}'.format(key, obj))
 
 
-def rule_openhab_utility(obj=m.Utility(), field_changed_list=None):
+def rule_openhab_utility(obj=m.Utility(), change=None):
     if hasattr(obj, 'utility_type') and hasattr(obj, 'utility_name') and obj.utility_name is not None:
         # L.l.info("PROCESSING utility {}".format(obj.utility_type))
         key = 'electricity'
@@ -81,7 +81,7 @@ def rule_openhab_utility(obj=m.Utility(), field_changed_list=None):
             L.l.warning('Got empty openhab utility name {}'.format(obj))
 
 
-def rule_openhab_alarm(obj=m.ZoneAlarm(), field_changed_list=None):
+def rule_openhab_alarm(obj=m.ZoneAlarm(), change=None):
     if obj.alarm_pin_name is not None:
         key = 'contact'
         if obj.alarm_pin_triggered is True:
@@ -93,28 +93,28 @@ def rule_openhab_alarm(obj=m.ZoneAlarm(), field_changed_list=None):
         L.l.warning('Got empty alarm pin name {}'.format(obj))
 
 
-def rule_openhab_ups(obj=m.Ups(), field_changed_list=None):
-    if field_changed_list is not None:
+def rule_openhab_ups(obj=m.Ups(), change=None):
+    if change is not None:
         key = 'power_failed'
-        if key in field_changed_list:
+        if key in change:
             if obj.power_failed:
                 state = "OFF"
             else:
                 state = "ON"
             send_mqtt_openhab(subtopic="ups_" + key, payload=state)
         key = 'load_percent'
-        if key in field_changed_list:
+        if key in change:
             send_mqtt_openhab(subtopic="ups_" + key, payload=obj.load_percent)
         key = 'battery_voltage'
-        if key in field_changed_list:
+        if key in change:
             send_mqtt_openhab(subtopic="ups_" + key, payload=obj.battery_voltage)
         key = 'input_voltage'
-        if key in field_changed_list:
+        if key in change:
             send_mqtt_openhab(subtopic="ups_" + key, payload=obj.input_voltage)
 
 
-def rule_openhab_custom_relay(obj=m.ZoneCustomRelay(), field_changed_list=None):
-    if field_changed_list is not None:
+def rule_openhab_custom_relay(obj=m.ZoneCustomRelay(), change=None):
+    if change is not None:
         if obj.relay_is_on:
             state = "ON"
         else:
@@ -122,9 +122,9 @@ def rule_openhab_custom_relay(obj=m.ZoneCustomRelay(), field_changed_list=None):
         send_mqtt_openhab(subtopic="relay_" + obj.relay_pin_name, payload=state)
 
 
-def rule_openhab_heat_relay(obj=m.ZoneHeatRelay(), field_changed_list=None):
+def rule_openhab_heat_relay(obj=m.ZoneHeatRelay(), change=None):
     if obj.heat_pin_name is not None:
-        if field_changed_list is not None:
+        if change is not None:
             if obj.heat_is_on:
                 state = "ON"
             else:
@@ -134,7 +134,7 @@ def rule_openhab_heat_relay(obj=m.ZoneHeatRelay(), field_changed_list=None):
         L.l.warning('Got empty heat relay pin name {}'.format(obj))
 
 
-def rule_openhab_thermo(obj=m.ZoneThermostat(), field_changed_list=None):
+def rule_openhab_thermo(obj=m.ZoneThermostat(), change=None):
     # if field_changed_list is not None and len(field_changed_list) > 0:
     #if 'heat_target_temperature' in field_changed_list:
     if hasattr(obj, 'heat_target_temperature'):
@@ -152,10 +152,10 @@ def rule_openhab_thermo(obj=m.ZoneThermostat(), field_changed_list=None):
     send_mqtt_openhab(subtopic='temperature_mode_' + zone, payload=state)
 
 
-def rule_openhab_music(obj=m.Music(), field_changed_list=None):
-    if field_changed_list is not None:
+def rule_openhab_music(obj=m.Music(), change=None):
+    if change is not None:
         zone = obj.zone_name
-        for key in field_changed_list:
+        for key in change:
             if key not in P.ignored_fields:
                 if hasattr(obj, key):
                     val = getattr(obj, key)
@@ -164,10 +164,10 @@ def rule_openhab_music(obj=m.Music(), field_changed_list=None):
                     L.l.warning('Field {} in music change list but not in obj={}'.format(key, obj))
 
 
-def rule_openhab_powermonitor(obj=m.PowerMonitor(), field_changed_list=None):
-    if field_changed_list is not None:
+def rule_openhab_powermonitor(obj=m.PowerMonitor(), change=None):
+    if change is not None:
         name = obj.name
-        for key in field_changed_list:
+        for key in change:
             if key not in P.ignored_fields:
                 if hasattr(obj, key):
                     val = getattr(obj, key)
@@ -176,9 +176,9 @@ def rule_openhab_powermonitor(obj=m.PowerMonitor(), field_changed_list=None):
                     L.l.warning('Field {} in power change list but not in obj={}'.format(key, obj))
 
 
-def rule_openhab_musicloved(obj=m.MusicLoved(), field_changed_list=None):
-    if field_changed_list is not None:
-        for key in field_changed_list:
+def rule_openhab_musicloved(obj=m.MusicLoved(), change=None):
+    if change is not None:
+        for key in change:
             if key not in P.ignored_fields:
                 if hasattr(obj, key):
                     val = getattr(obj, key)
