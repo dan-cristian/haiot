@@ -199,8 +199,8 @@ def _read_port_config():
 
 
 def _normalise(uni):
-    if isinstance(uni, str):
-        uni = uni.decode('utf-8')
+    # if isinstance(uni, str):
+    #    uni = uni.decode('utf-8')
     return unicodedata.normalize('NFKD', uni).encode('ascii', 'ignore')
 
 
