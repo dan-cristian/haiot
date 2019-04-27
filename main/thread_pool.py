@@ -1,6 +1,7 @@
 import time
 from datetime import datetime
-
+import threading
+import prctl
 import concurrent.futures
 
 from main.logger_helper import L
@@ -48,6 +49,8 @@ def get_thread_status():
 
 
 def run_thread_pool():
+    prctl.set_name("thread_pool")
+    threading.current_thread().name = "thread_pool"
     P.tpool = True
     # https://docs.python.org/3.3/library/concurrent.futures.html
     P.ff = {}

@@ -1,5 +1,7 @@
 import time
 import socket
+import threading
+import prctl
 from main.logger_helper import L
 from common import Constant, utils
 import common
@@ -98,6 +100,9 @@ def payload2json(payload):
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
+    if threading.current_thread().name != 'mqtt_loop':
+        prctl.set_name("mqtt_loop")
+        threading.current_thread().name = "mqtt_loop"
     start = utils.get_base_location_now_date()
     json = msg
     try:
