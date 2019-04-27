@@ -45,11 +45,11 @@ def _process_obj(obj):
                 table = str(obj[Constant.JSON_PUBLISH_TABLE])
                 # cls = getattr(sys.modules[tinydb_model.__name__], table)
                 cls = getattr(m, table)
-                if cls._is_used_in_module:
-                    cls.save(obj)
-                else:
-                    L.l.info('Ignoring save for {}'.format(cls.__name__))
-                    pass
+                # if cls._is_used_in_module:
+                cls.save(obj)
+                # else:
+                #    L.l.info('Ignoring save for {}'.format(cls.__name__))
+                #   pass
         else:
             L.l.error('mqtt message sent from me to me!')
     except Exception as ex:
