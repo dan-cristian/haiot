@@ -296,7 +296,7 @@ def _set_main_heat_source():
                     # if heat_source_relay.is_alternate_heat_source is False:
                     L.l.info('Alternate heat source is active with temp={}'.format(temp_rec.temperature))
                     heat_source_relay.is_alternate_heat_source = True
-                heat_source_relay.save_changed_fields()
+                    heat_source_relay.save_changed_fields()
             else:
                 # if alternate source is no longer valid
                 if heat_source_relay.is_alternate_source_switch:
