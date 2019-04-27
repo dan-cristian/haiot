@@ -1,5 +1,6 @@
 import inspect
 import sys
+import traceback
 from pydispatch import dispatcher
 from main import thread_pool
 import datetime
@@ -34,7 +35,6 @@ class P:
 
 # save heat status and announce to all nodes.
 def _save_heat_state_db(zone, heat_is_on):
-    L.add_history()
     zone_heat_relay = m.ZoneHeatRelay.find_one({m.ZoneHeatRelay.zone_id: zone.id})
     zone_thermo = m.ZoneThermostat.find_one({m.ZoneThermostat.zone_id: zone.id})
     if zone_thermo is None:
@@ -55,7 +55,6 @@ def _save_heat_state_db(zone, heat_is_on):
 
 # triggers heat status update if heat changed
 def _decide_action(zone, current_temperature, target_temperature, force_on=False, force_off=False, zone_thermo=None):
-    L.add_history()
     heat_is_on = None
     if force_on:
         heat_is_on = True
@@ -82,7 +81,6 @@ def _decide_action(zone, current_temperature, target_temperature, force_on=False
 
 
 def _get_temp_target(pattern_id):
-    L.add_history()
     hour = utils.get_base_location_now_date().hour
     schedule_pattern = m.SchedulePattern.find_one({m.SchedulePattern.id: pattern_id})
     # strip formatting characters that are not used to represent target temperature
@@ -100,7 +98,7 @@ def _get_temp_target(pattern_id):
 
 # provide heat pattern
 def _get_schedule_pattern(heat_schedule):
-    L.add_history()
+
     weekday = datetime.datetime.today().weekday()
     heat_thermo = m.ZoneThermostat.find_one({m.ZoneThermostat.zone_id: heat_schedule.zone_id})
     schedule_pattern = None
@@ -126,7 +124,7 @@ def _get_schedule_pattern(heat_schedule):
 
 # turn heat source off in some cases, for alternate heat sources, when switching from solar to gas etc.
 def _get_heat_off_condition(schedule_pattern):
-    L.add_history()
+
     force_off = False
     relay_name = schedule_pattern.activate_condition_relay
     zone_heat_relay = m.ZoneHeatRelay.find_one({m.ZoneHeatRelay.heat_pin_name: relay_name})
@@ -139,7 +137,7 @@ def _get_heat_off_condition(schedule_pattern):
 
 # check if we need forced heat on, if for this hour temp has a upper target than min
 def _get_heat_on_keep_warm(schedule_pattern, temp_code, temp_target, temp_actual):
-    L.add_history()
+
     force_on = False
     if schedule_pattern.keep_warm and temp_actual is not None:
         minute = utils.get_base_location_now_date().minute
@@ -161,7 +159,7 @@ def _get_heat_on_keep_warm(schedule_pattern, temp_code, temp_target, temp_actual
 
 # check if temp target is manually overridden
 def _get_heat_on_manual(zone_thermo):
-    L.add_history()
+
     force_on = False
     manual_temp_target = None
     if zone_thermo.last_manual_set is not None and zone_thermo.is_mode_manual:
@@ -181,7 +179,7 @@ def _get_heat_on_manual(zone_thermo):
 # set and return the required heat state in a zone (True - on, False - off).
 # Also return if main source is needed, usefull if you only heat a boiler from alternate heat source
 def _update_zone_heat(zone, heat_schedule, sensor):
-    L.add_history()
+
     heat_is_on = False
     main_source_needed = True
     zone_thermo = m.ZoneThermostat.find_one({m.ZoneThermostat.zone_id: zone.id})
@@ -226,7 +224,7 @@ def _update_zone_heat(zone, heat_schedule, sensor):
 # iterate zones and decide heat state for each zone and also for master zone (main heat system)
 # if one zone requires heat master zone will be on
 def _loop_zones():
-    L.add_history()
+
     try:
         heat_is_on = False
         zone_list = m.Zone.find()
@@ -275,13 +273,14 @@ def _loop_zones():
 
 # set which is the main heat source relay that must be set on
 def _set_main_heat_source():
-    L.add_history()
+
     P.thread_pool_status = 'set main source'
     heat_source_relay_list = m.ZoneHeatRelay.find({'$not': {m.ZoneHeatRelay.temp_sensor_name: None}})
     up_limit = P.temp_limit + P.threshold
     for heat_source_relay in heat_source_relay_list:
         if heat_source_relay.heat_pin_name == 'puffer gas valve':
-            utils.init_debug()
+            traceback.print_stack()
+            L.l.info('Debug 1 {}'.format(heat_source_relay))
         # is there is a temp sensor defined, consider this source as possible alternate source
         if heat_source_relay.temp_sensor_name is not None:
             temp_rec = m.Sensor.find_one({m.Sensor.sensor_name: heat_source_relay.temp_sensor_name})
@@ -330,7 +329,7 @@ def _set_main_heat_source():
 
 # start/stop heat based on user movement/presence
 def _handle_presence(zone_name=None, zone_id=None):
-    L.add_history()
+
     if zone_id is not None:
         heat_thermo = m.ZoneThermostat.find_one({m.ZoneThermostat.zone_id: zone_id})
         if heat_thermo is not None:
@@ -340,15 +339,16 @@ def _handle_presence(zone_name=None, zone_id=None):
 
 
 def _zoneheatrelay_upsert_listener(record, changed_fields):
-    L.add_history()
     # set pin only on pins owned by this host
     if record.gpio_host_name == Constant.HOST_NAME and record.heat_is_on is not None:
         # L.l.info("Setting heat pin {}:{} to {}".format(record.heat_pin_name, record.gpio_pin_code, pin_value))
+        if record.heat_pin_name == 'puffer gas valve':
+            traceback.print_stack()
+            L.l.info('Debug 2 {} ---- {}'.format(record, changed_fields))
         pin_state = gpio.set_relay_state(
             pin_code=record.gpio_pin_code, relay_is_on=record.heat_is_on, relay_type=record.relay_type)
         L.l.info("Setting heat pin {}:{}:{} to {} returned {}".format(
             record.heat_pin_name, record.gpio_pin_code, record.relay_type, record.heat_is_on, pin_state))
-        L.l.info('Thread history is:{}'.format(L.func_history()))
 
 
 def _zonethermostat_upsert_listener(record, changed_fields):
