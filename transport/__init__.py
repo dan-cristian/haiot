@@ -13,14 +13,18 @@ import transport.mqtt_io
 from pydispatch import dispatcher
 from common import utils, Constant
 from transport import mqtt_io
-
+from main import general_init
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 
 class P:
     initialised = False
     send_json_queue = []
-    mqtt_lock = threading.Lock()
+    mqtt_send_lock = threading.Lock()
+    send_thread_lock = threading.Lock()
+    recv_thread_lock = threading.Lock()
+    thread_recv = None
+    thread_send = None
 
     def __init__(self):
         pass
@@ -29,38 +33,41 @@ class P:
 # exit fast to avoid blocking db commit request?
 def send_message_json(json=''):
     P.send_json_queue.append([json, mqtt_io.P.topic_main])
+    # if P.send_thread_lock.locked():
+    #    P.send_thread_lock.release()
 
 
 def send_message_topic(json='', topic=None):
     P.send_json_queue.append([json, topic])
+    if P.recv_thread_lock.locked():
+        P.recv_thread_lock.release()
 
 
 def thread_run_send():
     prctl.set_name("mqtt_send")
     threading.current_thread().name = "mqtt_send"
-    P.mqtt_lock.acquire()
-    try:
-        if mqtt_io.P.client_connected:
-            start_len = len(P.send_json_queue)
-            if start_len > 10:
-                L.l.info('Mqtt SEND len={}'.format(start_len))
-            # FIXME: complete this, will potentially accumulate too many requests
-            for [json, topic] in list(P.send_json_queue):
-                res = transport.mqtt_io._send_message(json, topic)
-                if res:
-                    P.send_json_queue.remove([json, topic])
-                else:
-                    L.l.info('Failed to send mqtt message, res={}'.format(res))
-            end_len = len(P.send_json_queue)
-            if end_len > 10:
-                L.l.warning("{} messages are pending for transport, start was {}".format(end_len, start_len))
-        else:
-            elapsed = (utils.get_base_location_now_date() - mqtt_io.P.last_connect_attempt).total_seconds()
-            if elapsed > 10:
-                L.l.info("Initialising mqtt as message needs to be sent, elapsed={}".format(elapsed))
-                mqtt_io.init()
-    finally:
-        P.mqtt_lock.release()
+    P.thread_send = threading.current_thread()
+    if mqtt_io.P.client_connected:
+        start_len = len(P.send_json_queue)
+        if start_len > 10:
+            L.l.info('Mqtt SEND len={}'.format(start_len))
+        # FIXME: complete this, will potentially accumulate too many requests
+        P.mqtt_send_lock.acquire()
+        for [json, topic] in list(P.send_json_queue):
+            res = transport.mqtt_io._send_message(json, topic)
+            if res:
+                P.send_json_queue.remove([json, topic])
+            else:
+                L.l.info('Failed to send mqtt message, res={}'.format(res))
+        P.mqtt_send_lock.release()
+        end_len = len(P.send_json_queue)
+        if end_len > 10:
+            L.l.warning("{} messages are pending for transport, start was {}".format(end_len, start_len))
+    else:
+        elapsed = (utils.get_base_location_now_date() - mqtt_io.P.last_connect_attempt).total_seconds()
+        if elapsed > 10:
+            L.l.info("Initialising mqtt as message needs to be sent, elapsed={}".format(elapsed))
+            mqtt_io.init()
     prctl.set_name("idle")
     threading.current_thread().name = "idle"
 
@@ -68,6 +75,7 @@ def thread_run_send():
 def thread_run_recv():
     prctl.set_name("mqtt_recv")
     threading.current_thread().name = "mqtt_recv"
+    P.thread_recv = threading.current_thread()
     obj = None
     try:
         if len(mqtt_io.P.received_mqtt_list) > 10:
@@ -93,8 +101,8 @@ def unload():
 def init():
     from main import thread_pool
     L.l.info('Transport initialising')
-    thread_pool.add_interval_callable(thread_run_send, run_interval_second=1)
-    thread_pool.add_interval_callable(thread_run_recv, run_interval_second=1)
+    thread_pool.add_interval_callable(thread_run_send, run_interval_second=0.2)
+    thread_pool.add_interval_callable(thread_run_recv, run_interval_second=0.2)
     mqtt_io.init()
     # utils.init_debug()
     P.initialised = True

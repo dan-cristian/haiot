@@ -27,6 +27,9 @@ if __name__ == '__main__':
 
     from main.logger_helper import L
     L.l.info('Feeding dogs with grass until app will exit')
+    if common.Constant.HOST_NAME == 'netbook':
+        common.Constant.HOST_NAME = 'pi-face'
+        common.Constant.debug_dummy = True
     try:
         while not main.general_init.P.shutting_down:
             time.sleep(1)
