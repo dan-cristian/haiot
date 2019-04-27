@@ -146,7 +146,7 @@ def init(arg_list):
     if 'debug_remote' in arg_list:
         if Constant.is_os_linux():
             from pudb import set_trace
-            set_trace()
+            set_trace(paused=False)
     system_info.init()
     # import storage.tiny.tinydb_app
     # storage.tiny.tinydb_app.init(arg_list)
