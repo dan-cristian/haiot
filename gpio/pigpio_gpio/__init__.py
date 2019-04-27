@@ -187,7 +187,7 @@ class PwmIo(GpioBase):
 
     @staticmethod
     def get_db_record(key):
-        rec = m.Pwm.find_one({m.Pwm.name: key})
+        rec = m.Pwm.find_one({m.Pwm.id: key})
         if rec is not None and rec.id == key:
             # PwmIo.key_ok = PwmIo.key_ok + 1
             # L.l.info("KEY found ok {}, count={}".format(key, PwmIo.key_ok))
