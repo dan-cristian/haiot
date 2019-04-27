@@ -9,6 +9,7 @@ from main.logger_helper import L
 from common import utils, Constant, get_json_param
 import gpio
 from storage.model import m
+import pudb
 
 __author__ = 'dcristian'
 
@@ -364,7 +365,7 @@ def thread_run():
     threading.current_thread().name = "heat"
     L.init_history(force=True)
     if Constant.is_os_linux():
-        breakpoint()
+        pudb.set_trace()
     if P.threshold is None:
         P.threshold = float(get_json_param(Constant.P_TEMPERATURE_THRESHOLD))
         P.temp_limit = float(get_json_param(Constant.P_HEAT_SOURCE_MIN_TEMP))
