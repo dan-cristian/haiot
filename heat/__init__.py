@@ -33,11 +33,12 @@ class P:
 
 
 def _add_history(msg=''):
-    a = inspect.currentframe().f_back
-    P.thread_local.func_history += '{}[{}]: '.format(inspect.currentframe().f_back.f_code.co_name, msg)
-    # print(inspect.currentframe().f_code.co_name)
-    # print(inspect.stack()[0][3])
-    # print(sys._getframe().f_code.co_name)
+    if P.thread_local is not None:
+        a = inspect.currentframe().f_back
+        P.thread_local.func_history += '{}[{}]: '.format(inspect.currentframe().f_back.f_code.co_name, msg)
+        # print(inspect.currentframe().f_code.co_name)
+        # print(inspect.stack()[0][3])
+        # print(sys._getframe().f_code.co_name)
 
 
 # save heat status and announce to all nodes.
@@ -51,14 +52,11 @@ def _save_heat_state_db(zone, heat_is_on):
         zone_thermo.zone_name = zone.name
     if zone_heat_relay is not None:
         zone_heat_relay.heat_is_on = heat_is_on
-        zone_heat_relay.updated_on = utils.get_base_location_now_date()
-        zone_heat_relay.notify_transport_enabled = True
-        zone_heat_relay.save_to_graph = True
-        zone_heat_relay.save_to_history = True
         # save latest heat state for caching purposes
         zone_thermo.heat_is_on = heat_is_on
         zone_thermo.last_heat_status_update = utils.get_base_location_now_date()
         zone_heat_relay.save_changed_fields(broadcast=True, persist=True)
+        _add_history('thermo')
         zone_thermo.save_changed_fields()
     else:
         L.l.warning('No heat relay found in zone {} id {}'.format(zone.name, zone.id))
@@ -374,7 +372,7 @@ def thread_run():
     prctl.set_name("heat")
     threading.current_thread().name = "heat"
     P.thread_local = threading.local()
-    P.thread_local.func_history = ''
+    P.thread_local.func_history = str(datetime.datetime.now())
     if P.threshold is None:
         P.threshold = float(get_json_param(Constant.P_TEMPERATURE_THRESHOLD))
         P.temp_limit = float(get_json_param(Constant.P_HEAT_SOURCE_MIN_TEMP))
