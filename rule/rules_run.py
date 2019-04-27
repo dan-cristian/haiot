@@ -65,8 +65,8 @@ def execute_macro(obj=m.Rule(), field_changed_list=None, force_exec=False):
     return result
 
 
-def rule_node(obj=m.Node(), field_changed_list=None):
-    if not field_changed_list:
+def rule_node(obj=m.Node(), change=None):
+    if not change:
         field_changed_list = []
     return 'rule node ok'
 
@@ -117,8 +117,8 @@ def rule_alarm(obj=m.ZoneAlarm(), field_changed_list=None):
 
 
 # min & max temperatures
-def rule_sensor_temp_target(obj=m.Sensor(), field_changed_list=None):
-    if not field_changed_list:
+def rule_sensor_temp_target(obj=m.Sensor(), change=None):
+    if not change:
         field_changed_list = []
     #temp = obj.temperature
     return 'rule temp ok'
@@ -137,7 +137,7 @@ class TempStore:
 
 
 # catch sudden changes or extremes (fire or cold)
-def rule_sensor_temp_extreme(obj=m.Sensor(), field_changed_list=None):
+def rule_sensor_temp_extreme(obj=m.Sensor(), change=None):
     if hasattr(obj, 'temperature') and obj.temperature is not None:
         if sqlitedb:
             # m = ZoneSensor()
@@ -187,21 +187,21 @@ def rule_sensor_temp_extreme(obj=m.Sensor(), field_changed_list=None):
 
 
 # ups rule
-def rule_ups_power(obj=m.Ups(), field_changed_list=None):
+def rule_ups_power(obj=m.Ups(), change=None):
     # Log.logger.info("changed list is {}".format(field_changed_list))
-    if field_changed_list is not None:
-        if 'power_failed' in field_changed_list:
+    if change is not None:
+        if 'power_failed' in change:
             if obj.power_failed:
                 rule_common.notify_via_all(title="UPS power LOST", message="power lost", priority=1)
             else:
                 rule_common.notify_via_all(title="UPS power OK", message="power is back", priority=1)
-        if 'battery_voltage' in field_changed_list:
+        if 'battery_voltage' in change:
             if obj.battery_voltage <= 52:
                 rule_common.notify_via_all("UPS battery low at {} volts".format(obj.battery_voltage), "Low voltage")
-        if 'load_percent' in field_changed_list:
+        if 'load_percent' in change:
             if obj.load_percent >= 60:
                 rule_common.notify_via_all("UPS load HIGH at {}".format(obj.load_percent), "High ups load")
-        if 'input_voltage' in field_changed_list:
+        if 'input_voltage' in change:
             if obj.input_voltage <= 190:
                 rule_common.send_notification(title="Low grid voltage {}".format(obj.input_voltage),
                                               message="Grid low at {} volts".format(obj.input_voltage))
