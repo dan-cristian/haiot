@@ -38,7 +38,7 @@ class DictTable:
         # if self.model_class._column_type_list[new_key] == int:
         self.index[new_key] = {}
         for rec in newlist:
-            key = rec[1]
+            key = rec[1][self.model_class._main_key]
             if new_key in rec[1]:
                 key_val = rec[1][new_key]
                 self.index[new_key][key_val] = key
@@ -127,7 +127,7 @@ class DictTable:
                 if key in self.index:
                     indexed_recs = self.index[key]
                     if doc[key] in indexed_recs:
-                        good_key_val = indexed_recs[doc[key]][self.model_class._main_key]
+                        good_key_val = indexed_recs[doc[key]]
                     else:
                         L.l.error('Key {} not in index {}'.format(key, cls_name))
                         return None
