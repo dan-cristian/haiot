@@ -47,7 +47,7 @@ except ImportError:
 # first parameter must have an object type equal to the object for which you get events in case there are DB changes
 # 2nd parameter will contain list of fields changed
 
-def execute_macro(obj=m.Rule(), field_changed_list=None, force_exec=False):
+def execute_macro(obj=m.Rule(), change=None, force_exec=False):
     if obj.execute_now or force_exec:
         L.l.info('Execute macro {} as execute_now is True'.format(obj.command))
         # obj.execute_now = False
@@ -71,7 +71,7 @@ def rule_node(obj=m.Node(), change=None):
     return 'rule node ok'
 
 
-def rule_alarm(obj=m.ZoneAlarm(), field_changed_list=None):
+def rule_alarm(obj=m.ZoneAlarm(), change=None):
     # Log.logger.info('Rule Alarm: obj={} fields={}'.format(obj, field_changed_list))
     if obj.alarm_pin_triggered:
         if obj.start_alarm:
