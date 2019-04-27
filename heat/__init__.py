@@ -363,6 +363,8 @@ def thread_run():
     prctl.set_name("heat")
     threading.current_thread().name = "heat"
     L.init_history(force=True)
+    if Constant.is_os_linux():
+        breakpoint()
     if P.threshold is None:
         P.threshold = float(get_json_param(Constant.P_TEMPERATURE_THRESHOLD))
         P.temp_limit = float(get_json_param(Constant.P_HEAT_SOURCE_MIN_TEMP))
@@ -389,4 +391,3 @@ def init():
     P.initialised = True
     m.ZoneHeatRelay.add_upsert_listener(_zoneheatrelay_upsert_listener)
     m.ZoneThermostat.add_upsert_listener(_zonethermostat_upsert_listener)
-    utils.init_debug()
