@@ -9,7 +9,6 @@ from main.logger_helper import L
 from common import utils, Constant, get_json_param
 import gpio
 from storage.model import m
-import pudb
 
 __author__ = 'dcristian'
 
@@ -281,8 +280,8 @@ def _set_main_heat_source():
     heat_source_relay_list = m.ZoneHeatRelay.find({'$not': {m.ZoneHeatRelay.temp_sensor_name: None}})
     up_limit = P.temp_limit + P.threshold
     for heat_source_relay in heat_source_relay_list:
-        # if heat_source_relay.heat_pin_name == 'puffer heat':
-        #    breakpoint()
+        if heat_source_relay.heat_pin_name == 'puffer gas valve':
+            utils.init_debug()
         # is there is a temp sensor defined, consider this source as possible alternate source
         if heat_source_relay.temp_sensor_name is not None:
             temp_rec = m.Sensor.find_one({m.Sensor.sensor_name: heat_source_relay.temp_sensor_name})
@@ -363,8 +362,6 @@ def _zonethermostat_upsert_listener(record, changed_fields):
 def thread_run():
     prctl.set_name("heat")
     threading.current_thread().name = "heat"
-    # if Constant.is_os_linux():
-    #    pudb.set_trace()
     if P.threshold is None:
         P.threshold = float(get_json_param(Constant.P_TEMPERATURE_THRESHOLD))
         P.temp_limit = float(get_json_param(Constant.P_HEAT_SOURCE_MIN_TEMP))
