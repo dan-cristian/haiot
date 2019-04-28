@@ -12,19 +12,6 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 initialised = False
 
 
-def not_used_record_update(obj, source_host):
-    if sqlitedb:
-        utility_rec = utils.json_to_record(models.Utility(), obj)
-    else:
-        utility_rec = m.Utility()
-    if source_host != Constant.HOST_NAME:
-        if sqlitedb:
-            current_rec = models.Utility.query.filter_by(utility_name=utility_rec.utility_name).first()
-        else:
-            current_rec = m.Utility.find_one({m.Utility.utility_name: utility_rec.utility_name})
-        utility_rec.save_changed_fields(current_record=current_rec, notify_transport_enabled=False, save_to_graph=False)
-
-
 # water & electricity utility from specialised sensors
 def __utility_update_ex(sensor_name, value, unit=None, index=None):
     try:
@@ -102,65 +89,46 @@ def __utility_update(sensor_name, units_delta_a, units_delta_b, total_units_a, t
         ignore_save = False
         for delta in [units_delta_a, units_delta_b]:
             if delta is not None: # and delta != 0:
-                if sqlitedb:
-                    record = models.Utility(sensor_name=sensor_name)
-                    current_record = models.Utility.query.filter_by(sensor_name=sensor_name, sensor_index=index).first()
-                else:
-                    record = m.Utility()
-                    record.sensor_name = sensor_name
-                    current_record = m.Utility.find_one({m.Utility.sensor_name: sensor_name, 
-                                                         m.Utility.sensor_index: index})
-                if current_record is not None:
+                record = m.Utility.find_one({m.Utility.sensor_name: sensor_name,  m.Utility.sensor_index: index})
+                if record is not None:
                     record.sensor_index = index
-                    record.utility_name = current_record.utility_name
-                    if current_record.utility_type == Constant.UTILITY_TYPE_ELECTRICITY:
-                        record.units_delta = delta / (current_record.ticks_per_unit * 1.0)  # kwh
-                        record.unit_name = current_record.unit_name  # Constant.UTILITY_TYPE_ELECTRICITY_MEASURE
+                    if record.utility_type == Constant.UTILITY_TYPE_ELECTRICITY:
+                        record.units_delta = delta / (record.ticks_per_unit * 1.0)  # kwh
                         record.units_2_delta = (1000 * record.units_delta) / (sampling_period_seconds / 3600.0)  # watts
                         L.l.debug("Watts usage in {} is {}".format(record.utility_name, record.units_2_delta))
-                        record.unit_2_name = current_record.unit_2_name
-                    elif current_record.utility_type == Constant.UTILITY_TYPE_WATER:
-                        record.unit_name = current_record.unit_name  # Constant.UTILITY_TYPE_WATER_MEASURE
-                        record.units_delta = delta / (current_record.ticks_per_unit * 1.0)
+                    elif record.utility_type == Constant.UTILITY_TYPE_WATER:
+                        record.units_delta = delta / (record.ticks_per_unit * 1.0)
                         record.units_2_delta = 0.0  # to match comparison in field changed
                         L.l.debug("Saving utility water delta={}".format(record.units_delta))
-                    elif current_record.utility_type == Constant.UTILITY_TYPE_GAS:
-                        record.unit_name = current_record.unit_name  # Constant.UTILITY_TYPE_GAS_MEASURE
-                        record.units_delta = delta / (current_record.ticks_per_unit * 1.0)
+                    elif record.utility_type == Constant.UTILITY_TYPE_GAS:
+                        record.units_delta = delta / (record.ticks_per_unit * 1.0)
                         record.units_2_delta = 0.0  # to match comparison in field changed
                         L.l.debug("Saving utility gas delta={}".format(record.units_delta))
                     else:
                         L.l.debug("Saving unknown utility type={} sensor={}".format(
-                            current_record.utility_type, sensor_name))
-                        if current_record.ticks_per_unit is not None:
-                            record.units_delta = delta / (current_record.ticks_per_unit * 1.0)  # force float operation
+                            record.utility_type, sensor_name))
+                        if record.ticks_per_unit is not None:
+                            record.units_delta = delta / (record.ticks_per_unit * 1.0)  # force float operation
                             record.units_2_delta = 0.0
                         else:
                             L.l.warning("Null ticks per unit")
                     record.ticks_delta = delta
-                    if current_record.unit_cost is None:
-                        current_record.unit_cost = 0.0
-                    record.cost = 1.0 * record.units_delta * current_record.unit_cost
+                    if record.unit_cost is None:
+                        record.unit_cost = 0.0
+                    record.cost = 1.0 * record.units_delta * record.unit_cost
                     # todo: read previous value from history
-                    if current_record.units_total is None:
+                    if record.units_total is None:
                         # get val from history db
-                        if sqlitedb:
-                            last_rec = models.UtilityHistory.query.filter_by(
-                                utility_name=record.utility_name).order_by(desc(models.UtilityHistory.id)).first()
-                        else:
-                            # fixme:
-                            last_rec = None
-                            pass
+                        # fixme:
+                        last_rec = None
                         if last_rec is not None:
-                            current_record.units_total = last_rec.units_total
+                            record.units_total = last_rec.units_total
                         else:
                             L.l.warning("Could not find last history record for {}".format(record.utility_name))
-                            current_record.units_total = 0.0
-                    record.units_total = 0.0 + current_record.units_total + record.units_delta
-                    L.l.debug("Saving utility record {} name={}".format(current_record, record.utility_name))
-                    record.save_changed_fields(current_record=current_record, new_record=record, debug=is_debug,
-                                               notify_transport_enabled=True, save_to_graph=True,
-                                               save_all_fields=False)
+                            record.units_total = 0.0
+                    record.units_total = 0.0 + record.units_total + record.units_delta
+                    L.l.debug("Saving utility record {} name={}".format(record, record.utility_name))
+                    record.save_changed_fields(broadcast=True, persist=True)
                 else:
                     L.l.critical("Counter sensor [{}] index {} is not defined in Utility table".format(
                         sensor_name, index))

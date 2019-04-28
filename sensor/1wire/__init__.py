@@ -112,10 +112,11 @@ def save_to_db(dev):
     try:
         delta_time_counters = None
         address = dev['address']
-        record = m.Sensor()
-        record.address = address
         zone_sensor = m.ZoneSensor.find_one({m.ZoneSensor.sensor_address: address})
-        current_record = m.Sensor.find_one({m.Sensor.address: address})
+        record = m.Sensor.find_one({m.Sensor.address: address})
+        if record is None:
+            record = m.Sensor()
+            record.address = address
         if zone_sensor:
             record.sensor_name = zone_sensor.sensor_name
         else:
@@ -124,18 +125,18 @@ def save_to_db(dev):
         record.updated_on = utils.get_base_location_now_date()
         record.comment = dev['path']
         if 'counters_a' in dev.keys():
-            record.counters_a = dev['counters_a']
-            if current_record:
-                record.delta_counters_a = record.counters_a - current_record.counters_a
-                # get accurate interval (e.g. to establish power consumption in watts)
-                delta_time_counters = (utils.get_base_location_now_date() - current_record.updated_on).total_seconds()
-            else:  # when running first time with db empty
+            if record.counters_a is not None:
+                record.delta_counters_a = dev['counters_a'] - record.counters_a
+            else:
                 record.delta_counters_a = 0  # don't know prev. count, assume no consumption (ticks could be lost)
+            if record.updated_on is not None:
+                # get accurate interval (e.g. to establish power consumption in watts)
+                delta_time_counters = (utils.get_base_location_now_date() - record.updated_on).total_seconds()
+            else:  # when running first time with db empty
                 delta_time_counters = P.sampling_period_seconds
         if 'counters_b' in dev.keys():
-            record.counters_b = dev['counters_b']
-            if current_record:
-                record.delta_counters_b = record.counters_b - current_record.counters_b
+            if record.counters_b is not None:
+                record.delta_counters_b = dev['counters_b'] - record.counters_b
             else:
                 # fixme: don't know prev. count, assume no consumption (ticks could be lost)
                 record.delta_counters_b = 0
@@ -159,12 +160,7 @@ def save_to_db(dev):
             record.sensed_b = dev['sensed_b']
         # force field changed detection for delta_counters to enable save in history
         # but allow one 0 record to be saved for nicer graphics
-        if current_record is not None:
-            if record.delta_counters_a != 0:
-                current_record.delta_counters_a = 0
-            if record.delta_counters_b != 0:
-                current_record.delta_counters_b = 0
-        record.save_changed_fields(current_record=current_record, new_record=record, broadcast=True, persist=True)
+        record.save_changed_fields(broadcast=True, persist=True)
         if record.delta_counters_a is not None or record.delta_counters_b is not None:
             dispatcher.send(Constant.SIGNAL_UTILITY, sensor_name=record.sensor_name,
                             units_delta_a=record.delta_counters_a, units_delta_b=record.delta_counters_b,

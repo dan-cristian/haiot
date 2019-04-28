@@ -122,12 +122,11 @@ def __read_ups_status():
                 P.ups.TestInProgress = (P.ups.OtherStatus[5] == '1')
                 P.ups.BeeperOn = (P.ups.OtherStatus[7] == '1')
 
-            if sqlitedb:
-                record = models.Ups()
-            else:
+            record = m.Ups.find_one({m.Ups.system_name: Constant.HOST_NAME})
+            if record is None:
                 record = m.Ups()
-            record.name = P.ups.Name
-            record.system_name = Constant.HOST_NAME
+                record.name = P.ups.Name
+                record.system_name = Constant.HOST_NAME
             record.input_voltage = P.ups.InputVoltage
             record.remaining_minutes = P.ups.RemainingMinutes
             record.battery_voltage = P.ups.BatteryVoltage
@@ -139,12 +138,7 @@ def __read_ups_status():
             record.other_status = P.ups.OtherStatus
             record.power_failed = P.ups.PowerFailed
             record.updated_on = utils.get_base_location_now_date()
-            if sqlitedb:
-                current_record = models.Ups.query.filter_by(system_name=Constant.HOST_NAME).first()
-            else:
-                current_record = m.Ups.find_one({m.Ups.system_name: Constant.HOST_NAME})
-            record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
-                                       save_to_graph=True)
+            record.save_changed_fields(broadcast=True, persist=True)
 
             L.l.debug('UPS remaining={} load={} input={} output={}'.format(
                 P.ups.RemainingMinutes, P.ups.LoadPercent, P.ups.InputVoltage, P.ups.OutputVoltage))
@@ -157,24 +151,6 @@ def __read_ups_status():
 def _quiet():
     status = __write_read_port(P.serial, 'Q\r')
     L.l.info('Set quiet returned: {}'.format(status))
-
-
-def _create_dummy_entry():
-    name = "dummy UPS"
-    if sqlitedb:
-        record = models.Ups()
-        current_record = models.Ups.query.filter_by(name=name).first()
-    else:
-        record = m.Ups()
-        current_record = m.Ups.find_one({m.Ups.name: name})
-    record.name = name
-    if current_record is None:
-        record.save_changed_fields(current_record=current_record, new_record=record)
-    else:
-        record.name = current_record.name
-        record.power_failed = 1
-        record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=True,
-                                   save_to_graph=True)
 
 
 def _init_comm():

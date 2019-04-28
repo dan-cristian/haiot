@@ -17,13 +17,11 @@ def not_used_record_update(obj):
             address = utils.get_object_field_value(obj, 'address')
             n_address = utils.get_object_field_value(obj, 'n_address')
             sensor_type = utils.get_object_field_value(obj, 'type')
-            if sqlitedb:
-                record = models.Sensor(address=address)
-                zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=address).first()
-            else:
+            record = m.Sensor.find_one({m.Sensor.address: address})
+            if record is None:
                 record = m.Sensor()
                 record.address = address
-                zone_sensor = m.ZoneSensor.find_one({m.ZoneSensor.sensor_address: address})
+            zone_sensor = m.ZoneSensor.find_one({m.ZoneSensor.sensor_address: address})
             if zone_sensor is not None:
                 record.sensor_name = zone_sensor.sensor_name
             else:
@@ -50,16 +48,10 @@ def not_used_record_update(obj):
             if 'sensed_a' in obj: record.sensed_a = utils.get_object_field_value(obj, 'sensed_a')
             if 'sensed_b' in obj: record.sensed_b = utils.get_object_field_value(obj, 'sensed_b')
 
-            if sqlitedb:
-                current_record = models.Sensor.query.filter_by(address=address).first()
-            else:
-                current_record = m.Sensor.find_one({m.Sensor.address: address})
             # force field changed detection for delta_counters
-            if current_record:
-                current_record.delta_counters_a = 0
-                current_record.delta_counters_b = 0
-            record.save_changed_fields(current_record=current_record, new_record=record, notify_transport_enabled=False,
-                                       save_to_graph=False)
+            record.delta_counters_a = 0
+            record.delta_counters_b = 0
+            record.save_changed_fields(broadcast=False, persist=False)
             # commit() # not needed?
 
             # enable below only for testing on netbook

@@ -30,26 +30,18 @@ def _read_bmp280():
     temperature = P.obj_bmp280.get_temperature()
     pressure = P.obj_bmp280.get_pressure()
     sensor_address = Constant.HOST_NAME + '_bmp280'
-    if sqlitedb:
-        zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=sensor_address).first()
-    else:
-        zone_sensor = m.ZoneSensor.find_one({m.ZoneSensor.sensor_address: sensor_address})
+    zone_sensor = m.ZoneSensor.find_one({m.ZoneSensor.sensor_address: sensor_address})
     if zone_sensor is not None:
         sensor_name = zone_sensor.sensor_name
-        if sqlitedb:
-            current_record = models.Sensor.query.filter_by(address=sensor_address).first()
-            record = models.Sensor(address=sensor_address, sensor_name=sensor_name)
-        else:
-            current_record = m.Sensor.find_one({m.Sensor.address: sensor_address})
+        record = m.Sensor.find_one({m.Sensor.address: sensor_address})
+        if record is None:
             record = m.Sensor()
             record.address = sensor_address
             record.sensor_name = sensor_name
-        if current_record is None:
             record.type = 'BMP280'
         record.temperature = round(temperature, 1)
         record.pressure = round(pressure, 1)
-        record.save_changed_fields(current_record=current_record, new_record=record,
-                                   notify_transport_enabled=True, save_to_graph=True, debug=False)
+        record.save_changed_fields(broadcast=True, persist=True)
     else:
         L.l.info("Undefined {} sensor found temp={} and pressure={}".format(sensor_address, temperature, pressure))
 
