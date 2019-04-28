@@ -130,26 +130,17 @@ def announce_node_state():
     try:
         L.l.debug('I tell everyone my node state')
         # current_record = models.Node.query.filter_by(name=constant.HOST_NAME).first()
-        if sqlitedb:
-            node = models.Node()
-            current_record = models.Node().query_filter_first(models.Node.name.in_([Constant.HOST_NAME, ""]))
-        else:
+        node = m.Node.find_one({m.Node.name: Constant.HOST_NAME})
+        if node is None:
             node = m.Node()
-            current_record = m.Node.find_one({m.Node.name: Constant.HOST_NAME})
-        node.name = Constant.HOST_NAME
-        if not current_record:
-            node.priority = random.randint(1, 100) # todo: clarify why 1 -100?
+            node.priority = random.randint(1, 100)  # todo: clarify why 1 -100?
             node.run_overall_cycles = 0
             node.master_overall_cycles = 0
-        else:
-            node.run_overall_cycles = current_record.run_overall_cycles
-            node.master_overall_cycles = current_record.master_overall_cycles
-            node.is_master_logging = current_record.is_master_logging
-            node.is_master_overall = current_record.is_master_overall
-            if not node.run_overall_cycles:
-                node.run_overall_cycles = 0
-            if not node.master_overall_cycles:
-                node.master_overall_cycles = 0
+        node.name = Constant.HOST_NAME
+        if not node.run_overall_cycles:
+            node.run_overall_cycles = 0
+        if not node.master_overall_cycles:
+            node.master_overall_cycles = 0
         node.event_sent_datetime= utils.get_base_location_now_date()
         node.updated_on = utils.get_base_location_now_date()
         node.ip = Constant.HOST_MAIN_IP
@@ -158,11 +149,8 @@ def announce_node_state():
         node.run_overall_cycles += 1
         node.os_type = Constant.OS
         node.machine_type = Constant.HOST_MACHINE_TYPE
-        node.priority = current_record.priority
-        node.notify_transport_enabled = True
         progress_status = 'Announce node status before save fields'
-        node.save_changed_fields(current_record=current_record, new_record=node, notify_transport_enabled=True,
-                                 save_to_graph=True, graph_save_frequency=120)
+        node.save_changed_fields(broadcast=True, persist=True)
     except Exception as ex:
         L.l.error('Unable to announce my state, err={}'.format(ex), exc_info=True)
 

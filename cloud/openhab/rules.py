@@ -199,10 +199,7 @@ def custom_relay(name, value):
     if relay is not None:
         if relay.gpio_host_name == Constant.HOST_NAME:
             relay.relay_is_on = value
-            if sqlitedb:
-                relay.save_changed_fields(new_record=relay, notify_transport_enabled=True, save_all_fields=True)
-            else:
-                relay.save_changed_fields(broadcast=True, persist=True)
+            relay.save_changed_fields(broadcast=True, persist=True)
             L.l.info("OK setting custom relay {} to {} from openhab".format(name, value))
 
 
@@ -212,4 +209,4 @@ def heat_relay(name, value):
         if relay.gpio_host_name == Constant.HOST_NAME:
             L.l.info("OK setting heat relay {} to {} from openhab".format(name, value))
             relay.heat_is_on = value
-            relay.save_changed_fields(new_record=relay, notify_transport_enabled=True, save_all_fields=True)
+            relay.save_changed_fields(broadcast=True, persist=True)

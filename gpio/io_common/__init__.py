@@ -95,7 +95,7 @@ class GpioBase:
                 # https://stackoverflow.com/questions/1496346/passing-a-list-of-kwargs
                 self.set(key, **kwargs)
                 # do nothing, action done already as it was local
-            new_record.save_changed_fields(current_record=current_record)
+            record.save_changed_fields()
 
     @staticmethod
     @abc.abstractmethod

@@ -188,10 +188,10 @@ class ModelBase(metaclass=OrderedClassMembers):
         cls._is_used_in_module = False
 
     @classmethod
-    def get_key(cls, record):
+    def get_key(cls, record, backup_rec=None):
         key = cls._main_key
         if key not in record:
-            L.l.warning('Main key={} not in record={}'.format(key, record))
+            L.l.warning('Main {} key={} not in record={}'.format(cls.__name__, key, record))
             key = cls.__dict__['__ordered__'][1]
             if key not in record:
                 key = list(record)[0]

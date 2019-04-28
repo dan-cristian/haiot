@@ -90,10 +90,6 @@ class ZoneCustomRelay(ModelBase):
 class Zone(ModelBase):
     name = ''
     id = 0
-    # active_heat_schedule_pattern_id = Column(Integer)
-    # heat_is_on = False
-    # last_heat_status_update = datetime.now()
-    # heat_target_temperature = Column(Integer)
     is_indoor_heated = False
     is_indoor = False
     is_outdoor = False
@@ -171,6 +167,7 @@ class SystemMonitor(ModelBase):
 
 
 class ZoneThermostat(ModelBase):
+    """key=zone_id"""
     id = 0
     zone_id = 0
     zone_name = ''
