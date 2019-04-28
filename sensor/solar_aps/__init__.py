@@ -53,23 +53,14 @@ def thread_run():
                                         P.start_key_panel, P.end_key_panel, end_first=True)
             utility_name = get_json_param(Constant.P_SOLAR_UTILITY_NAME)
             if temperature is not None:
-                if sqlitedb:
-                    zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=panel_id).first()
-                else:
-                    zone_sensor = m.ZoneSensor.find_one({m.ZoneSensor.sensor_address: panel_id})
+                zone_sensor = m.ZoneSensor.find_one({m.ZoneSensor.sensor_address: panel_id})
                 if zone_sensor is None:
                     L.l.warning('Solar panel id {} is not defined in zone sensor list'.format(panel_id))
-                if sqlitedb:
-                    record = models.Sensor(address=panel_id)
-                    current_record = models.Sensor.query.filter_by(address=panel_id).first()
-                else:
+                record = m.Sensor.find_one({m.Sensor.address: panel_id})
+                if record is None:
                     record = m.Sensor()
                     record.address = panel_id
-                    current_record = m.Sensor.find_one({m.Sensor.address: panel_id})
-                record.type = 'solar'
-                if current_record is not None:
-                    record.sensor_name = current_record.sensor_name
-                else:
+                    record.type = 'solar'
                     if zone_sensor:
                         record.sensor_name = zone_sensor.sensor_name
                     else:
@@ -77,37 +68,26 @@ def thread_run():
                 record.temperature = temperature
                 record.updated_on = utils.get_base_location_now_date()
                 # fixme: keeps saving same temp even when panels are off. stop during night.
-                record.save_changed_fields(current_record=current_record, new_record=record,
-                                           notify_transport_enabled=True, save_to_graph=True, debug=False)
+                record.save_changed_fields(broadcast=True, persist=True)
             if production is not None:
                 production = float(production)
-                if sqlitedb:
-                    record = models.Utility()
-                    current_record = models.Utility.query.filter_by(utility_name=utility_name).first()
-                else:
+                record = m.Utility.find_one({m.Utility.utility_name: utility_name})
+                if record is None:
                     record = m.Utility()
-                    current_record = m.Utility.find_one({m.Utility.utility_name: utility_name})
-                record.utility_name = utility_name
-                if current_record is not None:
-                    if current_record.units_total is None:
-                        record.units_delta = 0
-                    else:
-                        record.units_delta = production - current_record.units_total
-                        if record.units_delta == 0:
-                            # do not waste db space if no power generated
-                            return
-                    record.units_total = production
-                    record.unit_name = current_record.unit_name
-                    record.units_2_delta = last_power
-                    record.unit_2_name = current_record.unit_2_name
-                    if current_record.unit_cost is None:
-                        current_record.unit_cost = 0.0
-                    record.cost = 1.0 * record.units_delta * current_record.unit_cost
-                else:
+                    record.utility_name = utility_name
                     record.units_delta = production
                     record.units_total = production
-                record.save_changed_fields(current_record=current_record, new_record=record, debug=False,
-                                           notify_transport_enabled=True, save_to_graph=True, save_all_fields=False)
+                else:
+                    record.units_delta = production - record.units_total
+                    if record.units_delta == 0:
+                        # do not waste db space if no power generated
+                        return
+                record.units_total = production
+                record.units_2_delta = last_power
+                if record.unit_cost is None:
+                   record.unit_cost = 0.0
+                record.cost = 1.0 * record.units_delta * record.unit_cost
+                record.save_changed_fields(broadcast=True, persist=True)
         except Exception as ex:
             L.l.warning("Got exception on solar thread run, ex={}".format(ex))
 

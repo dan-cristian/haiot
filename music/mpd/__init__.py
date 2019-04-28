@@ -212,11 +212,8 @@ def _normalise(uni):
 # 'artist': 'Soul Lifters', 'pos': '19', 'last-modified': '2018-11-02T18:44:57Z',
 # 'file': '_New/recent/asot888/20. Soul Lifters - Destiny.mp3', 'time': '287', 'id': '116'}
 def _save_status(zone, status_json, song):
-    if sqlitedb:
-        cur_rec = models.Music.query.filter_by(zone_name=zone).first()
-        rec = models.Music(zone_name=zone)
-    else:
-        cur_rec = m.Music.find_one({m.Music.zone_name: zone})
+    rec = m.Music.find_one({m.Music.zone_name: zone})
+    if rec is None:
         rec = m.Music()
         rec.zone_name = zone
     rec.state = status_json['state']
@@ -237,31 +234,25 @@ def _save_status(zone, status_json, song):
     rec.volume = int(status_json['volume'])
     if 'elapsed' in status_json and 'time' in song:
         rec.position = int(100 * (float(status_json['elapsed']) / float(song['time'])))
-    rec.save_changed_fields(current_record=cur_rec, notify_transport_enabled=True)
+    rec.save_changed_fields(broadcast=True)
 
 
 def save_lastfm():
     lastfmloved = lastfm.iscurrent_loved()
     lastfmsong = lastfm.get_current_song()
     if lastfmsong is not None:
-        if sqlitedb:
-            cur_rec = models.MusicLoved.query.first()
-            rec = models.MusicLoved(lastfmsong=lastfmsong)
+        recs = m.MusicLoved.find()
+        if len(recs) > 0:
+            rec = recs[0]
         else:
-            cur_recs = m.MusicLoved.find()
             rec = m.MusicLoved()
-            if len(cur_recs) > 0:
-                cur_rec = cur_recs[0]
-                rec.id = cur_rec.id
-            else:
-                cur_rec = None
-            rec.lastfmsong = lastfmsong
+        rec.lastfmsong = lastfmsong
         if lastfmloved is None:
             lastfmloved = False
         rec.lastfmloved = lastfmloved
         rec.lastfmsong = lastfmsong
         # notify all as loved state might not change
-        rec.save_changed_fields(current_record=cur_rec, notify_transport_enabled=True, save_all_fields=True)
+        rec.save_changed_fields(broadcast=True, persist=True)
 
 
 def update_state(zone_name):

@@ -234,18 +234,13 @@ class PwmIo(GpioBase):
     def set(key, **kwargs):
         pwm = PwmIo.get_db_record(key=key)
         if pwm is not None:
-            if sqlitedb:
-                new_pwm = models.Pwm(id=0)
-            else:
-                new_pwm = m.Pwm()
-            new_pwm.name = pwm.name
             for name, value in kwargs.items():
                 if name == 'frequency':
-                    new_pwm.frequency = value
+                    pwm.frequency = value
                 elif name == 'duty_cycle':
-                    new_pwm.duty_cycle = value
+                    pwm.duty_cycle = value
                 elif name == 'is_started':
-                    new_pwm.is_started = value
+                    pwm.is_started = value
             if pwm.host_name == Constant.HOST_NAME and P.pi is not None:  # condition for debug
                 if pwm.is_started:
                     L.l.info("Set PWM {} to frequency {} duty {}".format(
@@ -255,9 +250,8 @@ class PwmIo(GpioBase):
                     L.l.info("Stop PWM {} ".format(pwm.gpio_pin_code))
                     P.pi.hardware_PWM(pwm.gpio_pin_code, pwm.frequency, 0)
             L.l.info("Saving status PWM {} {} to frequency {} duty old={} new={}".format(
-                key, pwm.gpio_pin_code, new_pwm.frequency, pwm.duty_cycle, new_pwm.duty_cycle))
-            new_pwm.save_changed_fields(
-                current_record=pwm, new_record=new_pwm, notify_transport_enabled=True, force_dirty=False, debug=False)
+                key, pwm.gpio_pin_code, pwm.frequency, pwm.duty_cycle, pwm.duty_cycle))
+            pwm.save_changed_fields(broadcast=True, persist=True)
         else:
             L.l.warning("Cannot find pwm {} to set".format(key))
 
