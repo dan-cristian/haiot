@@ -264,19 +264,16 @@ class Area(ModelBase):
     is_armed = False
 
 
-"""not all gpios are alarm events, some are contacts, some are movement sensors"""
 # fixme: should be more generic, i.e. ZoneContact (with types = sensor, contact)
 class ZoneAlarm(ModelBase):
+    """key=id"""
     id = 0
     # friendly display name for pin mapping
     alarm_pin_name = ''
-    zone_id = 0  # , ForeignKey('zone.id'))
-    # zone = db.relationship('Zone', backref=db.backref('ZoneAlarm(zone)', lazy='dynamic'))
-    # gpio_pin_code = Column(String(50), ForeignKey('gpio_pin.pin_code'))
+    zone_id = 0
     gpio_pin_code = ''
     gpio_host_name = ''
     sensor_type = ''
-    # gpio_pin = db.relationship('GpioPin', backref=db.backref('ZoneAlarm(gpiopincode)', lazy='dynamic'))
     alarm_pin_triggered = False  # True if alarm sensor is connected (move detected)
     is_false_alarm_prone = False  # True if sensor can easily trigger false alarms (gate move by wind)
     start_alarm = False  # True if alarm must start (because area/zone is armed)
