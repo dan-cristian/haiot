@@ -89,7 +89,7 @@ def thread_run():
                 record.cost = 1.0 * record.units_delta * record.unit_cost
                 record.save_changed_fields(broadcast=True, persist=True)
         except Exception as ex:
-            L.l.warning("Got exception on solar thread run, ex={}".format(ex))
+            L.l.error("Got exception on solar thread run, ex={}".format(ex), exc_info=True)
 
 
 def unload():
