@@ -39,31 +39,22 @@ def handle_event_presence_io(gpio_pin_code='', direction='', pin_value='', pin_c
         if zonealarm is not None:
             zone_id = zonealarm.zone_id
             if zone_id is not None:
-                if sqlitedb:
-                    zone = models.Zone().query_filter_first(models.Zone.id == zone_id)
-                else:
-                    zone = m.Zone.find_one({m.Zone.id: zone_id})
+                zone = m.Zone.find_one({m.Zone.id: zone_id})
                 if zone is not None:
                     zone_name = zone.name
                 else:
                     L.l.warning("Zone not found for presence zoneid={}".format(zone_id))
                     zone_name = "zone_name not found"
-                if sqlitedb:
-                    current_record = models.Presence().query_filter_first(models.Presence.zone_id == zone_id)
-                    record = models.Presence()
-                else:
-                    current_record = m.Presence.find_one({m.Presence.zone_id: zone_id})
+                record = m.Presence.find_one({m.Presence.zone_id: zone_id})
+                if record is None:
                     record = m.Presence()
                 record.event_type = zonealarm.sensor_type
-                record.zone_id = zone_id
                 record.zone_name = zone_name
                 # record.event_io_date = utils.get_base_location_now_date()
                 record.sensor_name = zonealarm.alarm_pin_name
                 record.is_connected = pin_connected
                 # Log.logger.info('Presence saving sensor {}'.format(record.sensor_name))
-                record.save_changed_fields(current_record=current_record, new_record=record,
-                                           notify_transport_enabled=True, save_to_graph=True,
-                                           save_all_fields=True)
+                record.save_changed_fields(broadcast=True, persist=True)
             else:
                 L.l.warning('Unable to find presence zone for pin {} in Alarm table'.format(gpio_pin_code))
     except Exception as ex:
@@ -72,16 +63,10 @@ def handle_event_presence_io(gpio_pin_code='', direction='', pin_value='', pin_c
 
 def handle_event_presence_cam(zone_name, cam_name, has_move):
     L.l.debug("Got cam event zone {} cam {} move={}".format(zone_name, cam_name, has_move))
-    if sqlitedb:
-        zone = models.Zone().query_filter_first(models.Zone.name == zone_name)
-    else:
-        zone = m.Zone.find_one({m.Zone.name: zone_name})
+    zone = m.Zone.find_one({m.Zone.name: zone_name})
     if zone is not None:
-        if sqlitedb:
-            current_record = models.Presence().query_filter_first(models.Presence.zone_id == zone.id)
-            record = models.Presence()
-        else:
-            current_record = m.Presence().find_one({m.Presence.zone_id: zone.id})
+        record = m.Presence().find_one({m.Presence.zone_id: zone.id})
+        if record is None:
             record = m.Presence()
         record.event_type = Constant.PRESENCE_TYPE_CAM
         record.zone_id = zone.id
@@ -91,9 +76,7 @@ def handle_event_presence_cam(zone_name, cam_name, has_move):
         record.is_connected = bool(int(has_move))
         L.l.debug("Saving cam event zone {} sensor {} is_conn={} record={}".format(
             record.zone_name, record.sensor_name, record.is_connected, record))
-        record.save_changed_fields(current_record=current_record, new_record=record,
-                                   notify_transport_enabled=True, save_to_graph=True,
-                                   save_all_fields=True)
+        record.save_changed_fields(broadcast=True, persist=True)
     else:
         L.l.warning('Unable to find presence zone for camera zone {}'.format(zone_name))
 

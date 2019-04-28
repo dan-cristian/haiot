@@ -80,13 +80,9 @@ def _read_all_hdd_smart():
     global ERR_TEXT_NO_DEV
     if import_module_psutil_exist:
         while current_disk_valid and disk_count < 64:
+            record = m.SystemDisk.find_one({m.SystemDisk.hdd_disk_dev: Constant.DISK_DEV_MAIN + disk_letter,
+                                            m.SystemDisk.system_name: Constant.HOST_NAME})
             try:
-                if sqlitedb:
-                    record = models.SystemDisk()
-                else:
-                    record = m.SystemDisk()
-                record.system_name = Constant.HOST_NAME
-                record.hdd_disk_dev = Constant.DISK_DEV_MAIN + disk_letter
                 L.l.debug('Processing disk {}'.format(record.hdd_disk_dev))
                 try:
                     record.power_status = __read_hddparm(disk_dev=record.hdd_disk_dev)
@@ -157,14 +153,7 @@ def _read_all_hdd_smart():
                     record.serial = 'serial not available {} {}'.format(Constant.HOST_NAME, record.hdd_disk_dev)
                 else:
                     record.hdd_name = '{} {} {}'.format(record.system_name, record.hdd_device, record.hdd_disk_dev)
-                    if sqlitedb:
-                        current_record = models.SystemDisk.query.filter_by(
-                            hdd_disk_dev=record.hdd_disk_dev, system_name=record.system_name).first()
-                    else:
-                        current_record = m.SystemDisk.find_one({m.SystemDisk.hdd_disk_dev: record.hdd_disk_dev,
-                                                              m.SystemDisk.system_name: record.system_name})
-                    record.save_changed_fields(current_record=current_record, new_record=record,
-                                               notify_transport_enabled=True, save_to_graph=True)
+                    record.save_changed_fields(broadcast=True, persist=True)
                 disk_letter = chr(ord(disk_letter) + 1)
                 disk_count += 1
             except subprocess.CalledProcessError as ex1:
@@ -393,9 +382,8 @@ def __get_cpu_temperature():
 def _read_system_attribs():
     global import_module_psutil_exist, progress_status
     try:
-        if sqlitedb:
-            record = models.SystemMonitor()
-        else:
+        record = m.SystemMonitor.find_one({m.SystemMonitor.name: Constant.HOST_NAME})
+        if record is None:
             record = m.SystemMonitor()
         if import_module_psutil_exist:
             record.cpu_usage_percent = psutil.cpu_percent(interval=1)
@@ -420,19 +408,11 @@ def _read_system_attribs():
                 record.cpu_usage_percent = __get_cpu_utilisation_linux()
                 record.uptime_days = int(__get_uptime_linux_days())
                 record.cpu_temperature = __get_cpu_temperature()
-                L.l.debug('Read mem free {} cpu% {} cpu_temp {} uptime {}'.format(
-                    record.memory_available_percent, record.cpu_usage_percent,
-                    record.cpu_temperature,record.uptime_days))
         progress_status = 'Saving mem cpu uptime to db'
         record.name = Constant.HOST_NAME
         record.updated_on = utils.get_base_location_now_date()
-        if sqlitedb:
-            current_record = models.SystemMonitor.query.filter_by(name=record.name).first()
-        else:
-            current_record = m.SystemMonitor.find_one({m.SystemMonitor.name: record.name})
         progress_status = 'Saving mem cpu before save fields'
-        record.save_changed_fields(current_record=current_record, new_record=record,
-                                   notify_transport_enabled=False, save_to_graph=True)
+        record.save_changed_fields(persist=True)
     except Exception as ex:
         L.l.exception('Error saving system to DB err={}'.format(ex))
 
@@ -492,6 +472,8 @@ Description:
 
 
 def _read_disk_stats():
+    #fixme
+    return
     if Constant.is_os_linux():
         with open('/proc/diskstats') as f:
             for line in f:
@@ -503,26 +485,19 @@ def _read_disk_stats():
                     # skip for non hdds and partitions (ending with digit)
                     if device_major != '8' or device_name[-1:].isdigit():
                         continue  # just to avoid another tab
-
+                    record = m.SystemDisk.find_one({m.SystemDisk.hdd_disk_dev: '/dev/' + device_name,
+                                                    m.SystemDisk.system_name: Constant.HOST_NAME})
+                    if record is None:
+                        record = models.SystemDisk()
                     reads_completed = utils.round_sensor_value(words[3])
                     writes_completed = utils.round_sensor_value(words[7])
-                    if sqlitedb:
-                        record = models.SystemDisk()
-                    else:
-                        record = m.SystemDisk()
                     record.hdd_disk_dev = '/dev/' + device_name
                     record.last_reads_completed_count = reads_completed
                     record.last_writes_completed_count = writes_completed
                     record.system_name = Constant.HOST_NAME
                     record.updated_on = utils.get_base_location_now_date()
-                    if sqlitedb:
-                        current_record = models.SystemDisk.query.filter_by(
-                            hdd_disk_dev=record.hdd_disk_dev, system_name=record.system_name).first()
-                    else:
-                        current_record = m.SystemDisk.find_one({m.SystemDisk.hdd_disk_dev: record.hdd_disk_dev,
-                                                              m.SystemDisk.system_name: record.system_name})
                     # save read/write date time only if count changes
-                    if current_record:
+                    if current_record is not None:
                         if current_record.serial is None or current_record.serial == '':
                             record.serial = 'serial not available {} {}'.format(Constant.HOST_NAME, record.hdd_disk_dev)
                         if current_record.hdd_name is None or current_record.hdd_name == '':
@@ -563,10 +538,7 @@ def _get_total_subtracted_voltage(id_list):
     if id_list is not None:
         id_atoms = id_list.split(',')
         for pow_id in id_atoms:
-            if sqlitedb:
-                power_rec = models.PowerMonitor.query.filter_by(id=pow_id).first()
-            else:
-                power_rec = m.PowerMonitor.find_one({m.PowerMonitor.id: pow_id})
+            power_rec = m.PowerMonitor.find_one({m.PowerMonitor.id: pow_id})
             voltage += power_rec.voltage
     return voltage
 
@@ -583,25 +555,17 @@ def _read_battery_power():
                 power = round(ina.power(), 0)
                 dispatcher.send(signal=Constant.SIGNAL_BATTERY_STAT, battery_name=addr[0],
                                 voltage=voltage, current=current, power=power)
-                if sqlitedb:
-                    power_rec = models.PowerMonitor.query.filter_by(name=addr[0]).first()
-                else:
-                    power_rec = m.PowerMonitor.find_one({m.PowerMonitor.name: addr[0]})
+                power_rec = m.PowerMonitor.find_one({m.PowerMonitor.name: addr[0]})
                 if power_rec is not None:
-                    if sqlitedb:
-                        new_rec = models.PowerMonitor()
-                    else:
-                        new_rec = m.PowerMonitor()
-                    new_rec.raw_voltage = voltage
+                    power_rec.raw_voltage = voltage
                     total_subtracted_voltage = _get_total_subtracted_voltage(power_rec.subtracted_sensor_id_list)
                     if power_rec.voltage_divider_ratio is not None:
-                        new_rec.voltage = (voltage / power_rec.voltage_divider_ratio) - total_subtracted_voltage
+                        power_rec.voltage = (voltage / power_rec.voltage_divider_ratio) - total_subtracted_voltage
                     else:
-                        new_rec.voltage = voltage - total_subtracted_voltage
-                    new_rec.current = current
-                    new_rec.power = power
-                    new_rec.save_changed_fields(current_record=power_rec, notify_transport_enabled=True,
-                                                save_to_graph=True)
+                        power_rec.voltage = voltage - total_subtracted_voltage
+                    power_rec.current = current
+                    power_rec.power = power
+                    power_rec.save_changed_fields(broadcast=True, persist=True)
             except ImportError as imp:
                 L.l.info("INA module not available on this system, ex={}".format(imp))
                 _import_ina_failed = True

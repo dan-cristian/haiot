@@ -35,15 +35,12 @@ def _get_zone_sensor(sensor_address, sensor_type):
 
 def _get_sensor(sensor_address, sensor_type):
     zone_sensor, actual_sensor_name = _get_zone_sensor(sensor_address, sensor_type)
-    if sqlitedb:
-        sensor = models.Sensor.query.filter_by(address=sensor_address).first()
-        new_sensor = models.Sensor(address=sensor_address, sensor_name=actual_sensor_name)
-    else:
-        sensor = m.Sensor.find_one({m.Sensor.address: sensor_address})
-        new_sensor = m.Sensor()
-        new_sensor.address = sensor_address
-        new_sensor.sensor_name = actual_sensor_name
-    return zone_sensor, sensor, new_sensor
+    sensor = m.Sensor.find_one({m.Sensor.address: sensor_address})
+    if sensor is None:
+        sensor = m.Sensor()
+        sensor.address = sensor_address
+        sensor.sensor_name = actual_sensor_name
+    return zone_sensor, sensor
 
 
 def _get_dust_sensor(sensor_address, sensor_type):
@@ -92,16 +89,14 @@ def _process_message(msg):
                 if voltage or factor or current:
                     zone_sensor = m.ZoneSensor.find_one({m.ZoneSensor.sensor_address: sensor_name})
                     if zone_sensor is not None:
-                        current_record = m.Sensor.find_one({m.Sensor.address: sensor_name})
-                        if current_record is None:
-                            pass
-                        else:
-                            current_record.vad = None
-                            current_record.iad = None
-                            current_record.vdd = None
-                        record = m.Sensor()
-                        record.address = sensor_name
-                        record.sensor_name = zone_sensor.sensor_name
+                        record = m.Sensor.find_one({m.Sensor.address: sensor_name})
+                        if record is None:
+                            record = m.Sensor()
+                            record.address = sensor_name
+                            record.sensor_name = zone_sensor.sensor_name
+                        record.vad = None
+                        record.iad = None
+                        record.vdd = None
                         if voltage is not None:
                             record.vad = round(voltage, 0)
                         if current is not None:
@@ -109,29 +104,16 @@ def _process_message(msg):
                         if factor is not None:
                             record.vdd = round(factor, 1)
                         if voltage is not None or current is not None or factor is not None:
-                            record.save_changed_fields(current_record=current_record, new_record=record,
-                                                       notify_transport_enabled=True, save_to_graph=True, debug=False)
+                            record.save_changed_fields(broadcast=True, persist=True)
                 # dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=current, unit='kWh')
             if 'POWER' in obj:
                 power_is_on = obj['POWER'] == 'ON'
-                current_relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.gpio_pin_code: sensor_name,
-                                                            m.ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME})
-                if current_relay is not None:
+                relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.gpio_pin_code: sensor_name,
+                                                    m.ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME})
+                if relay is not None:
                     L.l.info("Got relay {} state={}".format(sensor_name, power_is_on))
-                    if sqlitedb:
-                        new_relay = models.ZoneCustomRelay(gpio_pin_code=sensor_name, gpio_host_name=Constant.HOST_NAME)
-                    else:
-                        new_relay = m.ZoneCustomRelay()
-                        new_relay.relay_pin_name = current_relay.relay_pin_name
-                        new_relay.gpio_pin_code = sensor_name
-                        new_relay.gpio_host_name = Constant.HOST_NAME
-                    new_relay.relay_is_on = power_is_on
-                    if sqlitedb:
-                        current_relay.is_event_external = True
-                        models.ZoneCustomRelay().save_changed_fields(current_record=current_relay, new_record=new_relay,
-                                                                     notify_transport_enabled=True, save_to_graph=True)
-                    else:
-                        new_relay.save_changed_fields(current=current_relay, broadcast=True, persist=True)
+                    relay.relay_is_on = power_is_on
+                    relay.save_changed_fields(broadcast=True, persist=True)
                 else:
                     L.l.warning("ZoneCustomRelay {} not defined in db".format(sensor_name))
             if 'COUNTER' in obj:
@@ -149,10 +131,10 @@ def _process_message(msg):
                 temp = bmp['Temperature']
                 press = bmp['Pressure']
                 sensor_address = '{}_{}'.format(sensor_name, 'bmp280')
-                zone_sensor, sensor, new_sensor = _get_sensor(sensor_address=sensor_address, sensor_type='BMP280')
-                new_sensor.temperature = temp
-                new_sensor.pressure = press
-                new_sensor.save_changed_fields(current_record=sensor, notify_transport_enabled=True, save_to_graph=True)
+                zone_sensor, sensor = _get_sensor(sensor_address=sensor_address, sensor_type='BMP280')
+                sensor.temperature = temp
+                sensor.pressure = press
+                sensor.save_changed_fields(broadcast=True, persist=True)
             if 'BME280' in obj:
                 # "BME280":{"Temperature":24.1,"Humidity":39.2,"Pressure":980.0},"PressureUnit":"hPa","TempUnit":"C"}
                 bmp = obj['BME280']
@@ -160,56 +142,49 @@ def _process_message(msg):
                 press = bmp['Pressure']
                 humid = bmp['Humidity']
                 sensor_address = '{}_{}'.format(sensor_name, 'bme280')
-                zone_sensor, sensor, new_sensor = _get_sensor(sensor_address=sensor_address, sensor_type='BME280')
-                new_sensor.temperature = temp
-                new_sensor.pressure = press
-                new_sensor.humidity = humid
-                new_sensor.save_changed_fields(current_record=sensor, notify_transport_enabled=True, save_to_graph=True)
+                zone_sensor, sensor = _get_sensor(sensor_address=sensor_address, sensor_type='BME280')
+                sensor.temperature = temp
+                sensor.pressure = press
+                sensor.humidity = humid
+                sensor.save_changed_fields(broadcast=True, persist=True)
             if 'INA219' in obj:
                 ina = obj['INA219']
                 voltage = ina['Voltage']
                 current = ina['Current']
                 power = ina['Power']
-                if sqlitedb:
-                    sensor = models.PowerMonitor.query.filter_by(host_name=sensor_name).first()
-                else:
-                    sensor = m.PowerMonitor.find_one({m.PowerMonitor.host_name: sensor_name})
-                if sensor is not None:
-                    if sqlitedb:
-                        new = models.PowerMonitor()
-                    else:
-                        new = m.PowerMonitor()
-                        new.id = sensor.id
-                    new.voltage = voltage
-                    new.save_changed_fields(current_record=sensor, notify_transport_enabled=True, save_to_graph=True)
-                else:
+                sensor = m.PowerMonitor.find_one({m.PowerMonitor.host_name: sensor_name})
+                if sensor is None:
                     L.l.warning('Sensor INA on {} not defined in db'.format(sensor_name))
+                    sensor = m.PowerMonitor()
+                    sensor.id = sensor.id
+                sensor.voltage = voltage
+                sensor.save_changed_fields(broadcast=True, persist=True)
             if 'ANALOG' in obj:
                 # "ANALOG":{"A0":7}
                 an = obj['ANALOG']
                 a0 = an['A0']
                 sensor_address = '{}_{}'.format(sensor_name, 'a0')
-                zone_sensor, sensor, new_sensor = _get_sensor(sensor_address=sensor_address, sensor_type='ANALOG')
-                new_sensor.vad = a0
-                new_sensor.save_changed_fields(current_record=sensor, notify_transport_enabled=True, save_to_graph=True)
+                zone_sensor, sensor = _get_sensor(sensor_address=sensor_address, sensor_type='ANALOG')
+                sensor.vad = a0
+                sensor.save_changed_fields(broadcast=True, persist=True)
             if 'PMS5003' in obj:
                 # "PMS5003":{"CF1":0,"CF2.5":1,"CF10":3,"PM1":0,"PM2.5":1,"PM10":3,"PB0.3":444,"PB0.5":120,"PB1":12,
                 # "PB2.5":6,"PB5":2,"PB10":2}
                 pms = obj['PMS5003']
                 sensor_address = '{}_{}'.format(sensor_name, 'PMS5003')
-                zone_sensor, sensor, new_sensor = _get_dust_sensor(sensor_address=sensor_address, sensor_type='PMS5003')
-                new_sensor.pm_1 = pms['PM1']
-                new_sensor.pm_2_5 = pms['PM2.5']
-                new_sensor.pm_10 = pms['PM10']
+                zone_sensor, sensor = _get_dust_sensor(sensor_address=sensor_address, sensor_type='PMS5003')
+                sensor.pm_1 = pms['PM1']
+                sensor.pm_2_5 = pms['PM2.5']
+                sensor.pm_10 = pms['PM10']
 
-                new_sensor.p_0_3 = pms['PB0.3']
-                new_sensor.p_0_5 = pms['PB0.5']
-                new_sensor.p_1 = pms['PB1']
+                sensor.p_0_3 = pms['PB0.3']
+                sensor.p_0_5 = pms['PB0.5']
+                sensor.p_1 = pms['PB1']
 
-                new_sensor.p_2_5 = pms['PB2.5']
-                new_sensor.p_5 = pms['PB5']
-                new_sensor.p_10 = pms['PB10']
-                new_sensor.save_changed_fields(current_record=sensor, notify_transport_enabled=True, save_to_graph=True)
+                sensor.p_2_5 = pms['PB2.5']
+                sensor.p_5 = pms['PB5']
+                sensor.p_10 = pms['PB10']
+                sensor.save_changed_fields(broadcast=True, persist=True)
         else:
             L.l.warning("Invalid sensor topic {}".format(msg.topic))
 
@@ -241,12 +216,8 @@ def _get_relay_status(relay_name):
 def post_init():
     if P.initialised:
         # force sonoff sensors to send their status
-        if sqlitedb:
-            relays = models.ZoneCustomRelay.query.filter_by(
-                gpio_host_name=Constant.HOST_NAME, relay_type=Constant.GPIO_PIN_TYPE_SONOFF).all()
-        else:
-            relays = m.ZoneCustomRelay.find({m.ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME,
-                                            m.ZoneCustomRelay.relay_type: Constant.GPIO_PIN_TYPE_SONOFF})
+        relays = m.ZoneCustomRelay.find({m.ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME,
+                                         m.ZoneCustomRelay.relay_type: Constant.GPIO_PIN_TYPE_SONOFF})
         for relay in relays:
             L.l.info('Reading sonoff sensor {}'.format(relay.gpio_pin_code))
             _get_relay_status(relay.gpio_pin_code)
