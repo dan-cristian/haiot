@@ -78,11 +78,12 @@ def thread_run():
                     record.units_delta = production
                     record.units_total = production
                 else:
+                    if record.units_total is None:
+                        record.units_total = production
                     record.units_delta = production - record.units_total
                     if record.units_delta == 0:
                         # do not waste db space if no power generated
                         return
-                record.units_total = production
                 record.units_2_delta = last_power
                 if record.unit_cost is None:
                    record.unit_cost = 0.0
