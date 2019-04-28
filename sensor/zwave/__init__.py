@@ -144,38 +144,26 @@ def set_value(network, node, value):
             else:
                 # skip controller node
                 if node.node_id > 1:
-                    current_record = m.Sensor.find_one({m.Sensor.address: sensor_address})
-                    if current_record is None:
-                        sensor_name = zone_sensor.sensor_name
-                        delta_last_save = 0
-                    else:
-                        # L.l.info("Received node={}, value={}".format(node, value))
-                        # current_record.vad = 0
-                        # current_record.iad = 0
-                        # current_record.vdd = 0
-                        sensor_name = current_record.sensor_name
-                        delta_last_save = (datetime.now() - current_record.updated_on).total_seconds()
-                    if sqlitedb:
-                        record = models.Sensor(address=sensor_address, sensor_name=sensor_name)
-                    else:
+                    record = m.Sensor.find_one({m.Sensor.address: sensor_address})
+                    if record is None:
                         record = m.Sensor()
                         record.address = sensor_address
-                        record.sensor_name = sensor_name
+                        delta_last_save = 0
+                        record.sensor_name = zone_sensor.sensor_name
+                    else:
+                        delta_last_save = (datetime.now() - record.updated_on).total_seconds()
                     record.is_event_external = True
                     if delta_last_save > P.DELTA_SAVE_SECONDS and value.label == "Voltage":
                         record.vad = round(value.data, 0)
-                        record.save_changed_fields(current_record=current_record,
-                                                   notify_transport_enabled=True, save_to_graph=True, debug=False)
+                        record.save_changed_fields(broadcast=True, persist=True)
                         # L.l.info("Saving voltage {} {}".format(sensor_name, value.data))
                     elif delta_last_save > P.DELTA_SAVE_SECONDS and value.label == "Current":
                         record.iad = round(value.data, 1)
-                        record.save_changed_fields(current_record=current_record,
-                                                   notify_transport_enabled=True, save_to_graph=True, debug=False)
+                        record.save_changed_fields(broadcast=True, persist=True)
                         # L.l.info("Saving current {} {}".format(sensor_name, value.data))
                     elif delta_last_save > P.DELTA_SAVE_SECONDS and value.label == "Power Factor":
                         record.vdd = round(value.data, 1)
-                        record.save_changed_fields(current_record=current_record,
-                                                   notify_transport_enabled=True, save_to_graph=True, debug=False)
+                        record.save_changed_fields(broadcast=True, persist=True)
                         # L.l.info("Saving power factor {} {}".format(sensor_name, value.data))
         else:
             L.l.info("Cannot find zonesensor definition in db, address={}".format(sensor_address))
