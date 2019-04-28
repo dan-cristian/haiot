@@ -12,10 +12,7 @@ def get_proc(keywords):
                 atoms = line.strip().split(' ')
                 if atoms[0].isdigit():
                     res = int(atoms[0])
-    except Exception, ex:
+    except Exception as ex:
         print("Got exception on proc find, err={}".format(ex))
     return res
 
-
-if __name__ == '__main__':
-    print get_proc('/home/haiot/recordings/' + '%Y-%m-%d_%H-%M-%S_usb.mp4')
