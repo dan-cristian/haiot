@@ -233,6 +233,7 @@ class ZoneHeatRelay(ModelBase):
 
 
 class Presence(ModelBase):
+    """key=sensor_name"""
     id = 0
     zone_id = 0
     zone_name = ''
