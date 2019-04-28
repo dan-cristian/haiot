@@ -232,7 +232,7 @@ def post_init():
             func = rpi_gpio.post_init_relay_value
         if func is not None:
             relay_value = func(gpio_pin_code=gpio_pin_code)
-            if relay_value is not None or Constant.HOST_NAME=='netbook':
+            if relay_value is not None or Constant.HOST_NAME == 'netbook':
                 relay.relay_is_on = relay_value
                 # skip listeners to avoid relay triggering?
                 relay.save_changed_fields(broadcast=True, persist=True, listeners=False)
