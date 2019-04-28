@@ -188,6 +188,19 @@ class ModelBase(metaclass=OrderedClassMembers):
         cls._is_used_in_module = False
 
     @classmethod
+    def get_key(cls, record):
+        key = cls._main_key
+        if key not in record:
+            L.l.warning('Main key={} not in record={}'.format(key, record))
+            key = cls.__dict__['__ordered__'][1]
+            if key not in record:
+                key = list(record)[0]
+                L.l.warning('Using record 1st field as key={}'.format(key))
+            else:
+                L.l.warning('Using model 2nd field as key={}'.format(key))
+        return key
+
+    @classmethod
     def find(cls, filter=None, sort=None, skip=None, limit=None, *args, **kwargs):
         if not cls._is_used_in_module:
             cls._is_used_in_module = True
@@ -225,15 +238,7 @@ class ModelBase(metaclass=OrderedClassMembers):
         table = cls._table_list[cls.__name__]
         if u"$set" in doc:
             doc = doc[u"$set"]
-        key = cls._main_key
-        if key not in doc:
-            L.l.warning('Update main key={} not in record={}'.format(key, doc))
-            key = cls.__dict__['__ordered__'][1]
-            if key not in doc:
-                key = list(doc)[0]
-                L.l.warning('Using record 1st field as key={}'.format(key))
-            else:
-                L.l.warning('Using model 2nd field as key={}'.format(key))
+        key = cls.get_key(doc)
         r = table.update_one(key=key, doc=doc)
         return r
 
@@ -268,7 +273,6 @@ class ModelBase(metaclass=OrderedClassMembers):
         if not cls._is_used_in_module:
             cls._is_used_in_module = True
         update = {}
-        key = None
         for fld in cls._column_list:
             if fld not in cls._ignore_save_change_fields:
                 if fld == 'updated_on' and self.updated_on is None:
@@ -288,9 +292,9 @@ class ModelBase(metaclass=OrderedClassMembers):
                         update[fld] = curr_val
                     else:
                         L.l.info('what?')
-                # set key as the first field in the new record that is not none
-                if key is None and new_val is not None:
-                    key = {fld: new_val}
+
+        k = self.get_key(record=update)
+        key = {k: update[k]}
 
         if len(update) > 0:
             if key is not None:
