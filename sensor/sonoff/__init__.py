@@ -45,14 +45,11 @@ def _get_sensor(sensor_address, sensor_type):
 
 def _get_dust_sensor(sensor_address, sensor_type):
     zone_sensor, actual_sensor_name = _get_zone_sensor(sensor_address, sensor_type)
-    if sqlitedb:
-        sensor = models.DustSensor.query.filter_by(address=sensor_address).first()
-        new_sensor = models.DustSensor()
-    else:
-        sensor = m.DustSensor.find_one({m.DustSensor.address: sensor_address})
-        new_sensor = m.DustSensor()
-    new_sensor.address = sensor_address
-    return zone_sensor, sensor, new_sensor
+    sensor = m.DustSensor.find_one({m.DustSensor.address: sensor_address})
+    if sensor is None:
+        sensor = m.DustSensor()
+        sensor.address = sensor_address
+    return zone_sensor, sensor
 
 
 # '{"Time":"2018-10-14T21:57:33","ENERGY":{"Total":0.006,"Yesterday":0.000,"Today":0.006,"Power":5,"Factor":0.10,"Voltage":214,"Current":0.241}}'
