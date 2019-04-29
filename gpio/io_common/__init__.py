@@ -83,15 +83,16 @@ class GpioBase:
         if current_record is not None:
             new_record = self.obj()
             kwargs = {}
-            for field in record.last_commit_field_changed_list:
+            for field in changed_fields:
                 val = getattr(record, field)
                 #setattr(new_record, field, val)
                 kwargs[field] = val
-            if record.host_name == Constant.HOST_NAME and record.is_event_external is True:
+            if record.host_name == Constant.HOST_NAME and record.source_host != Constant.HOST_NAME:
                 # https://stackoverflow.com/questions/1496346/passing-a-list-of-kwargs
                 self.set(key, **kwargs)
                 # do nothing, action done already as it was local
-            record.save_changed_fields()
+            # save will be done on model.save
+            # record.save_changed_fields()
 
     @staticmethod
     @abc.abstractmethod
