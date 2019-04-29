@@ -84,8 +84,8 @@ class Relaydevice:
             # start device if exporting and there is enough surplus
             export_watts = -grid_watts
             # only trigger power on if over treshold
-            if export_watts > P.MIN_WATTS_THRESHOLD and self.AVG_CONSUMPTION <= export_watts \
-                    and (not self.is_power_on() or self.POWER_ADJUSTABLE):
+            if self.POWER_ADJUSTABLE or export_watts > P.MIN_WATTS_THRESHOLD and self.AVG_CONSUMPTION <= export_watts\
+                    and (not self.is_power_on()):
                 self.set_power_status(power_is_on=True, exported_watts=export_watts)
                 L.l.info("Should auto start device {} state={} consuming={} surplus={}".format(
                     self.RELAY_NAME, self.state, self.watts, export_watts))
@@ -230,13 +230,14 @@ class P:
     # init in order of priority
     def init_dev():
         if P.emulate_export:
-            relay = 'boiler2'
-            utility = 'power boiler'
-            obj = PwmHeater(relay_name=relay, relay_id=4, utility_name='power boiler', max_watts=2400)
-            P.device_list[relay] = obj
-            P.utility_list[utility] = obj
-
             if False:
+                relay = 'boiler2'
+                utility = 'power boiler'
+                obj = PwmHeater(relay_name=relay, relay_id=4, utility_name='power boiler', max_watts=2400)
+                P.device_list[relay] = obj
+                P.utility_list[utility] = obj
+
+            if True:
                 relay = 'boiler'
                 utility = 'power boiler'
                 obj = PwmHeater(relay_name=relay, relay_id=3, utility_name=utility, max_watts=2400)
@@ -291,7 +292,7 @@ def _update_devices():
             changed = device.grid_updated(P.grid_watts)
             if changed:  # exit to allow main meter to update and recheck if more power changes are needed
                 if P.emulate_export is True:
-                    pass
+                    break
                 else:
                     break
 
@@ -304,7 +305,7 @@ def rule_energy_export(obj=m.Utility(), change=None):
                 P.grid_watts = random.randint(-800, -300)
             else:
                 P.grid_watts = obj.units_2_delta
-            #_update_devices()
+            # _update_devices()
     else:
         # set consumption for device
         if obj.utility_name in P.utility_list:
@@ -328,7 +329,7 @@ def thread_run():
 
 def init():
     if True:
-        P.emulate_export = False
+        P.emulate_export = True
         P.init_dev()
         current_module = sys.modules[__name__]
         rule.init_sub_rule(thread_run_func=thread_run, rule_module=current_module)
