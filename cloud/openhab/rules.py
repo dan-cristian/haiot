@@ -135,22 +135,18 @@ def rule_openhab_heat_relay(obj=m.ZoneHeatRelay(), change=None):
 
 
 def rule_openhab_thermo(obj=m.ZoneThermostat(), change=None):
-    # if field_changed_list is not None and len(field_changed_list) > 0:
-    #if 'heat_target_temperature' in field_changed_list:
+    zone = obj.zone_name
     if hasattr(obj, 'heat_target_temperature'):
         temp = obj.heat_target_temperature
         if temp is not None:
-            zone = obj.zone_name
-            send_mqtt_openhab(subtopic='temperature_target_' + zone, payload=temp)
-    #if 'heat_is_on' in field_changed_list:
-    #0- Off, 1-Heating, 2- Cooling
+            send_mqtt_openhab(subtopic='thermo_target_' + zone, payload=temp)
+    # 0- Off, 1-Heating, 2- Cooling
     if obj.heat_is_on:
         state = 'ON'
     else:
         state = 'OFF'
-    zone = obj.zone_name
-    send_mqtt_openhab(subtopic='temperature_mode_' + zone, payload=state)
-
+    send_mqtt_openhab(subtopic='thermo_state_' + zone, payload=state)
+    send_mqtt_openhab(subtopic='thermo_mode_' + zone, payload=state)
 
 def rule_openhab_music(obj=m.Music(), change=None):
     if change is not None:
