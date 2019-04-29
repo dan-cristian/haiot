@@ -195,18 +195,15 @@ class PwmIo(GpioBase):
 
     @staticmethod
     def _get_pwm_attrib(gpio):
-        is_started = True
         try:
             frequency = P.pi.get_PWM_frequency(gpio)
         except Exception as ex:
             frequency = 0
-            is_started = False
         try:
             duty_cycle = P.pi.get_PWM_dutycycle(gpio)
         except Exception as ex:
             duty_cycle = 0
-            is_started = False
-        return is_started, frequency, duty_cycle 
+        return frequency, duty_cycle
 
     @staticmethod
     def sync_2_db(key):
@@ -273,7 +270,7 @@ class PwmIo(GpioBase):
             if pwm.host_name == Constant.HOST_NAME:
                 return PwmIo._get_pwm_attrib(pwm.gpio_pin_code)
             else:
-                return pwm.is_started, pwm.frequency, pwm.duty_cycle
+                return pwm.frequency, pwm.duty_cycle
         else:
             L.l.warning("Cannot find pwm {} on get".format(key))
             return None, None, None
@@ -288,10 +285,7 @@ class PwmIo(GpioBase):
 
     @staticmethod
     def unload():
-        if sqlitedb:
-            pwm_list = models.Pwm.query.filter_by(host_name=Constant.HOST_NAME).all()
-        else:
-            pwm_list = m.Pwm.find({m.Pwm.host_name: Constant.HOST_NAME})
+        pwm_list = m.Pwm.find({m.Pwm.host_name: Constant.HOST_NAME})
         for pwm in pwm_list:
             try:
                 P.pi.hardware_PWM(pwm.gpio_pin_code, 0, 0)
