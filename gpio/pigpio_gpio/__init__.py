@@ -379,10 +379,7 @@ def _try_connect():
 
 
 def init():
-    if sqlitedb:
-        P.pwm = PwmIo(obj=models.Pwm)
-    else:
-        P.pwm = PwmIo(obj=m.Pwm)
+    P.pwm = PwmIo(obj=m.Pwm)
     L.l.info('PiGpio initialising')
     if P.import_ok:
         try:
@@ -398,6 +395,8 @@ def init():
                 L.l.info('PiGpio initialised OK')
             else:
                 L.l.info('Unable to initialise pigpio, cannot connect')
+                if Constant.HOST_NAME == 'netbook':
+                    m.Pwm.add_upsert_listener(_pwm_upsert_listener)
         except Exception as ex1:
             L.l.info('Unable to initialise PiGpio, err={}'.format(ex1))
             P.pi = None
