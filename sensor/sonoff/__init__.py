@@ -181,7 +181,10 @@ def _process_message(msg):
                 sensor.p_2_5 = pms['PB2.5']
                 sensor.p_5 = pms['PB5']
                 sensor.p_10 = pms['PB10']
-                sensor.save_changed_fields(broadcast=True, persist=True)
+                # sometimes first read after power on returns invalid 0 values
+                if sensor.pm_1 + sensor.pm_2_5 +  sensor.pm_10 + sensor.p_0_3+ sensor.p_0_5 + sensor.p_1 \
+                        + sensor.p_2_5 + sensor.p_5 + sensor.p_10 != 0:
+                    sensor.save_changed_fields(broadcast=True, persist=True)
         else:
             L.l.warning("Invalid sensor topic {}".format(msg.topic))
 
