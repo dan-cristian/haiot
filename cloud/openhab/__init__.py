@@ -80,9 +80,11 @@ def mqtt_on_message(client, userdata, msg):
             rules.custom_relay(name[len('relay_'):], switch_state)
         elif name.startswith("heat_"):
             rules.heat_relay(name[len('heat_'):], switch_state)
-        elif name.startswith("temperature_target_"):
+        elif name.startswith("thermo_target_"):
             temp = float(payload)
-            rules.thermostat(zone_name=name[len('temperature_target_'):], temp_target=temp)
+            rules.thermostat(zone_name=name[len('thermo_target_'):], temp_target=temp)
+        elif name.startswith("thermo_state_"):
+            rules.thermostat(zone_name=name[len('thermo_state_'):], state=switch_state)
         elif name.startswith("mpd_"):
             vals = name.split("mpd_")
             items = vals[1].split('_')
