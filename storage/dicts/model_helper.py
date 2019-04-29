@@ -49,6 +49,7 @@ class DictTable:
                 L.l.error('New key {} not in index {}'.format(new_key, rec[1]))
 
     def find(self, filter=None, sort=None, skip=None, limit=None, *args, **kwargs):
+        cls = self.model_class
         res = []
         res_ordered = {}
         if sort is not None:
@@ -80,7 +81,9 @@ class DictTable:
             if match:
                 if sort is None:
                     # res[rec] = self.table[rec]
-                    res.append(self.model_class({**self.table[rec]}))
+                    rec_obj = self.model_class({**self.table[rec]})
+                    rec_obj.reference = cls(copy=rec_obj.__dict__)  # duplicate orig record for change track
+                    res.append(rec_obj)
                 else:
                     if sort_key in self.table[rec]:
                         s_rec = self.table[rec][sort_key]
@@ -96,7 +99,10 @@ class DictTable:
             if sort_dir > 0:
                 sort_list = sorted(res_ordered.items(), key=lambda x: x[0])
                 for r in sort_list:
-                    res.append(self.model_class({**r[1]}))
+                    rec_obj = self.model_class({**r[1]})
+                    rec_obj.reference = self.model_class(copy=rec_obj.__dict__)
+                    # self.referece.dup(copy=rec_obj)  # duplicate orig rec for change track
+                    res.append(rec_obj)
                 return res
 
     def insert_one(self, key, doc, bypass_document_validation=False):
@@ -109,6 +115,7 @@ class DictTable:
                 if key != 'id':
                     L.l.error('No key [{}] for {} found in record: {}'.format(key, self.model_class.__name__, doc))
                     return None
+        cls = self.model_class
         self.key = key
         if 'id' not in doc or doc['id'] is None:
             self.id += 1
@@ -117,50 +124,53 @@ class DictTable:
             L.l.info('Invalidating all indexes {} on insert'.format(self.model_class.__name__))
             self.index.clear()  # delete key from index
         self.table[doc[key]] = doc
-        return {'inserted_id': doc['id']}
+        res = self.model_class({**doc})
+        self.reference = self.model_class(copy=res.__dict__)
+        # self.referece.dup(copy=doc)
+        return res
 
-    def update_one(self, key, doc):
+    def not_used_update_one(self, key, key_val, updated_record):
         cls_name = self.model_class.__name__
         try:
             if key == self.model_class._column_list[0]:
-                good_key_val = doc[key]
+                good_key_val = updated_record[key]
             else:
                 if key not in self.index:
                     self._add_index(new_key=key)
                 if key in self.index:
                     indexed_recs = self.index[key]
-                    if doc[key] in indexed_recs:
-                        good_key_val = indexed_recs[doc[key]]
+                    if updated_record[key] in indexed_recs:
+                        good_key_val = indexed_recs[updated_record[key]]
                     else:
                         L.l.error('Key {} not in index {}'.format(key, cls_name))
                         return None
                 else:
-                    new_key = list(doc)[0]
+                    new_key = list(updated_record)[0]
                     good_key_val = None
                     for rec in self.table:
-                        if new_key in self.table[rec] and self.table[rec][new_key] == doc[new_key]:
+                        if new_key in self.table[rec] and self.table[rec][new_key] == updated_record[new_key]:
                             good_key_val = rec
                             break
                     if good_key_val is None:
                         L.l.error('Failed to find record for update by key {}'.format(key))
                         return None
 
-            for fld in doc:
+            for fld in updated_record:
                 if fld not in self.model_class._column_list:
                     L.l.warning('Unexpected new field {} on updating {}'.format(fld, cls_name))
                 # if good_key_val in self.table:
                 if fld in self.table[good_key_val]:
-                    if self.table[good_key_val][fld] != doc[fld]:
+                    if self.table[good_key_val][fld] != updated_record[fld]:
                         if fld in self.index:
                             L.l.info('Invalidating index {}:{} on update'.format(cls_name, fld))
                             self.index[fld].clear()  # delete key from index
-                        self.table[good_key_val][fld] = doc[fld]
+                        self.table[good_key_val][fld] = updated_record[fld]
                 elif fld in self.model_class._column_list:
-                    self.table[good_key_val][fld] = doc[fld]
+                    self.table[good_key_val][fld] = updated_record[fld]
                 else:
                     L.l.error('Trying to update an alien field {} for {}'.format(fld, cls_name))
-            if self.model_class._main_key in doc:
-                return doc[self.model_class._main_key]
+            if self.model_class._main_key in updated_record:
+                return updated_record[self.model_class._main_key]
             else:
                 return None
         except KeyError as ke:
@@ -187,17 +197,32 @@ class ModelBase(metaclass=OrderedClassMembers):
     def reset_usage(cls):
         cls._is_used_in_module = False
 
+    def dup(self, copy):
+        try:
+            for fld in copy:
+                if hasattr(self, fld):
+                    setattr(self, fld, copy[fld])
+                if '_listener_executed' in self.__dict__:
+                    self._listener_executed = None
+                self.reference = None
+        except Exception as ex:
+            L.l.error('Duplicate error er={}'.format(ex), exc_info=True)
+
     @classmethod
-    def get_key(cls, record, backup_rec=None):
-        key = cls._main_key
-        if key not in record:
-            L.l.warning('Main {} key={} not in record={}'.format(cls.__name__, key, record))
-            key = cls.__dict__['__ordered__'][1]
+    def get_key(cls, record):
+        try:
+            key = cls._main_key
             if key not in record:
-                key = list(record)[0]
-                L.l.warning('Using record 1st field as key={}'.format(key))
-            else:
-                L.l.warning('Using model 2nd field as key={}'.format(key))
+                L.l.warning('Main {} key={} not in record={}'.format(cls.__name__, key, record))
+                key = cls.__dict__['__ordered__'][1]
+                if key not in record:
+                    key = list(record)[0]
+                    L.l.warning('Using record 1st field as key={}'.format(key))
+                else:
+                    L.l.warning('Using model 2nd field as key={}'.format(key))
+        except TypeError as ex:
+            L.l.error('Key error {}, ex={}'.format(cls.__name__, ex), exc_info=True)
+            key = None
         return key
 
     @classmethod
@@ -214,10 +239,13 @@ class ModelBase(metaclass=OrderedClassMembers):
             cls._is_used_in_module = True
         table = cls._table_list[cls.__name__]
         r = table.find(filter=filter, limit=1)
-        if len(r) == 1:
-            return r[0]
+        if len(r) >= 1:
+            rec = r[0]
+            if len(r) > 1:
+                L.l.warning('Multiple records exists on find_one {} {}'.format(cls, filter))
         else:
-            return None
+            rec = None
+        return rec
 
     @classmethod
     def insert_one(cls, doc, bypass_document_validation=False):
@@ -225,22 +253,26 @@ class ModelBase(metaclass=OrderedClassMembers):
             cls._is_used_in_module = True
         table = cls._table_list[cls.__name__]
         key = cls._main_key
-        r = table.insert_one(key=key, doc=doc, bypass_document_validation=bypass_document_validation)
-        if r is not None:
-            return r['inserted_id']
+        rec = table.insert_one(key=key, doc=doc, bypass_document_validation=bypass_document_validation)
+        if rec is not None:
+            return rec
         else:
             return None
 
-    @classmethod
-    def update_one(cls, query, doc):
-        if not cls._is_used_in_module:
-            cls._is_used_in_module = True
-        table = cls._table_list[cls.__name__]
-        if u"$set" in doc:
-            doc = doc[u"$set"]
-        key = cls.get_key(doc)
-        r = table.update_one(key=key, doc=doc)
-        return r
+    # @classmethod
+    # def update_one(cls, query, updated_record, existing_record):
+    #    if not cls._is_used_in_module:
+    #        cls._is_used_in_module = True
+    #    table = cls._table_list[cls.__name__]
+    #    if u"$set" in updated_record:
+    #        updated_record = updated_record[u"$set"]
+    #    key = cls.get_key(existing_record)
+    #    if hasattr(existing_record, key):
+    #        key_val = getattr(existing_record, key)
+    #    else:
+    #        key_val = getattr(updated_record, key)
+    #    r = table.update_one(key=key, key_val=key_val, updated_record=updated_record)
+    #    return r
 
     @classmethod
     def add_upsert_listener(cls, func):
@@ -256,6 +288,7 @@ class ModelBase(metaclass=OrderedClassMembers):
 
     @staticmethod
     def _broadcast(record, update, class_name):
+        out_rec = None
         try:
             out_rec = record.__dict__
             # record[Constant.JSON_PUBLISH_SOURCE_HOST] = str(Constant.HOST_NAME)
@@ -265,14 +298,17 @@ class ModelBase(metaclass=OrderedClassMembers):
             js = utils.safeobj2json(out_rec)
             transport.send_message_json(json=js)
         except Exception as ex:
-            L.l.error('Unable to broadcast {} rec={}'.format(class_name, out_rec))
+            L.l.error('Unable to broadcast {} rec={} ex={}'.format(class_name, out_rec, ex), exc_info=True)
 
-    def save_changed_fields(self, current=None, broadcast=None, persist=None, listeners=True, *args, **kwargs):
+    def save_changed_fields(self, broadcast=None, persist=None, listeners=True):  # , *args, **kwargs):
         cls = self.__class__
         cls_name = cls.__name__
         if not cls._is_used_in_module:
             cls._is_used_in_module = True
+        k = cls.get_key(record=self.__dict__)
+        key = {k: self.__dict__[k]}
         update = {}
+        current = self.reference
         for fld in cls._column_list:
             if fld not in cls._ignore_save_change_fields:
                 if fld == 'updated_on' and self.updated_on is None:
@@ -293,13 +329,12 @@ class ModelBase(metaclass=OrderedClassMembers):
                     else:
                         L.l.info('what?')
 
-        k = self.get_key(record=update)
-        key = {k: update[k]}
-
         if len(update) > 0:
             if key is not None:
-                if cls.find_one(filter=key) is not None:
-                    res = cls.update_one(query=key, doc={"$set": update})
+                if current is not None:
+                    # copy record to reference
+                    self.reference.dup(copy=self.__dict__)
+                    # res = cls.update_one(query=key, updated_record={"$set": update}, existing_record=self)
                     # L.l.info('Updated key {}, {}'.format(key, self.__repr__()))
                 else:
                     res = cls.insert_one(update, bypass_document_validation=True)
@@ -307,12 +342,12 @@ class ModelBase(metaclass=OrderedClassMembers):
                 # execute listener
                 has_listener = cls_name in cls._upsert_listener_list
                 record = cls.find_one(filter=key)
+                if record is None:
+                    L.l.error('No record in db after insert/update for cls {} key {}'.format(cls_name, key))
+                    return
                 rec_clone = cls(copy=record.__dict__)
                 change_list = list(update.keys())
                 if persist is True or broadcast is True or has_listener is True:
-                    if record is None:
-                        L.l.error('No record in db after insert/update for cls {} key {}'.format(cls_name, key))
-                        return
                     if persist is True:
                         self._persist(record=rec_clone, update=update, class_name=cls_name)
                     if broadcast is True:
@@ -349,6 +384,7 @@ class ModelBase(metaclass=OrderedClassMembers):
                     cls._column_list = cls._column_list + (attr,)
             cls.source_host = 'source_host'
             cls._class_initialised = True
+            cls.reference = None
             if cls.__doc__ is not None and 'key=' in cls.__doc__:
                 cls._main_key = cls.__doc__.split('key=')[1]
             else:
@@ -360,7 +396,5 @@ class ModelBase(metaclass=OrderedClassMembers):
         self.source_host = Constant.HOST_NAME
 
         if copy is not None:
-            for fld in copy:
-                if hasattr(self, fld):
-                    setattr(self, fld, copy[fld])
-                self._listener_executed = None
+            self.dup(copy=copy)
+
