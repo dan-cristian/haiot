@@ -201,14 +201,14 @@ class PwmHeater(LoadPowerDevice):
         L.l.info("Setting pwm {} status {} to watts level {}".format(self.RELAY_NAME, power_is_on, exported_watts))
         if power_is_on:
             assert exported_watts is not None
-            required_duty = int(exported_watts * self.max_duty / self.MAX_WATTS)
+            required_duty = int(0.9 * exported_watts * self.max_duty / self.MAX_WATTS)
             pigpio_gpio.P.pwm.set(self.RELAY_ID, duty_cycle=required_duty, target_watts=exported_watts)
         else:
             pigpio_gpio.P.pwm.set(self.RELAY_ID, duty_cycle=0, target_watts = 0)
 
     def is_power_on(self):
-        is_on, frequency, duty_cycle = pigpio_gpio.P.pwm.get(self.RELAY_ID)
-        return is_on
+        frequency, duty_cycle = pigpio_gpio.P.pwm.get(self.RELAY_ID)
+        return duty_cycle > 0
 
     def __init__(self, relay_name, relay_id, utility_name, max_watts):
         LoadPowerDevice.__init__(self, relay_name, relay_id, utility_name, max_watts)
@@ -237,7 +237,7 @@ class P:
                 P.device_list[relay] = obj
                 P.utility_list[utility] = obj
 
-            if True:
+            if False:
                 relay = 'boiler'
                 utility = 'power boiler'
                 obj = PwmHeater(relay_name=relay, relay_id=3, utility_name=utility, max_watts=2400)
@@ -262,11 +262,12 @@ class P:
         P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=50, supports_breaks=True)
 
         if not P.emulate_export:
-            relay = 'boiler2'
-            utility = 'power boiler'
-            obj = PwmHeater(relay_name=relay, relay_id=4, utility_name='power boiler', max_watts=2400)
-            P.device_list[relay] = obj
-            P.utility_list[utility] = obj
+            if False:
+                relay = 'boiler2'
+                utility = 'power boiler'
+                obj = PwmHeater(relay_name=relay, relay_id=4, utility_name='power boiler', max_watts=2400)
+                P.device_list[relay] = obj
+                P.utility_list[utility] = obj
 
             relay = 'boiler'
             utility = 'power boiler'
@@ -328,9 +329,8 @@ def thread_run():
 
 
 def init():
-    if True:
-        P.emulate_export = True
-        P.init_dev()
-        current_module = sys.modules[__name__]
-        rule.init_sub_rule(thread_run_func=thread_run, rule_module=current_module)
-        L.l.info("Initialised solar rules with {} devices".format(len(P.device_list)))
+    P.emulate_export = False
+    P.init_dev()
+    current_module = sys.modules[__name__]
+    rule.init_sub_rule(thread_run_func=thread_run, rule_module=current_module)
+    L.l.info("Initialised solar rules with {} devices".format(len(P.device_list)))
