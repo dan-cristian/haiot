@@ -81,8 +81,8 @@ class DictTable:
             if match:
                 if sort is None:
                     # res[rec] = self.table[rec]
-                    rec_obj = self.model_class({**self.table[rec]})
-                    rec_obj.reference = cls(copy=rec_obj.__dict__)  # duplicate orig record for change track
+                    rec_obj = self.model_class({**self.table[rec]})  # duplicate orig record for change track
+                    rec_obj.reference = self.table[rec]
                     res.append(rec_obj)
                 else:
                     if sort_key in self.table[rec]:
@@ -99,9 +99,8 @@ class DictTable:
             if sort_dir > 0:
                 sort_list = sorted(res_ordered.items(), key=lambda x: x[0])
                 for r in sort_list:
-                    rec_obj = self.model_class({**r[1]})
-                    rec_obj.reference = self.model_class(copy=rec_obj.__dict__)
-                    # self.referece.dup(copy=rec_obj)  # duplicate orig rec for change track
+                    rec_obj = self.model_class({**r[1]})  # duplicate orig rec for change track
+                    rec_obj.reference = r[1]
                     res.append(rec_obj)
                 return res
 
@@ -124,9 +123,8 @@ class DictTable:
             L.l.info('Invalidating all indexes {} on insert'.format(self.model_class.__name__))
             self.index.clear()  # delete key from index
         self.table[doc[key]] = doc
-        res = self.model_class({**doc})
-        self.reference = self.model_class(copy=res.__dict__)
-        # self.referece.dup(copy=doc)
+        res = self.model_class({**doc})  # duplicate
+        res.reference = self.table[doc[key]]
         return res
 
     def not_used_update_one(self, key, key_val, updated_record):
@@ -197,14 +195,15 @@ class ModelBase(metaclass=OrderedClassMembers):
     def reset_usage(cls):
         cls._is_used_in_module = False
 
-    def dup(self, copy):
+    @classmethod
+    def dup(cls, target, copy):
         try:
             for fld in copy:
-                if hasattr(self, fld):
-                    setattr(self, fld, copy[fld])
-                if '_listener_executed' in self.__dict__:
-                    self._listener_executed = None
-                self.reference = None
+                if hasattr(target, fld):
+                    setattr(target, fld, copy[fld])
+                if '_listener_executed' in target.__dict__:
+                    target._listener_executed = None
+                target.reference = None
         except Exception as ex:
             L.l.error('Duplicate error er={}'.format(ex), exc_info=True)
 
@@ -317,8 +316,8 @@ class ModelBase(metaclass=OrderedClassMembers):
                     new_val = getattr(self, fld)
                 else:
                     new_val = None
-                if current is not None and hasattr(current, fld):
-                    curr_val = getattr(current, fld)
+                if current is not None and fld in current:
+                    curr_val = current[fld]
                 else:
                     curr_val = None
                 if curr_val != new_val:
@@ -328,14 +327,15 @@ class ModelBase(metaclass=OrderedClassMembers):
                         update[fld] = curr_val
                     else:
                         L.l.info('what?')
+                    if current is not None:
+                        # update storage fields
+                        self.reference[fld] = new_val
 
         if len(update) > 0:
             if key is not None:
                 if current is not None:
-                    # copy record to reference
-                    self.reference.dup(copy=self.__dict__)
                     # res = cls.update_one(query=key, updated_record={"$set": update}, existing_record=self)
-                    # L.l.info('Updated key {}, {}'.format(key, self.__repr__()))
+                    L.l.info('Updated {} key {}, {}'.format(cls_name, key, update))
                 else:
                     res = cls.insert_one(update, bypass_document_validation=True)
                     # L.l.info('Inserted key {}, {} with eid={}'.format(key, self.__repr__(), res.eid))
@@ -396,5 +396,5 @@ class ModelBase(metaclass=OrderedClassMembers):
         self.source_host = Constant.HOST_NAME
 
         if copy is not None:
-            self.dup(copy=copy)
+            cls.dup(target=self, copy=copy)
 
