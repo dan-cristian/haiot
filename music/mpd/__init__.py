@@ -130,6 +130,10 @@ def toggle_state(zone_name):
                 client.pause(0)
 
 
+def is_playing(client):
+    return client.status()['state'] == 'play'
+
+
 def play(zone_name, default_dir=None):
     client = _get_client(_get_port(zone_name))
     if client is not None:
@@ -160,10 +164,12 @@ def set_volume(zone_name, volume):
 
 def set_position(zone_name, position_percent):
     client = _get_client(_get_port(zone_name))
-    if client is not None:
+    if client is not None and is_playing(client):
         song = client.currentsong()
         if 'time' in song:
             client.seekcur(float(song['time']) * position_percent / 100)
+    else:
+        L.l.info('Cannot set position as client is none or not playing')
 
 
 # http://pythonhosted.org/python-mpd2/topics/commands.html#the-music-database
