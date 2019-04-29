@@ -200,8 +200,9 @@ def _read_port_config():
 
 def _normalise(uni):
     # if isinstance(uni, str):
-    #    uni = uni.decode('utf-8')
-    return unicodedata.normalize('NFKD', uni).encode('ascii', 'ignore')
+    # uni = uni.decode('utf-8')
+    return uni
+    #return unicodedata.normalize('NFKD', uni).encode('ascii', 'ignore')
 
 
 # {'songid': '100', 'playlistlength': '32', 'playlist': '8', 'repeat': '0', 'consume': '0', 'mixrampdb': '0.000000',
