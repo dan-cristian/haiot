@@ -233,10 +233,10 @@ class PwmIo(GpioBase):
         pwm = PwmIo.get_db_record(key=key)
         if pwm is not None:
             for name, value in kwargs.items():
-                if name == 'frequency':
-                    pwm.frequency = value
-                elif name == 'duty_cycle':
-                    pwm.duty_cycle = value
+                if hasattr(pwm, name):
+                    setattr(pwm, name, value)
+                else:
+                    L.l.error('Pwm unexpected arg {}'.format(name))
             if pwm.host_name == Constant.HOST_NAME and P.pi is not None:  # condition for debug
                 if pwm.duty_cycle > 0:
                     L.l.info("Set PWM {} to frequency {} duty {}".format(
