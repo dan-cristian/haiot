@@ -146,7 +146,12 @@ def rule_openhab_thermo(obj=m.ZoneThermostat(), change=None):
     else:
         state = 'OFF'
     send_mqtt_openhab(subtopic='thermo_state_' + zone, payload=state)
-    send_mqtt_openhab(subtopic='thermo_mode_' + zone, payload=state)
+    if obj.is_mode_manual:
+        mode = 'ON'
+    else:
+        mode = 'OFF'
+    send_mqtt_openhab(subtopic='thermo_mode_' + zone, payload=mode)
+
 
 def rule_openhab_music(obj=m.Music(), change=None):
     if change is not None:
@@ -208,5 +213,5 @@ def heat_relay(name, value):
             relay.save_changed_fields(broadcast=True, persist=True)
 
 
-def thermostat(zone_name=None, temp_target=None, state=None):
-    L.l.info('Got thermo zone {} temp {} state {}'.format(zone_name, temp_target, state))
+def thermostat(zone_name=None, temp_target=None, state=None, mode=None):
+    L.l.info('Got thermo zone {} temp {} state {} mode={}'.format(zone_name, temp_target, state, mode))
