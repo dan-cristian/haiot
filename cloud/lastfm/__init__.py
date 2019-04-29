@@ -79,7 +79,7 @@ def get_current_song():
     if track is not None:
         return track.title
     else:
-        return '(None)'
+        return None
 
 
 def iscurrent_loved():

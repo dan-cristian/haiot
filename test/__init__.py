@@ -8,6 +8,10 @@ from pydispatch import dispatcher
 initialised = False
 
 
+class P:
+    list = {}
+
+
 def test1():
     noerr = True
     i = 0
@@ -33,6 +37,9 @@ def unload():
     initialised = False
 
 
+def getsome():
+    return P.list[2]
+
 def init():
     L.l.info('TEST module initialising')
     # test1()
@@ -40,9 +47,11 @@ def init():
     # current_record = models.Sensor.query.filter_by(address=sensor_address).first()
     # thread_pool.add_interval_callable(test_run.thread_run, run_interval_second=60)
     global initialised
-    Constant.HOST_NAME = 'pi-face'
     dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code='0:in:2', direction=Constant.GPIO_PIN_DIRECTION_IN,
                     pin_value=1, pin_connected=False)
     initialised = True
-
-
+    P.list[1] = {'one': 'unu'}
+    P.list[2] = {'two': 'doi'}
+    P.list[3] = {'three': 'trei'}
+    getsome()['two'] = 'zwei'
+    print(P.list)

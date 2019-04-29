@@ -127,7 +127,7 @@
     {"id":567, "active":true, "start_order":67, "name":"alarm", "host_name":"netbook"},
     {"id":570, "active":true, "start_order":70, "name":"music", "host_name":"netbook"},
     {"id":503, "active":true, "start_order":3, "name":"health_monitor", "host_name":"netbook"},
-    {"id":620, "active":false, "start_order":120, "name":"test", "host_name":"netbook"},
+    {"id":620, "active":true, "start_order":120, "name":"test", "host_name":"netbook"},
 
 
     {"id":609, "active":true, "start_order":9, "name":"heat", "host_name":"pi-face"},
@@ -336,7 +336,8 @@
     {"relay_pin_name": "odroid_pcf_1", "zone_id": "7", "gpio_pin_code": "1", "gpio_host_name": "pizero2", "relay_type": "pcf8574"},
     {"relay_pin_name": "odroid_pcf_7", "zone_id": "7", "gpio_pin_code": "7", "gpio_host_name": "pizero2", "relay_type": "pcf8574"},
 
-    {"relay_pin_name": "front_gate_relay_test", "zone_id": "7", "gpio_pin_code": "0:out:1", "gpio_host_name": "netbook", "relay_type": "piface"}
+    {"relay_pin_name": "front_gate_relay_test", "zone_id": "7", "gpio_pin_code": "0:out:1", "gpio_host_name": "netbook", "relay_type": "piface"},
+    {"relay_pin_name": "blackwater_pump_relay_test", "zone_id": "9", "gpio_pin_code": "sonoff-basic-3", "gpio_host_name": "netbook", "relay_type": "sonoff"}
   ],
 
   "PowerMonitor": [
