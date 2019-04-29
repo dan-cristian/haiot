@@ -233,11 +233,11 @@ def _loop_zones():
                 if heat_schedule is not None and zonesensor is not None:
                     sensor = m.Sensor.find_one({m.Sensor.address: zonesensor.sensor_address})
                     if sensor is not None:
-                        P.heat_status += 'sensor: ' + sensor.address + ', '
+                        P.heat_status += 'sensor: {} {} '.format(sensor.address, sensor.sensor_name)
                         heat_state, main_source_needed = _update_zone_heat(zone, heat_schedule, sensor)
+                        P.heat_status += 'heat on: {} main {},'.format(heat_state, main_source_needed)
                         if not heat_is_on:
                             heat_is_on = main_source_needed and heat_state
-                            P.heat_status += 'heat on:' + str(heat_state) + ', '
                         if zonesensor.zone_id in sensor_processed:
                             prev_sensor = sensor_processed[zonesensor.zone_id]
                             L.l.warning('Already processed temp sensor {} in zone {}, duplicate?'.format(
