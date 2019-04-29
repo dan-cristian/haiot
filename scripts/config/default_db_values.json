@@ -132,7 +132,7 @@
 
     {"id":609, "active":true, "start_order":9, "name":"heat", "host_name":"pi-face"},
     {"id":619, "active":true, "start_order":19, "name":"ddns", "host_name":"pi-face"},
-    {"id":626, "active":true, "start_order":26, "name":"rule.electricity", "host_name":"pi-face"},
+    {"id":626, "active":false, "start_order":26, "name":"rule.electricity", "host_name":"pi-face"},
     {"id":641, "active":true, "start_order":41, "name":"cloud.alexa", "host_name":"pi-face"},
     {"id":647, "active":true, "start_order":47, "name":"sensor.rfxcom", "host_name":"pi-face"},
     {"id":649, "active":true, "start_order":49, "name":"sensor.ups_legrand", "host_name":"pi-face"},
@@ -307,6 +307,9 @@
     {"relay_pin_name": "small_battery_relay", "zone_id": "54", "gpio_pin_code": "sonoff-basic-11", "gpio_host_name": "pi-face", "relay_type": "sonoff"},
 
     {"relay_pin_name": "unused_relay", "zone_id": "2", "gpio_pin_code": "sonoff-basic-13", "gpio_host_name": "pi-face", "relay_type": "sonoff"},
+
+    {"relay_pin_name": "dust_parter", "zone_id": "2", "gpio_pin_code": "wemos-micro-1", "gpio_host_name": "pi-face", "relay_type": "sonoff"},
+    {"relay_pin_name": "dust_etaj", "zone_id": "4", "gpio_pin_code": "wemos-micro-2", "gpio_host_name": "pi-face", "relay_type": "sonoff"},
 
     {"relay_pin_name": "unused-formerheat", "zone_id": "19", "gpio_pin_code": "24", "gpio_host_name": "pi-power", "relay_type": "gpio"},
     {"relay_pin_name": "pod_music_relay", "zone_id": "1", "gpio_pin_code": "23", "gpio_host_name": "pi-power", "relay_type": "gpio"},
