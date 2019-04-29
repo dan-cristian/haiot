@@ -16,64 +16,46 @@ initialised = False
 def __utility_update_ex(sensor_name, value, unit=None, index=None):
     try:
         if value is not None:
-            record = m.Utility()
-            record.sensor_name = sensor_name
             if index is None:
-                current_record = m.Utility.find_one({m.Utility.sensor_name: sensor_name})
+                record = m.Utility.find_one({m.Utility.sensor_name: sensor_name})
             else:
-                current_record = m.Utility.find_one({m.Utility.sensor_name: sensor_name,
-                                                     m.Utility.sensor_index: index})
-            if current_record is not None:
-                if current_record.units_total is None:
-                    # need to get
-                    if sqlitedb:
-                        last_rec = models.UtilityHistory.query.filter_by(
-                            utility_name=record.utility_name).order_by(desc(models.UtilityHistory.id)).first()
-                    else:
-                        # fixme
-                        last_rec = None
+                record = m.Utility.find_one({m.Utility.sensor_name: sensor_name, m.Utility.sensor_index: index})
+            if record is not None:
+                if record.units_total is None:
+                    # fixme
+                    last_rec = None
                     if last_rec is not None:
-                        current_record.units_total = last_rec.units_total
+                        record.units_total = last_rec.units_total
                     else:
-                        current_record.units_total = 0.0
-                # else: - should not be needed
-                #    # force save
-                #    if current_record is not None:
-                #        current_record.units_total = -1
-                record.utility_name = current_record.utility_name
-                if current_record.utility_type == Constant.UTILITY_TYPE_WATER:
-                    new_value = value / (current_record.ticks_per_unit * 1.0)
-                    delta = max(0, new_value - current_record.units_total)
+                        record.units_total = 0.0
+                if record.utility_type == Constant.UTILITY_TYPE_WATER:
+                    new_value = value / (record.ticks_per_unit * 1.0)
+                    delta = max(0, new_value - record.units_total)
                     record.units_total = new_value
                     record.units_delta = delta
                     # record.units_2_delta = 0.0
-                elif current_record.utility_type == Constant.UTILITY_TYPE_WATER_LEVEL:
-                    record.units_total = value / (current_record.ticks_per_unit * 1.0)
+                elif record.utility_type == Constant.UTILITY_TYPE_WATER_LEVEL:
+                    record.units_total = value / (record.ticks_per_unit * 1.0)
                     L.l.info("Saving utility water level value={} depth={}".format(value, record.units_total))
-                elif current_record.utility_type == Constant.UTILITY_TYPE_ELECTRICITY:
-                    if unit == current_record.unit_2_name:
+                elif record.utility_type == Constant.UTILITY_TYPE_ELECTRICITY:
+                    if unit == record.unit_2_name:
                         record.units_2_delta = value
                         # record.units_delta = 0.0  # needed for comparison
-                    elif unit == current_record.unit_name:
+                    elif unit == record.unit_name:
                         record.units_total = value
-                        record.units_delta = value - current_record.units_total
-                        current_record.units_total = value
-                elif current_record.utility_type == Constant.UTILITY_TYPE_GAS:
-                    new_value = value / (current_record.ticks_per_unit * 1.0)
-                    delta = max(0, new_value - current_record.units_total)
+                        record.units_delta = value - record.units_total
+                        record.units_total = value
+                elif record.utility_type == Constant.UTILITY_TYPE_GAS:
+                    new_value = value / (record.ticks_per_unit * 1.0)
+                    delta = max(0, new_value - record.units_total)
                     record.units_total = new_value
                     record.units_delta = delta
                     # record.units_2_delta = 0.0
                 else:
                     L.l.warning("Unkown utility type not processed from sensor {}".format(sensor_name))
-                # L.l.debug("Saving utility ex record {} name={}".format(current_record, record.utility_name))
-                # if sensor_name == 'sonoff-basic-2':
-                #    is_debug = True
-                # else:
-                #    is_debug = False
                 record.save_changed_fields(broadcast=True, persist=True)
             else:
-                L.l.info("Utility ex sensor {} index {} not defined in Utility table".format(sensor_name, index))
+                L.l.warning("Utility ex sensor {} index {} not defined in Utility table".format(sensor_name, index))
     except Exception as ex:
         L.l.error("Error saving utility ex update {}".format(ex), exc_info=True)
         if sqlitedb:
