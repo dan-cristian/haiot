@@ -311,8 +311,8 @@ def not_used_pwm_record_update(json_object):
     P.pwm.record_update(json_object)
 
 
-def _pwm_upsert_listener(record):
-    P.pwm.record_update(record)
+def _pwm_upsert_listener(record, changed_fields):
+    P.pwm.record_update(record, changed_fields)
 
 
 def _setup_in_ports(gpio_pin_list):
