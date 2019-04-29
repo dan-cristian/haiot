@@ -145,9 +145,9 @@ def rule_openhab_thermo(obj=m.ZoneThermostat(), change=None):
     #if 'heat_is_on' in field_changed_list:
     #0- Off, 1-Heating, 2- Cooling
     if obj.heat_is_on:
-        state = 1
+        state = 'ON'
     else:
-        state = 0
+        state = 'OFF'
     zone = obj.zone_name
     send_mqtt_openhab(subtopic='temperature_mode_' + zone, payload=state)
 
@@ -210,3 +210,7 @@ def heat_relay(name, value):
             L.l.info("OK setting heat relay {} to {} from openhab".format(name, value))
             relay.heat_is_on = value
             relay.save_changed_fields(broadcast=True, persist=True)
+
+
+def thermostat(zone_name=None, temp_target=None, state=None):
+    L.l.info('Got thermo zone {} temp {} state {}'.format(zone_name, temp_target, state))
