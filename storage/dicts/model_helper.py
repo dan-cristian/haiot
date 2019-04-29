@@ -369,7 +369,11 @@ class ModelBase(metaclass=OrderedClassMembers):
     @classmethod
     def save(cls, obj):
         # L.l.info('Saving remote record {}'.format(cls.__name__))
+        key = cls.get_key(obj)
+        rec = cls.find_one(filter={key: obj[key]})
         new_obj = cls(copy=obj)
+        if rec is not None:
+            new_obj.reference = rec.reference
         new_obj.save_changed_fields()
 
     def __init__(self, copy=None):
@@ -381,8 +385,10 @@ class ModelBase(metaclass=OrderedClassMembers):
                 if attr is not '__doc__':
                     cls._column_type_list[attr] = type(getattr(cls, attr))
                     setattr(cls, attr, attr)
-                    cls._column_list = cls._column_list + (attr,)
+                    cls._column_list += (attr,)
             cls.source_host = 'source_host'
+            # add manually to column list
+            cls._column_list += ('source_host',)
             cls._class_initialised = True
             cls.reference = None
             if cls.__doc__ is not None and 'key=' in cls.__doc__:
