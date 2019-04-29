@@ -373,6 +373,7 @@ class ZoneMusic(ModelBase):
 
 
 class Music(ModelBase):
+    """key=zone_name"""
     zone_name = ''  # unique name
     id = 0
     state = ''
@@ -386,6 +387,7 @@ class Music(ModelBase):
 
 
 class MusicLoved(ModelBase):
+    """key=lastfmsong"""
     id = 0
     lastfmsong = ''
     lastfmloved = False
