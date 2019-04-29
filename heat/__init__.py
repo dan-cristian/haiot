@@ -28,6 +28,7 @@ class P:
     debug = False
     thread_pool_status = None
     thread_local = None
+    heat_status = ''
 
     def __init__(self):
         pass
@@ -220,9 +221,11 @@ def _update_zone_heat(zone, heat_schedule, sensor):
 def _loop_zones():
     try:
         heat_is_on = False
+        P.heat_status = ''
         zone_list = m.Zone.find()
         for zone in zone_list:
             P.thread_pool_status = 'do zone {}'.format(zone.name)
+            P.heat_status += 'zone=' + zone.name + ': '
             heat_schedule = m.HeatSchedule.find_one({m.HeatSchedule.zone_id: zone.id, m.HeatSchedule.season: P.season})
             zonesensor_list = m.ZoneSensor.find({m.ZoneSensor.zone_id: zone.id, m.ZoneSensor.is_main: True})
             sensor_processed = {}
@@ -230,9 +233,11 @@ def _loop_zones():
                 if heat_schedule is not None and zonesensor is not None:
                     sensor = m.Sensor.find_one({m.Sensor.address: zonesensor.sensor_address})
                     if sensor is not None:
+                        P.heat_status += 'sensor: ' + sensor.address + ', '
                         heat_state, main_source_needed = _update_zone_heat(zone, heat_schedule, sensor)
                         if not heat_is_on:
                             heat_is_on = main_source_needed and heat_state
+                            P.heat_status += 'heat on:' + str(heat_state) + ', '
                         if zonesensor.zone_id in sensor_processed:
                             prev_sensor = sensor_processed[zonesensor.zone_id]
                             L.l.warning('Already processed temp sensor {} in zone {}, duplicate?'.format(
@@ -253,7 +258,8 @@ def _loop_zones():
                 # check when thermo is none
                 if main_thermo is None or (main_thermo.heat_is_on != heat_is_on or update_age_mins >=
                                            int(get_json_param(Constant.P_HEAT_STATE_REFRESH_PERIOD))):
-                    L.l.info("Setting main heat on={}, zone={}".format(heat_is_on, main_source_zone.name))
+                    L.l.info("Setting main heat on={}, zone={}, status={}".format(
+                        heat_is_on, main_source_zone.name, P.heat_status))
                     _save_heat_state_db(zone=main_source_zone, heat_is_on=heat_is_on)
                     P.last_main_heat_update = utils.get_base_location_now_date()
             else:

@@ -217,6 +217,7 @@ class TemperatureTarget(ModelBase):
 
 
 class ZoneHeatRelay(ModelBase):
+    """key=zone_id"""
     id = 0
     # friendly display name for pin mapping
     heat_pin_name = ''
