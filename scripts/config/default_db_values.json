@@ -117,7 +117,7 @@
     {"id":501, "active":false, "start_order":50, "name":"apps.dashcam", "host_name":"netbook"},
     {"id":509, "active":false, "start_order":9, "name":"heat", "host_name":"netbook"},
     {"id":525, "active":true, "start_order":25, "name":"rule", "host_name":"netbook"},
-    {"id":526, "active":false, "start_order":26, "name":"rule.electricity", "host_name":"netbook"},
+    {"id":526, "active":true, "start_order":26, "name":"rule.electricity", "host_name":"netbook"},
     {"id":527, "active":true, "start_order":27, "name":"node", "host_name":"netbook"},
     {"id":535, "active":true, "start_order":35, "name":"cloud.newtifry", "host_name":"netbook"},
     {"id":541, "active":true, "start_order":41, "name":"cloud.alexa", "host_name":"netbook"},
@@ -132,7 +132,7 @@
 
     {"id":609, "active":true, "start_order":9, "name":"heat", "host_name":"pi-face"},
     {"id":619, "active":true, "start_order":19, "name":"ddns", "host_name":"pi-face"},
-    {"id":626, "active":true, "start_order":26, "name":"rule.electricity", "host_name":"pi-face"},
+    {"id":626, "active":false, "start_order":26, "name":"rule.electricity", "host_name":"pi-face"},
     {"id":641, "active":true, "start_order":41, "name":"cloud.alexa", "host_name":"pi-face"},
     {"id":647, "active":true, "start_order":47, "name":"sensor.rfxcom", "host_name":"pi-face"},
     {"id":649, "active":true, "start_order":49, "name":"sensor.ups_legrand", "host_name":"pi-face"},
