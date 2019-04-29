@@ -19,6 +19,7 @@ class Pwm(ModelBase):
     gpio_pin_code = 0
     host_name = ''
     is_started = False
+    target_watts = 0
     update_on = datetime.now()
 
 
