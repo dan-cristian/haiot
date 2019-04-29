@@ -77,8 +77,8 @@ class GpioBase:
     def get_db_record(key):
         return None
 
-    def record_update(self, json_object, changed_fields):
-        record = utils.json_to_record(self.obj, json_object)
+    def record_update(self, record, changed_fields):
+        # record = utils.json_to_record(self.obj, json_object)
         current_record, key = self.get_current_record(record)
         if current_record is not None:
             new_record = self.obj()

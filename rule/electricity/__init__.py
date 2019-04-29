@@ -204,7 +204,7 @@ class PwmHeater(LoadPowerDevice):
             required_duty = int(exported_watts * self.max_duty / self.MAX_WATTS)
             pigpio_gpio.P.pwm.set(self.RELAY_ID, duty_cycle=required_duty)
         else:
-            pigpio_gpio.P.pwm.set(self.RELAY_ID, is_started=False)
+            pigpio_gpio.P.pwm.set(self.RELAY_ID, duty_cycle=0)
 
     def is_power_on(self):
         is_on, frequency, duty_cycle = pigpio_gpio.P.pwm.get(self.RELAY_ID)
@@ -230,14 +230,14 @@ class P:
     # init in order of priority
     def init_dev():
         if P.emulate_export:
-            if False:
+            if True:
                 relay = 'boiler2'
                 utility = 'power boiler'
                 obj = PwmHeater(relay_name=relay, relay_id=4, utility_name='power boiler', max_watts=2400)
                 P.device_list[relay] = obj
                 P.utility_list[utility] = obj
 
-            if True:
+            if False:
                 relay = 'boiler'
                 utility = 'power boiler'
                 obj = PwmHeater(relay_name=relay, relay_id=3, utility_name=utility, max_watts=2400)

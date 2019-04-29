@@ -189,8 +189,6 @@ class PwmIo(GpioBase):
     def get_db_record(key):
         rec = m.Pwm.find_one({m.Pwm.id: key})
         if rec is not None and rec.id == key:
-            # PwmIo.key_ok = PwmIo.key_ok + 1
-            # L.l.info("KEY found ok {}, count={}".format(key, PwmIo.key_ok))
             return rec
         L.l.error('No key retrieved for pwm {}, got {}'.format(key, rec))
         return None
@@ -239,10 +237,8 @@ class PwmIo(GpioBase):
                     pwm.frequency = value
                 elif name == 'duty_cycle':
                     pwm.duty_cycle = value
-                elif name == 'is_started':
-                    pwm.is_started = value
             if pwm.host_name == Constant.HOST_NAME and P.pi is not None:  # condition for debug
-                if pwm.is_started:
+                if pwm.duty_cycle > 0:
                     L.l.info("Set PWM {} to frequency {} duty {}".format(
                         pwm.gpio_pin_code, pwm.frequency, pwm.duty_cycle))
                     P.pi.hardware_PWM(pwm.gpio_pin_code, pwm.frequency, pwm.duty_cycle)
