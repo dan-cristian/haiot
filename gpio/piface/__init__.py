@@ -80,7 +80,7 @@ def set_pin_value(pin_index, pin_value, board_index):
 
 
 def _input_event(event):
-    # L.l.info('Piface switch event={}'.format(event))
+    L.l.info('Piface switch event={}'.format(event))
     pin_num = event.pin_num
     board_index = event.chip.hardware_addr
     # direction gives different results than pin value, not used, reading value instead
