@@ -135,7 +135,7 @@ def _setup_board():
             else:
                 L.l.error("Cannot initialise piface board on {}".format(Constant.HOST_MACHINE_TYPE))
                 return
-            last_err = None
+            last_err = ''
             for chip in chip_range:
                 try:
                     L.l.info("Try piface init on spi spidev{}.{}".format(bus, chip))
@@ -144,7 +144,7 @@ def _setup_board():
                     L.l.info("Initialised piface spi spidev{}.{} OK".format(bus, chip))
                 # except SPIInitError as ex1:
                 except Exception as ex1:
-                    last_err = "{}".format(ex1)
+                    last_err += "{}".format(ex1)
             if len(P.chip_list) == 0:
                     L.l.warning("Unable to init spi, probably not spi not enabled, last err={}".format(last_err))
             for board in board_range:
