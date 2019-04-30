@@ -306,6 +306,7 @@ def rule_energy_export(obj=m.Utility(), change=None):
                 P.grid_watts = random.randint(-800, -300)
             else:
                 P.grid_watts = obj.units_2_delta
+                L.l.info('Got main watts {}'.format(P.grid_watts))
             _update_devices()
     else:
         # set consumption for device
