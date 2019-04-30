@@ -108,7 +108,7 @@ class DictTable:
         if bypass_document_validation is False:
             if key in doc:
                 if doc[key] in self.table:
-                    L.l.error('Cannot insert, record exist')
+                    L.l.error('Cannot insert {}, record exist, key={}'.format(doc, key))
                     return None
             else:
                 if key != 'id':
