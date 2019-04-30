@@ -188,7 +188,7 @@ class ModelBase(metaclass=OrderedClassMembers):
     def __repr__(self):
         cls = self.__class__
         tbl = cls._table_list[cls.__name__]
-        rec_key = getattr(self, tbl.key)
+        rec_key = getattr(self, tbl._main_key)
         return str(tbl.table[rec_key])
 
     @classmethod
