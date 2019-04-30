@@ -113,7 +113,7 @@ def __read_ups_status():
             P.ups.RemainingMinutes = utils.round_sensor_value(atoms[1])
             P.ups.OutputVoltage = round(utils.round_sensor_value(atoms[2]), 0)
             P.ups.LoadPercent = utils.round_sensor_value(atoms[3])
-            P.ups.PowerFrequency = int(atoms[4])
+            P.ups.PowerFrequency = utils.round_sensor_value(atoms[4])
             P.ups.BatteryVoltage = utils.round_sensor_value(atoms[5])
             P.ups.Temperature = utils.round_sensor_value(atoms[6])
             P.ups.OtherStatus = atoms[7]
