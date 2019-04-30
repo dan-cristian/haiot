@@ -189,9 +189,14 @@ def _process_message(msg):
 
 def mqtt_on_message(client, userdata, msg):
     try:
+        prctl.set_name("mqtt_sonoff")
+        threading.current_thread().name = "mqtt_sonoff"
         _process_message(msg)
     except Exception as ex:
         L.l.error("Error processing sonoff mqtt {}, err={}, msg={}".format(msg.topic, ex, msg), exc_info=True)
+    finally:
+        prctl.set_name("idle")
+        threading.current_thread().name = "idle"
 
 
 # iot/sonoff/stat/sonoff-basic-5/POWER = ON/OFF
