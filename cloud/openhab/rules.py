@@ -151,7 +151,7 @@ def rule_openhab_thermo(obj=m.ZoneThermostat(), change=None):
     else:
         mode = 'OFF'
     send_mqtt_openhab(subtopic='thermo_mode_manual_' + zone, payload=mode)
-    if obj.model_presence_auto:
+    if obj.mode_presence_auto:
         mode = 'ON'
     else:
         mode = 'OFF'
