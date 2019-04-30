@@ -308,6 +308,8 @@ def rule_energy_export(obj=m.Utility(), change=None):
                 P.grid_watts = obj.units_2_delta
                 L.l.info('Got main watts {}'.format(P.grid_watts))
             _update_devices()
+        else:
+            L.l.info('Got energy utility {}'.format(obj.utility_name))
     else:
         # set consumption for device
         if obj.utility_name in P.utility_list:
