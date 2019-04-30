@@ -251,8 +251,8 @@ def _process_sub_rules():
 def init_sub_rule(thread_run_func, rule_module):
     add_rules_into_db(module=rule_module)
     P.sub_modules[rule_module] = thread_run_func
-    if len(P.sub_modules) == 1:
-        thread_pool.add_interval_callable(_process_sub_rules, run_interval_second=10)
+    # if len(P.sub_modules) == 1:
+    #    thread_pool.add_interval_callable(_process_sub_rules, run_interval_second=10)
 
 
 def init():
