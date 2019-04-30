@@ -404,7 +404,7 @@ class Ups(ModelBase):
     remaining_minutes = 0
     output_voltage = 0
     load_percent = 0.0
-    power_frequency = 0.0
+    power_frequency = 0
     battery_voltage = 0.0
     temperature = 0.0
     power_failed = False
