@@ -153,7 +153,7 @@ def _setup_board():
             for board in board_range:
                 for chip in P.chip_list:
                     try:
-                        L.l.info("Try piface pfio on board-hw {} spidev{}.{}".format(board, bus, chip))
+                        # L.l.info("Try piface pfio on board-hw {} spidev{}.{}".format(board, bus, chip))
                         pfd = pfio.PiFaceDigital(hardware_addr=board, bus=bus, chip_select=chip, init_board=True)
                         P.pfd[board] = pfd
                         P.listener[board] = pfio.InputEventListener(chip=P.pfd[board])
@@ -164,7 +164,7 @@ def _setup_board():
                 L.l.warning("Unable to init listeners, last err={}".format(last_err))
             else:
                 L.l.info('Initialised {} piface listeners'.format(len(P.pfd)))
-            if len(P.chip_list) > 0:
+            if len(P.chip_list) > 0 and len(P.pfd) > 0:
                 P.board_init = True
             else:
                 L.l.warning('Piface setup failed, no boards found')
