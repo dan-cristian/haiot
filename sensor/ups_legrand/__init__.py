@@ -113,9 +113,9 @@ def __read_ups_status():
             P.ups.RemainingMinutes = utils.round_sensor_value(atoms[1])
             P.ups.OutputVoltage = round(utils.round_sensor_value(atoms[2]), 0)
             P.ups.LoadPercent = utils.round_sensor_value(atoms[3])
-            P.ups.PowerFrequency = atoms[4]
-            P.ups.BatteryVoltage = atoms[5]
-            P.ups.Temperature = atoms[6]
+            P.ups.PowerFrequency = int(atoms[4])
+            P.ups.BatteryVoltage = float(atoms[5])
+            P.ups.Temperature = float(atoms[6])
             P.ups.OtherStatus = atoms[7]
             if len(P.ups.OtherStatus) >= 8:
                 P.ups.PowerFailed = (P.ups.OtherStatus[0] == '1')
