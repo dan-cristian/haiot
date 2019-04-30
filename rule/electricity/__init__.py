@@ -306,10 +306,10 @@ def rule_energy_export(obj=m.Utility(), change=None):
                 P.grid_watts = random.randint(-800, -300)
             else:
                 P.grid_watts = obj.units_2_delta
-                L.l.info('Got main watts {}'.format(P.grid_watts))
+                # L.l.info('Got main watts {}'.format(P.grid_watts))
             _update_devices()
-        else:
-            L.l.info('Got energy utility {}'.format(obj.utility_name))
+        # else:
+        #    L.l.info('Got energy utility {}'.format(obj.utility_name))
     else:
         # set consumption for device
         if obj.utility_name in P.utility_list:
@@ -320,20 +320,9 @@ def rule_energy_export(obj=m.Utility(), change=None):
                 pass
 
 
-def thread_run():
-    if P.emulate_export is True:
-        P.grid_watts = random.randint(-800, -300)
-    else:
-        # main_rec = models.Utility.query.filter_by(utility_name='power main mono').first()
-        main_rec = m.Utility.find_one({m.Utility.utility_name: 'power main mono'})
-        if main_rec is not None and main_rec.units_2_delta is not None:
-            P.grid_watts = main_rec.units_2_delta
-    _update_devices()
-
-
 def init():
     P.emulate_export = False
     P.init_dev()
     current_module = sys.modules[__name__]
-    rule.init_sub_rule(thread_run_func=thread_run, rule_module=current_module)
+    rule.init_sub_rule(thread_run_func=None, rule_module=current_module)
     L.l.info("Initialised solar rules with {} devices".format(len(P.device_list)))

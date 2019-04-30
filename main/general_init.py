@@ -4,7 +4,7 @@ while True:
     try:
         import wheel  # needed for auto install/compile
         import ujson
-        import requests
+        # import requests
         break
     except ImportError as iex:
         if not fix_module(iex):
@@ -135,6 +135,11 @@ def _init_debug():
         print("Error in remote debug: {}".format(ex))
 
 
+def _init_debug_pycharm():
+    import pydevd_pycharm
+    pydevd_pycharm.settrace('192.168.0.105', port=12888, stdoutToServer=True, stderrToServer=True)
+
+
 def unload():
     L.l.info('Main module is unloading, application will exit')
     import main.thread_pool
@@ -145,7 +150,8 @@ def unload():
 
 def init(arg_list):
     if 'debug_remote' in arg_list:
-        _init_debug()
+        # _init_debug()
+        _init_debug_pycharm()
         # if Constant.is_os_linux():
         #    from pudb import set_trace
         #    set_trace(paused=False)
