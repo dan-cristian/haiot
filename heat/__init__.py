@@ -66,8 +66,10 @@ def _decide_action(zone, current_temperature, target_temperature, force_on=False
             heat_is_on = False
         if current_temperature < target_temperature:
             heat_is_on = True
+            P.heat_status += 'temp low {} '.format(heat_is_on)
         if current_temperature > (target_temperature + P.threshold):
             heat_is_on = False
+            P.heat_status += 'temp high {} '.format(heat_is_on)
     # trigger if state is different and every 5 minutes (in case other hosts with relays have restarted)
     if zone_thermo.last_heat_status_update is not None:
         last_heat_update_age_sec = (utils.get_base_location_now_date()
@@ -193,14 +195,17 @@ def _update_zone_heat(zone, heat_schedule, sensor):
                 act_temp_target = std_temp_target
                 if schedule_pattern.activate_on_condition:
                     force_off = _get_heat_off_condition(schedule_pattern)
+                    P.heat_status += 'condition off {} '.format(force_off)
                 else:
                     force_off = False
                 force_on = _get_heat_on_keep_warm(schedule_pattern=schedule_pattern, temp_code=temp_code,
                                                   temp_target=std_temp_target, temp_actual=sensor.temperature)
+                P.heat_status += 'keep warm {} '.format(force_on)
                 if not force_on:
                     force_on, manual_temp_target = _get_heat_on_manual(zone_thermo=zone_thermo)
                     if manual_temp_target is not None:
                         act_temp_target = manual_temp_target
+                    P.heat_status += 'force on manual {} '.format(force_on)
                 if zone_thermo.active_heat_schedule_pattern_id != schedule_pattern.id:
                     zone_thermo.active_heat_schedule_pattern_id = schedule_pattern.id
                 zone_thermo.heat_target_temperature = std_temp_target
