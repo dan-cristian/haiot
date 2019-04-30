@@ -26,14 +26,14 @@ class OrderedClassMembers(type):
 
 class DictTable:
     id = 0
-    key = None
+    # key = None
 
     def __init__(self, model_class):
         self.table = {}
         self.index = {}
         self.model_class = model_class
         self.id = 0
-        self.key = None
+        # self.key = None
 
     def _add_index(self, new_key):
         L.l.info('Adding index for {} on {}'.format(new_key, self.model_class.__name__))
@@ -115,7 +115,7 @@ class DictTable:
                     L.l.error('No key [{}] for {} found in record: {}'.format(key, self.model_class.__name__, doc))
                     return None
         cls = self.model_class
-        self.key = key
+        # self.key = key
         if 'id' not in doc or doc['id'] is None:
             self.id += 1
             doc['id'] = self.id
@@ -186,10 +186,10 @@ class ModelBase(metaclass=OrderedClassMembers):
     _is_used_in_module = False
 
     def __repr__(self):
-        cls = self.__class__
-        tbl = cls._table_list[cls.__name__]
-        rec_key = getattr(self, tbl._main_key)
-        return str(tbl.table[rec_key])
+        # cls = self.__class__
+        # tbl = cls._table_list[cls.__name__]
+        # rec_key = getattr(self, tbl.key)
+        return str(self.__dict__)
 
     @classmethod
     def reset_usage(cls):
