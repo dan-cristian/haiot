@@ -79,7 +79,7 @@
     {"id":26, "active":false, "start_order":26, "name":"rule.electricity", "host_name":""},
     {"id":27, "active":true, "start_order":27, "name":"node", "host_name":""},
     {"id":33, "active":false, "start_order":33, "name":"utility", "host_name":""},
-    {"id":35, "active":true, "start_order":35, "name":"cloud.newtifry", "host_name":""},
+    {"id":35, "active":false, "start_order":35, "name":"cloud.newtifry", "host_name":""},
     {"id":37, "active":false, "start_order":37, "name":"cloud.hipchat", "host_name":""},
     {"id":39, "active":true, "start_order":39, "name":"presence", "host_name":""},
     {"id":41, "active":false, "start_order":41, "name":"cloud.alexa", "host_name":""},
@@ -120,7 +120,6 @@
     {"id":526, "active":true, "start_order":26, "name":"rule.electricity", "host_name":"netbook"},
     {"id":527, "active":true, "start_order":27, "name":"node", "host_name":"netbook"},
     {"id":533, "active":true, "start_order":33, "name":"utility", "host_name":"netbook"},
-    {"id":535, "active":true, "start_order":35, "name":"cloud.newtifry", "host_name":"netbook"},
     {"id":541, "active":true, "start_order":41, "name":"cloud.alexa", "host_name":"netbook"},
     {"id":557, "active":false, "start_order":57, "name":"sensor.sonoff", "host_name":"netbook"},
     {"id":559, "active":false, "start_order":59, "name":"sensor.i2c", "host_name":"netbook"},
@@ -150,9 +149,20 @@
 
     {"id":757, "active":true, "start_order":57, "name":"sensor.sonoff", "host_name":"EN610668"},
 
+    {"id":809, "active":true, "start_order":9, "name":"heat", "host_name":"homew"},
+    {"id":819, "active":true, "start_order":19, "name":"ddns", "host_name":"homew"},
+    {"id":825, "active":true, "start_order":25, "name":"rule", "host_name":"homew"},
+    {"id":826, "active":true, "start_order":26, "name":"rule.electricity", "host_name":"homew"},
+    {"id":833, "active":true, "start_order":33, "name":"utility", "host_name":"homew"},
+    {"id":841, "active":true, "start_order":41, "name":"cloud.alexa", "host_name":"homew"},
+    {"id":851, "active":true, "start_order":51, "name":"sensor.solar_aps", "host_name":"homew"},
     {"id":865, "active":true, "start_order":65, "name":"gpio", "host_name":"homew"},
     {"id":855, "active":true, "start_order":55, "name":"sensor.1wire", "host_name":"homew"},
     {"id":857, "active":true, "start_order":57, "name":"sensor.sonoff", "host_name":"homew"},
+    {"id":859, "active":true, "start_order":59, "name":"sensor.i2c", "host_name":"homew"},
+    {"id":865, "active":true, "start_order":65, "name":"gpio", "host_name":"homew"},
+    {"id":867, "active":true, "start_order":67, "name":"alarm", "host_name":"homew"},
+    {"id":870, "active":true, "start_order":70, "name":"music", "host_name":"homew"},
 
     {"id":903, "active":true, "start_order":3, "name":"health_monitor", "host_name":"pizero1"},
     {"id":955, "active":true, "start_order":55, "name":"sensor.1wire", "host_name":"pizero1"},
@@ -341,9 +351,10 @@
     {"relay_pin_name": "odroid_1_0", "zone_id": "7", "gpio_pin_code": "1:out:0", "gpio_host_name": "pizero2", "relay_type": "piface"},
     {"relay_pin_name": "odroid_1_1", "zone_id": "7", "gpio_pin_code": "1:out:1", "gpio_host_name": "pizero2", "relay_type": "piface"},
     {"relay_pin_name": "odroid_1_2", "zone_id": "7", "gpio_pin_code": "1:out:2", "gpio_host_name": "pizero2", "relay_type": "piface"},
-    {"relay_pin_name": "odroid_pcf_0", "zone_id": "7", "gpio_pin_code": "0", "gpio_host_name": "pizero2", "relay_type": "pcf8574"},
-    {"relay_pin_name": "odroid_pcf_1", "zone_id": "7", "gpio_pin_code": "1", "gpio_host_name": "pizero2", "relay_type": "pcf8574"},
-    {"relay_pin_name": "odroid_pcf_7", "zone_id": "7", "gpio_pin_code": "7", "gpio_host_name": "pizero2", "relay_type": "pcf8574"},
+
+    {"relay_pin_name": "odroid_pcf_0", "zone_id": "7", "gpio_pin_code": "0", "gpio_host_name": "homew", "relay_type": "pcf8574"},
+    {"relay_pin_name": "odroid_pcf_1", "zone_id": "7", "gpio_pin_code": "1", "gpio_host_name": "homew", "relay_type": "pcf8574"},
+    {"relay_pin_name": "odroid_pcf_7", "zone_id": "7", "gpio_pin_code": "7", "gpio_host_name": "homew", "relay_type": "pcf8574"},
 
     {"relay_pin_name": "front_gate_relay_test", "zone_id": "7", "gpio_pin_code": "0:out:1", "gpio_host_name": "netbook", "relay_type": "piface"},
     {"relay_pin_name": "blackwater_pump_relay_test", "zone_id": "9", "gpio_pin_code": "sonoff-basic-3", "gpio_host_name": "netbook", "relay_type": "sonoff"}
