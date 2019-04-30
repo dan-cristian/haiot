@@ -138,7 +138,7 @@ def _setup_board():
             last_err = ''
             for chip in chip_range:
                 try:
-                    L.l.info("Try piface init on spi spidev{}.{}".format(bus, chip))
+                    # L.l.info("Try piface init on spi spidev{}.{}".format(bus, chip))
                     pfio.init(bus=bus, chip_select=chip)
                     P.chip_list.append(chip)
                     L.l.info("Initialised piface spi spidev{}.{} OK".format(bus, chip))
@@ -147,6 +147,9 @@ def _setup_board():
                     last_err += "{}".format(ex1)
             if len(P.chip_list) == 0:
                     L.l.warning("Unable to init spi, probably not spi not enabled, last err={}".format(last_err))
+            else:
+                L.l.info('Found {} piface chips {}'.format(len(P.chip_list), P.chip_list))
+            last_err = ''
             for board in board_range:
                 for chip in P.chip_list:
                     try:
@@ -155,10 +158,12 @@ def _setup_board():
                         P.pfd[board] = pfd
                         P.listener[board] = pfio.InputEventListener(chip=P.pfd[board])
                         L.l.info("Initialised piface pfio listener board-hw {} spidev{}.{}".format(board, bus, chip))
-                    except NoPiFaceDigitalDetectedError as ex:
-                        pass
-                    except SPIInitError as spex:
-                        pass
+                    except Exception as ex2:
+                        last_err += "{}".format(ex2)
+            if len(P.pfd) == 0:
+                L.l.warning("Unable to init listeners, last err={}".format(last_err))
+            else:
+                L.l.info('Initialised {} piface listeners'.format(len(P.pfd)))
             if len(P.chip_list) > 0:
                 P.board_init = True
             else:
