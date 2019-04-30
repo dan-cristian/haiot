@@ -66,10 +66,10 @@ def _decide_action(zone, current_temperature, target_temperature, force_on=False
             heat_is_on = False
         if current_temperature < target_temperature:
             heat_is_on = True
-            P.heat_status += 'temp low {} '.format(heat_is_on)
+        P.heat_status += 'temp low {}<{} {} '.format(current_temperature, target_temperature, heat_is_on)
         if current_temperature > (target_temperature + P.threshold):
             heat_is_on = False
-            P.heat_status += 'temp high {} '.format(heat_is_on)
+        P.heat_status += 'temp high {}>{} {} '.format(current_temperature, target_temperature + P.threshold, heat_is_on)
     # trigger if state is different and every 5 minutes (in case other hosts with relays have restarted)
     if zone_thermo.last_heat_status_update is not None:
         last_heat_update_age_sec = (utils.get_base_location_now_date()
