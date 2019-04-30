@@ -149,7 +149,7 @@ def unload():
 
 
 def init(arg_list):
-    if 'debug_remote' in arg_list:
+    if 'remote_debug' in arg_list:
         # _init_debug()
         _init_debug_pycharm()
         # if Constant.is_os_linux():
