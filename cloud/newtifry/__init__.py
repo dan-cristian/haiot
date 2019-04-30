@@ -83,7 +83,7 @@ def _send_queue():
         # Prepare our request
         try:
             response = urllib.request.urlopen(
-                BACKEND, urllib.parse.urlencode(params), timeout=Constant.URL_OPEN_TIMEOUT)
+                BACKEND, urllib.parse.urlencode(params).encode("utf8"), timeout=Constant.URL_OPEN_TIMEOUT)
             # Read the body
             body = response.read()
             # It's JSON - parse it
@@ -94,7 +94,7 @@ def _send_queue():
                 L.l.info("Newtifry message sent OK. Size: %d." % contents['size'])
                 del _message_queue[:]
                 _last_send_date = utils.get_base_location_now_date()
-        except urllib.request.URLError as ex:
+        except Exception as ex:
             L.l.warning("Newtifry failed to make request to the server: " + str(ex))
     finally:
         __queue_lock.release()
@@ -160,7 +160,7 @@ def init():
     global _source_key
     _source_key = get_json_param(Constant.P_NEWTIFY_KEY)
     dispatcher.connect(send_message, signal=Constant.SIGNAL_PUSH_NOTIFICATION, sender=dispatcher.Any)
-    # send_message(title="Initialising", message="Module initialising", priority=1)
+    send_message(title="Initialising", message="Module initialising", priority=1)
     # send_message(title="Initialised", message="Module initialised")
     # send_message(title="Initialised 2", message="Module initialised 2")
     thread_pool.add_interval_callable(_send_queue, run_interval_second=60)
