@@ -150,6 +150,9 @@
 
     {"id":757, "active":true, "start_order":57, "name":"sensor.sonoff", "host_name":"EN610668"},
 
+    {"id":865, "active":true, "start_order":65, "name":"gpio", "host_name":"homew"},
+    {"id":855, "active":true, "start_order":55, "name":"sensor.1wire", "host_name":"homew"},
+    {"id":857, "active":true, "start_order":57, "name":"sensor.sonoff", "host_name":"homew"},
 
     {"id":903, "active":true, "start_order":3, "name":"health_monitor", "host_name":"pizero1"},
     {"id":955, "active":true, "start_order":55, "name":"sensor.1wire", "host_name":"pizero1"},
