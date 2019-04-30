@@ -24,7 +24,7 @@
 # 2 - Backend error
 
 import urllib.request
-# import urllib2
+import urllib.parse
 import json
 from main.logger_helper import L
 from common import Constant, utils, get_json_param
@@ -82,7 +82,8 @@ def _send_queue():
                 params['image'] = item.image_url
         # Prepare our request
         try:
-            response = urllib.request.urlopen(BACKEND, urllib.urlencode(params), timeout=Constant.URL_OPEN_TIMEOUT)
+            response = urllib.request.urlopen(
+                BACKEND, urllib.parse.urlencode(params), timeout=Constant.URL_OPEN_TIMEOUT)
             # Read the body
             body = response.read()
             # It's JSON - parse it
