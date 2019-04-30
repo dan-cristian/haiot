@@ -59,6 +59,8 @@ def _decide_action(zone, current_temperature, target_temperature, force_on=False
     if force_on:
         heat_is_on = True
     if force_off:
+        if heat_is_on:
+            L.l.warning('Conflicting heat states on {} force_on={}, force_off={}'.format(zone, force_on, force_off))
         heat_is_on = False
     if heat_is_on is None:
         heat_is_on = zone_thermo.heat_is_on
