@@ -135,14 +135,12 @@ def _process_message(msg):
             if 'BME280' in obj:
                 # "BME280":{"Temperature":24.1,"Humidity":39.2,"Pressure":980.0},"PressureUnit":"hPa","TempUnit":"C"}
                 bmp = obj['BME280']
-                temp = bmp['Temperature']
-                press = bmp['Pressure']
-                humid = bmp['Humidity']
                 sensor_address = '{}_{}'.format(sensor_name, 'bme280')
                 zone_sensor, sensor = _get_sensor(sensor_address=sensor_address, sensor_type='BME280')
-                sensor.temperature = temp
-                sensor.pressure = press
-                sensor.humidity = humid
+                sensor.temperature = bmp['Temperature']
+                sensor.pressure = bmp['Pressure']
+                if 0 < bmp['Humidity'] < 100:
+                    sensor.humidity = bmp['Humidity']
                 sensor.save_changed_fields(broadcast=True, persist=True)
             if 'INA219' in obj:
                 ina = obj['INA219']
