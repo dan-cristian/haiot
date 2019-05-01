@@ -527,13 +527,17 @@
     {"id":22, "zone_id":7 ,  "gpio_pin_code":"1:in:1", "gpio_host_name": "homew", "alarm_pin_name": "gate", "sensor_type": "contact", "relay_type": "piface"},
     {"id":23, "zone_id":7 ,  "gpio_pin_code":"1:in:2", "gpio_host_name": "homew", "alarm_pin_name": "sonerie", "sensor_type": "contact", "relay_type": "piface"},
     {"id":24, "zone_id":3 ,  "gpio_pin_code":"1:in:3", "gpio_host_name": "homew", "alarm_pin_name": "usa garaj", "sensor_type": "contact", "relay_type": "piface"},
+    {"id":25, "zone_id":3 ,  "gpio_pin_code":"1:in:4", "gpio_host_name": "homew", "alarm_pin_name": "unused 1", "sensor_type": "contact", "relay_type": "piface"},
+    {"id":26, "zone_id":3 ,  "gpio_pin_code":"1:in:5", "gpio_host_name": "homew", "alarm_pin_name": "unused 2", "sensor_type": "contact", "relay_type": "piface"},
+    {"id":27, "zone_id":3 ,  "gpio_pin_code":"1:in:6", "gpio_host_name": "homew", "alarm_pin_name": "unused 3", "sensor_type": "contact", "relay_type": "piface"},
+    {"id":28, "zone_id":3 ,  "gpio_pin_code":"1:in:7", "gpio_host_name": "homew", "alarm_pin_name": "unused 4", "sensor_type": "contact", "relay_type": "piface"},
 
 
-    {"id":25, "zone_id":29 , "gpio_pin_code":"18", "gpio_host_name": "pi-face", "alarm_pin_name": "beci test", "relay_type": "gpio"},
-    {"id":26, "zone_id":200 , "gpio_pin_code":"23", "gpio_host_name": "pidash", "alarm_pin_name": "car vibrate", "sensor_type": "contact", "relay_type": "gpio"},
-    {"id":27, "zone_id":200 , "gpio_pin_code":"17", "gpio_host_name": "pidash", "alarm_pin_name": "pidash battery low", "sensor_type": "contact", "relay_type": "gpio"},
-    {"id":28, "zone_id":200 , "gpio_pin_code":"24", "gpio_host_name": "pidash", "alarm_pin_name": "car sound", "sensor_type": "contact", "relay_type": "gpio"},
-    {"id":29, "zone_id":200 , "gpio_pin_code":"25", "gpio_host_name": "pidash", "alarm_pin_name": "switch", "sensor_type": "contact", "relay_type": "gpio"}
+    {"id":29, "zone_id":29 , "gpio_pin_code":"18", "gpio_host_name": "pi-face", "alarm_pin_name": "beci test", "relay_type": "gpio"},
+    {"id":30, "zone_id":200 , "gpio_pin_code":"23", "gpio_host_name": "pidash", "alarm_pin_name": "car vibrate", "sensor_type": "contact", "relay_type": "gpio"},
+    {"id":31, "zone_id":200 , "gpio_pin_code":"17", "gpio_host_name": "pidash", "alarm_pin_name": "pidash battery low", "sensor_type": "contact", "relay_type": "gpio"},
+    {"id":32, "zone_id":200 , "gpio_pin_code":"24", "gpio_host_name": "pidash", "alarm_pin_name": "car sound", "sensor_type": "contact", "relay_type": "gpio"},
+    {"id":33, "zone_id":200 , "gpio_pin_code":"25", "gpio_host_name": "pidash", "alarm_pin_name": "switch", "sensor_type": "contact", "relay_type": "gpio"}
   ],
 
   "Pwm": [
