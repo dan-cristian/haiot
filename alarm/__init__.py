@@ -66,11 +66,10 @@ def init():
         if alarm.relay_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
             gpio_pin.board_index, gpio_pin.pin_direction, gpio_pin.pin_index_bcm = io_common.decode_piface_pin(
                 alarm.gpio_pin_code)
-            gpio_pin.pin_type = alarm.relay_type
         else:
-            gpio_pin.pin_type = alarm.relay_type
-            gpio_pin.pin_code = alarm.gpio_pin_code
             gpio_pin.pin_index_bcm = int(alarm.gpio_pin_code)
+        gpio_pin.pin_type = alarm.relay_type
+        gpio_pin.pin_code = alarm.gpio_pin_code
         port_list.append(gpio_pin)
     dispatcher.send(signal=Constant.SIGNAL_GPIO_INPUT_PORT_LIST, gpio_pin_list=port_list)
     # just for test on netbook
