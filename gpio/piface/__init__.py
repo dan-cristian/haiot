@@ -88,7 +88,7 @@ def _input_event(event):
     pin_val = _get_in_pin_value(pin_num, board_index)
     gpio_pin_code = format_piface_pin_code(board_index=board_index, pin_direction=Constant.GPIO_PIN_DIRECTION_IN,
                                            pin_index=pin_num)
-    # L.l.info('Event piface gpio={} direction={} altval={}'.format(gpio_pin_code, direction, pin_val))
+    L.l.info('Event piface gpio={} direction={} altval={}'.format(gpio_pin_code, direction, pin_val))
     dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio_pin_code, direction=Constant.GPIO_PIN_DIRECTION_IN,
                     pin_value=pin_val, pin_connected=(pin_val == 1))
 
