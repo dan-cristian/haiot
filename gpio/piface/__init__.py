@@ -103,14 +103,13 @@ def _setup_in_ports_pif(gpio_pin_list):
             #    gpio_pin.pin_code,gpio_pin.pin_type, gpio_pin.pin_index_bcm))
             board = None
             try:
-                # i = gpio_pin.pin_code.split(":")[2]
                 # Log.logger.info("Piface registering input pin {}".format(gpio_pin.pin_index_bcm))
                 pin = int(gpio_pin.pin_index_bcm)
                 board = int(gpio_pin.board_index)
                 if board in P.listener.keys():
                     P.listener[board].register(pin, pfio.IODIR_ON, _input_event)
                     P.listener[board].register(pin, pfio.IODIR_OFF, _input_event)
-                    L.l.info('OK callback set on piface board {}, {} pin {}'.format(board, gpio_pin.pin_code, pin))
+                    L.l.info('Callback set OK piface board {} code {} pin {}'.format(board, gpio_pin.pin_code, pin))
                     # _read_default(pin=pin, board_index=board)
             except Exception as ex:
                 L.l.critical('Unable to setup piface listener board={} pin={} err={}'.format(
