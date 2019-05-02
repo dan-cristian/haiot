@@ -211,16 +211,13 @@ class PwmIo(GpioBase):
         if pwm is not None:
             if pwm.host_name == Constant.HOST_NAME:
                 pwm.frequency, pwm.duty_cycle = PwmIo._get_pwm_attrib(pwm.gpio_pin_code)
-                pwm.commit_record_to_db_notify()
+                pwm.save_changed_fields(broadcast=True, persist=True)
         else:
             L.l.warning("Cannot find pwm {} to sync2db".format(key))
 
     @staticmethod
     def _init_pwm():
-        if sqlitedb:
-            pwm_list = models.Pwm.query.filter_by(host_name=Constant.HOST_NAME).all()
-        else:
-            pwm_list = m.Pwm.find({m.Pwm.host_name: Constant.HOST_NAME})
+        pwm_list = m.Pwm.find({m.Pwm.host_name: Constant.HOST_NAME})
         for pwm in pwm_list:
             PwmIo.sync_2_db(pwm.id)
         pass
@@ -373,8 +370,8 @@ def _try_connect():
 
 
 def init():
-    P.pwm = PwmIo(obj=m.Pwm)
     L.l.info('PiGpio initialising')
+    P.pwm = PwmIo(obj=m.Pwm)
     if P.import_ok:
         try:
             if _try_connect():
