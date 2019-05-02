@@ -75,6 +75,9 @@ class Relaydevice:
         # job is never finished for devices without power metering
         pass
 
+    def set_watts(self, watts):
+        self.watts = watts
+
     # returns power status changes
     def grid_updated(self, grid_watts):
         changed_relay_status = False
