@@ -113,8 +113,10 @@ class Relaydevice:
                         self.set_power_status(power_is_on=False)
                         changed_relay_status = True
                     else:
-                        L.l.info("Keep device {} consumption {} with import power {} and power_on={}".format(
-                            self.RELAY_NAME, current_watts, grid_watts, self.is_power_on()))
+                        L.l.info("Keep device {} consumption {} import power {} power_on={} thresh {}".format(
+                            self.RELAY_NAME, current_watts, grid_watts, power_on, P.MIN_WATTS_THRESHOLD))
+                else:
+                    L.l.info('No change as watts {} are in idle zone {}'.format(current_watts, P.IDLE_WATTS))
             else:
                 L.l.info('Current watts on import is None for device {}'.format(self))
         self.update_job_finished()
