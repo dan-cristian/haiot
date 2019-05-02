@@ -85,7 +85,7 @@ class GpioBase:
             kwargs = {}
             for field in changed_fields:
                 val = getattr(record, field)
-                #setattr(new_record, field, val)
+                # setattr(new_record, field, val)
                 kwargs[field] = val
             if record.host_name == Constant.HOST_NAME and record.source_host != Constant.HOST_NAME:
                 # https://stackoverflow.com/questions/1496346/passing-a-list-of-kwargs
