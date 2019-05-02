@@ -320,15 +320,16 @@ def rule_energy_export(obj=m.Utility(), change=None):
             _update_devices()
         else:
             L.l.info('Got energy utility {}'.format(obj.utility_name))
+            if obj.utility_name in P.utility_list:
+                inst = P.utility_list[obj.utility_name]
+                if isinstance(inst, Relaydevice) and inst.UTILITY_NAME == obj.utility_name:
+                    # set consumption for device
+                    inst.set_watts(obj.units_2_delta)
+                else:
+                    L.l.info('Discarding utility {}, not relevant'.format(obj.utility_name))
     else:
         L.l.info('Got utility with no changes {}'.format(obj.utility_name))
-        # set consumption for device
-        if obj.utility_name in P.utility_list:
-            inst = P.utility_list[obj.utility_name]
-            if isinstance(inst, Powerdevice) and inst.UTILITY_NAME == obj.utility_name:
-                inst.set_watts(obj.units_2_delta)
-            else:
-                pass
+
 
 
 def init():
