@@ -221,7 +221,7 @@ class PwmIo(GpioBase):
     def _init_pwm():
         pwm_list = m.Pwm.find({m.Pwm.host_name: Constant.HOST_NAME})
         for pwm in pwm_list:
-            PwmIo.sync_2_db(pwm.id)
+            PwmIo.sync_2_db(pwm.name)
 
     @staticmethod
     def set(key, **kwargs):
