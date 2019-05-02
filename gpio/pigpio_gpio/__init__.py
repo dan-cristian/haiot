@@ -183,8 +183,6 @@ def input_event(gpio, level, tick):
 
 
 class PwmIo(GpioBase):
-    key_ok = 0
-
     @staticmethod
     def get_db_record(key):
         rec = m.Pwm.find_one({m.Pwm.name: key})
