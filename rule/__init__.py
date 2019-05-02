@@ -60,7 +60,8 @@ def parse_rules(obj, change):
         if hasattr(obj, Constant.JSON_PUBLISH_FIELDS_CHANGED):
             field_changed_list = obj.last_commit_field_changed_list
         else:
-            field_changed_list = []
+            # fixme: not sure if above is still needed
+            field_changed_list = change
         # iterate all functions in each rule module and queue for execution what matches
         for func_list in P.func.values():
             if func_list:
