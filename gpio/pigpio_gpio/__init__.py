@@ -210,7 +210,7 @@ class PwmIo(GpioBase):
         pwm = PwmIo.get_db_record(key=key)
         if pwm is not None:
             if pwm.host_name == Constant.HOST_NAME:
-                pwm.is_started, pwm.frequency, pwm.duty_cycle = PwmIo._get_pwm_attrib(pwm.gpio_pin_code)
+                pwm.frequency, pwm.duty_cycle = PwmIo._get_pwm_attrib(pwm.gpio_pin_code)
                 pwm.commit_record_to_db_notify()
         else:
             L.l.warning("Cannot find pwm {} to sync2db".format(key))
