@@ -107,7 +107,7 @@ class Relaydevice:
                         self.set_power_status(power_is_on=False)
                         changed_relay_status = True
                     else:
-                        L.l.debug("Keep device {} consumption {} with import power {} and power_on={}".format(
+                        L.l.info("Keep device {} consumption {} with import power {} and power_on={}".format(
                             self.RELAY_NAME, current_watts, grid_watts, self.is_power_on()))
         self.update_job_finished()
         return changed_relay_status
@@ -208,6 +208,7 @@ class PwmHeater(LoadPowerDevice):
 
     def is_power_on(self):
         frequency, duty_cycle = pigpio_gpio.P.pwm.get(self.RELAY_ID)
+        L.l.info('Pwm frequency={} duty={} is_on={}'.format(frequency, duty_cycle, duty_cycle > 0))
         return duty_cycle > 0
 
     def __init__(self, relay_name, relay_id, utility_name, max_watts):
