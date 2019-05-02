@@ -273,7 +273,7 @@ class PwmIo(GpioBase):
                 return pwm.frequency, pwm.duty_cycle
         else:
             L.l.warning("Cannot find pwm {} on get".format(key))
-            return None, None, None
+            return None, None
 
     @staticmethod
     def get_current_record(record):
