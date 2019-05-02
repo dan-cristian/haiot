@@ -291,7 +291,7 @@ class PwmIo(GpioBase):
 
     def __init__(self, obj):
         GpioBase.__init__(self, obj)
-        # PwmIo._init_pwm()
+        PwmIo._init_pwm()
 
 
 def not_used_pwm_record_update(json_object):
