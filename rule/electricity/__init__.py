@@ -210,6 +210,7 @@ class PwmHeater(LoadPowerDevice):
         frequency, duty_cycle = pigpio_gpio.P.pwm.get(self.RELAY_ID)
         L.l.info('Pwm frequency={} duty={} is_on={}'.format(frequency, duty_cycle, duty_cycle > 0))
         return duty_cycle > 0
+        # not used
 
     def __init__(self, relay_name, relay_id, utility_name, max_watts):
         LoadPowerDevice.__init__(self, relay_name, relay_id, utility_name, max_watts)
