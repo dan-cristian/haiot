@@ -261,10 +261,10 @@ def post_init():
                 alarm.save_changed_fields(broadcast=True, persist=True, listeners=False)
 
     # init PWM
-    pwm_list = m.Pwm.find({m.Pwm.host_name: Constant.HOST_NAME})
-    for pwm in pwm_list:
-        pwm.frequency, pwm.duty = pigpio_gpio.P.pwm.get(pwm.name)
-        pwm.save_changed_fields(broadcast=True, persist=True)
+    # pwm_list = m.Pwm.find({m.Pwm.host_name: Constant.HOST_NAME})
+    # for pwm in pwm_list:
+    #    pwm.frequency, pwm.duty = pigpio_gpio.P.pwm.get(pwm.name)
+    #    pwm.save_changed_fields(broadcast=True, persist=True)
 
     # piface.post_init()
     # rpi_gpio.post_init()
