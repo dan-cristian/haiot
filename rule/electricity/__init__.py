@@ -85,11 +85,14 @@ class Relaydevice:
             export_watts = -grid_watts
             # only trigger power on if over treshold
             if self.POWER_ADJUSTABLE or export_watts > P.MIN_WATTS_THRESHOLD and self.AVG_CONSUMPTION <= export_watts\
-                    and (not self.is_power_on()):
+                    and not power_on:
                 self.set_power_status(power_is_on=True, exported_watts=export_watts)
                 L.l.info("Should auto start device {} state={} consuming={} surplus={}".format(
                     self.RELAY_NAME, self.state, self.watts, export_watts))
                 changed_relay_status = True
+            else:
+                L.l.info('No action done on export watts {} thresh {} avg_cons {} power_on {}'.format(
+                    export_watts, P.MIN_WATTS_THRESHOLD, self.AVG_CONSUMPTION, power_on))
         else:
             # L.l.info("Not exporting, import={}".format(grid_watts))
             import_watts = grid_watts
@@ -109,6 +112,8 @@ class Relaydevice:
                     else:
                         L.l.info("Keep device {} consumption {} with import power {} and power_on={}".format(
                             self.RELAY_NAME, current_watts, grid_watts, self.is_power_on()))
+            else:
+                L.l.info('Current watts on import is None for device {}'.format(self))
         self.update_job_finished()
         return changed_relay_status
 
@@ -294,6 +299,7 @@ def _update_devices():
         for device in dev_list:
             changed = device.grid_updated(P.grid_watts)
             if changed:  # exit to allow main meter to update and recheck if more power changes are needed
+                L.l.info('Done change action for device {}'.format(device))
                 if P.emulate_export is True:
                     break
                 else:
@@ -308,7 +314,7 @@ def rule_energy_export(obj=m.Utility(), change=None):
                 P.grid_watts = random.randint(-800, -300)
             else:
                 P.grid_watts = obj.units_2_delta
-                # L.l.info('Got main watts {}'.format(P.grid_watts))
+                L.l.info('Got rule main watts {}'.format(P.grid_watts))
             _update_devices()
         # else:
         #    L.l.info('Got energy utility {}'.format(obj.utility_name))
