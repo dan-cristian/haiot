@@ -227,16 +227,17 @@ class PwmHeater(LoadPowerDevice):
 
     def grid_updated(self, grid_watts):
         power_on = self.is_power_on()
+        if self.target_watts is None:
+            current_watts = 0
+        else:
+            current_watts = self.target_watts
         if grid_watts <= 0:
             export_watts = -grid_watts
-            L.l.info('Adjusting PWM to consume export={}'.format(export_watts))
-            self.set_power_status(power_is_on=True, pwm_watts=export_watts)
+            new_target = current_watts + export_watts
+            L.l.info('Adjusting PWM to {} for export={}'.format(new_target, export_watts))
+            self.set_power_status(power_is_on=True, pwm_watts=new_target)
         else:
             import_watts = grid_watts
-            if self.target_watts is None:
-                current_watts = 0
-            else:
-                current_watts = self.target_watts
             delta = current_watts - import_watts
             if delta < 0:
                 L.l.info('Need to stop as importing and PWM as delta={}'.format(delta))
