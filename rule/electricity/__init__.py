@@ -212,8 +212,10 @@ class PwmHeater(LoadPowerDevice):
             assert pwm_watts is not None
             required_duty = int(0.9 * pwm_watts * self.max_duty / self.MAX_WATTS)
             pigpio_gpio.P.pwm.set(self.RELAY_NAME, duty_cycle=required_duty, target_watts=pwm_watts)
+            self.target_watts = pwm_watts
         else:
-            pigpio_gpio.P.pwm.set(self.RELAY_NAME, duty_cycle=0, target_watts = 0)
+            pigpio_gpio.P.pwm.set(self.RELAY_NAME, duty_cycle=0, target_watts=0)
+            self.target_watts = 0
 
     def is_power_on(self):
         frequency, duty_cycle = pigpio_gpio.P.pwm.get(self.RELAY_NAME)
@@ -223,7 +225,6 @@ class PwmHeater(LoadPowerDevice):
         return duty_cycle > 0
         # not used
 
-
     def grid_updated(self, grid_watts):
         power_on = self.is_power_on()
         if grid_watts <= 0:
@@ -232,10 +233,10 @@ class PwmHeater(LoadPowerDevice):
             self.set_power_status(power_is_on=True, pwm_watts=export_watts)
         else:
             import_watts = grid_watts
-            if self.watts is None:
+            if self.target_watts is None:
                 current_watts = 0
             else:
-                current_watts = self.watts
+                current_watts = self.target_watts
             delta = current_watts - import_watts
             if delta < 0:
                 L.l.info('Need to stop as importing and PWM as delta={}'.format(delta))
@@ -247,6 +248,7 @@ class PwmHeater(LoadPowerDevice):
 
     def __init__(self, relay_name, relay_id, utility_name, max_watts):
         LoadPowerDevice.__init__(self, relay_name, relay_id, utility_name, max_watts)
+        self.target_watts = None
 
 
 class P:
