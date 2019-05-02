@@ -212,6 +212,8 @@ class PwmIo(GpioBase):
             if pwm.host_name == Constant.HOST_NAME:
                 pwm.frequency, pwm.duty_cycle = PwmIo._get_pwm_attrib(pwm.gpio_pin_code)
                 pwm.save_changed_fields(broadcast=True, persist=True)
+            else:
+                L.l.warning('Cannot sync to db, pwm not local')
         else:
             L.l.warning("Cannot find pwm {} to sync2db".format(key))
 
@@ -220,7 +222,6 @@ class PwmIo(GpioBase):
         pwm_list = m.Pwm.find({m.Pwm.host_name: Constant.HOST_NAME})
         for pwm in pwm_list:
             PwmIo.sync_2_db(pwm.id)
-        pass
 
     @staticmethod
     def set(key, **kwargs):
