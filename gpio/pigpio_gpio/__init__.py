@@ -273,9 +273,9 @@ class PwmIo(GpioBase):
 
     @staticmethod
     def get_current_record(record):
-        rec = PwmIo.get_db_record(key=record.id)
+        rec = PwmIo.get_db_record(key=record.name)
         if rec is not None:
-            return rec, rec.id
+            return rec, rec.name
         else:
             return None, None
 
