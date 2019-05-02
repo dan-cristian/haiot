@@ -12,6 +12,7 @@ class Module(ModelBase):
 
 
 class Pwm(ModelBase):
+    """key=name"""
     id = 0
     name = ''
     frequency = 0

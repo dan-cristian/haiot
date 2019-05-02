@@ -299,7 +299,7 @@ class ModelBase(metaclass=OrderedClassMembers):
         except Exception as ex:
             L.l.error('Unable to broadcast {} rec={} ex={}'.format(class_name, out_rec, ex), exc_info=True)
 
-    def save_changed_fields(self, broadcast=None, persist=None, listeners=True):  # , *args, **kwargs):
+    def save_changed_fields(self, broadcast=None, persist=None, listeners=True, silent=False):  # , *args, **kwargs):
         cls = self.__class__
         cls_name = cls.__name__
         if not cls._is_used_in_module:
@@ -326,7 +326,7 @@ class ModelBase(metaclass=OrderedClassMembers):
                     elif curr_val is not None:
                         update[fld] = curr_val
                     else:
-                        L.l.info('what?')
+                        L.l.warning('what?')
                     if current is not None:
                         # update storage fields
                         self.reference[fld] = new_val
@@ -335,7 +335,8 @@ class ModelBase(metaclass=OrderedClassMembers):
             if key is not None:
                 if current is not None:
                     # res = cls.update_one(query=key, updated_record={"$set": update}, existing_record=self)
-                    L.l.info('Updated {} key {}, {}'.format(cls_name, key, update))
+                    if not silent:
+                        L.l.info('Updated {} key {}, {}'.format(cls_name, key, update))
                 else:
                     res = cls.insert_one(update, bypass_document_validation=True)
                     # L.l.info('Inserted key {}, {} with eid={}'.format(key, self.__repr__(), res.eid))
@@ -374,7 +375,7 @@ class ModelBase(metaclass=OrderedClassMembers):
         new_obj = cls(copy=obj)
         if rec is not None:
             new_obj.reference = rec.reference
-        new_obj.save_changed_fields()
+        new_obj.save_changed_fields(silent=True)
 
     def __init__(self, copy=None):
         cls = self.__class__
