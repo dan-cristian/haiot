@@ -187,8 +187,8 @@ class PwmIo(GpioBase):
 
     @staticmethod
     def get_db_record(key):
-        rec = m.Pwm.find_one({m.Pwm.id: key})
-        if rec is not None and rec.id == key:
+        rec = m.Pwm.find_one({m.Pwm.name: key})
+        if rec is not None and rec.name == key:
             return rec
         L.l.error('No key retrieved for pwm {}, got {}'.format(key, rec))
         return None
