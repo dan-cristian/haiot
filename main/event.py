@@ -46,7 +46,7 @@ def _process_obj(obj):
                 # cls = getattr(sys.modules[tinydb_model.__name__], table)
                 cls = getattr(m, table)
                 # if cls._is_used_in_module:
-                if table == 'Pwm':
+                if 'Pwm' in table:
                     L.l.info('Got PWM mqtt {}'.format(obj))
                 cls.save(obj)
                 # else:
