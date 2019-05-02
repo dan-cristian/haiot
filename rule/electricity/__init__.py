@@ -28,7 +28,6 @@ class Relaydevice:
     MIN_ON_INTERVAL = 60  # how long to run before auto stop, in seconds
     DEVICE_SUPPORTS_BREAKS = False  # can this device be started/stopped several times during the job
     AVG_CONSUMPTION = 1
-    POWER_ADJUSTABLE = False
     JOB_DURATION = 3600 * 4  # max duration if device does not support breaks
     watts = None  # current consumption for this device
     last_state_change = datetime.min
@@ -87,7 +86,7 @@ class Relaydevice:
             # start device if exporting and there is enough surplus
             export_watts = -grid_watts
             # only trigger power on if over treshold
-            if self.POWER_ADJUSTABLE or export_watts > P.MIN_WATTS_THRESHOLD and self.AVG_CONSUMPTION <= export_watts\
+            if export_watts > P.MIN_WATTS_THRESHOLD and self.AVG_CONSUMPTION <= export_watts\
                     and not power_on:
                 self.set_power_status(power_is_on=True, exported_watts=export_watts)
                 L.l.info("Should auto start device {} state={} consuming={} surplus={}".format(
@@ -207,12 +206,12 @@ class PwmHeater(LoadPowerDevice):
     max_duty = 1000000
 
     # override
-    def set_power_status(self, power_is_on, exported_watts=None):
-        L.l.info("Setting pwm {} status {} to watts level {}".format(self.RELAY_NAME, power_is_on, exported_watts))
+    def set_power_status(self, power_is_on, pwm_watts=None):
+        L.l.info("Setting pwm {} status {} to watts level {}".format(self.RELAY_NAME, power_is_on, pwm_watts))
         if power_is_on:
-            assert exported_watts is not None
-            required_duty = int(0.9 * exported_watts * self.max_duty / self.MAX_WATTS)
-            pigpio_gpio.P.pwm.set(self.RELAY_NAME, duty_cycle=required_duty, target_watts=exported_watts)
+            assert pwm_watts is not None
+            required_duty = int(0.9 * pwm_watts * self.max_duty / self.MAX_WATTS)
+            pigpio_gpio.P.pwm.set(self.RELAY_NAME, duty_cycle=required_duty, target_watts=pwm_watts)
         else:
             pigpio_gpio.P.pwm.set(self.RELAY_NAME, duty_cycle=0, target_watts = 0)
 
@@ -224,9 +223,30 @@ class PwmHeater(LoadPowerDevice):
         return duty_cycle > 0
         # not used
 
+
+    def grid_updated(self, grid_watts):
+        power_on = self.is_power_on()
+        if grid_watts <= 0:
+            export_watts = -grid_watts
+            L.l.info('Adjusting PWM to consume export={}'.format(export_watts))
+            self.set_power_status(power_is_on=True, pwm_watts=export_watts)
+        else:
+            import_watts = grid_watts
+            if self.watts is None:
+                current_watts = 0
+            else:
+                current_watts = self.watts
+            delta = current_watts - import_watts
+            if delta < 0:
+                L.l.info('Need to stop as importing and PWM as delta={}'.format(delta))
+                self.set_power_status(power_is_on=False)
+            else:
+                L.l.info('Need to adjust down PWM on import with delta={}'.format(delta))
+                self.set_power_status(power_is_on=True, pwm_watts=current_watts - delta)
+        return True
+
     def __init__(self, relay_name, relay_id, utility_name, max_watts):
         LoadPowerDevice.__init__(self, relay_name, relay_id, utility_name, max_watts)
-        self.POWER_ADJUSTABLE = True
 
 
 class P:
