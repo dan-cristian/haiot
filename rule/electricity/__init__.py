@@ -319,6 +319,7 @@ def rule_energy_export(obj=m.Utility(), change=None):
         else:
             L.l.info('Got energy utility {}'.format(obj.utility_name))
     else:
+        L.l.info('Got utility with no changes {}'.format(obj.utility_name))
         # set consumption for device
         if obj.utility_name in P.utility_list:
             inst = P.utility_list[obj.utility_name]
