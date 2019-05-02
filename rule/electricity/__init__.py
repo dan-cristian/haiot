@@ -213,6 +213,8 @@ class PwmHeater(LoadPowerDevice):
 
     def is_power_on(self):
         frequency, duty_cycle = pigpio_gpio.P.pwm.get(self.RELAY_ID)
+        if duty_cycle is None:
+            duty_cycle = 0
         L.l.info('Pwm frequency={} duty={} is_on={}'.format(frequency, duty_cycle, duty_cycle > 0))
         return duty_cycle > 0
         # not used
