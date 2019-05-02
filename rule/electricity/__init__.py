@@ -86,8 +86,7 @@ class Relaydevice:
             # start device if exporting and there is enough surplus
             export_watts = -grid_watts
             # only trigger power on if over treshold
-            if export_watts > P.MIN_WATTS_THRESHOLD and self.AVG_CONSUMPTION <= export_watts\
-                    and not power_on:
+            if export_watts > P.MIN_WATTS_THRESHOLD and self.AVG_CONSUMPTION <= export_watts and not power_on:
                 self.set_power_status(power_is_on=True, exported_watts=export_watts)
                 L.l.info("Should auto start device {} state={} consuming={} surplus={}".format(
                     self.RELAY_NAME, self.state, self.watts, export_watts))
