@@ -277,6 +277,7 @@ def thread_run():
                 dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio_pin_code,
                                 direction=Constant.GPIO_PIN_DIRECTION_IN,
                                 pin_value=pin_val, pin_connected=(pin_val == 1))
+                P.input_pins[board][pin] = pin_val
 
 
 def unload():
