@@ -13,3 +13,7 @@ openzwave/__init__.py
 test/__init__.pyc
 pcf8574/*
 pcf8574/__init__.py
+posix/*
+posix/__init__.py
+fcntl/*
+fcntl/__init__.py
