@@ -236,7 +236,7 @@ def _setup_board():
                     gpio = pifacecommon.interrupts.GPIO_INTERRUPT_DEVICE_VALUE
                     L.l.info('Default gpio on board {} is {}'.format(board, gpio))
                     # monkey patch
-                    pifacecommon.interrupts.GPIO_INTERRUPT_DEVICE_VALUE = gpio.replace('25', P.gpio_ports[board])
+                    pifacecommon.interrupts.GPIO_INTERRUPT_DEVICE_VALUE = gpio.replace('25', str(P.gpio_ports[board]))
                     P.listener[board] = pfio.InputEventListener(chip=P.pfd[board])
                     L.l.info("Initialised piface pfio listener board-hw {} spidev{}.{} interrupt".format(
                         board, bus, chip))
