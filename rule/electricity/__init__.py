@@ -240,7 +240,7 @@ class PwmHeater(LoadPowerDevice):
             delta = current_watts - import_watts
             if delta < 0:
                 L.l.info('Need to stop as importing and PWM as delta={}'.format(delta))
-                self.set_power_status(power_is_on=False)
+                self.set_power_status(power_is_on=False, pwm_watts=0)
             else:
                 L.l.info('Need to adjust down PWM on import with delta={}'.format(delta))
                 self.set_power_status(power_is_on=True, pwm_watts=current_watts - delta)
@@ -328,7 +328,7 @@ def _update_devices():
         for device in dev_list:
             changed = device.grid_updated(P.grid_watts)
             if changed:  # exit to allow main meter to update and recheck if more power changes are needed
-                L.l.info('Done change action for device {}'.format(device))
+                # L.l.info('Done change action for device {}'.format(device))
                 if P.emulate_export is True:
                     break
                 else:
@@ -346,7 +346,7 @@ def rule_energy_export(obj=m.Utility(), change=None):
             L.l.info('Got rule main watts {}'.format(P.grid_watts))
             _update_devices()
         else:
-            L.l.info('Got energy utility {}'.format(obj.utility_name))
+            # L.l.info('Got energy utility {}'.format(obj.utility_name))
             if obj.utility_name in P.utility_list:
                 inst = P.utility_list[obj.utility_name]
                 if isinstance(inst, Relaydevice) and inst.UTILITY_NAME == obj.utility_name:
