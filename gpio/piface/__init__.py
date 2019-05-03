@@ -226,15 +226,16 @@ def _setup_board():
             for chip in P.chip_list:
                 try:
                     # L.l.info("Try piface pfio on board-hw {} spidev{}.{}".format(board, bus, chip))
-                    pfd = PiFaceDigitalMulti(hardware_addr=board, bus=bus, chip_select=chip, init_board=True,
-                                             gpio=gpio_ports[board])
+                    pfd = pfio.PiFaceDigital(hardware_addr=board, bus=bus, chip_select=chip, init_board=True)
+                                             #,gpio=gpio_ports[board])
                     P.pfd[board] = pfd
                     P.listener[board] = pfio.InputEventListener(chip=P.pfd[board])
-                    L.l.info("Initialised piface pfio listener board-hw {} spidev{}.{} interrupt {}".format(
-                        board, bus, chip, gpio_ports[board]))
+                    L.l.info("Initialised piface pfio listener board-hw {} spidev{}.{} interrupt".format(
+                        board, bus, chip))
+                        #, gpio_ports[board]))
                 except Exception as ex2:
                     last_err += "{}".format(ex2)
-                    L.l.error('Err listener', exc_info=True)
+                    # L.l.error('Err listener', exc_info=True)
         if len(P.pfd) == 0:
             L.l.warning("Unable to init listeners, last err={}".format(last_err))
         else:
