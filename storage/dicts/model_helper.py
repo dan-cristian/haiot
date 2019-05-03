@@ -336,7 +336,8 @@ class ModelBase(metaclass=OrderedClassMembers):
                 if current is not None:
                     # res = cls.update_one(query=key, updated_record={"$set": update}, existing_record=self)
                     if not silent:
-                        L.l.info('Updated {} key {}, {}'.format(cls_name, key, update))
+                        # L.l.info('Updated {} key {}, {}'.format(cls_name, key, update))
+                        pass
                 else:
                     res = cls.insert_one(update, bypass_document_validation=True)
                     # L.l.info('Inserted key {}, {} with eid={}'.format(key, self.__repr__(), res.eid))
