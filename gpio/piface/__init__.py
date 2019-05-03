@@ -25,6 +25,7 @@ class P:
     initialised = False
     board_init = False
     chip_list = []
+    gpio_ports = [25, 24, 23, 22]
     # pool_pin_codes = []
 
     def __init__(self):
@@ -41,6 +42,14 @@ try:
 except Exception as ex:
     P.import_ok = False
     L.l.info('Pifacedigitalio module not available due to {}'.format(ex))
+
+
+class InputEventListenerMulti(pfio.InputEventListener):
+    def __init__(self, chip=None):
+        # monkey patch
+        pifacecommon.interrupts.GPIO_INTERRUPT_DEVICE_VALUE = \
+            pifacecommon.interrupts.GPIO_INTERRUPT_DEVICE_VALUE.replace('25', P.gpio_ports[chip])
+        pfio.InputEventListener.__init__(self, chip)
 
 
 class GPIOInterruptDeviceMulti(interrupts.GPIOInterruptDevice):
@@ -62,7 +71,6 @@ class GPIOInterruptDeviceMulti(interrupts.GPIOInterruptDevice):
             # no, bring it into userspace
             with open(interrupts.GPIO_EXPORT_FILE, 'w') as export_file:
                 export_file.write(str(self.GPIO_INTERRUPT_PIN))
-
             interrupts.wait_until_file_exists(self.GPIO_INTERRUPT_DEVICE_VALUE)
 
     def deactivate_gpio_interrupt(self):
@@ -183,8 +191,7 @@ def _setup_in_ports_pif(gpio_pin_list):
                     P.listener[board].register(pin, pfio.IODIR_ON, _input_event)
                     P.listener[board].register(pin, pfio.IODIR_OFF, _input_event)
                     val = _get_in_pin_value(pin_index=pin, board_index=board)
-                    L.l.info('Callback OK piface board {} code {} pin {} val {}'.format(
-                        board, gpio_pin.pin_code, pin, val))
+                    L.l.info('Callback OK board {} code {} pin {} val {}'.format(board, gpio_pin.pin_code, pin, val))
             except Exception as ex:
                 L.l.critical('Unable to setup piface listener board={} pin={} err={}'.format(
                     board, gpio_pin.pin_code, ex))
@@ -196,15 +203,13 @@ def _setup_in_ports_pif(gpio_pin_list):
 def _setup_board():
     # if Constant.MACHINE_TYPE_RASPBERRY or Constant.MACHINE_TYPE_ODROID:
     try:
+        chip_range = [0, 1, 2, 3]
+        board_range = [0, 1, 2, 3]
         if Constant.IS_MACHINE_ODROID:
-            chip_range = [0, 1, 2, 3]
             bus = 32766
-            board_range = [0, 1, 2, 3]
         else:
             # Constant.IS_MACHINE_RASPBERRYPI:
-            chip_range = [0, 1, 2, 3]
             bus = 0
-            board_range = [0, 1, 2, 3]
         last_err = ''
         for chip in chip_range:
             try:
@@ -216,11 +221,10 @@ def _setup_board():
             except Exception as ex1:
                 last_err += "{}".format(ex1)
         if len(P.chip_list) == 0:
-                L.l.warning("Unable to init spi, probably not spi not enabled, last err={}".format(last_err))
+            L.l.warning("Unable to init spi, probably not spi not enabled, last err={}".format(last_err))
         else:
             L.l.info('Found {} piface chips {}'.format(len(P.chip_list), P.chip_list))
         last_err = ''
-        gpio_ports = [25, 24, 23, 22]
         # pftest = PiFaceDigitalMulti(hardware_addr=0, bus=bus, chip_select=0, init_board=True, gpio=24)
         for board in board_range:
             for chip in P.chip_list:
@@ -229,6 +233,10 @@ def _setup_board():
                     pfd = pfio.PiFaceDigital(hardware_addr=board, bus=bus, chip_select=chip, init_board=True)
                                              #,gpio=gpio_ports[board])
                     P.pfd[board] = pfd
+                    gpio = pifacecommon.interrupts.GPIO_INTERRUPT_DEVICE_VALUE
+                    L.l.info('Default gpio on board {} is {}'.format(board, gpio))
+                    # monkey patch
+                    pifacecommon.interrupts.GPIO_INTERRUPT_DEVICE_VALUE = gpio.replace('25', P.gpio_ports[board])
                     P.listener[board] = pfio.InputEventListener(chip=P.pfd[board])
                     L.l.info("Initialised piface pfio listener board-hw {} spidev{}.{} interrupt".format(
                         board, bus, chip))
