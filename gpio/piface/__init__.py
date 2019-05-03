@@ -243,7 +243,7 @@ def _setup_board():
                         #, gpio_ports[board]))
                 except Exception as ex2:
                     last_err += "{}".format(ex2)
-                    # L.l.error('Err listener', exc_info=True)
+                    L.l.info('Err setting listener {}'.format(ex2))
         if len(P.pfd) == 0:
             L.l.warning("Unable to init listeners, last err={}".format(last_err))
         else:
