@@ -1,3 +1,4 @@
+import time
 from gpio.io_common import format_piface_pin_code
 from pydispatch import dispatcher
 from main.logger_helper import L
@@ -6,8 +7,8 @@ from gpio import io_common
 
 while True:
     try:
-        if Constant.is_os_linux():
-            import pifacedigitalio as pfio
+        #if Constant.is_os_linux():
+        import pifacedigitalio as pfio
         break
     except ImportError as iex:
         if not fix_module(iex):
@@ -33,11 +34,112 @@ class P:
 try:
     # import pifacedigitalio as pfio
     from pifacedigitalio.core import NoPiFaceDigitalDetectedError
+    import pifacecommon
     from pifacecommon.spi import SPIInitError
+    from pifacecommon import interrupts
     P.import_ok = True
 except Exception as ex:
     P.import_ok = False
     L.l.info('Pifacedigitalio module not available due to {}'.format(ex))
+
+
+class GPIOInterruptDeviceMulti(interrupts.GPIOInterruptDevice):
+    def __init__(self, gpio):
+        super(interrupts.GPIOInterruptDevice, self).__init__()
+        L.l.info('Initialising custom piface interrupts on GPIO {}'.format(gpio))
+        self.GPIO_INTERRUPT_PIN = gpio
+        self.GPIO_INTERRUPT_DEVICE = "/sys/class/gpio/gpio%d" % self.GPIO_INTERRUPT_PIN
+        self.GPIO_INTERRUPT_DEVICE_EDGE = '%s/edge' % self.GPIO_INTERRUPT_DEVICE
+        self.GPIO_INTERRUPT_DEVICE_VALUE = '%s/value' % self.GPIO_INTERRUPT_DEVICE
+
+    def bring_gpio_interrupt_into_userspace(self):  # activate gpio interrupt
+        """Bring the interrupt pin on the GPIO into Linux userspace."""
+        try:
+            # is it already there?
+            with open(self.GPIO_INTERRUPT_DEVICE_VALUE):
+                return
+        except IOError:
+            # no, bring it into userspace
+            with open(interrupts.GPIO_EXPORT_FILE, 'w') as export_file:
+                export_file.write(str(self.GPIO_INTERRUPT_PIN))
+
+            interrupts.wait_until_file_exists(self.GPIO_INTERRUPT_DEVICE_VALUE)
+
+    def deactivate_gpio_interrupt(self):
+        """Remove the GPIO interrupt pin from Linux userspace."""
+        with open(interrupts.GPIO_UNEXPORT_FILE, 'w') as unexport_file:
+            unexport_file.write(str(self.GPIO_INTERRUPT_PIN))
+
+    def set_gpio_interrupt_edge(self, edge='falling'):
+        """Set the interrupt edge on the userspace GPIO pin.
+
+        :param edge: The interrupt edge ('none', 'falling', 'rising').
+        :type edge: string
+        """
+        # we're only interested in the falling edge (1 -> 0)
+        start_time = time.time()
+        time_limit = start_time + interrupts.FILE_IO_TIMEOUT
+        while time.time() < time_limit:
+            try:
+                with open(self.GPIO_INTERRUPT_DEVICE_EDGE, 'w') as gpio_edge:
+                    gpio_edge.write(edge)
+                    return
+            except IOError:
+                pass
+
+    """A device that interrupts using the GPIO pins."""
+    def gpio_interrupts_enable(self):
+        """Enables GPIO interrupts."""
+        try:
+            self.bring_gpio_interrupt_into_userspace()
+            self.set_gpio_interrupt_edge()
+        except interrupts.Timeout as e:
+            raise IOError("There was an error bringing gpio{} into userspace. {}".format(self.GPIO_INTERRUPT_PIN, e))
+
+    def gpio_interrupts_disable(self):
+        """Disables gpio interrupts."""
+        self.set_gpio_interrupt_edge('none')
+        self.deactivate_gpio_interrupt()
+
+
+class PiFaceDigitalMulti(pfio.PiFaceDigital, pifacecommon.mcp23s17.MCP23S17, GPIOInterruptDeviceMulti):
+    DEFAULT_SPI_BUS = 0
+    DEFAULT_SPI_CHIP_SELECT = 0
+    MAX_BOARDS = 4
+
+    def __init__(self, hardware_addr=0, bus=DEFAULT_SPI_BUS, chip_select=DEFAULT_SPI_CHIP_SELECT,
+                 init_board=True, gpio=25):
+        GPIOInterruptDeviceMulti.__init__(self, gpio)
+        super(pfio.PiFaceDigital, self).__init__(hardware_addr, bus, chip_select)
+
+        self.input_pins = [pifacecommon.mcp23s17.MCP23S17RegisterBitNeg(
+            i, pifacecommon.mcp23s17.GPIOB, self)
+            for i in range(8)]
+
+        self.input_port = pifacecommon.mcp23s17.MCP23S17RegisterNeg(
+            pifacecommon.mcp23s17.GPIOB, self)
+
+        self.output_pins = [pifacecommon.mcp23s17.MCP23S17RegisterBit(
+            i, pifacecommon.mcp23s17.GPIOA, self)
+            for i in range(8)]
+
+        self.output_port = pifacecommon.mcp23s17.MCP23S17Register(
+            pifacecommon.mcp23s17.GPIOA, self)
+
+        self.leds = [pifacecommon.mcp23s17.MCP23S17RegisterBit(
+            i, pifacecommon.mcp23s17.GPIOA, self)
+            for i in range(8)]
+
+        self.relays = [pifacecommon.mcp23s17.MCP23S17RegisterBit(
+            i, pifacecommon.mcp23s17.GPIOA, self)
+            for i in range(2)]
+
+        self.switches = [pifacecommon.mcp23s17.MCP23S17RegisterBitNeg(
+            i, pifacecommon.mcp23s17.GPIOB, self)
+            for i in range(4)]
+
+        if init_board:
+            self.init_board()
 
 
 # To read the state of an input use the pfio.digital_read(pin) function. If a button is
@@ -121,56 +223,58 @@ def _setup_in_ports_pif(gpio_pin_list):
 
 
 def _setup_board():
-    if Constant.MACHINE_TYPE_RASPBERRY or Constant.MACHINE_TYPE_ODROID:
-        try:
-            if Constant.IS_MACHINE_RASPBERRYPI:
-                chip_range = [0, 1, 2, 3]
-                bus = 0
-                board_range = [0, 1, 2, 3]
-            elif Constant.IS_MACHINE_ODROID:
-                chip_range = [0, 1, 2, 3]
-                bus = 32766
-                board_range = [0, 1, 2, 3]
-            else:
-                L.l.error("Cannot initialise piface board on {}".format(Constant.HOST_MACHINE_TYPE))
-                return
-            last_err = ''
-            for chip in chip_range:
+    # if Constant.MACHINE_TYPE_RASPBERRY or Constant.MACHINE_TYPE_ODROID:
+    try:
+        if Constant.IS_MACHINE_ODROID:
+            chip_range = [0, 1, 2, 3]
+            bus = 32766
+            board_range = [0, 1, 2, 3]
+        else:
+            # Constant.IS_MACHINE_RASPBERRYPI:
+            chip_range = [0, 1, 2, 3]
+            bus = 0
+            board_range = [0, 1, 2, 3]
+        last_err = ''
+        for chip in chip_range:
+            try:
+                # L.l.info("Try piface init on spi spidev{}.{}".format(bus, chip))
+                pfio.init(bus=bus, chip_select=chip)
+                P.chip_list.append(chip)
+                L.l.info("Initialised piface spi spidev{}.{} OK".format(bus, chip))
+            # except SPIInitError as ex1:
+            except Exception as ex1:
+                last_err += "{}".format(ex1)
+        if len(P.chip_list) == 0:
+                L.l.warning("Unable to init spi, probably not spi not enabled, last err={}".format(last_err))
+        else:
+            L.l.info('Found {} piface chips {}'.format(len(P.chip_list), P.chip_list))
+        last_err = ''
+        gpio_ports = [25, 26, 27, 28]
+        pftest = PiFaceDigitalMulti(hardware_addr=0, bus=bus, chip_select=0, init_board=True, gpio=26)
+
+        for board in board_range:
+            for chip in P.chip_list:
                 try:
-                    # L.l.info("Try piface init on spi spidev{}.{}".format(bus, chip))
-                    pfio.init(bus=bus, chip_select=chip)
-                    P.chip_list.append(chip)
-                    L.l.info("Initialised piface spi spidev{}.{} OK".format(bus, chip))
-                # except SPIInitError as ex1:
-                except Exception as ex1:
-                    last_err += "{}".format(ex1)
-            if len(P.chip_list) == 0:
-                    L.l.warning("Unable to init spi, probably not spi not enabled, last err={}".format(last_err))
-            else:
-                L.l.info('Found {} piface chips {}'.format(len(P.chip_list), P.chip_list))
-            last_err = ''
-            for board in board_range:
-                for chip in P.chip_list:
-                    try:
-                        # L.l.info("Try piface pfio on board-hw {} spidev{}.{}".format(board, bus, chip))
-                        pfd = pfio.PiFaceDigital(hardware_addr=board, bus=bus, chip_select=chip, init_board=True)
-                        P.pfd[board] = pfd
-                        P.listener[board] = pfio.InputEventListener(chip=P.pfd[board])
-                        L.l.info("Initialised piface pfio listener board-hw {} spidev{}.{}".format(board, bus, chip))
-                    except Exception as ex2:
-                        last_err += "{}".format(ex2)
-            if len(P.pfd) == 0:
-                L.l.warning("Unable to init listeners, last err={}".format(last_err))
-            else:
-                L.l.info('Initialised {} piface listeners'.format(len(P.pfd)))
-            if len(P.chip_list) > 0 and len(P.pfd) > 0:
-                P.board_init = True
-            else:
-                L.l.warning('Piface setup failed, no boards found')
-        except Exception as ex:
-            L.l.critical('Piface setup board failed, err={}'.format(ex), exc_info=True)
-    else:
-        L.l.info('Piface can only be initialised on PI or ODROID')
+                    # L.l.info("Try piface pfio on board-hw {} spidev{}.{}".format(board, bus, chip))
+                    pfd = pfio.PiFaceDigital(hardware_addr=board, bus=bus, chip_select=chip, init_board=True,
+                                             gpio=gpio_ports[board])
+                    P.pfd[board] = pfd
+                    P.listener[board] = pfio.InputEventListener(chip=P.pfd[board])
+                    L.l.info("Initialised piface pfio listener board-hw {} spidev{}.{}".format(board, bus, chip))
+                except Exception as ex2:
+                    last_err += "{}".format(ex2)
+        if len(P.pfd) == 0:
+            L.l.warning("Unable to init listeners, last err={}".format(last_err))
+        else:
+            L.l.info('Initialised {} piface listeners'.format(len(P.pfd)))
+        if len(P.chip_list) > 0 and len(P.pfd) > 0:
+            P.board_init = True
+        else:
+            L.l.warning('Piface setup failed, no boards found')
+    except Exception as ex:
+        L.l.critical('Piface setup board failed, err={}'.format(ex), exc_info=True)
+    #else:
+    #    L.l.info('Piface can only be initialised on PI or ODROID')
 
 
 def unload():

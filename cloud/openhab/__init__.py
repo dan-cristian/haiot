@@ -66,67 +66,70 @@ def parse_rules(obj, change):
 
 
 def mqtt_on_message(client, userdata, msg):
-    item = msg.topic.split(P.mqtt_topic_receive_prefix)
-    payload = msg.payload.decode('utf-8').lower()
-    L.l.info('Got openhab mqtt {}={}'.format(msg.topic, payload))
-    if len(item) == 2:
-        name = item[1]
-        switch_state = None
-        if payload == 'on':
-            switch_state = True
-        elif payload == 'off':
-            switch_state = False
-        if name.startswith("relay_"):
-            rules.custom_relay(name[len('relay_'):], switch_state)
-        elif name.startswith("heat_"):
-            rules.heat_relay(name[len('heat_'):], switch_state)
-        elif name.startswith("thermo_target_"):
-            temp = float(payload)
-            rules.thermostat(zone_name=name[len('thermo_target_'):], temp_target=temp)
-        elif name.startswith("thermo_state_"):
-            rules.thermostat(zone_name=name[len('thermo_state_'):], state=switch_state)
-        elif name.startswith("thermo_mode_manual_"):
-            rules.thermostat(zone_name=name[len('thermo_mode_manual_'):], mode_manual=switch_state)
-        elif name.startswith("thermo_mode_presence_"):
-            rules.thermostat(zone_name=name[len('thermo_mode_presence_'):], mode_presence=switch_state)
+    try:
+        item = msg.topic.split(P.mqtt_topic_receive_prefix)
+        payload = msg.payload.decode('utf-8').lower()
+        L.l.info('Got openhab mqtt {}={}'.format(msg.topic, payload))
+        if len(item) == 2:
+            name = item[1]
+            switch_state = None
+            if payload == 'on':
+                switch_state = True
+            elif payload == 'off':
+                switch_state = False
+            if name.startswith("relay_"):
+                rules.custom_relay(name[len('relay_'):], switch_state)
+            elif name.startswith("heat_"):
+                rules.heat_relay(name[len('heat_'):], switch_state)
+            elif name.startswith("thermo_target_"):
+                temp = float(payload)
+                rules.thermostat(zone_name=name[len('thermo_target_'):], temp_target=temp)
+            elif name.startswith("thermo_state_"):
+                rules.thermostat(zone_name=name[len('thermo_state_'):], state=switch_state)
+            elif name.startswith("thermo_mode_manual_"):
+                rules.thermostat(zone_name=name[len('thermo_mode_manual_'):], mode_manual=switch_state)
+            elif name.startswith("thermo_mode_presence_"):
+                rules.thermostat(zone_name=name[len('thermo_mode_presence_'):], mode_presence=switch_state)
 
-        elif name.startswith("mpd_"):
-            vals = name.split("mpd_")
-            items = vals[1].split('_')
-            if len(items) >= 2:
-                zone_name = items[1]
-            else:
-                zone_name = None
-            cmd = False
-            if items[0] == 'volume':
-                mpd.set_volume(zone_name=zone_name, volume=int(payload))
-                cmd = True
-            elif items[0] == 'position':
-                mpd.set_position(zone_name=zone_name, position_percent=float(payload))
-                cmd = True
-            elif items[0] == 'player' or items[0] == 'state':
-                if payload == 'up':
-                    mpd.previous_song(zone_name)
+            elif name.startswith("mpd_"):
+                vals = name.split("mpd_")
+                items = vals[1].split('_')
+                if len(items) >= 2:
+                    zone_name = items[1]
+                else:
+                    zone_name = None
+                cmd = False
+                if items[0] == 'volume':
+                    mpd.set_volume(zone_name=zone_name, volume=int(payload))
                     cmd = True
-                elif payload == 'down':
-                    mpd.next_song(zone_name=zone_name)
+                elif items[0] == 'position':
+                    mpd.set_position(zone_name=zone_name, position_percent=float(payload))
                     cmd = True
-                elif payload == 'stop' or payload == 'toggle':
-                    mpd.toggle_state(zone_name=zone_name)
+                elif items[0] == 'player' or items[0] == 'state':
+                    if payload == 'up':
+                        mpd.previous_song(zone_name)
+                        cmd = True
+                    elif payload == 'down':
+                        mpd.next_song(zone_name=zone_name)
+                        cmd = True
+                    elif payload == 'stop' or payload == 'toggle':
+                        mpd.toggle_state(zone_name=zone_name)
+                        cmd = True
+                    elif payload == 'play':
+                        mpd.play(zone_name=zone_name)
+                        cmd = True
+                elif items[0] == 'lastfmloved':
+                    lastfm.set_current_loved(loved=(switch_state == 1))
                     cmd = True
-                elif payload == 'play':
-                    mpd.play(zone_name=zone_name)
-                    cmd = True
-            elif items[0] == 'lastfmloved':
-                lastfm.set_current_loved(loved=(switch_state == 1))
-                cmd = True
-            if cmd:
-                mpd.update_state(zone_name=zone_name)
-                mpd.save_lastfm()
-            else:
-                L.l.warning('Undefined mpd command {}'.format(msg.topic))
-    else:
-        L.l.warning("Unexpected mqtt receive topic {} payload={}".format(msg.topic, msg.payload))
+                if cmd:
+                    mpd.update_state(zone_name=zone_name)
+                    mpd.save_lastfm()
+                else:
+                    L.l.warning('Undefined mpd command {}'.format(msg.topic))
+        else:
+            L.l.warning("Unexpected mqtt receive topic {} payload={}".format(msg.topic, msg.payload))
+    except Exception as ex:
+        L.l.error('Error sonoff mqtt {} ex={}'.format(msg.payload, ex), exc_info=True)
 
 
 def __load_rules():
