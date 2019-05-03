@@ -4,6 +4,7 @@ from main.logger_helper import L
 import random
 from common import Constant
 from pydispatch import dispatcher
+from storage.dicts import model as m
 
 initialised = False
 
@@ -40,6 +41,7 @@ def unload():
 def getsome():
     return P.list[2]
 
+
 def init():
     L.l.info('TEST module initialising')
     # test1()
@@ -55,3 +57,8 @@ def init():
     P.list[3] = {'three': 'trei'}
     getsome()['two'] = 'zwei'
     print(P.list)
+
+    r = 'front_gate_relay_test'
+    rel = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.relay_pin_name: r})
+    rel.relay_is_on = True
+    rel.save_changed_fields()
