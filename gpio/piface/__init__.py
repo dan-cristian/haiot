@@ -249,18 +249,18 @@ def _setup_board():
         else:
             L.l.info('Found {} piface chips {}'.format(len(P.chip_list), P.chip_list))
         last_err = ''
-        gpio_ports = [25, 26, 27, 28]
-        pftest = PiFaceDigitalMulti(hardware_addr=0, bus=bus, chip_select=0, init_board=True, gpio=26)
-
+        gpio_ports = [25, 24, 23, 22]
+        # pftest = PiFaceDigitalMulti(hardware_addr=0, bus=bus, chip_select=0, init_board=True, gpio=26)
         for board in board_range:
             for chip in P.chip_list:
                 try:
                     # L.l.info("Try piface pfio on board-hw {} spidev{}.{}".format(board, bus, chip))
-                    pfd = pfio.PiFaceDigital(hardware_addr=board, bus=bus, chip_select=chip, init_board=True,
+                    pfd = PiFaceDigitalMulti(hardware_addr=board, bus=bus, chip_select=chip, init_board=True,
                                              gpio=gpio_ports[board])
                     P.pfd[board] = pfd
                     P.listener[board] = pfio.InputEventListener(chip=P.pfd[board])
-                    L.l.info("Initialised piface pfio listener board-hw {} spidev{}.{}".format(board, bus, chip))
+                    L.l.info("Initialised piface pfio listener board-hw {} spidev{}.{} interrupt {}".format(
+                        board, bus, chip, gpio_ports[board]))
                 except Exception as ex2:
                     last_err += "{}".format(ex2)
         if len(P.pfd) == 0:
