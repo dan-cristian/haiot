@@ -90,7 +90,6 @@ def mqtt_on_message(client, userdata, msg):
                 rules.thermostat(zone_name=name[len('thermo_mode_manual_'):], mode_manual=switch_state)
             elif name.startswith("thermo_mode_presence_"):
                 rules.thermostat(zone_name=name[len('thermo_mode_presence_'):], mode_presence=switch_state)
-
             elif name.startswith("mpd_"):
                 vals = name.split("mpd_")
                 items = vals[1].split('_')
