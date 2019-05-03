@@ -228,8 +228,10 @@ def _setup_board():
         #last_err = ''
         # pftest = PiFaceDigitalMulti(hardware_addr=0, bus=bus, chip_select=0, init_board=True, gpio=24)
         for chip in chip_range:
-            try:
-                for board in board_range:
+            last_err = ''
+            board_count = len(P.pfd)
+            for board in board_range:
+                try:
                     # L.l.info("Try piface pfio on board-hw {} spidev{}.{}".format(board, bus, chip))
                     pfd = pfio.PiFaceDigital(hardware_addr=board, bus=bus, chip_select=chip, init_board=True)
                     gpio = pifacecommon.interrupts.GPIO_INTERRUPT_DEVICE_VALUE
@@ -241,17 +243,15 @@ def _setup_board():
                     gpio = pifacecommon.interrupts.GPIO_INTERRUPT_DEVICE_VALUE
                     L.l.info("Initialised piface pfio listener board-hw {} spidev{}.{} interrupt {}".format(
                         board, bus, chip, gpio))
-            except Exception as ex2:
-                last_err += "{}".format(ex2)
-                L.l.info('Err setting listener {}'.format(ex2))
+                except Exception as ex2:
+                    last_err += "{}".format(ex2)
+            if board_count == len(P.pfd):
+                L.l.info('No board at index {}, errs={}'.format(board, last_err))
         if len(P.pfd) == 0:
-            L.l.warning("Unable to init listeners, last err={}".format(last_err))
+            L.l.warning('Piface setup failed, no boards found')
         else:
             L.l.info('Initialised {} piface listeners'.format(len(P.pfd)))
-        if len(P.pfd) > 0:
             P.board_init = True
-        else:
-            L.l.warning('Piface setup failed, no boards found')
     except Exception as ex:
         L.l.critical('Piface setup board failed, err={}'.format(ex), exc_info=True)
     #else:
