@@ -238,8 +238,9 @@ def _setup_board():
                     # monkey patch
                     pifacecommon.interrupts.GPIO_INTERRUPT_DEVICE_VALUE = gpio.replace('25', str(P.gpio_ports[board]))
                     P.listener[board] = pfio.InputEventListener(chip=P.pfd[board])
-                    L.l.info("Initialised piface pfio listener board-hw {} spidev{}.{} interrupt".format(
-                        board, bus, chip))
+                    gpio = pifacecommon.interrupts.GPIO_INTERRUPT_DEVICE_VALUE
+                    L.l.info("Initialised piface pfio listener board-hw {} spidev{}.{} interrupt {}".format(
+                        board, bus, chip, gpio))
                         #, gpio_ports[board]))
                 except Exception as ex2:
                     last_err += "{}".format(ex2)
