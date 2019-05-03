@@ -45,12 +45,12 @@ except Exception as ex:
 
 class GPIOInterruptDeviceMulti(interrupts.GPIOInterruptDevice):
     def __init__(self, gpio):
-        super(interrupts.GPIOInterruptDevice, self).__init__()
         L.l.info('Initialising custom piface interrupts on GPIO {}'.format(gpio))
         self.GPIO_INTERRUPT_PIN = gpio
         self.GPIO_INTERRUPT_DEVICE = "/sys/class/gpio/gpio%d" % self.GPIO_INTERRUPT_PIN
         self.GPIO_INTERRUPT_DEVICE_EDGE = '%s/edge' % self.GPIO_INTERRUPT_DEVICE
         self.GPIO_INTERRUPT_DEVICE_VALUE = '%s/value' % self.GPIO_INTERRUPT_DEVICE
+        super(interrupts.GPIOInterruptDevice, self).__init__()
 
     def bring_gpio_interrupt_into_userspace(self):  # activate gpio interrupt
         """Bring the interrupt pin on the GPIO into Linux userspace."""
@@ -234,6 +234,7 @@ def _setup_board():
                         board, bus, chip, gpio_ports[board]))
                 except Exception as ex2:
                     last_err += "{}".format(ex2)
+                    L.l.error('Err listener', exc_info=True)
         if len(P.pfd) == 0:
             L.l.warning("Unable to init listeners, last err={}".format(last_err))
         else:
