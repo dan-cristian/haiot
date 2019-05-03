@@ -201,6 +201,8 @@ def mqtt_on_message(client, userdata, msg):
 
 # iot/sonoff/stat/sonoff-basic-5/POWER = ON/OFF
 def set_relay_state(relay_name, relay_is_on):
+    if not P.initialised:
+        return None
     if relay_is_on:
         payload = 'ON'
     else:
