@@ -71,7 +71,7 @@ def get_pin_bcm(bcm_id):
 
 def _do_event(channel, state):
     try:
-        dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=channel, direction='in',
+        dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=int(channel), direction='in',
                         pin_value=state, pin_connected=(state == 0))
     except Exception as ex:
         L.l.warning('Error rpi.gpio event detected, err {}'.format(ex))
