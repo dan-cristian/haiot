@@ -11,20 +11,8 @@ from common import utils
 
 # update in db (without propagatting the change by default)
 def update_custom_relay(pin_code, pin_value, notify=False, ignore_missing=False):
-    if sqlitedb:
-        gpio = models.GpioPin.query.filter_by(pin_code=pin_code, host_name=Constant.HOST_NAME).first()
-        if gpio is not None:
-            gpio.pin_value = int(pin_value)
-            gpio.notify_transport_enabled = notify
-            gpio.commit_record_to_db()
-        else:
-            if not ignore_missing:
-                L.l.warning('Unable to find gpio pin {}'.format(pin_code))
-    if sqlitedb:
-        relay = models.ZoneCustomRelay.query.filter_by(gpio_pin_code=pin_code, gpio_host_name=Constant.HOST_NAME).first()
-    else:
-        relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.gpio_pin_code: pin_code,
-                                            m.ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME})
+    relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.gpio_pin_code: pin_code,
+                                        m.ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME})
     if relay is not None:
         relay.relay_is_on = pin_value
         relay.save_changed_fields(broadcast=notify)
