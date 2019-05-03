@@ -204,7 +204,7 @@ def _setup_in_ports_pif(gpio_pin_list):
 def _setup_board():
     # if Constant.MACHINE_TYPE_RASPBERRY or Constant.MACHINE_TYPE_ODROID:
     try:
-        chip_range = [0, 1, 2, 3]
+        chip_range = [0, 1]
         board_range = [0, 1, 2, 3]
         if Constant.IS_MACHINE_ODROID:
             bus = 32766
@@ -233,13 +233,13 @@ def _setup_board():
             for board in board_range:
                 try:
                     L.l.info("Try piface pfio on board-hw {} spidev{}.{}".format(board, bus, chip))
-                    # pfd = pfio.PiFaceDigital(hardware_addr=board, bus=bus, chip_select=chip, init_board=True)
-                    pfd = PiFaceDigitalMulti(
-                        hardware_addr=board, bus=bus, chip_select=chip, init_board=True, gpio=P.gpio_ports[board])
+                    pfd = pfio.PiFaceDigital(hardware_addr=board, bus=bus, chip_select=chip, init_board=True)
+                    # pfd = PiFaceDigitalMulti(
+                    #    hardware_addr=board, bus=bus, chip_select=chip, init_board=True, gpio=P.gpio_ports[board])
                     gpio = pifacecommon.interrupts.GPIO_INTERRUPT_DEVICE_VALUE
                     L.l.info('Default gpio on board {} is {}'.format(board, gpio))
                     # monkey patch
-                    pifacecommon.interrupts.GPIO_INTERRUPT_DEVICE_VALUE = gpio.replace('25', str(P.gpio_ports[board]))
+                    # pifacecommon.interrupts.GPIO_INTERRUPT_DEVICE_VALUE = gpio.replace('25', str(P.gpio_ports[board]))
                     P.listener[board] = pfio.InputEventListener(chip=pfd)
                     P.pfd[board] = pfd
                     gpio = pifacecommon.interrupts.GPIO_INTERRUPT_DEVICE_VALUE
