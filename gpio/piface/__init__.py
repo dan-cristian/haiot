@@ -2,6 +2,7 @@ import time
 from gpio.io_common import format_piface_pin_code
 from pydispatch import dispatcher
 from main.logger_helper import L
+from main import thread_pool
 from common import Constant, fix_module
 from gpio import io_common
 
@@ -25,6 +26,7 @@ class P:
     initialised = False
     board_init = False
     gpio_ports = [25, 24, 23, 22]
+    input_pins = {}
     # pool_pin_codes = []
 
     def __init__(self):
@@ -170,7 +172,8 @@ def _input_event(event):
     pin_val = _get_in_pin_value(pin_num, board_index)
     gpio_pin_code = format_piface_pin_code(board_index=board_index, pin_direction=Constant.GPIO_PIN_DIRECTION_IN,
                                            pin_index=pin_num)
-    L.l.info('Event piface gpio={} direction={} altval={}'.format(gpio_pin_code, direction, pin_val))
+    P.input_pins[board_index][pin_num] = pin_val
+    L.l.info('Event piface gpio={} direction={} val={}'.format(gpio_pin_code, direction, pin_val))
     dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio_pin_code, direction=Constant.GPIO_PIN_DIRECTION_IN,
                     pin_value=pin_val, pin_connected=(pin_val == 1))
 
@@ -242,6 +245,7 @@ def _setup_board():
                     # pifacecommon.interrupts.GPIO_INTERRUPT_DEVICE_VALUE = gpio.replace('25', str(P.gpio_ports[board]))
                     P.listener[board] = pfio.InputEventListener(chip=pfd)
                     P.pfd[board] = pfd
+                    P.input_pins[board] = [None, None, None, None, None, None, None, None]
                     gpio = pifacecommon.interrupts.GPIO_INTERRUPT_DEVICE_VALUE
                     L.l.info("Initialised piface pfio listener board-hw {} spidev{}.{} interrupt {}".format(
                         board, bus, chip, gpio))
@@ -259,6 +263,20 @@ def _setup_board():
         L.l.critical('Piface setup board failed, err={}'.format(ex), exc_info=True)
     #else:
     #    L.l.info('Piface can only be initialised on PI or ODROID')
+
+
+def thread_run():
+    # polling inputs
+    for board in P.pfd.keys():
+        for pin in range(0, 8):
+            pin_val = _get_in_pin_value(pin, board)
+            if pin_val != P.input_pins[board][pin]:
+                L.l.info('Pooled event piface board {} pin={} val={}'.format(board, pin, pin_val))
+                gpio_pin_code = format_piface_pin_code(
+                    board_index=board, pin_direction=Constant.GPIO_PIN_DIRECTION_IN, pin_index=pin)
+                dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio_pin_code,
+                                direction=Constant.GPIO_PIN_DIRECTION_IN,
+                                pin_value=pin_val, pin_connected=(pin_val == 1))
 
 
 def unload():
@@ -321,6 +339,7 @@ def init():
                 # thread_pool.add_interval_callable(thread_run, run_interval_second=10)
                 dispatcher.connect(_setup_in_ports_pif, signal=Constant.SIGNAL_GPIO_INPUT_PORT_LIST,
                                    sender=dispatcher.Any)
+                thread_pool.add_interval_callable(thread_run, run_interval_second=1)
                 P.initialised = True
                 L.l.info('Piface initialised OK')
         except Exception as ex1:
