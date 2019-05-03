@@ -232,7 +232,7 @@ def _setup_board():
             board_count = len(P.pfd)
             for board in board_range:
                 try:
-                    # L.l.info("Try piface pfio on board-hw {} spidev{}.{}".format(board, bus, chip))
+                    L.l.info("Try piface pfio on board-hw {} spidev{}.{}".format(board, bus, chip))
                     pfd = pfio.PiFaceDigital(hardware_addr=board, bus=bus, chip_select=chip, init_board=True)
                     gpio = pifacecommon.interrupts.GPIO_INTERRUPT_DEVICE_VALUE
                     L.l.info('Default gpio on board {} is {}'.format(board, gpio))
@@ -245,6 +245,7 @@ def _setup_board():
                         board, bus, chip, gpio))
                 except Exception as ex2:
                     last_err += "{}".format(ex2)
+                    L.l.info('Piface detect returned exception {}'.format(ex2))
             if board_count == len(P.pfd):
                 L.l.info('No board at index {}, errs={}'.format(board, last_err))
         if len(P.pfd) == 0:
