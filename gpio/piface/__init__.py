@@ -109,8 +109,8 @@ class PiFaceDigitalMulti(pfio.PiFaceDigital, pifacecommon.mcp23s17.MCP23S17, GPI
 
     def __init__(self, hardware_addr=0, bus=DEFAULT_SPI_BUS, chip_select=DEFAULT_SPI_CHIP_SELECT,
                  init_board=True, gpio=25):
-        pfio.PiFaceDigital.__init__(self, hardware_addr, bus, chip_select)
         GPIOInterruptDeviceMulti.__init__(self, gpio)
+        pfio.PiFaceDigital.__init__(self, hardware_addr, bus, chip_select)
 
 
 # To read the state of an input use the pfio.digital_read(pin) function. If a button is
