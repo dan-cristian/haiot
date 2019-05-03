@@ -109,37 +109,8 @@ class PiFaceDigitalMulti(pfio.PiFaceDigital, pifacecommon.mcp23s17.MCP23S17, GPI
 
     def __init__(self, hardware_addr=0, bus=DEFAULT_SPI_BUS, chip_select=DEFAULT_SPI_CHIP_SELECT,
                  init_board=True, gpio=25):
+        pfio.PiFaceDigital.__init__(self, hardware_addr, bus, chip_select)
         GPIOInterruptDeviceMulti.__init__(self, gpio)
-        super(pfio.PiFaceDigital, self).__init__(hardware_addr, bus, chip_select)
-
-        self.input_pins = [pifacecommon.mcp23s17.MCP23S17RegisterBitNeg(
-            i, pifacecommon.mcp23s17.GPIOB, self)
-            for i in range(8)]
-
-        self.input_port = pifacecommon.mcp23s17.MCP23S17RegisterNeg(
-            pifacecommon.mcp23s17.GPIOB, self)
-
-        self.output_pins = [pifacecommon.mcp23s17.MCP23S17RegisterBit(
-            i, pifacecommon.mcp23s17.GPIOA, self)
-            for i in range(8)]
-
-        self.output_port = pifacecommon.mcp23s17.MCP23S17Register(
-            pifacecommon.mcp23s17.GPIOA, self)
-
-        self.leds = [pifacecommon.mcp23s17.MCP23S17RegisterBit(
-            i, pifacecommon.mcp23s17.GPIOA, self)
-            for i in range(8)]
-
-        self.relays = [pifacecommon.mcp23s17.MCP23S17RegisterBit(
-            i, pifacecommon.mcp23s17.GPIOA, self)
-            for i in range(2)]
-
-        self.switches = [pifacecommon.mcp23s17.MCP23S17RegisterBitNeg(
-            i, pifacecommon.mcp23s17.GPIOB, self)
-            for i in range(4)]
-
-        if init_board:
-            self.init_board()
 
 
 # To read the state of an input use the pfio.digital_read(pin) function. If a button is
@@ -250,7 +221,7 @@ def _setup_board():
             L.l.info('Found {} piface chips {}'.format(len(P.chip_list), P.chip_list))
         last_err = ''
         gpio_ports = [25, 24, 23, 22]
-        # pftest = PiFaceDigitalMulti(hardware_addr=0, bus=bus, chip_select=0, init_board=True, gpio=26)
+        # pftest = PiFaceDigitalMulti(hardware_addr=0, bus=bus, chip_select=0, init_board=True, gpio=24)
         for board in board_range:
             for chip in P.chip_list:
                 try:
