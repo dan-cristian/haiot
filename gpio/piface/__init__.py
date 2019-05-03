@@ -24,7 +24,6 @@ class P:
     listener = {}
     initialised = False
     board_init = False
-    chip_list = []
     gpio_ports = [25, 24, 23, 22]
     # pool_pin_codes = []
 
@@ -125,7 +124,8 @@ class PiFaceDigitalMulti(pfio.PiFaceDigital, pifacecommon.mcp23s17.MCP23S17, GPI
 # pressed the function returns a 1, otherwise it returns a 0.
 def _get_in_pin_value(pin_index, board_index):
     try:
-        return pfio.digital_read(pin_num=pin_index, hardware_addr=board_index)
+        return P.pfd[board_index].input_pins[pin_index].value
+        # return pfio.digital_read(pin_num=pin_index, hardware_addr=board_index)
     except Exception as ex:
         L.l.error('Unable to read pin {} board {}, err={}'.format(pin_index, board_index, ex))
         return None
@@ -150,7 +150,8 @@ def set_pin_value(pin_index, pin_value, board_index):
     L.l.info('Set piface pin {} to value={}, board {}'.format(pin_index, pin_value, board_index))
     if Constant.debug_dummy: return pin_value
     try:
-        pfio.digital_write(pin_num=pin_index, value=pin_value, hardware_addr=board_index)
+        #pfio.digital_write(pin_num=pin_index, value=pin_value, hardware_addr=board_index)
+        P.pfd[board_index].output_pins[pin_index] = pin_value
         act_value = get_out_pin_value(pin_index=pin_index, board_index=board_index)
         if pin_value != act_value:
             L.l.warning("Piface set pin {} failed, actual value={}".format(pin_index, act_value))
@@ -211,37 +212,35 @@ def _setup_board():
             # Constant.IS_MACHINE_RASPBERRYPI:
             bus = 0
         last_err = ''
-        for chip in chip_range:
-            try:
+        # for chip in chip_range:
+        #    try:
                 # L.l.info("Try piface init on spi spidev{}.{}".format(bus, chip))
-                pfio.init(bus=bus, chip_select=chip)
-                P.chip_list.append(chip)
-                L.l.info("Initialised piface spi spidev{}.{} OK".format(bus, chip))
+        #        pfio.init(bus=bus, chip_select=chip)
+        #        P.chip_list.append(chip)
+        #        L.l.info("Initialised piface spi spidev{}.{} OK".format(bus, chip))
             # except SPIInitError as ex1:
-            except Exception as ex1:
-                last_err += "{}".format(ex1)
-        if len(P.chip_list) == 0:
-            L.l.warning("Unable to init spi, probably not spi not enabled, last err={}".format(last_err))
-        else:
-            L.l.info('Found {} piface chips {}'.format(len(P.chip_list), P.chip_list))
-        last_err = ''
+        #    except Exception as ex1:
+        #        last_err += "{}".format(ex1)
+        #if len(P.chip_list) == 0:
+        #    L.l.warning("Unable to init spi, probably not spi not enabled, last err={}".format(last_err))
+        #else:
+        #    L.l.info('Found {} piface chips {}'.format(len(P.chip_list), P.chip_list))
+        #last_err = ''
         # pftest = PiFaceDigitalMulti(hardware_addr=0, bus=bus, chip_select=0, init_board=True, gpio=24)
         for board in board_range:
-            for chip in P.chip_list:
+            for chip in chip_range:
                 try:
                     # L.l.info("Try piface pfio on board-hw {} spidev{}.{}".format(board, bus, chip))
                     pfd = pfio.PiFaceDigital(hardware_addr=board, bus=bus, chip_select=chip, init_board=True)
-                                             #,gpio=gpio_ports[board])
-                    P.pfd[board] = pfd
                     gpio = pifacecommon.interrupts.GPIO_INTERRUPT_DEVICE_VALUE
                     L.l.info('Default gpio on board {} is {}'.format(board, gpio))
                     # monkey patch
                     pifacecommon.interrupts.GPIO_INTERRUPT_DEVICE_VALUE = gpio.replace('25', str(P.gpio_ports[board]))
-                    P.listener[board] = pfio.InputEventListener(chip=P.pfd[board])
+                    P.listener[board] = pfio.InputEventListener(chip=pfd)
+                    P.pfd[board] = pfd
                     gpio = pifacecommon.interrupts.GPIO_INTERRUPT_DEVICE_VALUE
                     L.l.info("Initialised piface pfio listener board-hw {} spidev{}.{} interrupt {}".format(
                         board, bus, chip, gpio))
-                        #, gpio_ports[board]))
                 except Exception as ex2:
                     last_err += "{}".format(ex2)
                     L.l.info('Err setting listener {}'.format(ex2))
@@ -249,7 +248,7 @@ def _setup_board():
             L.l.warning("Unable to init listeners, last err={}".format(last_err))
         else:
             L.l.info('Initialised {} piface listeners'.format(len(P.pfd)))
-        if len(P.chip_list) > 0 and len(P.pfd) > 0:
+        if len(P.pfd) > 0:
             P.board_init = True
         else:
             L.l.warning('Piface setup failed, no boards found')
