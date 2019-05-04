@@ -26,7 +26,8 @@ class P:
     initialised = False
     board_init = False
     gpio_ports = [25, 24, 23, 22]
-    input_pins = {}
+    input_pin_val = {}
+    input_pin_dir = {}
     # pool_pin_codes = []
 
     def __init__(self):
@@ -173,15 +174,19 @@ def _input_event(event):
     # L.l.info('Piface switch event={}'.format(event))
     pin_num = event.pin_num
     board_index = event.chip.hardware_addr
-    # direction gives different results than pin value, not used, reading value instead
-    direction = event.direction  # 0 for press/contact, 1 for release/disconnect
-    pin_val = _get_in_pin_value(pin_num, board_index)
     gpio_pin_code = format_piface_pin_code(board_index=board_index, pin_direction=Constant.GPIO_PIN_DIRECTION_IN,
                                            pin_index=pin_num)
-    P.input_pins[board_index][pin_num] = pin_val
-    L.l.info('Event piface gpio={} direction={} val={} type={}'.format(gpio_pin_code, direction, pin_val, type(pin_val)))
-    dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio_pin_code, direction=Constant.GPIO_PIN_DIRECTION_IN,
-                    pin_value=pin_val, pin_connected=(direction == 0))
+    # direction gives different results than pin value, not used, reading value instead
+    direction = event.direction  # 0 for press/contact, 1 for release/disconnect
+    if direction != P.input_pin_dir[board_index][pin_num]:
+        pin_val = _get_in_pin_value(pin_num, board_index)
+        P.input_pin_val[board_index][pin_num] = pin_val
+        P.input_pin_dir[board_index][pin_num] = direction
+        L.l.info('Event piface gpio={} direction={} val={}'.format(gpio_pin_code, direction, pin_val))
+        dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio_pin_code, direction=Constant.GPIO_PIN_DIRECTION_IN,
+                        pin_value=pin_val, pin_connected=(direction == 0))
+    else:
+        L.l.info('Duplicate input event pin {} direction {}'.format(gpio_pin_code, direction))
 
 
 #  define all ports that are used as read/input
@@ -251,7 +256,8 @@ def _setup_board():
                     # pifacecommon.interrupts.GPIO_INTERRUPT_DEVICE_VALUE = gpio.replace('25', str(P.gpio_ports[board]))
                     P.listener[board] = pfio.InputEventListener(chip=pfd)
                     P.pfd[board] = pfd
-                    P.input_pins[board] = [None, None, None, None, None, None, None, None]
+                    P.input_pin_val[board] = [None] * 8
+                    P.input_pin_dir[board] = [None] * 8
                     gpio = pifacecommon.interrupts.GPIO_INTERRUPT_DEVICE_VALUE
                     L.l.info("Initialised piface pfio listener board-hw {} spidev{}.{} interrupt {}".format(
                         board, bus, chip, gpio))
@@ -276,14 +282,14 @@ def thread_run():
     for board in P.pfd.keys():
         for pin in range(0, 8):
             pin_val = _get_in_pin_value(pin, board)
-            if pin_val != P.input_pins[board][pin]:
+            if pin_val != P.input_pin_val[board][pin]:
                 L.l.info('Pooled event piface board {} pin={} val={}'.format(board, pin, pin_val))
                 gpio_pin_code = format_piface_pin_code(
                     board_index=board, pin_direction=Constant.GPIO_PIN_DIRECTION_IN, pin_index=pin)
                 dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio_pin_code,
                                 direction=Constant.GPIO_PIN_DIRECTION_IN,
                                 pin_value=pin_val, pin_connected=(pin_val == 1))
-                P.input_pins[board][pin] = pin_val
+                P.input_pin_val[board][pin] = pin_val
 
 
 def unload():
