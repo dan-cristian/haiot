@@ -273,10 +273,9 @@ def post_init():
 
 def init():
     L.l.debug("GPIO initialising")
-    piface.init()
     if Constant.IS_MACHINE_RASPBERRYPI or Constant.IS_MACHINE_ODROID:
         pcf8574_gpio.init()
-        #piface.init()
+        # piface.init()
         rpi_gpio.init()
         pigpio_gpio.init()
     # if Constant.IS_MACHINE_BEAGLEBONE:
@@ -284,6 +283,8 @@ def init():
         # std_gpio.init()
     if Constant.is_os_windows():
         pigpio_gpio.init()
+    # init last after RPI
+    piface.init()
     m.ZoneCustomRelay.add_upsert_listener(zone_custom_relay_upsert_listener)
     thread_pool.add_interval_callable(thread_run, run_interval_second=1)
     P.initialised = True
