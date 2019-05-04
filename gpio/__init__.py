@@ -1,6 +1,5 @@
 import gpio.io_common
-
-__author__ = 'dcristian'
+import time
 from main import sqlitedb
 from datetime import datetime, timedelta
 from main.logger_helper import L
@@ -19,6 +18,9 @@ import prctl
 from gpio import rpi_gpio
 from gpio import pigpio_gpio
 from storage.model import m
+
+
+__author__ = 'dcristian'
 
 
 class P:
@@ -232,6 +234,7 @@ def post_init():
             func = rpi_gpio.post_init_relay_value
         if func is not None:
             relay_value = func(gpio_pin_code=gpio_pin_code)
+            L.l.info('Post init relay pin {}, value read is {}'.format(gpio_pin_code, relay_value))
             if relay_value is not None or Constant.HOST_NAME == 'netbook':
                 relay.relay_is_on = relay_value
                 # skip listeners to avoid relay triggering?
@@ -285,6 +288,8 @@ def init():
         pigpio_gpio.init()
     # init last after RPI
     piface.init()
+    L.l.info('Sleep 10 sec')
+    time.sleep(10)
     m.ZoneCustomRelay.add_upsert_listener(zone_custom_relay_upsert_listener)
     thread_pool.add_interval_callable(thread_run, run_interval_second=1)
     P.initialised = True
