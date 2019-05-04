@@ -100,6 +100,7 @@ def run_thread_pool():
                     tf = P.thread_func_list[func]
                 else:
                     L.l.warning('Skip processing func {}, was removed?'.format(print_name))
+                    P.ff.pop(future_obj, None)
                     break
                 # exec_interval = P.eil.get(func, None)
                 exec_interval = tf.interval
