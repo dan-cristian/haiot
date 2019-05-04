@@ -181,7 +181,7 @@ def _input_event(event):
     P.input_pins[board_index][pin_num] = pin_val
     L.l.info('Event piface gpio={} direction={} val={} type={}'.format(gpio_pin_code, direction, pin_val, type(pin_val)))
     dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio_pin_code, direction=Constant.GPIO_PIN_DIRECTION_IN,
-                    pin_value=pin_val, pin_connected=(pin_val == 1))
+                    pin_value=pin_val, pin_connected=(direction == 0))
 
 
 #  define all ports that are used as read/input
