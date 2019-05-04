@@ -288,8 +288,6 @@ def init():
         pigpio_gpio.init()
     # init last after RPI
     piface.init()
-    L.l.info('Sleep 10 sec')
-    time.sleep(10)
     m.ZoneCustomRelay.add_upsert_listener(zone_custom_relay_upsert_listener)
     thread_pool.add_interval_callable(thread_run, run_interval_second=1)
     P.initialised = True
