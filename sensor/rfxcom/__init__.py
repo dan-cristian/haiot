@@ -173,6 +173,7 @@ def get_progress():
 
 
 def unload():
+    L.l.info('Unloading RFXCom')
     thread_pool.remove_callable(thread_run)
     if P.initialised:
         P.transport.close()
