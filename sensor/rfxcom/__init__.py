@@ -133,7 +133,7 @@ def _init_board():
             L.l.info('No RFX device detected on this system')
     except Exception as ex:
         L.l.warning('Unable to open RFX tty port, err={}'.format(ex))
-    if not P.initialised:
+    if P.initialised is False:
         P.init_failed_count += 1
     return P.initialised
 
