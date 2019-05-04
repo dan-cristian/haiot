@@ -107,7 +107,7 @@
     {"id":123, "active":false, "start_order":23, "name":"sysutils.filewatch", "host_name":"nas"},
 
     {"id":209, "active":false, "start_order":9, "name":"heat", "host_name":"pi-power"},
-    {"id":247, "active":true, "start_order":47, "name":"sensor.rfxcom", "host_name":"pi-power"},
+    {"id":247, "active":false, "start_order":47, "name":"sensor.rfxcom", "host_name":"pi-power"},
     {"id":249, "active":true, "start_order":49, "name":"sensor.ups_legrand", "host_name":"pi-power"},
     {"id":255, "active":true, "start_order":55, "name":"sensor.1wire", "host_name":"pi-power"},
     {"id":259, "active":true, "start_order":59, "name":"sensor.i2c", "host_name":"pi-power"},
