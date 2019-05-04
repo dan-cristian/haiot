@@ -61,8 +61,11 @@ def unload():
 
 
 def post_init_relay_value(gpio_pin_code):
-    pin_index = int(gpio_pin_code)
-    return get_pin(pin_index)
+    if P.initialised:
+        pin_index = int(gpio_pin_code)
+        return get_pin(pin_index)
+    else:
+        return None
 
 
 def post_init_alarm_value(gpio_pin_code):
@@ -92,7 +95,7 @@ def init():
         try:
             L.l.info('Initialising PCF8574')
             P.pcf = PCF8574(P.i2c_port_num, P.pcf_address)
-            get_pin(0) # try a read
+            get_pin(0)  # try a read
             P.initialised = True
             L.l.info('Initialising PCF8574 OK, state= {}'.format(P.pcf.port))
         except Exception as ex:
