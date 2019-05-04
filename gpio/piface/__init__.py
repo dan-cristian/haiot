@@ -134,10 +134,13 @@ def _get_in_pin_value(pin_index, board_index):
 
 
 def get_out_pin_value(pin_index, board_index):
+    out_pin = None
     try:
-        return P.pfd[board_index].output_pins[pin_index].value
+        out_pin = P.pfd[board_index].output_pins[pin_index]
+        return out_pin.value
     except Exception as ex:
-        L.l.error('Out pin val error, board={}, index={}, err={}'.format(board_index, pin_index, ex), exc_info=True)
+        L.l.error('Out error pin val={}, board={}, index={}, err={}'.format(
+            out_pin, board_index, pin_index, ex), exc_info=True)
         return None
 
 
