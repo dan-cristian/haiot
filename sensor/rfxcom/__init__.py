@@ -41,7 +41,7 @@ class P:
 def __rfx_reading(packet):
     if packet:
         try:
-            L.l.info("Received RFX packet={}".format(packet))
+            # L.l.info("Received RFX packet={}".format(packet))
             if isinstance(packet, RFXtrx.SensorEvent):
                 __save_sensor_db(p_id=packet.device.id_string, p_type=packet.device.type_string,
                                  value_list=packet.values)
