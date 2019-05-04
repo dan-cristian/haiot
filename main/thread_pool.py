@@ -10,7 +10,6 @@ from main.logger_helper import L
 class P:
     thread_func_list = {}
     cl = []  # list with callables
-    # cpl = {} # list with callables progress
     eil = {}  # exec_interval_list
     eldl = {}  # exec_last_date_list
     tpool = True  # thread pool is enabled?
