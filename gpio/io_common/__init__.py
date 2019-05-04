@@ -15,7 +15,7 @@ def update_custom_relay(pin_code, pin_value, notify=False, ignore_missing=False)
                                         m.ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME})
     if relay is not None:
         relay.relay_is_on = pin_value
-        relay.save_changed_fields(broadcast=notify)
+        relay.save_changed_fields(broadcast=notify, listeners=False)
         L.l.info('Updated relay {} val={}'.format(pin_code, pin_value))
     else:
         if not ignore_missing:
