@@ -95,7 +95,7 @@ def init():
         try:
             L.l.info('Initialising PCF8574')
             P.pcf = PCF8574(P.i2c_port_num, P.pcf_address)
-            get_pin(0)  # try a read
+            test_ok = P.pcf.port[0]  # try a read
             P.initialised = True
             L.l.info('Initialising PCF8574 OK, state= {}'.format(P.pcf.port))
         except Exception as ex:
