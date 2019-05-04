@@ -113,6 +113,8 @@
     {"id":259, "active":true, "start_order":59, "name":"sensor.i2c", "host_name":"pi-power"},
     {"id":265, "active":true, "start_order":65, "name":"gpio", "host_name":"pi-power"},
     {"id":267, "active":true, "start_order":67, "name":"alarm", "host_name":"pi-power"},
+    {"id":302, "active":false, "start_order":102, "name":"webui.api", "host_name":"pi-power"},
+    {"id":303, "active":false, "start_order":103, "name":"webui", "host_name":"pi-power"},
 
 
     {"id":401, "active":true, "start_order":50, "name":"apps.dashcam", "host_name":"pidash"},
