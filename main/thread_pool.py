@@ -57,11 +57,13 @@ def add_interval_callable(func, run_interval_second, long_running=False):  # , *
 
 def remove_callable(func):
     print_name = __get_print_name_callable(func)
-    if print_name in P.thread_func_list:
-        P.thread_func_list.pop(print_name, None)
+    if func in P.thread_func_list:
+        P.thread_func_list.pop(func, None)
     #if func in P.cl:
         #P.cl.remove(func)
         L.l.info('Removed from processing callable ' + print_name)
+    else:
+        L.l.info('Cannot find callable {} to remove'.format(print_name))
 
 
 def unload():
