@@ -349,9 +349,9 @@
     {"relay_pin_name": "odroid_pcf_1", "zone_id": "7", "gpio_pin_code": "1", "gpio_host_name": "homew", "relay_type": "pcf8574"},
     {"relay_pin_name": "odroid_pcf_7", "zone_id": "7", "gpio_pin_code": "7", "gpio_host_name": "homew", "relay_type": "pcf8574"},
 
-    {"relay_pin_name": "front_gate_relay", "zone_id": "7", "gpio_pin_code": "0:out:0", "gpio_host_name": "pi-power", "relay_type": "piface", "expire":  1},
+    {"relay_pin_name": "front_gate_relay", "zone_id": "7", "gpio_pin_code": "0:out:0", "gpio_host_name": "pi-power", "relay_type": "piface", "expire":  2},
 
-    {"relay_pin_name": "front_gate_relay_test", "zone_id": "7", "gpio_pin_code": "0:out:1", "gpio_host_name": "netbook", "relay_type": "piface", "expire":  1},
+    {"relay_pin_name": "front_gate_relay_test", "zone_id": "7", "gpio_pin_code": "0:out:1", "gpio_host_name": "netbook", "relay_type": "piface", "expire":  2},
     {"relay_pin_name": "blackwater_pump_relay_test", "zone_id": "9", "gpio_pin_code": "sonoff-basic-3", "gpio_host_name": "netbook", "relay_type": "sonoff"}
   ],
 
