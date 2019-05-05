@@ -170,7 +170,12 @@ def set_pin_value(pin_index, pin_value, board_index):
         return None
 
 
-def _input_event(event):
+# for normal open contacts
+def _input_event_reversed(event):
+    _input_event(event, reversed=True)
+
+
+def _input_event(event, reversed=False):
     # L.l.info('Piface switch event={}'.format(event))
     pin_num = event.pin_num
     board_index = event.chip.hardware_addr
@@ -183,8 +188,11 @@ def _input_event(event):
         P.input_pin_val[board_index][pin_num] = pin_val
         P.input_pin_dir[board_index][pin_num] = direction
         L.l.info('Event piface gpio={} direction={} val={}'.format(gpio_pin_code, direction, pin_val))
+        pin_connected = (direction == 0)
+        if reversed:
+            pin_connected = not pin_connected
         dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio_pin_code, direction=Constant.GPIO_PIN_DIRECTION_IN,
-                        pin_value=pin_val, pin_connected=(direction == 0))
+                        pin_value=pin_val, pin_connected=pin_connected)
     else:
         L.l.info('Duplicate input event pin {} direction {}'.format(gpio_pin_code, direction))
 
@@ -203,8 +211,12 @@ def _setup_in_ports_pif(gpio_pin_list):
                 pin = int(gpio_pin.pin_index_bcm)
                 board = int(gpio_pin.board_index)
                 if board in P.listener.keys():
-                    P.listener[board].register(pin, pfio.IODIR_ON, _input_event)
-                    P.listener[board].register(pin, pfio.IODIR_OFF, _input_event)
+                    if gpio_pin.contact_type == Constant.CONTACT_TYPE_NO:
+                        P.listener[board].register(pin, pfio.IODIR_ON, _input_event_reversed)
+                        P.listener[board].register(pin, pfio.IODIR_OFF, _input_event_reversed)
+                    else:
+                        P.listener[board].register(pin, pfio.IODIR_ON, _input_event)
+                        P.listener[board].register(pin, pfio.IODIR_OFF, _input_event)
                     val = _get_in_pin_value(pin_index=pin, board_index=board)
                     L.l.info('Callback OK board {} code {} pin {} val {}'.format(board, gpio_pin.pin_code, pin, val))
             except Exception as ex:
