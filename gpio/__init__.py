@@ -176,7 +176,7 @@ def zone_custom_relay_upsert_listener(record, changed_fields):
 
 # https://stackoverflow.com/questions/26881396/how-to-add-a-function-call-to-a-list
 def _process_expire():
-    for func_time in dict(P.expire_func_list).keys():
+    for func_time in sorted(P.expire_func_list.keys()):
         if datetime.now() >= func_time:
             func = P.expire_func_list[func_time]
             L.l.info("Function expired, executing relay action func={}".format(func))
