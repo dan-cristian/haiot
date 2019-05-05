@@ -233,7 +233,7 @@ def post_init():
             func = rpi_gpio.post_init_relay_value
         if func is not None:
             relay_value = func(gpio_pin_code=gpio_pin_code)
-            L.l.info('Post init relay pin {}, value read is {}'.format(gpio_pin_code, relay_value))
+            L.l.info('Init relay {} pin {}, value read is {}'.format(relay.relay_pin_name, gpio_pin_code, relay_value))
             if relay_value is not None or Constant.HOST_NAME == 'netbook':
                 relay.relay_is_on = relay_value
                 # skip listeners to avoid relay triggering?
@@ -263,7 +263,8 @@ def post_init():
                     alarm.alarm_pin_triggered = pin_connected
                 else:
                     alarm.alarm_pin_triggered = not pin_connected
-                L.l.info('Post init alarm pin {}, value read is {}'.format(gpio_pin_code, pin_connected))
+                L.l.info('Init alarm {} pin {}, value read is {}'.format(
+                    alarm.alarm_pin_name, gpio_pin_code, pin_connected))
                 alarm.save_changed_fields(broadcast=True, persist=True, listeners=False)
 
     # init PWM
