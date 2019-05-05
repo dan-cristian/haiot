@@ -33,8 +33,6 @@ def __get_print_name_callable(func):
 
 def add_interval_callable(func, run_interval_second, long_running=False):  # , *args):
     print_name = __get_print_name_callable(func)
-    #if func not in P.cl:
-
     if func not in P.thread_func_list:
         f = ThreadFunc()
         f.name = print_name
@@ -43,11 +41,6 @@ def add_interval_callable(func, run_interval_second, long_running=False):  # , *
         f.last_exec = datetime.now()
         f.long_running = long_running
         P.thread_func_list[func] = f
-
-        #P.cl.append(func)
-        #P.eldl[func] = datetime.now()
-        #P.eil[func] = run_interval_second
-
         if len(P.ff) > 0 and P.executor is not None:  # run the function already if thread pool is started
             P.ff[P.executor.submit(func)] = func
     else:
@@ -58,8 +51,6 @@ def remove_callable(func):
     print_name = __get_print_name_callable(func)
     if func in P.thread_func_list:
         P.thread_func_list.pop(func, None)
-    #if func in P.cl:
-        #P.cl.remove(func)
         L.l.info('Removed from processing callable ' + print_name)
     else:
         L.l.info('Cannot find callable {} to remove'.format(print_name))
@@ -83,11 +74,8 @@ def run_thread_pool():
     # with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
     while P.tpool:
         try:
-            #if len(P.cl) != len(P.ff):
-            #    P.ff = {P.executor.submit(call_obj): call_obj
-            #            for call_obj in P.cl}
-
             if len(P.thread_func_list) != len(P.ff):
+                P.ff.clear()
                 # copy list as can change
                 for tf in dict(P.thread_func_list):
                     P.ff[P.executor.submit(tf)] = P.thread_func_list[tf].func
@@ -101,12 +89,10 @@ def run_thread_pool():
                     L.l.warning('Skip processing func {}, was removed?'.format(print_name))
                     P.ff.pop(future_obj, None)
                     break
-                # exec_interval = P.eil.get(func, None)
                 exec_interval = tf.interval
                 if exec_interval is None:
                     L.l.error('No exec interval set for thread function ' + print_name)
                     exec_interval = 60  # set a default exec interval
-                # last_exec_date = P.eldl.get(func, None)
                 last_exec_date = tf.last_exec
                 elapsed_seconds = (datetime.now() - last_exec_date).total_seconds()
                 # when function is done check if needs to run again or if is running for too long
@@ -120,14 +106,13 @@ def run_thread_pool():
                         del P.ff[future_obj]
                         P.ff[P.executor.submit(func)] = func
                         tf.last_exec = datetime.now()
-                        #P.eldl[func] = datetime.now()
                 elif future_obj.running():
                     if elapsed_seconds > 1*20 and not tf.long_running:
                         L.l.info('Threaded func{} is running for {} sec'.format(print_name, elapsed_seconds))
                         if 'P' in func.__globals__ and hasattr(func.__globals__['P'], 'thread_pool_status'):
                             progress_status = func.__globals__['P'].thread_pool_status
                             L.l.warning('Progress Status since {} sec is [{}]'.format(elapsed_seconds, progress_status))
-            time.sleep(0.2)
+            time.sleep(0.4)
         except Exception as ex:
             L.l.error('Error in threadpool run, ex={}'.format(ex), exc_info=True)
     P.executor.shutdown()
