@@ -148,7 +148,7 @@ def zone_custom_relay_upsert_listener(record, changed_fields):
             expire_func = (sonoff.set_relay_state, record.gpio_pin_code, expired_relay_is_on)
         elif record.relay_type == Constant.GPIO_PIN_TYPE_PI_PCF8574:
             # pcf on state is reversed!
-            expire_func = (pcf8574_gpio.set_pin_value, record.gpio_pin_code, expired_relay_is_on)
+            expire_func = (pcf8574_gpio.set_pin_value, record.gpio_pin_code, not expired_relay_is_on)
         elif P.has_zwave and record.relay_type == Constant.GPIO_PIN_TYPE_ZWAVE:
             node_id = zwave.get_node_id_from_txt(pin_code)
             zwave.set_switch_state(node_id=node_id, state=record.relay_is_on)
@@ -176,14 +176,15 @@ def zone_custom_relay_upsert_listener(record, changed_fields):
 
 # https://stackoverflow.com/questions/26881396/how-to-add-a-function-call-to-a-list
 def _process_expire():
-    for func_time in sorted(P.expire_func_list.keys()):
-        if datetime.now() >= func_time:
-            func = P.expire_func_list[func_time]
-            L.l.info("Function expired, executing relay action func={}".format(func))
-            func[0](*func[1:])
-            P.expire_func_list.pop(func_time, None)
-            # del P.expire_func_list[func_time]
-            L.l.info("Function deleted, list={}".format(len(P.expire_func_list)))
+    if len(P.expire_func_list) > 0:
+        for func_time in sorted(P.expire_func_list.keys()):
+            if datetime.now() >= func_time:
+                func = P.expire_func_list[func_time]
+                L.l.info("Function expired, executing relay action func={}".format(func))
+                func[0](*func[1:])
+                P.expire_func_list.pop(func_time, None)
+                # del P.expire_func_list[func_time]
+                L.l.info("Function deleted, list={}".format(len(P.expire_func_list)))
 
 
 def thread_run():
@@ -258,7 +259,10 @@ def post_init():
         if func is not None:
             pin_connected = func(gpio_pin_code=gpio_pin_code)
             if pin_connected is not None:
-                alarm.alarm_pin_triggered = not pin_connected
+                if alarm.sensor_type == Constant.CONTACT_TYPE_NO:
+                    alarm.alarm_pin_triggered = pin_connected
+                else:
+                    alarm.alarm_pin_triggered = not pin_connected
                 alarm.save_changed_fields(broadcast=True, persist=True, listeners=False)
 
     # init PWM
