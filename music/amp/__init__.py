@@ -73,7 +73,7 @@ def _amp_bi_set_yamaha(on, sock):
 
 
 def amp_zone_power(on, zone_index):
-    # L.l.info("Setting amp power for zone {}".format(zone_index))
+    L.l.info("Setting amp power {} for zone {}".format(on, zone_index))
     global _AMP_ZONE3_POWER_OFF, _AMP_ZONE3_POWER_ON
     sock = connect_socket()
     msg = "socket cmd ok, "
@@ -101,7 +101,7 @@ def amp_zone_power(on, zone_index):
     msg = "{} {}".format(msg, result)
     sock.close()
     result = "Set done amp zone {} to state {}, result={}\n".format(zone_index, on, msg)
-    L.l.info(result)
+    # L.l.info(result)
     return result
 
 
@@ -134,8 +134,11 @@ def set_amp_power(power_state, relay_name, amp_zone_index):
             if initial_relay_state is not True and power_state is True:
                 # delay to wait for amp to fully start
                 time.sleep(5)
-            result_amp = amp_zone_power(power_state, amp_zone_index)
-            return msg + result_amp
+                result_amp = amp_zone_power(power_state, amp_zone_index)
+                return msg + result_amp
+            else:
+                msg += 'Power state is {} so no amp action'.format(power_state)
+                return msg
     except Exception as ex:
         L.l.error("Error set_amp_power {}".format(ex), exc_info=True)
         return "Error set_amp_power {}".format(ex)
