@@ -73,7 +73,7 @@ def _amp_bi_set_yamaha(on, sock):
 
 
 def amp_zone_power(on, zone_index):
-    L.l.debug("Setting amp power for zone {}".format(zone_index))
+    # L.l.info("Setting amp power for zone {}".format(zone_index))
     global _AMP_ZONE3_POWER_OFF, _AMP_ZONE3_POWER_ON
     sock = connect_socket()
     msg = "socket cmd ok, "
@@ -101,30 +101,22 @@ def amp_zone_power(on, zone_index):
     msg = "{} {}".format(msg, result)
     sock.close()
     result = "Set done amp zone {} to state {}, result={}\n".format(zone_index, on, msg)
-    L.l.debug(result)
+    L.l.info(result)
     return result
 
 
 def set_amp_power(power_state, relay_name, amp_zone_index):
     try:
-        if sqlitedb:
-            relay = models.ZoneCustomRelay.query.filter_by(relay_pin_name=relay_name).first()
-        else:
-            relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.relay_pin_name: relay_name})
+        relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.relay_pin_name: relay_name})
         power_state = bool(power_state)
         if relay is not None:
             initial_relay_state = relay.relay_is_on
             # power on main relay for amp or on/off if there is no zone
             if power_state is True or amp_zone_index == 0:
                 relay.relay_is_on = power_state
-                if sqlitedb:
-                    commit()
-                    # dispatch as UI action otherwise change actions are not triggered
-                    dispatcher.send(signal=Constant.SIGNAL_UI_DB_POST, model=models.ZoneCustomRelay, row=relay)
-                else:
-                    relay.save_changed_fields()
-                    # fixme: set amp
-                    # L.l.error('check if fix me set amp relay')
+                relay.save_changed_fields()
+                # fixme: set amp
+                # L.l.error('check if fix me set amp relay')
                 msg = "Set relay {} to state {} zone_index={}\n".format(relay_name, power_state, amp_zone_index)
             else:
                 msg = "Not changed relay state for {}\n".format(relay_name)
