@@ -394,7 +394,7 @@ def _set_param(node_id, param_name, value, param_code):
             L.l.info("Set ok param {} {} to {}, old value={}".format(c, configs[c].label, value, old))
             return True
         conf.append(configs[c])
-    L.l.warning("Could not find parameter {} in config list {}".format(param_name, conf))
+    L.l.warning("Could not find parameter {} in config list {}, trying alternate config set".format(param_name, conf))
     node.set_config(param_code, value)
     return False
 
@@ -403,6 +403,7 @@ def _set_param(node_id, param_name, value, param_code):
 def _initial_node_init():
     if not P.init_done:
         _set_param(2, 'Power reporting in Watts on power change',  1, 40)
+        _set_param(2, 'Other Values - Reporting on time interval', 1, 43)
         _set_param(2, 'Power reporting in Watts by time interval', 600, 42)
         P.init_done = True
         node = P.network.nodes[2]
