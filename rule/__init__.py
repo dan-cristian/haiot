@@ -63,6 +63,7 @@ def parse_rules(obj, change):
             # fixme: not sure if above is still needed
             field_changed_list = change
         # iterate all functions in each rule module and queue for execution what matches
+        # fixme: improve performance by using dictionary search
         for func_list in P.func.values():
             if func_list:
                 for func in func_list:
@@ -70,10 +71,11 @@ def parse_rules(obj, change):
                         first_param = func[1].__defaults__[0]
                         # find rule methods for queued execution with first param type equal to passed object type
                         if type(obj) == type(first_param):
-                            record = Obj()
-                            for attr, value in obj.__dict__.items():
-                                setattr(record, attr, value)
-                            P.event_list.append([record, func[0], field_changed_list])
+                            # record = Obj()
+                            # for attr, value in obj.__dict__.items():
+                            #    setattr(record, attr, value)
+                            # P.event_list.append([record, func[0], field_changed_list])
+                            P.event_list.append([obj, func[0], field_changed_list])
                             # optimises CPU, but ensure each function name is unique in rule file
                             break
     except Exception as ex:
