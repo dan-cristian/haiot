@@ -229,7 +229,7 @@ def reload_rules():
     if new_stamp != P.timestamp:
         L.l.info('Reloading rules as timestamp changed, {} != {}'.format(P.timestamp, new_stamp))
         imp.reload(rules_run)
-        add_rules_into_db()
+        add_rules_into_db(module=rules_run)
         P.timestamp = new_stamp
         rules_run.test_code()
     # else:
@@ -264,10 +264,7 @@ def init():
         P.rules_modules.append(rules_run)
         P.rules_modules.append(electricity)
         scheduler.remove_all_jobs()
-        if sqlitedb:
-            models.Rule().delete()
         add_rules_into_db(module=rules_run)
-
         # __load_rules_from_db()
         scheduler.start()
         P.timestamp = _get_stamp()
