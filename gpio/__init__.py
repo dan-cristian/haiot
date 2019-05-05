@@ -138,7 +138,7 @@ def zone_custom_relay_upsert_listener(record, changed_fields):
         return
     L.l.info('Upsert listener {} pin {} value {}'.format(record.relay_type, record.gpio_pin_code, record.relay_is_on))
     set_relay_state(record.gpio_pin_code, record.relay_is_on, record.relay_type)
-    L.l.info('Upsert after pin {} value {}'.format(record.gpio_pin_code, record.relay_is_on))
+    # L.l.info('Upsert after pin {} value {}'.format(record.gpio_pin_code, record.relay_is_on))
     expire_func = None
     if record.expire is not None:
         pin_code = record.gpio_pin_code
