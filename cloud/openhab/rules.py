@@ -1,6 +1,5 @@
 import transport.mqtt_io
 from main.logger_helper import L
-from main import sqlitedb
 from storage.model import m
 import transport
 from common import Constant
@@ -26,9 +25,6 @@ def rule_openhab_sensor(obj=m.Sensor(), change=None):
         return
     key = 'temperature'
     if hasattr(obj, key) and obj.temperature is not None:
-        # if obj.sensor_name == 'curte fata':
-        #    obj_text = utils.dump_primitives_as_text(obj)
-        #    L.l.info('CURTE TEMP={}'.format(obj_text))
         send_mqtt_openhab(subtopic=key + "_" + obj.sensor_name, payload=obj.temperature)
     key = 'humidity'
     if hasattr(obj, key) and obj.humidity is not None:
@@ -76,7 +72,6 @@ def rule_openhab_utility(obj=m.Utility(), change=None):
         if obj.utility_type == key and obj.units_delta is not None:
             send_mqtt_openhab(subtopic=key + "_" + obj.utility_name, payload=obj.units_delta)
     else:
-        # L.l.info("NO UTILITY TYPE in {}".format(obj))
         if obj.utility_name is None:
             L.l.warning('Got empty openhab utility name {}'.format(obj))
 
