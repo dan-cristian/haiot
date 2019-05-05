@@ -167,7 +167,7 @@ def set_value(network, node, value):
                         record.save_changed_fields(broadcast=True, persist=True)
                         # L.l.info("Saving power factor {} {}".format(sensor_name, value.data))
         else:
-            L.l.info("Cannot find zonesensor definition in db, address={}".format(sensor_address))
+            L.l.info("Cannot find zwave sensor in db, address={} node={} value={}".format(sensor_address, node, value))
     except Exception as ex:
         L.l.error("Error in zwave value={}".format(ex), exc_info=True)
 
@@ -456,15 +456,20 @@ def _init_recovery():
 def init():
     if P.module_imported:
         thread_pool.add_interval_callable(thread_run, run_interval_second=P.interval)
-        if not os.path.isdir('../openzwave/config'):
+        opath = '../openzwave/config'
+        if not os.path.isdir(opath):
             L.l.info('Openzawave config directory does not exist, creating')
             if not os.path.isdir('../openzwave'):
                 os.mkdir('../openzwave')
-            if not os.path.isdir('../openzwave/config'):
-                os.mkdir('../openzwave/config')
-        if not os.path.isfile('../openzwave/config/zwcfg.xsd'):
+            if not os.path.isdir(opath):
+                os.mkdir(opath)
+        if not os.path.isfile(opath + '/zwcfg.xsd'):
             L.l.info('Openzawave config file does not exist, creating empty')
-            with open("../openzwave/config/zwcfg.xsd", "w") as text_file:
+            with open(opath + "/zwcfg.xsd", "w") as text_file:
+                print("", file=text_file)
+        if not os.path.isfile(opath + '/options.xml'):
+            L.l.info('Openzawave options file does not exist, creating empty')
+            with open(opath + "/options.xml", "w") as text_file:
                 print("", file=text_file)
         dispatcher.connect(_init_recovery, signal=Constant.SIGNAL_USB_DEVICE_CHANGE, sender=dispatcher.Any)
 
