@@ -462,5 +462,9 @@ def init():
                 os.mkdir('../openzwave')
             if not os.path.isdir('../openzwave/config'):
                 os.mkdir('../openzwave/config')
+        if not os.path.isfile('../openzwave/config/zwcfg.xsd'):
+            L.l.info('Openzawave config file does not exist, creating empty')
+            with open("../openzwave/config/zwcfg.xsd", "w") as text_file:
+                print("", file=text_file)
         dispatcher.connect(_init_recovery, signal=Constant.SIGNAL_USB_DEVICE_CHANGE, sender=dispatcher.Any)
 
