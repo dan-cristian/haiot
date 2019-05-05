@@ -125,7 +125,7 @@ def _init_board():
             # fixme windows autodetect version
         if portpath:
             L.l.info('Initialising RFXCOM on port {}'.format(portpath))
-            P.transport = PySerialTransport(portpath, debug=True)
+            P.transport = PySerialTransport(portpath, debug=False)
             P.transport.reset()
             P.initialised = True
             variable.USB_PORTS_IN_USE.append(portpath)
