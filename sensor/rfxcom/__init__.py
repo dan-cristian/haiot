@@ -81,6 +81,7 @@ def __save_sensor_db(p_id='', p_type='', value_list=None):
         record.battery_level = value_list['Battery numeric']
     if 'Rssi numeric' in value_list:
         record.rssi = value_list['Rssi numeric']
+    L.l.info('Saving RFX object {}'.format(record))
     record.save_changed_fields(broadcast=True, persist=True)
 
 
