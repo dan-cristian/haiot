@@ -105,8 +105,9 @@ def _process_message(msg):
                 # dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=current, unit='kWh')
             if 'POWER' in obj:
                 power_is_on = obj['POWER'] == 'ON'
-                relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.gpio_pin_code: sensor_name,
-                                                    m.ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME})
+                # relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.gpio_pin_code: sensor_name,
+                #                                    m.ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME})
+                relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.gpio_pin_code: sensor_name})
                 if relay is not None:
                     L.l.info("Got relay {} state={}".format(sensor_name, power_is_on))
                     relay.relay_is_on = power_is_on
@@ -221,8 +222,8 @@ def _get_relay_status(relay_name):
 def post_init():
     if P.initialised:
         # force sonoff sensors to send their status
-        relays = m.ZoneCustomRelay.find({m.ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME,
-                                         m.ZoneCustomRelay.relay_type: Constant.GPIO_PIN_TYPE_SONOFF})
+        relays = m.ZoneCustomRelay.find({m.ZoneCustomRelay.relay_type: Constant.GPIO_PIN_TYPE_SONOFF})
+        # m.ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME,
         for relay in relays:
             L.l.info('Reading sonoff sensor {}'.format(relay.gpio_pin_code))
             _get_relay_status(relay.gpio_pin_code)
