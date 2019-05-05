@@ -263,6 +263,7 @@ def post_init():
                     alarm.alarm_pin_triggered = pin_connected
                 else:
                     alarm.alarm_pin_triggered = not pin_connected
+                L.l.info('Post init alarm pin {}, value read is {}'.format(gpio_pin_code, pin_connected))
                 alarm.save_changed_fields(broadcast=True, persist=True, listeners=False)
 
     # init PWM
