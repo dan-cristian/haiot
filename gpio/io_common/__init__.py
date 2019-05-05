@@ -22,6 +22,13 @@ def update_custom_relay(pin_code, pin_value, notify=False, ignore_missing=False)
             L.l.warning('Unable to find relay pin {}'.format(pin_code))
 
 
+# update in db (without propagatting the change by default)
+def update_listener_custom_relay(relay, is_on):
+    relay.relay_is_on = is_on
+    relay.save_changed_fields(broadcast=True)
+    L.l.info('Updated listener relay {} val={}'.format(relay, is_on))
+
+
 class Port:
     _port_list = []
     type = None

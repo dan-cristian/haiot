@@ -140,6 +140,7 @@ def zone_custom_relay_upsert_listener(record, changed_fields):
 
     L.l.info('Upsert listener {} pin {} value {}'.format(record.relay_type, record.gpio_pin_code, record.relay_is_on))
     set_relay_state(record.gpio_pin_code, record.relay_is_on, record.relay_type)
+    L.l.info('Upsert after pin {} value {}'.format(record.gpio_pin_code, record.relay_is_on))
     if record.expire is not None:
         pin_code = record.gpio_pin_code
         if record.relay_type == Constant.GPIO_PIN_TYPE_SONOFF:
@@ -171,7 +172,7 @@ def zone_custom_relay_upsert_listener(record, changed_fields):
         expire_time = datetime.now() + timedelta(seconds=record.expire)
         if expire_time not in P.expire_func_list.keys():
             P.expire_func_list[expire_time] = expire_func
-            func_update = (io_common.update_custom_relay, pin_code, expired_relay_is_on, True)
+            func_update = (io_common.update_listener_custom_relay, record, expired_relay_is_on)
             P.expire_func_list[expire_time + timedelta(microseconds=1)] = func_update
         else:
             L.l.error("Duplicate expire key in list")
