@@ -140,7 +140,7 @@ def get_out_pin_value(pin_index, board_index):
         out_pin = P.pfd[board_index].output_pins[pin_index]
         # if isinstance(out_pin, int):
         #    return out_pin
-        #else:
+        # else:
         return out_pin.value
     except Exception as ex:
         L.l.error('Out error pin val={}, board={}, index={}, err={}'.format(
@@ -149,7 +149,8 @@ def get_out_pin_value(pin_index, board_index):
 
 
 def set_pin_code_value(pin_code, pin_value):
-    if Constant.debug_dummy: return pin_value
+    if Constant.debug_dummy:
+        return pin_value
     board, direction, pin = io_common.decode_piface_pin(pin_code)
     return set_pin_value(pin_index=pin, pin_value=pin_value, board_index=board)
 
