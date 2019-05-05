@@ -1,3 +1,4 @@
+import os
 import threading
 import prctl
 from datetime import datetime
@@ -455,5 +456,11 @@ def _init_recovery():
 def init():
     if P.module_imported:
         thread_pool.add_interval_callable(thread_run, run_interval_second=P.interval)
+        if not os.path.isdir('../openzwave/config'):
+            L.l.info('Openzawave config directory does not exist, creating')
+            if not os.path.isdir('../openzwave'):
+                os.mkdir('../openzwave')
+            if not os.path.isdir('../openzwave/config'):
+                os.mkdir('../openzwave/config')
         dispatcher.connect(_init_recovery, signal=Constant.SIGNAL_USB_DEVICE_CHANGE, sender=dispatcher.Any)
 
