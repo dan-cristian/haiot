@@ -15,6 +15,7 @@ class P:
     tpool = True  # thread pool is enabled?
     ff = {}  # dict_future_func
     executor = None
+    _event = threading.Event()
 
 
 class ThreadFunc:
@@ -25,6 +26,10 @@ class ThreadFunc:
         self.interval = None
         self.last_exec = datetime.min
         self.long_running = False
+
+    def done_callback(self, obj):
+        # L.l.info('I am done {}={}'.format(self.name, obj))
+        P._event.set()
 
 
 def __get_print_name_callable(func):
@@ -104,7 +109,9 @@ def run_thread_pool():
                     # run the function again at given interval
                     if elapsed_seconds and elapsed_seconds > exec_interval:
                         del P.ff[future_obj]
-                        P.ff[P.executor.submit(func)] = func
+                        future = P.executor.submit(func)
+                        future.add_done_callback(tf.done_callback)
+                        P.ff[future] = func
                         tf.last_exec = datetime.now()
                 elif future_obj.running():
                     if elapsed_seconds > 1*20 and not tf.long_running:
@@ -112,7 +119,11 @@ def run_thread_pool():
                         if 'P' in func.__globals__ and hasattr(func.__globals__['P'], 'thread_pool_status'):
                             progress_status = func.__globals__['P'].thread_pool_status
                             L.l.warning('Progress Status since {} sec is [{}]'.format(elapsed_seconds, progress_status))
-            time.sleep(0.4)
+            # fixme: replace sleep with thread signal to reduce CPU usage
+            # time.sleep(0.4)
+            P._event.wait()
+            P._event.clear()
+
         except Exception as ex:
             L.l.error('Error in threadpool run, ex={}'.format(ex), exc_info=True)
     P.executor.shutdown()
