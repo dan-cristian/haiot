@@ -29,7 +29,8 @@ class ThreadFunc:
 
     def done_callback(self, obj):
         # L.l.info('I am done {}={}'.format(self.name, obj))
-        P._event.set()
+        # P._event.set()
+        pass
 
 
 def __get_print_name_callable(func):
@@ -120,9 +121,10 @@ def run_thread_pool():
                             progress_status = func.__globals__['P'].thread_pool_status
                             L.l.warning('Progress Status since {} sec is [{}]'.format(elapsed_seconds, progress_status))
             # fixme: replace sleep with thread signal to reduce CPU usage
-            # time.sleep(0.4)
-            P._event.wait()
-            P._event.clear()
+            time.sleep(0.6)
+            # https://stackoverflow.com/questions/44551728/pause-and-resume-thread-in-python
+            # P._event.wait()
+            # P._event.clear()
 
         except Exception as ex:
             L.l.error('Error in threadpool run, ex={}'.format(ex), exc_info=True)
