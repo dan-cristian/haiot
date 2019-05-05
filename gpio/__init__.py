@@ -153,13 +153,13 @@ def zone_custom_relay_upsert_listener(record, changed_fields):
             node_id = zwave.get_node_id_from_txt(pin_code)
             zwave.set_switch_state(node_id=node_id, state=record.relay_is_on)
             expire_func = (zwave.set_switch_state, node_id, expired_relay_is_on)
-        elif record.relay_type in [Constant.GPIO_PIN_TYPE_PI_STDGPIO, Constant.GPIO_PIN_TYPE_PI_FACE_SPI]:
-            value = 1 if record.relay_is_on else 0
-            if record.relay_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
-                expire_func = (piface.set_pin_code_value, record.gpio_pin_code, value)
-            else:
-                bcm_id = int(record.gpio_pin_code)
-                expire_func = (rpi_gpio.set_pin_bcm, bcm_id, value)
+        elif record.relay_type == Constant.GPIO_PIN_TYPE_PI_STDGPIO:
+            value = 1 if expired_relay_is_on else 0
+            bcm_id = int(record.gpio_pin_code)
+            expire_func = (rpi_gpio.set_pin_bcm, bcm_id, value)
+        elif record.relay_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
+            value = 1 if expired_relay_is_on else 0
+            expire_func = (piface.set_pin_code_value, record.gpio_pin_code, value)
         else:
             L.l.warning('Unknown relay type {}'.format(record.relay_type))
             expire_func = None
