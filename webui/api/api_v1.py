@@ -71,7 +71,7 @@ def camera_alert(zone_name, cam_name, has_move):
 def amp_power(power_state, relay_name, amp_zone_index=None):
     L.l.info("Amp_power relay={} state={} index={}".format(relay_name, power_state, amp_zone_index))
     result = amp.set_amp_power(int(power_state), relay_name, int(amp_zone_index))
-    # L.l.info("Done amp_power api request result={}".format(result))
+    L.l.info("Done amp_power api request result={}".format(result))
     return result
 
 
