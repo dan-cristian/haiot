@@ -122,10 +122,6 @@ def _set_custom_relay_state(sensor_address, state):
 # Cannot find zwave sensor in db, address=Unknown: type=0007, id=0052_2
 # node=home_id: [0xe39aea61] id: [2] name: [] model: [Unknown: type=0007, id=0052]
 # value=home_id: [0xe39aea61] id: [72057594076496002] parent_id: [2] label: [Power] data: [774.0999755859375]
-
-
-
-
 # https://github.com/OpenZWave/python-openzwave/blob/master/examples/api_demo.py
 def set_value(network, node, value):
     try:
@@ -392,6 +388,7 @@ def _set_param(node_id, param_name, value):
     configs = node.get_configs()
     conf = []
     for c in configs:
+        L.l.info('Read config: {}'.format(c))
         if configs[c].label == param_name:
             old = configs[c].data
             node.set_config(c, value)
