@@ -41,7 +41,7 @@ class P:
 def __rfx_reading(packet):
     if packet:
         try:
-            L.l.info("Received RFX packet={}".format(packet))
+            # L.l.info("Received RFX packet={}".format(packet))
             if isinstance(packet, RFXtrx.SensorEvent):
                 __save_sensor_db(p_id=packet.device.id_string, p_type=packet.device.type_string,
                                  value_list=packet.values)
@@ -81,7 +81,7 @@ def __save_sensor_db(p_id='', p_type='', value_list=None):
         record.battery_level = value_list['Battery numeric']
     if 'Rssi numeric' in value_list:
         record.rssi = value_list['Rssi numeric']
-    L.l.info('Saving RFX object {}'.format(record))
+    # L.l.info('Saving RFX object {}'.format(record))
     record.save_changed_fields(broadcast=True, persist=True)
 
 
