@@ -107,7 +107,7 @@ def _set_custom_relay_state(sensor_address, state):
         current_relay.is_device_event = True
         current_relay.save_changed_fields(broadcast=True, persist=True)
     else:
-        L.l.info("ZoneCustomRelay with code {} not defined in database".format(sensor_address))
+        L.l.info("ZoneCustomRelay with code={} not defined in database".format(sensor_address))
 
 
 # Qubino Meter Values
