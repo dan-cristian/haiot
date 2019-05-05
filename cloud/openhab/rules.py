@@ -203,7 +203,7 @@ def custom_relay(name, value):
     # L.l.info("Try to set custom relay {} to {}".format(name, value))
     relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.relay_pin_name: name})
     if relay is not None:
-        if relay.gpio_host_name == Constant.HOST_NAME:
+        if relay.gpio_host_name == Constant.HOST_NAME or relay.gpio_host_name in ['', None]:
             relay.relay_is_on = value
             relay.save_changed_fields(broadcast=True, persist=True)
             L.l.info("OK setting custom relay {} to {} from openhab".format(name, value))

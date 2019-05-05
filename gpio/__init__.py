@@ -113,17 +113,17 @@ def relay_set(gpio_pin_index_bcm=None, gpio_pin_type=None, gpio_board_index=None
 
 
 def set_relay_state(pin_code, relay_is_on, relay_type):
-    if relay_type == Constant.GPIO_PIN_TYPE_SONOFF:
+    if relay_type == Constant.GPIO_PIN_TYPE_SONOFF and sonoff.P.initialised:
         res = sonoff.set_relay_state(relay_name=pin_code, relay_is_on=relay_is_on)
-    elif relay_type == Constant.GPIO_PIN_TYPE_PI_PCF8574:
+    elif relay_type == Constant.GPIO_PIN_TYPE_PI_PCF8574 and pcf8574_gpio.P.initialised:
         res = pcf8574_gpio.set_pin_value(pin_index=pin_code, pin_value=not relay_is_on)
-    elif P.has_zwave and relay_type == Constant.GPIO_PIN_TYPE_ZWAVE:
+    elif P.has_zwave and relay_type == Constant.GPIO_PIN_TYPE_ZWAVE and zwave.P.initialised:
         node_id = zwave.get_node_id_from_txt(pin_code)
         res = zwave.set_switch_state(node_id=node_id, state=relay_is_on)
-    elif relay_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
+    elif relay_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI and piface.P.initialised:
         value = 1 if relay_is_on else 0
         res = piface.set_pin_code_value(pin_code=pin_code, pin_value=value)
-    elif relay_type == Constant.GPIO_PIN_TYPE_PI_STDGPIO:
+    elif relay_type == Constant.GPIO_PIN_TYPE_PI_STDGPIO and rpi_gpio.P.initialised:
             bcm_id = int(pin_code)
             value = 1 if relay_is_on else 0
             res = rpi_gpio.set_pin_bcm(bcm_id=bcm_id, pin_value=value)
@@ -137,41 +137,42 @@ def zone_custom_relay_upsert_listener(record, changed_fields):
     assert isinstance(record, m.ZoneCustomRelay)
     if record.gpio_host_name != Constant.HOST_NAME or m.ZoneCustomRelay.relay_is_on not in changed_fields:
         return
-
     L.l.info('Upsert listener {} pin {} value {}'.format(record.relay_type, record.gpio_pin_code, record.relay_is_on))
     set_relay_state(record.gpio_pin_code, record.relay_is_on, record.relay_type)
     L.l.info('Upsert after pin {} value {}'.format(record.gpio_pin_code, record.relay_is_on))
+    expire_func = None
     if record.expire is not None:
         pin_code = record.gpio_pin_code
         expired_relay_is_on = False
-        if record.relay_type == Constant.GPIO_PIN_TYPE_SONOFF:
+        if record.relay_type == Constant.GPIO_PIN_TYPE_SONOFF and sonoff.P.initialised:
             expire_func = (sonoff.set_relay_state, record.gpio_pin_code, expired_relay_is_on)
-        elif record.relay_type == Constant.GPIO_PIN_TYPE_PI_PCF8574:
+        elif record.relay_type == Constant.GPIO_PIN_TYPE_PI_PCF8574 and pcf8574_gpio.P.initialised:
             # pcf on state is reversed!
             expire_func = (pcf8574_gpio.set_pin_value, record.gpio_pin_code, not expired_relay_is_on)
-        elif P.has_zwave and record.relay_type == Constant.GPIO_PIN_TYPE_ZWAVE:
+        elif P.has_zwave and record.relay_type == Constant.GPIO_PIN_TYPE_ZWAVE and zwave.P.initialised:
             node_id = zwave.get_node_id_from_txt(pin_code)
             zwave.set_switch_state(node_id=node_id, state=record.relay_is_on)
             expire_func = (zwave.set_switch_state, node_id, expired_relay_is_on)
-        elif record.relay_type == Constant.GPIO_PIN_TYPE_PI_STDGPIO:
+        elif record.relay_type == Constant.GPIO_PIN_TYPE_PI_STDGPIO and rpi_gpio.P.initialised:
             value = 1 if expired_relay_is_on else 0
             bcm_id = int(record.gpio_pin_code)
             expire_func = (rpi_gpio.set_pin_bcm, bcm_id, value)
-        elif record.relay_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
+        elif record.relay_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI and piface.P.initialised:
             value = 1 if expired_relay_is_on else 0
             expire_func = (piface.set_pin_code_value, record.gpio_pin_code, value)
         else:
             L.l.warning('Unknown relay type {}'.format(record.relay_type))
             expire_func = None
             pin_code = None
-        # setup revert to off
-        expire_time = datetime.now() + timedelta(seconds=record.expire)
-        if expire_time not in P.expire_func_list.keys():
-            P.expire_func_list[expire_time] = expire_func
-            func_update = (io_common.update_listener_custom_relay, record, expired_relay_is_on)
-            P.expire_func_list[expire_time + timedelta(microseconds=1)] = func_update
-        else:
-            L.l.error("Duplicate expire key in list")
+        if expire_func is not None:
+            # setup revert to off
+            expire_time = datetime.now() + timedelta(seconds=record.expire)
+            if expire_time not in P.expire_func_list.keys():
+                P.expire_func_list[expire_time] = expire_func
+                func_update = (io_common.update_listener_custom_relay, record, expired_relay_is_on)
+                P.expire_func_list[expire_time + timedelta(microseconds=1)] = func_update
+            else:
+                L.l.error("Duplicate expire key in list")
 
 
 # https://stackoverflow.com/questions/26881396/how-to-add-a-function-call-to-a-list
