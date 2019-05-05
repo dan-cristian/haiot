@@ -259,10 +259,10 @@ def post_init():
         if func is not None:
             pin_connected = func(gpio_pin_code=gpio_pin_code)
             if pin_connected is not None:
-                #if alarm.sensor_type == Constant.CONTACT_TYPE_NO:
-                #    alarm.alarm_pin_triggered = pin_connected
-                #else:
-                alarm.alarm_pin_triggered = not pin_connected
+                if alarm.sensor_type == Constant.CONTACT_TYPE_NO:
+                    alarm.alarm_pin_triggered = pin_connected
+                else:
+                    alarm.alarm_pin_triggered = not pin_connected
                 L.l.info('Init alarm {} pin {}, value read is {} type {}'.format(
                     alarm.alarm_pin_name, gpio_pin_code, pin_connected, alarm.sensor_type))
                 alarm.save_changed_fields(broadcast=True, persist=True, listeners=False)
