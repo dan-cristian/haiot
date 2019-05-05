@@ -118,6 +118,14 @@ def _set_custom_relay_state(sensor_address, state):
 # Switch All=On and Off Enabled, Powerlevel=Normal, Switch=True, Exporting=False, Energy=0.483kWh, Power=109.6W,
 # Voltage=222.7V, Current=0.912A, Power Factor=0.54, Timeout=0
 
+# May  5 05:54:42 homew start.sh[12282]: 2019-05-05 05:54:42,940 haiot INFO -1433127824 __init__:set_value
+# Cannot find zwave sensor in db, address=Unknown: type=0007, id=0052_2
+# node=home_id: [0xe39aea61] id: [2] name: [] model: [Unknown: type=0007, id=0052]
+# value=home_id: [0xe39aea61] id: [72057594076496002] parent_id: [2] label: [Power] data: [774.0999755859375]
+
+
+
+
 # https://github.com/OpenZWave/python-openzwave/blob/master/examples/api_demo.py
 def set_value(network, node, value):
     try:
