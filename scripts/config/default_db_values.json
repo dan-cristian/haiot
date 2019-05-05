@@ -463,6 +463,7 @@
     {"zone_id":26 , "sensor_address": "f9:02",            "sensor_name": "congelator"},
     {"zone_id":27 , "sensor_address": "b8:01",            "sensor_name": "desk"},
     {"zone_id":8 ,  "sensor_address": "ZMNHTDx Smart meter S4 S5 S6_2",             "sensor_name": "zwave main power meter"},
+    {"zone_id":8 ,  "sensor_address": "Unknown: type=0007, id=0052_2",             "sensor_name": "zwave main power meter"},
     {"zone_id":29 , "sensor_address": "TZ69 Smart energy plug in switch_4",         "sensor_name": "zwave plug 1"},
     {"zone_id":29 , "sensor_address": "TZ69 Smart energy plug in switch_5",         "sensor_name": "zwave plug 2"},
     {"zone_id":10 , "sensor_address": "pi-face_bmp280",                             "sensor_name": "baro_house"},
