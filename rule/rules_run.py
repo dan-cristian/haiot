@@ -72,7 +72,6 @@ def rule_node(obj=m.Node(), change=None):
 
 
 def rule_alarm(obj=m.ZoneAlarm(), change=None):
-    L.l.info('Rule Alarm: obj={} fields={}'.format(obj, change))
     if obj.alarm_pin_triggered:
         if obj.start_alarm:
             L.l.debug('Rule Alarm ON:  pin={} triggered={}'.format(obj.alarm_pin_name, obj.alarm_pin_triggered))
