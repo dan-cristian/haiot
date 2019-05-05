@@ -383,12 +383,11 @@ def set_switch_state(node_id, state):
 
 
 # https://hk.saowen.com/a/b5d414ca130fafc1f306a46dc0e2f13ec54876d9070ff3122a0a93a956b1fa2f
-def _set_param(node_id, param_name, value):
+def _set_param(node_id, param_name, value, param_code):
     node = P.network.nodes[node_id]
     configs = node.get_configs()
     conf = []
     for c in configs:
-        L.l.info('Read config: {}'.format(c))
         if configs[c].label == param_name:
             old = configs[c].data
             node.set_config(c, value)
@@ -396,14 +395,15 @@ def _set_param(node_id, param_name, value):
             return True
         conf.append(configs[c])
     L.l.warning("Could not find parameter {} in config list {}".format(param_name, conf))
+    node.set_config(param_code, value)
     return False
 
 
 # https://github.com/openhab/org.openhab.binding.zwave/blob/master/doc/qubino/zmnhxd_0_0.md
 def _initial_node_init():
     if not P.init_done:
-        _set_param(2, 'Power reporting in Watts on power change',  1)
-        _set_param(2, 'Power reporting in Watts by time interval', 600)
+        _set_param(2, 'Power reporting in Watts on power change',  1, 40)
+        _set_param(2, 'Power reporting in Watts by time interval', 600, 42)
         P.init_done = True
         node = P.network.nodes[2]
         configs = node.get_configs()
