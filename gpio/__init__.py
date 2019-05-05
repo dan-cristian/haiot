@@ -124,11 +124,10 @@ def set_relay_state(pin_code, relay_is_on, relay_type):
         value = 1 if relay_is_on else 0
         res = piface.set_pin_code_value(pin_code=pin_code, pin_value=value)
     elif relay_type == Constant.GPIO_PIN_TYPE_PI_STDGPIO and rpi_gpio.P.initialised:
-            bcm_id = int(pin_code)
-            value = 1 if relay_is_on else 0
-            res = rpi_gpio.set_pin_bcm(bcm_id=bcm_id, pin_value=value)
+        bcm_id = int(pin_code)
+        value = 1 if relay_is_on else 0
+        res = rpi_gpio.set_pin_bcm(bcm_id=bcm_id, pin_value=value)
     else:
-        L.l.error('Unexpected relay type {}'.format(relay_type))
         res = None
     return res
 
