@@ -160,7 +160,6 @@ def zone_custom_relay_upsert_listener(record, changed_fields):
             value = 1 if expired_relay_is_on else 0
             expire_func = (piface.set_pin_code_value, record.gpio_pin_code, value)
         else:
-            L.l.warning('Unknown relay type {}'.format(record.relay_type))
             expire_func = None
             pin_code = None
         if expire_func is not None:
