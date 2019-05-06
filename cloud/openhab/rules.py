@@ -198,23 +198,23 @@ def custom_relay(name, value):
     # L.l.info("Try to set custom relay {} to {}".format(name, value))
     relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.relay_pin_name: name})
     if relay is not None:
-        if relay.gpio_host_name == Constant.HOST_NAME or relay.gpio_host_name in ['', None]:
-            relay.relay_is_on = value
-            relay.save_changed_fields(broadcast=True, persist=True)
-            L.l.info("OK setting custom relay {} to {} from openhab".format(name, value))
-        else:
-            L.l.info("Skip set custom relay {} to {} from openhab host={}".format(name, value, relay.gpio_host_name))
+        # if relay.gpio_host_name == Constant.HOST_NAME or relay.gpio_host_name in ['', None]:
+        L.l.info("Saving custom relay {} to {} from openhab".format(name, value))
+        relay.relay_is_on = value
+        relay.save_changed_fields(broadcast=True, persist=True)
     else:
-        L.l.info('Not setting relay {} as is None'.format(name))
+        L.l.info('Not saving relay {} as is None'.format(name))
 
 
 def heat_relay(name, value):
     relay = m.ZoneHeatRelay.find_one({m.ZoneHeatRelay.heat_pin_name: name})
     if relay is not None:
-        if relay.gpio_host_name == Constant.HOST_NAME:
-            L.l.info("OK setting heat relay {} to {} from openhab".format(name, value))
-            relay.heat_is_on = value
-            relay.save_changed_fields(broadcast=True, persist=True)
+        # if relay.gpio_host_name == Constant.HOST_NAME:
+        L.l.info("Saving heat relay {} to {} from openhab".format(name, value))
+        relay.heat_is_on = value
+        relay.save_changed_fields(broadcast=True, persist=True)
+    else:
+        L.l.info('Not saving relay {} as is None'.format(name))
 
 
 def thermostat(zone_name=None, temp_target=None, state=None, mode_manual=None, mode_presence=None):
