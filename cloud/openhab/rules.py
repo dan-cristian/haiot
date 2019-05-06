@@ -202,6 +202,10 @@ def custom_relay(name, value):
             relay.relay_is_on = value
             relay.save_changed_fields(broadcast=True, persist=True)
             L.l.info("OK setting custom relay {} to {} from openhab".format(name, value))
+        else:
+            L.l.info("Skip set custom relay {} to {} from openhab host={}".format(name, value, relay.gpio_host_name))
+    else:
+        L.l.info('Not setting relay {} as is None'.format(name))
 
 
 def heat_relay(name, value):
