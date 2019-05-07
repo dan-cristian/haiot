@@ -4,6 +4,7 @@ Frame {
     Default item=relay_front_gate
 	Default item=relay_front_lights_relay
 	Default item=relay_front_gate_test
+	Default item=relay_front_gate_test_2
 }
 
 Frame {
