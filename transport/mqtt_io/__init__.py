@@ -30,6 +30,7 @@ class P:
     last_rec = utils.get_base_location_now_date()
     last_minute = 0
     received_mqtt_list = []
+    message_callbacks = {}
 
     def __init__(self):
         pass
@@ -45,6 +46,10 @@ except Exception:
 
 __author__ = 'dcristian'
 
+
+def add_message_callback(topic, callback):
+    P.message_callbacks[topic] = callback
+    P.mqtt_client.message_callback_add(topic, callback)
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect_paho(client, userdata, flags, rc):
@@ -70,6 +75,8 @@ def on_disconnect(client, userdata, rc):
 def on_subscribe(client, userdata, mid, granted_qos):
     P.client_connected = True
     L.l.info("Mqtt subscribed")
+    for topic in P.message_callbacks:
+        P.mqtt_client.message_callback_add(topic, P.message_callbacks[topic])
 
 
 # def on_subscribe(client, userdata, mid, granted_qos):

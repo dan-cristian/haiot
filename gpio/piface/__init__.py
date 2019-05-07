@@ -370,5 +370,8 @@ def init():
                 L.l.info('Piface initialised OK')
         except Exception as ex1:
             L.l.info('Piface not initialised, err={}'.format(ex1))
+
+        if Constant.HOST_NAME == 'netbook':
+            P.initialised = True
     else:
         L.l.info('Piface not initialised, module pifacedigitalio unavailable on this system')
