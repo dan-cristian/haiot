@@ -141,7 +141,8 @@ def _process_obj(obj):
                 # if heat.initialised:
                 heat.record_update(obj)
             elif table == utils.get_table_name(models.Sensor):
-                sensor.not_used_record_update(obj)
+                # sensor.not_used_record_update(obj)
+                pass
             elif table == utils.get_table_name(models.DustSensor):
                 pass
             elif table == utils.get_table_name(models.ZoneCustomRelay):

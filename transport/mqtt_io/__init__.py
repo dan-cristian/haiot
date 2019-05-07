@@ -135,11 +135,7 @@ def on_message(client, userdata, msg):
             if elapsed > 1:
                 L.l.warning('Command mqtt received took {} seconds'.format(elapsed))
         else:
-            x = utils.json2obj(json)
-            if '_sent_on' in x:
-                delta = (start - utils.parse_to_date(x['_sent_on'])).total_seconds()
-                if delta > 5:
-                    L.l.info('Mqtt own age={}'.format(delta))
+            pass
     except Exception as ex:
         L.l.warning('Unknown attribute error in msg {} err {}'.format(json, ex))
 
