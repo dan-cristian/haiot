@@ -293,6 +293,7 @@ class ModelBase(metaclass=OrderedClassMembers):
             # record[Constant.JSON_PUBLISH_SOURCE_HOST] = str(Constant.HOST_NAME)
             out_rec[Constant.JSON_PUBLISH_TABLE] = class_name
             out_rec[Constant.JSON_PUBLISH_FIELDS_CHANGED] = list(update.keys())
+            out_rec[Constant.JSON_PUBLISH_SRC_HOST] = Constant.HOST_NAME
             out_rec['_sent_on'] = utils.get_base_location_now_date()
             js = utils.safeobj2json(out_rec)
             transport.send_message_json(json=js)
@@ -401,7 +402,7 @@ class ModelBase(metaclass=OrderedClassMembers):
         for attr in obj_fields:
             if attr is not '__doc__':
                 setattr(self, attr, None)
-        self.source_host = Constant.HOST_NAME
+        # self.source_host = Constant.HOST_NAME
 
         if copy is not None:
             cls.dup(target=self, copy=copy)
