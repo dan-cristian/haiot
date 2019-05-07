@@ -290,7 +290,6 @@ class ModelBase(metaclass=OrderedClassMembers):
         out_rec = None
         try:
             out_rec = record.__dict__
-            # record[Constant.JSON_PUBLISH_SOURCE_HOST] = str(Constant.HOST_NAME)
             out_rec[Constant.JSON_PUBLISH_TABLE] = class_name
             out_rec[Constant.JSON_PUBLISH_FIELDS_CHANGED] = list(update.keys())
             out_rec[Constant.JSON_PUBLISH_SRC_HOST] = Constant.HOST_NAME
