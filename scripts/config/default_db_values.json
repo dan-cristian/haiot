@@ -176,8 +176,8 @@
     {"id":870, "active":true, "start_order":70, "name":"music", "host_name":"homew"},
 
 
-    {"id":903, "active":false, "start_order":3, "name":"health_monitor", "host_name":"pizero1"},
-    {"id":945, "active":true, "start_order":45, "name":"cloud.openhab", "host_name":"pizero1"},
+    {"id":903, "active":true, "start_order":3, "name":"health_monitor", "host_name":"pizero1"},
+    {"id":945, "active":false, "start_order":45, "name":"cloud.openhab", "host_name":"pizero1"},
     {"id":955, "active":true, "start_order":55, "name":"sensor.1wire", "host_name":"pizero1"},
     {"id":959, "active":true, "start_order":59, "name":"sensor.i2c", "host_name":"pizero1"},
     {"id":965, "active":true, "start_order":65, "name":"gpio", "host_name":"pizero1"},
