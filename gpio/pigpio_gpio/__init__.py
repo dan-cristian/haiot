@@ -238,8 +238,8 @@ class PwmIo(GpioBase):
                 else:
                     L.l.info("Stop PWM {} ".format(pwm.gpio_pin_code))
                     P.pi.hardware_PWM(pwm.gpio_pin_code, pwm.frequency, 0)
-            L.l.info("Saving status PWM {} {} to frequency {} duty old={} new={}".format(
-                key, pwm.gpio_pin_code, pwm.frequency, pwm.duty_cycle, pwm.duty_cycle))
+            # L.l.info("Saving status PWM {} {} to frequency {} duty old={} new={}".format(
+            #    key, pwm.gpio_pin_code, pwm.frequency, pwm.duty_cycle, pwm.duty_cycle))
             pwm.save_changed_fields(broadcast=True, persist=True)
         else:
             L.l.warning("Cannot find pwm {} to set".format(key))

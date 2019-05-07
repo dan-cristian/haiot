@@ -140,7 +140,8 @@ def zone_custom_relay_upsert_listener(record, changed_fields):
     set_relay_state(record.gpio_pin_code, record.relay_is_on, record.relay_type)
     # L.l.info('Upsert after pin {} value {}'.format(record.gpio_pin_code, record.relay_is_on))
     expire_func = None
-    if record.expire is not None:
+    # apply expire action only for relay ON events
+    if record.expire is not None and record.relay_is_on is True:
         pin_code = record.gpio_pin_code
         expired_relay_is_on = False
         if record.relay_type == Constant.GPIO_PIN_TYPE_SONOFF and sonoff.P.initialised:
@@ -166,9 +167,12 @@ def zone_custom_relay_upsert_listener(record, changed_fields):
             # setup revert to off
             expire_time = datetime.now() + timedelta(seconds=record.expire)
             if expire_time not in P.expire_func_list.keys():
-                P.expire_func_list[expire_time] = expire_func
-                func_update = (io_common.update_listener_custom_relay, record, expired_relay_is_on)
-                P.expire_func_list[expire_time + timedelta(microseconds=1)] = func_update
+                if expire_func in P.expire_func_list.values():
+                    L.l.warning('Expire function already in list, ignoring, func={}'.format(expire_func))
+                else:
+                    P.expire_func_list[expire_time] = expire_func
+                    func_update = (io_common.update_listener_custom_relay, record, expired_relay_is_on)
+                    P.expire_func_list[expire_time + timedelta(microseconds=1)] = func_update
             else:
                 L.l.error("Duplicate expire key in list")
 
