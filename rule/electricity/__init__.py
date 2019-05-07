@@ -356,7 +356,8 @@ def rule_energy_export(obj=m.Utility(), change=None):
                 else:
                     L.l.info('Discarding utility {}, not relevant'.format(obj.utility_name))
     else:
-        L.l.info('Got utility with no changes {}'.format(obj.utility_name))
+        # L.l.info('Got utility with no changes {}'.format(obj.utility_name))
+        pass
 
 
 
