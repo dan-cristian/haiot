@@ -81,3 +81,7 @@ Note that db content will be lost at restarts if db is created in ram
 
 <h1>Other packages used</h1>
 https://github.com/woudt/pyRFXtrx
+
+<p><p>
+<b>
+Many thanks to @Jetbrains for providing a full license for PyCharm Professional!

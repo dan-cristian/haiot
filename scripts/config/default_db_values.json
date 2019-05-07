@@ -130,8 +130,8 @@
     {"id":527, "active":true, "start_order":27, "name":"node", "host_name":"netbook"},
     {"id":533, "active":true, "start_order":33, "name":"utility", "host_name":"netbook"},
     {"id":541, "active":false, "start_order":41, "name":"cloud.alexa", "host_name":"netbook"},
-    {"id":545, "active":true, "start_order":45, "name":"cloud.openhab", "host_name":"netbook"},
-    {"id":557, "active":true, "start_order":57, "name":"sensor.sonoff", "host_name":"netbook"},
+    {"id":545, "active":false, "start_order":45, "name":"cloud.openhab", "host_name":"netbook"},
+    {"id":557, "active":false, "start_order":57, "name":"sensor.sonoff", "host_name":"netbook"},
     {"id":559, "active":false, "start_order":59, "name":"sensor.i2c", "host_name":"netbook"},
     {"id":565, "active":true, "start_order":65, "name":"gpio", "host_name":"netbook"},
     {"id":567, "active":true, "start_order":67, "name":"alarm", "host_name":"netbook"},
@@ -175,7 +175,9 @@
     {"id":867, "active":true, "start_order":67, "name":"alarm", "host_name":"homew"},
     {"id":870, "active":true, "start_order":70, "name":"music", "host_name":"homew"},
 
-    {"id":903, "active":true, "start_order":3, "name":"health_monitor", "host_name":"pizero1"},
+
+    {"id":903, "active":false, "start_order":3, "name":"health_monitor", "host_name":"pizero1"},
+    {"id":945, "active":true, "start_order":45, "name":"cloud.openhab", "host_name":"pizero1"},
     {"id":955, "active":true, "start_order":55, "name":"sensor.1wire", "host_name":"pizero1"},
     {"id":959, "active":true, "start_order":59, "name":"sensor.i2c", "host_name":"pizero1"},
     {"id":965, "active":true, "start_order":65, "name":"gpio", "host_name":"pizero1"},
