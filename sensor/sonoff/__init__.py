@@ -245,6 +245,7 @@ def unload():
 def init():
     L.l.info('Sonoff module initialising')
     P.sonoff_topic = str(get_json_param(Constant.P_MQTT_TOPIC_SONOFF_1))
-    mqtt_io.P.mqtt_client.message_callback_add(P.sonoff_topic, mqtt_on_message)
+    # mqtt_io.P.mqtt_client.message_callback_add(P.sonoff_topic, mqtt_on_message)
+    mqtt_io.add_message_callback(P.sonoff_topic, mqtt_on_message)
     thread_pool.add_interval_callable(thread_run, P.check_period)
     P.initialised = True
