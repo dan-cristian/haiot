@@ -166,6 +166,7 @@ def init():
     P.mqtt_topic_receive = get_json_param(Constant.P_MQTT_TOPIC_OPENHAB_RECEIVE)
     P.mqtt_topic_receive_prefix = P.mqtt_topic_receive.replace('#', '')
     mqtt_io.P.mqtt_client.message_callback_add(P.mqtt_topic_receive, mqtt_on_message)
+    mqtt_io.add_message_callback(P.mqtt_topic_receive, mqtt_on_message)
     __load_rules()
     thread_pool.add_interval_callable(thread_run, run_interval_second=1)
     dispatcher.connect(parse_rules, signal=Constant.SIGNAL_DB_CHANGE_FOR_RULES, sender=dispatcher.Any)
