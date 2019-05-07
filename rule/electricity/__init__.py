@@ -206,7 +206,7 @@ class PwmHeater(LoadPowerDevice):
 
     # override
     def set_power_status(self, power_is_on, pwm_watts=None):
-        L.l.info("Setting pwm {} status {} to watts level {}".format(self.RELAY_NAME, power_is_on, pwm_watts))
+        # L.l.info("Setting pwm {} status {} to watts level {}".format(self.RELAY_NAME, power_is_on, pwm_watts))
         if power_is_on:
             assert pwm_watts is not None
             required_duty = int(0.9 * pwm_watts * self.max_duty / self.MAX_WATTS)
@@ -220,7 +220,7 @@ class PwmHeater(LoadPowerDevice):
         frequency, duty_cycle = pigpio_gpio.P.pwm.get(self.RELAY_NAME)
         if duty_cycle is None:
             duty_cycle = 0
-        L.l.info('Pwm frequency={} duty={} is_on={}'.format(frequency, duty_cycle, duty_cycle > 0))
+        # L.l.info('Pwm frequency={} duty={} is_on={}'.format(frequency, duty_cycle, duty_cycle > 0))
         return duty_cycle > 0
         # not used
 
@@ -239,8 +239,9 @@ class PwmHeater(LoadPowerDevice):
             import_watts = grid_watts
             delta = current_watts - import_watts
             if delta < 0:
-                L.l.info('Need to stop as importing and PWM as delta={}'.format(delta))
-                self.set_power_status(power_is_on=False, pwm_watts=0)
+                if power_on:
+                    L.l.info('Need to stop as importing and PWM as delta={}'.format(delta))
+                    self.set_power_status(power_is_on=False, pwm_watts=0)
             else:
                 L.l.info('Need to adjust down PWM on import with delta={}'.format(delta))
                 self.set_power_status(power_is_on=True, pwm_watts=current_watts - delta)
@@ -343,7 +344,7 @@ def rule_energy_export(obj=m.Utility(), change=None):
                 P.grid_watts = random.randint(-800, -300)
             else:
                 P.grid_watts = obj.units_2_delta
-            L.l.info('Got rule main watts {}'.format(P.grid_watts))
+            # L.l.info('Got rule main watts {}'.format(P.grid_watts))
             _update_devices()
         else:
             # L.l.info('Got energy utility {}'.format(obj.utility_name))
