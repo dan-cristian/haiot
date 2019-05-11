@@ -237,19 +237,21 @@ class PwmHeater(LoadPowerDevice):
         else:
             current_watts = self.target_watts
         if grid_watts <= 0:
-            export_watts = -grid_watts
-            L.l.info('Adjusting PWM to export={}'.format(export_watts))
-            self.set_power_status(power_is_on=True, pwm_watts=export_watts)
+            delta = -grid_watts
+            new_target = delta + self.target_watts
+            L.l.info('Adjusting PWM to delta export={}, total target={}'.format(delta, new_target))
+            self.set_power_status(power_is_on=True, pwm_watts=new_target)
         else:
             import_watts = grid_watts
             delta = current_watts - import_watts
             if delta < 0:
                 if power_on:
-                    L.l.info('Need to stop as importing and PWM as delta={}'.format(delta))
+                    L.l.info('Need to stop, importing PWM with delta={}'.format(delta))
                     self.set_power_status(power_is_on=False, pwm_watts=0)
             else:
-                L.l.info('Need to adjust down PWM on import with delta={}'.format(delta))
-                self.set_power_status(power_is_on=True, pwm_watts=current_watts - delta)
+                new_target = current_watts - delta
+                L.l.info('Need to adjust down PWM on import to {} with delta={}'.format(new_target, delta))
+                self.set_power_status(power_is_on=True, pwm_watts=new_target)
         return True
 
     def __init__(self, relay_name, relay_id, utility_name, max_watts):
