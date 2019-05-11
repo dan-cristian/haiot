@@ -211,7 +211,7 @@ class PwmHeater(LoadPowerDevice):
             assert pwm_watts is not None
             required_duty = int(0.9 * pwm_watts * self.max_duty / self.MAX_WATTS)
             if required_duty > self.max_duty:
-                L.l.warning('Calculated incorrect duty {} watts={} max_duty={} max_watt={}'.format(
+                L.l.warning('Calculated incorrect duty {} watts={} max_duty={} max_watt={} '.format(
                     required_duty, pwm_watts, self.max_duty, self.MAX_WATTS))
             pigpio_gpio.P.pwm.set(self.RELAY_NAME, duty_cycle=required_duty, target_watts=pwm_watts)
             self.target_watts = pwm_watts
