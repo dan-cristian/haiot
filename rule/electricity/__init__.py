@@ -256,7 +256,7 @@ class PwmHeater(LoadPowerDevice):
 
     def __init__(self, relay_name, relay_id, utility_name, max_watts):
         LoadPowerDevice.__init__(self, relay_name, relay_id, utility_name, max_watts)
-        self.target_watts = None
+        self.target_watts = 0
 
 
 class P:
