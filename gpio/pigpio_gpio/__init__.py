@@ -243,6 +243,7 @@ class PwmIo(GpioBase):
             pwm.save_changed_fields(broadcast=True, persist=True)
         else:
             L.l.warning("Cannot find pwm {} to set".format(key))
+        return pwm
 
     @staticmethod
     def save(key, **kwargs):

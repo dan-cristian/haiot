@@ -213,8 +213,9 @@ class PwmHeater(LoadPowerDevice):
             if required_duty > self.max_duty:
                 L.l.warning('Calculated incorrect duty {} watts={} max_duty={} max_watt={} '.format(
                     required_duty, pwm_watts, self.max_duty, self.MAX_WATTS))
-            pigpio_gpio.P.pwm.set(self.RELAY_NAME, duty_cycle=required_duty, target_watts=pwm_watts)
+            pwm = pigpio_gpio.P.pwm.set(self.RELAY_NAME, duty_cycle=required_duty, target_watts=pwm_watts)
             self.target_watts = pwm_watts
+            L.l.info('Just set power to freq={} duty={}'.format(pwm.frequency, pwm.duty_cycle))
         else:
             pigpio_gpio.P.pwm.set(self.RELAY_NAME, duty_cycle=0, target_watts=0)
             self.target_watts = 0
@@ -235,9 +236,8 @@ class PwmHeater(LoadPowerDevice):
             current_watts = self.target_watts
         if grid_watts <= 0:
             export_watts = -grid_watts
-            new_target = current_watts + export_watts
-            L.l.info('Adjusting PWM to {} for export={}'.format(new_target, export_watts))
-            self.set_power_status(power_is_on=True, pwm_watts=new_target)
+            L.l.info('Adjusting PWM to export={}'.format(export_watts))
+            self.set_power_status(power_is_on=True, pwm_watts=export_watts)
         else:
             import_watts = grid_watts
             delta = current_watts - import_watts
