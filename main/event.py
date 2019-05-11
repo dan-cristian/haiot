@@ -46,8 +46,8 @@ def _process_obj(obj):
                 # cls = getattr(sys.modules[tinydb_model.__name__], table)
                 cls = getattr(m, table)
                 # if cls._is_used_in_module:
-                # if 'ZoneCustomRelay' in table:
-                #    L.l.info('Got mqtt {}'.format(obj))
+                if 'Pwm' in table and Constant.HOST_NAME == 'pizero1':
+                    L.l.info('Got mqtt {}'.format(obj))
                 cls.save(obj)
                 # else:
                 #    L.l.info('Ignoring save for {}'.format(cls.__name__))
