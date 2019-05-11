@@ -203,6 +203,7 @@ class Upscharger(Powerdevice):
 class PwmHeater(LoadPowerDevice):
     DEVICE_SUPPORTS_BREAKS = True
     max_duty = 1000000
+    frequency = 55
 
     # override
     def set_power_status(self, power_is_on, pwm_watts=None):
@@ -213,7 +214,8 @@ class PwmHeater(LoadPowerDevice):
             if required_duty > self.max_duty:
                 L.l.warning('Calculated incorrect duty {} watts={} max_duty={} max_watt={} '.format(
                     required_duty, pwm_watts, self.max_duty, self.MAX_WATTS))
-            pwm = pigpio_gpio.P.pwm.set(self.RELAY_NAME, duty_cycle=required_duty, target_watts=pwm_watts)
+            pwm = pigpio_gpio.P.pwm.set(
+                self.RELAY_NAME, duty_cycle=required_duty, frequency=self.frequency, target_watts=pwm_watts)
             self.target_watts = pwm_watts
             L.l.info('Just set power to freq={} duty={}'.format(pwm.frequency, pwm.duty_cycle))
         else:
