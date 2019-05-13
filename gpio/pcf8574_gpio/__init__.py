@@ -36,7 +36,7 @@ def _not_initialised(message):
 
 def get_pin(pin_index):
     if P.initialised:
-        if pin_index in range(0, 8):
+        if 0 <= pin_index <= 7:
             val = P.pcf.port[int(pin_index)]
             L.l.info('Getting == PCF == pin {} val={}'.format(pin_index, val))
             return val
