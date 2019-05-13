@@ -116,7 +116,7 @@ def set_relay_state(pin_code, relay_is_on, relay_type):
     if relay_type == Constant.GPIO_PIN_TYPE_SONOFF and sonoff.P.initialised:
         res = sonoff.set_relay_state(relay_name=pin_code, relay_is_on=relay_is_on)
     elif relay_type == Constant.GPIO_PIN_TYPE_PI_PCF8574 and pcf8574_gpio.P.initialised:
-        res = pcf8574_gpio.set_pin_value(pin_index=pin_code, pin_value=not relay_is_on)
+        res = pcf8574_gpio.set_pin_value(pin_index=int(pin_code), pin_value=not relay_is_on)
     elif P.has_zwave and relay_type == Constant.GPIO_PIN_TYPE_ZWAVE and zwave.P.initialised:
         node_id = zwave.get_node_id_from_txt(pin_code)
         res = zwave.set_switch_state(node_id=node_id, state=relay_is_on)
