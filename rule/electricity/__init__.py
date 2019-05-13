@@ -209,11 +209,11 @@ class PwmHeater(LoadPowerDevice):
     def set_power_status(self, power_is_on, pwm_watts=None):
         # L.l.info("Setting pwm {} status {} to watts level {}".format(self.RELAY_NAME, power_is_on, pwm_watts))
         if power_is_on:
-            assert pwm_watts is not None
             required_duty = int(0.9 * pwm_watts * self.max_duty / self.MAX_WATTS)
             if required_duty > self.max_duty:
-                L.l.warning('Calculated incorrect duty {} watts={} max_duty={} max_watt={} '.format(
+                L.l.warning('Capping incorrect duty {} watts={} max_duty={} max_watt={} '.format(
                     required_duty, pwm_watts, self.max_duty, self.MAX_WATTS))
+                required_duty = self.max_duty
             pwm = pigpio_gpio.P.pwm.set(
                 self.RELAY_NAME, duty_cycle=required_duty, frequency=self.frequency, target_watts=pwm_watts)
             self.target_watts = pwm_watts
@@ -237,9 +237,9 @@ class PwmHeater(LoadPowerDevice):
         else:
             current_watts = self.target_watts
         if grid_watts <= 0:
-            delta = -grid_watts
-            new_target = delta + self.target_watts
-            L.l.info('Adjusting PWM to delta export={}, total target={}'.format(delta, new_target))
+            export = -grid_watts
+            new_target = export + self.target_watts
+            L.l.info('Adjusting PWM to delta export={}, total target={}'.format(export, new_target))
             self.set_power_status(power_is_on=True, pwm_watts=new_target)
         else:
             import_watts = grid_watts
@@ -247,7 +247,7 @@ class PwmHeater(LoadPowerDevice):
             if delta < 0:
                 if power_on:
                     L.l.info('Need to stop, importing PWM with delta={}'.format(delta))
-                    self.set_power_status(power_is_on=False, pwm_watts=0)
+                    self.set_power_status(power_is_on=False)
             else:
                 new_target = current_watts - delta
                 L.l.info('Need to adjust down PWM on import to {} with delta={}'.format(new_target, delta))
