@@ -112,7 +112,8 @@ def set_amp_power(power_state, relay_name, amp_zone_index):
         if relay is not None:
             initial_relay_state = relay.relay_is_on
             # power on main relay for amp or on/off if there is no zonerue
-            if power_state is True or amp_zone_index == 0:
+            #if power_state is True or
+            if amp_zone_index == 0:
                 relay.relay_is_on = power_state
                 relay.save_changed_fields(broadcast=True, persist=True)
                 # fixme: set amp
