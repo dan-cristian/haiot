@@ -300,9 +300,9 @@
 
   "ZoneCustomRelay": [
     {"relay_pin_name": "back_pump_relay", "zone_id": "39", "gpio_pin_code": "0:out:2", "gpio_host_name": "pi-power", "relay_type": "piface"},
+    {"relay_pin_name": "back_valve_relay", "zone_id": "37", "gpio_pin_code": "0:out:3", "gpio_host_name": "pi-power", "relay_type": "piface"},
+    {"relay_pin_name": "back_lights_relay", "zone_id": "40", "gpio_pin_code": "0:out:4", "gpio_host_name": "pi-power", "relay_type": "piface"},
 
-    {"relay_pin_name": "back_valve_relay", "zone_id": "37", "gpio_pin_code": "16", "gpio_host_name": "pi-face", "relay_type": "gpio"},
-    {"relay_pin_name": "back_lights_relay", "zone_id": "40", "gpio_pin_code": "12", "gpio_host_name": "pi-face", "relay_type": "gpio"},
     {"relay_pin_name": "front_main_valve_relay", "zone_id": "36", "gpio_pin_code": "21", "gpio_host_name": "pi-face", "relay_type": "gpio"},
     {"relay_pin_name": "dormitor_heat_relay", "zone_id": "4", "gpio_pin_code": "4", "gpio_host_name": "pi-face", "relay_type": "gpio"},
     {"relay_pin_name": "living_sub_relay", "zone_id": "2", "gpio_pin_code": "17", "gpio_host_name": "pi-face", "relay_type": "gpio"},
