@@ -157,7 +157,10 @@ def setup_in_ports(gpio_pin_list):
 def post_init_relay_value(gpio_pin_code):
     pin_index_bcm = int(gpio_pin_code)
     GPIO.setup(pin_index_bcm, GPIO.OUT)
-    return get_pin_bcm(pin_index_bcm)
+    val = get_pin_bcm(pin_index_bcm)
+    # reverse val to have relays off at init
+    val = int(not bool(val))
+    return val
 
 
 def post_init_alarm_value(gpio_pin_code):
