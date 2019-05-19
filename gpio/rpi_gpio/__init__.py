@@ -160,6 +160,7 @@ def post_init_relay_value(gpio_pin_code):
     # val = get_pin_bcm(pin_index_bcm)
     # reverse val to have relays off at init
     val = 1  # default off
+    set_pin_bcm(pin_index_bcm, val)
     return val
 
 
