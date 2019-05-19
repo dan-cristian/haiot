@@ -43,8 +43,8 @@ def set_pin_bcm(bcm_id=None, pin_value=None):
     L.l.info('Set rpi.gpio pin {} value {}'.format(bcm_id, pin_value))
     if Constant.debug_dummy: return pin_value
     try:
-        # if __get_pin_function(bcm_id) != GPIO.OUT:
-        GPIO.setup(bcm_id, GPIO.OUT)
+        if __get_pin_function(bcm_id) != GPIO.OUT:
+            GPIO.setup(bcm_id, GPIO.OUT)
         if __get_pin_function(bcm_id) in {GPIO.OUT}:
             GPIO.output(bcm_id, pin_value)
             set_val = get_pin_bcm(bcm_id)
