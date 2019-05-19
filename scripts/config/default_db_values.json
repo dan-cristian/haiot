@@ -299,14 +299,14 @@
   ],
 
   "ZoneCustomRelay": [
-    {"relay_pin_name": "back_pump_relay", "zone_id": "39", "gpio_pin_code": "1",          "gpio_host_name": "pi-power", "relay_type": "gpio"},
+    {"relay_pin_name": "back_pump_relay", "zone_id": "39", "gpio_pin_code": "24",          "gpio_host_name": "pi-power", "relay_type": "gpio"},
     {"relay_pin_name": "back_valve_relay", "zone_id": "37", "gpio_pin_code": "4",         "gpio_host_name": "pi-power", "relay_type": "gpio"},
     {"relay_pin_name": "back_lights_relay", "zone_id": "40", "gpio_pin_code": "0:out:7",  "gpio_host_name": "pi-power", "relay_type": "piface"},
 
     {"relay_pin_name": "front_main_valve_relay", "zone_id": "36", "gpio_pin_code": "18",  "gpio_host_name": "pi-power", "relay_type": "gpio"},
     {"relay_pin_name": "front_valve_relay",      "zone_id": "7", "gpio_pin_code": "4",    "gpio_host_name": "pi-power", "relay_type": "gpio"},
     {"relay_pin_name": "socket_unused1",         "zone_id": "7", "gpio_pin_code": "23",   "gpio_host_name": "pi-power", "relay_type": "gpio"},
-    {"relay_pin_name": "socket_unused2",         "zone_id": "7", "gpio_pin_code": "24",   "gpio_host_name": "pi-power", "relay_type": "gpio"},
+    {"relay_pin_name": "socket_unused2",         "zone_id": "7", "gpio_pin_code": "0",   "gpio_host_name": "pi-power", "relay_type": "gpio"},
 
     {"relay_pin_name": "puffer_pump_heat_relay", "zone_id": "38", "gpio_pin_code": "22", "gpio_host_name": "pi-face", "relay_type": "gpio"},
     {"relay_pin_name": "puffer_pump_water_relay", "zone_id": "38", "gpio_pin_code": "5", "gpio_host_name": "pi-face", "relay_type": "gpio"},
