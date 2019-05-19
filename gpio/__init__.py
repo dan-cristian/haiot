@@ -125,7 +125,8 @@ def set_relay_state(pin_code, relay_is_on, relay_type):
         res = piface.set_pin_code_value(pin_code=pin_code, pin_value=value)
     elif relay_type == Constant.GPIO_PIN_TYPE_PI_STDGPIO and rpi_gpio.P.initialised:
         bcm_id = int(pin_code)
-        value = 1 if relay_is_on else 0
+        # value = 1 if relay_is_on else 0
+        value = 0 if relay_is_on else 1
         res = rpi_gpio.set_pin_bcm(bcm_id=bcm_id, pin_value=value)
     else:
         res = None
@@ -154,7 +155,8 @@ def zone_custom_relay_upsert_listener(record, changed_fields):
             zwave.set_switch_state(node_id=node_id, state=record.relay_is_on)
             expire_func = (zwave.set_switch_state, node_id, expired_relay_is_on)
         elif record.relay_type == Constant.GPIO_PIN_TYPE_PI_STDGPIO and rpi_gpio.P.initialised:
-            value = 1 if expired_relay_is_on else 0
+            # value = 1 if expired_relay_is_on else 0
+            value = 0 if expired_relay_is_on else 1
             bcm_id = int(record.gpio_pin_code)
             expire_func = (rpi_gpio.set_pin_bcm, bcm_id, value)
         elif record.relay_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI and piface.P.initialised:
