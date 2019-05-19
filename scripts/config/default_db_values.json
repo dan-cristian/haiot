@@ -299,7 +299,7 @@
   ],
 
   "ZoneCustomRelay": [
-    {"relay_pin_name": "back_pump_relay", "zone_id": "39", "gpio_pin_code": "0",          "gpio_host_name": "pi-power", "relay_type": "gpio"},
+    {"relay_pin_name": "back_pump_relay", "zone_id": "39", "gpio_pin_code": "1",          "gpio_host_name": "pi-power", "relay_type": "gpio"},
     {"relay_pin_name": "back_valve_relay", "zone_id": "37", "gpio_pin_code": "4",         "gpio_host_name": "pi-power", "relay_type": "gpio"},
     {"relay_pin_name": "back_lights_relay", "zone_id": "40", "gpio_pin_code": "0:out:7",  "gpio_host_name": "pi-power", "relay_type": "piface"},
 
