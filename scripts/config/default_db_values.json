@@ -299,7 +299,8 @@
   ],
 
   "ZoneCustomRelay": [
-    {"relay_pin_name": "back_pump_relay", "zone_id": "39", "gpio_pin_code": "20", "gpio_host_name": "pi-face", "relay_type": "gpio"},
+    {"relay_pin_name": "back_pump_relay", "zone_id": "39", "gpio_pin_code": "0:out:2", "gpio_host_name": "pi-power", "relay_type": "piface"},
+
     {"relay_pin_name": "back_valve_relay", "zone_id": "37", "gpio_pin_code": "16", "gpio_host_name": "pi-face", "relay_type": "gpio"},
     {"relay_pin_name": "back_lights_relay", "zone_id": "40", "gpio_pin_code": "12", "gpio_host_name": "pi-face", "relay_type": "gpio"},
     {"relay_pin_name": "front_main_valve_relay", "zone_id": "36", "gpio_pin_code": "21", "gpio_host_name": "pi-face", "relay_type": "gpio"},
