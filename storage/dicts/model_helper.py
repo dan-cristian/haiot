@@ -56,6 +56,7 @@ class DictTable:
             sort_key = sort[0][0]
             sort_dir = sort[0][1]
         match_count = 0
+        #fixme: lock self.table during interation
         for rec in self.table:
             match = True
             comparison_not = False
