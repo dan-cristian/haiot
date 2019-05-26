@@ -432,8 +432,8 @@
     {"zone_id":19,"heat_pin_name":"gas heat",   "gpio_pin_code":"0:out:0", "gpio_host_name":"homew", "relay_type": "piface", "is_main_heat_source":true},
     {"zone_id":29,"heat_pin_name":"recirculation pump", "gpio_pin_code":"27", "gpio_host_name":"pi-face", "relay_type": "gpio"},
     {"zone_id":52,"heat_pin_name":"puffer boiler", "gpio_pin_code":"5", "gpio_host_name":"pi-face", "relay_type": "gpio"},
-    {"zone_id":50,"heat_pin_name":"puffer heat", "gpio_pin_code":"22", "gpio_host_name":"pi-face", "relay_type": "gpio", "temp_sensor_name":"puffer sus"},
-    {"zone_id":51,"heat_pin_name":"puffer gas valve", "gpio_pin_code":"13", "gpio_host_name":"pi-face", "relay_type": "gpio", "is_alternate_source_switch":true, "temp_sensor_name":"puffer sus"}
+    {"zone_id":50,"heat_pin_name":"puffer heat", "gpio_pin_code":"0:out:7", "gpio_host_name":"homew", "relay_type": "piface", "temp_sensor_name":"puffer sus"},
+    {"zone_id":51,"heat_pin_name":"puffer gas valve", "gpio_pin_code":"0:out:6", "gpio_host_name":"homew", "relay_type": "piface", "is_alternate_source_switch":true, "temp_sensor_name":"puffer sus"}
   ],
 
   "ZoneSensor": [
