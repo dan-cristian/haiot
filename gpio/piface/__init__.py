@@ -23,6 +23,7 @@ class P:
     import_ok = False
     pfd = {}
     listener = {}
+    listeners_active = False
     initialised = False
     board_init = False
     gpio_ports = [25, 24, 23, 22]
@@ -202,8 +203,6 @@ def _input_event(event, reversed=False):
 #  port format is x:direction:y, e.g. 0:in:3, x=board, direction=in/out, y=pin index (0 based)
 # !!! make sure piface listener is enabled in the same thread, and pin index is integer
 def _setup_in_ports_pif(gpio_pin_list):
-    for li in P.listener.values():
-        li.deactivate()
     for gpio_pin in gpio_pin_list:
         if gpio_pin.pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
             # Log.logger.info('Set piface code={} type={} index={}'.format(
@@ -225,9 +224,11 @@ def _setup_in_ports_pif(gpio_pin_list):
             except Exception as ex:
                 L.l.critical('Unable to setup piface listener board={} pin={} err={}'.format(
                     board, gpio_pin.pin_code, ex))
-    for li in P.listener.values():
-        li.activate()
-    L.l.info('Activating listeners done')
+    if not P.listeners_active:
+        for li in P.listener.values():
+            li.activate()
+            P.listeners_active = True
+        L.l.info('Activating listeners done')
 
 
 def _setup_board():
