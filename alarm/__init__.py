@@ -52,15 +52,10 @@ def unload():
 
 def init():
     L.l.info('Alarm module initialising')
-    # alarm_loop.init()
-    # thread_pool.add_interval_callable(alarm_loop.thread_run)
     dispatcher.connect(handle_event_alarm, signal=Constant.SIGNAL_GPIO, sender=dispatcher.Any)
     # get list of input gpio ports and communicate them to gpio modules for proper port setup as "IN"
     port_list = []
-    if sqlitedb:
-        local_alarms = models.ZoneAlarm().query_filter_all(models.ZoneAlarm.gpio_host_name.in_([Constant.HOST_NAME]))
-    else:
-        local_alarms = m.ZoneAlarm.find({m.ZoneAlarm.gpio_host_name: Constant.HOST_NAME})
+    local_alarms = m.ZoneAlarm.find({m.ZoneAlarm.gpio_host_name: Constant.HOST_NAME})
     for alarm in local_alarms:
         gpio_pin = m.GpioPin()
         gpio_pin.host_name = Constant.HOST_NAME
