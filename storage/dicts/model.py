@@ -281,6 +281,17 @@ class ZoneAlarm(ModelBase):
     updated_on = datetime.now()
 
 
+class IOSensor(ModelBase):
+    """key=sensor_name"""
+    sensor_name = ''
+    zone_id = 0
+    io_code = ''
+    host_name = ''
+    sensor_type = ''
+    purpose = ''
+    relay_type = ''
+
+
 class Node(ModelBase):
     name = ''
     id = 0

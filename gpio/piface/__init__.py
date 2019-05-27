@@ -290,6 +290,7 @@ def _setup_board():
     #    L.l.info('Piface can only be initialised on PI or ODROID')
 
 
+# not used
 def thread_run():
     # polling inputs
     for board in P.pfd.keys():
@@ -330,11 +331,6 @@ def post_init_alarm_value(gpio_pin_code):
 def post_init():
     if P.initialised:
         L.l.info('Running post_init piface')
-        # relays = ZoneCustomRelay.query.filter_by(
-        #    gpio_host_name=Constant.HOST_NAME, relay_type=Constant.GPIO_PIN_TYPE_PI_FACE_SPI).all()
-        # for relay in relays:
-        #    L.l.info('Reading piface relay{}'.format(relay.gpio_pin_code))
-
         # read default values
         for board in P.pfd.keys():
             for pin in range(8):
