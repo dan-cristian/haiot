@@ -202,6 +202,8 @@ def _input_event(event, reversed=False):
 #  port format is x:direction:y, e.g. 0:in:3, x=board, direction=in/out, y=pin index (0 based)
 # !!! make sure piface listener is enabled in the same thread, and pin index is integer
 def _setup_in_ports_pif(gpio_pin_list):
+    for li in P.listener.values():
+        li.deactivate()
     for gpio_pin in gpio_pin_list:
         if gpio_pin.pin_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
             # Log.logger.info('Set piface code={} type={} index={}'.format(
