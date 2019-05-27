@@ -49,17 +49,15 @@ class DictTable:
                 L.l.error('New key {} not in index {}'.format(new_key, rec[1]))
 
     def find(self, filter=None, sort=None, skip=None, limit=None, *args, **kwargs):
-        cls = self.model_class
         res = []
         res_ordered = {}
         if sort is not None:
             sort_key = sort[0][0]
             sort_dir = sort[0][1]
         match_count = 0
-        #fixme: lock self.table during interation
+        # fixme: lock self.table during iteration
         for rec in self.table:
             match = True
-            comparison_not = False
             if filter is not None:
                 for cond in filter:
                     if cond == '$not':
@@ -81,7 +79,6 @@ class DictTable:
                             break
             if match:
                 if sort is None:
-                    # res[rec] = self.table[rec]
                     rec_obj = self.model_class({**self.table[rec]})  # duplicate orig record for change track
                     rec_obj.reference = self.table[rec]
                     res.append(rec_obj)

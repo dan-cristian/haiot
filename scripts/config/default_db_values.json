@@ -501,7 +501,7 @@
     {"utility_name":"gas", "sensor_name":"sonoff-basic-2", "sensor_index":2, "ticks_per_unit":100, "unit_name":"mc", "utility_type":"gas", "unit_cost":1.5675},
     {"utility_name":"water house", "sensor_name":"sonoff-basic-4", "sensor_index":1, "ticks_per_unit":1, "unit_name":"l", "utility_type":"water", "unit_cost":2.9388},
     {"utility_name":"unused 1", "sensor_name":"sonoff-basic-4", "sensor_index":2, "ticks_per_unit":1, "unit_name":"l", "utility_type":"water", "unit_cost":0},
-    {"utility_name":"water main", "sensor_name":"sonoff-basic-5", "sensor_index":1, "ticks_per_unit":0.1, "unit_name":"l", "utility_type":"water", "unit_cost":2.9388},
+    {"utility_name":"water main", "sensor_name":"water main", "sensor_index":0, "ticks_per_unit":0.1, "unit_name":"l", "utility_type":"water", "unit_cost":2.9388},
 
     {"utility_name":"solar_aps", "sensor_name":"none", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259}
   ],
@@ -521,7 +521,7 @@
     {"id":23, "zone_id":7 ,  "gpio_pin_code":"0:in:2", "gpio_host_name": "pi-power", "alarm_pin_name": "gate", "sensor_type": "contact", "relay_type": "piface"},
     {"id":24, "zone_id":7 ,  "gpio_pin_code":"0:in:3", "gpio_host_name": "pi-power", "alarm_pin_name": "sonerie", "sensor_type": "contact-no", "relay_type": "piface"},
     {"id":25, "zone_id":7 ,  "gpio_pin_code":"0:in:4", "gpio_host_name": "pi-power", "alarm_pin_name": "portita", "sensor_type": "contact", "relay_type": "piface"},
-    {"id":26, "zone_id":7 ,  "gpio_pin_code":"0:in:5", "gpio_host_name": "pi-power", "alarm_pin_name": "unused 5", "sensor_type": "contact", "relay_type": "piface"},
+
     {"id":27, "zone_id":7 ,  "gpio_pin_code":"0:in:6", "gpio_host_name": "pi-power", "alarm_pin_name": "unused 6", "sensor_type": "contact", "relay_type": "piface"},
     {"id":28, "zone_id":7 ,  "gpio_pin_code":"0:in:7", "gpio_host_name": "pi-power", "alarm_pin_name": "unused 7", "sensor_type": "contact", "relay_type": "piface"},
 
@@ -529,6 +529,10 @@
     {"id":31, "zone_id":200 , "gpio_pin_code":"17", "gpio_host_name": "pidash", "alarm_pin_name": "pidash battery low", "sensor_type": "contact", "relay_type": "gpio"},
     {"id":32, "zone_id":200 , "gpio_pin_code":"24", "gpio_host_name": "pidash", "alarm_pin_name": "car sound", "sensor_type": "contact", "relay_type": "gpio"},
     {"id":33, "zone_id":200 , "gpio_pin_code":"25", "gpio_host_name": "pidash", "alarm_pin_name": "switch", "sensor_type": "contact", "relay_type": "gpio"}
+  ],
+
+  "IOSensor": [
+    {"sensor_name": "water main", "zone_id":7 , "io_code":"0:in:5", "host_name": "pi-power", "sensor_type": "contact-no", "purpose": "utility", "relay_type": "piface"}
   ],
 
   "Pwm": [

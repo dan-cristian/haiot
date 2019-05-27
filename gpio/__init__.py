@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from main.logger_helper import L
 from common import Constant
 from common import utils
+from pydispatch import dispatcher
 if sqlitedb:
     from storage.sqalc import models
 # from storage.tiny.tinydb_model import GpioPin
@@ -283,6 +284,36 @@ def post_init():
     # pcf8574_gpio.post_init()
 
 
+def _handle_io_event(gpio_pin_code='', direction='', pin_value='', pin_connected=None):
+    sensor = m.IOSensor.find_one({m.IOSensor.io_code: gpio_pin_code, m.IOSensor.host_name: Constant.HOST_NAME})
+    if sensor is not None:
+        if sensor.purpose == Constant.IO_SENSOR_PURPOSE:
+            if pin_connected:
+                dispatcher.send(Constant.SIGNAL_UTILITY, sensor_name=sensor.sensor_name, units_delta_a=1)
+    else:
+        L.l.info('Cannot find IOSensor {}'.format(gpio_pin_code))
+
+
+def _init_io():
+    dispatcher.connect(_handle_io_event, signal=Constant.SIGNAL_GPIO, sender=dispatcher.Any)
+    # get list of input gpio ports and communicate them to gpio modules for proper port setup as "IN"
+    port_list = []
+    local_sensors = m.IOSensor.find({m.IOSensor.host_name: Constant.HOST_NAME})
+    for sensor in local_sensors:
+        gpio_pin = m.GpioPin()
+        gpio_pin.host_name = Constant.HOST_NAME
+        gpio_pin.contact_type = sensor.sensor_type
+        if sensor.relay_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
+            gpio_pin.board_index, gpio_pin.pin_direction, gpio_pin.pin_index_bcm = io_common.decode_piface_pin(
+                sensor.io_code)
+        else:
+            gpio_pin.pin_index_bcm = int(sensor.io_code)
+        gpio_pin.pin_type = sensor.relay_type
+        gpio_pin.pin_code = sensor.io_code
+        port_list.append(gpio_pin)
+    dispatcher.send(signal=Constant.SIGNAL_GPIO_INPUT_PORT_LIST, gpio_pin_list=port_list)
+
+
 def init():
     L.l.debug("GPIO initialising")
     if Constant.IS_MACHINE_RASPBERRYPI or Constant.IS_MACHINE_ODROID:
@@ -297,6 +328,8 @@ def init():
         pigpio_gpio.init()
     # init last after RPI
     piface.init()
+    # init IO Sensors
+    _init_io()
     m.ZoneCustomRelay.add_upsert_listener(zone_custom_relay_upsert_listener)
     thread_pool.add_interval_callable(thread_run, run_interval_second=1)
     P.initialised = True
