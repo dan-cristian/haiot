@@ -189,6 +189,8 @@ class Constant:
     #UTILITY_TYPE_GAS_MEASURE = 'l'
     UTILITY_TYPE_WATER_LEVEL = 'water level'
 
+    IO_SENSOR_PURPOSE = 'utility'
+
     LOG_SENSOR_INACTIVE = ''
 
     DB_REPORTING_ID = 'reporting'
