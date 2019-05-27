@@ -255,6 +255,10 @@ def _loop_zones():
                                 prev_sensor, zonesensor.zone_id))
                         else:
                             sensor_processed[zonesensor.zone_id] = sensor.sensor_name
+                    else:
+                        P.heat_status += ' sensor={}'.format(sensor)
+                else:
+                    P.heat_status += ' sched={} zonesensor={}'.format(heat_schedule, zonesensor)
         # turn on/off the main heating system based on zone heat needs
         # check first to find alternate valid heat sources
         heatrelay_main_source = m.ZoneHeatRelay.find_one({m.ZoneHeatRelay.is_alternate_heat_source: True})
