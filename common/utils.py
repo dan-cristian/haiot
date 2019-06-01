@@ -160,18 +160,20 @@ def json_to_record(table, json_object):
 
 
 def parse_http(url, start_key, end_key, end_first=False):
-    text = str(urllib.request.urlopen(url).read())
-    end = text.find(end_key)
-    if end_first:
-        start = text.rfind(start_key, 0, end)
-    else:
-        start = text.find(start_key)
-    if start != -1 and end != -1:
-        val_start = start + len(start_key)
-        value_str = text[val_start:end]
-        return value_str
-    else:
-        return None
+    try:
+        text = str(urllib.request.urlopen(url).read())
+        end = text.find(end_key)
+        if end_first:
+            start = text.rfind(start_key, 0, end)
+        else:
+            start = text.find(start_key)
+        if start != -1 and end != -1:
+            val_start = start + len(start_key)
+            value_str = text[val_start:end]
+            return value_str
+    except Exception as ex:
+        L.l.error('Unable to open url {}, err={}'.format(url, ex))
+    return None
 
 
 def sleep(secs):
