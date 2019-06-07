@@ -102,7 +102,7 @@ Number gas_co_beci "Gas CO beci [%.0f]" <gas>                                   
 Number gas_ch4_beci "Gas CH4 beci [%.0f]" <gas>                                                       {mqtt="<[mosquitto:iot/openhab/vad_gas CH4 beci:state:default]"}
 
 Number humidity_living "Living [%.0f %%]" <humidity> [ "CurrentHumidity" ]                        {mqtt="<[mosquitto:iot/openhab/humidity_living:state:default]"}
-Number humidity_curte_fata "Curte fata [%.0f %%]" <humidity> [ "CurrentHumidity" ]                {mqtt="<[mosquitto:iot/openhab/humidity_curte bme:state:default]"}
+Number humidity_curte_fata "Curte fata [%.0f %%]" <humidity> [ "CurrentHumidity" ]                {mqtt="<[mosquitto:iot/openhab/humidity_curte_bme:state:default]"}
 Number humidity_fridge "Fridge [%.0f %%]" <humidity> [ "CurrentHumidity" ]                        {mqtt="<[mosquitto:iot/openhab/humidity_fridge:state:default]"}
 Number pressure_baro_house "Pressure [%.0f hPa]" <pressure>                                       {mqtt="<[mosquitto:iot/openhab/pressure_baro_house:state:default]"}
 Number humidity_parter "Parter [%.0f %%]" <humidity> [ "CurrentHumidity" ]                        {mqtt="<[mosquitto:iot/openhab/humidity_parter:state:default]"}
