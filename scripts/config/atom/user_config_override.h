@@ -51,16 +51,19 @@ Examples :
 #define CFG_HOLDER        4617                   // [Reset 1] Change this value to load SECTION1 configuration parameters to flash
 
 #undef  FRIENDLY_NAME
-#define FRIENDLY_NAME     "wemos-mini-2"
+#define FRIENDLY_NAME     "wemos-mini-"
 #undef MQTT_TOPIC
-#define MQTT_TOPIC        "wemos-mini-2"
+#define MQTT_TOPIC        "wemos-mini-"
+
+#undef WIFI_HOSTNAME
+#define WIFI_HOSTNAME "wemos-mini-"
 
 // -- Setup your own Wifi settings  ---------------
 #undef  STA_SSID1
 #define STA_SSID1         "home3"             // [Ssid1] Wifi SSID
 
 #undef  STA_PASS1
-#define STA_PASS1         "xxx"     // [Password1] Wifi password
+#define STA_PASS1         "1z2x3c4v"     // [Password1] Wifi password
 
 // -- Setup your own MQTT settings  ---------------
 #undef  MQTT_HOST
@@ -76,7 +79,7 @@ Examples :
 #define MQTT_PASS         "YourMqttPass"         // [MqttPassword] Optional password
 
 #undef  MQTT_CLIENT_ID
-#define MQTT_CLIENT_ID       "tasmota_%06X"
+#define MQTT_CLIENT_ID       "tasmota_%04d"
 
 #undef  MQTT_FULLTOPIC
 #define MQTT_FULLTOPIC    "iot/sonoff/%prefix%/%topic%/"
@@ -123,16 +126,16 @@ Examples :
 //#define USE_RULES
 #undef USE_IR_REMOTE
 #define USE_IR_REMOTE                            // Send IR remote commands using library IRremoteESP8266 and ArduinoJson (+4k3 code, 0k3 mem, 48 iram)
-  #undef USE_IR_HVAC
-  #define USE_IR_HVAC                           // Support for HVAC (Toshiba, Mitsubishi and LG) system using IR (+3k5 code)
-  #undef  USE_IR_RECEIVE
-  #define USE_IR_RECEIVE                         // Support for IR receiver (+7k2 code, 264 iram)
-    #undef IR_RCV_BUFFER_SIZE
-    #define IR_RCV_BUFFER_SIZE      1000          // Max number of packets allowed in capture buffer (default 100 (*2 bytes ram))
-    #undef IR_RCV_TIMEOUT
-    #define IR_RCV_TIMEOUT          50           // Number of milli-Seconds of no-more-data before we consider a message ended (default 15)
-    #undef IR_RCV_MIN_UNKNOWN_SIZE
-    #define IR_RCV_MIN_UNKNOWN_SIZE 6            // Set the smallest sized "UNKNOWN" message packets we actually care about (default 6)
+#undef USE_IR_HVAC
+#define USE_IR_HVAC                           // Support for HVAC (Toshiba, Mitsubishi and LG) system using IR (+3k5 code)
+#undef  USE_IR_RECEIVE
+#define USE_IR_RECEIVE                         // Support for IR receiver (+7k2 code, 264 iram)
+#undef IR_RCV_BUFFER_SIZE
+#define IR_RCV_BUFFER_SIZE      1000          // Max number of packets allowed in capture buffer (default 100 (*2 bytes ram))
+#undef IR_RCV_TIMEOUT
+#define IR_RCV_TIMEOUT          50           // Number of milli-Seconds of no-more-data before we consider a message ended (default 15)
+#undef IR_RCV_MIN_UNKNOWN_SIZE
+#define IR_RCV_MIN_UNKNOWN_SIZE 6            // Set the smallest sized "UNKNOWN" message packets we actually care about (default 6)
 
 
 #endif  // _USER_CONFIG_OVERRIDE_H_
