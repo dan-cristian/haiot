@@ -223,12 +223,14 @@ class PwmHeater(LoadPowerDevice):
             self.target_watts = 0
 
     def is_power_on(self):
-        frequency, duty_cycle = pigpio_gpio.P.pwm.get(self.RELAY_NAME)
-        if duty_cycle is None:
-            duty_cycle = 0
-        # L.l.info('Pwm frequency={} duty={} is_on={}'.format(frequency, duty_cycle, duty_cycle > 0))
-        return duty_cycle > 0
-        # not used
+        if pigpio_gpio.P.pwm is not None:
+            frequency, duty_cycle = pigpio_gpio.P.pwm.get(self.RELAY_NAME)
+            if duty_cycle is None:
+                duty_cycle = 0
+            # L.l.info('Pwm frequency={} duty={} is_on={}'.format(frequency, duty_cycle, duty_cycle > 0))
+            return duty_cycle > 0
+            # not used
+        return None
 
     def grid_updated(self, grid_watts):
         power_on = self.is_power_on()

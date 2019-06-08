@@ -1,6 +1,7 @@
 import time
 import socket
 import threading
+import json
 import prctl
 from main.logger_helper import L
 from common import Constant, utils
@@ -171,6 +172,11 @@ def init():
             [common.get_json_param(Constant.P_MQTT_HOST_2), int(common.get_json_param(Constant.P_MQTT_PORT_2))]
             #[model_helper.get_param(constant.P_MQTT_HOST_3), int(model_helper.get_param(constant.P_MQTT_PORT_3))]
             ]
+        config_file = common.get_json_param(Constant.P_MQTT_CREDENTIAL_FILE)
+        with open(config_file, 'r') as f:
+            config = json.load(f)
+            user = config['username']
+            passwd = config['password']
         P.topic = str(common.get_json_param(Constant.P_MQTT_TOPIC))
         P.topic_main = str(common.get_json_param(Constant.P_MQTT_TOPIC_MAIN))
         if P.mqtt_paho_exists:
@@ -191,7 +197,7 @@ def init():
                         P.mqtt_client.on_connect = on_connect_paho
                     P.mqtt_client.on_subscribe = on_subscribe
                     P.mqtt_client.on_unsubscribe = on_unsubscribe
-                    # mqtt_client.username_pw_set('user', 'pass')
+                    P.mqtt_client.username_pw_set(user, passwd)
                     P.mqtt_client.max_inflight_messages_set(100)
                     P.mqtt_client.max_queued_messages_set(0)
                     P.mqtt_client.connect(host=host, port=port, keepalive=60)
