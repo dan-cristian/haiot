@@ -29,6 +29,9 @@ while True:
     except ImportError as iex:
         if not fix_module(iex):
             break
+    except Exception as ex:
+        L.l.info('Error importing, ex={}'.format(ex))
+        break
 
 
 # https://sourceforge.net/p/raspberry-gpio-python/wiki/Checking%20function%20of%20GPIO%20channels/
