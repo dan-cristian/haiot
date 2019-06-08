@@ -275,7 +275,7 @@ def _setup_board():
                         board, bus, chip, gpio))
                 except Exception as ex2:
                     last_err += "{}".format(ex2)
-                    L.l.info('Piface detect returned exception {}'.format(ex2))
+                    # L.l.info('Piface detect returned exception {}'.format(ex2))
             if board_count == len(P.pfd):
                 L.l.info('No board at index {}, errs={}'.format(board, last_err))
         if len(P.pfd) == 0:
@@ -285,8 +285,6 @@ def _setup_board():
             P.board_init = True
     except Exception as ex:
         L.l.critical('Piface setup board failed, err={}'.format(ex), exc_info=True)
-    #else:
-    #    L.l.info('Piface can only be initialised on PI or ODROID')
 
 
 # not used
