@@ -311,6 +311,7 @@ def _init_io():
         gpio_pin.pin_type = sensor.relay_type
         gpio_pin.pin_code = sensor.io_code
         port_list.append(gpio_pin)
+    L.l.info('Init {} IO sensor input ports'.format(len(port_list)))
     dispatcher.send(signal=Constant.SIGNAL_GPIO_INPUT_PORT_LIST, gpio_pin_list=port_list)
 
 
