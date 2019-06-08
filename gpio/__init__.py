@@ -279,7 +279,7 @@ def post_init():
     #    pwm.frequency, pwm.duty = pigpio_gpio.P.pwm.get(pwm.name)
     #    pwm.save_changed_fields(broadcast=True, persist=True)
 
-    # piface.post_init()
+    piface.post_init()
     # rpi_gpio.post_init()
     # pcf8574_gpio.post_init()
 

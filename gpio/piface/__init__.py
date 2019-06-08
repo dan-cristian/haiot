@@ -327,26 +327,27 @@ def post_init_alarm_value(gpio_pin_code):
 
 def post_init():
     if P.initialised:
-        L.l.info('Running post_init piface')
+        L.l.info('Running post_init piface !!!!!!!!!!!!!!!!!!!!!!!!!!')
         # read default values
-        for board in P.pfd.keys():
-            for pin in range(8):
-                gpio_pin_code = format_piface_pin_code(board_index=board, pin_direction=Constant.GPIO_PIN_DIRECTION_OUT,
-                                                       pin_index=pin)
-                pin_out_val = get_out_pin_value(pin_index=pin, board_index=board)
-                L.l.info('Read out pin {} value={}'.format(gpio_pin_code, pin_out_val))
-                io_common.update_custom_relay(
-                    pin_code=gpio_pin_code, pin_value=pin_out_val, notify=True, ignore_missing=True)
-                gpio_pin_code = format_piface_pin_code(board_index=board, pin_direction=Constant.GPIO_PIN_DIRECTION_IN,
-                                                       pin_index=pin)
-                pin_in_val = _get_in_pin_value(pin_index=pin, board_index=board)
-                L.l.info('Read input pin {} value={}'.format(gpio_pin_code, pin_in_val))
-                io_common.update_custom_relay(
-                    pin_code=gpio_pin_code, pin_value=pin_in_val, notify=True, ignore_missing=True)
-                # resend to ensure is received by other late init modules like openhab
-                dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio_pin_code,
-                                direction=Constant.GPIO_PIN_DIRECTION_IN,
-                                pin_value=pin_in_val, pin_connected=(pin_in_val == 1))
+        if False:
+            for board in P.pfd.keys():
+                for pin in range(8):
+                    gpio_pin_code = format_piface_pin_code(board_index=board, pin_direction=Constant.GPIO_PIN_DIRECTION_OUT,
+                                                           pin_index=pin)
+                    pin_out_val = get_out_pin_value(pin_index=pin, board_index=board)
+                    L.l.info('Read out pin {} value={}'.format(gpio_pin_code, pin_out_val))
+                    io_common.update_custom_relay(
+                        pin_code=gpio_pin_code, pin_value=pin_out_val, notify=True, ignore_missing=True)
+                    gpio_pin_code = format_piface_pin_code(board_index=board, pin_direction=Constant.GPIO_PIN_DIRECTION_IN,
+                                                           pin_index=pin)
+                    pin_in_val = _get_in_pin_value(pin_index=pin, board_index=board)
+                    L.l.info('Read input pin {} value={}'.format(gpio_pin_code, pin_in_val))
+                    io_common.update_custom_relay(
+                        pin_code=gpio_pin_code, pin_value=pin_in_val, notify=True, ignore_missing=True)
+                    # resend to ensure is received by other late init modules like openhab
+                    dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio_pin_code,
+                                    direction=Constant.GPIO_PIN_DIRECTION_IN,
+                                    pin_value=pin_in_val, pin_connected=(pin_in_val == 1))
         if not P.listeners_active:
             for li in P.listener.values():
                 li.activate()
