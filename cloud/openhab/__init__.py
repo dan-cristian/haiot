@@ -2,7 +2,6 @@ from main.logger_helper import L
 from main import thread_pool
 from pydispatch import dispatcher
 from common import Constant, get_json_param
-# from main.admin import model_helper
 from inspect import getmembers, isfunction
 from transport import mqtt_io
 from cloud.openhab import rules
@@ -129,7 +128,7 @@ def mqtt_on_message(client, userdata, msg):
         else:
             L.l.warning("Unexpected mqtt receive topic {} payload={}".format(msg.topic, msg.payload))
     except Exception as ex:
-        L.l.error('Error sonoff mqtt {} ex={}'.format(msg.payload, ex), exc_info=True)
+        L.l.error('Error openhab mqtt {} ex={}'.format(msg.payload, ex), exc_info=True)
 
 
 def __load_rules():
