@@ -6,6 +6,7 @@ LOG=/mnt/log/mqtt-cli.log
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "$DIR/functions.sh"
+source "$DIR/../../.credentials/.mqtt.bash.credentials"
 
 screen_on(){
    echo2 "Detected presence, notify video"
@@ -16,7 +17,7 @@ listen(){
 rm -f $p
 ([ ! -p "$p" ]) && mkfifo $p
 killall mosquitto_sub
-(mosquitto_sub -h $host -t $topic >$p 2>>$LOG) &
+(mosquitto_sub -h $host -t $topic -u $user -P $passwd >$p 2>>$LOG) &
 #echo "$!" > pidfile
 while read line <$p
 do
