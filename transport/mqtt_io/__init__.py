@@ -52,6 +52,7 @@ def add_message_callback(topic, callback):
     P.message_callbacks[topic] = callback
     P.mqtt_client.message_callback_add(topic, callback)
 
+
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect_paho(client, userdata, flags, rc):
     L.l.info("Connected to mqtt paho with result code " + str(rc))
@@ -94,7 +95,9 @@ def subscribe():
     P.mqtt_client.username_pw_set(Constant.HOST_NAME)
     P.mqtt_client.user_data_set(Constant.HOST_NAME + " userdata")
     P.mqtt_client.will_set(Constant.HOST_NAME + " DIE")
-    P.mqtt_client.subscribe(topic=P.topic, qos=0)
+    # P.mqtt_client.subscribe(topic=P.topic, qos=0)
+    # subscribe to all topics to catch all
+    P.mqtt_client.subscribe(topic="#", qos=0)
 
 
 def payload2json(payload):

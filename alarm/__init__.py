@@ -1,10 +1,6 @@
 from pydispatch import dispatcher
 from main.logger_helper import L
 from common import Constant, utils
-from main import sqlitedb
-if sqlitedb:
-    from storage.sqalc import models
-    from storage.sqalc.model_helper import commit
 from storage.model import m
 from gpio import io_common
 __author__ = 'dcristian'

@@ -224,11 +224,7 @@ def _setup_in_ports_pif(gpio_pin_list):
             except Exception as ex:
                 L.l.critical('Unable to setup piface listener board={} pin={} err={}'.format(
                     board, gpio_pin.pin_code, ex))
-    if not P.listeners_active:
-        for li in P.listener.values():
-            li.activate()
-            P.listeners_active = True
-        L.l.info('Activating listeners done')
+
 
 
 def _setup_board():
@@ -353,6 +349,11 @@ def post_init():
                 dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=gpio_pin_code,
                                 direction=Constant.GPIO_PIN_DIRECTION_IN,
                                 pin_value=pin_in_val, pin_connected=(pin_in_val == 1))
+        if not P.listeners_active:
+            for li in P.listener.values():
+                li.activate()
+                P.listeners_active = True
+            L.l.info('Activating listeners done')
 
 
 def init():
