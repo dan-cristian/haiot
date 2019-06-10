@@ -2,9 +2,7 @@ __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
 from main.logger_helper import L
 from common import Constant, utils, get_json_param
-from main import thread_pool, sqlitedb
-if sqlitedb:
-    from storage.sqalc import models
+from main import thread_pool
 from storage.model import m
 
 
