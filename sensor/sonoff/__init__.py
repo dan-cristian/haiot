@@ -5,8 +5,6 @@ import transport.mqtt_io
 from common import Constant, utils, get_json_param
 from main.logger_helper import L
 from main import sqlitedb
-if sqlitedb:
-    from main.admin import models
 from main import thread_pool
 from transport import mqtt_io
 from storage.model import m

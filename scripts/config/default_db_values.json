@@ -40,7 +40,7 @@
     {"name": "P_YOUTUBE_CREDENTIAL_FILE", "value": ".credentials/.youtube.credentials"},
     {"name": "GMAIL_NOTIFY_FROM_EMAIL", "value": "antonio.gaudi33@gmail.com"},
     {"name": "GMAIL_CREDENTIAL_FILE", "value": ".credentials/.gmail.credentials"},
-    {"name": "MQTT_CREDENTIAL_FILE", "value": ".credentials/.mqtt.credentials"},
+    {"name": "ALL_CREDENTIAL_FILE", "value": ".credentials/.all.credentials"},
     {"name": "THINGSPEAK_API_FILE", "value": ".credentials/.thingspeak.api"},
     {"name": "NOTIFY_EMAIL_RECIPIENT", "value": "dan.cristian@gmail.com"},
     {"name": "DB_REPORTING_LOCATION_ENABLED", "value": "1", "description":"1 for recording data, 0 disabled"},
@@ -65,7 +65,8 @@
     {"name": "MAX_DELTA_TEMP_KEEP_WARM", "value": "2", "description":"max delta in degrees for a keep warm zone to be started"},
     {"name": "SOLAR_APS_LOCAL_URL", "value": "http://192.168.0.10/cgi-bin/home", "description":"link to aps ecu page with day production"},
     {"name": "SOLAR_APS_LOCAL_REALTIME_URL", "value": "http://192.168.0.10/cgi-bin/parameters", "description":"link to aps ecu page with realtime production"},
-    {"name": "SOLAR_UTILITY_NAME", "value": "solar_aps", "description":"utility name from utility table"}
+    {"name": "SOLAR_UTILITY_NAME", "value": "solar_aps", "description":"utility name from utility table"},
+    {"name": "NEXTCLOUD_PHONETRACK_URL", "value": "https://192.168.0.9:8443/nextcloud/index.php/apps/phonetrack/logGet/<token>/<name>?lat=<lat>&lon=<lon>&alt=<alt>&acc=<acc>&bat=<bat>&sat=<sat>&speed=<speed>&bearing=<bearing>&timestamp=<time>"}
   ],
   "Module": [
     {"id":1,  "active":true, "start_order": 1, "name":"main", "host_name":""},
@@ -482,8 +483,8 @@
     {"zone_id":29 , "sensor_address": "esp12-1_a0",                                 "sensor_name": "gas CO beci"},
     {"zone_id":29 , "sensor_address": "esp12-2_a0",                                 "sensor_name": "gas CH4 beci"},
     {"zone_id":54 , "sensor_address": "sonoff-pow-3",                               "sensor_name": "solar meter"},
-    {"zone_id":7 ,  "sensor_address": "wemos-mini-5_bme280",                        "sensor_name": "curte_bme"},
-    {"zone_id":7 ,  "sensor_address": "wemos-mini-5_a0",                            "sensor_name": "curte_CO"},
+    {"zone_id":7 ,  "sensor_address": "wemosmini5_bme280",                        "sensor_name": "curte_bme"},
+    {"zone_id":7 ,  "sensor_address": "wemosmini5_a0",                            "sensor_name": "curte_CO"},
     {"zone_id":2 ,  "sensor_address": "wemos-mini-1_bme280",                        "sensor_name": "living_bme"},
 
     {"zone_id":2  , "sensor_address": "sonoff-basic-1_bme280",                        "sensor_name": "living_atmo"},
