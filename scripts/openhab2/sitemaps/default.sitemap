@@ -249,6 +249,7 @@ Frame {
     Default item=relay_blackwater_pump_relay
     Default item=relay_fan_bucatarie_relay
     Default item=relay_fan_baie_parter_relay
+    Default item=relay_fan_baie_etaj_relay
 }
 
 Frame {
