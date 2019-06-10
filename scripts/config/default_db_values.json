@@ -340,6 +340,7 @@
     {"relay_pin_name": "sonoff-5", "zone_id": "2", "gpio_pin_code": "sonoff-basic-5", "gpio_host_name": "", "relay_type": "sonoff"},
     {"relay_pin_name": "fan_bucatarie_relay", "zone_id": "2", "gpio_pin_code": "sonoff-basic-6", "gpio_host_name": "", "relay_type": "sonoff", "expire": 120},
     {"relay_pin_name": "fan_baie_parter_relay", "zone_id": "56", "gpio_pin_code": "sonoff-basic-7", "gpio_host_name": "", "relay_type": "sonoff", "expire": 120},
+    {"relay_pin_name": "fan_baie_etaj_relay", "zone_id": "5", "gpio_pin_code": "sonoff-basic-14", "gpio_host_name": "", "relay_type": "sonoff", "expire": 120},
     {"relay_pin_name": "big_battery_relay", "zone_id": "54", "gpio_pin_code": "sonoff-basic-12", "gpio_host_name": "", "relay_type": "sonoff"},
     {"relay_pin_name": "small_battery_relay", "zone_id": "54", "gpio_pin_code": "sonoff-basic-11", "gpio_host_name": "", "relay_type": "sonoff"},
 
@@ -490,6 +491,7 @@
 
     {"zone_id":2  , "sensor_address": "sonoff-basic-1_bme280",                        "sensor_name": "living_atmo"},
     {"zone_id":1  , "sensor_address": "sonoff-basic-6_bme280",                        "sensor_name": "bucatarie_atmo"},
+    {"zone_id":5  , "sensor_address": "sonoff-basic-14_bme280",                        "sensor_name": "baie_etaj_atmo"},
     {"zone_id":56 , "sensor_address": "sonoff-basic-7_bme280",                        "sensor_name": "baie_parter_atmo"}
   ],
 
