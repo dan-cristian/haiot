@@ -42,6 +42,7 @@ Switch relay_other_heat "Other heat" <switch>                                   
 Switch relay_front_gate "Front gate" <switch> [ "Switchable" ]                      {mqtt="<[mosquitto:iot/openhab/relay_front_gate_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_front_gate_relay:command:*:default]", autoupdate="false"}
 Switch relay_fan_bucatarie_relay "Fan bucatarie" <switch> [ "Switchable" ]          {mqtt="<[mosquitto:iot/openhab/relay_fan_bucatarie_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_fan_bucatarie_relay:command:*:default]", autoupdate="false"}
 Switch relay_fan_baie_parter_relay "Fan baie parter" <switch> [ "Switchable" ]      {mqtt="<[mosquitto:iot/openhab/relay_fan_baie_parter_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_fan_baie_parter_relay:command:*:default]", autoupdate="false"}
+Switch relay_fan_baie_etaj_relay "Fan baie etaj" <switch> [ "Switchable" ]      {mqtt="<[mosquitto:iot/openhab/relay_fan_baie_etaj_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_fan_baie_etaj_relay:command:*:default]", autoupdate="false"}
 Switch relay_front_gate_test "Front gate test" <switch> [ "Switchable" ]            {mqtt="<[mosquitto:iot/openhab/relay_front_gate_relay_test:state:default],>[mosquitto:iot/openhab/cmd/relay_front_gate_relay_test:command:*:default]", autoupdate="false"}
 Switch relay_front_gate_test_2 "Front gate test" <switch> [ "Switchable" ]          {mqtt="<[mosquitto:iot/openhab/relay_front_gate_relay_test_2:state:default],>[mosquitto:iot/openhab/cmd/relay_front_gate_relay_test_2:command:*:default]", autoupdate="false"}
 
@@ -121,6 +122,9 @@ Number temperature_baie_parter "Baie parter [%.1f °C]" <temperature>           
 Number humidity_baie_parter "Baie parter [%.0f %%]" <humidity> [ "CurrentHumidity" ]              {mqtt="<[mosquitto:iot/openhab/humidity_baie_parter_atmo:state:default]"}
 Number pressure_baie_parter "Baie parter [%.0f hPa]" <pressure>                                   {mqtt="<[mosquitto:iot/openhab/pressure_baie_parter_atmo:state:default]"}
 
+Number temperature_baie_etaj "Baie etaj [%.1f °C]" <temperature>                              {mqtt="<[mosquitto:iot/openhab/temperature_baie_etaj_atmo:state:default]"}
+Number humidity_baie_etaj "Baie etaj [%.0f %%]" <humidity> [ "CurrentHumidity" ]              {mqtt="<[mosquitto:iot/openhab/humidity_baie_etaj_atmo:state:default]"}
+Number pressure_baie_etaj "Baie etaj [%.0f hPa]" <pressure>                                   {mqtt="<[mosquitto:iot/openhab/pressure_baie_etaj_atmo:state:default]"}
 
 Number electricity_power_main_mono "Power main mono [%.0fw]" <energy>   {mqtt="<[mosquitto:iot/openhab/electricity_power main mono:state:default]"}
 Number electricity_kWh_power_main_mono "KWh main mono [%.2f kWh]" <energy>  {mqtt="<[mosquitto:iot/openhab/electricity_kWh_power main mono:state:default]"}
