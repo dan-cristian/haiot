@@ -25,7 +25,7 @@ class P:
     client_connected = False
     is_client_connecting = False
     mqtt_msg_count_per_minute = 0
-    last_connect_attempt = None
+    last_connect_attempt = utils.get_base_location_now_date()
     mqtt_mosquitto_exists = False
     mqtt_paho_exists = False
     last_rec = utils.get_base_location_now_date()
