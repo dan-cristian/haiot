@@ -323,7 +323,7 @@
     {"relay_pin_name": "unused_beci_relay", "zone_id": "14", "gpio_pin_code": "19", "gpio_host_name": "pi-face", "relay_type": "gpio"},
 
     {"relay_pin_name": "beci_contactor_relay", "zone_id": "10", "gpio_pin_code": "0:out:2", "gpio_host_name": "pi-face", "relay_type": "piface"},
-    {"relay_pin_name": "beci_upscharge_relay", "zone_id": "10", "gpio_pin_code": "0:out:3", "gpio_host_name": "pi-face", "relay_type": "piface"},
+    {"relay_pin_name": "beci_upscharge_relay", "zone_id": "10", "gpio_pin_code": "sonoff-basic-8", "gpio_host_name": "", "relay_type": "sonoff"},
     {"relay_pin_name": "beci_extra_relay", "zone_id": "10", "gpio_pin_code": "0:out:4", "gpio_host_name": "pi-face", "relay_type": "piface"},
 
     {"relay_pin_name": "freezer_relay", "zone_id": "10", "gpio_pin_code": "sonoff-pow-1", "gpio_host_name": "", "relay_type": "sonoff"},
