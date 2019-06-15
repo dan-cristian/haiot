@@ -29,6 +29,7 @@ class AMP_YMH:
     BI_AMP_ON = None
     ZONE2_ON = None
     ZONE3_ON = None
+    amp_state_dict = {}
 
     def __init__(self):
         pass
@@ -110,12 +111,11 @@ def set_amp_power(power_state, relay_name, amp_zone_index):
         relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.relay_pin_name: relay_name})
         power_state = bool(power_state)
         if relay is not None:
-            initial_relay_state = relay.relay_is_on
             # power on main relay for amp or on/off if there is no zonerue
-            #if power_state is True or
             if amp_zone_index == 0:
                 relay.relay_is_on = power_state
                 relay.save_changed_fields(broadcast=True, persist=True)
+                AMP_YMH.amp_state_dict[relay_name + str(amp_zone_index)] = power_state
                 # fixme: set amp
                 # L.l.error('check if fix me set amp relay')
                 msg = "Set relay {} to state {} zone_index={}\n".format(relay_name, power_state, amp_zone_index)
@@ -132,10 +132,15 @@ def set_amp_power(power_state, relay_name, amp_zone_index):
             return msg + "Power in {} set to {}\n".format(relay_name, relay.relay_is_on)
         else:
             # potentially amp settings change is required to switch amp zones
-            if initial_relay_state is not True and power_state is True:
+            if relay_name + str(amp_zone_index) in AMP_YMH.amp_state_dict.keys():
+                current_state = AMP_YMH.amp_state_dict[relay_name + str(amp_zone_index)]
+            else:
+                current_state = None
+            if power_state is True and (current_state is False or current_state is None):
                 # delay to wait for amp to fully start
                 time.sleep(5)
                 result_amp = amp_zone_power(power_state, amp_zone_index)
+                AMP_YMH.amp_state_dict[relay_name + str(amp_zone_index)] = power_state
                 return msg + result_amp
             else:
                 msg += 'Power state is {} so no amp action'.format(power_state)
