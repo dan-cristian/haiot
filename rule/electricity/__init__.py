@@ -203,13 +203,13 @@ class Upscharger(Powerdevice):
 class PwmHeater(LoadPowerDevice):
     DEVICE_SUPPORTS_BREAKS = True
     max_duty = 1000000
-    frequency = 20
+    frequency = 10
 
     # override
     def set_power_status(self, power_is_on, pwm_watts=None):
         # L.l.info("Setting pwm {} status {} to watts level {}".format(self.RELAY_NAME, power_is_on, pwm_watts))
         if power_is_on:
-            required_duty = int(0.9 * pwm_watts * self.max_duty / self.MAX_WATTS)
+            required_duty = int(0.8 * pwm_watts * self.max_duty / self.MAX_WATTS)
             if required_duty > self.max_duty:
                 L.l.warning('Capping incorrect duty {} watts={} max_duty={} max_watt={} '.format(
                     required_duty, pwm_watts, self.max_duty, self.MAX_WATTS))
