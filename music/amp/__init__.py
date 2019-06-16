@@ -136,7 +136,7 @@ def set_amp_power(power_state, relay_name, amp_zone_index):
                 current_state = AMP_YMH.amp_state_dict[relay_name + str(amp_zone_index)]
             else:
                 current_state = None
-            if power_state is True and (current_state is False or current_state is None):
+            if current_state is None or power_state != current_state:
                 # delay to wait for amp to fully start
                 time.sleep(5)
                 result_amp = amp_zone_power(power_state, amp_zone_index)
