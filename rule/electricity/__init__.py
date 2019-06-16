@@ -254,7 +254,7 @@ class PwmHeater(LoadPowerDevice):
                 new_target = current_watts - delta
                 L.l.info('Need to adjust down PWM on import {} to {} with delta={}'.format(
                     import_watts, new_target, delta))
-                self.set_power_status(power_is_on=True, pwm_watts=new_target)
+                self.set_power_status(power_is_on=True, pwm_watts=delta)
         return True
 
     def __init__(self, relay_name, relay_id, utility_name, max_watts):
