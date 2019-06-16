@@ -132,6 +132,12 @@ Number electricity_power_factor_mono "Main power factor [%.2f]" <flow>      {mqt
 Number electricity_voltage_mono "Main voltage [%.0f V]" <energy>            {mqtt="<[mosquitto:iot/openhab/vad_ZMNHTDx Smart meter S4 S5 S6_2:state:default]"}
 Number electricity_current_mono "Main current [%.1f A]" <poweroutlet_eu>    {mqtt="<[mosquitto:iot/openhab/iad_ZMNHTDx Smart meter S4 S5 S6_2:state:default]"}
 
+Number electricity_power_ups "Power ups [%.0fw]" <energy>                 {mqtt="<[mosquitto:iot/openhab/electricity_power ups:state:default]"}
+Number electricity_kWh_power_ups "KWh ups [%.2f kWh]" <energy>            {mqtt="<[mosquitto:iot/openhab/electricity_kWh_power ups:state:default]"}
+Number electricity_power_factor_ups "Ups power factor [%.2f]" <flow>      {mqtt="<[mosquitto:iot/openhab/vdd_power ups:state:default]"}
+Number electricity_voltage_ups "Ups voltage [%.0f V]" <energy>            {mqtt="<[mosquitto:iot/openhab/vad_power ups:state:default]"}
+Number electricity_current_ups "Ups current [%.1f A]" <poweroutlet_eu>    {mqtt="<[mosquitto:iot/openhab/iad_power ups:state:default]"}
+
 Number electricity_kWh_power_main_1 "KWh main 1 [%.2f kWh]" <energy>        {mqtt="<[mosquitto:iot/openhab/electricity_kWh_power main 1:state:default]"}
 
 Number electricity_solar_aps "Power solar [%.0fw]" <solarplant>             {mqtt="<[mosquitto:iot/openhab/electricity_solar_aps:state:default]"}
