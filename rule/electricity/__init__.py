@@ -203,7 +203,7 @@ class Upscharger(Powerdevice):
 class PwmHeater(LoadPowerDevice):
     DEVICE_SUPPORTS_BREAKS = True
     max_duty = 1000000
-    frequency = 10
+    frequency = 20
 
     # override
     def set_power_status(self, power_is_on, pwm_watts=None):
