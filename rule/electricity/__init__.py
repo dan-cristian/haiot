@@ -203,7 +203,7 @@ class Upscharger(Powerdevice):
 class PwmHeater(LoadPowerDevice):
     DEVICE_SUPPORTS_BREAKS = True
     max_duty = 1000000
-    frequency = 10
+    frequency = 20
 
     # override
     def set_power_status(self, power_is_on, pwm_watts=None):
@@ -217,7 +217,7 @@ class PwmHeater(LoadPowerDevice):
             pwm = pigpio_gpio.P.pwm.set(
                 self.RELAY_NAME, duty_cycle=required_duty, frequency=self.frequency, target_watts=pwm_watts)
             self.target_watts = pwm_watts
-            L.l.info('Just set power to freq={} duty={}'.format(pwm.frequency, pwm.duty_cycle))
+            L.l.info('Just set power to freq={} duty={} target={}'.format(pwm.frequency, pwm.duty_cycle, pwm_watts))
         else:
             pigpio_gpio.P.pwm.set(self.RELAY_NAME, duty_cycle=0, target_watts=0)
             self.target_watts = 0
@@ -248,11 +248,12 @@ class PwmHeater(LoadPowerDevice):
             delta = current_watts - import_watts
             if delta < 0:
                 if power_on:
-                    L.l.info('Need to stop, importing PWM with delta={}'.format(delta))
+                    L.l.info('Need to stop, importing {} PWM with delta={}'.format(import_watts, delta))
                     self.set_power_status(power_is_on=False)
             else:
                 new_target = current_watts - delta
-                L.l.info('Need to adjust down PWM on import to {} with delta={}'.format(new_target, delta))
+                L.l.info('Need to adjust down PWM on import {} to {} with delta={}'.format(
+                    import_watts, new_target, delta))
                 self.set_power_status(power_is_on=True, pwm_watts=new_target)
         return True
 
