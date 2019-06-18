@@ -194,11 +194,14 @@ def _process_message(msg):
             key = 'MHZ19B'
             if key in obj:
                 # "MHZ19B":{"Model":"B","CarbonDioxide":473,"Temperature":26.0},"TempUnit":"C"
-                co2 = obj[key]
+                air = obj[key]
+                co2 = air['CarbonDioxide']
+                temperature = air['Temperature']
                 sensor_address = '{}_{}'.format(sensor_name, key)
                 zone_sensor, sensor = _get_air_sensor(sensor_address=sensor_address, sensor_type=key)
                 sensor.co2 = co2
-                if co2 != 0:
+                sensor.temperature = temperature
+                if co2 != 0 or temperature != 0.0:
                     sensor.save_changed_fields(broadcast=True, persist=True)
         else:
             L.l.warning("Invalid sensor topic {}".format(msg.topic))
