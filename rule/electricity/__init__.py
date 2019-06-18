@@ -370,7 +370,6 @@ def rule_energy_export(obj=m.Utility(), change=None):
         pass
 
 
-
 def init():
     P.emulate_export = False
     P.init_dev()

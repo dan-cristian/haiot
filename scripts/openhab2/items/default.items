@@ -196,11 +196,12 @@ Number dust_etaj_pm2_5 "Dust etaj PM2.5 [%.0f ug/m3]" <smoke>    {mqtt="<[mosqui
 Number dust_etaj_pm10 "Dust etaj PM10 [%.0f ug/m3]" <smoke>      {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_10_wemos-micro-2_PMS5003:state:default]"}
 Number dust_etaj_p_2_5 "Dust etaj P2.5 [%.0f ppd]" <smoke>       {mqtt="<[mosquitto:iot/openhab/dustsensor_p_2_5_wemos-micro-2_PMS5003:state:default]"}
 
-Number dust_curte_pm1 "Dust curte PM1 [%.0f ug/m3]" <smoke>                  {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_1_wemosmini5_PMS5003:state:default]"}
-Number dust_curte_pm2_5 "Dust curte PM2.5 [%.0f ug/m3]" <smoke>              {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_2_5_wemosmini5_PMS5003:state:default]"}
-Number dust_curte_pm10 "Dust curte PM10 [%.0f ug/m3]" <smoke>                {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_10_wemosmini5_PMS5003:state:default]"}
-Number dust_curte_p_2_5 "Dust curte P2.5 [%.0f ppd]" <smoke>                 {mqtt="<[mosquitto:iot/openhab/dustsensor_p_2_5_wemosmini5_PMS5003:state:default]"}
+Number dust_curte_pm1 "Dust curte PM1 [%.0f ug/m3]" <smoke>       {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_1_wemosmini5_PMS5003:state:default]"}
+Number dust_curte_pm2_5 "Dust curte PM2.5 [%.0f ug/m3]" <smoke>   {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_2_5_wemosmini5_PMS5003:state:default]"}
+Number dust_curte_pm10 "Dust curte PM10 [%.0f ug/m3]" <smoke>     {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_10_wemosmini5_PMS5003:state:default]"}
+Number dust_curte_p_2_5 "Dust curte P2.5 [%.0f ppd]" <smoke>      {mqtt="<[mosquitto:iot/openhab/dustsensor_p_2_5_wemosmini5_PMS5003:state:default]"}
 
+Number co2_living "CO2 living [%.0f ppd]" <smoke>                 {mqtt="<[mosquitto:iot/openhab/airsensor_co2_wemos-mini-8_MHZ19B:state:default]"}
 
 Rollershutter mpd_player_living                 {mqtt="<[mosquitto:iot/openhab/mpd_player_living:state:default],>[mosquitto:iot/openhab/cmd/mpd_player_living:command:*:default]"}
 Dimmer mpd_volume_living "[%s]" <soundvolume>   {mqtt="<[mosquitto:iot/openhab/mpd_volume_living:state:default],>[mosquitto:iot/openhab/cmd/mpd_volume_living:command:*:default]"}

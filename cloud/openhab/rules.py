@@ -55,6 +55,18 @@ def rule_openhab_dustsensor(obj=m.DustSensor(), change=None):
                     L.l.warning('Field {} in dustsensor change list but not in obj={}'.format(key, obj))
 
 
+def rule_openhab_airsensor(obj=m.AirSensor(), change=None):
+    if change is not None:
+        address = obj.address
+        for key in change:
+            if key not in P.ignored_fields:
+                if hasattr(obj, key):
+                    val = getattr(obj, key)
+                    send_mqtt_openhab(subtopic='airsensor_' + key + '_' + address, payload=val)
+                else:
+                    L.l.warning('Field {} in airsensor change list but not in obj={}'.format(key, obj))
+
+
 def rule_openhab_utility(obj=m.Utility(), change=None):
     if hasattr(obj, 'utility_type') and hasattr(obj, 'utility_name') and obj.utility_name is not None:
         # L.l.info("PROCESSING utility {}".format(obj.utility_type))
