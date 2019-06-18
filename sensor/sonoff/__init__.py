@@ -50,6 +50,15 @@ def _get_dust_sensor(sensor_address, sensor_type):
     return zone_sensor, sensor
 
 
+def _get_air_sensor(sensor_address, sensor_type):
+    zone_sensor, actual_sensor_name = _get_zone_sensor(sensor_address, sensor_type)
+    sensor = m.AirSensor.find_one({m.AirSensor.address: sensor_address})
+    if sensor is None:
+        sensor = m.AirSensor()
+        sensor.address = sensor_address
+    return zone_sensor, sensor
+
+
 # '{"Time":"2018-10-14T21:57:33","ENERGY":{"Total":0.006,"Yesterday":0.000,"Today":0.006,"Power":5,"Factor":0.10,"Voltage":214,"Current":0.241}}'
 # 'iot/sonoff/tele/sonoff-pow-2/SENSOR'
 # {"Time":"2018-11-01T23:42:54","ENERGY":{"TotalStartTime":"2018-10-31T20:05:27","Total":0.000,"Yesterday":0.000,"Today":0.000,"Period":0,
@@ -181,6 +190,15 @@ def _process_message(msg):
                 # sometimes first read after power on returns invalid 0 values
                 if sensor.pm_1 + sensor.pm_2_5 +  sensor.pm_10 + sensor.p_0_3+ sensor.p_0_5 + sensor.p_1 \
                         + sensor.p_2_5 + sensor.p_5 + sensor.p_10 != 0:
+                    sensor.save_changed_fields(broadcast=True, persist=True)
+            key = 'MHZ19B'
+            if key in obj:
+                # "MHZ19B":{"Model":"B","CarbonDioxide":473,"Temperature":26.0},"TempUnit":"C"
+                co2 = obj[key]
+                sensor_address = '{}_{}'.format(sensor_name, key)
+                zone_sensor, sensor = _get_air_sensor(sensor_address=sensor_address, sensor_type=key)
+                sensor.co2 = co2
+                if co2 != 0:
                     sensor.save_changed_fields(broadcast=True, persist=True)
         else:
             L.l.warning("Invalid sensor topic {}".format(msg.topic))
