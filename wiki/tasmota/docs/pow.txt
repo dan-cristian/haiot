@@ -1,0 +1,2 @@
+PowerDelta 2
+PowerOnState 1

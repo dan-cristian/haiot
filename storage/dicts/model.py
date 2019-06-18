@@ -113,6 +113,13 @@ class DustSensor(ModelBase):
     updated_on = datetime.now()
 
 
+class AirSensor(ModelBase):
+    """key=address"""
+    id = 0
+    address = ''
+    co2 = 0
+
+
 class PowerMonitor(ModelBase):
     id = 0
     name = ''
