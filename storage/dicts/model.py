@@ -118,6 +118,7 @@ class AirSensor(ModelBase):
     id = 0
     address = ''
     co2 = 0
+    temperature = 0
 
 
 class PowerMonitor(ModelBase):
