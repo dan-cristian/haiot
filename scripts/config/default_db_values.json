@@ -128,7 +128,7 @@
     {"id":443, "active":false, "start_order":43, "name":"cloud.thingspeak", "host_name":"pidash"},
 
     {"id":501, "active":false, "start_order":50, "name":"apps.dashcam", "host_name":"netbook"},
-    {"id":509, "active":false, "start_order":9, "name":"heat", "host_name":"netbook"},
+    {"id":509, "active":true, "start_order":9, "name":"heat", "host_name":"netbook"},
     {"id":525, "active":true, "start_order":25, "name":"rule", "host_name":"netbook"},
     {"id":526, "active":true, "start_order":26, "name":"rule.electricity", "host_name":"netbook"},
     {"id":527, "active":true, "start_order":27, "name":"node", "host_name":"netbook"},
@@ -483,7 +483,7 @@
     {"zone_id":27 , "sensor_address": "8DFF517369C66710", "sensor_name": "odroid-test", "target_material": "air", "alt_address": "10.67C6697351FF"},
 
     {"zone_id":53 , "sensor_address": "404000225631",     "sensor_name": "solar back", "alt_address": ""},
-    {"zone_id":23 , "sensor_address": "cc:01",            "sensor_name": "fridge"},
+    {"zone_id":23 , "sensor_address": "cc:01",            "sensor_name": "fridge", "is_main":true},
     {"zone_id":26 , "sensor_address": "f9:02",            "sensor_name": "congelator"},
     {"zone_id":27 , "sensor_address": "b8:01",            "sensor_name": "desk"},
     {"zone_id":8 ,  "sensor_address": "ZMNHTDx Smart meter S4 S5 S6_2",             "sensor_name": "zwave main power meter"},
