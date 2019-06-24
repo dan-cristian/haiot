@@ -54,7 +54,8 @@ def _save_heat_state_db(zone, heat_is_on):
 
 
 # triggers heat status update if heat changed
-def _decide_action(zone, current_temperature, target_temperature, force_on=False, force_off=False, zone_thermo=None):
+def _decide_action(zone, current_temperature, target_temperature, force_on=False,
+                   force_off=False, zone_thermo=None, direction=1):
     heat_is_on = None
     if force_on:
         heat_is_on = True
@@ -66,12 +67,26 @@ def _decide_action(zone, current_temperature, target_temperature, force_on=False
         heat_is_on = zone_thermo.heat_is_on
         if heat_is_on is None:
             heat_is_on = False
-        if current_temperature < target_temperature:
-            heat_is_on = True
-        P.heat_status += 'temp low {}<{} {} '.format(current_temperature, target_temperature, heat_is_on)
-        if current_temperature > (target_temperature + P.threshold):
-            heat_is_on = False
-        P.heat_status += 'temp high {}>{} {} '.format(current_temperature, target_temperature + P.threshold, heat_is_on)
+        if direction >= 0:
+            # for heating
+            if current_temperature < target_temperature:
+                heat_is_on = True
+                P.heat_status += 'temp low {}<{} {} '.format(current_temperature, target_temperature, heat_is_on)
+            if current_temperature > (target_temperature + P.threshold):
+                heat_is_on = False
+                P.heat_status += 'temp high {}>{} {} '.format(
+                    current_temperature, target_temperature + P.threshold, heat_is_on)
+        else:
+            # for cooling
+            if current_temperature > target_temperature:
+                heat_is_on = True
+                P.heat_status += 'temp too high {}<{} {} - cooling '.format(
+                    current_temperature, target_temperature, heat_is_on)
+            if current_temperature < (target_temperature + P.threshold):
+                heat_is_on = False
+                P.heat_status += 'temp too low {}>{} {} - no cool'.format(
+                    current_temperature, target_temperature + P.threshold, heat_is_on)
+
     # trigger if state is different and every 5 minutes (in case other hosts with relays have restarted)
     if zone_thermo.last_heat_status_update is not None:
         last_heat_update_age_sec = (utils.get_base_location_now_date()
@@ -92,12 +107,15 @@ def _get_temp_target(pattern_id):
     # check pattern validity
     if len(pattern) == 24:
         temp_code = pattern[hour]
-        temp_target = float(m.TemperatureTarget.find_one({m.TemperatureTarget.code: temp_code}).target)
+        target_rec = m.TemperatureTarget.find_one({m.TemperatureTarget.code: temp_code})
+        temp_target = target_rec.target
+        temp_dir = target_rec.direction
     else:
         L.l.warning('Incorrect temp pattern [{}] in zone {}, length is not 24'.format(pattern, schedule_pattern.name))
         temp_target = None
         temp_code = None
-    return temp_target, temp_code
+        temp_dir = None
+    return temp_target, temp_code, temp_dir
 
 
 # provide heat pattern
@@ -148,7 +166,7 @@ def _get_heat_on_keep_warm(schedule_pattern, temp_code, temp_target, temp_actual
             if delta_warm <= P.MAX_DELTA_TEMP_KEEP_WARM:
                 force_on = ((schedule_pattern.keep_warm_pattern[interval] == "1") and
                             temp_code is not P.TEMP_NO_HEAT)
-                #if force_on:
+                # if force_on:
                 L.l.info("Forcing heat {} keep warm, zone {} interval {} pattern {}".format(
                     force_on, schedule_pattern.name, interval, schedule_pattern.keep_warm_pattern[interval]))
             else:
@@ -194,7 +212,7 @@ def _update_zone_heat(zone, heat_schedule, sensor):
     try:
         schedule_pattern = _get_schedule_pattern(heat_schedule)
         if schedule_pattern:
-            std_temp_target, temp_code = _get_temp_target(schedule_pattern.id)
+            std_temp_target, temp_code, temp_dir = _get_temp_target(schedule_pattern.id)
             main_source_needed = schedule_pattern.main_source_needed
             # set heat to off if condition is met (i.e. do not try to heat water if heat source is cold)
             if std_temp_target is not None:
@@ -219,7 +237,7 @@ def _update_zone_heat(zone, heat_schedule, sensor):
                 zone_thermo.save_changed_fields()
                 if sensor.temperature is not None:
                     heat_is_on = _decide_action(zone, sensor.temperature, act_temp_target, force_on=force_on,
-                                                force_off=force_off, zone_thermo=zone_thermo)
+                                                force_off=force_off, zone_thermo=zone_thermo, direction=temp_dir)
             else:
                 L.l.critical('Unknown temperature pattern code {}'.format(temp_code))
     except Exception as ex:
