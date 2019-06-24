@@ -159,10 +159,10 @@ def amp_zone_on(zone_index):
 def amp_zone_off(zone_index):
     return amp.amp_zone_power(on=False, zone_index=zone_index)
 
-
-@app.route('/network/wifi_dhcp/operation=<operation>&mac=<mac>&ip=<ip>&device=<device>', methods=['GET'])
-def wifi_dhcp(operation, mac, ip, device):
-    L.l.info('Got wifi dhcp update {} {} {} {}'.format(operation, mac, ip, device))
+# &mac=<mac>&ip=<ip>&device=<device>
+@app.route('/network/wifi_dhcp/operation=<operation>', methods=['GET'])
+def wifi_dhcp(operation):
+    L.l.info('Got wifi dhcp update {}'.format(operation))
 
 
 # @app.route('/ebooks', defaults={'req_path': ''})
