@@ -382,19 +382,22 @@
   ],
 
   "TemperatureTarget": [
-    {"code":".", "target":"18"},
-    {"code":"0", "target":"20"},
-    {"code":"a", "target":"20.5"},
-    {"code":"1", "target":"21"},
-    {"code":"b", "target":"21.5"},
-    {"code":"2", "target":"22"},
-    {"code":"c", "target":"22.5"},
-    {"code":"3", "target":"23"},
-    {"code":"d", "target":"23.5"},
-    {"code":"4", "target":"24"},
-    {"code":"e", "target":"24.5"},
-    {"code":"h", "target":"45"},
-    {"code":"i", "target":"43"}
+    {"code":".", "target":18,   "direction": 1},
+    {"code":"0", "target":20,   "direction": 1},
+    {"code":"a", "target":20.5, "direction": 1},
+    {"code":"1", "target":21,   "direction": 1},
+    {"code":"b", "target":21.5, "direction": 1},
+    {"code":"2", "target":22,   "direction": 1},
+    {"code":"c", "target":22.5, "direction": 1},
+    {"code":"3", "target":23,   "direction": 1},
+    {"code":"d", "target":23.5, "direction": 1},
+    {"code":"4", "target":24,   "direction": 1},
+    {"code":"e", "target":24.5, "direction": 1},
+    {"code":"h", "target":45,   "direction": 1},
+    {"code":"i", "target":43,   "direction": 1},
+
+    {"code":"x", "target":0,   "direction": -1},
+    {"code":"y", "target":-18, "direction": -1}
   ],
 
   "SchedulePattern": [
@@ -416,7 +419,9 @@
     {"id":16, "name":"weekend-dormitor-summer",  "pattern":"bbbb bbbb .... .bbb ...b bbbb", "main_source_needed":true},
     {"id":17, "name":"week-boiler-winter",       "pattern":"hhhh hhhh hhhh hhhh hhhh hhhh", "activate_on_condition":true, "activate_condition_relay":"puffer gas valve", "main_source_needed":false},
     {"id":18, "name":"week-boiler-summer",       "pattern":"iiii iiii iiii iiii iiii iiii", "activate_on_condition":true, "activate_condition_relay":"puffer gas valve", "main_source_needed":false},
-    {"id":20, "name":"away",                     "pattern":".... .... .... .... .... ....", "main_source_needed":true}
+    {"id":20, "name":"away",                     "pattern":".... .... .... .... .... ....", "main_source_needed":true},
+
+    {"id":30, "name":"fridge-summer",            "pattern":"xxxx xxxx xxxx xxxx xxxx xxxx", "main_source_needed":false}
   ],
 
   "HeatSchedule": [
@@ -429,19 +434,24 @@
     {"zone_id":4,  "pattern_week_id":13,  "pattern_weekend_id":14, "pattern_id_presence":14, "pattern_id_no_presence":20, "season": "winter"},
     {"zone_id":4,  "pattern_week_id":13,  "pattern_weekend_id":14, "pattern_id_presence":14, "pattern_id_no_presence":20, "season": "summer"},
     {"zone_id":52, "pattern_week_id":17,  "pattern_weekend_id":17, "pattern_id_presence":17, "pattern_id_no_presence":20, "season": "winter"},
-    {"zone_id":52, "pattern_week_id":18,  "pattern_weekend_id":18, "pattern_id_presence":18, "pattern_id_no_presence":20, "season": "summer"}
+    {"zone_id":52, "pattern_week_id":18,  "pattern_weekend_id":18, "pattern_id_presence":18, "pattern_id_no_presence":20, "season": "summer"},
+
+    {"zone_id":23, "pattern_week_id":30,  "pattern_weekend_id":30, "pattern_id_presence":30, "pattern_id_no_presence":30, "season": "summer"},
+    {"zone_id":23, "pattern_week_id":30,  "pattern_weekend_id":30, "pattern_id_presence":30, "pattern_id_no_presence":30, "season": "winter"}
   ],
 
 
   "ZoneHeatRelay":[
-    {"zone_id":1, "heat_pin_name":"bucatarie",  "gpio_pin_code":"0:out:3", "gpio_host_name":"pi-face", "relay_type": "gpio"},
-    {"zone_id":2, "heat_pin_name":"living",     "gpio_pin_code":"0:out:4", "gpio_host_name":"pi-face", "relay_type": "gpio"},
-    {"zone_id":47,"heat_pin_name":"birou",      "gpio_pin_code":"0:out:5", "gpio_host_name":"pi-face", "relay_type": "gpio"},
+    {"zone_id":1, "heat_pin_name":"bucatarie",  "gpio_pin_code":"0:out:3", "gpio_host_name":"homew", "relay_type": "piface"},
+    {"zone_id":2, "heat_pin_name":"living",     "gpio_pin_code":"0:out:4", "gpio_host_name":"homew", "relay_type": "piface"},
+    {"zone_id":47,"heat_pin_name":"birou",      "gpio_pin_code":"0:out:5", "gpio_host_name":"homew", "relay_type": "piface"},
     {"zone_id":4, "heat_pin_name":"dormitor",   "gpio_pin_code":"0:out:2", "gpio_host_name":"homew", "relay_type": "piface"},
     {"zone_id":19,"heat_pin_name":"gas heat",   "gpio_pin_code":"0:out:0", "gpio_host_name":"homew", "relay_type": "piface", "is_main_heat_source":true},
     {"zone_id":52,"heat_pin_name":"puffer boiler", "gpio_pin_code":"0:out:1", "gpio_host_name":"homew", "relay_type": "piface"},
     {"zone_id":50,"heat_pin_name":"puffer heat", "gpio_pin_code":"0:out:7", "gpio_host_name":"homew", "relay_type": "piface", "temp_sensor_name":"puffer sus"},
-    {"zone_id":51,"heat_pin_name":"puffer gas valve", "gpio_pin_code":"0:out:6", "gpio_host_name":"homew", "relay_type": "piface", "is_alternate_source_switch":true, "temp_sensor_name":"puffer sus"}
+    {"zone_id":51,"heat_pin_name":"puffer gas valve", "gpio_pin_code":"0:out:6", "gpio_host_name":"homew", "relay_type": "piface", "is_alternate_source_switch":true, "temp_sensor_name":"puffer sus"},
+
+    {"zone_id":23, "heat_pin_name":"fridge",  "gpio_pin_code":"Unknown: type=0004, id=0002_5", "gpio_host_name":"homew", "relay_type": "zwave"}
   ],
 
   "ZoneSensor": [

@@ -14,9 +14,8 @@ Number ups_battery_voltage "UPS Battery [%.1f V]" <batterylevel>            {mqt
 Number ups_input_voltage "UPS Input [%.0f V]" <poweroutlet_us>              {mqtt="<[mosquitto:iot/openhab/ups_input_voltage:state:default]"}
 
 Switch relay_front_lights_relay "Front lights" <switch> [ "Lighting" ]      {mqtt="<[mosquitto:iot/openhab/relay_front_lights_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_front_lights_relay:command:*:default]", autoupdate="false"}
-Switch relay_plug_dishwasher "Plug dishwasher" <switch>                     {mqtt="<[mosquitto:iot/openhab/relay_plug_dishwasher:state:default],>[mosquitto:iot/openhab/cmd/relay_plug_dishwasher:command:*:default]", autoupdate="false"}
-Switch relay_plug_fridge "Plug fridge" <switch>                             {mqtt="<[mosquitto:iot/openhab/relay_plug_fridge:state:default],>[mosquitto:iot/openhab/cmd/relay_plug_fridge:command:*:default]", autoupdate="false"}
-
+Switch relay_dishwasher "Plug dishwasher" <switch>                     {mqtt="<[mosquitto:iot/openhab/relay_plug_dishwasher:state:default],>[mosquitto:iot/openhab/cmd/relay_plug_dishwasher:command:*:default]", autoupdate="false"}
+Switch relay_fridge "Plug fridge" <switch>                             {mqtt="<[mosquitto:iot/openhab/relay_plug_fridge:state:default],>[mosquitto:iot/openhab/cmd/relay_plug_fridge:command:*:default]", autoupdate="false"}
 Switch relay_tv "TV" <switch>                           [ "Switchable" ]    {mqtt="<[mosquitto:iot/openhab/relay_tv_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_tv_relay:command:*:default]", autoupdate="false"}
 
 Group:Switch:OR(ON, OFF)    RELAY_AMP   "Music amp [(%d)]"  <switch>

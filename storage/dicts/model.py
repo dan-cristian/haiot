@@ -223,6 +223,7 @@ class TemperatureTarget(ModelBase):
     id = 0
     code = ''
     target = 0.0
+    direction = 1  # > 0 is a heating zone, < 0 is a cooling zone (fridge)
 
 
 class ZoneHeatRelay(ModelBase):
