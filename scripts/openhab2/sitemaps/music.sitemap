@@ -1,4 +1,4 @@
-sitemap default label="Music" {
+sitemap music label="Music" {
 
 Frame {
     Default item=mpd_lastfmloved
