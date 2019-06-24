@@ -353,9 +353,9 @@
     {"relay_pin_name": "portita_relay", "zone_id": "7", "gpio_pin_code": "26", "gpio_host_name": "pi-power", "relay_type": "gpio"},
 
     {"relay_pin_name": "plug_1_old", "zone_id": "29", "gpio_pin_code": "TZ69 Smart energy plug in switch_4", "relay_type": "zwave", "gpio_host_name": "homew"},
-    {"relay_pin_name": "plug_1", "zone_id": "29", "gpio_pin_code": "Unknown: type=0004, id=0002_4", "relay_type": "zwave", "gpio_host_name": "homew"},
+    {"relay_pin_name": "plug_dishwasher", "zone_id": "29", "gpio_pin_code": "Unknown: type=0004, id=0002_4", "relay_type": "zwave", "gpio_host_name": "homew"},
     {"relay_pin_name": "plug_2_old", "zone_id": "29", "gpio_pin_code": "TZ69 Smart energy plug in switch_5", "relay_type": "zwave", "gpio_host_name": "homew"},
-    {"relay_pin_name": "plug_2", "zone_id": "29", "gpio_pin_code": "Unknown: type=0004, id=0002_5", "relay_type": "zwave", "gpio_host_name": "homew"},
+    {"relay_pin_name": "plug_fridge", "zone_id": "29", "gpio_pin_code": "Unknown: type=0004, id=0002_5", "relay_type": "zwave", "gpio_host_name": "homew"},
 
     {"relay_pin_name": "living_music_relay",    "zone_id": "2", "gpio_pin_code": "17", "gpio_host_name": "pi-power", "relay_type": "gpio"},
     {"relay_pin_name": "living_sub_relay",      "zone_id": "2", "gpio_pin_code": "17", "gpio_host_name": "pi-power", "relay_type": "gpio"},
@@ -478,10 +478,10 @@
     {"zone_id":27 , "sensor_address": "b8:01",            "sensor_name": "desk"},
     {"zone_id":8 ,  "sensor_address": "ZMNHTDx Smart meter S4 S5 S6_2",             "sensor_name": "zwave main power meter"},
     {"zone_id":8 ,  "sensor_address": "Unknown: type=0007, id=0052_2",              "sensor_name": "zwave main power meter"},
-    {"zone_id":29 , "sensor_address": "TZ69 Smart energy plug in switch_4",         "sensor_name": "zwave plug 1"},
-    {"zone_id":29 , "sensor_address": "Unknown: type=0004, id=0002_4",              "sensor_name": "zwave plug 1"},
-    {"zone_id":29 , "sensor_address": "TZ69 Smart energy plug in switch_5",         "sensor_name": "zwave plug 2"},
-    {"zone_id":29 , "sensor_address": "Unknown: type=0004, id=0002_5",              "sensor_name": "zwave plug 2"},
+    {"zone_id":29 , "sensor_address": "TZ69 Smart energy plug in switch_4",         "sensor_name": "zwave dishwasher"},
+    {"zone_id":29 , "sensor_address": "Unknown: type=0004, id=0002_4",              "sensor_name": "zwave dishwasher"},
+    {"zone_id":29 , "sensor_address": "TZ69 Smart energy plug in switch_5",         "sensor_name": "zwave fridge"},
+    {"zone_id":29 , "sensor_address": "Unknown: type=0004, id=0002_5",              "sensor_name": "zwave fridge"},
 
     {"zone_id":10 , "sensor_address": "pi-face_bmp280",                             "sensor_name": "baro_house"},
     {"zone_id":29 , "sensor_address": "esp12-1_a0",                                 "sensor_name": "gas CO beci"},
@@ -499,8 +499,8 @@
 
   "Utility": [
     {"utility_name":"power main mono", "sensor_name":"zwave main power meter", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
-    {"utility_name":"power plug 1", "sensor_name":"zwave plug 1", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
-    {"utility_name":"power plug 2", "sensor_name":"zwave plug 2", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
+    {"utility_name":"power dishwasher", "sensor_name":"zwave dishwasher", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
+    {"utility_name":"power fridge", "sensor_name":"zwave fridge", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
 
     {"utility_name":"power freezer", "sensor_name":"sonoff-pow-1", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
     {"utility_name":"power gas heater", "sensor_name":"sonoff-pow-2", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
