@@ -1,32 +1,6 @@
 sitemap default label="Home" {
 
 Frame {
-    Default item=mpd_lastfmloved
-    Default item=mpd_lastfmsong
-}
-
-Frame {
-    Default item=mpd_player_living
-    Default item=mpd_volume_living
-    Default item=mpd_position_living
-    Default item=mpd_song_living
-    Default item=mpd_state_living
-}
-
-Frame {
-    Default item=mpd_player_beci
-    Default item=mpd_volume_beci
-    Default item=mpd_position_beci
-    Default item=mpd_song_beci
-    Default item=mpd_state_beci
-}
-
-Frame {
-    Default item=mpd_player_dormitor
-}
-
-
-Frame {
     Group item=TEMP_BOI {
         Text item=temperature_boiler_sus {
             Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
@@ -201,14 +175,14 @@ Frame {
 	Default item=electricity_power_factor_mono
 	Default item=electricity_voltage_mono
 	Default item=electricity_current_mono
-	Default item=electricity_power_plug_1
-	Default item=electricity_power_factor_plug_1
-	Default item=electricity_voltage_plug_1
-	Default item=electricity_current_plug_1
-	Default item=electricity_power_plug_2
-	Default item=electricity_power_factor_plug_2
-	Default item=electricity_voltage_plug_2
-	Default item=electricity_current_plug_2
+	Default item=electricity_power_dishwasher
+	Default item=electricity_power_factor_dishwasher
+	Default item=electricity_voltage_dishwasher
+	Default item=electricity_current_dishwasher
+	Default item=electricity_power_fridge
+	Default item=electricity_power_factor_fridge
+	Default item=electricity_voltage_fridge
+	Default item=electricity_current_fridge
 	Default item=electricity_power_freezer
 	Default item=electricity_power_gas_heater
 	Default item=electricity_power_washing
@@ -221,8 +195,8 @@ Frame {
 Frame {
     Default item=relay_front_gate
 	Default item=relay_front_lights_relay
-	Default item=relay_plug_1
-	Default item=relay_plug_2
+	Default item=relay_dishwasher
+	Default item=relay_fridge
 	Default item=relay_beci_contactor
 	Default item=relay_beci_upscharge
 	Default item=relay_beci_extra_relay
