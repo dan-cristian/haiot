@@ -163,6 +163,7 @@ def amp_zone_off(zone_index):
 @app.route('/network/wifi_dhcp/operation=<operation>', methods=['GET'])
 def wifi_dhcp(operation):
     L.l.info('Got wifi dhcp update {}'.format(operation))
+    return operation
 
 
 # @app.route('/ebooks', defaults={'req_path': ''})
