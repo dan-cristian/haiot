@@ -119,6 +119,9 @@ class AirSensor(ModelBase):
     address = ''
     co2 = 0
     temperature = 0
+    pressure = 0
+    humidity = 0
+    gas = 0  # for BME680
 
 
 class PowerMonitor(ModelBase):
