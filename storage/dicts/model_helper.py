@@ -56,7 +56,7 @@ class DictTable:
             sort_dir = sort[0][1]
         match_count = 0
         # fixme: lock self.table during iteration
-        for rec in self.table:
+        for rec in dict(self.table):
             match = True
             if filter is not None:
                 for cond in filter:
