@@ -112,11 +112,11 @@ Number humidity_dormitor_etaj "Dormitor etaj [%.0f %%]" <humidity> [ "CurrentHum
 Number temperature_living_tv "Living TV [%.1f °C]" <temperature>                            {mqtt="<[mosquitto:iot/openhab/temperature_living_atmo:state:default]"}
 Number humidity_living "Living [%.0f %%]" <humidity> [ "CurrentHumidity" ]                  {mqtt="<[mosquitto:iot/openhab/humidity_living_atmo:state:default]"}
 Number pressure_living "Living [%.0f hPa]" <pressure>                                       {mqtt="<[mosquitto:iot/openhab/pressure_living_atmo:state:default]"}
-Number air_co2_living "CO2 living [%.0f ppm]" <smoke>                       {mqtt="<[mosquitto:iot/openhab/airsensor_co2_wemos-mini-8_MHZ19B:state:default]"}
-Number air_temperature_living "Temp mhz living [%.1f °C]" <temperature>    {mqtt="<[mosquitto:iot/openhab/airsensor_temperature_wemos-mini-8_MHZ19B:state:default]"}
-Number air_gas_living "Gas living [%.2f kOhm]" <smoke>                       {mqtt="<[mosquitto:iot/openhab/airsensor_gas_wemos-mini-8_BME680:state:default]"}
-Number air_temperature_bme_living "Temp bme living [%.1f °C]" <temperature>  {mqtt="<[mosquitto:iot/openhab/airsensor_temperature_wemos-mini-8_BME680:state:default]"}
-Number air_pressure_bme_living "Pressure bme living [%.0f ppd]" <temperature>  {mqtt="<[mosquitto:iot/openhab/airsensor_pressure_wemos-mini-8_BME680:state:default]"}
+Number air_co2_living "CO2 living [%.0f ppm]" <smoke>                       {mqtt="<[mosquitto:iot/openhab/airsensor_co2_wemos-mini-8_mhz19b:state:default]"}
+Number air_temperature_living "Temp mhz living [%.1f °C]" <temperature>    {mqtt="<[mosquitto:iot/openhab/airsensor_temperature_wemos-mini-8_mhz19b:state:default]"}
+Number air_gas_living "Gas living [%.2f kOhm]" <smoke>                       {mqtt="<[mosquitto:iot/openhab/airsensor_gas_wemos-mini-8_bme680:state:default]"}
+Number air_temperature_bme_living "Temp bme living [%.1f °C]" <temperature>  {mqtt="<[mosquitto:iot/openhab/airsensor_temperature_wemos-mini-8_bme680:state:default]"}
+Number air_pressure_bme_living "Pressure bme living [%.0f ppd]" <temperature>  {mqtt="<[mosquitto:iot/openhab/airsensor_pressure_wemos-mini-8_bme680:state:default]"}
 
 
 Number temperature_bucatarie_hota "Bucatarie hota [%.1f °C]" <temperature>                      {mqtt="<[mosquitto:iot/openhab/temperature_bucatarie_atmo:state:default]"}
