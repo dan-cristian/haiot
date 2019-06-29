@@ -129,27 +129,30 @@ def _process_message(msg):
                     if c in counter:
                         cval = int(counter[c])
                         dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=cval, index=i)
-            if 'BMP280' in obj:
-                # iot/sonoff/tele/sonoff-basic-3/SENSOR =
-                # {"Time":"2018-10-28T08:12:26","BMP280":{"Temperature":24.6,"Pressure":971.0},"TempUnit":"C"}
-                bmp = obj['BMP280']
-                temp = bmp['Temperature']
-                press = bmp['Pressure']
-                sensor_address = '{}_{}'.format(sensor_name, 'bmp280')
-                zone_sensor, sensor = _get_sensor(sensor_address=sensor_address, sensor_type='BMP280')
-                sensor.temperature = temp
-                sensor.pressure = press
-                sensor.save_changed_fields(broadcast=True, persist=True)
-            if 'BME280' in obj:
-                # "BME280":{"Temperature":24.1,"Humidity":39.2,"Pressure":980.0},"PressureUnit":"hPa","TempUnit":"C"}
-                bmp = obj['BME280']
-                sensor_address = '{}_{}'.format(sensor_name, 'bme280')
-                zone_sensor, sensor = _get_sensor(sensor_address=sensor_address, sensor_type='BME280')
-                sensor.temperature = bmp['Temperature']
-                sensor.pressure = bmp['Pressure']
-                if 0 < bmp['Humidity'] < 100:
-                    sensor.humidity = bmp['Humidity']
-                sensor.save_changed_fields(broadcast=True, persist=True)
+
+            # iot/sonoff/tele/sonoff-basic-3/SENSOR =
+            # {"Time":"2018-10-28T08:12:26","BMP280":{"Temperature":24.6,"Pressure":971.0},"TempUnit":"C"}
+            # "BME280":{"Temperature":24.1,"Humidity":39.2,"Pressure":980.0},"PressureUnit":"hPa","TempUnit":"C"}
+            # {"BME680":{"Temperature":29.0,"Humidity":63.3,"Pressure":981.6,"Gas":24.46},"PressureUnit":"hPa","TempUnit":"C"}
+            # "MHZ19B":{"Model":"B","CarbonDioxide":473,"Temperature":26.0},"TempUnit":"C"
+            for k, v in obj.items():
+                if k.startswith('BME') or k.startswith('BMP') or k.startswith('MHZ19'):
+                    sensor_address = '{}_{}'.format(sensor_name, k.lower())
+                    zone_sensor, sensor = _get_air_sensor(sensor_address=sensor_address, sensor_type=k)
+                    if 'Temperature' in v:
+                        sensor.temperature = v['Temperature']
+                    if 'Pressure' in v:
+                        sensor.pressure = v['Pressure']
+                    if 'Humidity' in v:
+                        if 0 < v['Humidity'] < 100:
+                            sensor.humidity = v['Humidity']
+                    if 'Gas' in v:
+                        sensor.gas = v['Gas']
+                    if 'CarbonDioxide' in v:
+                        sensor.co2 = v['CarbonDioxide']
+                    sensor.save_changed_fields(broadcast=True, persist=True)
+
+
             if 'INA219' in obj:
                 ina = obj['INA219']
                 voltage = ina['Voltage']
@@ -190,18 +193,6 @@ def _process_message(msg):
                 # sometimes first read after power on returns invalid 0 values
                 if sensor.pm_1 + sensor.pm_2_5 +  sensor.pm_10 + sensor.p_0_3+ sensor.p_0_5 + sensor.p_1 \
                         + sensor.p_2_5 + sensor.p_5 + sensor.p_10 != 0:
-                    sensor.save_changed_fields(broadcast=True, persist=True)
-            key = 'MHZ19B'
-            if key in obj:
-                # "MHZ19B":{"Model":"B","CarbonDioxide":473,"Temperature":26.0},"TempUnit":"C"
-                air = obj[key]
-                co2 = air['CarbonDioxide']
-                temperature = air['Temperature']
-                sensor_address = '{}_{}'.format(sensor_name, key)
-                zone_sensor, sensor = _get_air_sensor(sensor_address=sensor_address, sensor_type=key)
-                sensor.co2 = co2
-                sensor.temperature = temperature
-                if co2 != 0 or temperature != 0.0:
                     sensor.save_changed_fields(broadcast=True, persist=True)
         else:
             L.l.warning("Invalid sensor topic {}".format(msg.topic))
