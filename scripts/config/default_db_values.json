@@ -396,7 +396,7 @@
     {"code":"h", "target":45,   "direction": 1},
     {"code":"i", "target":43,   "direction": 1},
 
-    {"code":"x", "target":0,   "direction": -1},
+    {"code":"x", "target":1,   "direction": -1},
     {"code":"y", "target":-18, "direction": -1}
   ],
 
