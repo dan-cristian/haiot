@@ -109,9 +109,9 @@ Number humidity_fridge "Fridge [%.0f %%]" <humidity> [ "CurrentHumidity" ]      
 Number humidity_parter "Parter [%.0f %%]" <humidity> [ "CurrentHumidity" ]                        {mqtt="<[mosquitto:iot/openhab/humidity_parter:state:default]"}
 Number humidity_dormitor_etaj "Dormitor etaj [%.0f %%]" <humidity> [ "CurrentHumidity" ]          {mqtt="<[mosquitto:iot/openhab/humidity_dormitor etaj:state:default]"}
 
-Number temperature_living_tv "Living TV [%.1f °C]" <temperature>                            {mqtt="<[mosquitto:iot/openhab/temperature_living_atmo:state:default]"}
-Number humidity_living "Living [%.0f %%]" <humidity> [ "CurrentHumidity" ]                  {mqtt="<[mosquitto:iot/openhab/humidity_living_atmo:state:default]"}
-Number pressure_living "Living [%.0f hPa]" <pressure>                                       {mqtt="<[mosquitto:iot/openhab/pressure_living_atmo:state:default]"}
+Number temperature_living_tv "Living TV [%.1f °C]" <temperature>                      {mqtt="<[mosquitto:iot/openhab/airsensor_temperature_sonoff-basic-1_bme280:state:default]"}
+Number humidity_living "Living [%.0f %%]" <humidity> [ "CurrentHumidity" ]            {mqtt="<[mosquitto:iot/openhab/airsensor_humidity_sonoff-basic-1_bme280:state:default]"}
+Number pressure_living "Living [%.0f hPa]" <pressure>                                 {mqtt="<[mosquitto:iot/openhab/airsensor_pressure_sonoff-basic-1_bme280:state:default]"}
 Number air_co2_living "CO2 living [%.0f ppm]" <smoke>                       {mqtt="<[mosquitto:iot/openhab/airsensor_co2_wemos-mini-8_mhz19b:state:default]"}
 Number air_temperature_living "Temp mhz living [%.1f °C]" <temperature>    {mqtt="<[mosquitto:iot/openhab/airsensor_temperature_wemos-mini-8_mhz19b:state:default]"}
 Number air_gas_living "Gas living [%.2f kOhm]" <smoke>                       {mqtt="<[mosquitto:iot/openhab/airsensor_gas_wemos-mini-8_bme680:state:default]"}
@@ -119,17 +119,17 @@ Number air_temperature_bme_living "Temp bme living [%.1f °C]" <temperature>  {m
 Number air_pressure_bme_living "Pressure bme living [%.0f hPa]" <pressure>  {mqtt="<[mosquitto:iot/openhab/airsensor_pressure_wemos-mini-8_bme680:state:default]"}
 Number air_humidity_bme_living "Humidity bme living [%.0f %%]" <humidity>  {mqtt="<[mosquitto:iot/openhab/airsensor_humidity_wemos-mini-8_bme680:state:default]"}
 
-Number temperature_bucatarie_hota "Bucatarie hota [%.1f °C]" <temperature>                      {mqtt="<[mosquitto:iot/openhab/temperature_bucatarie_atmo:state:default]"}
-Number humidity_bucatarie "Bucatarie [%.0f %%]" <humidity> [ "CurrentHumidity" ]                {mqtt="<[mosquitto:iot/openhab/humidity_bucatarie_atmo:state:default]"}
-Number pressure_bucatarie "Bucatarie [%.0f hPa]" <pressure>                                     {mqtt="<[mosquitto:iot/openhab/pressure_bucatarie_atmo:state:default]"}
+Number temperature_bucatarie_hota "Bucatarie hota [%.1f °C]" <temperature>            {mqtt="<[mosquitto:iot/openhab/airsensor_temperature_sonoff-basic-6_bme280:state:default]"}
+Number humidity_bucatarie "Bucatarie [%.0f %%]" <humidity> [ "CurrentHumidity" ]      {mqtt="<[mosquitto:iot/openhab/airsensor_humidity_sonoff-basic-6_bme280:state:default]"}
+Number pressure_bucatarie "Bucatarie [%.0f hPa]" <pressure>                           {mqtt="<[mosquitto:iot/openhab/airsensor_pressure_sonoff-basic-6_bme280:state:default]"}
 
-Number temperature_baie_parter "Baie parter [%.1f °C]" <temperature>                              {mqtt="<[mosquitto:iot/openhab/temperature_baie_parter_atmo:state:default]"}
-Number humidity_baie_parter "Baie parter [%.0f %%]" <humidity> [ "CurrentHumidity" ]              {mqtt="<[mosquitto:iot/openhab/humidity_baie_parter_atmo:state:default]"}
-Number pressure_baie_parter "Baie parter [%.0f hPa]" <pressure>                                   {mqtt="<[mosquitto:iot/openhab/pressure_baie_parter_atmo:state:default]"}
+Number temperature_baie_parter "Baie parter [%.1f °C]" <temperature>                  {mqtt="<[mosquitto:iot/openhab/airsensor_temperature_sonoff-basic-7_bme280:state:default]"}
+Number humidity_baie_parter "Baie parter [%.0f %%]" <humidity> [ "CurrentHumidity" ]  {mqtt="<[mosquitto:iot/openhab/airsensor_humidity_sonoff-basic-7_bme280:state:default]"}
+Number pressure_baie_parter "Baie parter [%.0f hPa]" <pressure>                       {mqtt="<[mosquitto:iot/openhab/airsensor_pressure_sonoff-basic-7_bme280:state:default]"}
 
-Number temperature_baie_etaj "Baie etaj [%.1f °C]" <temperature>                              {mqtt="<[mosquitto:iot/openhab/temperature_baie_etaj_atmo:state:default]"}
-Number humidity_baie_etaj "Baie etaj [%.0f %%]" <humidity> [ "CurrentHumidity" ]              {mqtt="<[mosquitto:iot/openhab/humidity_baie_etaj_atmo:state:default]"}
-Number pressure_baie_etaj "Baie etaj [%.0f hPa]" <pressure>                                   {mqtt="<[mosquitto:iot/openhab/pressure_baie_etaj_atmo:state:default]"}
+Number temperature_baie_etaj "Baie etaj [%.1f °C]" <temperature>                      {mqtt="<[mosquitto:iot/openhab/airsensor_temperature_sonoff-basic-14_bme280:state:default]"}
+Number humidity_baie_etaj "Baie etaj [%.0f %%]" <humidity> [ "CurrentHumidity" ]      {mqtt="<[mosquitto:iot/openhab/airsensor_humidity_sonoff-basic-14_bme280:state:default]"}
+Number pressure_baie_etaj "Baie etaj [%.0f hPa]" <pressure>                           {mqtt="<[mosquitto:iot/openhab/airsensor_pressure_sonoff-basic-14_bme280:state:default]"}
 
 Number electricity_power_main_mono "Power main mono [%.0fw]" <energy>   {mqtt="<[mosquitto:iot/openhab/electricity_power main mono:state:default]"}
 Number electricity_kWh_power_main_mono "KWh main mono [%.2f kWh]" <energy>  {mqtt="<[mosquitto:iot/openhab/electricity_kWh_power main mono:state:default]"}
