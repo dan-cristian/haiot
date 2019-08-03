@@ -42,6 +42,8 @@ def _get_current():
             track = P.network.get_user(P.USERNAME).get_now_playing()
         except Exception as ex:
             L.l.warning("Unable to get current lastfm play, err={}".format(ex))
+    else:
+        L.l.warning("Unable to init lastfm network")
     return track
 
 
@@ -51,10 +53,12 @@ def love(request):
         result = "Not Playing!"
     else:
         track.love()
-        if track.get_userloved():
-            result = 'LOVED ' + track.title
-        else:
-            result = 'Failed!'
+        for i in range(1, 4):
+            if track.get_userloved():
+                result = 'LOVED ' + track.title
+                break
+            else:
+                result = 'Failed-{}!'.format(i)
     return '{"result": "' + _multify(result) + '"}'
 
 
