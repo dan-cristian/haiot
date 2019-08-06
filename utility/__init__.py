@@ -53,7 +53,10 @@ def __utility_update_ex(sensor_name, value, unit=None, index=None):
                     # record.units_2_delta = 0.0
                 else:
                     L.l.warning("Unknown utility type not processed from sensor {}".format(sensor_name))
-                if record.units_2_delta < 0 or record.units_2_delta > 1000000:
+                if record.units_delta is not None and record.units_delta < 0 or record.units_delta > 100000:
+                    L.l.warning('Invalid utility value delta={} '.format(record.units_delta))
+
+                if record.units_2_delta is not None and record.units_2_delta < 0 or record.units_2_delta > 100000:
                     L.l.warning('Invalid utility value delta2={} '.format(record.units_2_delta))
                 record.save_changed_fields(broadcast=True, persist=True)
             else:
