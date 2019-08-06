@@ -43,7 +43,7 @@ def __utility_update_ex(sensor_name, value, unit=None, index=None):
                         # record.units_delta = 0.0  # needed for comparison
                     elif unit == record.unit_name:
                         record.units_total = value
-                        record.units_delta = value - record.units_total
+                        record.units_delta = max(0, value - record.units_total)
                         record.units_total = value
                 elif record.utility_type == Constant.UTILITY_TYPE_GAS:
                     new_value = value / (record.ticks_per_unit * 1.0)
@@ -52,7 +52,9 @@ def __utility_update_ex(sensor_name, value, unit=None, index=None):
                     record.units_delta = delta
                     # record.units_2_delta = 0.0
                 else:
-                    L.l.warning("Unkown utility type not processed from sensor {}".format(sensor_name))
+                    L.l.warning("Unknown utility type not processed from sensor {}".format(sensor_name))
+                if record.units_2_delta < 0 or record.units_2_delta > 1000000:
+                    L.l.warning('Invalid utility value delta2={} '.format(record.units_2_delta))
                 record.save_changed_fields(broadcast=True, persist=True)
             else:
                 L.l.warning("Utility ex sensor {} index {} not defined in Utility table".format(sensor_name, index))
