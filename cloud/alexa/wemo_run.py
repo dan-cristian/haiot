@@ -150,6 +150,7 @@ class upnp_device(object):
         if self.port == 0:
             self.port = (int)(get_json_param(Constant.P_ALEXA_WEMO_LISTEN_PORT)) + index
             #self.port = self.socket.getsockname()[1]
+        L.l.info("Listening wemo on ip {} port {}".format(self.ip_address, self.port))
         self.socket.bind((self.ip_address, self.port))
         self.socket.listen(5)
         self.poller.add(self)
