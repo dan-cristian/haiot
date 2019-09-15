@@ -203,8 +203,9 @@ adduser ${USERNAME} video
 adduser ${USERNAME} tty
 adduser ${USERNAME} dialout
 adduser ${USERNAME} gpio
-adduser ${USERNAME} netdev # for wpa_cli access as non-root
-echo "${USERNAME} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/010_pi-nopasswd
+# for wpa_cli access as non-root
+adduser ${USERNAME} netdev
+echo " ${USERNAME} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/010_pi-nopasswd
 chsh -s /bin/bash ${USERNAME}
 
 
@@ -347,6 +348,7 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
             # https://forum.odroid.com/viewtopic.php?t=15000
             cat $HAIOT_DIR/scripts/osinstall/ubuntu/etc/udev/10-odroid.rules >> /etc/udev/rules.d/
         fi
+    fi
 
     if ! grep -q "^aml[-_]i2c" /etc/modules; then printf "aml_i2c\n" >> /etc/modules; fi
     modprobe aml_i2c
@@ -385,7 +387,9 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
     virtualenv  --version > /dev/null 2>&1
     if [ "$?" != "0" ]; then
         echo "Installing virtualenv"
-        pip install --no-cache-dir virtualenv
+        # pip install --no-cache-dir virtualenv
+        apt install python3-venv
+        python3 -m venv 3venv
     fi
 
     echo "Configuring HAIOT application in dir ${HAIOT_DIR}"
@@ -393,12 +397,15 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
     chmod +x scripts/*sh*
     chmod +x *.sh
 
-    source venv/bin/activate > /dev/null 2>&1
+    source 3venv/bin/activate > /dev/null 2>&1
+
     if [ "$?" != "0" ]; then
-        #sudo pip install --upgrade pip
-        pip install virtualenv
-        virtualenv venv
-        source venv/bin/activate
+        # sudo pip install --upgrade pip
+        # pip install virtualenv
+        # virtualenv venv
+        apt install python3-venv
+        python3 -m venv 3venv
+        source 3venv/bin/activate
     fi
 
     echo "Installing mysql connector"
