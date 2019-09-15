@@ -231,7 +231,7 @@ class fauxmo(upnp_device):
         return self.name
 
     def handle_request(self, data, sender, socket):
-        if data.find('GET /setup.xml HTTP/1.1') == 0:
+        if data.find(b'GET /setup.xml HTTP/1.1') == 0:
             L.l.info("Responding to setup.xml for %s" % self.name)
             xml = SETUP_XML % {'device_name': self.name, 'device_serial': self.serial}
             date_str = email.utils.formatdate(timeval=None, localtime=False, usegmt=True)
@@ -246,7 +246,7 @@ class fauxmo(upnp_device):
                        "\r\n"
                        "%s" % (len(xml), date_str, xml))
             socket.send(message)
-        elif data.find('SOAPACTION: "urn:Belkin:service:basicevent:1#SetBinaryState"') != -1:
+        elif data.find(b'SOAPACTION: "urn:Belkin:service:basicevent:1#SetBinaryState"') != -1:
             success = False
             if data.find('<BinaryState>1</BinaryState>') != -1:
                 # on
@@ -254,7 +254,7 @@ class fauxmo(upnp_device):
                 # success = rule.execute_rule(self.action_handler_on)
                 success = getattr(rule.alexa, self.action_handler_on)()
                 # success = self.action_handler_on()
-            elif data.find('<BinaryState>0</BinaryState>') != -1:
+            elif data.find(b'<BinaryState>0</BinaryState>') != -1:
                 # off
                 L.l.info("Responding to OFF for {} function={}".format(self.name, self.action_handler_off))
                 # success = rule.execute_rule(self.action_handler_off)
