@@ -13,7 +13,7 @@ WTForms-Alchemy>=0.13.0
 blinker>=0.0
 #plotly>=0.0
 #fix for ssl warning
-requests==2.5.3
+requests==2.20.0
 #for rfxcom utility
 pyserial>=0.0
 python-dateutil>=0.0
