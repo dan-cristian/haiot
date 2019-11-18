@@ -339,7 +339,6 @@ def _set_main_heat_source():
             else:
                 # if alternate source is no longer valid
                 if heat_source_relay.is_alternate_source_switch:
-                    # todo: stop heat pumps if on
                     # stop alternate heat source
                     # heatrelay_alt_source = models.ZoneHeatRelay.query.filter_by(is_alternate_heat_source=1).first()
                     # if heatrelay_alt_source is not None:

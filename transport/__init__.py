@@ -80,6 +80,10 @@ def thread_run_recv():
     try:
         if len(mqtt_io.P.received_mqtt_list) > 10:
             L.l.info('Mqtt RECV len={}'.format(len(mqtt_io.P.received_mqtt_list)))
+        if len(mqtt_io.P.received_mqtt_list) == 0:
+            delta = (utils.get_base_location_now_date() - mqtt_io.P.last_rec).total_seconds()
+            if delta > 60:
+                L.l.warning('No mqtt received since {} sec'.format(delta))
         for obj in list(mqtt_io.P.received_mqtt_list):
             mqtt_io.P.received_mqtt_list.remove(obj)
             dispatcher.send(signal=Constant.SIGNAL_MQTT_RECEIVED, obj=obj)
