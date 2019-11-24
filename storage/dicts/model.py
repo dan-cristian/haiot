@@ -305,6 +305,7 @@ class IOSensor(ModelBase):
 
 
 class Node(ModelBase):
+    """key=name"""
     name = ''
     id = 0
     ip = ''

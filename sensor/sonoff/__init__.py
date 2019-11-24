@@ -4,7 +4,6 @@ from pydispatch import dispatcher
 import transport.mqtt_io
 from common import Constant, utils, get_json_param
 from main.logger_helper import L
-from main import sqlitedb
 from main import thread_pool
 from transport import mqtt_io
 from storage.model import m
@@ -20,10 +19,7 @@ class P:
 
 
 def _get_zone_sensor(sensor_address, sensor_type):
-    if sqlitedb:
-        zone_sensor = models.ZoneSensor.query.filter_by(sensor_address=sensor_address).first()
-    else:
-        zone_sensor = m.ZoneSensor.find_one({m.ZoneSensor.sensor_address: sensor_address})
+    zone_sensor = m.ZoneSensor.find_one({m.ZoneSensor.sensor_address: sensor_address})
     if zone_sensor is None:
         actual_sensor_name = 'N/A {} {}'.format(sensor_address, sensor_type)
     else:
