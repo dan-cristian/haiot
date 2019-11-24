@@ -8,9 +8,6 @@ import threading
 import prctl
 from main.logger_helper import L
 from common import Constant, variable, utils
-if sqlitedb:
-    from storage.sqalc import models
-    from storage.sqalc.model_helper import commit
 from transport import mqtt_io
 from storage.model import m
 
@@ -30,13 +27,11 @@ def x_node_update(obj=None):
         L.l.debug('Received node state update from {}'.format(node_host_name))
         # avoid node to update itself in infinite recursion
         if node_host_name != Constant.HOST_NAME:
-            if sqlitedb:
-                models.Node().save_changed_fields_from_json_object(
-                    json_object=obj, unique_key_name='name', notify_transport_enabled=False, save_to_graph=False)
-            else:
-                # fixme: see above
-                L.l.warning('Fix me, node save')
-                pass
+            # if sqlitedb:
+            #    models.Node().save_changed_fields_from_json_object(
+            #        json_object=obj, unique_key_name='name', notify_transport_enabled=False, save_to_graph=False)
+            # fixme: see above
+            L.l.warning('Fix me, node save')
         else:
             L.l.debug('Skipping node DB save, this node is master = {}'.format(
                 variable.NODE_THIS_IS_MASTER_OVERALL))
@@ -52,22 +47,16 @@ def x_node_update(obj=None):
 
 
 def check_if_no_masters_overall():
-    if sqlitedb:
-        node_masters = models.Node.query.filter_by(is_master_overall=True).all()
-    else:
-        node_masters = m.Node.find({m.Node.is_master_overall: True})
+    node_masters = m.Node.find({m.Node.is_master_overall: True})
     return len(node_masters) == 0
 
 
-#elect and set master status in db for current node only. master is elected by node_id priority, if alive
+# elect and set master status in db for current node only. master is elected by node_id priority, if alive
 def update_master_state():
     master_overall_selected = False
     try:
         alive_date_time = utils.get_base_location_now_date() - datetime.timedelta(minutes=1)
-        if sqlitedb:
-            node_list = models.Node.query.order_by(models.Node.priority).all()
-        else:
-            node_list = m.Node.find(sort=[(m.Node.priority, 1)], filter={})
+        node_list = m.Node.find(sort=[(m.Node.priority, 1)], filter={})
         for node in node_list:
             # if recently alive, in order of id prio
             if node.updated_on is None:
@@ -81,10 +70,7 @@ def update_master_state():
                     if node.name == Constant.HOST_NAME:
                         node.is_master_overall = True
                         node.notify_enabled_ = True
-                        if sqlitedb:
-                            commit()
-                        else:
-                            node.save_changed_fields()
+                        node.save_changed_fields()
                     master_overall_selected = True
             else:
                 if master_overall_selected and node.is_master_overall:
@@ -92,10 +78,7 @@ def update_master_state():
                     if node.name == Constant.HOST_NAME:
                         node.is_master_overall = False
                         node.notify_enabled_ = True
-                        if sqlitedb:
-                            commit()
-                        else:
-                            node.save_changed_fields()
+                        node.save_changed_fields()
             # applying node master status locally, if changed in db
             if node.name == Constant.HOST_NAME:
                 variable.NODE_THIS_IS_MASTER_LOGGING = node.is_master_logging
@@ -155,6 +138,10 @@ def announce_node_state():
         L.l.error('Unable to announce my state, err={}'.format(ex), exc_info=True)
 
 
+def _node_update(record, changed_fields):
+    L.l.info('Got node update {}'.format(record))
+
+
 def get_progress():
     return progress_status
 
@@ -182,7 +169,6 @@ def thread_run():
 
 
 def unload():
-    #...
     thread_pool.remove_callable(thread_run)
     global initialised
     initialised = False
@@ -194,6 +180,7 @@ def init():
         thread_pool.add_interval_callable(thread_run, run_interval_second=30, long_running=True)
         global initialised
         initialised = True
+        m.Node.add_upsert_listener(_node_update)
     else:
         L.l.info('Skipping node module initialising, standalone mode')
 

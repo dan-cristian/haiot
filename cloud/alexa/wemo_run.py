@@ -149,7 +149,7 @@ class upnp_device(object):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         if self.port == 0:
             self.port = (int)(get_json_param(Constant.P_ALEXA_WEMO_LISTEN_PORT)) + index
-            #self.port = self.socket.getsockname()[1]
+            # self.port = self.socket.getsockname()[1]
         L.l.info("Listening wemo on ip {} port {}".format(self.ip_address, self.port))
         self.socket.bind((self.ip_address, self.port))
         self.socket.listen(5)
@@ -408,7 +408,11 @@ def get_alexawemo_rules():
 def unload():
     global _pooler
     thread_pool.remove_callable(_pooler.poll)
-
+    try:
+        for fauxmo in _FAUXMOS:
+            fauxmo.socket.close()
+    except Exception as ex:
+        L.l.warning('Unable to close socked {}'.format(ex))
 
 def init():
     L.l.info('Wemo module initialising')
@@ -435,6 +439,7 @@ def init():
         dev_name = rule_entry.replace('_', ' ')
         switch = fauxmo(dev_name=dev_name, listener=u, pooller=_pooler, ip_address=None, port=0, index=index,
                         action_handler_on=alexa_list[rule_entry][0], action_handler_off=alexa_list[rule_entry][1])
+        _FAUXMOS.append(switch)
         index += 1
 
     thread_pool.add_interval_callable(_pooler.poll, run_interval_second=0.5)
