@@ -297,7 +297,8 @@ class ModelBase(metaclass=OrderedClassMembers):
         except Exception as ex:
             L.l.error('Unable to broadcast {} rec={} ex={}'.format(class_name, out_rec, ex), exc_info=True)
 
-    def save_changed_fields(self, broadcast=None, persist=None, listeners=True, silent=False):  # , *args, **kwargs):
+    # silent is used for debug
+    def save_changed_fields(self, broadcast=None, persist=None, listeners=True, silent=True):  # , *args, **kwargs):
         cls = self.__class__
         cls_name = cls.__name__
         if not cls._is_used_in_module:
@@ -334,11 +335,11 @@ class ModelBase(metaclass=OrderedClassMembers):
                 if current is not None:
                     # res = cls.update_one(query=key, updated_record={"$set": update}, existing_record=self)
                     if not silent:
-                        # L.l.info('Updated {} key {}, {}'.format(cls_name, key, update))
-                        pass
+                        L.l.info('Updated {} key {}, {}'.format(cls_name, key, update))
                 else:
                     res = cls.insert_one(update, bypass_document_validation=True)
-                    # L.l.info('Inserted key {}, {} with eid={}'.format(key, self.__repr__(), res.eid))
+                    if not silent:
+                        L.l.info('Inserted key {}, {} with eid={}'.format(key, self.__repr__(), res.eid))
                 # execute listener
                 has_listener = cls_name in cls._upsert_listener_list
                 record = cls.find_one(filter=key)
@@ -351,14 +352,19 @@ class ModelBase(metaclass=OrderedClassMembers):
                     if persist is True:
                         self._persist(record=rec_clone, update=update, class_name=cls_name)
                     if broadcast is True:
+                        if not silent:
+                            L.l.info('Broadcasting event for {} record {}'.format(cls_name, rec_clone))
                         self._broadcast(record=rec_clone, update=update, class_name=cls_name)
                     if listeners and has_listener:
                         if hasattr(self, '_listener_executed') and self._listener_executed is True:
-                            pass
+                            if not silent:
+                                L.l.info('Already executed listener on device events for {}'.format(cls_name))
                         elif hasattr(self, 'is_device_event') and self.is_device_event is True:
-                            # L.l.info('No listener on device events for {}'.format(cls_name))
-                            pass
+                            if not silent:
+                                L.l.info('No listener on device events for {}'.format(cls_name))
                         else:
+                            if not silent:
+                                L.l.info('Executing listener on device events for {}'.format(cls_name))
                             rec_clone._listener_executed = True
                             cls._upsert_listener_list[cls_name](record=rec_clone, changed_fields=change_list)
                 dispatcher.send(Constant.SIGNAL_DB_CHANGE_FOR_RULES, obj=rec_clone, change=change_list)
