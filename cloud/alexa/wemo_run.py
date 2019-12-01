@@ -410,6 +410,7 @@ def unload():
     thread_pool.remove_callable(_pooler.poll)
     try:
         for fauxmo in _FAUXMOS:
+            L.l.info('Closing socket {}'.format(fauxmo.socket))
             fauxmo.socket.close()
     except Exception as ex:
         L.l.warning('Unable to close socked {}'.format(ex))
