@@ -415,6 +415,7 @@ def unload():
     except Exception as ex:
         L.l.warning('Unable to close socked {}'.format(ex))
 
+
 def init():
     L.l.info('Wemo module initialising')
     global _pooler
