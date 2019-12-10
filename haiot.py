@@ -12,7 +12,7 @@ def signal_handler(signal_name, frame):
 
 
 if __name__ == '__main__':
-    signal.signal(signal.SIGKILL, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
 
     from main.logger_helper import L
     L.init_logging()
