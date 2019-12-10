@@ -12,8 +12,7 @@ def signal_handler(signal_name, frame):
 
 
 if __name__ == '__main__':
-    for sig in (signal.SIGKILL):
-        signal.signal(sig, signal_handler)
+    signal.signal(signal.SIGKILL, signal_handler)
 
     from main.logger_helper import L
     L.init_logging()
