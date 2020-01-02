@@ -139,7 +139,8 @@ def announce_node_state():
 
 
 def _node_update(record, changed_fields):
-    L.l.info('Got node update {}'.format(record))
+    # L.l.info('Got node update {}'.format(record))
+    pass
 
 
 def get_progress():
