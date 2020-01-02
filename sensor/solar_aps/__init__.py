@@ -42,7 +42,7 @@ def thread_run():
         init_solar_aps()
     if P.initialised:
         try:
-            aps_text = str(urllib.request.urlopen(Constant.P_SOLAR_APS_LOCAL_URL).read())
+            aps_text = str(urllib.request.urlopen(get_json_param(Constant.P_SOLAR_APS_LOCAL_URL)).read())
             production = utils.parse_text(aps_text, P.start_keyword, P.end_keyword)
             last_power = utils.parse_http(aps_text, P.start_keyword_now, P.end_keyword_now)
             temperature = utils.parse_http(aps_text, P.start_key_temp, P.end_key_temp, end_first=True)
