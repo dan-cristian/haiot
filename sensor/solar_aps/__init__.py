@@ -76,6 +76,7 @@ def thread_run():
                 else:
                     if record.units_total is None:
                         record.units_total = production
+                        record.units_delta = 0
                     else:
                         record.units_delta = production - record.units_total
                         if record.units_delta == 0:
