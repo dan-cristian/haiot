@@ -44,9 +44,9 @@ def thread_run():
         try:
             aps_text = str(urllib.request.urlopen(get_json_param(Constant.P_SOLAR_APS_LOCAL_URL)).read())
             production = utils.parse_text(aps_text, P.start_keyword, P.end_keyword)
-            last_power = utils.parse_http(aps_text, P.start_keyword_now, P.end_keyword_now)
-            temperature = utils.parse_http(aps_text, P.start_key_temp, P.end_key_temp, end_first=True)
-            panel_id = utils.parse_http(aps_text, P.start_key_panel, P.end_key_panel, end_first=True)
+            last_power = utils.parse_text(aps_text, P.start_keyword_now, P.end_keyword_now)
+            temperature = utils.parse_text(aps_text, P.start_key_temp, P.end_key_temp, end_first=True)
+            panel_id = utils.parse_text(aps_text, P.start_key_panel, P.end_key_panel, end_first=True)
             utility_name = get_json_param(Constant.P_SOLAR_UTILITY_NAME)
             if temperature is not None:
                 zone_sensor = m.ZoneSensor.find_one({m.ZoneSensor.sensor_address: panel_id})
