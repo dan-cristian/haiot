@@ -2,7 +2,8 @@ import os
 import uuid
 import json
 import re
-import datetime, time
+import datetime
+import time
 import calendar
 import math
 import importlib
@@ -159,9 +160,8 @@ def json_to_record(table, json_object):
     return table
 
 
-def parse_http(url, start_key, end_key, end_first=False):
+def parse_text(text, start_key, end_key, end_first=False):
     try:
-        text = str(urllib.request.urlopen(url).read())
         end = text.find(end_key)
         if end_first:
             start = text.rfind(start_key, 0, end)
@@ -171,6 +171,15 @@ def parse_http(url, start_key, end_key, end_first=False):
             val_start = start + len(start_key)
             value_str = text[val_start:end]
             return value_str
+    except Exception as ex:
+        L.l.error('Unable to parse text {}, err={}'.format(text, ex))
+    return None
+
+
+def parse_http(url, start_key, end_key, end_first=False):
+    try:
+        text = str(urllib.request.urlopen(url).read())
+        return parse_text(text, start_key, end_key, end_first)
     except Exception as ex:
         L.l.error('Unable to open url {}, err={}'.format(url, ex))
     return None
