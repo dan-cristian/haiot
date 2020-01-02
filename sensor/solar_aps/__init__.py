@@ -1,5 +1,6 @@
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
+import urllib.request
 from main.logger_helper import L
 from common import Constant, utils, get_json_param
 from main import thread_pool
@@ -41,14 +42,11 @@ def thread_run():
         init_solar_aps()
     if P.initialised:
         try:
-            production = utils.parse_http(
-                get_json_param(Constant.P_SOLAR_APS_LOCAL_URL), P.start_keyword, P.end_keyword)
-            last_power = utils.parse_http(
-                get_json_param(Constant.P_SOLAR_APS_LOCAL_URL), P.start_keyword_now, P.end_keyword_now)
-            temperature = utils.parse_http(get_json_param(Constant.P_SOLAR_APS_LOCAL_REALTIME_URL),
-                                           P.start_key_temp, P.end_key_temp, end_first=True)
-            panel_id = utils.parse_http(get_json_param(Constant.P_SOLAR_APS_LOCAL_REALTIME_URL),
-                                        P.start_key_panel, P.end_key_panel, end_first=True)
+            aps_text = str(urllib.request.urlopen(Constant.P_SOLAR_APS_LOCAL_URL).read())
+            production = utils.parse_text(aps_text, P.start_keyword, P.end_keyword)
+            last_power = utils.parse_http(aps_text, P.start_keyword_now, P.end_keyword_now)
+            temperature = utils.parse_http(aps_text, P.start_key_temp, P.end_key_temp, end_first=True)
+            panel_id = utils.parse_http(aps_text, P.start_key_panel, P.end_key_panel, end_first=True)
             utility_name = get_json_param(Constant.P_SOLAR_UTILITY_NAME)
             if temperature is not None:
                 zone_sensor = m.ZoneSensor.find_one({m.ZoneSensor.sensor_address: panel_id})
@@ -81,12 +79,15 @@ def thread_run():
                     record.units_delta = production - record.units_total
                     if record.units_delta == 0:
                         # do not waste db space if no power generated
+                        L.l.info('Solar production is 0')
                         return
                 record.units_2_delta = last_power
                 if record.unit_cost is None:
-                   record.unit_cost = 0.0
+                    record.unit_cost = 0.0
                 record.cost = 1.0 * record.units_delta * record.unit_cost
                 record.save_changed_fields(broadcast=True, persist=True)
+            else:
+                L.l.info('Solar production is none')
         except Exception as ex:
             L.l.error("Got exception on solar thread run, ex={}".format(ex), exc_info=True)
 
