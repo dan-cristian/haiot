@@ -81,7 +81,8 @@ def thread_run():
                         record.units_delta = production - record.units_total
                         if record.units_delta == 0:
                             # do not waste db space if no power generated
-                            L.l.info('Solar production is 0')
+                            L.l.info('Solar production is energy={} watts={} temp={}'.format(
+                                production, last_power, temperature))
                             # return
                         else:
                             L.l.info('Solar production is {}'.format(record.units_delta))
