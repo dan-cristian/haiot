@@ -1,6 +1,6 @@
 #!/bin/bash
-. /home/haiot/PYC/.credentials/.general.credentials
-LOG=/mnt/log/private-cloud.log
+source /home/haiot/PYC/.credentials/.general.credentials
+LOG=/mnt/log/motion.log
 CLOUD_DIR=/mnt/sdd1/motion/
 SRC_DIR=/mnt/motion/tmp/
 OLD_COUNT=1000
@@ -42,10 +42,10 @@ if [ $# -ne 0 ]; then
   
   #/usr/sbin/rclone copy $source $dest_parent >> $LOG 2>&1
   echo2 "Creating remote parent folder $dest_parent"
-  echo2 ssh -T -p ${HAIOT_SSH_PORT} -c ${HAIOT_SSH_CIPHER} -o Compression=no ${HAIOT_SSH_SERVER} "mkdir -p $dest_parent"
+  #echo2 ssh -T -p ${HAIOT_SSH_PORT} -c ${HAIOT_SSH_CIPHER} -o Compression=no ${HAIOT_SSH_SERVER} "mkdir -p $dest_parent"
   ssh -T -p ${HAIOT_SSH_PORT} -c ${HAIOT_SSH_CIPHER} -o Compression=no ${HAIOT_SSH_SERVER} "mkdir -p $dest_parent" >> $LOG 2>&1
   echo2 "Now uploading"
-  echo2 rsync -avPe 'ssh -T -p '${HAIOT_SSH_PORT}' -c '${HAIOT_SSH_CIPHER}' -o Compression=no -x' ${source} ${HAIOT_SSH_SERVER}:${dest_parent}/
+  #echo2 rsync -avPe 'ssh -T -p '${HAIOT_SSH_PORT}' -c '${HAIOT_SSH_CIPHER}' -o Compression=no -x' ${source} ${HAIOT_SSH_SERVER}:${dest_parent}/
   rsync -avPe 'ssh -T -p '${HAIOT_SSH_PORT}' -c '${HAIOT_SSH_CIPHER}' -o Compression=no -x' ${source} ${HAIOT_SSH_SERVER}:${dest_parent}/ >> $LOG 2>&1
 
   #cp -f $source $dest >> $LOG 2>&1
