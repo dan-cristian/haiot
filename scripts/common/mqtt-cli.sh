@@ -17,7 +17,7 @@ listen(){
 rm -f $p
 ([ ! -p "$p" ]) && mkfifo $p
 killall mosquitto_sub
-(mosquitto_sub -h $host -t $topic -u $user -P $passwd >$p 2>>$LOG) &
+(mosquitto_sub -h $host -t $topic -u $MQTT_USER -P $MQTT_PASSWORD >$p 2>>$LOG) &
 #echo "$!" > pidfile
 while read line <$p
 do
@@ -44,7 +44,7 @@ search_screen_on='"Presence", "sensor_name": "living"'
 
 while :
 do
-echo2 "Starting mqtt listener"
+echo2 "Starting mqtt listener with user $MQTT_USER"
 listen >> $LOG 2>&1
 sleep 10
 done
