@@ -1,9 +1,7 @@
 #!/bin/bash
 
 DIRSRV=/mnt/motion/
-maxrepositorysize="750" #GBytes
 MAX_REPO_SIZE="1100100100"
-LOG=/mnt/log/dvr.log
 FILE_AGE=30
 
 function clean() {
@@ -18,7 +16,7 @@ echo "Clean done"
 }
 
 function checkandclean() {
-current=(`du -s $DIRSRV`)
+current=$(du -s $DIRSRV)
 echo "Checking space on storage, current=$current maxtarget=$MAX_REPO_SIZE units=bytes"
 if (( $(echo "$current > $MAX_REPO_SIZE" | bc -l) )); then
 	echo "Max size reached on storage, cleaning files older than $FILE_AGE"
