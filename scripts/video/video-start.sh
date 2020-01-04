@@ -9,7 +9,7 @@ source "$DIR/../common/params.sh"
 
 function stop_kodi(){
 echo2 "Stopping kodi"
-kill_proc "kodi/kodi.bin"
+kill_proc "kodi/kodi-x11"
 }
 
 function stop_browser(){
@@ -19,7 +19,7 @@ kill_proc "qupzilla"
 
 
 function exit_if_kodi_run(){
-ps ax | grep -q [k]odi.bin
+ps ax | grep -q [k]odi-x11
 kodi_code=$?
 if [ $kodi_code -eq 0 ]; then
         echo2 "Kodi is running, exit"
@@ -133,10 +133,10 @@ fi
 function increase_prio(){
 while :
 do
-	ps -ef | grep -q "kodi.bin"
+	ps -ef | grep -q "kodi-x11"
 	if [ $? -eq 0 ]; then
 		sleep 5
-		ps -ef | grep "kodi.bin" | grep -v grep | awk '{print $2}' | xargs renice -12 -p 
+		ps -ef | grep "kodi-x11" | grep -v grep | awk '{print $2}' | xargs renice -12 -p 
 		echo "Reniced!"
 		return 0
 	fi
