@@ -132,6 +132,9 @@ dpkg-reconfigure -f noninteractive tzdata
 # needed for above functions
 apt-get install -y lua50
 
+# speed up other installs, man-db not really needed
+apt-get remove man-db
+
 # give internet connectivity via WIFI first
 if [ "$ENABLE_DASHCAM_PI" == "1" ]; then
 	#http://pidashcam.blogspot.ro/2013/09/install.html#front
