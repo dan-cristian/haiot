@@ -268,6 +268,7 @@ if [ "$ENABLE_GIT" == "1" ]; then
     echo "echo git-daemon starting" >> /etc/sv/git-daemon/run
     echo "exec chpst -ugitdaemon "$(git --exec-path)"/git-daemon --verbose --reuseaddr --syslog --informative-errors --base-path=/mnt/git --enable=receive-pack" >> /etc/sv/git-daemon/run
     chmod +x /etc/sv/git-daemon/run
+    apt install -y runit-systemd
     sv start git-daemon
 fi
 
