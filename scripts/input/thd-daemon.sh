@@ -40,4 +40,5 @@ killall -q thd
 killall udevadm
 restart_thd
 echo2 'Listening for USB add events'
+sleep 1
 udevadm monitor --udev | grep --line-buffered 'add' | while read ; do restart_thd ; done
