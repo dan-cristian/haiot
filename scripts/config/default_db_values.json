@@ -406,7 +406,7 @@
     {"id":3, "name":"week-bucatarie-summer",     "pattern":".... ..22 2222 2222 2222 2222", "main_source_needed":true},
     {"id":4, "name":"weekend-bucatarie-summer",  "pattern":".... .... bbbb bbbb bbbb bbbb", "main_source_needed":true},
     {"id":5, "name":"week-living-winter",        "pattern":".... ..22 .... .... 3333 3333", "main_source_needed":true},
-    {"id":6, "name":"weekend-living-winter",     "pattern":".... .... cccc cccc cccc cccc", "main_source_needed":true},
+    {"id":6, "name":"weekend-living-winter",     "pattern":".... .... 3333 3333 3333 3333", "main_source_needed":true},
     {"id":7, "name":"week-living-summer",        "pattern":".... ..22 .... .... 2222 2222", "main_source_needed":true},
     {"id":8, "name":"weekend-living-summer",     "pattern":".... .... 2222 2222 2222 2222", "main_source_needed":true},
     {"id":9, "name":"week-birou-winter",         "pattern":".... .... .... .... ..22 2222", "main_source_needed":true},
