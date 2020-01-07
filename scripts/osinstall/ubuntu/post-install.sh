@@ -10,33 +10,46 @@ USERNAME=haiot
 USERPASS=haiot
 EMAIL_USER=antonio.gaudi33@gmail.com
 EMAIL_TEST=dan.cristian@gmail.com
-ENABLE_WEBMIN=0
-ENABLE_OPTIONAL=0
-ENABLE_HAIOT=1
+ENABLE_RAM_FS=0
+ENABLE_WEBMIN=1
+ENABLE_OPTIONAL=1
+ENABLE_HAIOT=0
 ENABLE_RAMRUN=0
-ENABLE_MEDIA=0
+ENABLE_MEDIA=1
+ENABLE_PLEX=1
+ENABLE_KODI=0
+ENABLE_GMUSIC=0
 MUSIC_ROOT=/mnt/data/hdd-wdr-evhk/music
 
 ENABLE_SNAPRAID=0
-DATA_DISK1=/mnt/data/hdd-wdg-6297
+ENABLE_DISK_MOUNT=1
+DATA_DISK1=/mnt/data/hdd-wdg-vsfn
+DATA_DISK1_BLKID="b311a65b-fe80-4e60-876f-7b21a8d1ee92"
 DATA_DISK2=/mnt/data/hdd-wdr-evhk
+DATA_DISK2_BLKID="615e4b68-905a-43e0-81f2-5c0a66d632ba"
+DATA_DISK3=/mnt/data/hdd-seb-pgmz
+DATA_DISK3_BLKID="6a03c7fc-2fbe-4564-8d3f-a8ddf2af84b6"
 PARITY_DISK=/mnt/parity/hdd-wdg-2130
+PARITY_DISK_BLKID="1bc8e1b1-da57-4e66-9b4a-4b35fa555f15"
 
 VIDEOS_ROOT=/mnt/data/hdd-wdr-evhk/videos
 PHOTOS_ROOT=/mnt/data/hdd-wdg-6297/photos
 PRIVATE_ROOT=/mnt/data/hdd-wdg-6297/private
 EBOOKS_ROOT=/mnt/data/hdd-wdg-6297/ebooks
+MOVIES_ROOT=/mnt/data/hdd-seb-pgmz/movies
 
-ENABLE_GIT=0
+ENABLE_GIT=1
 GIT_ROOT=/mnt/data/hdd-wdg-6297/git
 
-ENABLE_CAMERA=0
+ENABLE_CAMERA=1
+ENABLE_MOTION_COMPILE=0
+ENABLE_FFMPEG_COMPILE=0
 ENABLE_CAMERA_SHINOBI=0
 MOTION_ROOT=/mnt/data/hdd-wdr-evhk/motion
 LOG_ROOT=/mnt/data/hdd-wdr-evhk/log
 
-ENABLE_TORRENT=0
-#ENABLE_SAMBA=1
+ENABLE_TORRENT=1
+# ENABLE_SAMBA=1
 ENABLE_CLOUD_AMAZON=0
 
 ENABLE_MYSQL_SERVER=0
@@ -60,8 +73,8 @@ ENABLE_3G_MODEM=0
 ENABLE_LOG_RAM=0
 
 ENABLE_THINGSBOARD=0
-ENABLE_OPENHAB=0
-
+ENABLE_OPENHAB=1
+ENABLE_NEXTCLOUD=0
 ENABLE_UPS_APC=0
 
 set_config_var() {
@@ -133,7 +146,7 @@ dpkg-reconfigure -f noninteractive tzdata
 apt-get install -y lua50
 
 # speed up other installs, man-db not really needed
-apt-get remove man-db
+apt-get remove -y man-db
 
 # give internet connectivity via WIFI first
 if [ "$ENABLE_DASHCAM_PI" == "1" ]; then
@@ -194,7 +207,7 @@ fi
 echo "Installing additional generic packages"
 # make sound as localepurge needs user input
 echo -ne '\007'
-apt-get -y install ssh dialog sudo nano wget runit git ssmtp mailutils psmisc smartmontools localepurge sshpass dos2unix
+apt-get -y install ssh dialog sudo nano wget runit git ssmtp mailutils psmisc smartmontools localepurge sshpass dos2unix apt-transport-https
 
 
 echo "Creating user $USERNAME with password=$USERPASS"
@@ -210,7 +223,38 @@ adduser ${USERNAME} gpio
 adduser ${USERNAME} netdev
 echo " ${USERNAME} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/010_pi-nopasswd
 chsh -s /bin/bash ${USERNAME}
+echo "Getting HAIOT application from git"
+cd /home/${USERNAME}
+if [ -d PYC ]; then
+    # make sound as we need user input
+    echo -ne '\007'
+    echo "PYC exists, remove? If Yes, beware that you lose all python packages, reinstall takes ages. y/[n]"
+    read -t 30 remove
+    if [ "$remove" == "y" ]; then
+        rm -r PYC
+    fi
+fi
 
+if [ -d PYC ]; then
+    cd PYC
+    git pull
+    cd ..
+else
+    git clone git://192.168.0.9/PYC.git
+fi
+if [ "$?" == "0" ]; then
+    echo "Downloaded haiot from local repository"
+    export HAIOT_DIR=/home/$USERNAME/PYC
+else
+    echo "Downloading haiot from github"
+    rm -r haiot
+    git clone https://github.com/dan-cristian/haiot.git
+    export HAIOT_DIR=/home/$USERNAME/haiot
+fi
+echo "export HAIOT_DIR=$HAIOT_DIR" > /etc/profile.d/haiot.sh
+echo "export HAIOT_USER=haiot" >> /etc/profile.d/haiot.sh
+chmod +x /etc/profile.d/haiot.sh
+cp /etc/profile.d/haiot.sh /etc/profile.d/root.sh
 
 if [ "$ENABLE_RAMRUN" == "1" ]; then
     # run in ram needs busybox for ramfs copy operations, see "local" script sample
@@ -230,15 +274,12 @@ if [ "$ENABLE_WEBMIN" == "1" ]; then
         wget http://www.webmin.com/jcameron-key.asc
         apt-key add jcameron-key.asc
         apt-get update
-        apt-get install webmin
+        apt-get install -y webmin
     fi
 fi
 
 
-if [ "$ENABLE_SNAPRAID" == "1" ]; then
-    echo "Installing backup clients"
-    apt install -y openvpn
-
+if [ "$ENABLE_DISK_MOUNT" == "1" ]; then
     cat /etc/fstab | grep "/mnt/data"
     if [ "$?" == "1" ]; then
         echo "Setting up hard drives in fstab. This is custom setup for each install."
@@ -246,15 +287,17 @@ if [ "$ENABLE_SNAPRAID" == "1" ]; then
         mkdir -p $DATA_DISK2
         mkdir -p $PARITY_DISK
         echo "# Added by postinstall script" >> /etc/fstab
-        echo "UUID=f6283955-9310-4ff2-8525-a48dbcdf61e3       $DATA_DISK1          ext4    nofail,noatime,journal_async_commit,data=writeback,barrier=0,errors=remount-ro    1       1" >> /etc/fstab
-        echo "UUID=1bc8e1b1-da57-4e66-9b4a-4b35fa555f15       $PARITY_DISK        ext4    nofail,noatime,journal_async_commit,data=writeback,barrier=0,errors=remount-ro    1       1" >> /etc/fstab
-        echo "UUID=615e4b68-905a-43e0-81f2-5c0a66d632ba       $DATA_DISK2          ext4    nofail,noatime,journal_async_commit,data=writeback,barrier=0,errors=remount-ro    1       1" >> /etc/fstab
+        echo "UUID=$DATA_DISK1_BLKID       $DATA_DISK1          ext4    nofail,noatime,journal_async_commit,data=writeback,barrier=0,errors=remount-ro    1       1" >> /etc/fstab
+        echo "UUID=$PARITY_DISK_BLKID      $PARITY_DISK         ext4    nofail,noatime,journal_async_commit,data=writeback,barrier=0,errors=remount-ro    1       1" >> /etc/fstab
+        echo "UUID=$DATA_DISK2_BLKID       $DATA_DISK2          ext4    nofail,noatime,journal_async_commit,data=writeback,barrier=0,errors=remount-ro    1       1" >> /etc/fstab
+        echo "UUID=$DATA_DISK3_BLKID       $DATA_DISK3          ext4    nofail,noatime,journal_async_commit,data=writeback,barrier=0,errors=remount-ro    1       1" >> /etc/fstab
         echo "#/mnt/data/*                                     /mnt/media      fuse.mergerfs   defaults,allow_other,big_writes,direct_io,fsname=mergerfs,minfreespace=50G         0       0" >> /etc/fstab
         mount -a
         ln -s $VIDEOS_ROOT /mnt/videos
         ln -s $PHOTOS_ROOT /mnt/photos
         ln -s $PRIVATE_ROOT /mnt/private
         ln -s $EBOOKS_ROOT /mnt/ebooks
+        ln -s $MOVIES_ROOT /mnt/movies
     fi
 fi
 
@@ -276,39 +319,7 @@ if [ "$ENABLE_GIT" == "1" ]; then
 fi
 
 if [ "$ENABLE_HAIOT" == "1" ]; then
-    echo "Getting HAIOT application from git"
-    cd /home/${USERNAME}
-    if [ -d PYC ]; then
-        # make sound as we need user input
-        echo -ne '\007'
-        echo "PYC exists, remove? If Yes, beware that you lose all python packages, reinstall takes ages. y/[n]"
-        read -t 30 remove
-        if [ "$remove" == "y" ]; then
-            rm -r PYC
-        fi
-    fi
 
-    if [ -d PYC ]; then
-        cd PYC
-        git pull
-        cd ..
-    else
-        git clone git://192.168.0.9/PYC.git
-    fi
-    if [ "$?" == "0" ]; then
-        echo "Downloaded haiot from local repository"
-        export HAIOT_DIR=/home/$USERNAME/PYC
-    else
-        echo "Downloading haiot from github"
-        rm -r haiot
-        git clone https://github.com/dan-cristian/haiot.git
-        export HAIOT_DIR=/home/$USERNAME/haiot
-    fi
-    echo "export HAIOT_DIR=$HAIOT_DIR" > /etc/profile.d/haiot.sh
-    echo "export DISPLAY=:0.0" >> /etc/profile.d/haiot.sh
-    echo "export HAIOT_USER=haiot" >> /etc/profile.d/haiot.sh
-    chmod +x /etc/profile.d/haiot.sh
-    cp /etc/profile.d/haiot.sh /etc/profile.d/root.sh
 
     apt-get -y install mosquitto owfs ow-shell usbutils systemd-sysv
 
@@ -471,6 +482,8 @@ fi
 
 
 if [ "$ENABLE_SNAPRAID" == "1" ]; then
+    echo "Installing backup clients"
+    apt install -y openvpn
     echo "Setup snapraid"
     apt-get install gcc git make -y
     cd
@@ -490,12 +503,12 @@ fi
 
 
 if [ "$ENABLE_MEDIA" == "1" ]; then
-    echo "Installing bluetooth BLE for polar7"
-   #http://installfights.blogspot.ro/2016/08/fix-set-scan-parameters-failed.html
+    # echo "Installing bluetooth BLE for polar7"
+    # http://installfights.blogspot.ro/2016/08/fix-set-scan-parameters-failed.html
 
 
-    echo "Installing media - sound + mpd + kodi + mp3 tagger"
-    apt-get install alsa-utils bluez pulseaudio-module-bluetooth python-gobject python-gobject-2
+    echo "Installing media - sound + mpd + mp3 tagger"
+    apt-get install -y alsa-utils bluez pulseaudio-module-bluetooth python-gobject python-gobject-2
     # https://www.raspberrypi.org/forums/viewtopic.php?t=68779
     # https://jimshaver.net/2015/03/31/going-a2dp-only-on-linux/
     usermod -a -G lp $USERNAME
@@ -542,14 +555,7 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     '
     echo 'Installing music tools'
 
-    apt-get install mpd mpc triggerhappy avahi-daemon shairport-sync sox lame metaflac mpdscribble id3v2 flac mediainfo
-    git clone https://github.com/wertarbyte/triggerhappy.git
-    cd triggerhappy/
-    make
-    make install
-    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/triggerhappy/triggers.conf /etc/triggerhappy/
-    cd ..
-    rm -r triggerhappy
+    apt-get install -y mpd mpc avahi-daemon shairport-sync sox lame mpdscribble id3v2 flac mediainfo
     ln -s $LOG_ROOT /mnt/log
     ln -s $MUSIC_ROOT /mnt/music
     ln -s $HAIOT_DIR/scripts /home/scripts
@@ -580,8 +586,8 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     # http://www.lesbonscomptes.com/upmpdcli/upmpdcli.html
     # https://www.lesbonscomptes.com/upmpdcli/downloads.html#ubuntu
     add-apt-repository ppa:jean-francois-dockes/upnpp1
-    apt-get update
-    apt-get install upmpdcli
+    # apt-get update
+    apt-get install -y upmpdcli
     # will start manually with cron
     systemctl stop upmpdcli
     systemctl disable upmpdcli
@@ -600,36 +606,10 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     echo "snd_aloop" >> /etc/modules
     # this is loaded with index 0
     echo "options snd_aloop pcm_substreams=1" >> /etc/modprobe.d/alsa-base.conf
-    echo "Setting sound card order - useful for kodi if default is busy with audio chose the next one"
+    echo "TODO: Setting sound card order - useful for kodi if default is busy with audio chose the next one. Find correct index!"
     # set here the next one (in a safe zone, kodi picks this one if others are busy)
     # http://superuser.com/questions/626606/how-to-make-alsa-pick-a-preferred-sound-device-automatically
-    echo "options snd_oxygen index=1" >> /etc/modprobe.d/alsa-base.conf
-
-    echo 'Installing video tools'
-    #http://blog.endpoint.com/2012/11/using-cec-client-to-control-hdmi-devices.html
-    # http://www.semicomplete.com/projects/xdotool/#idp2912
-    # http://askubuntu.com/questions/371261/display-monitor-info-via-command-line
-    apt-get install i3 xinit xterm kodi xdotool i3blocks jq read-edid
-    
-    #dependencies for chrome
-    #apt-get install gconf-service
-
-    echo "Set default card for X"
-    echo '
-    pcm.!default {
-    type hw
-    card DAC
-    }
-
-    ctl.!default {
-    type hw
-    card DAC
-    }' > /root/.asoundrc
-
-    #echo "Configure kodi socket activation"
-    #cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/kodi* /lib/systemd/system/
-    #systemctl enable kodi@root.socket
-    #systemctl start kodi@root.socket
+    #echo "options snd_oxygen index=1" >> /etc/modprobe.d/alsa-base.conf
 
     # https://github.com/mikebrady/shairport-sync
     echo "Configure AirPlay default sound card"
@@ -652,9 +632,9 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     echo "Configure mpdscribble to Last.fm"
     cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/mpdscribble@.service /lib/systemd/system/
     systemctl disable mpdscribble
-    echo "Comment port setting in conf file"
+    echo "TODO: Comment port setting in conf file"
     sleep 5
-    nano /etc/mpdscribble.conf
+    # nano /etc/mpdscribble.conf
     systemctl enable mpdscribble@6600
     systemctl enable mpdscribble@6601
     systemctl enable mpdscribble@6602
@@ -668,21 +648,21 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     echo "Configuring additional music scripts"
     cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/activate-audio-amp.service /lib/systemd/system/
     cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/record-audio.service /lib/systemd/system/
-    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/thd.service /lib/systemd/system/
     systemctl enable activate-audio-amp
     systemctl enable record-audio
     systemctl start activate-audio-amp
     systemctl start record-audio
-    systemctl enable thd
-    systemctl start thd
 
-    echo "Installing screenshow"
-    apt install feh exiv2 
+    echo "Serial control via net for AMP setup"
+   # http://techtinkering.com/2013/04/02/connecting-to-a-remote-serial-port-over-tcpip/
+   apt install ser2net
+   echo "TODO: update /etc/ser2net.conf, use port 2000, comment the other lines"
+   systemctl restart ser2net
 
-   echo "Installing gesture"
-   apt install easystroke gpm
+fi
 
-   echo "Installing GoogleMusicProxy"
+if [ "$ENABLE_GMUSIC" == "1" ]; then
+  echo "Installing GoogleMusicProxy"
    # http://gmusicproxy.net/
    apt-get install python-virtualenv virtualenvwrapper
    cd /home/${USERNAME}
@@ -696,19 +676,71 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/gmusicproxy.service /lib/systemd/system/
    cp $HAIOT_DIR/scripts/config/gmusicproxy.cfg /home/${USERNAME}/.config/
    systemctl enable gmusicproxy
-   echo "Open gmusicproxy config file to set user, pass and port"
+   echo "TODO: Open gmusicproxy config file to set user, pass and port"
    # systemctl start gmusicproxy
    # chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}
+fi
 
-   echo "serial control via net for AMP setup"
-   # http://techtinkering.com/2013/04/02/connecting-to-a-remote-serial-port-over-tcpip/
-   apt install ser2net
-   echo "update /etc/ser2net.conf, use port 2000"
-   systemctl restart ser2net
+if [ "$ENABLE_PLEX" == "1" ]; then
+  echo deb https://downloads.plex.tv/repo/deb public main | sudo tee /etc/apt/sources.list.d/plexmediaserver.list
+  curl https://downloads.plex.tv/plex-keys/PlexSign.key | sudo apt-key add -
+  apt update
+  apt install -y plexmediaserver
+fi
 
+if [ "$ENABLE_KODI" == "1" ]; then
+    #echo "Configure kodi socket activation"
+    #cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/kodi* /lib/systemd/system/
+    #systemctl enable kodi@root.socket
+    #systemctl start kodi@root.socket
+    echo No kodi setup avail
 fi
 
 if [ "$ENABLE_DASHBOARD" == "1" ]; then
+    echo "export DISPLAY=:0.0" >> /etc/profile.d/haiot.sh
+
+    echo "Installing screenshow"
+    apt install feh exiv2
+
+    echo "Installing gesture"
+    apt install easystroke gpm
+
+    echo "Install input control scripts"
+    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/systemd/system/thd.service /lib/systemd/system/
+    systemctl enable thd
+    systemctl start thd
+
+    apt-get install triggerhappy
+    git clone https://github.com/wertarbyte/triggerhappy.git
+    cd triggerhappy/
+    make
+    make install
+    cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/triggerhappy/triggers.conf /etc/triggerhappy/
+    cd ..
+    rm -r triggerhappy
+
+
+    echo 'Installing video tools'
+    #http://blog.endpoint.com/2012/11/using-cec-client-to-control-hdmi-devices.html
+    # http://www.semicomplete.com/projects/xdotool/#idp2912
+    # http://askubuntu.com/questions/371261/display-monitor-info-via-command-line
+    apt-get install i3 xinit xterm kodi xdotool i3blocks jq read-edid
+
+    #dependencies for chrome
+    #apt-get install gconf-service
+
+    echo "Set default card for X"
+    echo '
+    pcm.!default {
+    type hw
+    card DAC
+    }
+
+    ctl.!default {
+    type hw
+    card DAC
+    }' > /root/.asoundrc
+
     echo "Installing smashing dashboard"
     adduser ${USERNAME} dialout
     # http://labrat.it/2014/01/11/dashing-dashboard/
@@ -732,7 +764,7 @@ fi
 
 if [ "$ENABLE_CAMERA" == "1" ]; then
     echo 'Installing motion'
-    apt-get install motion lsof
+    apt-get install -y motion lsof
     /etc/init.d/motion stop
     cp $HAIOT_DIR/scripts/osinstall/ubuntu/etc/motion/*.conf /etc/motion/
     echo 'start_motion_daemon=yes' > /etc/default/motion
@@ -747,120 +779,126 @@ if [ "$ENABLE_CAMERA" == "1" ]; then
     chsh -s /bin/bash motion
     usermod -m -d /home/motion motion
 
-    echo 'Installing latest version from alternate git as default package is very old'
-    git clone https://github.com/Motion-Project/motion.git
-    cd motion/
-    apt-get -y install autoconf libjpeg-dev pkgconf libavutil-dev libavformat-dev libavcodec-dev libswscale-dev
-    apt-get -y install libavdevice-dev libmicrohttpd-dev
-    autoreconf
-    ./configure
-    make -j`nproc`
-    make install
-    ln -s /etc/motion/motion.conf /usr/local/etc/motion/motion.conf
-    echo "Update motion daemon path and paths, usually in /local/bin rather than /bin"
-    sleep 5
-    nano /etc/init.d/motion
-    /etc/init.d/motion restart
+    if [ "$ENABLE_MOTION_COMPILE" == "1" ]; then
+      echo 'Installing latest version from alternate git as default package is very old'
+      git clone https://github.com/Motion-Project/motion.git
+      cd motion/
+      apt-get -y install make autoconf libjpeg-dev pkgconf libavutil-dev libavformat-dev libavcodec-dev libswscale-dev
+       apt-get -y install  automake autopoint pkgconf libtool libjpeg8-dev build-essential libzip-dev gettext libmicrohttpd-dev
+      apt-get -y install libavdevice-dev libmicrohttpd-dev
+      autoreconf -fiv
+      ./configure
+      make -j`nproc`
+      make install
+      ln -s /etc/motion/motion.conf /usr/local/etc/motion/motion.conf
+      echo "Update motion daemon path and paths, usually in /local/bin rather than /bin"
+      sleep 5
+      nano /etc/init.d/motion
+      /etc/init.d/motion restart
+    fi
 
-    echo "Compiling ffmpeg with HW"
-    # https://gist.github.com/Brainiarc7/eb45d2e22afec7534f4a117d15fe6d89
-    apt-get -y install autoconf automake build-essential libass-dev libtool pkg-config texinfo zlib1g-dev libdrm-dev libva-dev vainfo libogg-dev
-    mkdir ffmpeg-hw
-    cd ffmpeg-hw
-    git clone https://github.com/01org/cmrt
-    cd cmrt
-    ./autogen.sh
-    ./configure
-    time make -j$(nproc) VERBOSE=1
-    make -j$(nproc) install
-    ldconfig -vvvv
+    if [ "$ENABLE_FFMPEG_COMPILE" == "1" ]; then
+      echo "Compiling ffmpeg with HW"
+      # https://gist.github.com/Brainiarc7/eb45d2e22afec7534f4a117d15fe6d89
+      apt-get -y install autoconf automake build-essential libass-dev libtool pkg-config texinfo zlib1g-dev libdrm-dev libva-dev vainfo libogg-dev
+      mkdir ffmpeg-hw
+      cd ffmpeg-hw
+      git clone https://github.com/01org/cmrt
+      cd cmrt
+      ./autogen.sh
+      ./configure
+      time make -j$(nproc) VERBOSE=1
+      make -j$(nproc) install
+      ldconfig -vvvv
 
-    cd ..
-    git clone https://github.com/01org/libva
-    cd libva
-    ./autogen.sh
-    ./configure
-    time make -j$(nproc) VERBOSE=1
-    make -j$(nproc) install
-
-
-    cd ..
-    cd intel-hybrid-driver
-    ./autogen.sh
-    ./configure
-    time make -j$(nproc) VERBOSE=1
-    make -j$(nproc) install
-    ldconfig -vvv
-
-    cd ./post-install.shgit clone https://github.com/01org/intel-vaapi-driver
-    cd intel-vaapi-driver
-    ./autogen.sh
-    ./configure --enable-hybrid-codec
-    time make -j$(nproc) VERBOSE=1
-    make -j$(nproc) install
-    ldconfig -vvvv
+      cd ..
+      git clone https://github.com/01org/libva
+      cd libva
+      ./autogen.sh
+      ./configure
+      time make -j$(nproc) VERBOSE=1
+      make -j$(nproc) install
 
 
-    mkdir -p $HOME/bin
-    chown -Rc $USER:$USER $HOME/bin
-    mkdir -p ~/ffmpeg_sources
-    cd ~/ffmpeg_sources
-    wget wget http://www.nasm.us/pub/nasm/releasebuilds/2.14rc0/nasm-2.14rc0.tar.gz
-    tar xzvf nasm-2.14rc0.tar.gz
-    cd nasm-2.14rc0
-    ./configure --prefix="$HOME/bin" --bindir="$HOME/bin"
-    make -j$(nproc) VERBOSE=1
-    make -j$(nproc) install
-    make -j$(nproc) distclean
+      cd ..
+      cd intel-hybrid-driver
+      ./autogen.sh
+      ./configure
+      time make -j$(nproc) VERBOSE=1
+      make -j$(nproc) install
+      ldconfig -vvv
 
-    cd ~/ffmpeg_sources
-    wget http://download.videolan.org/pub/x264/snapshots/last_stable_x264.tar.bz2
-    tar xjvf last_stable_x264.tar.bz2
-    cd x264-snapshot*
-    PATH="$HOME/bin:$PATH" ./configure --prefix="$HOME/bin" --bindir="$HOME/bin" --enable-static --disable-opencl
-    PATH="$HOME/bin:$PATH" make -j$(nproc) VERBOSE=1
-    make -j$(nproc) install VERBOSE=1
-    make -j$(nproc) distclean
+      cd ./post-install.shgit clone https://github.com/01org/intel-vaapi-driver
+      cd intel-vaapi-driver
+      ./autogen.sh
+      ./configure --enable-hybrid-codec
+      time make -j$(nproc) VERBOSE=1
+      make -j$(nproc) install
+      ldconfig -vvvv
 
-    apt-get install cmake mercurial
-    cd ~/ffmpeg_sources
-    hg clone https://bitbucket.org/multicoreware/x265
-    cd ~/ffmpeg_sources/x265/build/linux
-    PATH="$HOME/bin:$PATH" cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$HOME/bin" -DENABLE_SHARED:bool=off ../../source
-    make -j$(nproc) VERBOSE=1
-    make -j$(nproc) install VERBOSE=1
-    make -j$(nproc) clean VERBOSE=1
 
-    cd ~/ffmpeg_sources
-    wget -O fdk-aac.tar.gz https://github.com/mstorsjo/fdk-aac/tarball/master
-    tar xzvf fdk-aac.tar.gz
-    cd mstorsjo-fdk-aac*
-    autoreconf -fiv
-    ./configure --prefix="$HOME/bin" --disable-shared
-    make -j$(nproc)
-    make -j$(nproc) install
-    make -j$(nproc) distclean
+      mkdir -p $HOME/bin
+      chown -Rc $USER:$USER $HOME/bin
+      mkdir -p ~/ffmpeg_sources
+      cd ~/ffmpeg_sources
+      wget wget http://www.nasm.us/pub/nasm/releasebuilds/2.14rc0/nasm-2.14rc0.tar.gz
+      tar xzvf nasm-2.14rc0.tar.gz
+      cd nasm-2.14rc0
+      ./configure --prefix="$HOME/bin" --bindir="$HOME/bin"
+      make -j$(nproc) VERBOSE=1
+      make -j$(nproc) install
+      # make -j$(nproc) distclean
 
-    cd ~/ffmpeg_sources
-    git clone https://github.com/webmproject/libvpx/
-    cd libvpx
-    ./configure --prefix="$HOME/bin" --enable-runtime-cpu-detect --enable-vp9 --enable-vp8 \
-    --enable-postproc --enable-vp9-postproc --enable-multi-res-encoding --enable-webm-io --enable-vp9-highbitdepth --enable-onthefly-bitpacking --enable-realtime-only \
-    --cpu=native --as=yasm
-    time make -j$(nproc)
-    time make -j$(nproc) install
-    time make clean -j$(nproc)
-    time make distclean
+      cd ~/ffmpeg_sources
+      git clone https://code.videolan.org/videolan/x264.git
+      # wget http://download.videolan.org/pub/x264/snapshots/last_stable_x264.tar.bz2
+      # tar xjvf last_stable_x264.tar.bz2
+      cd x264
+      PATH="$HOME/bin:$PATH" ./configure --prefix="$HOME/bin" --bindir="$HOME/bin" --enable-static --disable-opencl
+      PATH="$HOME/bin:$PATH" make -j$(nproc) VERBOSE=1
+      make -j$(nproc) install VERBOSE=1
+      # make -j$(nproc) distclean
 
-    cd ~/ffmpeg_sources
-    wget -c -v http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.5.tar.xz
-    tar -xvf libvorbis-1.3.5.tar.xz
-    cd libvorbis-1.3.5
-    ./configure --enable-static --prefix="$HOME/bin"
-    time make -j$(nproc)
-    time make -j$(nproc) install
-    time make clean -j$(nproc)
-    time make distclean
+      apt-get install cmake mercurial
+      cd ~/ffmpeg_sources
+      hg clone https://bitbucket.org/multicoreware/x265
+      cd ~/ffmpeg_sources/x265/build/linux
+      PATH="$HOME/bin:$PATH" cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$HOME/bin" -DENABLE_SHARED:bool=off ../../source
+      make -j$(nproc) VERBOSE=1
+      make -j$(nproc) install VERBOSE=1
+      # make -j$(nproc) clean VERBOSE=1
+
+      cd ~/ffmpeg_sources
+      wget -O fdk-aac.tar.gz https://github.com/mstorsjo/fdk-aac/tarball/master
+      tar xzvf fdk-aac.tar.gz
+      cd mstorsjo-fdk-aac*
+      autoreconf -fiv
+      ./configure --prefix="$HOME/bin" --disable-shared
+      make -j$(nproc)
+      make -j$(nproc) install
+      # make -j$(nproc) distclean
+
+      cd ~/ffmpeg_sources
+      git clone https://github.com/webmproject/libvpx/
+      cd libvpx
+      ./configure --prefix="$HOME/bin" --enable-runtime-cpu-detect --enable-vp9 --enable-vp8 \
+      --enable-postproc --enable-vp9-postproc --enable-multi-res-encoding --enable-webm-io --enable-vp9-highbitdepth --enable-onthefly-bitpacking --enable-realtime-only \
+      --cpu=native --as=yasm
+      time make -j$(nproc)
+      time make -j$(nproc) install
+      # time make clean -j$(nproc)
+      # time make distclean
+
+      cd ~/ffmpeg_sources
+      wget -c -v http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.5.tar.xz
+      tar -xvf libvorbis-1.3.5.tar.xz
+      cd libvorbis-1.3.5
+      ./configure --enable-static --prefix="$HOME/bin"
+      time make -j$(nproc)
+      time make -j$(nproc) install
+      # time make clean -j$(nproc)
+      # time make distclean
+    fi
 
 fi
 
@@ -1355,7 +1393,7 @@ if [ "$ENABLE_THINGSBOARD" == "1" ]; then
     curl -L https://raw.githubusercontent.com/thingsboard/thingsboard/release-1.4/docker/tb.env > tb.env
 
     #https://docs.docker.com/install/linux/docker-ce/ubuntu/#install-using-the-repository
-    apt-get install apt-transport-https ca-certificates curl software-properties-common
+    apt-get install -y apt-transport-https ca-certificates curl software-properties-common
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
     add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
     apt-get update
@@ -1371,43 +1409,60 @@ if [ "$ENABLE_THINGSBOARD" == "1" ]; then
 fi
 
 if [ "$ENABLE_OPENHAB" == "1" ]; then
+    apt-get install -y influxdb
+    # https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-grafana-on-ubuntu-18-04
+    wget -q -O - https://packages.grafana.com/gpg.key |  apt-key add -
+    add-apt-repository "deb https://packages.grafana.com/oss/deb stable main"
+    apt-get install -y grafana
+    systemctl enable grafana-server
+    systemctl start grafana-server
     # https://docs.openhab.org/installation/linux.html#package-repository-installation
     wget -qO - 'https://bintray.com/user/downloadSubjectPublicKey?username=openhab' | apt-key add -
     apt-get install -y apt-transport-https
     echo 'deb https://dl.bintray.com/openhab/apt-repo2 stable main' | tee /etc/apt/sources.list.d/openhab2.list
-    apt-get update
-    apt-get install -y openhab2 openhab2-addons
-    echo "Edit default ports"
+    echo Install Java Zulu
+    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 0xB1998361219BD9C9
+    apt-add-repository 'deb http://repos.azulsystems.com/ubuntu stable main'
+    #apt-get update
+    apt-get install -y zulu8 openhab2 openhab2-addons
+    echo "TODO: Edit default ports"
     nano /etc/default/openhab2
     systemctl start openhab2.service
     systemctl status openhab2.service
     systemctl daemon-reload
     systemctl enable openhab2.service
+
+
+fi
+
+if [ "$ENABLE_NEXTCLOUD" == "1" ]; then
+  apt-get install -y snapd
+  snap install nextcloud
 fi
 
 if [ "$ENABLE_UPS_APC" == "1" ]; then
     apt-get install -y apcupsd
-
 fi
 
-echo "Optimise for flash and ssd usage"
+if [ "$ENABLE_RAM_FS" == "1" ]; then
+  echo "Optimise for flash and ssd usage"
+  echo "Create tmpfs"
+  # http://www.zdnet.com/article/raspberry-pi-extending-the-life-of-the-sd-card/
+  mkdir -p /var/ram
+  chmod 777 /var/ram/
 
-echo "Create tmpfs"
-# http://www.zdnet.com/article/raspberry-pi-extending-the-life-of-the-sd-card/
-mkdir -p /var/ram
-chmod 777 /var/ram/
-
-cat /etc/fstab | grep "/var/ram"
-if [ "$?" == "1" ]; then
-	echo "Add ram folder for sqlite db storage and logs"
-	echo "tmpfs           /var/ram        tmpfs   defaults,noatime        0       0" >> /etc/fstab
-	if [ "$ENABLE_LOG_RAM" == "1" ]; then
-        echo "tmpfs           /var/log        tmpfs   defaults,noatime        0       0" >> /etc/fstab
-	fi
-    echo "tmpfs           /tmp            tmpfs   defaults,noatime        0       0" >> /etc/fstab
-	mount -a
-else
-	echo "Ram folder for sqlite db storage exists already"
+  cat /etc/fstab | grep "/var/ram"
+  if [ "$?" == "1" ]; then
+    echo "Add ram folder for sqlite db storage and logs"
+    echo "tmpfs           /var/ram        tmpfs   defaults,noatime        0       0" >> /etc/fstab
+    if [ "$ENABLE_LOG_RAM" == "1" ]; then
+          echo "tmpfs           /var/log        tmpfs   defaults,noatime        0       0" >> /etc/fstab
+    fi
+      echo "tmpfs           /tmp            tmpfs   defaults,noatime        0       0" >> /etc/fstab
+    mount -a
+  else
+    echo "Ram folder for sqlite db storage exists already"
+  fi
 fi
 
 # https://www.cyberciti.biz/tips/linux-use-gmail-as-a-smarthost.html
