@@ -17,3 +17,4 @@ posix/*
 posix/__init__.py
 fcntl/*
 fcntl/__init__.py
+scripts/osinstall/ubuntu/etc/motion/thread*.conf
