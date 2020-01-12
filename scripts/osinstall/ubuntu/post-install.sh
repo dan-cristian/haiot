@@ -1409,7 +1409,7 @@ if [ "$ENABLE_THINGSBOARD" == "1" ]; then
 fi
 
 if [ "$ENABLE_OPENHAB" == "1" ]; then
-    apt-get install -y influxdb
+    apt-get install -y influxdb influxdb-client
     # https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-grafana-on-ubuntu-18-04
     wget -q -O - https://packages.grafana.com/gpg.key |  apt-key add -
     add-apt-repository "deb https://packages.grafana.com/oss/deb stable main"
