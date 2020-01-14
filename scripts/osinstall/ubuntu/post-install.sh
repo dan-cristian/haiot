@@ -638,6 +638,9 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     systemctl enable mpdscribble@6600
     systemctl enable mpdscribble@6601
     systemctl enable mpdscribble@6602
+    systemctl enable mpdscribble@6603
+    systemctl enable mpdscribble@6604
+    systemctl enable mpdscribble@6605
     systemctl start mpdscribble@6600
     systemctl start mpdscribble@6601
     systemctl start mpdscribble@6602
