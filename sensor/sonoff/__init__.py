@@ -83,6 +83,10 @@ def _process_message(msg):
                     current = float(energy['Current'])
                 else:
                     current = None
+                if 'Today' in energy:
+                    today_energy = energy['Today']
+                else:
+                    today_energy = None
                 # unit should match Utility unit name in models definition
                 dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=power, unit='watt')
                 # todo: save total energy utility
