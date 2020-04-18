@@ -269,7 +269,7 @@ class P:
     grid_exporting = None
     device_list = collections.OrderedDict()  # key is utility name
     utility_list = {}
-    MIN_WATTS_THRESHOLD = 30
+    MIN_WATTS_THRESHOLD = 70
     IDLE_WATTS = 10
     emulate_export = False # used to test export energy scenarios
 
