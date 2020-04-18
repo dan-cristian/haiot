@@ -3,16 +3,16 @@
 <h2>Overview</h2>
 With Haiot you can control a huge number of sensors and devices in your house (and not only), setup automation rules and visualise sensors and control the system via Web and Mobile interfaces. It integrates with Openhab via Mqtt.
 The application currently implementes the following automation scripts in my house:
-- Heating control (with multiple sources: gas, solar)
-- Alarm sensors (PIR)
-- Motion sensors (IP cameras via motion)
-- Watering system
-- Audio control via MPD
-- Gate opening/close control
-- Electricity usage monitoring and grid export control function
-- Presence monitoring (wifi, bluetooth)
-- Location tracking
-- and many more
+<br>- Heating control (with multiple sources: gas, solar)
+<br>- Alarm sensors (PIR)
+<br>- Motion sensors (IP cameras via motion)
+<br>- Watering system
+<br>- Audio control via MPD
+<br>- Gates opening/close control
+<br>- Electricity usage monitoring and grid export control function
+<br>- Presence monitoring (wifi, bluetooth)
+<br>- Location tracking
+<br>- and many more
 
 <h2>System capabilities</h2>
 Application is split in modules, each with a set of features. Modules can be enabled or disabled.
