@@ -402,9 +402,32 @@ def _set_param(node_id, param_name, value, param_code):
 # https://github.com/openhab/org.openhab.binding.zwave/blob/master/doc/qubino/zmnhxd_0_0.md
 def _initial_node_init():
     if not P.init_done:
+        # Parameter no. 40 –Reporting Watts on power change
+        # Set value means percentage from 0-100 = 0% - 100%
+        # Values (size is 1 byte dec):
+        # • Default value 10
+        # • 0 – reporting disabled
+        # • 1-100 = 1% - 100% reporting enabled. Power report is send (push) only when actual
+        # power in Watts (in real time changes for more than set percentage comparing to
+        # previous actual power in Watts, step is 1%.
         _set_param(2, 'Power reporting in Watts on power change',  1, 40)
-        _set_param(2, 'Other Values - Reporting on time interval', 1, 43)
-        _set_param(2, 'Power reporting in Watts by time interval', 600, 42)
+        # Parameter no. 43 – Other Values - Reporting on time interval
+        # This parameter is valid only for Voltage (V of ph1, ph2, ph3), Current (A of ph1, ph2, ph3), Total
+        # Power Factor, Total Reactive Power (var)
+        # Available configuration parameters (data type is 2 Byte DEC)
+        # • Default value 600 (600 seconds - 10 minutes)
+        # • 0 – reporting disabled
+        # • 30-32535 = 30 (30 seconds – 32535 seconds). Reporting enabled. Report is send
+        # with the time interval set by entered value.
+        # • Note: Device is reporting only if there was a change
+        _set_param(2, 'Other Values - Reporting on time interval', 30, 43)
+        # Parameter no. 42 – Reporting on time interval
+        # Values (size is 2 byte dec):
+        # • Default value 600 (10 minutes)
+        # • 0-59 = reporting disabled
+        # • 60-32535 = 60 seconds - 32535 seconds. Reporting enabled. Report is send with the
+        # time interval set by entered value.
+        _set_param(2, 'Power reporting in Watts by time interval', 60, 42)
         P.init_done = True
         node = P.network.nodes[2]
         configs = node.get_configs()
