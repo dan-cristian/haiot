@@ -19,7 +19,7 @@ class P:
     inclusion_started = False
     initialised = False
     thread_run_at_init = False  # was thread run first at init?
-    interval = 10
+    interval = 5
     init_fail_count = 0
     device = "/dev/ttyACM"
     device_index = 0
