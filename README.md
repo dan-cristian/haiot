@@ -1,5 +1,18 @@
-# haiot
+ # haiot
 <h1>Home Automation &amp; Internet of Things</h1>
+<h2>Overview</h2>
+With Haiot you can control a huge number of sensors and devices in your house (and not only), setup automation rules and visualise sensors and control the system via Web and Mobile interfaces. It integrates with Openhab via Mqtt.
+The application currently implementes the following automation scripts in my house:
+<br>- Heating control (with multiple sources: gas, solar)
+<br>- Alarm sensors (PIR)
+<br>- Motion sensors (IP cameras via motion)
+<br>- Watering system
+<br>- Audio control via MPD
+<br>- Gates opening/close control
+<br>- Electricity usage monitoring and grid export control function
+<br>- Presence monitoring (wifi, bluetooth)
+<br>- Location tracking
+<br>- and many more
 
 <h2>System capabilities</h2>
 Application is split in modules, each with a set of features. Modules can be enabled or disabled.
@@ -31,7 +44,7 @@ RFXCOM device tested is RFXtrx433.
 IO input capability for beaglebone, detects contact states, used as a basis for alarm system
 
 <h3>graph_plotly</h3>
-Automatically creates graphics online using free plot.ly service. 
+<deprecated>Automatically creates graphics online using free plot.ly service. 
 Check some samples <a  href="https://plot.ly/~dancri77">here</a>.
 
 <h3>relay</h3>
@@ -42,11 +55,17 @@ Turns on and off relays
 - Windows (tested with Windows 8.1
 
 <h3>Application was tested on:</h3>
-- Raspberry Pi model B
+- Raspberry Pi  (all versions)
 - Beaglebone Black
 - Debian (Openmediavault based install)
 - OpenWrt/Linaro GCC 4.8-2014.04 r42625 (
 - Windows 8.1 64 bit
+
+<h3> Supported sensors</h3>
+Sonoff (Basic, Pow)
+zWave (Qubino and other power meters)
+1wire (temperature, humidity, etc)
+
 
 <h2>How to setup the application</h2>
 General prerequisites:<br>
