@@ -293,6 +293,15 @@ Frame label="Charts" {
         Chart item=electricity_power_solar_rulota period=3M refresh=10000 visibility=[p_switch==4]
         Chart item=electricity_power_solar_rulota period=Y refresh=10000 visibility=[p_switch==5]
     }
+    Text item=electricity_power_grid_rulota {
+        Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
+        Chart item=electricity_power_grid_rulota period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
+        Chart item=electricity_power_grid_rulota period=D refresh=10000 visibility=[p_switch==1]
+        Chart item=electricity_power_grid_rulota period=W refresh=10000 visibility=[p_switch==2]
+        Chart item=electricity_power_grid_rulota period=M refresh=10000 visibility=[p_switch==3]
+        Chart item=electricity_power_grid_rulota period=3M refresh=10000 visibility=[p_switch==4]
+        Chart item=electricity_power_grid_rulota period=Y refresh=10000 visibility=[p_switch==5]
+    }
     Text item=electricity_solar_aps {
         Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
         Chart item=electricity_solar_aps period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
