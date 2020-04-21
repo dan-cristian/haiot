@@ -397,7 +397,8 @@
     {"code":"i", "target":43,   "direction": 1},
 
     {"code":"x", "target":-8,   "direction": -1},
-    {"code":"y", "target":-18, "direction": -1}
+    {"code":"y", "target":-18, "direction": -1},
+    {"code":"z", "target":65, "direction": -1}
   ],
 
   "SchedulePattern": [
@@ -421,7 +422,9 @@
     {"id":18, "name":"week-boiler-summer",       "pattern":"iiii iiii iiii iiii iiii iiii", "activate_on_condition":true, "activate_condition_relay":"puffer gas valve", "main_source_needed":false},
     {"id":20, "name":"away",                     "pattern":".... .... .... .... .... ....", "main_source_needed":true},
 
-    {"id":30, "name":"fridge-summer",            "pattern":"xxxx xxxx xxxx xxxx xxxx xxxx", "main_source_needed":false}
+    {"id":30, "name":"fridge-summer",            "pattern":"xxxx xxxx xxxx xxxx xxxx xxxx", "main_source_needed":false},
+
+    {"id":31, "name":"boiler-summer",            "pattern":"zzzz zzzz zzzz zzzz zzzz zzzz", "main_source_needed":false}
   ],
 
   "HeatSchedule": [
@@ -433,8 +436,11 @@
     {"zone_id":47, "pattern_week_id":11,  "pattern_weekend_id":12, "pattern_id_presence":12, "pattern_id_no_presence":20, "season": "summer"},
     {"zone_id":4,  "pattern_week_id":14,  "pattern_weekend_id":14, "pattern_id_presence":14, "pattern_id_no_presence":20, "season": "winter"},
     {"zone_id":4,  "pattern_week_id":13,  "pattern_weekend_id":14, "pattern_id_presence":14, "pattern_id_no_presence":20, "season": "summer"},
+
     {"zone_id":52, "pattern_week_id":17,  "pattern_weekend_id":17, "pattern_id_presence":17, "pattern_id_no_presence":20, "season": "winter"},
     {"zone_id":52, "pattern_week_id":18,  "pattern_weekend_id":18, "pattern_id_presence":18, "pattern_id_no_presence":20, "season": "summer"},
+
+    {"zone_id":52, "pattern_week_id":31,  "pattern_weekend_id":31, "pattern_id_presence":31, "pattern_id_no_presence":20, "season": "summer"},
 
     {"zone_id":23, "pattern_week_id":30,  "pattern_weekend_id":30, "pattern_id_presence":30, "pattern_id_no_presence":30, "season": "summer"},
     {"zone_id":23, "pattern_week_id":30,  "pattern_weekend_id":30, "pattern_id_presence":30, "pattern_id_no_presence":30, "season": "winter"}
