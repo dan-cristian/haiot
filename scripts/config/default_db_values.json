@@ -440,8 +440,8 @@
     {"zone_id":52, "pattern_week_id":17,  "pattern_weekend_id":17, "pattern_id_presence":17, "pattern_id_no_presence":20, "season": "winter"},
     {"zone_id":52, "pattern_week_id":18,  "pattern_weekend_id":18, "pattern_id_presence":18, "pattern_id_no_presence":20, "season": "summer"},
 
-    {"zone_id":52, "pattern_week_id":31,  "pattern_weekend_id":31, "pattern_id_presence":31, "pattern_id_no_presence":20, "season": "summer"},
-    {"zone_id":52, "pattern_week_id":31,  "pattern_weekend_id":31, "pattern_id_presence":31, "pattern_id_no_presence":20, "season": "winter"},
+    {"zone_id":52, "pattern_week_id":31,  "pattern_weekend_id":31, "pattern_id_presence":31, "pattern_id_no_presence":20, "season": "disabled"},
+    {"zone_id":52, "pattern_week_id":31,  "pattern_weekend_id":31, "pattern_id_presence":31, "pattern_id_no_presence":20, "season": "disabled"},
 
     {"zone_id":23, "pattern_week_id":30,  "pattern_weekend_id":30, "pattern_id_presence":30, "pattern_id_no_presence":30, "season": "summer"},
     {"zone_id":23, "pattern_week_id":30,  "pattern_weekend_id":30, "pattern_id_presence":30, "pattern_id_no_presence":30, "season": "winter"}
