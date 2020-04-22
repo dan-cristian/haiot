@@ -254,30 +254,33 @@ def _loop_zones():
         zone_list = m.Zone.find()
         for zone in zone_list:
             P.thread_pool_status = 'do zone {}'.format(zone.name)
-            heat_schedule = m.HeatSchedule.find_one({m.HeatSchedule.zone_id: zone.id, m.HeatSchedule.season: P.season})
-            zonesensor_list = m.ZoneSensor.find({m.ZoneSensor.zone_id: zone.id, m.ZoneSensor.is_main: True})
-            sensor_processed = {}
-            P.heat_status += 'zone=' + zone.name + ': heat_sched {} sensors_count {}'.format(
-                heat_schedule, len(zone_list))
-            for zonesensor in zonesensor_list:
-                if heat_schedule is not None and zonesensor is not None:
-                    sensor = m.Sensor.find_one({m.Sensor.address: zonesensor.sensor_address})
-                    if sensor is not None:
-                        P.heat_status += 'sensor: {} {} '.format(sensor.address, sensor.sensor_name)
-                        heat_state, main_source_needed = _update_zone_heat(zone, heat_schedule, sensor)
-                        P.heat_status += 'heat on: {} main {},'.format(heat_state, main_source_needed)
-                        if not heat_is_on:
-                            heat_is_on = main_source_needed and heat_state
-                        if zonesensor.zone_id in sensor_processed:
-                            prev_sensor = sensor_processed[zonesensor.zone_id]
-                            L.l.warning('Already processed temp sensor {} in zone {}, duplicate?'.format(
-                                prev_sensor, zonesensor.zone_id))
+            heat_schedule_list = m.HeatSchedule.find({m.HeatSchedule.zone_id: zone.id, m.HeatSchedule.season: P.season})
+            if len(heat_schedule_list) > 1:
+                L.l.warning('Multiple heat schedules for this zone, iterating')
+            for heat_schedule in heat_schedule_list:
+                zonesensor_list = m.ZoneSensor.find({m.ZoneSensor.zone_id: zone.id, m.ZoneSensor.is_main: True})
+                sensor_processed = {}
+                P.heat_status += 'zone=' + zone.name + ': heat_sched {} sensors_count {} '.format(
+                    heat_schedule, len(zone_list))
+                for zonesensor in zonesensor_list:
+                    if heat_schedule is not None and zonesensor is not None:
+                        sensor = m.Sensor.find_one({m.Sensor.address: zonesensor.sensor_address})
+                        if sensor is not None:
+                            P.heat_status += 'sensor: {} {} '.format(sensor.address, sensor.sensor_name)
+                            heat_state, main_source_needed = _update_zone_heat(zone, heat_schedule, sensor)
+                            P.heat_status += 'heat on: {} main {},'.format(heat_state, main_source_needed)
+                            if not heat_is_on:
+                                heat_is_on = main_source_needed and heat_state
+                            if zonesensor.zone_id in sensor_processed:
+                                prev_sensor = sensor_processed[zonesensor.zone_id]
+                                L.l.warning('Already processed temp sensor {} in zone {}, duplicate?'.format(
+                                    prev_sensor, zonesensor.zone_id))
+                            else:
+                                sensor_processed[zonesensor.zone_id] = sensor.sensor_name
                         else:
-                            sensor_processed[zonesensor.zone_id] = sensor.sensor_name
+                            P.heat_status += ' sensor={}'.format(sensor)
                     else:
-                        P.heat_status += ' sensor={}'.format(sensor)
-                else:
-                    P.heat_status += ' sched={} zonesensor={}'.format(heat_schedule, zonesensor)
+                        P.heat_status += ' sched={} zonesensor={}'.format(heat_schedule, zonesensor)
         # turn on/off the main heating system based on zone heat needs
         # check first to find alternate valid heat sources
         heatrelay_main_source = m.ZoneHeatRelay.find_one({m.ZoneHeatRelay.is_alternate_heat_source: True})
