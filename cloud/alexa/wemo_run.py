@@ -420,28 +420,33 @@ def init():
     L.l.info('Wemo module initialising')
     global _pooler
 
-    # Set up our singleton for polling the sockets for data read
-    _pooler = poller()
+    try:
+        # Set up our singleton for polling the sockets for data read
+        _pooler = poller()
 
-    # Set up our singleton listener for UPnP broadcasts
-    u = upnp_broadcast_responder()
-    u.init_socket()
+        # Set up our singleton listener for UPnP broadcasts
+        u = upnp_broadcast_responder()
+        u.init_socket()
 
-    # Add the UPnP broadcast listener to the poller so we can respond
-    # when a broadcast is received.
-    _pooler.add(u)
+        # Add the UPnP broadcast listener to the poller so we can respond
+        # when a broadcast is received.
+        _pooler.add(u)
 
-    # NOTE: As of 2015-08-17, the Echo appears to have a hard-coded limit of
-    # 16 switches it can control. Only the first 16 elements of the FAUXMOS
-    # list will be used.
-    alexa_list = get_alexawemo_rules()
-    index = 0
-    for rule_entry in alexa_list.keys():
-        # a fixed port wasn't specified, use a dynamic one
-        dev_name = rule_entry.replace('_', ' ')
-        switch = fauxmo(dev_name=dev_name, listener=u, pooller=_pooler, ip_address=None, port=0, index=index,
-                        action_handler_on=alexa_list[rule_entry][0], action_handler_off=alexa_list[rule_entry][1])
-        _FAUXMOS.append(switch)
-        index += 1
-
-    thread_pool.add_interval_callable(_pooler.poll, run_interval_second=0.5)
+        # NOTE: As of 2015-08-17, the Echo appears to have a hard-coded limit of
+        # 16 switches it can control. Only the first 16 elements of the FAUXMOS
+        # list will be used.
+        alexa_list = get_alexawemo_rules()
+        index = 0
+        for rule_entry in alexa_list.keys():
+            # a fixed port wasn't specified, use a dynamic one
+            dev_name = rule_entry.replace('_', ' ')
+            switch = fauxmo(dev_name=dev_name, listener=u, pooller=_pooler, ip_address=None, port=0, index=index,
+                            action_handler_on=alexa_list[rule_entry][0], action_handler_off=alexa_list[rule_entry][1])
+            _FAUXMOS.append(switch)
+            index += 1
+        thread_pool.add_interval_callable(_pooler.poll, run_interval_second=0.5)
+        init_ok = True
+    except Exception as ex:
+        L.l.error('Unable to initialise Alexa listening ports')
+        init_ok = False
+    return init_ok

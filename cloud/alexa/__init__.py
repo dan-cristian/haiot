@@ -16,6 +16,6 @@ def unload():
 
 def init():
     L.l.info('Alexa module initialising')
-    wemo_run.init()
-    global initialised
-    initialised = True
+    if wemo_run.init():
+        global initialised
+        initialised = True
