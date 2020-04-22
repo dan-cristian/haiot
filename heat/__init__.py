@@ -254,10 +254,11 @@ def _loop_zones():
         zone_list = m.Zone.find()
         for zone in zone_list:
             P.thread_pool_status = 'do zone {}'.format(zone.name)
-            P.heat_status += 'zone=' + zone.name + ': '
             heat_schedule = m.HeatSchedule.find_one({m.HeatSchedule.zone_id: zone.id, m.HeatSchedule.season: P.season})
             zonesensor_list = m.ZoneSensor.find({m.ZoneSensor.zone_id: zone.id, m.ZoneSensor.is_main: True})
             sensor_processed = {}
+            P.heat_status += 'zone=' + zone.name + ': heat_sched {} sensors_count {}'.format(
+                heat_schedule, len(zone_list))
             for zonesensor in zonesensor_list:
                 if heat_schedule is not None and zonesensor is not None:
                     sensor = m.Sensor.find_one({m.Sensor.address: zonesensor.sensor_address})
