@@ -24,10 +24,10 @@ compare=$(echo "$current_nospace > $MAX_REPO_SIZE" | bc -l)
 if (( $compare )); then
 	echo "Max size reached on storage, cleaning files older than $FILE_AGE"
 	clean
-	echo 0
+	return 0
 else
 	echo "Space left on storage, clean not needed"
-	echo 1
+	return 1
 fi
 }
 
