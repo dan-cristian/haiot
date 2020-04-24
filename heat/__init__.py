@@ -257,6 +257,7 @@ def _loop_zones():
             heat_schedule_list = m.HeatSchedule.find({m.HeatSchedule.zone_id: zone.id, m.HeatSchedule.season: P.season})
             if len(heat_schedule_list) > 1:
                 L.l.warning('Multiple heat schedules for this zone, iterating')
+            # todo: fix needed to avoid multiple state changes on same relays rapidly, on multiple schedules
             for heat_schedule in heat_schedule_list:
                 zonesensor_list = m.ZoneSensor.find({m.ZoneSensor.zone_id: zone.id, m.ZoneSensor.is_main: True})
                 sensor_processed = {}
