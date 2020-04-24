@@ -164,6 +164,8 @@ def _process_message(msg):
                     sensor = m.PowerMonitor()
                     sensor.id = sensor.id
                 sensor.voltage = voltage
+                sensor.power = power
+                sensor.current = current
                 sensor.save_changed_fields(broadcast=True, persist=True)
             if 'ANALOG' in obj:
                 # "ANALOG":{"A0":7}
