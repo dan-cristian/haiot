@@ -173,6 +173,8 @@ Number powermonitor_voltage_big_battery_3 "Big battery 3 [%.3f V]" <energy> {mqt
 Number powermonitor_voltage_big_battery_4 "Big battery 4 [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_voltage_big battery 4:state:default]"}
 
 Number powermonitor_voltage_rulota_battery_1 "Rulota battery 1 [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_voltage_rulota battery 1:state:default]"}
+Number powermonitor_power_rulota_battery_1 "Rulota battery 1 [%.3f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_power_rulota battery 1:state:default]"}
+
 Number powermonitor_voltage_rulota_battery_2 "Rulota battery 2 [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_voltage_rulota battery 2:state:default]"}
 
 Number gas_gas "Gas [%.1f mc]" <gas>                                        {mqtt="<[mosquitto:iot/openhab/gas_gas:state:default]"}
