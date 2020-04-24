@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DIRSRV=/mnt/motion/
-MAX_REPO_SIZE="1100100100"
+MAX_REPO_SIZE="1100100100" # in bytes
 FILE_AGE=30
 
 function clean() {
@@ -17,8 +17,11 @@ echo "Clean done"
 
 function checkandclean() {
 current=$(du -s $DIRSRV)
-echo "Checking space on storage, current=$current maxtarget=$MAX_REPO_SIZE units=bytes"
-if (( $(echo "$current > $MAX_REPO_SIZE" | bc -l) )); then
+current_nospace=${current%%/*}
+echo "Checking space on storage, current=.$current_nospace. maxtarget=.$MAX_REPO_SIZE. units=bytes"
+compare=$(echo "$current_nospace > $MAX_REPO_SIZE" | bc -l)
+# echo "Compare is $compare"
+if (( $compare )); then
 	echo "Max size reached on storage, cleaning files older than $FILE_AGE"
 	clean
 	echo 0
