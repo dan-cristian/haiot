@@ -381,7 +381,8 @@
     {"id":6, "name":"big battery 4", "type":"ina", "host_name":"sonoff-basic-12", "max_voltage":14.7, "warn_voltage":12.5, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
 
     {"id":11, "name":"rulota battery 1", "type":"ina", "host_name":"wemos-rulota-bat1",  "max_voltage":14.7, "warn_voltage":12.4, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
-    {"id":12, "name":"rulota battery 2", "type":"ina", "host_name":"wemos-rulota-bat2",  "max_voltage":14.7, "warn_voltage":12.4, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000}
+    {"id":12, "name":"rulota battery 2", "type":"ina", "host_name":"wemos-rulota-bat2",  "max_voltage":14.7, "warn_voltage":12.4, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
+    {"id":12, "name":"rulota battery main", "type":"ina", "host_name":"wemos-rulota-bat-main",  "max_voltage":14.7, "warn_voltage":12.4, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000}
   ],
 
   "TemperatureTarget": [
