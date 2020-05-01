@@ -119,6 +119,9 @@ Number air_temperature_bme_living "Temp bme living [%.1f °C]" <temperature>  {m
 Number air_pressure_bme_living "Pressure bme living [%.0f hPa]" <pressure>  {mqtt="<[mosquitto:iot/openhab/airsensor_pressure_wemos-living-air_bme680:state:default]"}
 Number air_humidity_bme_living "Humidity bme living [%.0f %%]" <humidity>  {mqtt="<[mosquitto:iot/openhab/airsensor_humidity_wemos-living-air_bme680:state:default]"}
 
+Number air_co2_kids "CO2 kids [%.0f ppm]" <smoke>                       {mqtt="<[mosquitto:iot/openhab/airsensor_co2_wemos-kids-air_mhz19b:state:default]"}
+
+
 Number temperature_bucatarie_hota "Bucatarie hota [%.1f °C]" <temperature>            {mqtt="<[mosquitto:iot/openhab/airsensor_temperature_sonoff-basic-6_bme280:state:default]"}
 Number humidity_bucatarie "Bucatarie [%.0f %%]" <humidity> [ "CurrentHumidity" ]      {mqtt="<[mosquitto:iot/openhab/airsensor_humidity_sonoff-basic-6_bme280:state:default]"}
 Number pressure_bucatarie "Bucatarie [%.0f hPa]" <pressure>                           {mqtt="<[mosquitto:iot/openhab/airsensor_pressure_sonoff-basic-6_bme280:state:default]"}
