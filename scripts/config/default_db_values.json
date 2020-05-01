@@ -510,7 +510,7 @@
     {"zone_id":54 , "sensor_address": "sonoff-pow-3",                               "sensor_name": "solar meter"},
     {"zone_id":7 ,  "sensor_address": "wemosmini5_bme280",                        "sensor_name": "curte_bme"},
     {"zone_id":7 ,  "sensor_address": "wemosmini5_a0",                            "sensor_name": "curte_CO"},
-    {"zone_id":2 ,  "sensor_address": "wemos-mini-1_bme280",                        "sensor_name": "living_bme"},
+    {"zone_id":2 ,  "sensor_address": "wemos-living-air",                           "sensor_name": "living_bme"},
 
     {"zone_id":2  , "sensor_address": "sonoff-basic-1_bme280",                        "sensor_name": "living_atmo"},
     {"zone_id":1  , "sensor_address": "sonoff-basic-6_bme280",                        "sensor_name": "bucatarie_atmo"},
