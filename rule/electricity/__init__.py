@@ -214,6 +214,7 @@ class PwmHeater(LoadPowerDevice):
                 L.l.warning('Capping incorrect duty {} watts={} max_duty={} max_watt={} '.format(
                     required_duty, pwm_watts, self.max_duty, self.MAX_WATTS))
                 required_duty = self.max_duty
+            pwm_watts = min(pwm_watts, self.MAX_WATTS)
             pwm = pigpio_gpio.P.pwm.set(
                 self.RELAY_NAME, duty_cycle=required_duty, frequency=self.frequency, target_watts=pwm_watts)
             self.target_watts = pwm_watts
