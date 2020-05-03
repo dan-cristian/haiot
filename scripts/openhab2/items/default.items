@@ -127,6 +127,8 @@ Number air_co2_bedroom "CO2 bedroom [%.0f ppm]" <smoke>                       {m
 Number air_gas_bedroom "Gas bedroom [%.2f kOhm]" <smoke>                       {mqtt="<[mosquitto:iot/openhab/airsensor_gas_wemos-bedroom-air_bme680:state:default]"}
 Number air_gas_curte "Gas curte [%.2f kOhm]" <smoke>                       {mqtt="<[mosquitto:iot/openhab/airsensor_gas_wemos-curte-air_bme680:state:default]"}
 
+Number ozone "Ozone [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_voltage_ozone:state:default]"}
+
 
 Number temperature_bucatarie_hota "Bucatarie hota [%.1f °C]" <temperature>            {mqtt="<[mosquitto:iot/openhab/airsensor_temperature_sonoff-basic-6_bme280:state:default]"}
 Number humidity_bucatarie "Bucatarie [%.0f %%]" <humidity> [ "CurrentHumidity" ]      {mqtt="<[mosquitto:iot/openhab/airsensor_humidity_sonoff-basic-6_bme280:state:default]"}
