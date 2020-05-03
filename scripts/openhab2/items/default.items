@@ -123,6 +123,7 @@ Number air_co2_kids "CO2 kids [%.0f ppm]" <smoke>                       {mqtt="<
 Number air_gas_kids "Gas kids [%.2f kOhm]" <smoke>                       {mqtt="<[mosquitto:iot/openhab/airsensor_gas_wemos-kids-air_bme680:state:default]"}
 Number air_temperature_kids "Temp mhz kids [%.1f °C]" <temperature>    {mqtt="<[mosquitto:iot/openhab/airsensor_temperature_wemos-kids-air_mhz19b:state:default]"}
 
+Number air_co2_bedroom "CO2 bedroom [%.0f ppm]" <smoke>                       {mqtt="<[mosquitto:iot/openhab/airsensor_co2_wemos-bedroom-air_mhz19b:state:default]"}
 Number air_gas_bedroom "Gas bedroom [%.2f kOhm]" <smoke>                       {mqtt="<[mosquitto:iot/openhab/airsensor_gas_wemos-bedroom-air_bme680:state:default]"}
 Number air_gas_curte "Gas curte [%.2f kOhm]" <smoke>                       {mqtt="<[mosquitto:iot/openhab/airsensor_gas_wemos-curte-air_bme680:state:default]"}
 
