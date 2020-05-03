@@ -361,7 +361,9 @@ def _set_main_heat_source():
                         L.l.info('Force alt source {} off'.format(alt_source_zone))
                         _save_heat_state_db(zone=alt_source_zone, heat_is_on=False)
                         # todo: sleep needed to allow for valve return
-                        L.l.info('Alternate heat source is now inactive, temp source is {}'.format(temp_rec))
+                        L.l.info('Alternate heat source is now inactive, temp source is {}. Sleeping 60s!!!'.format(
+                            temp_rec))
+                        utils.sleep(60)
                     else:
                         # stop heat puffer alt source
                         heat_source_relay.heat_is_on = False
