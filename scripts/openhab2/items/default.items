@@ -114,6 +114,7 @@ Number humidity_living_air "Living air [%.0f %%]" <humidity> [ "CurrentHumidity"
 Number pressure_living "Living [%.0f hPa]" <pressure>                                 {mqtt="<[mosquitto:iot/openhab/airsensor_pressure_sonoff-basic-1_bme280:state:default]"}
 Number air_co2_living "CO2 living [%.0f ppm]" <smoke>                       {mqtt="<[mosquitto:iot/openhab/airsensor_co2_wemos-living-air_mhz19b:state:default]"}
 Number air_temperature_living "Temp mhz living [%.1f °C]" <temperature>    {mqtt="<[mosquitto:iot/openhab/airsensor_temperature_wemos-living-air_mhz19b:state:default]"}
+
 Number air_gas_living "Gas living [%.2f kOhm]" <smoke>                       {mqtt="<[mosquitto:iot/openhab/airsensor_gas_wemos-living-air_bme680:state:default]"}
 Number air_temperature_bme_living "Temp bme living [%.1f °C]" <temperature>  {mqtt="<[mosquitto:iot/openhab/airsensor_temperature_wemos-living-air_bme680:state:default]"}
 Number air_pressure_bme_living "Pressure bme living [%.0f hPa]" <pressure>  {mqtt="<[mosquitto:iot/openhab/airsensor_pressure_wemos-living-air_bme680:state:default]"}
@@ -210,10 +211,10 @@ Contact contact_portita "Portita [%s]" <door>                               (CON
 Contact contact_gate "Gate [%s]" <door>                                     (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_gate:state:default]"}
 Contact contact_usa_garaj "Usa garaj [%s]" <door>                           (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_usa garaj:state:default]"}
 
-Number dust_living_pm1 "Dust living PM1 [%.0f ug/m3]" <smoke>                  {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_1_wemos-mini-1_PMS5003:state:default]"}
-Number dust_living_pm2_5 "Dust living PM2.5 [%.0f ug/m3]" <smoke>              {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_2_5_wemos-mini-1_PMS5003:state:default]"}
-Number dust_living_pm10 "Dust living PM10 [%.0f ug/m3]" <smoke>                {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_10_wemos-mini-1_PMS5003:state:default]"}
-Number dust_living_p_2_5 "Dust living P2.5 [%.0f ppd]" <smoke>                 {mqtt="<[mosquitto:iot/openhab/dustsensor_p_2_5_wemos-mini-1_PMS5003:state:default]"}
+Number dust_living_pm1 "Dust living PM1 [%.0f ug/m3]" <smoke>                  {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_1_wemos-living-air_PMS5003:state:default]"}
+Number dust_living_pm2_5 "Dust living PM2.5 [%.0f ug/m3]" <smoke>              {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_2_5_wemos-living-air_PMS5003:state:default]"}
+Number dust_living_pm10 "Dust living PM10 [%.0f ug/m3]" <smoke>                {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_10_wemos--living-air_PMS5003:state:default]"}
+Number dust_living_p_2_5 "Dust living P2.5 [%.0f ppd]" <smoke>                 {mqtt="<[mosquitto:iot/openhab/dustsensor_p_2_5_wemos--living-air_PMS5003:state:default]"}
 
 Number dust_etaj_pm1 "Dust etaj PM1 [%.0f ug/m3]" <smoke>        {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_1_wemos-bedroom-air_PMS5003:state:default]"}
 Number dust_etaj_pm2_5 "Dust etaj PM2.5 [%.0f ug/m3]" <smoke>    {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_2_5_wemos-bedroom-air_PMS5003:state:default]"}
