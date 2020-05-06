@@ -1,1 +1,2 @@
 iot/sonoff/%prefix%/%topic%/
+
