@@ -321,7 +321,9 @@ def init():
         pcf8574_gpio.init()
         # piface.init()
         rpi_gpio.init()
-        pigpio_gpio.init()
+
+    pigpio_gpio.init()
+
     # if Constant.IS_MACHINE_BEAGLEBONE:
         # bbb_io.init()
         # std_gpio.init()

@@ -26,6 +26,7 @@
     {"name": "MQTT_TOPIC_OPENHAB_RECEIVE", "value": "iot/openhab/cmd/#", "description": "openhab integration mqtt channel for receiving"},
     {"name": "MQTT_TOPIC_OWNTRACKS_RECEIVE", "value": "owntracks/haiot/#", "description": "owntracks integration mqtt channel for receiving"},
     {"name": "MQTT_TOPIC_SONOFF_1", "value": "iot/sonoff/#", "description": "sonoff-tasmota integration mqtt channel"},
+    {"name": "MQTT_TOPIC_MICRO", "value": "iot/micro", "description": "mqtt publish channel for micropython devices"},
     {"name": "MQTT_HOST_2", "value": "127.0.0.1"},
     {"name": "MQTT_PORT_2", "value": "1883"},
     {"name": "DDNS_RACKSPACE_CONFIG_FILE", "value": ".credentials/.rackspace.ddnsupdate.config.json",
@@ -139,7 +140,7 @@
     {"id":551, "active":true, "start_order":51, "name":"sensor.solar_aps", "host_name":"netbook"},
     {"id":557, "active":true, "start_order":57, "name":"sensor.sonoff", "host_name":"netbook"},
     {"id":559, "active":false, "start_order":59, "name":"sensor.i2c", "host_name":"netbook"},
-    {"id":565, "active":false, "start_order":65, "name":"gpio", "host_name":"netbook"},
+    {"id":565, "active":true, "start_order":65, "name":"gpio", "host_name":"netbook"},
     {"id":567, "active":true, "start_order":67, "name":"alarm", "host_name":"netbook"},
     {"id":570, "active":true, "start_order":70, "name":"music", "host_name":"netbook"},
     {"id":503, "active":true, "start_order":3, "name":"health_monitor", "host_name":"netbook"},
@@ -574,8 +575,8 @@
   ],
 
   "Pwm": [
-    {"id": 3, "name": "boiler", "frequency": 55, "duty_cycle": 0, "gpio_pin_code": 13, "host_name": "pizero1"},
-    {"id": 4, "name": "boiler2", "frequency": 55, "duty_cycle": 0, "gpio_pin_code": 18, "host_name": "netbook"}
+    {"id": 3, "name": "boiler", "frequency": 55, "duty_cycle": 0, "gpio_pin_code": 13, "host_name": "pwm_we", "host_type": "micro"},
+    {"id": 4, "name": "boiler2", "frequency": 55, "duty_cycle": 0, "gpio_pin_code": 18, "host_name": "netbook", "host_type": "pi"}
   ],
 
   "_disabled": [
