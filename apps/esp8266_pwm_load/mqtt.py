@@ -1,6 +1,5 @@
 from umqtt.simple import MQTTClient
 import time
-import machine
 import pwm
 import ujson
 
@@ -54,12 +53,6 @@ def connect_and_subscribe(client_id, server, topic_sub, user, password):
     return client
 
 
-def restart_and_reconnect():
-    print('Failed to connect to MQTT broker. Restarting...')
-    time.sleep(10)
-    machine.reset()
-
-
 def connect(client_id, server, topic_sub, topic_pub, user, password):
     try:
         global mqtt_client_id
@@ -80,7 +73,7 @@ def connect(client_id, server, topic_sub, topic_pub, user, password):
                     time.sleep(0.01)
             except OSError as e:
                 print(e)
-                restart_and_reconnect()
+                return "restart"
     except OSError as e:
         print(e)
-        restart_and_reconnect()
+        return "restart"
