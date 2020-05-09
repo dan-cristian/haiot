@@ -1,11 +1,18 @@
 import time
 from datetime import datetime
 import threading
-import prctl
 import concurrent.futures
 
 from main.logger_helper import L
 
+from common import fix_module
+while True:
+    try:
+        import prctl
+        break
+    except ImportError as iex:
+        if not fix_module(iex):
+            break
 
 class P:
     thread_func_list = {}
