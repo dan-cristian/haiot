@@ -243,7 +243,7 @@ def _send_message(txt, topic=None):
             topic = P.topic_main
         # Log.logger.debug('Sending message at {} [{}] '.format(utils.get_base_location_now_date(), txt))
         if P.client_connected:
-            P.mqtt_client.publish(topic, "{}".format(txt))
+            P.mqtt_client.publish(topic=topic, payload="{}".format(txt), qos=1, retain=True)
             return True
         else:
             # Log.logger.debug('MQTT client not connected, retrying connect, message to be discarded: {}'.format(txt))

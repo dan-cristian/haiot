@@ -13,7 +13,6 @@ import transport.mqtt_io
 from pydispatch import dispatcher
 from common import utils, Constant
 from transport import mqtt_io
-from main import general_init
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 
