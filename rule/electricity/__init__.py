@@ -4,7 +4,6 @@ import collections
 import random
 import sys
 from main.logger_helper import L
-# from main.admin import models
 from rule import rule_common
 import rule
 from gpio import pigpio_gpio
@@ -202,7 +201,7 @@ class Upscharger(Powerdevice):
 
 class PwmHeater(LoadPowerDevice):
     DEVICE_SUPPORTS_BREAKS = True
-    max_duty = 100  # set actual duty on receiving devices, use percentages here
+    max_duty = 100  # set actual duty on receiving devices so use percentages here
     frequency = 55
 
     # override
