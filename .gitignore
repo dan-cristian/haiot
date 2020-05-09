@@ -20,3 +20,4 @@ fcntl/__init__.py
 scripts/osinstall/ubuntu/etc/motion/thread*.conf
 /apps/esp8266_pwm_load/.idea/
 /apps/esp8266_pwm_load/venv/
+/apps/esp8266_pwm_load/credentials.py
