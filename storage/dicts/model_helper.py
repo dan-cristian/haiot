@@ -182,12 +182,19 @@ class ModelBase(metaclass=OrderedClassMembers):
     _upsert_listener_list = {}
     _ignore_save_change_fields = ['updated_on']
     _is_used_in_module = False
+    _broadcast_mqtt_topic = None
 
     def __repr__(self):
         # cls = self.__class__
         # tbl = cls._table_list[cls.__name__]
         # rec_key = getattr(self, tbl.key)
         return str(self.__dict__)
+
+    def get_mqtt_topic(self):
+        return self._broadcast_mqtt_topic
+
+    def set_mqtt_topic(self, mqtt_topic):
+        self._broadcast_mqtt_topic = mqtt_topic
 
     @classmethod
     def reset_usage(cls):
@@ -283,6 +290,11 @@ class ModelBase(metaclass=OrderedClassMembers):
         dispatcher.send(signal=Constant.SIGNAL_STORABLE_RECORD, new_record=record)
         # persistence.save_to_history_db(record)
 
+
+    @classmethod
+    def set_broadcast_topic(cls, mqtt_topic):
+        cls._broadcast_mqtt_topic = mqtt_topic
+
     @staticmethod
     def _broadcast(record, update, class_name):
         out_rec = None
@@ -294,7 +306,8 @@ class ModelBase(metaclass=OrderedClassMembers):
             out_rec[Constant.JSON_PUBLISH_SRC_HOST] = Constant.HOST_NAME
             out_rec['_sent_on'] = utils.get_base_location_now_date()
             js = utils.safeobj2json(out_rec)
-            transport.send_message_json(json=js)
+            # transport.send_message_json(json=js)
+            transport.send_message_topic(json=js, topic=record.get_mqtt_topic())
         except Exception as ex:
             L.l.error('Unable to broadcast {} rec={} ex={}'.format(class_name, out_rec, ex), exc_info=True)
 

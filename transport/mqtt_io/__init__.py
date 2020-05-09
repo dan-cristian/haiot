@@ -2,7 +2,6 @@ import time
 import socket
 import threading
 import json
-import prctl
 from main.logger_helper import L
 from common import Constant, utils
 import common
@@ -12,6 +11,7 @@ while True:
     try:
         from pydispatch import dispatcher
         import paho.mqtt.client as mqtt
+        import prctl
         break
     except ImportError as iex:
         if not fix_module(iex):
@@ -186,6 +186,8 @@ def init():
             P.mqtt_client = mqtt.Client(client_id=Constant.HOST_NAME)
         elif P.mqtt_mosquitto_exists:
             P.mqtt_client = mqtt.Mosquitto(client_id=Constant.HOST_NAME)
+        else:
+            L.l.error("Unable to create the Mqtt client")
 
         for host_port in host_list:
             host = host_port[0]
@@ -233,6 +235,7 @@ def init():
             L.l.critical('MQTT connection not available, all connect attempts failed')
     except Exception as ex:
         L.l.error('Exception on mqtt init, err={}'.format(ex))
+
     finally:
         P.is_client_connecting = False
 
