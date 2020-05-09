@@ -298,7 +298,6 @@ class ModelBase(metaclass=OrderedClassMembers):
     def _broadcast(record, update, class_name):
         out_rec = None
         try:
-            L.l.info("Mqtt broadcast {} on topic {}".format(class_name, record.get_mqtt_topic()))
             out_rec = record.__dict__
             out_rec[Constant.JSON_PUBLISH_TABLE] = class_name
             out_rec[Constant.JSON_PUBLISH_FIELDS_CHANGED] = list(update.keys())
@@ -306,8 +305,10 @@ class ModelBase(metaclass=OrderedClassMembers):
             out_rec['_sent_on'] = utils.get_base_location_now_date()
             js = utils.safeobj2json(out_rec)
             if 'mqtt_pub_topic' in out_rec:
+                mqtt_topic = out_rec['mqtt_pub_topic']
+                L.l.info("Mqtt broadcast {} on non-default topic {}".format(class_name, mqtt_topic))
                 # send to limited traffic topic for low cpu devices etc
-                transport.send_message_topic(json=js, topic=out_rec['mqtt_pub_topic'])
+                transport.send_message_topic(json=js, topic=mqtt_topic)
             else:
                 # send to main topic
                 transport.send_message_json(json=js)
