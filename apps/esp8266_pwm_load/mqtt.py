@@ -28,7 +28,7 @@ def sub_cb(topic, msg):
                 js = ujson.loads(data)
                 print(js)
                 for key, value in js.items():
-                    print("Parsing {}".format(key))
+                    # print("Parsing {}".format(key))
                     if key == "duty_cycle":
                         pwm.set_duty(duty=value)
                         print("Set duty to {}".format(value))
@@ -49,7 +49,7 @@ def sub_cb(topic, msg):
 
 
 def connect_and_subscribe(client_id, server, topic_sub, topic_pub, user, password):
-    client = MQTTClient(client_id=client_id, server=server)  # , user=user, password=password)
+    client = MQTTClient(client_id=client_id, server=server, user=user, password=password)
     client.set_callback(sub_cb)
     client.connect()
     client.subscribe(topic_sub)
