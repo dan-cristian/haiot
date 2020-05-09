@@ -211,16 +211,16 @@ class PwmIo(GpioBase):
             if pwm.host_name == Constant.HOST_NAME:
                 pwm.frequency, pwm.duty_cycle = PwmIo._get_pwm_attrib(pwm.gpio_pin_code)
                 # set different topic depending on PWM host type speed (wemos=micro, raspberry etc)
-            if pwm.host_type == "micro":
-                pwm.set_mqtt_topic(common.get_json_param(Constant.P_MQTT_TOPIC_MICRO))
-            pwm.save_changed_fields(broadcast=False, persist=True)
+            # if pwm.host_type == "micro":
+            #    pwm.set_mqtt_topic(common.get_json_param(Constant.P_MQTT_TOPIC_MICRO))
+                pwm.save_changed_fields(broadcast=True, persist=True)
         else:
             L.l.warning("Cannot find pwm {} to sync2db".format(key))
 
     @staticmethod
     def _init_pwm():
-        # pwm_list = m.Pwm.find({m.Pwm.host_name: Constant.HOST_NAME})
-        pwm_list = m.Pwm.find()
+        pwm_list = m.Pwm.find({m.Pwm.host_name: Constant.HOST_NAME})
+        # pwm_list = m.Pwm.find()
         for pwm in pwm_list:
             PwmIo.sync_2_db(pwm.name)
 
