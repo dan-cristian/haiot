@@ -5,10 +5,13 @@ import ujson
 
 # Complete project details at https://RandomNerdTutorials.com
 mqtt_client_id = None
+msg_count = 0
 
 
 def sub_cb(topic, msg):
-    # print((topic, msg))
+    global msg_count
+    msg_count += 1
+    print(msg_count)
     try:
         topic = topic.decode().split('/')
         device_id = topic.pop(-1)
@@ -21,6 +24,7 @@ def sub_cb(topic, msg):
         # ensure message if addressed to us and contains Pwm info
         if True or "'host_name': '{}'".format(mqtt_client_id) in data:
             if 'Pwm' in data:
+                print("'host_name': '{}'".format(mqtt_client_id) in data)
                 js = ujson.loads(data)
                 print(js)
                 for key, value in js.items():
@@ -62,15 +66,15 @@ def connect(client_id, server, topic_sub, topic_pub, user, password):
                                        user=user, password=password)
         while True:
             try:
-                new_message = client.check_msg()
-                # new_message = client.wait_msg()
+                # new_message = client.check_msg()
+                new_message = client.wait_msg()
                 # print(new_message)
-                if new_message is not None:
+                # if new_message is not None:
                     # print(new_message)
                     # client.publish(topic_pub, b'received')
-                    pass
-                else:
-                    time.sleep(0.01)
+                    # pass
+                # else:
+                #    time.sleep(0.01)
             except OSError as e:
                 print(e)
                 return "restart"

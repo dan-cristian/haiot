@@ -4,6 +4,7 @@ import time
 from threading import Thread, Lock
 from pydispatch import dispatcher
 from main.logger_helper import L
+import common
 from common import Constant
 from main import sqlitedb
 from main import thread_pool
@@ -209,15 +210,17 @@ class PwmIo(GpioBase):
         if pwm is not None:
             if pwm.host_name == Constant.HOST_NAME:
                 pwm.frequency, pwm.duty_cycle = PwmIo._get_pwm_attrib(pwm.gpio_pin_code)
-                pwm.save_changed_fields(broadcast=True, persist=True)
-            else:
-                L.l.warning('Cannot sync to db, pwm not local')
+                # set different topic depending on PWM host type speed (wemos=micro, raspberry etc)
+            if pwm.host_type == "micro":
+                pwm.set_mqtt_topic(common.get_json_param(Constant.P_MQTT_TOPIC_MICRO))
+            pwm.save_changed_fields(broadcast=False, persist=True)
         else:
             L.l.warning("Cannot find pwm {} to sync2db".format(key))
 
     @staticmethod
     def _init_pwm():
-        pwm_list = m.Pwm.find({m.Pwm.host_name: Constant.HOST_NAME})
+        # pwm_list = m.Pwm.find({m.Pwm.host_name: Constant.HOST_NAME})
+        pwm_list = m.Pwm.find()
         for pwm in pwm_list:
             PwmIo.sync_2_db(pwm.name)
 
@@ -382,6 +385,7 @@ def init():
                 # setup this to receive list of ports that must be set as "IN" and have callbacks defined
                 # dispatcher.connect(setup_in_ports, signal=Constant.SIGNAL_GPIO_INPUT_PORT_LIST, sender=dispatcher.Any)
                 P.initialised = True
+                # set alternate mqtt send topic to avoid message overload on low cpu devices
                 m.Pwm.add_upsert_listener(_pwm_upsert_listener)
                 thread_pool.add_interval_callable(thread_run, run_interval_second=30)
                 L.l.info('PiGpio initialised OK')
