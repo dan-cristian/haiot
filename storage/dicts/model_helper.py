@@ -299,7 +299,7 @@ class ModelBase(metaclass=OrderedClassMembers):
     def _broadcast(record, update, class_name):
         out_rec = None
         try:
-            L.l.info("Mqtt broadcast {}".format(class_name))
+            L.l.info("Mqtt broadcast {} on topic {}".format(class_name, record.get_mqtt_topic()))
             out_rec = record.__dict__
             out_rec[Constant.JSON_PUBLISH_TABLE] = class_name
             out_rec[Constant.JSON_PUBLISH_FIELDS_CHANGED] = list(update.keys())
