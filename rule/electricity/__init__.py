@@ -242,8 +242,9 @@ class PwmHeater(LoadPowerDevice):
         #    export = -grid_watts
         if grid_watts > 0:  # for debug only
             export = grid_watts  # for debug only
+            new_target = export  # for debug only
 
-            new_target = export + self.target_watts
+            # new_target = export + self.target_watts
             L.l.info('Adjusting PWM to delta export={}, total target={}'.format(export, new_target))
             self.set_power_status(power_is_on=True, pwm_watts=new_target)
         else:
