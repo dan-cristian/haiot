@@ -92,8 +92,8 @@ class Relaydevice:
                     self.RELAY_NAME, self.state, self.watts, export_watts))
                 changed_relay_status = True
             else:
-                L.l.info('No action done on export watts {} thresh {} avg_cons {} power_on {}'.format(
-                    export_watts, P.MIN_WATTS_THRESHOLD, self.AVG_CONSUMPTION, power_on))
+                L.l.info('No action {} on export watts {} thresh {} avg_cons {} power_on {}'.format(
+                    self.RELAY_NAME, export_watts, P.MIN_WATTS_THRESHOLD, self.AVG_CONSUMPTION, power_on))
         else:
             # L.l.info("Not exporting, import={}".format(grid_watts))
             import_watts = grid_watts
