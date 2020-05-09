@@ -51,8 +51,8 @@ def sub_cb(topic, msg):
 def connect_and_subscribe(client_id, server, topic_sub, topic_pub, user, password):
     client = MQTTClient(client_id=client_id, server=server, user=user, password=password)
     client.set_callback(sub_cb)
-    client.connect()
-    client.subscribe(topic_sub)
+    client.connect(clean_session=False)
+    client.subscribe(topic_sub, qos=1)
     # client.publish(topic_pub, b'I am alive')
     print('Connected to %s MQTT broker, subscribed to %s topic' % (server, topic_sub))
     return client
