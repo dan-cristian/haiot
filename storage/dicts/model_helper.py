@@ -290,7 +290,6 @@ class ModelBase(metaclass=OrderedClassMembers):
         dispatcher.send(signal=Constant.SIGNAL_STORABLE_RECORD, new_record=record)
         # persistence.save_to_history_db(record)
 
-
     @classmethod
     def set_broadcast_topic(cls, mqtt_topic):
         cls._broadcast_mqtt_topic = mqtt_topic
@@ -306,8 +305,12 @@ class ModelBase(metaclass=OrderedClassMembers):
             out_rec[Constant.JSON_PUBLISH_SRC_HOST] = Constant.HOST_NAME
             out_rec['_sent_on'] = utils.get_base_location_now_date()
             js = utils.safeobj2json(out_rec)
-            # transport.send_message_json(json=js)
-            transport.send_message_topic(json=js, topic=record.get_mqtt_topic())
+            if 'mqtt_pub_topic' in out_rec:
+                # send to limited traffic topic for low cpu devices etc
+                transport.send_message_topic(json=js, topic=out_rec['mqtt_pub_topic'])
+            else:
+                # send to main topic
+                transport.send_message_json(json=js)
         except Exception as ex:
             L.l.error('Unable to broadcast {} rec={} ex={}'.format(class_name, out_rec, ex), exc_info=True)
 
