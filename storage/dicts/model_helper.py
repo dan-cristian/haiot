@@ -1,7 +1,7 @@
 from datetime import datetime
 import collections
 from main.logger_helper import L
-from common import Constant, utils, fix_module
+from common import Constant, utils, fix_module, get_json_param
 import transport
 while True:
     try:
@@ -10,6 +10,12 @@ while True:
     except ImportError as iex:
         if not fix_module(iex):
             break
+
+
+class P:
+    # mqtt_pub_topic_field = "mqtt_pub_topic"
+    host_type_field = "host_type"  # determine if this device needs special topic for broadcast (e.g. micro-python)
+    HOST_TYPE_MICRO = "micro"
 
 
 # https://stackoverflow.com/questions/4459531/how-to-read-class-attributes-in-the-same-order-as-declared
@@ -182,7 +188,6 @@ class ModelBase(metaclass=OrderedClassMembers):
     _upsert_listener_list = {}
     _ignore_save_change_fields = ['updated_on']
     _is_used_in_module = False
-    _broadcast_mqtt_topic = None
 
     def __repr__(self):
         # cls = self.__class__
@@ -304,8 +309,19 @@ class ModelBase(metaclass=OrderedClassMembers):
             out_rec[Constant.JSON_PUBLISH_SRC_HOST] = Constant.HOST_NAME
             out_rec['_sent_on'] = utils.get_base_location_now_date()
             js = utils.safeobj2json(out_rec)
-            if 'mqtt_pub_topic' in out_rec:
-                mqtt_topic = out_rec['mqtt_pub_topic']
+            # if P.mqtt_pub_topic_field in out_rec:
+            if P.host_type_field in out_rec and out_rec[P.host_type_field] is not None:
+                host_type = out_rec[P.host_type_field]
+                mqtt_topic = None
+                if host_type == P.HOST_TYPE_MICRO:
+                    if "host_name" in out_rec:
+                        host_name = out_rec["host_name"]
+                        mqtt_topic = get_json_param(Constant.P_MQTT_TOPIC_MICRO) + "/" + host_name
+                    else:
+                        L.l.error("Missing host_name field for mqtt topic creation: {}".format(host_type))
+                else:
+                    L.l.error("Unexpected host type {}".format(host_type))
+                # mqtt_topic = out_rec[P.mqtt_pub_topic_field]
                 L.l.info("Mqtt broadcast {} on non-default topic {}".format(class_name, mqtt_topic))
                 # send to limited traffic topic for low cpu devices etc
                 transport.send_message_topic(json=js, topic=mqtt_topic)
