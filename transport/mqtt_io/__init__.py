@@ -170,11 +170,8 @@ def init():
             return False
         P.is_client_connecting = True
         host_list = [
-            #[model_helper.get_param(Constant.P_MQTT_HOST_3), int(model_helper.get_param(Constant.P_MQTT_PORT_3))],
             [common.get_json_param(common.Constant.P_MQTT_HOST_1), int(common.get_json_param(Constant.P_MQTT_PORT_1))],
-            [common.get_json_param(Constant.P_MQTT_HOST_2), int(common.get_json_param(Constant.P_MQTT_PORT_2))]
-            #[model_helper.get_param(constant.P_MQTT_HOST_3), int(model_helper.get_param(constant.P_MQTT_PORT_3))]
-            ]
+            [common.get_json_param(Constant.P_MQTT_HOST_2), int(common.get_json_param(Constant.P_MQTT_PORT_2))]]
         config_file = common.get_json_param(Constant.P_ALL_CREDENTIAL_FILE)
         with open(config_file, 'r') as f:
             config = json.load(f)

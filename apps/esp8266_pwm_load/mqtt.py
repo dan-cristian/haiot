@@ -13,13 +13,13 @@ def sub_cb(topic, msg):
     msg_count += 1
     print(msg_count)
     try:
-        topic = topic.decode().split('/')
-        device_id = topic.pop(-1)
-        name = topic[-1]
         # print("device={}, topic={}, start={}, my_name={}".format(device_id, name, msg[0], mqtt_client_id))
-        data = msg.decode()
         if msg[0] != 123:  # check for valid json staring with { character
             return
+        data = msg.decode()
+        # topic = topic.decode().split('/')
+        # device_id = topic.pop(-1)
+        # name = topic[-1]
         # print(data)
         # ensure message if addressed to us and contains Pwm info
         if True or "'host_name': '{}'".format(mqtt_client_id) in data:
@@ -40,7 +40,7 @@ def sub_cb(topic, msg):
                     #        print("SubParsing {}".format(key1))
 
             else:
-                # print("Got a message without Pwm payload: {}".format(data))
+                print("Got a message without Pwm payload: {}".format(data))
                 pass
         else:
             print("Ignoring message: {}".format(data[:40]))
@@ -48,11 +48,12 @@ def sub_cb(topic, msg):
         print('Got exception {}, string={}'.format(ex, msg))
 
 
-def connect_and_subscribe(client_id, server, topic_sub, user, password):
-    client = MQTTClient(client_id=client_id, server=server, user=user, password=password)
+def connect_and_subscribe(client_id, server, topic_sub, topic_pub, user, password):
+    client = MQTTClient(client_id=client_id, server=server)  # , user=user, password=password)
     client.set_callback(sub_cb)
     client.connect()
     client.subscribe(topic_sub)
+    # client.publish(topic_pub, b'I am alive')
     print('Connected to %s MQTT broker, subscribed to %s topic' % (server, topic_sub))
     return client
 
@@ -61,9 +62,8 @@ def connect(client_id, server, topic_sub, topic_pub, user, password):
     try:
         global mqtt_client_id
         mqtt_client_id = client_id
-
-        client = connect_and_subscribe(client_id=client_id, server=server, topic_sub=topic_sub,
-                                       user=user, password=password)
+        client = connect_and_subscribe(
+            client_id=client_id, server=server, topic_sub=topic_sub, topic_pub=topic_pub, user=user, password=password)
         while True:
             try:
                 # new_message = client.check_msg()
@@ -71,10 +71,9 @@ def connect(client_id, server, topic_sub, topic_pub, user, password):
                 # print(new_message)
                 # if new_message is not None:
                     # print(new_message)
-                    # client.publish(topic_pub, b'received')
-                    # pass
+                    #    pass
                 # else:
-                #    time.sleep(0.01)
+                #   time.sleep(1)
             except OSError as e:
                 print(e)
                 return "restart"
