@@ -2,10 +2,13 @@ import machine
 
 pin_pwm = None
 
+# https://docs.micropython.org/en/latest/esp8266/tutorial/pwm.html
+
 
 def set_duty(duty):
     global pin_pwm
-    pin_pwm.duty(duty)
+    # expect duty as a %
+    pin_pwm.duty(int(1023 * duty/100))
 
 
 def set_frequency(frequency):
