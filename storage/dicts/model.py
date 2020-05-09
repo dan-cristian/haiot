@@ -21,7 +21,6 @@ class Pwm(ModelBase):
     host_name = ''
     host_type = ''
     target_watts = 0
-    mqtt_pub_topic = ''
     update_on = datetime.now()
 
 

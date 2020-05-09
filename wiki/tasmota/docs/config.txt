@@ -1,5 +1,7 @@
-Backlog SSID1 <myssid>; Password1 <mypassword>; SSID2 <myssid2>; Password2 <mypassword2>
-Backlog mqtthost <mqtt_broker_address>; mqttport <mqtt_broker_port>; mqttuser <username>; mqttpassword <password>; topic <device_topic>
+# general configuration for all devices, non-sensitive data
+Backlog PowerOnState 1; Emulation 0; SetOption65 1; SerialLog 1; SetOption57 1
+
+
 
 Backlog MqttClient freezer_pow; Topic freezer_pow; FriendlyName freezer_pow; Hostname freezer_pow
 Backlog MqttClient gas_pow; Topic gas_pow; FriendlyName gas_pow; Hostname gas_pow
@@ -16,8 +18,10 @@ Backlog MqttClient rulota_grid_pow; Topic rulota_grid_pow; FriendlyName rulota_g
 Backlog MqttClient bat1_rulota_we; Topic bat1_rulota_we; FriendlyName bat1_rulota_we; Hostname bat1_rulota_we
 Backlog MqttClient bat2_rulota_we; Topic bat2_rulota_we; FriendlyName bat2_rulota_we; Hostname bat2_rulota_we
 
+
 Backlog MqttClient sewage_bas; Topic sewage_bas; FriendlyName sewage_bas; Hostname sewage_bas
 Backlog MqttClient fanwc_parter_bas; Topic fanwc_parter_bas; FriendlyName fanwc_parter_bas; Hostname fanwc_parter_bas
+Backlog MqttClient front_garden_lights_sb; Topic front_garden_lights_sb; FriendlyName front_garden_lights_sb; Hostname front_garden_lights_sb
 
 
-PowerOnState 1; Emulation 0
+
