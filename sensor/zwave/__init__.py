@@ -155,6 +155,7 @@ def set_value(network, node, value):
                         record.address = sensor_address
                         delta_last_save = P.DELTA_SAVE_SECONDS
                         record.sensor_name = zone_sensor.sensor_name
+                        record.updated_on = datetime.now()
                     else:
                         delta_last_save = (datetime.now() - record.updated_on).total_seconds()
                     record.is_event_external = True
