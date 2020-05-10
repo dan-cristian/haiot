@@ -172,7 +172,7 @@ Frame {
 	Default item=ups_load_percent
 	Default item=ups_input_voltage
 	Default item=ups_battery_voltage
-	Default item=ups_power_frequency
+	Default item=ups_frequency
 	Default item=electricity_power_factor_mono
 	Default item=electricity_voltage_mono
 	Default item=electricity_current_mono
