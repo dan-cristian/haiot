@@ -161,15 +161,15 @@ def set_value(network, node, value):
                         if record.updated_on is not None:
                             delta_last_save = (datetime.now() - record.updated_on).total_seconds()
                     record.is_event_external = True
-                    if delta_last_save >= P.DELTA_SAVE_SECONDS and value.label == "Voltage":
+                    if value.label == "Voltage":
                         record.vad = round(value.data, 0)
                         record.save_changed_fields(broadcast=True, persist=True)
                         L.l.info("Saving voltage {} {}".format(sensor_name, value.data))
-                    elif delta_last_save >= P.DELTA_SAVE_SECONDS and value.label == "Current":
+                    elif value.label == "Current":
                         record.iad = round(value.data, 1)
                         record.save_changed_fields(broadcast=True, persist=True)
                         L.l.info("Saving current {} {}".format(sensor_name, value.data))
-                    elif delta_last_save >= P.DELTA_SAVE_SECONDS and value.label == "Power Factor":
+                    elif value.label == "Power Factor":
                         record.vdd = round(value.data, 1)
                         record.save_changed_fields(broadcast=True, persist=True)
                         L.l.info("Saving power factor {} {}".format(sensor_name, value.data))
