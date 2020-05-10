@@ -502,7 +502,6 @@
     {"zone_id":27 , "sensor_address": "b8:01",            "sensor_name": "desk"},
     {"zone_id":8 ,  "sensor_address": "ZMNHTDx Smart meter S4 S5 S6_2",             "sensor_name": "zwave main power meter_old"},
     {"zone_id":8 ,  "sensor_address": "Unknown: type=0007, id=0052_2",              "sensor_name": "zwave main power meter"},
-    ,
     {"zone_id":29 , "sensor_address": "TZ69 Smart energy plug in switch_4",         "sensor_name": "zwave dishwasher_old"},
     {"zone_id":29 , "sensor_address": "Unknown: type=0004, id=0002_4",              "sensor_name": "zwave dishwasher"},
     {"zone_id":29 , "sensor_address": "TZ69 Smart energy plug in switch_5",         "sensor_name": "zwave fridge_old"},
