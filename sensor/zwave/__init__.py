@@ -125,7 +125,7 @@ def _set_custom_relay_state(sensor_address, state):
 # https://github.com/OpenZWave/python-openzwave/blob/master/examples/api_demo.py
 def set_value(network, node, value):
     try:
-        # L.l.info('Louie signal: Node={} Value={}'.format(node, value))
+        L.l.info('Louie set_value signal: Node={} Value={}'.format(node, value))
         sensor_address = "{}_{}".format(node.product_name, node.node_id)
         zone_sensor = m.ZoneSensor.find_one({m.ZoneSensor.sensor_address: sensor_address})
         if zone_sensor is not None:
@@ -170,6 +170,8 @@ def set_value(network, node, value):
                         record.vdd = round(value.data, 1)
                         record.save_changed_fields(broadcast=True, persist=True)
                         # L.l.info("Saving power factor {} {}".format(sensor_name, value.data))
+                    else:
+                        L.l.warning("Doing nothing on zwave set value {}".format(value))
         else:
             L.l.info("Cannot find zwave sensor in db, address={} node={} value={}".format(sensor_address, node, value))
     except Exception as ex:
@@ -201,7 +203,7 @@ def louie_value_refreshed(network, node, value):
 
 
 def louie_value_changed(network, node, value):
-    # L.l.info('Louie signal: Value changed for {}={} {}'.format(value.label, value.data, value.units))
+    L.l.info('Louie signal: Value changed for {}={} {}'.format(value.label, value.data, value.units))
     set_value(network, node, value)
 
 
