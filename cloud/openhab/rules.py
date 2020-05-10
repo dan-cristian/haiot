@@ -102,22 +102,20 @@ def rule_openhab_alarm(obj=m.ZoneAlarm(), change=None):
 
 def rule_openhab_ups(obj=m.Ups(), change=None):
     if change is not None:
-        key = 'power_failed'
-        if key in change:
-            if obj.power_failed:
-                state = "OFF"
-            else:
-                state = "ON"
-            send_mqtt_openhab(subtopic="ups_" + key, payload=state)
-        key = 'load_percent'
-        if key in change:
-            send_mqtt_openhab(subtopic="ups_" + key, payload=obj.load_percent)
-        key = 'battery_voltage'
-        if key in change:
-            send_mqtt_openhab(subtopic="ups_" + key, payload=obj.battery_voltage)
-        key = 'input_voltage'
-        if key in change:
-            send_mqtt_openhab(subtopic="ups_" + key, payload=obj.input_voltage)
+        for key in change:
+            if key not in P.ignored_fields:
+                if hasattr(obj, key):
+                    val = getattr(obj, key)
+                else:
+                    L.l.warning('Field {} in ups object change list but not in obj={}'.format(key, obj))
+                    val = None
+                # do some specific translations for openhab
+                if key == 'power_failed':
+                    if val:
+                        val = "OFF"
+                    else:
+                        val = "ON"
+                send_mqtt_openhab(subtopic='ups_' + key, payload=val)
 
 
 def rule_openhab_custom_relay(obj=m.ZoneCustomRelay(), change=None):
