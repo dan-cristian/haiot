@@ -12,6 +12,7 @@ Switch ups_power_failed "UPS Power" <switch>                                {mqt
 Number ups_load_percent "UPS Load [%.0f %%]" <light>                        {mqtt="<[mosquitto:iot/openhab/ups_load_percent:state:default]"}
 Number ups_battery_voltage "UPS Battery [%.1f V]" <batterylevel>            {mqtt="<[mosquitto:iot/openhab/ups_battery_voltage:state:default]"}
 Number ups_input_voltage "UPS Input [%.0f V]" <poweroutlet_us>              {mqtt="<[mosquitto:iot/openhab/ups_input_voltage:state:default]"}
+Number ups_frequency "UPS Frequency [%.0f Hz]" <poweroutlet_us>              {mqtt="<[mosquitto:iot/openhab/ups_power_frequency:state:default]"}
 
 Switch relay_front_lights_relay "Front lights" <switch> [ "Lighting" ]      {mqtt="<[mosquitto:iot/openhab/relay_front_lights_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_front_lights_relay:command:*:default]", autoupdate="false"}
 Switch relay_dishwasher "Plug dishwasher" <switch>                     {mqtt="<[mosquitto:iot/openhab/relay_plug_dishwasher:state:default],>[mosquitto:iot/openhab/cmd/relay_plug_dishwasher:command:*:default]", autoupdate="false"}
