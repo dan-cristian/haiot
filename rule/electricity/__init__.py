@@ -252,11 +252,9 @@ class PwmHeater(LoadPowerDevice):
             import_watts = grid_watts
             delta = current_watts - import_watts
             if delta < 0:
-                if power_on:
-                    L.l.info('Need to stop, importing {} PWM with delta={}'.format(import_watts, delta))
-                    self.set_power_status(power_is_on=False)
-                else:
-                    L.l.info('Power seems off {}, doing nothing'.format(power_on))
+                # if power_on:
+                L.l.info('Need to stop, importing {} PWM with delta={}'.format(import_watts, delta))
+                self.set_power_status(power_is_on=False)
             else:
                 new_target = current_watts - delta
                 L.l.info('Need to adjust down PWM on import {} to {} with delta={}'.format(
