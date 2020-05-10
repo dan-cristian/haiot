@@ -153,23 +153,23 @@ def set_value(network, node, value):
                     if record is None:
                         record = m.Sensor()
                         record.address = sensor_address
-                        delta_last_save = 0
+                        delta_last_save = P.DELTA_SAVE_SECONDS
                         record.sensor_name = zone_sensor.sensor_name
                     else:
                         delta_last_save = (datetime.now() - record.updated_on).total_seconds()
                     record.is_event_external = True
-                    if delta_last_save > P.DELTA_SAVE_SECONDS and value.label == "Voltage":
+                    if delta_last_save >= P.DELTA_SAVE_SECONDS and value.label == "Voltage":
                         record.vad = round(value.data, 0)
                         record.save_changed_fields(broadcast=True, persist=True)
-                        # L.l.info("Saving voltage {} {}".format(sensor_name, value.data))
-                    elif delta_last_save > P.DELTA_SAVE_SECONDS and value.label == "Current":
+                        L.l.info("Saving voltage {} {}".format(sensor_name, value.data))
+                    elif delta_last_save >= P.DELTA_SAVE_SECONDS and value.label == "Current":
                         record.iad = round(value.data, 1)
                         record.save_changed_fields(broadcast=True, persist=True)
-                        # L.l.info("Saving current {} {}".format(sensor_name, value.data))
-                    elif delta_last_save > P.DELTA_SAVE_SECONDS and value.label == "Power Factor":
+                        L.l.info("Saving current {} {}".format(sensor_name, value.data))
+                    elif delta_last_save >= P.DELTA_SAVE_SECONDS and value.label == "Power Factor":
                         record.vdd = round(value.data, 1)
                         record.save_changed_fields(broadcast=True, persist=True)
-                        # L.l.info("Saving power factor {} {}".format(sensor_name, value.data))
+                        L.l.info("Saving power factor {} {}".format(sensor_name, value.data))
                     else:
                         L.l.warning("Doing nothing on zwave set value {}".format(value))
         else:
