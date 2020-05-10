@@ -30,6 +30,9 @@ def set_pin(pin):
 
 def init(pin, frequency):
     global pin_pwm, pin_code
+    if pin_pwm is not None:
+        # stop this pwm before initialising another
+        pin_pwm.duty(0)
     pin_pwm = machine.PWM(machine.Pin(pin), frequency)
     pin_pwm.duty(0)
     pin_code = pin
