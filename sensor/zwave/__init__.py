@@ -150,15 +150,16 @@ def set_value(network, node, value):
                 # skip controller node
                 if node.node_id > 1:
                     record = m.Sensor.find_one({m.Sensor.address: sensor_address})
+                    delta_last_save = P.DELTA_SAVE_SECONDS
                     if record is None:
                         L.l.info("Zwave sensor address not found: {}".format(sensor_address))
                         record = m.Sensor()
                         record.address = sensor_address
-                        delta_last_save = P.DELTA_SAVE_SECONDS
                         record.sensor_name = zone_sensor.sensor_name
                         record.updated_on = datetime.now()
                     else:
-                        delta_last_save = (datetime.now() - record.updated_on).total_seconds()
+                        if record.updated_on is not None:
+                            delta_last_save = (datetime.now() - record.updated_on).total_seconds()
                     record.is_event_external = True
                     if delta_last_save >= P.DELTA_SAVE_SECONDS and value.label == "Voltage":
                         record.vad = round(value.data, 0)
