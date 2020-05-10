@@ -151,6 +151,7 @@ def set_value(network, node, value):
                 if node.node_id > 1:
                     record = m.Sensor.find_one({m.Sensor.address: sensor_address})
                     if record is None:
+                        L.l.info("Zwave sensor address not found: {}".format(sensor_address))
                         record = m.Sensor()
                         record.address = sensor_address
                         delta_last_save = P.DELTA_SAVE_SECONDS
