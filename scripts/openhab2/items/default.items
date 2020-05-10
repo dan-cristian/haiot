@@ -145,9 +145,9 @@ Number pressure_baie_etaj "Baie etaj [%.0f hPa]" <pressure>                     
 
 Number electricity_power_main_mono "Power main mono [%.0fw]" <energy>   {mqtt="<[mosquitto:iot/openhab/electricity_power main mono:state:default]"}
 Number electricity_kWh_power_main_mono "KWh main mono [%.2f kWh]" <energy>  {mqtt="<[mosquitto:iot/openhab/electricity_kWh_power main mono:state:default]"}
-Number electricity_power_factor_mono "Main power factor [%.2f]" <flow>      {mqtt="<[mosquitto:iot/openhab/vdd_Unknown\\: type=0007, id=0052_2:state:default]"}
-Number electricity_voltage_mono "Main voltage [%.0f V]" <energy>            {mqtt="<[mosquitto:iot/openhab/vad_Unknown\\: type=0007, id=0052_2:state:default]"}
-Number electricity_current_mono "Main current [%.1f A]" <poweroutlet_eu>    {mqtt="<[mosquitto:iot/openhab/iad_Unknown\\: type=0007, id=0052_2:state:default]"}
+Number electricity_power_factor_mono "Main power factor [%.2f]" <flow>      {mqtt="<[mosquitto:iot/openhab/vdd_zwave main power meter:state:default]"}
+Number electricity_voltage_mono "Main voltage [%.0f V]" <energy>            {mqtt="<[mosquitto:iot/openhab/vad_zwave main power meter:state:default]"}
+Number electricity_current_mono "Main current [%.1f A]" <poweroutlet_eu>    {mqtt="<[mosquitto:iot/openhab/iad_zwave main power meter:state:default]"}
 
 Number electricity_power_ups "Power ups [%.0fw]" <energy>                 {mqtt="<[mosquitto:iot/openhab/electricity_power ups:state:default]"}
 Number electricity_kWh_power_ups "KWh ups [%.2f kWh]" <energy>            {mqtt="<[mosquitto:iot/openhab/electricity_kWh_power ups:state:default]"}
