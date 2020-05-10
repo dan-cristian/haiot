@@ -26,7 +26,7 @@ def sub_cb(topic, msg):
             if 'Pwm' in data:
                 print("'host_name': '{}'".format(mqtt_client_id) in data)
                 js = ujson.loads(data)
-                print(js)
+                # print(js)
                 for key, value in js.items():
                     # print("Parsing {}".format(key))
                     if key == "duty_cycle":
@@ -35,6 +35,9 @@ def sub_cb(topic, msg):
                     elif key == "frequency":
                         pwm.set_frequency(frequency=value)
                         print("Set frequency to {}".format(value))
+                    elif key == "gpio_pin_code":
+                        pwm.set_pin(pin=value)
+                        print("Set pin to {}".format(value))
                     # elif value is not None:
                     #    for key1, value1 in value.items():
                     #        print("SubParsing {}".format(key1))
