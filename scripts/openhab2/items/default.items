@@ -160,15 +160,15 @@ Number electricity_kWh_solar_aps "KWh solar [%.2f kWh]" <solarplant>        {mqt
 
 Number electricity_power_dishwasher "Power dishwasher [%.0fw]" <energy>                 {mqtt="<[mosquitto:iot/openhab/electricity_power dishwasher:state:default]"}
 Number electricity_kWh_power_dishwasher "KWh dishwasher [%.2f kWh]" <energy>            {mqtt="<[mosquitto:iot/openhab/electricity_kWh_power dishwasher:state:default]"}
-Number electricity_power_factor_dishwasher "Dishwasher power factor [%.2f]" <flow>      {mqtt="<[mosquitto:iot/openhab/vdd_Unknown\\: type=0004, id=0002_4:state:default]"}
-Number electricity_voltage_dishwasher "Dishwasher voltage [%.0f V]" <energy>            {mqtt="<[mosquitto:iot/openhab/vad_Unknown\\: type=0004, id=0002_4:state:default]"}
-Number electricity_current_dishwasher "Dishwasher current [%.1f A]" <poweroutlet_eu>    {mqtt="<[mosquitto:iot/openhab/iad_Unknown\\: type=0004, id=0002_4:state:default]"}
+Number electricity_power_factor_dishwasher "Dishwasher power factor [%.2f]" <flow>      {mqtt="<[mosquitto:iot/openhab/vdd_zwave dishwasher:state:default]"}
+Number electricity_voltage_dishwasher "Dishwasher voltage [%.0f V]" <energy>            {mqtt="<[mosquitto:iot/openhab/vad_zwave dishwasher:state:default]"}
+Number electricity_current_dishwasher "Dishwasher current [%.1f A]" <poweroutlet_eu>    {mqtt="<[mosquitto:iot/openhab/iad_zwave dishwasher:state:default]"}
 
 Number electricity_power_fridge "Power fridge [%.0fw]" <energy>                 {mqtt="<[mosquitto:iot/openhab/electricity_power fridge:state:default]"}
 Number electricity_kWh_power_fridge "KWh fridge [%.2f kWh]" <energy>            {mqtt="<[mosquitto:iot/openhab/electricity_kWh_power fridge:state:default]"}
-Number electricity_power_factor_fridge "Fridge power factor [%.2f]" <flow>      {mqtt="<[mosquitto:iot/openhab/vdd_Unknown\\: type=0004, id=0002_5:state:default]"}
-Number electricity_voltage_fridge "Fridge voltage [%.0f V]" <energy>            {mqtt="<[mosquitto:iot/openhab/vad_Unknown\\: type=0004, id=0002_5:state:default]"}
-Number electricity_current_fridge "Fridge current [%.1f A]" <poweroutlet_eu>    {mqtt="<[mosquitto:iot/openhab/iad_Unknown\\: type=0004, id=0002_5:state:default]"}
+Number electricity_power_factor_fridge "Fridge power factor [%.2f]" <flow>      {mqtt="<[mosquitto:iot/openhab/vdd_zwave fridge:state:default]"}
+Number electricity_voltage_fridge "Fridge voltage [%.0f V]" <energy>            {mqtt="<[mosquitto:iot/openhab/vad_zwave fridge:state:default]"}
+Number electricity_current_fridge "Fridge current [%.1f A]" <poweroutlet_eu>    {mqtt="<[mosquitto:iot/openhab/iad_zwave fridge:state:default]"}
 
 Number electricity_power_freezer "Power freezer [%.0fw]" <energy>           {mqtt="<[mosquitto:iot/openhab/electricity_power freezer:state:default]"}
 Number electricity_power_gas_heater "Power gas heater[%.0fw]" <energy>      {mqtt="<[mosquitto:iot/openhab/electricity_power gas heater:state:default]"}
