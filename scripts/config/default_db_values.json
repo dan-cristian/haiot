@@ -41,7 +41,7 @@
     {"name": "P_YOUTUBE_CREDENTIAL_FILE", "value": ".credentials/.youtube.credentials"},
     {"name": "GMAIL_NOTIFY_FROM_EMAIL", "value": "antonio.gaudi33@gmail.com"},
     {"name": "GMAIL_CREDENTIAL_FILE", "value": ".credentials/.gmail.credentials"},
-    {"name": "ALL_CREDENTIAL_FILE", "value": ".credentials/.all.credentials"},
+    {"name": "ALL_CREDENTIAL_FILE", "value": "../private_config/.credentials/.all.credentials"},
     {"name": "THINGSPEAK_API_FILE", "value": ".credentials/.thingspeak.api"},
     {"name": "NOTIFY_EMAIL_RECIPIENT", "value": "dan.cristian@gmail.com"},
     {"name": "DB_REPORTING_LOCATION_ENABLED", "value": "1", "description":"1 for recording data, 0 disabled"},
@@ -400,7 +400,7 @@
     {"code":"4", "target":24,   "direction": 1},
     {"code":"e", "target":24.5, "direction": 1},
     {"code":"h", "target":45,   "direction": 1},
-    {"code":"i", "target":43,   "direction": 1},
+    {"code":"i", "target":45,   "direction": 1},
 
     {"code":"x", "target":-8,   "direction": -1},
     {"code":"y", "target":-18, "direction": -1},
