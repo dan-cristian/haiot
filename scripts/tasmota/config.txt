@@ -5,7 +5,7 @@ Backlog PowerOnState 1; Emulation 0; SetOption65 1; SerialLog 1; SetOption57 1
 
 Backlog MqttClient freezer_pow; Topic freezer_pow; FriendlyName freezer_pow; Hostname freezer_pow
 Backlog MqttClient gas_pow; Topic gas_pow; FriendlyName gas_pow; Hostname gas_pow
-Backlog MqttClient solar_pow; Topic solar_pow; FriendlyName solar_pow; Hostname solar_pow
+
 Backlog MqttClient bath_pow; Topic bath_pow; FriendlyName bath_pow; Hostname bath_pow
 Backlog MqttClient washing_pow; Topic washing_pow; FriendlyName washing_pow; Hostname washing_pow
 Backlog MqttClient ups_pow; Topic ups_pow; FriendlyName ups_pow; Hostname ups_pow

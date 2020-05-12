@@ -5,8 +5,8 @@ venv/
 .idea/*
 nohup.out
 database.db
-.credentials/*
-.credentials
+../private_config/.credentials/*
+../private_config/.credentials
 prctl.py
 openzwave/*
 openzwave/__init__.py
@@ -21,3 +21,4 @@ scripts/osinstall/ubuntu/etc/motion/thread*.conf
 /apps/esp8266_pwm_load/.idea/
 /apps/esp8266_pwm_load/venv/
 /apps/esp8266_pwm_load/credentials.py
+/scripts/tasmota/device_config/
