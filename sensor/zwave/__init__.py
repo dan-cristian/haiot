@@ -164,15 +164,15 @@ def set_value(network, node, value):
                     if value.label == "Voltage":
                         record.vad = round(value.data, 0)
                         record.save_changed_fields(broadcast=True, persist=True)
-                        L.l.info("Saving voltage {} {}".format(sensor_name, value.data))
+                        # L.l.info("Saving voltage {} {}".format(sensor_name, value.data))
                     elif value.label == "Current":
                         record.iad = round(value.data, 1)
                         record.save_changed_fields(broadcast=True, persist=True)
-                        L.l.info("Saving current {} {}".format(sensor_name, value.data))
+                        # L.l.info("Saving current {} {}".format(sensor_name, value.data))
                     elif value.label == "Power Factor":
                         record.vdd = round(value.data, 1)
                         record.save_changed_fields(broadcast=True, persist=True)
-                        L.l.info("Saving power factor {} {}".format(sensor_name, value.data))
+                        # L.l.info("Saving power factor {} {}".format(sensor_name, value.data))
                     else:
                         # L.l.warning("Doing nothing on zwave set value {}".format(value))
                         pass
