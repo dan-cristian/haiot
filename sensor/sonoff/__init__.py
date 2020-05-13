@@ -21,7 +21,8 @@ class P:
 def _get_zone_sensor(sensor_address, sensor_type):
     zone_sensor = m.ZoneSensor.find_one({m.ZoneSensor.sensor_address: sensor_address})
     if zone_sensor is None:
-        actual_sensor_name = 'N/A {} {}'.format(sensor_address, sensor_type)
+        # use tasmota sensor name if not define in config
+        actual_sensor_name = '{}'.format(sensor_address)
     else:
         actual_sensor_name = zone_sensor.sensor_name
     return zone_sensor, actual_sensor_name
