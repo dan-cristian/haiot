@@ -137,7 +137,7 @@ def _process_message(msg):
             # {"BME680":{"Temperature":29.0,"Humidity":63.3,"Pressure":981.6,"Gas":24.46},"PressureUnit":"hPa","TempUnit":"C"}
             # "MHZ19B":{"Model":"B","CarbonDioxide":473,"Temperature":26.0},"TempUnit":"C"
             for k, v in obj.items():
-                if k.startswith('BME') or k.startswith('BMP') or k.startswith('MHZ19'):
+                if k.startswith('BME') or k.startswith('BMP') or k.startswith('MHZ19') or k.startswith('DS18B20'):
                     sensor_address = '{}_{}'.format(sensor_name, k.lower())
                     zone_sensor, sensor = _get_air_sensor(sensor_address=sensor_address, sensor_type=k)
                     if 'Temperature' in v:
@@ -152,7 +152,6 @@ def _process_message(msg):
                     if 'CarbonDioxide' in v:
                         sensor.co2 = v['CarbonDioxide']
                     sensor.save_changed_fields(broadcast=True, persist=True)
-
 
             if 'INA219' in obj:
                 ina = obj['INA219']
