@@ -152,7 +152,7 @@ def _get_heat_off_condition(schedule_pattern):
         force_off = zone_heat_relay.heat_is_on is False
         sensor = m.Sensor.find_one({m.Sensor.sensor_name: schedule_pattern.activate_condition_temp_sensor})
         if sensor is not None:
-            target = _get_temp_target(pattern_id=schedule_pattern.id)
+            target, code, direction = _get_temp_target(pattern_id=schedule_pattern.id)
             if sensor.temperature < (target + P.threshold):
                 # not enough heat in source, no point to run
                 force_off = True
