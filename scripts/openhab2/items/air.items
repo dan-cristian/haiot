@@ -1,6 +1,7 @@
 Group:Number:MAX TEMP_PUF "Max Puffer [%.1f °C]" <temperature_hot>
 Group:Number:MAX TEMP_BOI "Max Boiler [%.1f °C]" <temperature_hot>
-
+Group   PUF     "Puffer"   <heating>    (CEL)
+Group   BOI     "Boiler"   <heating>    (CEL)
 
 Number dust_living_pm1 "Dust living PM1 [%.0f ug/m3]" <smoke>                  {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_1_wemos-living-air_PMS5003:state:default]"}
 Number dust_living_pm2_5 "Dust living PM2.5 [%.0f ug/m3]" <smoke>              {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_2_5_wemos-living-air_PMS5003:state:default]"}
