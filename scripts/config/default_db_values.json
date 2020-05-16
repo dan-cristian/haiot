@@ -424,8 +424,8 @@
     {"id":14, "name":"weekend-dormitor-winter",  "pattern":"2222 2222 .... .222 ...2 2222", "main_source_needed":true},
     {"id":15, "name":"week-dormitor-summer",     "pattern":"bbbb bbbb .... .... ...b bbbb", "main_source_needed":true},
     {"id":16, "name":"weekend-dormitor-summer",  "pattern":"bbbb bbbb .... .bbb ...b bbbb", "main_source_needed":true},
-    {"id":17, "name":"week-boiler-winter",       "pattern":"hhhh hhhh hhhh hhhh hhhh hhhh", "activate_on_condition":true, "activate_condition_relay":"puffer gas valve", "main_source_needed":false},
-    {"id":18, "name":"week-boiler-summer",       "pattern":"iiii iiii iiii iiii iiii iiii", "activate_on_condition":true, "activate_condition_relay":"puffer gas valve", "main_source_needed":false},
+    {"id":17, "name":"week-boiler-winter",       "pattern":"hhhh hhhh hhhh hhhh hhhh hhhh", "activate_on_condition":true, "activate_condition_relay":"puffer gas valve", "activate_condition_temp_sensor":"puffer sus", "main_source_needed":false},
+    {"id":18, "name":"week-boiler-summer",       "pattern":"iiii iiii iiii iiii iiii iiii", "activate_on_condition":true, "activate_condition_relay":"puffer gas valve", "activate_condition_temp_sensor":"puffer sus", "main_source_needed":false},
     {"id":20, "name":"away",                     "pattern":".... .... .... .... .... ....", "main_source_needed":true},
 
     {"id":30, "name":"fridge-summer",            "pattern":"xxxx xxxx xxxx xxxx xxxx xxxx", "main_source_needed":false},
@@ -460,7 +460,7 @@
     {"zone_id":47,"heat_pin_name":"birou",      "gpio_pin_code":"0:out:5", "gpio_host_name":"homew", "relay_type": "piface"},
     {"zone_id":4, "heat_pin_name":"dormitor",   "gpio_pin_code":"0:out:2", "gpio_host_name":"homew", "relay_type": "piface"},
     {"zone_id":19,"heat_pin_name":"gas heat",   "gpio_pin_code":"0:out:0", "gpio_host_name":"homew", "relay_type": "piface", "is_main_heat_source":true},
-    {"zone_id":52,"heat_pin_name":"puffer boiler", "gpio_pin_code":"0:out:1", "gpio_host_name":"homew", "relay_type": "piface"},
+    {"zone_id":52,"heat_pin_name":"puffer boiler", "gpio_pin_code":"0:out:1", "gpio_host_name":"homew", "relay_type": "piface", "temp_sensor_name":"puffer sus"},
     {"zone_id":50,"heat_pin_name":"puffer heat", "gpio_pin_code":"0:out:7", "gpio_host_name":"homew", "relay_type": "piface", "temp_sensor_name":"puffer sus"},
     {"zone_id":51,"heat_pin_name":"puffer gas valve", "gpio_pin_code":"0:out:6", "gpio_host_name":"homew", "relay_type": "piface", "is_alternate_source_switch":true, "temp_sensor_name":"puffer sus"},
 
@@ -572,7 +572,7 @@
   ],
 
   "Pwm": [
-    {"id": 3, "name": "boiler", "frequency": 52, "duty_cycle": 0, "gpio_pin_code": 13, "host_name": "pwm_we", "host_type": "micro"},
+    {"id": 3, "name": "boiler", "frequency": 53, "duty_cycle": 0, "gpio_pin_code": 13, "host_name": "pwm_we", "host_type": "micro"},
     {"id": 4, "name": "boiler2", "frequency": 55, "duty_cycle": 0, "gpio_pin_code": 18, "host_name": "netbook", "host_type": "pi"}
   ],
 
