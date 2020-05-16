@@ -1,3 +1,5 @@
+Group:Contact:OR(OPEN, CLOSED) CON_PIR "PIR Contact [%s]" <door>
+
 Contact alarm_birou "Alarm birou [%s]" <door>                               (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_birou:state:default]"}
 Contact alarm_scari_beci "Alarm scari beci [%s]" <door>                     (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_scari beci:state:default]"}
 Contact alarm_living "Alarm living [%s]" <door>                             (CON_PIR) {mqtt="<[mosquitto:iot/openhab/contact_living:state:default]"}
