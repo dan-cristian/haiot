@@ -219,6 +219,7 @@ class SchedulePattern(ModelBase):
     keep_warm_pattern = ''  # pattern, 5 minutes increments of on/off: 100001000100
     activate_on_condition = False  # activate heat only if relay state condition is meet
     activate_condition_relay = ''  # the relay that must be on to activate this schedule pattern
+    activate_condition_temp_sensor = ''  # turn off if main source temperature is under temperature target
     season_name = ''  # season name when this will apply
     main_source_needed = True  # main source must be on as well (i.e. gas heater)
 

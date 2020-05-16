@@ -208,7 +208,7 @@ class PwmHeater(LoadPowerDevice):
     def set_power_status(self, power_is_on, pwm_watts=None):
         # L.l.info("Setting pwm {} status {} to watts level {}".format(self.RELAY_NAME, power_is_on, pwm_watts))
         if power_is_on:
-            adjust = 1.1
+            adjust = 1
             required_duty = int(adjust * self.max_duty * pwm_watts / self.MAX_WATTS)
             if required_duty > self.max_duty:
                 L.l.warning('Capping incorrect duty {} watts={} max_duty={} max_watt={} '.format(
