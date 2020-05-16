@@ -1,0 +1,9 @@
+
+Switch heat_bucatarie "Heat bucatarie" <fire>                               {mqtt="<[mosquitto:iot/openhab/heat_bucatarie:state:default],>[mosquitto:iot/openhab/cmd/heat_bucatarie:command:*:default]", autoupdate="false"}
+Switch heat_living "Heat living" <fire>                                     {mqtt="<[mosquitto:iot/openhab/heat_living:state:default],>[mosquitto:iot/openhab/cmd/heat_living:command:*:default]", autoupdate="false"}
+Switch heat_birou "Heat birou" <fire>                                       {mqtt="<[mosquitto:iot/openhab/heat_birou:state:default],>[mosquitto:iot/openhab/cmd/heat_birou:command:*:default]", autoupdate="false"}
+Switch heat_dormitor "Heat dormitor" <fire>                                 {mqtt="<[mosquitto:iot/openhab/heat_dormitor:state:default],>[mosquitto:iot/openhab/cmd/heat_dormitor:command:*:default]", autoupdate="false"}
+Switch heat_gas_heat "Heat gas" <fire>                                      {mqtt="<[mosquitto:iot/openhab/heat_gas heat:state:default],>[mosquitto:iot/openhab/cmd/heat_gas heat:command:*:default]", autoupdate="false"}
+Switch heat_puffer_boiler "Heat puffer boiler" <switch>                     {mqtt="<[mosquitto:iot/openhab/heat_puffer boiler:state:default],>[mosquitto:iot/openhab/cmd/heat_puffer boiler:command:*:default]", autoupdate="false"}
+Switch heat_puffer_heat "Heat puffer heat" <switch>                         {mqtt="<[mosquitto:iot/openhab/heat_puffer heat:state:default],>[mosquitto:iot/openhab/cmd/heat_puffer heat:command:*:default]", autoupdate="false"}
+Switch heat_puffer_gas_valve "Heat puffer gas valve" <switch>               {mqtt="<[mosquitto:iot/openhab/heat_puffer gas valve:state:default],>[mosquitto:iot/openhab/cmd/heat_puffer gas valve:command:*:default]", autoupdate="false"}

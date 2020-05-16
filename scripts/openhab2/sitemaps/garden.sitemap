@@ -1,5 +1,10 @@
 sitemap garden label="Garden" {
+
 Frame {
  	Default item=relay_front_garden_lights_relay
+ 	Default item=temperature_garden_air
+ 	Default item=humidity_garden_air
+    Chart item=temperature_garden_air
 }
+
 }
