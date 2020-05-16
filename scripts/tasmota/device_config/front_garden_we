@@ -1,6 +1,0 @@
-# i2c, analog, ds1820
-# mac 80:7D:3A:3E:84:E0
-# ESP Chip Id	4097248
-
-Backlog Module 18; GPIO5 5; GPIO4 6; GPIO14 4 ;ADC0 1
-Backlog MqttClient front_garden_we; Topic front_garden_we; FriendlyName front_garden_we; Hostname front_garden_we

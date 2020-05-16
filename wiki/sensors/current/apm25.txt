@@ -1,0 +1,14 @@
+input 30 volts lab source, 30.17 mastech = 2.944v INA
+20v lab, 20.09 mastech = 1.964 INA
+10v lab, 9.98 mastech = 0.984 INA
+
+
+10v = 286ADC
+12v = 349ADC
+13v = 376ADC
+
+
+0.68A=0.368v
+1.37A = 0.396V
+1.55A = 0.404v
+1.72A = 0.408v
