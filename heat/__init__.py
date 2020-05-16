@@ -150,6 +150,12 @@ def _get_heat_off_condition(schedule_pattern):
     zone_heat_relay = m.ZoneHeatRelay.find_one({m.ZoneHeatRelay.heat_pin_name: relay_name})
     if zone_heat_relay is not None:
         force_off = zone_heat_relay.heat_is_on is False
+        sensor = m.Sensor.find_one({m.Sensor.sensor_name: schedule_pattern.activate_condition_temp_sensor})
+        if sensor is not None:
+            target = _get_temp_target(pattern_id=schedule_pattern.id)
+            if sensor.temperature < (target + P.threshold):
+                # not enough heat in source, no point to run
+                force_off = True
     else:
         L.l.error('Could not find the heat relay for zone heat {}'.format(schedule_pattern.name))
     return force_off
@@ -199,7 +205,7 @@ def _get_heat_on_manual(zone_thermo):
 
 
 # set and return the required heat state in a zone (True - on, False - off).
-# Also return if main source is needed, usefull if you only heat a boiler from alternate heat source
+# Also return if main source is needed, useful if you only heat a boiler from alternate heat source
 def _update_zone_heat(zone, heat_schedule, sensor):
     heat_is_on = False
     main_source_needed = True
