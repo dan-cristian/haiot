@@ -7,3 +7,4 @@ Number powermonitor_power_rulota_battery_2 "Rulota battery 2 [%.3f W]" <energy> 
 Number powermonitor_voltage_rulota_battery_main "Rulota battery main [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_voltage_rulota battery main:state:default]"}
 Number powermonitor_power_rulota_battery_main "Rulota battery main [%.3f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_power_rulota battery main:state:default]"}
 
+Number powermonitor_current_rulota_battery_main "Rulota battery main [%.3f A]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_current_rulota battery main:state:default]"}

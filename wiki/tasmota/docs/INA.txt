@@ -4,5 +4,3 @@ Sensor13 2
 
 TelePeriod 0 or 60
 
-Rule1 on INA219#voltage do Backlog Scale1 %value%, 0, 3.3, 0, 51.8 var1; publish iot/sonoff/tele/wemos-rulota-bat-main/SENSOR {"INA219":{"Voltage":%var1%}} endon
-Rule1 on
