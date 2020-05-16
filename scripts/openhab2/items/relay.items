@@ -1,0 +1,1 @@
+Switch relay_front_garden_lights_relay "Front garden lights" <switch> [ "Lighting" ]      {mqtt="<[mosquitto:iot/openhab/relay_front_garden_lights_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_front_lights_relay:command:*:default]", autoupdate="false"}
