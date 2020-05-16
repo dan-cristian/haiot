@@ -380,8 +380,8 @@
     {"id":4, "name":"big battery 2", "type":"ina", "host_name":"sonoff-basic-8",  "max_voltage":14.7, "warn_voltage":12.5, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
     {"id":5, "name":"big battery 3", "type":"ina", "host_name":"sonoff-basic-11", "max_voltage":14.7, "warn_voltage":12.5, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
     {"id":6, "name":"big battery 4", "type":"ina", "host_name":"sonoff-basic-12", "max_voltage":14.7, "warn_voltage":12.5, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
-    {"id":11, "name":"rulota battery 1", "type":"ina", "host_name":"bat1_rulota_we",  "max_voltage":14.7, "warn_voltage":12.4, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
-    {"id":12, "name":"rulota battery 2", "type":"ina", "host_name":"bat2_rulota_we",  "max_voltage":14.7, "warn_voltage":12.4, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
+    {"id":11, "name":"rulota battery 1", "type":"ina", "host_name":"bat1_rulota_w",  "max_voltage":14.7, "warn_voltage":12.4, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
+    {"id":12, "name":"rulota battery 2", "type":"ina", "host_name":"bat2_rulota_w",  "max_voltage":14.7, "warn_voltage":12.4, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
     {"id":13, "name":"rulota battery main", "type":"ina", "host_name":"bat0_rulota_w",  "max_voltage":14.7, "warn_voltage":12.4, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
 
     {"id":20, "name":"ozone", "type":"ina", "host_name":"wemos-ozone"}
