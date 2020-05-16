@@ -1,10 +1,6 @@
 Group   PRO     "Our Home"   <house>
 Group   HOU     "Our House"   <house>    (PRO)
 Group   CEL     "Cellar"   <cellar>     (HOU)
-Group   PUF     "Puffer"   <heating>    (CEL)
-Group   BOI     "Boiler"   <heating>    (CEL)
-
-
 
 Switch ups_power_failed "UPS Power" <switch>                                {mqtt="<[mosquitto:iot/openhab/ups_power_failed:state:default]"}
 Number ups_load_percent "UPS Load [%.0f %%]" <light>                        {mqtt="<[mosquitto:iot/openhab/ups_load_percent:state:default]"}
