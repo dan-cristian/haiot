@@ -1,0 +1,18 @@
+Rollershutter mpd_player_living                 {mqtt="<[mosquitto:iot/openhab/mpd_player_living:state:default],>[mosquitto:iot/openhab/cmd/mpd_player_living:command:*:default]"}
+Dimmer mpd_volume_living "[%s]" <soundvolume>   {mqtt="<[mosquitto:iot/openhab/mpd_volume_living:state:default],>[mosquitto:iot/openhab/cmd/mpd_volume_living:command:*:default]"}
+Dimmer mpd_position_living "[%s %%]"            {mqtt="<[mosquitto:iot/openhab/mpd_position_living:state:default],>[mosquitto:iot/openhab/cmd/mpd_position_living:command:*:default]"}
+String mpd_song_living "[%s]"                   {mqtt="<[mosquitto:iot/openhab/mpd_song_living:state:default]"}
+String mpd_state_living "[%s]"                  {mqtt="<[mosquitto:iot/openhab/mpd_state_living:state:default],>[mosquitto:iot/openhab/cmd/mpd_state_living:command:*:default]"}
+
+Rollershutter mpd_player_beci                   {mqtt="<[mosquitto:iot/openhab/mpd_player_beci:state:default],>[mosquitto:iot/openhab/cmd/mpd_player_beci:command:*:default]"}
+Dimmer mpd_volume_beci "[%s]" <soundvolume>     {mqtt="<[mosquitto:iot/openhab/mpd_volume_beci:state:default],>[mosquitto:iot/openhab/cmd/mpd_volume_beci:command:*:default]"}
+Dimmer mpd_position_beci "[%s %%]"              {mqtt="<[mosquitto:iot/openhab/mpd_position_beci:state:default],>[mosquitto:iot/openhab/cmd/mpd_position_beci:command:*:default]"}
+String mpd_song_beci "[%s]"                     {mqtt="<[mosquitto:iot/openhab/mpd_song_beci:state:default]"}
+String mpd_state_beci "[%s]"                    {mqtt="<[mosquitto:iot/openhab/mpd_state_beci:state:default],>[mosquitto:iot/openhab/cmd/mpd_state_beci:command:*:default]"}
+
+Switch mpd_lastfmloved "[%s]" <fire>            {mqtt="<[mosquitto:iot/openhab/mpd_lastfmloved:state:default],>[mosquitto:iot/openhab/cmd/mpd_lastfmloved:command:*:default]", autoupdate="false"}
+String mpd_lastfmsong "[%s]"  <fire>            {mqtt="<[mosquitto:iot/openhab/mpd_lastfmsong:state:default]"}
+
+Dimmer mpd_player_pod           {mqtt="<[mosquitto:iot/openhab/mpd_player_pod:state:default],>[mosquitto:iot/openhab/cmd/mpd_player_pod:command:*:default]"}
+
+Player mpd_player_dormitor "[%s]"
