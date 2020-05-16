@@ -202,7 +202,7 @@ class Upscharger(Powerdevice):
 class PwmHeater(LoadPowerDevice):
     DEVICE_SUPPORTS_BREAKS = True
     max_duty = 100  # set actual duty on receiving devices so use percentages here
-    frequency = 55
+    frequency = None
 
     # override
     def set_power_status(self, power_is_on, pwm_watts=None):
@@ -262,8 +262,9 @@ class PwmHeater(LoadPowerDevice):
                 self.set_power_status(power_is_on=True, pwm_watts=delta)
         return True
 
-    def __init__(self, relay_name, relay_id, utility_name, max_watts):
+    def __init__(self, relay_name, relay_id, utility_name, max_watts, frequency):
         LoadPowerDevice.__init__(self, relay_name, relay_id, utility_name, max_watts)
+        self.frequency = frequency
         self.target_watts = 0
 
 
@@ -281,18 +282,21 @@ class P:
     @staticmethod
     # init in order of priority
     def init_dev():
+        pwm = m.Pwm.find_one({m.Pwm.name: "boiler"})
+        freq = pwm.frequency
         if P.emulate_export:
             if False:
                 relay = 'boiler2'
                 utility = 'power boiler'
-                obj = PwmHeater(relay_name=relay, relay_id=4, utility_name='power boiler', max_watts=2400)
+                obj = PwmHeater(relay_name=relay, relay_id=4, utility_name='power boiler', max_watts=2400,
+                                frequency=freq)
                 P.device_list[relay] = obj
                 P.utility_list[utility] = obj
 
             if False:
                 relay = 'boiler'
                 utility = 'power boiler'
-                obj = PwmHeater(relay_name=relay, relay_id=3, utility_name=utility, max_watts=2400)
+                obj = PwmHeater(relay_name=relay, relay_id=3, utility_name=utility, max_watts=2400, frequency=freq)
                 P.device_list[relay] = obj
                 P.utility_list[utility] = obj
 
@@ -317,13 +321,15 @@ class P:
             if False:
                 relay = 'boiler2'
                 utility = 'power boiler'
-                obj = PwmHeater(relay_name=relay, relay_id=4, utility_name='power boiler', max_watts=2400)
+                obj = PwmHeater(relay_name=relay, relay_id=4, utility_name='power boiler', max_watts=2400,
+                                frequency=freq)
                 P.device_list[relay] = obj
                 P.utility_list[utility] = obj
 
             relay = 'boiler'
             utility = 'power boiler'
-            obj = PwmHeater(relay_name=relay, relay_id=3, utility_name=utility, max_watts=2400)
+
+            obj = PwmHeater(relay_name=relay, relay_id=3, utility_name=utility, max_watts=2400, frequency=freq)
             P.device_list[relay] = obj
             P.utility_list[utility] = obj
 
