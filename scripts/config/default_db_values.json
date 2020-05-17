@@ -460,7 +460,7 @@
     {"zone_id":47,"heat_pin_name":"birou",      "gpio_pin_code":"0:out:5", "gpio_host_name":"homew", "relay_type": "piface"},
     {"zone_id":4, "heat_pin_name":"dormitor",   "gpio_pin_code":"0:out:2", "gpio_host_name":"homew", "relay_type": "piface"},
     {"zone_id":19,"heat_pin_name":"gas heat",   "gpio_pin_code":"0:out:0", "gpio_host_name":"homew", "relay_type": "piface", "is_main_heat_source":true},
-    {"zone_id":52,"heat_pin_name":"puffer boiler", "gpio_pin_code":"0:out:1", "gpio_host_name":"homew", "relay_type": "piface", "temp_sensor_name":"puffer sus"},
+    {"zone_id":52,"heat_pin_name":"puffer boiler", "gpio_pin_code":"0:out:1", "gpio_host_name":"homew", "relay_type": "piface"},
     {"zone_id":50,"heat_pin_name":"puffer heat", "gpio_pin_code":"0:out:7", "gpio_host_name":"homew", "relay_type": "piface", "temp_sensor_name":"puffer sus"},
     {"zone_id":51,"heat_pin_name":"puffer gas valve", "gpio_pin_code":"0:out:6", "gpio_host_name":"homew", "relay_type": "piface", "is_alternate_source_switch":true, "temp_sensor_name":"puffer sus"},
 
