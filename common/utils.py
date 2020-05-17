@@ -176,9 +176,13 @@ def parse_text(text, start_key, end_key, end_first=False):
     return None
 
 
+def get_url_content(url):
+    return str(urllib.request.urlopen(url).read())
+
+
 def parse_http(url, start_key, end_key, end_first=False):
     try:
-        text = str(urllib.request.urlopen(url).read())
+        text = get_url_content(url)
         return parse_text(text, start_key, end_key, end_first)
     except Exception as ex:
         L.l.error('Unable to open url {}, err={}'.format(url, ex))

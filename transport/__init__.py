@@ -48,7 +48,7 @@ def thread_run_send():
     P.thread_send = threading.current_thread()
     if mqtt_io.P.client_connected:
         start_len = len(P.send_json_queue)
-        if start_len > 10:
+        if start_len > 50:
             L.l.info('Mqtt SEND len={}'.format(start_len))
         # FIXME: complete this, will potentially accumulate too many requests
         P.mqtt_send_lock.acquire()
