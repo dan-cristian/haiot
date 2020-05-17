@@ -228,22 +228,6 @@ Frame {
     Default item=relay_fan_baie_etaj_relay
 }
 
-Frame {
-    Group item=CON_PIR {
-        Default item=contact_usa_garaj
-        Default item=contact_gate
-        Default item=contact_portita
-        Default item=contact_usa_intrare
-        Default item=alarm_living
-        Default item=alarm_bucatarie
-        Default item=alarm_birou
-        Default item=alarm_scari_beci
-        Default item=alarm_beci_mare
-        Default item=alarm_beci_mic
-        Default item=alarm_etaj_hol
-        Default item=contact_sonerie
-        }
-}
 
 Frame {
     Switch item=RELAY_BACK_WATER mappings=[OFF="All Off", ON="All On"]

@@ -16,3 +16,10 @@ input 30 volts lab source, 30.17 mastech = 2.944v INA
 1.37A = 0.396V
 1.55A = 0.404v
 1.72A = 0.408v
+------------------------------
+bat 1,2 =  12.89  12.91
+ina 1,2 = 12.777 12.801
+
+bat 0 = 25.80
+adc = 814
+calibration ADC = max volt 32.42
