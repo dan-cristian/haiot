@@ -194,7 +194,7 @@ Frame {
 }
 
 Frame {
-    Default item=relay_front_gate
+
 	Default item=relay_front_lights_relay
 	Default item=relay_dishwasher
 	Default item=relay_fridge
@@ -212,16 +212,6 @@ Frame {
 }
 
 Frame {
-    Default item=heat_bucatarie
-    Default item=heat_living
-    Default item=heat_birou
-    Default item=heat_dormitor
-    Default item=heat_gas_heat
-    Default item=heat_puffer_boiler
-    Default item=heat_puffer_heat
-    Default item=heat_puffer_gas_valve
-    Default item=relay_recirculation_pump
-    Default item=relay_other_heat
     Default item=relay_blackwater_pump_relay
     Default item=relay_fan_bucatarie_relay
     Default item=relay_fan_baie_parter_relay
@@ -238,17 +228,6 @@ Frame {
     Default item=relay_back_valve_relay
 }
 
-Frame {
-    Switch item=RELAY_AMP mappings=[OFF="All Off", ON="All On"]
-    Group item=RELAY_AMP {
-        Default item=relay_living_music_relay
-        Default item=relay_living_sub_relay
-        Default item=relay_dormitor_music_relay
-        Default item=relay_baie_mare_music_relay
-        Default item=relay_beci_music_relay
-        Default item=relay_pod_music_relay
-    }
-}
 
 Frame label="Charts" {
     Text item=electricity_power_main_mono {

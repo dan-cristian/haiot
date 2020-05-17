@@ -25,4 +25,16 @@ Frame {
     Default item=mpd_player_dormitor
 }
 
+Frame {
+    Switch item=RELAY_AMP mappings=[OFF="All Off", ON="All On"]
+    Group item=RELAY_AMP {
+        Default item=relay_living_music_relay
+        Default item=relay_living_sub_relay
+        Default item=relay_dormitor_music_relay
+        Default item=relay_baie_mare_music_relay
+        Default item=relay_beci_music_relay
+        Default item=relay_pod_music_relay
+    }
+}
+
 }
