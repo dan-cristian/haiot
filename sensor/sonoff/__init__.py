@@ -1,3 +1,7 @@
+import sys
+import os
+import glob
+import errno
 import threading
 import prctl
 from pydispatch import dispatcher
@@ -7,12 +11,14 @@ from main.logger_helper import L
 from main import thread_pool
 from transport import mqtt_io
 from storage.model import m
+import python_arptable
 
 
 class P:
     initialised = False
     sonoff_topic = None
-    check_period = 5
+    check_period = 60 * 5
+    mac_list = {}  # key=mac, value=file_name
 
     def __init__(self):
         pass
@@ -234,6 +240,49 @@ def _get_relay_status(relay_name):
     transport.send_message_topic('', topic + 'cmnd/' + relay_name + '/Power1')
 
 
+'''Read all mac addresses from config files'''
+def _read_mac_files():
+    path = '../private_config/tasmota/device_config/*'
+    files = glob.glob(path)
+    for name in files:  # 'file' is a builtin type, 'name' is a less-ambiguous variable name.
+        try:
+            with open(name) as f:  # No need to specify 'r': this is the default.
+                first_line = f.readline().lower()
+                if first_line.startswith('mac address='):
+                    mac = first_line.split("=")[1].rstrip('\n')
+                    P.mac_list[mac] = name
+        except IOError as exc:
+            if exc.errno != errno.EISDIR:  # Do not fail if a directory is found, just ignore it.
+                raise  # Propagate other kinds of IOError.
+
+
+def _tasmota_config(config_file, device_name, ip):
+    # init common parameters
+
+    # init specific device parameters
+    with open(config_file) as f:
+        line = f.readline().lower()
+        if line.startswith('backlog'):
+            pass
+
+
+'''Look for tasmota devices in the network not initialised and init them'''
+def _tasmota_discovery():
+    arp = python_arptable.get_arp_table()
+    for dev in arp:
+        mac = dev['HW address']
+        ip = dev['IP address']
+        if mac in P.mac_list:
+            config_file = P.mac_list[mac]
+            file_name = os.path.basename(config_file)
+            dev_name = utils.parse_http(url="http://{}/cm?cmnd=friendlyname1".format(ip),
+                                        start_key='{"FriendlyName1":"', end_key='"}')
+            if dev_name != file_name:
+                # tasmota device is not configured
+                L.l.info("Configuring tasmota device {} as {}".format(ip, file_name))
+                _tasmota_config(config_file=config_file, device_name=file_name, ip=ip)
+
+
 def post_init():
     if P.initialised:
         # force sonoff sensors to send their status
@@ -247,7 +296,7 @@ def post_init():
 def thread_run():
     prctl.set_name("sonoff")
     threading.current_thread().name = "sonoff"
-
+    _tasmota_discovery()
     prctl.set_name("idle")
     threading.current_thread().name = "idle"
 
@@ -262,5 +311,6 @@ def init():
     P.sonoff_topic = str(get_json_param(Constant.P_MQTT_TOPIC_SONOFF_1))
     # mqtt_io.P.mqtt_client.message_callback_add(P.sonoff_topic, mqtt_on_message)
     mqtt_io.add_message_callback(P.sonoff_topic, mqtt_on_message)
+    _read_mac_files()
     thread_pool.add_interval_callable(thread_run, P.check_period)
     P.initialised = True
