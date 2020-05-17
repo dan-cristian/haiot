@@ -150,13 +150,6 @@ def _get_heat_off_condition(schedule_pattern):
     zone_heat_relay = m.ZoneHeatRelay.find_one({m.ZoneHeatRelay.heat_pin_name: relay_name})
     if zone_heat_relay is not None:
         force_off = zone_heat_relay.heat_is_on is False
-        sensor = m.Sensor.find_one({m.Sensor.sensor_name: schedule_pattern.activate_condition_temp_sensor})
-        if sensor is not None:
-            target, code, direction = _get_temp_target(pattern_id=schedule_pattern.id)
-            if sensor.temperature < (target + P.threshold):
-                # not enough heat in source, no point to run
-                # force_off = True
-                pass
     else:
         L.l.error('Could not find the heat relay for zone heat {}'.format(schedule_pattern.name))
     return force_off
@@ -229,6 +222,15 @@ def _update_zone_heat(zone, heat_schedule, sensor):
                     P.heat_status += 'condition off {} '.format(force_off)
                 else:
                     force_off = False
+                # stop if source is colder than target or current temp
+                src_sensor = m.Sensor.find_one({m.Sensor.sensor_name: schedule_pattern.activate_condition_temp_sensor})
+                if src_sensor is not None:
+                    target, code, direction = _get_temp_target(pattern_id=schedule_pattern.id)
+                    if (src_sensor.temperature + P.threshold) > sensor.temperature:
+                        # not enough heat in source, no point to run
+                        P.heat_status += 'source is cold so stopping '
+                        force_off = True
+                # end stop
                 force_on = _get_heat_on_keep_warm(schedule_pattern=schedule_pattern, temp_code=temp_code,
                                                   temp_target=std_temp_target, temp_actual=sensor.temperature)
                 P.heat_status += 'keep warm {} '.format(force_on)
