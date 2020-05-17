@@ -155,7 +155,8 @@ def _get_heat_off_condition(schedule_pattern):
             target, code, direction = _get_temp_target(pattern_id=schedule_pattern.id)
             if sensor.temperature < (target + P.threshold):
                 # not enough heat in source, no point to run
-                force_off = True
+                # force_off = True
+                pass
     else:
         L.l.error('Could not find the heat relay for zone heat {}'.format(schedule_pattern.name))
     return force_off
