@@ -3,6 +3,9 @@ import os
 import glob
 import errno
 import threading
+from socket import timeout
+from ipaddress import IPv4Address
+from urllib.error import HTTPError, URLError
 import prctl
 from pydispatch import dispatcher
 import transport.mqtt_io
@@ -17,8 +20,10 @@ import python_arptable
 class P:
     initialised = False
     sonoff_topic = None
-    check_period = 60 * 5
+    check_period = 60 * 60  # every hour
     mac_list = {}  # key=mac, value=file_name
+    TASMOTA_PATH = "../private_config/tasmota/device_config/"
+    TASMOTA_CONFIG = TASMOTA_PATH + "tasmota.config"
 
     def __init__(self):
         pass
@@ -242,13 +247,13 @@ def _get_relay_status(relay_name):
 
 '''Read all mac addresses from config files'''
 def _read_mac_files():
-    path = '../private_config/tasmota/device_config/*'
+    path = P.TASMOTA_PATH + "*"
     files = glob.glob(path)
     for name in files:  # 'file' is a builtin type, 'name' is a less-ambiguous variable name.
         try:
             with open(name) as f:  # No need to specify 'r': this is the default.
                 first_line = f.readline().lower()
-                if first_line.startswith('mac address='):
+                if first_line.startswith('#mac address='):
                     mac = first_line.split("=")[1].rstrip('\n')
                     P.mac_list[mac] = name
         except IOError as exc:
@@ -257,30 +262,68 @@ def _read_mac_files():
 
 
 def _tasmota_config(config_file, device_name, ip):
+    tasmota_url = "http://{}/cm?cmnd={}"
     # init common parameters
 
     # init specific device parameters
     with open(config_file) as f:
-        line = f.readline().lower()
-        if line.startswith('backlog'):
-            pass
+        for line in f:
+            line = line.rstrip("\n").rstrip("\r")
+            if not line.lower().startswith('#') and line.strip():
+                command = line.split(maxsplit=1)[0].lower()
+                if "<name>" in line:
+                    line = line.replace("<name>", device_name)
+                line = utils.encode_url_request(line)
+                request = tasmota_url.format(ip, line)
+                done = False
+                for i in range(0, 5):
+                    try:
+                        response = utils.get_url_content(url=request, timeout=10)
+                        if command in response.lower():
+                            L.l.info("Set {}: {}={}".format(device_name, request, response))
+                            break
+                        elif '{"WARNING":"Enable weblog 2 if response expected"}' in response:
+                            L.l.info("Set {}: {}={}".format(device_name, request, response))
+                            break
+                        else:
+                            L.l.warning("Error setting tasmota param {}".format(response))
+                    except IOError as eio:
+                        L.l.error("Tasmota config IO error {}".format(eio))
+                    except (URLError, HTTPError, timeout) as et:
+                        L.l.error("Tasmota timeout error {}".format(et))
+                    except Exception as ex:
+                        L.l.error("Tasmota config exception {}".format(ex))
 
 
 '''Look for tasmota devices in the network not initialised and init them'''
 def _tasmota_discovery():
-    arp = python_arptable.get_arp_table()
-    for dev in arp:
-        mac = dev['HW address']
-        ip = dev['IP address']
-        if mac in P.mac_list:
-            config_file = P.mac_list[mac]
-            file_name = os.path.basename(config_file)
+    # try to connect assuming is a tasmota device
+    L.l.info("Begin tasmota network scan")
+    net_hosts = utils.get_my_network_ip_list()
+    for ip in net_hosts:
+        try:
+            # if ip > IPv4Address("192.168.0.140"):
             dev_name = utils.parse_http(url="http://{}/cm?cmnd=friendlyname1".format(ip),
-                                        start_key='{"FriendlyName1":"', end_key='"}')
-            if dev_name != file_name:
-                # tasmota device is not configured
-                L.l.info("Configuring tasmota device {} as {}".format(ip, file_name))
-                _tasmota_config(config_file=config_file, device_name=file_name, ip=ip)
+                                        start_key='{"FriendlyName1":"', end_key='"}', timeout=3)
+            if dev_name is not None:
+                arp = python_arptable.get_arp_table()
+                for entry in arp:
+                    if IPv4Address(entry["IP address"]) == ip:
+                        mac = entry["HW address"]
+                        if mac in P.mac_list:
+                            config_file = P.mac_list[mac]
+                            file_name = os.path.basename(config_file)
+                            # dev_name = utils.parse_http(url="http://{}/cm?cmnd=friendlyname1".format(ip),
+                            #                            start_key='{"FriendlyName1":"', end_key='"}')
+                            if dev_name != file_name:
+                                # tasmota device is not configured
+                                L.l.info("Configuring tasmota device {} as {}".format(ip, file_name))
+                                _tasmota_config(config_file=P.TASMOTA_CONFIG, device_name=file_name, ip=ip)
+                                _tasmota_config(config_file=config_file, device_name=file_name, ip=ip)
+                        break
+        except Exception as ex:
+            pass
+    L.l.info("Finalised tasmota network scan")
 
 
 def post_init():

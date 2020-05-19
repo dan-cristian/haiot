@@ -7,6 +7,9 @@ import time
 import calendar
 import math
 import importlib
+import subprocess
+import ipaddress
+import socket
 from collections import namedtuple
 from common import fix_module, Constant
 import _strptime #  workaround to fix this issue: https://www.raspberrypi.org/forums/viewtopic.php?t=166912
@@ -16,6 +19,7 @@ while True:
     try:
         import pytz
         import urllib.request
+        import urllib.parse
         break
     except ImportError as iex:
         if not fix_module(iex):
@@ -176,16 +180,24 @@ def parse_text(text, start_key, end_key, end_first=False):
     return None
 
 
-def get_url_content(url):
-    return str(urllib.request.urlopen(url).read())
+def get_url_content(url, timeout=None):
+    if timeout is None:
+        return str(urllib.request.urlopen(url).read())
+    else:
+        return str(urllib.request.urlopen(url, timeout=timeout).read())
 
 
-def parse_http(url, start_key, end_key, end_first=False):
+def encode_url_request(request):
+    return urllib.parse.quote_plus(request)
+
+
+def parse_http(url, start_key, end_key, end_first=False, timeout=None):
     try:
-        text = get_url_content(url)
+        text = get_url_content(url=url, timeout=timeout)
         return parse_text(text, start_key, end_key, end_first)
     except Exception as ex:
-        L.l.error('Unable to open url {}, err={}'.format(url, ex))
+        # L.l.error('Unable to open url {}, err={}'.format(url, ex))
+        pass
     return None
 
 
@@ -245,6 +257,37 @@ def multikeysort(items, columns):
     return sorted(items, cmp=comparer)
 
 
+def get_my_network_ip_list():
+    # get my ip
+    ip = ([l for l in ([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2]
+                        if not ip.startswith("127.")][:1], [[(s.connect(('8.8.8.8', 53)),
+                                                              s.getsockname()[0], s.close()) for s in
+                                                             [socket.socket(socket.AF_INET,
+                                                                            socket.SOCK_DGRAM)]][0][1]]) if l][0][0])
+    ip_ar = ip.split('.')
+    net_addr = ip.replace(ip_ar[len(ip_ar) - 1], "0/24")
+    # pings all hosts in my network
+    ip_net = ipaddress.ip_network(net_addr)
+    all_hosts = list(ip_net.hosts())
+    return all_hosts
+
+
+def ping_my_network():
+
+    # Configure subprocess to hide the console window
+    # info = subprocess.STARTUPINFO()
+    # info.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+    # info.wShowWindow = subprocess.SW_HIDE
+
+    # For each IP address in the subnet,
+    # run the ping command with subprocess.popen interface
+    for i in range(len(all_hosts)):
+        output = subprocess.Popen(['ping', '-c', '1', '-w', '1', '-s', '1', str(all_hosts[i])], stdout=subprocess.PIPE,
+                                  # startupinfo=info
+                                  ).communicate()[0]
+        L.l.info("Pinged {}".format(all_hosts[i]))
+
+
 def init_debug():
     try:
         import ptvsd
@@ -255,4 +298,3 @@ def init_debug():
     except Exception as ex:
         print("Error in remote debug: {}".format(ex))
 
-    
