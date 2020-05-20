@@ -226,7 +226,7 @@ def _update_zone_heat(zone, heat_schedule, sensor):
                 src_sensor = m.Sensor.find_one({m.Sensor.sensor_name: schedule_pattern.activate_condition_temp_sensor})
                 if src_sensor is not None:
                     target, code, direction = _get_temp_target(pattern_id=schedule_pattern.id)
-                    if (src_sensor.temperature + P.threshold) > sensor.temperature:
+                    if src_sensor.temperature < (sensor.temperature + P.threshold):
                         # not enough heat in source, no point to run
                         P.heat_status += 'source is colder {} so stopping '.format(
                             src_sensor.temperature + P.threshold)
