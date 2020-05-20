@@ -228,7 +228,8 @@ def _update_zone_heat(zone, heat_schedule, sensor):
                     target, code, direction = _get_temp_target(pattern_id=schedule_pattern.id)
                     if (src_sensor.temperature + P.threshold) > sensor.temperature:
                         # not enough heat in source, no point to run
-                        P.heat_status += 'source is colder so stopping '
+                        P.heat_status += 'source is colder {} so stopping '.format(
+                            src_sensor.temperature + P.threshold)
                         force_off = True
                 # end stop
                 force_on = _get_heat_on_keep_warm(schedule_pattern=schedule_pattern, temp_code=temp_code,
