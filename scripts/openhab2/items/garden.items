@@ -8,3 +8,4 @@ Number gas_co_curte "Gas CO curte [%.0f]" <gas>                                 
 Number pressure_curte "Psi curte [%.0f hPa]" <pressure>                                             {mqtt="<[mosquitto:iot/openhab/airsensor_pressure_wemosmini5_bme280:state:default]"}
 Number humidity_curte_fata "Curte fata [%.0f %%]" <humidity> [ "CurrentHumidity" ]                  {mqtt="<[mosquitto:iot/openhab/airsensor_humidity_wemosmini5_bme280:state:default]"}
 
+Switch relay_front_garden_lights_relay "Front garden lights" <switch> [ "Switchable" ]            {mqtt="<[mosquitto:iot/openhab/relay_front_garden_lights_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_front_garden_lights_relay:command:*:default]", autoupdate="false"}
