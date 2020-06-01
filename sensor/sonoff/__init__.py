@@ -136,7 +136,7 @@ def _process_message(msg):
             if 'COUNTER' in obj:
                 # TelePeriod 60
                 counter = obj['COUNTER']
-                for i in [1, 2, 3, 4]:
+                for i in [1, 2, 3, 4, 5, 6, 7, 8]:
                     c = 'C{}'.format(i)
                     if c in counter:
                         cval = int(counter[c])
@@ -164,23 +164,29 @@ def _process_message(msg):
                         sensor.co2 = v['CarbonDioxide']
                     sensor.save_changed_fields(broadcast=True, persist=True)
 
-            if 'INA219' in obj:
-                ina = obj['INA219']
-                sensor = m.PowerMonitor.find_one({m.PowerMonitor.host_name: sensor_name})
-                if sensor is None:
-                    L.l.warning('Sensor INA on {} not defined in db'.format(sensor_name))
-                    sensor = m.PowerMonitor()
-                    sensor.id = sensor.id
-                if 'Voltage' in ina:
-                    voltage = ina['Voltage']
-                    sensor.voltage = voltage
-                if 'Current' in ina:
-                    current = ina['Current']
-                    sensor.current = current
-                if 'Power' in ina:
-                    power = ina['Power']
-                    sensor.power = power
-                sensor.save_changed_fields(broadcast=True, persist=True)
+                if k.startswith('INA219'):
+                    ina = v  # obj['INA219']
+                    # multiple ina sensors
+                    if '-' in k:
+                        index = k.split('-')[1]
+                        sensor = m.PowerMonitor.find_one(
+                            {m.PowerMonitor.host_name: sensor_name, m.PowerMonitor.type: "ina{}".format(index)})
+                    else:
+                        sensor = m.PowerMonitor.find_one({m.PowerMonitor.host_name: sensor_name})
+                    if sensor is None:
+                        L.l.warning('Sensor INA on {} not defined in db'.format(sensor_name))
+                        sensor = m.PowerMonitor()
+                        sensor.id = sensor.id
+                    if 'Voltage' in ina:
+                        voltage = ina['Voltage']
+                        sensor.voltage = voltage
+                    if 'Current' in ina:
+                        current = ina['Current']
+                        sensor.current = current
+                    if 'Power' in ina:
+                        power = ina['Power']
+                        sensor.power = power
+                    sensor.save_changed_fields(broadcast=True, persist=True)
             if 'ANALOG' in obj:
                 # "ANALOG":{"A0":7}
                 an = obj['ANALOG']

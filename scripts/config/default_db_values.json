@@ -382,7 +382,8 @@
     {"id":6, "name":"big battery 4", "type":"ina", "host_name":"sonoff-basic-12", "max_voltage":14.7, "warn_voltage":12.5, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
     {"id":11, "name":"rulota battery 1", "type":"ina", "host_name":"bat1_rulota_w",  "max_voltage":14.7, "warn_voltage":12.4, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
     {"id":12, "name":"rulota battery 2", "type":"ina", "host_name":"bat2_rulota_w",  "max_voltage":14.7, "warn_voltage":12.4, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
-    {"id":13, "name":"rulota battery main", "type":"ina", "host_name":"bat0_rulota_w",  "max_voltage":14.7, "warn_voltage":12.4, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
+    {"id":13, "name":"rulota battery main", "type":"ina1", "host_name":"bat0_rulota_w",  "max_voltage":14.7, "warn_voltage":12.4, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
+    {"id":14, "name":"rulota battery main ref", "type":"ina2", "host_name":"bat0_rulota_w",  "max_voltage":14.7, "warn_voltage":12.4, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
 
     {"id":20, "name":"ozone", "type":"ina", "host_name":"wemos-ozone"}
     ],
@@ -533,9 +534,10 @@
     {"utility_name":"power solar rulota", "sensor_name":"rulota_solar_pow", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
     {"utility_name":"power grid rulota", "sensor_name":"rulota_grid_pow", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
 
-    {"utility_name":"water hot", "sensor_name":"sonoff-basic-2", "sensor_index":1, "ticks_per_unit":1, "unit_name":"l", "utility_type":"water", "unit_cost":2.9388},
-    {"utility_name":"gas", "sensor_name":"sonoff-basic-2", "sensor_index":2, "ticks_per_unit":100, "unit_name":"mc", "utility_type":"gas", "unit_cost":1.5675},
-    {"utility_name":"water house", "sensor_name":"sonoff-basic-4", "sensor_index":1, "ticks_per_unit":1, "unit_name":"l", "utility_type":"water", "unit_cost":2.9388},
+    {"utility_name":"water house", "sensor_name":"meter-house-w", "sensor_index":1, "ticks_per_unit":1, "unit_name":"l", "utility_type":"water", "unit_cost":2.9388},
+    {"utility_name":"water hot", "sensor_name":"meter-house-w", "sensor_index":2, "ticks_per_unit":1, "unit_name":"l", "utility_type":"water", "unit_cost":2.9388},
+    {"utility_name":"gas", "sensor_name":"meter-house-w", "sensor_index":4, "ticks_per_unit":100, "unit_name":"mc", "utility_type":"gas", "unit_cost":1.5675},
+
     {"utility_name":"unused 1", "sensor_name":"sonoff-basic-4", "sensor_index":2, "ticks_per_unit":1, "unit_name":"l", "utility_type":"water", "unit_cost":0},
     {"utility_name":"water main", "sensor_name":"water main", "sensor_index":0, "ticks_per_unit":0.1, "unit_name":"l", "utility_type":"water", "unit_cost":2.9388},
 
