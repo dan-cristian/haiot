@@ -10,3 +10,4 @@ bmp280
 pcf8574
 pigpio
 python_arptable
+python_openzwave
