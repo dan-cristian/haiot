@@ -403,7 +403,7 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
     if [ "$?" != "0" ]; then
         echo "Installing virtualenv"
         # pip install --no-cache-dir virtualenv
-        apt install python3-venv
+        apt install -y python3-venv
         python3 -m venv 3venv
     fi
 
@@ -418,7 +418,7 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
         # sudo pip install --upgrade pip
         # pip install virtualenv
         # virtualenv venv
-        apt install python3-venv
+        apt install -y python3-venv
         python3 -m venv 3venv
         source 3venv/bin/activate
     fi
