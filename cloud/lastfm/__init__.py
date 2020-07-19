@@ -1,20 +1,6 @@
 # from urllib import addinfo
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # from main.admin.model_helper import get_param
 import os
 from common import Constant, get_json_param
