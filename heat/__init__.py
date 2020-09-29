@@ -420,7 +420,7 @@ def thread_run():
         P.temp_limit = float(get_json_param(Constant.P_HEAT_SOURCE_MIN_TEMP))
         P.MAX_DELTA_TEMP_KEEP_WARM = float(get_json_param(Constant.P_MAX_DELTA_TEMP_KEEP_WARM))
     month = datetime.datetime.today().month
-    P.season = "summer" if month in range(5, 11) else "winter"
+    P.season = "summer" if month in range(5, 9) else "winter"
     _set_main_heat_source()
     _loop_zones()
     prctl.set_name("idle")
