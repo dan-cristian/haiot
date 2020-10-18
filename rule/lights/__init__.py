@@ -8,3 +8,6 @@ def rule_alarm(obj=m.ZoneAlarm(), change=None):
         if hasattr(obj, 'target_relay') and obj.target_relay is not None:
             # switch on relay
             rule_common.update_custom_relay(obj.target_relay, True)
+            return True
+    return False
+
