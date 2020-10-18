@@ -75,7 +75,8 @@ def parse_rules(obj, change):
                             # P.event_list.append([record, func[0], field_changed_list])
                             P.event_list.append([obj, func[0], field_changed_list])
                             # optimises CPU, but ensure each function name is unique in rule file
-                            break
+                            # optimisation does not work, does not allow multiple functions
+                            # break
     except Exception as ex:
         L.l.exception('Error parsing rules, ex={}'.format(ex))
 
