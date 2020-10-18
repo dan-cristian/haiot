@@ -7,6 +7,7 @@ def rule_start_lights(obj=m.ZoneAlarm(), change=None):
     if obj.alarm_pin_triggered:
         if hasattr(obj, 'target_relay') and obj.target_relay is not None:
             # switch on relay
+            L.l.info("Starting light, relay {}".format(obj.target_relay))
             rule_common.update_custom_relay(obj.target_relay, True)
             return True
     return False
