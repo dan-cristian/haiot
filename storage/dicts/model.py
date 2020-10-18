@@ -292,6 +292,7 @@ class ZoneAlarm(ModelBase):
     is_false_alarm_prone = False  # True if sensor can easily trigger false alarms (gate move by wind)
     start_alarm = False  # True if alarm must start (because area/zone is armed)
     relay_type = ''
+    target_relay = ''  # relay name to switch on if move detected
     updated_on = datetime.now()
 
 
