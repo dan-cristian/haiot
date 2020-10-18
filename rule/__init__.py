@@ -89,7 +89,8 @@ def _process_events():
                 if hasattr(rule_mod, obj[1]):
                     result = getattr(rule_mod, obj[1])(obj=obj[0], change=obj[2])
                     L.l.debug('Rule returned {}'.format(result))
-                    P.event_list.remove(obj)
+            # set remove at the end to allow for all rules with same object to execute
+            P.event_list.remove(obj)
         except Exception as ex:
             L.l.critical("Error processing rule event err={}".format(ex), exc_info=1)
 
