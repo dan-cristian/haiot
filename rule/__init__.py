@@ -75,8 +75,8 @@ def parse_rules(obj, change):
                             # P.event_list.append([record, func[0], field_changed_list])
                             P.event_list.append([obj, func[0], field_changed_list])
                             # optimises CPU, but ensure each function name is unique in rule file
-                            # optimisation does not work, does not allow multiple functions
-                            # break
+                            # fixme: optimisation does not work, does not allow multiple functions?
+                            break
     except Exception as ex:
         L.l.exception('Error parsing rules, ex={}'.format(ex))
 
@@ -90,8 +90,8 @@ def _process_events():
                 if hasattr(rule_mod, obj[1]):
                     result = getattr(rule_mod, obj[1])(obj=obj[0], change=obj[2])
                     L.l.debug('Rule returned {}'.format(result))
-            # set remove at the end to allow for all rules with same object to execute
-            P.event_list.remove(obj)
+                    # set remove at the end to allow for all rules with same object to execute
+                    P.event_list.remove(obj)
         except Exception as ex:
             L.l.critical("Error processing rule event err={}".format(ex), exc_info=1)
 
@@ -206,8 +206,6 @@ def add_rules_into_db(module):
                                               max_instances=1, misfire_grace_time=None)
                             L.l.info("Adding rule {}:{} to scheduler {}".format(record.name, record.command,
                                                                                 record.is_active))
-                    if sqlitedb:
-                        record.add_commit_record_to_db()
     except Exception as ex:
         L.l.exception('Error adding rules into db {}'.format(ex), exc_info=1)
 
@@ -257,10 +255,8 @@ def init():
     L.l.info('Rules module initialising')
     if scheduler:
         from rule import electricity
-        from rule import lights
         P.rules_modules.append(rules_run)
         P.rules_modules.append(electricity)
-        P.rules_modules.append(lights)
         scheduler.remove_all_jobs()
         add_rules_into_db(module=rules_run)
         # __load_rules_from_db()
