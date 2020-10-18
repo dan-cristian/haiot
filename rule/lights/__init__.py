@@ -3,7 +3,7 @@ from rule import rule_common
 from storage.model import m
 
 
-def rule_alarm(obj=m.ZoneAlarm(), change=None):
+def rule_start_lights(obj=m.ZoneAlarm(), change=None):
     if obj.alarm_pin_triggered:
         if hasattr(obj, 'target_relay') and obj.target_relay is not None:
             # switch on relay
