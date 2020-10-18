@@ -279,6 +279,8 @@ def _tasmota_config(config_file, device_name, ip):
                 command = line.split(maxsplit=1)[0].lower()
                 if "<name>" in line:
                     line = line.replace("<name>", device_name)
+                if "<day>" in line:
+                    line = line.replace("<day>", str(utils.get_base_location_now_date().day))
                 line = utils.encode_url_request(line)
                 request = tasmota_url.format(ip, line)
                 done = False
@@ -308,27 +310,33 @@ def _tasmota_discovery():
     net_hosts = utils.get_my_network_ip_list()
     for ip in net_hosts:
         try:
-            # if ip > IPv4Address("192.168.0.140"):
-            dev_name = utils.parse_http(url="http://{}/cm?cmnd=friendlyname1".format(ip),
-                                        start_key='{"FriendlyName1":"', end_key='"}', timeout=3)
-            if dev_name is not None:
-                arp = python_arptable.get_arp_table()
-                for entry in arp:
-                    if IPv4Address(entry["IP address"]) == ip:
-                        mac = entry["HW address"]
-                        if mac in P.mac_list:
-                            config_file = P.mac_list[mac]
-                            file_name = os.path.basename(config_file)
-                            # dev_name = utils.parse_http(url="http://{}/cm?cmnd=friendlyname1".format(ip),
-                            #                            start_key='{"FriendlyName1":"', end_key='"}')
-                            if dev_name != file_name:
-                                # tasmota device is not configured
-                                L.l.info("Configuring tasmota device {} as {}".format(ip, file_name))
-                                _tasmota_config(config_file=P.TASMOTA_CONFIG, device_name=file_name, ip=ip)
-                                _tasmota_config(config_file=config_file, device_name=file_name, ip=ip)
-                        break
+            if ip >= IPv4Address("192.168.0.145"):
+                dev_name = utils.parse_http(url="http://{}/cm?cmnd=friendlyname1".format(ip),
+                                            start_key='{"FriendlyName1":"', end_key='"}', timeout=3)
+                if dev_name is not None:
+                    arp = python_arptable.get_arp_table()
+                    for entry in arp:
+                        if IPv4Address(entry["IP address"]) == ip:
+                            mac = entry["HW address"]
+                            if mac in P.mac_list:
+                                config_file = P.mac_list[mac]
+                                file_name = os.path.basename(config_file)
+                                # dev_name = utils.parse_http(url="http://{}/cm?cmnd=friendlyname1".format(ip),
+                                #                            start_key='{"FriendlyName1":"', end_key='"}')
+                                last_update = utils.parse_http(url="http://{}/cm?cmnd=friendlyname2".format(ip),
+                                                                start_key='{"FriendlyName2":"', end_key='"}', timeout=3)
+                                if dev_name != file_name or last_update != str(utils.get_base_location_now_date().day):
+                                    # tasmota device is not configured
+                                    L.l.info("Configuring tasmota device {} as {}".format(ip, file_name))
+                                    _tasmota_config(config_file=P.TASMOTA_CONFIG, device_name=file_name, ip=ip)
+                                    _tasmota_config(config_file=config_file, device_name=file_name, ip=ip)
+                            break
+                else:
+                    L.l.info("Tasmota scan: IP {} not responding".format(ip))
         except Exception as ex:
+            L.l.info("Tasmota scan: IP {} failed".format(ip))
             pass
+
     L.l.info("Finalised tasmota network scan")
 
 
@@ -345,7 +353,7 @@ def post_init():
 def thread_run():
     prctl.set_name("sonoff")
     threading.current_thread().name = "sonoff"
-    # _tasmota_discovery()
+    _tasmota_discovery()
     prctl.set_name("idle")
     threading.current_thread().name = "idle"
 

@@ -7,8 +7,6 @@ from pydispatch import dispatcher
 from main.logger_helper import L
 from main import thread_pool
 from main import sqlitedb
-if sqlitedb:
-    from storage.sqalc import models
 from common import Constant
 from storage.model import m
 
@@ -125,10 +123,7 @@ def __load_rules_from_db():
     # keep host name default to '' rather than None (which does not work on filter in_)
     try:
         # rule_list = models.Rule.query.filter(models.Rule.host_name.in_([constant.HOST_NAME, ""])).all()
-        if sqlitedb:
-            rule_list = models.Rule().query_filter_all(models.Rule.host_name.in_([Constant.HOST_NAME, ""]))
-        else:
-            rule_list = m.Rule.find({m.Rule.host_name: Constant.HOST_NAME})
+        rule_list = m.Rule.find({m.Rule.host_name: Constant.HOST_NAME})
         scheduler.remove_all_jobs()
         for rule in rule_list:
             method_to_call = getattr(rules_run, rule.command)
@@ -159,10 +154,7 @@ def add_rules_into_db(module):
             for func in P.func[module]:
                 if not func[1].__defaults__ and not func[1].__name__.startswith('_'):
                     # add this to DB
-                    if sqlitedb:
-                        record = models.Rule()
-                    else:
-                        record = m.Rule()
+                    record = m.Rule()
                     record.name = func[1].__name__
                     record.command = func[1].__name__
                     record.host_name = Constant.HOST_NAME
@@ -263,8 +255,10 @@ def init():
     L.l.info('Rules module initialising')
     if scheduler:
         from rule import electricity
+        from rule import lights
         P.rules_modules.append(rules_run)
         P.rules_modules.append(electricity)
+        P.rules_modules.append(lights)
         scheduler.remove_all_jobs()
         add_rules_into_db(module=rules_run)
         # __load_rules_from_db()
