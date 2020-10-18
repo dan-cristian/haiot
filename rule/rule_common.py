@@ -1,11 +1,9 @@
 import subprocess
 from main.logger_helper import L
-from main import sqlitedb
-if sqlitedb:
-    from storage.sqalc import models
 from common import Constant
 from pydispatch import dispatcher
 from storage.model import m
+import gpio
 
 
 def update_custom_relay(relay_pin_name, power_is_on):
@@ -17,6 +15,17 @@ def update_custom_relay(relay_pin_name, power_is_on):
         current_relay.save_changed_fields(broadcast=True, persist=True)
     else:
         L.l.info("Cannot find relay {} on rule common update relay".format(relay_pin_name))
+
+
+def start_custom_relay(relay_pin_name, power_is_on):
+    current_relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.relay_pin_name: relay_pin_name})
+    if current_relay is not None:
+        L.l.info("Start relay {} on rule common to {}, current state={}".format(
+            relay_pin_name, power_is_on, current_relay.relay_is_on))
+        gpio.set_relay_state(
+            pin_code=current_relay.gpio_pin_code, relay_is_on=True, relay_type=current_relay.relay_type)
+    else:
+        L.l.info("Unable to find relay {} to start".format(relay_pin_name))
 
 
 def get_custom_relay(relay_pin_name):
