@@ -99,6 +99,10 @@ def rule_alarm(obj=m.ZoneAlarm(), change=None):
             # rule_common.notify_via_all(title=msg, message=msg, priority=3)
         # elif obj.alarm_pin_name == 'birou':
         #    thread.start_new_thread(rule_common.play_bell_local, ('29621__infobandit__phone.wav',))
+        if hasattr(obj, 'target_relay') and obj.target_relay is not None:
+            # switch on relay
+            L.l.info("Starting light, relay {}".format(obj.target_relay))
+            rule_common.update_custom_relay(obj.target_relay, True)
     # else:
     #    Log.logger.info('Rule Alarm OFF: pin={} triggered={}'.format(obj.alarm_pin_name, obj.alarm_pin_triggered))
     else:
