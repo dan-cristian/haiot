@@ -35,7 +35,7 @@ def event_detected(channel):
         L.l.info('IO input detected channel {} status {}'.format(channel, state))
         dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=channel, direction='in',
                         pin_value=state, pin_connected=(state == 0))
-    except Exception, ex:
+    except Exception as ex:
         zonealarm = None
         L.l.warning('Error io event detected, err {}'.format(ex))
 
@@ -62,13 +62,13 @@ def setup_in_ports(gpio_pin_list):
                 GPIO.add_event_detect(gpio_pin.pin_code, GPIO.BOTH)  # , callback=event_detected, bouncetime=300)
                 __pool_pin_codes.append(gpio_pin.pin_code)
                 L.l.info('OK callback on gpio'.format(gpio_pin.pin_code))
-            except Exception, ex:
+            except Exception as ex:
                 L.l.warning('Unable to add event callback pin={} err={}'.format(gpio_pin.pin_code, ex))
                 try:
                     GPIO.add_event_detect(gpio_pin.pin_code, GPIO.FALLING)
                     L.l.info('OK pooling on gpio {} err='.format(gpio_pin.pin_code, ex))
                     __pool_pin_codes.append(gpio_pin.pin_code)
-                except Exception, ex:
+                except Exception as ex:
                     L.l.warning('Unable to add pooling on pin {} err={}'.format(gpio_pin.pin_code, ex))
 
 
@@ -101,5 +101,5 @@ def init():
         thread_pool.add_interval_callable(thread_run, run_interval_second=10)
         global initialised
         initialised = True
-    except Exception, ex:
+    except Exception as ex:
         L.l.critical('Module io_bbb not initialised, err={}'.format(ex))
