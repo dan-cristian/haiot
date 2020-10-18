@@ -11,7 +11,8 @@ from storage.model import m
 def update_custom_relay(relay_pin_name, power_is_on):
     current_relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.relay_pin_name: relay_pin_name})
     if current_relay is not None:
-        L.l.info("Update relay {} on rule common to {}".format(relay_pin_name, power_is_on))
+        L.l.info("Update relay {} on rule common to {}, current state={}".format(
+            relay_pin_name, power_is_on, current_relay.relay_is_on))
         current_relay.relay_is_on = power_is_on
         current_relay.save_changed_fields(broadcast=True, persist=True)
     else:
