@@ -4,10 +4,7 @@ import threading
 import datetime
 from main.logger_helper import L
 from main import sqlitedb
-if sqlitedb:
-    from storage.sqalc import models
-else:
-    from storage.model import m
+from storage.model import m
 from rule import rule_common
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'

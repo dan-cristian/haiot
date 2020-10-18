@@ -272,6 +272,7 @@
     {"id":53, "name":"solar panel", "is_outdoor": 1},
     {"id":54, "name":"pod", "is_indoor": 1},
     {"id":56, "name":"baie parter", "is_indoor": 1},
+    {"id":58, "name":"camara beci", "is_indoor": 1},
     {"id":200, "name":"car octavia", "is_outdoor": 1}
   ],
 
@@ -350,6 +351,7 @@
     {"relay_pin_name": "unused_relay", "zone_id": "2", "gpio_pin_code": "sonoff-basic-13", "gpio_host_name": "", "relay_type": "sonoff"},
     {"relay_pin_name": "dust_parter", "zone_id": "2", "gpio_pin_code": "wemos-micro-1", "gpio_host_name": "", "relay_type": "sonoff"},
     {"relay_pin_name": "dust_etaj", "zone_id": "4", "gpio_pin_code": "wemos-micro-2", "gpio_host_name": "", "relay_type": "sonoff"},
+    {"relay_pin_name": "camara_lights", "zone_id": "58", "gpio_pin_code": "camara_lights_s", "relay_type": "sonoff"},
 
     {"relay_pin_name": "portita_relay", "zone_id": "7", "gpio_pin_code": "26", "gpio_host_name": "pi-power", "relay_type": "gpio"},
 
@@ -547,7 +549,7 @@
   "ZoneAlarm": [
     {"id":13, "zone_id":9 ,  "gpio_pin_code":"0:in:0", "gpio_host_name": "homew", "alarm_pin_name": "beci mare", "sensor_type": "pir", "relay_type": "piface"},
     {"id":14, "zone_id":1 ,  "gpio_pin_code":"0:in:1", "gpio_host_name": "homew", "alarm_pin_name": "bucatarie", "sensor_type": "pir", "relay_type": "piface"},
-    {"id":15, "zone_id":2 ,  "gpio_pin_code":"0:in:2", "gpio_host_name": "homew", "alarm_pin_name": "living", "sensor_type": "pir", "relay_type": "piface"},
+    {"id":15, "zone_id":2 ,  "gpio_pin_code":"0:in:2", "gpio_host_name": "homew", "alarm_pin_name": "living", "sensor_type": "pir", "relay_type": "piface", "target_relay": "camara_lights"},
     {"id":16, "zone_id":3 ,  "gpio_pin_code":"0:in:3", "gpio_host_name": "homew", "alarm_pin_name": "beci mic", "sensor_type": "pir", "relay_type": "piface"},
     {"id":17, "zone_id":47 , "gpio_pin_code":"0:in:4", "gpio_host_name": "homew", "alarm_pin_name": "birou", "sensor_type": "pir", "relay_type": "piface"},
     {"id":18, "zone_id":10 , "gpio_pin_code":"0:in:5", "gpio_host_name": "homew", "alarm_pin_name": "scari beci", "sensor_type": "pir", "relay_type": "piface"},
