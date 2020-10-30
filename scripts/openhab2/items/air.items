@@ -3,26 +3,26 @@ Group:Number:MAX TEMP_BOI "Max Boiler [%.1f °C]" <temperature_hot>
 Group   PUF     "Puffer"   <heating>    (CEL)
 Group   BOI     "Boiler"   <heating>    (CEL)
 
-Number dust_living_pm1 "Dust living PM1 [%.0f ug/m3]" <smoke>                  {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_1_wemos-living-air_PMS5003:state:default]"}
-Number dust_living_pm2_5 "Dust living PM2.5 [%.0f ug/m3]" <smoke>              {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_2_5_wemos-living-air_PMS5003:state:default]"}
-Number dust_living_pm10 "Dust living PM10 [%.0f ug/m3]" <smoke>                {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_10_wemos--living-air_PMS5003:state:default]"}
-Number dust_living_p_2_5 "Dust living P2.5 [%.0f ppd]" <smoke>                 {mqtt="<[mosquitto:iot/openhab/dustsensor_p_2_5_wemos--living-air_PMS5003:state:default]"}
+Number dust_living_pm1 "Dust living PM1 [%.0f ug/m3]" <smoke>                  {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_1_wemos-living-air_pms5003:state:default]"}
+Number dust_living_pm2_5 "Dust living PM2.5 [%.0f ug/m3]" <smoke>              {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_2_5_wemos-living-air_pms5003:state:default]"}
+Number dust_living_pm10 "Dust living PM10 [%.0f ug/m3]" <smoke>                {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_10_wemos--living-air_pms5003:state:default]"}
+Number dust_living_p_2_5 "Dust living P2.5 [%.0f ppd]" <smoke>                 {mqtt="<[mosquitto:iot/openhab/dustsensor_p_2_5_wemos--living-air_pms5003:state:default]"}
 
-Number dust_etaj_pm1 "Dust etaj PM1 [%.0f ug/m3]" <smoke>        {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_1_wemos-bedroom-air_PMS5003:state:default]"}
-Number dust_etaj_pm2_5 "Dust etaj PM2.5 [%.0f ug/m3]" <smoke>    {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_2_5_wemos-bedroom-air_PMS5003:state:default]"}
-Number dust_etaj_pm10 "Dust etaj PM10 [%.0f ug/m3]" <smoke>      {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_10_wemos-bedroom-air_PMS5003:state:default]"}
-Number dust_etaj_p_2_5 "Dust etaj P2.5 [%.0f ppd]" <smoke>       {mqtt="<[mosquitto:iot/openhab/dustsensor_p_2_5_wemos-bedroom-air_PMS5003:state:default]"}
+Number dust_etaj_pm1 "Dust etaj PM1 [%.0f ug/m3]" <smoke>        {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_1_wemos-bedroom-air_pms5003:state:default]"}
+Number dust_etaj_pm2_5 "Dust etaj PM2.5 [%.0f ug/m3]" <smoke>    {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_2_5_wemos-bedroom-air_pms5003:state:default]"}
+Number dust_etaj_pm10 "Dust etaj PM10 [%.0f ug/m3]" <smoke>      {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_10_wemos-bedroom-air_pms5003:state:default]"}
+Number dust_etaj_p_2_5 "Dust etaj P2.5 [%.0f ppd]" <smoke>       {mqtt="<[mosquitto:iot/openhab/dustsensor_p_2_5_wemos-bedroom-air_pms5003:state:default]"}
 
-Number dust_kids_pm1 "Dust kids PM1 [%.0f ug/m3]" <smoke>        {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_1_wemos-kids-air_PMS5003:state:default]"}
-Number dust_kids_pm2_5 "Dust kids PM2.5 [%.0f ug/m3]" <smoke>    {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_2_5_wemos-kids-air_PMS5003:state:default]"}
-Number dust_kids_pm10 "Dust kids PM10 [%.0f ug/m3]" <smoke>      {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_10_wemos-kids-air_PMS5003:state:default]"}
-Number dust_kids_p_2_5 "Dust kids P2.5 [%.0f ppd]" <smoke>       {mqtt="<[mosquitto:iot/openhab/dustsensor_p_2_5_wemos-kids-air_PMS5003:state:default]"}
+Number dust_kids_pm1 "Dust kids PM1 [%.0f ug/m3]" <smoke>        {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_1_wemos-kids-air_pms5003:state:default]"}
+Number dust_kids_pm2_5 "Dust kids PM2.5 [%.0f ug/m3]" <smoke>    {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_2_5_wemos-kids-air_pms5003:state:default]"}
+Number dust_kids_pm10 "Dust kids PM10 [%.0f ug/m3]" <smoke>      {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_10_wemos-kids-air_pms5003:state:default]"}
+Number dust_kids_p_2_5 "Dust kids P2.5 [%.0f ppd]" <smoke>       {mqtt="<[mosquitto:iot/openhab/dustsensor_p_2_5_wemos-kids-air_pms5003:state:default]"}
 
 
-Number dust_curte_pm1 "Dust curte PM1 [%.0f ug/m3]" <smoke>       {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_1_wemos-curte-air_PMS5003:state:default]"}
-Number dust_curte_pm2_5 "Dust curte PM2.5 [%.0f ug/m3]" <smoke>   {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_2_5_wemos-curte-air_PMS5003:state:default]"}
-Number dust_curte_pm10 "Dust curte PM10 [%.0f ug/m3]" <smoke>     {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_10_wemos-curte-air_PMS5003:state:default]"}
-Number dust_curte_p_2_5 "Dust curte P2.5 [%.0f ppd]" <smoke>      {mqtt="<[mosquitto:iot/openhab/dustsensor_p_2_5_wemos-curte-air_PMS5003:state:default]"}
+Number dust_curte_pm1 "Dust curte PM1 [%.0f ug/m3]" <smoke>       {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_1_wemos-curte-air_pms5003:state:default]"}
+Number dust_curte_pm2_5 "Dust curte PM2.5 [%.0f ug/m3]" <smoke>   {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_2_5_wemos-curte-air_pms5003:state:default]"}
+Number dust_curte_pm10 "Dust curte PM10 [%.0f ug/m3]" <smoke>     {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_10_wemos-curte-air_pms5003:state:default]"}
+Number dust_curte_p_2_5 "Dust curte P2.5 [%.0f ppd]" <smoke>      {mqtt="<[mosquitto:iot/openhab/dustsensor_p_2_5_wemos-curte-air_pms5003:state:default]"}
 
 Number air_co2_living "CO2 living [%.0f ppm]" <smoke>             {mqtt="<[mosquitto:iot/openhab/airsensor_co2_wemos-living-air_mhz19b:state:default]"}
 
