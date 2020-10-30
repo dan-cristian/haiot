@@ -327,6 +327,13 @@ def init():
         Constant.OS, Constant.HOST_NAME, Constant.HOST_MAIN_IP, Constant.HOST_MACHINE_TYPE))
 
 
+def get_secure_general(token):
+    config_file = get_json_param(Constant.P_ALL_CREDENTIAL_FILE)
+    with open(config_file, 'r') as f:
+        config = json.load(f)
+        return config[token]
+
+
 def init_simple():
     Constant.OS = os.name
     Constant.HOST_NAME = socket.gethostname()

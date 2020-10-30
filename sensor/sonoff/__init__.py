@@ -199,7 +199,7 @@ def _process_message(msg):
                 # "PMS5003":{"CF1":0,"CF2.5":1,"CF10":3,"PM1":0,"PM2.5":1,"PM10":3,"PB0.3":444,"PB0.5":120,"PB1":12,
                 # "PB2.5":6,"PB5":2,"PB10":2}
                 pms = obj['PMS5003']
-                sensor_address = '{}_{}'.format(sensor_name, 'PMS5003')
+                sensor_address = '{}_{}'.format(sensor_name, 'pms5003')
                 zone_sensor, sensor = _get_dust_sensor(sensor_address=sensor_address, sensor_type='PMS5003')
                 sensor.pm_1 = pms['PM1']
                 sensor.pm_2_5 = pms['PM2.5']
@@ -213,7 +213,7 @@ def _process_message(msg):
                 sensor.p_5 = pms['PB5']
                 sensor.p_10 = pms['PB10']
                 # sometimes first read after power on returns invalid 0 values
-                if sensor.pm_1 + sensor.pm_2_5 +  sensor.pm_10 + sensor.p_0_3+ sensor.p_0_5 + sensor.p_1 \
+                if sensor.pm_1 + sensor.pm_2_5 + sensor.pm_10 + sensor.p_0_3 + sensor.p_0_5 + sensor.p_1 \
                         + sensor.p_2_5 + sensor.p_5 + sensor.p_10 != 0:
                     sensor.save_changed_fields(broadcast=True, persist=True)
         else:
