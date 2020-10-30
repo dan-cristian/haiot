@@ -48,8 +48,11 @@ def upload_sensor():
             if data['status'] != "ok":
                 L.l.warning("Error posting sensor, {} {}".format(data['status'], data['reason']))
             else:
+                L.l.info("Uploaded air quality data pm2.5={} pm10={}".format(pm25, pm10))
                 P.pm25 = pm25
                 P.pm10 = pm10
+    else:
+        L.l.info("No air quality sensor matching for upload")
 
 
 def unload():
@@ -60,4 +63,4 @@ def init():
     L.l.info('Aqicn module initialising')
     # User parameter - get yours from https://aqicn.org/data-platform/token/
     P.token = common.get_secure_general("aqicn_token")
-    thread_pool.add_interval_callable(upload_sensor, run_interval_second=600)
+    thread_pool.add_interval_callable(upload_sensor, run_interval_second=60)
