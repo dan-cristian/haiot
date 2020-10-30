@@ -311,8 +311,11 @@ def unload():
 
 
 def post_init_relay_value(gpio_pin_code):
-    board, direction, pin = io_common.decode_piface_pin(gpio_pin_code)
-    return get_out_pin_value(pin_index=pin, board_index=board)
+    if P.board_init:
+        board, direction, pin = io_common.decode_piface_pin(gpio_pin_code)
+        return get_out_pin_value(pin_index=pin, board_index=board)
+    else:
+        return None
 
 
 def post_init_alarm_value(gpio_pin_code):

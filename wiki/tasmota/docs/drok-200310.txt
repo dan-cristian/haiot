@@ -1,0 +1,25 @@
+How to setup DROK 12A 60V (SKU:200310) with Tasmota/Wemos D1 Mini
+
+Module 18
+D1/GPIO5 - SerBrTx (71) - connect to Drok pin T
+D2/GPIO4 - SerVrRx (72) - connect to Drok pin R
+5V pin connect to Drok V pin
+G pin connect to Drok G pin
+
+SBaudrate 4800
+SerialConfig 3 (8N1)
+SerialDelimiter 13
+
+SSerialSend3 aro\r
+Read power on status
+{"SSerialReceived":"#ro00000000000"}
+{"SSerialReceived":"#ro00000000001"}
+
+SSerialSend3 awo1\r
+Turn on power
+{"SSerialReceived":"#wook"}
+
+SSerialSend3 awo0\r
+Turn off power
+
+script
