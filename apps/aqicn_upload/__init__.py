@@ -26,7 +26,7 @@ class P:
 
 
 def upload_sensor():
-    sensor = m.DustSensor.find_one({m.AirSensor.address: "wemos-curte-air_PMS5003"})
+    sensor = m.DustSensor.find_one({m.AirSensor.address: "wemos-curte-air_pms5003"})
     if sensor is not None:
         pm25 = sensor.pm_2_5
         pm10 = sensor.pm_10
