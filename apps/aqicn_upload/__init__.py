@@ -28,6 +28,7 @@ class P:
     }
 
 
+
 def upload_sensor():
     sensor_readings = []
     pm25 = None
@@ -45,9 +46,9 @@ def upload_sensor():
 
     air_sensor = m.AirSensor.find_one({m.AirSensor.address: "wemos-curte-air_bme280"})
     if air_sensor is not None and (P.pressure != air_sensor.pressure or P.humidity != air_sensor.humidity):
-        pressure = air_sensor.pressure
+        # pressure = air_sensor.pressure
         humidity = air_sensor.humidity
-        sensor_readings.append({'specie': "pressure", 'value': pressure, 'unit': 'hPa'})
+        # sensor_readings.append({'specie': "pressure", 'value': pressure, 'unit': 'hPa'})
         sensor_readings.append({'specie': "humidity", 'value': humidity, 'unit': '%'})
 
     air_sensor = m.AirSensor.find_one({m.AirSensor.address: "front_garden_we_ds18b20"})
