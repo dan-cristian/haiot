@@ -10,6 +10,7 @@ Frame {
  	Default item=humidity_garden_soil
  	Chart item=humidity_garden_soil period=D
  	Default item=pressure_curte
+ 	Chart item=pressure_curte period=D
 }
 
 }
