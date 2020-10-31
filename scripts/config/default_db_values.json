@@ -573,7 +573,10 @@
     {"id":30, "zone_id":200 , "gpio_pin_code":"23", "gpio_host_name": "pidash", "alarm_pin_name": "car vibrate", "sensor_type": "contact", "relay_type": "gpio"},
     {"id":31, "zone_id":200 , "gpio_pin_code":"17", "gpio_host_name": "pidash", "alarm_pin_name": "pidash battery low", "sensor_type": "contact", "relay_type": "gpio"},
     {"id":32, "zone_id":200 , "gpio_pin_code":"24", "gpio_host_name": "pidash", "alarm_pin_name": "car sound", "sensor_type": "contact", "relay_type": "gpio"},
-    {"id":33, "zone_id":200 , "gpio_pin_code":"25", "gpio_host_name": "pidash", "alarm_pin_name": "switch", "sensor_type": "contact", "relay_type": "gpio"}
+    {"id":33, "zone_id":200 , "gpio_pin_code":"25", "gpio_host_name": "pidash", "alarm_pin_name": "switch", "sensor_type": "contact", "relay_type": "gpio"},
+
+    {"id":40, "zone_id":8 ,  "gpio_pin_code":"F7655E", "gpio_host_name": "homew", "alarm_pin_name": "intrare", "sensor_type": "pir", "relay_type": "sonoff"},
+    {"id":41, "zone_id":8 ,  "gpio_pin_code":"F6D1FE", "gpio_host_name": "homew", "alarm_pin_name": "curte fata", "sensor_type": "pir", "relay_type": "sonoff"}
   ],
 
   "IOSensor": [

@@ -1,0 +1,12 @@
+sitemap air label="Air" {
+Frame  {
+    Default item=dust_curte_p_2_5
+ 	Chart item=dust_curte_p_2_5 period=D
+
+ 	Default item=dust_kids_pm2_5
+ 	Chart item=dust_kids_pm2_5 period=D
+
+
+}
+
+}
