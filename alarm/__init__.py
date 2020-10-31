@@ -59,8 +59,11 @@ def init():
         if alarm.relay_type == Constant.GPIO_PIN_TYPE_PI_FACE_SPI:
             gpio_pin.board_index, gpio_pin.pin_direction, gpio_pin.pin_index_bcm = io_common.decode_piface_pin(
                 alarm.gpio_pin_code)
-        else:
+        elif alarm.relay_type == Constant.GPIO_PIN_TYPE_PI_STDGPIO:
             gpio_pin.pin_index_bcm = int(alarm.gpio_pin_code)
+        else:
+            # for sonoff RF alarms I don't need a pin setup
+            pass
         gpio_pin.pin_type = alarm.relay_type
         gpio_pin.pin_code = alarm.gpio_pin_code
         port_list.append(gpio_pin)
