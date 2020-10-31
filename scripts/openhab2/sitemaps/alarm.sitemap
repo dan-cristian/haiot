@@ -8,6 +8,7 @@ Frame {
         Default item=contact_curte_fata
         Default item=contact_usa_intrare
         Default item=alarm_living
+        Chart item=alarm_living period=D
         Default item=alarm_bucatarie
         Default item=alarm_birou
         Default item=alarm_scari_beci
