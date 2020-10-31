@@ -123,6 +123,7 @@ class AirSensor(ModelBase):
     pressure = 0
     humidity = 0
     gas = 0  # for BME680
+    updated_on = datetime.now()
 
 
 class PowerMonitor(ModelBase):
