@@ -8,6 +8,7 @@ Frame {
  	Default item=humidity_garden_air
  	Chart item=humidity_garden_air period=D
  	Default item=humidity_garden_soil
+ 	Chart item=humidity_garden_soil period=D
 }
 
 }
