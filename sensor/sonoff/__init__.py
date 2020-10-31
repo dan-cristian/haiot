@@ -221,8 +221,8 @@ def _process_message(msg):
                 sensor_id = rf['Data']
                 alarm = m.ZoneAlarm.find_one({m.ZoneAlarm.gpio_pin_code: sensor_id})
                 if alarm is not None:
-                    dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=sensor_id, pin_connected=True)
                     dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=sensor_id, pin_connected=False)
+                    dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=sensor_id, pin_connected=True)
                 else:
                     L.l.warning('Unknown Sonoff RF packet received {}'.format(sensor_id))
         else:
