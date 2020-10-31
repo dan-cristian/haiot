@@ -216,6 +216,15 @@ def _process_message(msg):
                 if sensor.pm_1 + sensor.pm_2_5 + sensor.pm_10 + sensor.p_0_3 + sensor.p_0_5 + sensor.p_1 \
                         + sensor.p_2_5 + sensor.p_5 + sensor.p_10 != 0:
                     sensor.save_changed_fields(broadcast=True, persist=True)
+            if 'RfReceived' in obj:
+                rf = obj['RfReceived']
+                sensor_id = rf['Data']
+                alarm = m.ZoneAlarm.find_one({m.ZoneAlarm.gpio_pin_code: sensor_id})
+                if alarm is not None:
+                    dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=sensor_id, pin_connected=True)
+                    dispatcher.send(Constant.SIGNAL_GPIO, gpio_pin_code=sensor_id, pin_connected=False)
+                else:
+                    L.l.warning('Unknown Sonoff RF packet received {}'.format(sensor_id))
         else:
             L.l.warning("Invalid sensor topic {}".format(msg.topic))
 
