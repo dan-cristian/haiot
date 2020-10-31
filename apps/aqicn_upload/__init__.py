@@ -5,17 +5,16 @@ from main.logger_helper import L
 from main import thread_pool
 import common
 from storage.model import m
-
+import datetime
 
 class P:
     initialised = False
     token = None
     # Sensor parameter
-    pm25 = None
-    pm10 = None
-    temp = None
-    humidity = None
-    pressure = None
+    pm25_updated_on = datetime.datetime.min
+    temp_updated_on = datetime.datetime.min
+    humidity_updated_on = datetime.datetime.min
+    pressure_updated_on = datetime.datetime.min
 
     # Station parameter
     station = {
@@ -37,24 +36,27 @@ def upload_sensor():
     humidity = None
     pressure = None
     dust_sensor = m.DustSensor.find_one({m.DustSensor.address: "wemos-curte-air_pms5003"})
-    if dust_sensor is not None:  # and (P.pm25 != dust_sensor.pm_2_5 or P.pm10 != dust_sensor.pm_10):
+    if dust_sensor is not None and P.pm25_updated_on != dust_sensor.updated_on:
         pm25 = dust_sensor.pm_2_5
         pm10 = dust_sensor.pm_10
         # Then Upload the data
         sensor_readings.append({'specie': "pm2.5", 'value': pm25, 'unit': 'mg/m3'})
         sensor_readings.append({'specie': "pm10", 'value': pm10, 'unit': 'mg/m3'})
+        P.pm25_updated_on = dust_sensor.updated_on
 
     air_sensor = m.AirSensor.find_one({m.AirSensor.address: "wemos-curte-air_bme280"})
-    if air_sensor is not None:  # and P.humidity != air_sensor.humidity:  # (P.pressure != air_sensor.pressure or ):
+    if air_sensor is not None and P.humidity_updated_on != air_sensor.updated_on:
         # pressure = air_sensor.pressure
         humidity = air_sensor.humidity
         # sensor_readings.append({'specie': "pressure", 'value': pressure, 'unit': 'hPa'})
         sensor_readings.append({'specie': "humidity", 'value': humidity, 'unit': '%'})
+        P.humidity_updated_on = air_sensor.updated_on
 
     air_sensor = m.AirSensor.find_one({m.AirSensor.address: "front_garden_we_ds18b20"})
-    if air_sensor is not None:  # and P.temp != air_sensor.temperature:
+    if air_sensor is not None and P.temp_updated_on != air_sensor.updated_on:
         temp = air_sensor.temperature
         sensor_readings.append({'specie': "temp", 'value': temp, 'unit': 'C'})
+        P.temp_updated_on = air_sensor.updated_on
 
     if len(sensor_readings) > 0:
         params = {'token': P.token, 'station': P.station, 'readings': sensor_readings}
@@ -70,16 +72,6 @@ def upload_sensor():
         else:
             L.l.info("Uploaded air quality data pm2.5={} pm10={} temp={} hum={} pres={}".format(
                 pm25, pm10, temp, humidity, pressure))
-
-            if pm25 is not None or pm10 is not None:
-                P.pm25 = pm25
-                P.pm10 = pm10
-            if temp is not None:
-                P.temp = temp
-            if humidity is not None:
-                P.humidity = humidity
-            if pressure is not None:
-                P.pressure = pressure
 
 
 def unload():
