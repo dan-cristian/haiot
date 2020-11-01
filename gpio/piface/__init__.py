@@ -189,7 +189,7 @@ def _input_event(event, reversed=False):
         pin_val = _get_in_pin_value(pin_num, board_index)
         P.input_pin_val[board_index][pin_num] = pin_val
         P.input_pin_dir[board_index][pin_num] = direction
-        L.l.info('Event piface gpio={} direction={} val={}'.format(gpio_pin_code, direction, pin_val))
+        # L.l.info('Event piface gpio={} direction={} val={}'.format(gpio_pin_code, direction, pin_val))
         pin_connected = (direction == 0)
         if reversed:
             pin_connected = not pin_connected
