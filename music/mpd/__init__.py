@@ -20,6 +20,7 @@ while True:
 class P:
     zone_port = {}
     unique_ports = {}
+    thread_pool_status = ''
 
     def __init__(self):
         pass
@@ -245,6 +246,7 @@ def _save_status(zone, status_json, song):
 
 
 def save_lastfm():
+    P.thread_pool_status = 'Saving lastfm'
     lastfmloved = lastfm.iscurrent_loved()
     lastfmsong = lastfm.get_current_song()
     if lastfmsong is not None:
@@ -276,6 +278,7 @@ def update_state(zone_name):
 def update_state_all():
     try:
         for port in P.unique_ports.keys():
+            P.thread_pool_status = 'MPD port {}'.format(port)
             client = _get_client(port)
             if client is not None:
                 zone_name = P.unique_ports[port]
