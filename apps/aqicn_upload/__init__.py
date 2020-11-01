@@ -31,13 +31,17 @@ class P:
 def upload_sensor():
     sensor_readings = []
     pm25 = None
+    pm25_time = None
     pm10 = None
     temp = None
+    temp_time = None
     humidity = None
+    humidity_time = None
     pressure = None
     dust_sensor = m.DustSensor.find_one({m.DustSensor.address: "wemos-curte-air_pms5003"})
     if dust_sensor is not None and P.pm25_updated_on != dust_sensor.updated_on:
         pm25 = dust_sensor.pm_2_5
+        pm25_time = dust_sensor.updated_on
         pm10 = dust_sensor.pm_10
         # Then Upload the data
         sensor_readings.append({'specie': "pm2.5", 'value': pm25, 'unit': 'mg/m3'})
@@ -48,6 +52,7 @@ def upload_sensor():
     if air_sensor is not None and P.humidity_updated_on != air_sensor.updated_on:
         # pressure = air_sensor.pressure
         humidity = air_sensor.humidity
+        humidity_time = air_sensor.updated_on
         # sensor_readings.append({'specie': "pressure", 'value': pressure, 'unit': 'hPa'})
         sensor_readings.append({'specie': "humidity", 'value': humidity, 'unit': '%'})
         P.humidity_updated_on = air_sensor.updated_on
@@ -55,6 +60,7 @@ def upload_sensor():
     air_sensor2 = m.AirSensor.find_one({m.AirSensor.address: "front_garden_we_ds18b20"})
     if air_sensor2 is not None and P.temp_updated_on != air_sensor2.updated_on:
         temp = air_sensor2.temperature
+        temp_time = air_sensor2.updated_on
         sensor_readings.append({'specie': "temp", 'value': temp, 'unit': 'C'})
         P.temp_updated_on = air_sensor2.updated_on
 
@@ -70,8 +76,8 @@ def upload_sensor():
         if data['status'] != "ok":
             L.l.warning("Error posting sensor, {} {}".format(data['status'], data['reason']))
         else:
-            L.l.info("Uploaded air quality data pm2.5={} pm10={} temp={} hum={} pres={}".format(
-                pm25, pm10, temp, humidity, pressure))
+            L.l.info("Uploaded air quality data pm2.5={}/{} pm10={} temp={}/{} hum={}/{} pres={}".format(
+                pm25, pm25_time, pm10, temp, temp_time, humidity, humidity_time, pressure))
     else:
         L.l.info('No air sensors data to upload dust={} air={} air2={}'.format(dust_sensor, air_sensor, air_sensor2))
 
