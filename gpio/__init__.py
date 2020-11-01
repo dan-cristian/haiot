@@ -291,7 +291,8 @@ def _handle_io_event(gpio_pin_code='', direction='', pin_value='', pin_connected
             if pin_connected:
                 dispatcher.send(Constant.SIGNAL_UTILITY, sensor_name=sensor.sensor_name, units_delta_a=1)
     else:
-        L.l.info('Cannot find IOSensor {}'.format(gpio_pin_code))
+        pass
+        # L.l.info('Cannot find IOSensor {}'.format(gpio_pin_code))
 
 
 def _init_io():
