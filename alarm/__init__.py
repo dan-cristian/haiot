@@ -25,8 +25,8 @@ def handle_event_alarm(gpio_pin_code='', direction='', pin_value='', pin_connect
                 else:
                     L.l.error(
                         "Could not find zone for gpio pin {}, trigger actions could be missed".format(gpio_pin_code))
-                L.l.info('Alarm event in {} pin {} connect={}'.format(
-                    zone.name, zonealarm.alarm_pin_name, pin_connected))
+                # L.l.info('Alarm event in {} pin {} connect={}'.format(
+                #    zone.name, zonealarm.alarm_pin_name, pin_connected))
                 zonealarm.alarm_pin_triggered = not pin_connected
                 zonealarm.updated_on = utils.get_base_location_now_date()
                 zonealarm.save_changed_fields(broadcast=True, persist=True)
