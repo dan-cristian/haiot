@@ -52,11 +52,11 @@ def upload_sensor():
         sensor_readings.append({'specie': "humidity", 'value': humidity, 'unit': '%'})
         P.humidity_updated_on = air_sensor.updated_on
 
-    air_sensor = m.AirSensor.find_one({m.AirSensor.address: "front_garden_we_ds18b20"})
-    if air_sensor is not None and P.temp_updated_on != air_sensor.updated_on:
-        temp = air_sensor.temperature
+    air_sensor2 = m.AirSensor.find_one({m.AirSensor.address: "front_garden_we_ds18b20"})
+    if air_sensor2 is not None and P.temp_updated_on != air_sensor2.updated_on:
+        temp = air_sensor2.temperature
         sensor_readings.append({'specie': "temp", 'value': temp, 'unit': 'C'})
-        P.temp_updated_on = air_sensor.updated_on
+        P.temp_updated_on = air_sensor2.updated_on
 
     if len(sensor_readings) > 0:
         params = {'token': P.token, 'station': P.station, 'readings': sensor_readings}
@@ -72,6 +72,8 @@ def upload_sensor():
         else:
             L.l.info("Uploaded air quality data pm2.5={} pm10={} temp={} hum={} pres={}".format(
                 pm25, pm10, temp, humidity, pressure))
+    else:
+        L.l.info('No air sensors data to upload dust={} air={} air2={}'.format(dust_sensor, air_sensor, air_sensor2))
 
 
 def unload():
