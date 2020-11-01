@@ -342,9 +342,10 @@ class ModelBase(metaclass=OrderedClassMembers):
         update = {}
         current = self.reference
         for fld in cls._column_list:
+            if fld == 'updated_on' and self.updated_on is None:
+                self.updated_on = datetime.now()
             if fld not in cls._ignore_save_change_fields:
-                if fld == 'updated_on' and self.updated_on is None:
-                    self.updated_on = datetime.now()
+                # moved save upate_on above
                 if hasattr(self, fld):
                     new_val = getattr(self, fld)
                 else:
