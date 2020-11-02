@@ -32,7 +32,7 @@ class P:
 def upload_aqicn(pm25, pm10, temp, humidity, pressure):
     sensor_readings = []
     if pm25 is not None:
-        sensor_readings.append({'specie': "pm2.5", 'value': pm25, 'unit': 'mg/m3'})
+        sensor_readings.append({'specie': "pm25", 'value': pm25, 'unit': 'mg/m3'})
     if pm10 is not None:
         sensor_readings.append({'specie': "pm10", 'value': pm10, 'unit': 'mg/m3'})
     if humidity is not None:
