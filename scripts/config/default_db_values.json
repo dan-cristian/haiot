@@ -100,7 +100,7 @@
     {"id":65,  "active":false, "start_order":65, "name":"gpio", "host_name":""},
     {"id":67, "active":false, "start_order":67, "name":"alarm", "host_name":""},
     {"id":70, "active":false, "start_order":70, "name":"music", "host_name":""},
-    {"id":73, "active":false, "start_order":73, "name":"apps.aqicn_upload", "host_name":""},
+    {"id":73, "active":false, "start_order":73, "name":"apps.air_sensor_upload", "host_name":""},
     {"id":90, "active":false, "start_order":90, "name":"apps.dashcam", "host_name":""},
     {"id":99, "active":false, "start_order":99, "name":"main.cron", "host_name":""},
     {"id":101, "active":false, "start_order":101, "name":"webui.chart", "host_name":""},
@@ -146,7 +146,7 @@
     {"id":567, "active":true, "start_order":67, "name":"alarm", "host_name":"netbook"},
     {"id":570, "active":true, "start_order":70, "name":"music", "host_name":"netbook"},
     {"id":520, "active":true, "start_order":20, "name":"test", "host_name":"netbook"},
-    {"id":573, "active":true, "start_order":73, "name":"apps.aqicn_upload", "host_name":"netbook"},
+    {"id":573, "active":true, "start_order":73, "name":"apps.air_sensor_upload", "host_name":"netbook"},
 
 
     {"id":609, "active":true, "start_order":9, "name":"heat", "host_name":"pi-face"},
@@ -184,7 +184,7 @@
     {"id":865, "active":true, "start_order":65, "name":"gpio", "host_name":"homew"},
     {"id":867, "active":true, "start_order":67, "name":"alarm", "host_name":"homew"},
     {"id":870, "active":true, "start_order":70, "name":"music", "host_name":"homew"},
-    {"id":873, "active":true, "start_order":73, "name":"apps.aqicn_upload", "host_name":"homew"},
+    {"id":873, "active":true, "start_order":73, "name":"apps.air_sensor_upload", "host_name":"homew"},
 
 
     {"id":903, "active":true, "start_order":3, "name":"health_monitor", "host_name":"pizero1"},
