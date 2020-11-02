@@ -37,8 +37,8 @@ def upload_aqicn(pm25, pm10, temp, humidity, pressure):
         sensor_readings.append({'specie': "pm10", 'value': pm10, 'unit': 'mg/m3'})
     if humidity is not None:
         sensor_readings.append({'specie': "humidity", 'value': humidity, 'unit': '%'})
-    # if pressure is not None:
-    #    sensor_readings.append({'specie': "pressure", 'value': pressure, 'unit': 'hPa'})
+    if pressure is not None:
+        sensor_readings.append({'specie': "pressure", 'value': pressure, 'unit': 'hPa'})
     if temp is not None:
         sensor_readings.append({'specie': "temp", 'value': temp, 'unit': 'C'})
 
@@ -95,21 +95,6 @@ def upload_luftdaten(pm25, pm10, temp, humidity, pressure):
                 L.l.warning("Failed to upload luftdaten sensors, err={}".format(resp))
 
     return
-    resp_2 = requests.post("https://api.luftdaten.info/v1/push-sensor-data/",
-                           json={
-                               "software_version": "enviro-plus 0.0.1",
-                               "sensordatavalues": [{"value_type": key, "value": val} for
-                                                    key, val in temp_values.items()]
-                           },
-                           headers={
-                               "X-PIN": "11",
-                               "X-Sensor": P.luftdaten_sensor_id,
-                               "Content-Type": "application/json",
-                               "cache-control": "no-cache"
-                           }
-                           )
-
-
 
 
 def upload_sensor():
@@ -152,7 +137,7 @@ def unload():
 
 
 def init():
-    L.l.info('Aqicn module initialising')
+    L.l.info('Air sensor upload module initialising')
     # User parameter - get yours from https://aqicn.org/data-platform/token/
     P.token = common.get_secure_general("aqicn_token")
     P.luftdaten_sensor_id = common.get_secure_general("luftdaten_sensor_id")
