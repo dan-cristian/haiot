@@ -62,9 +62,9 @@ def upload_aqicn(pm25, pm10, temp, humidity, pressure):
 def upload_luftdaten(pm25, pm10, temp, humidity, pressure):
     values = {"1": {}, "11": {}}
     if pm10 is not None:
-        values["1"]["P10"] = str(pm10)
+        values["1"]["P1"] = str(pm10)
     if pm25 is not None:
-        values["1"]["P25"] = str(pm25)
+        values["1"]["P2"] = str(pm25)
     if temp is not None:
         values["11"]["temperature"] = str(temp)
     if humidity is not None:
