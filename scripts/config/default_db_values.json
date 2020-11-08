@@ -495,7 +495,7 @@
     {"zone_id":11 , "sensor_address": "F7000001CEF4C126", "sensor_name": "dormitor etaj", "target_material": "air", "alt_address": ""},
     {"zone_id":47 , "sensor_address": "EF000003BDE17928", "sensor_name": "birou", "is_main":true, "target_material": "air", "alt_address": "28.79E1BD030000"},
     {"zone_id":6 ,  "sensor_address": "1C000004F34A3428", "sensor_name": "dormitor spate", "target_material": "air", "alt_address": "28.344AF3040000"},
-    {"zone_id":49 , "sensor_address": "AC000003BE024F28", "sensor_name": "soba beci", "target_material": "water"},
+    {"zone_id":49 , "sensor_address": "AC000003BE024F28", "sensor_name": "air duct", "target_material": "air"},
     {"zone_id":10 , "sensor_address": "4E000001CEF07926", "sensor_name": "voltage-water"},
     {"zone_id":4 ,  "sensor_address": "FB00000017413E3A", "sensor_name": "dormitor contact", "target_material": "air", "alt_address": "3A.3E4117000000"},
     {"zone_id":7 ,  "sensor_address": "C8000004F3495728", "sensor_name": "curte fata", "target_material": "air"},
