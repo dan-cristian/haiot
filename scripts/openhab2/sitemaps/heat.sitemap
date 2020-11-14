@@ -15,7 +15,7 @@ Frame {
         Default item=thermo_mode_manual_birou
         Default item=thermo_mode_presence_birou
         }
-    Group item=bucatarie_THERMO {
+    Group item=BUCATARIE_THERMO {
         Default item=temperature_bucatarie
         Setpoint item=thermo_target_bucatarie minValue=18 maxValue=26 step=0.1
         Default item=thermo_state_bucatarie
