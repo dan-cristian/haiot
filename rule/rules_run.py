@@ -216,8 +216,8 @@ class HeatStateParter:
 def rule_heat(obj=m.ZoneHeatRelay(), change=None):
     if change is not None:
         HeatStateParter.heat_state[obj.heat_pin_name] = obj.heat_is_on
-        pump_on = HeatStateParter.heat_state['living'] and HeatStateParter.heat_state['birou'] \
-                  and HeatStateParter.heat_state['bucatarie']
+        pump_on = HeatStateParter.heat_state['living'] or HeatStateParter.heat_state['birou'] \
+                  or HeatStateParter.heat_state['bucatarie']
         # check if relay status matches
         pump_relay = m.ZoneHeatRelay.find_one(
             {m.ZoneHeatRelay.heat_pin_name: HeatStateParter.pump_relay_name})
