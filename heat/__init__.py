@@ -393,8 +393,10 @@ def _handle_presence(zone_name=None, zone_id=None):
 
 
 def _zoneheatrelay_upsert_listener(record, changed_fields):
-    # set pin only on pins owned by this host
-    if record.gpio_host_name == Constant.HOST_NAME and record.heat_is_on is not None:
+    # set pin only on pins owned by this host or tasmota/sonoff relays
+    if record.gpio_host_name not in [Constant.HOST_NAME, '', None]:
+        return
+    if record.heat_is_on is not None:
         # L.l.info("Setting heat pin {}:{} to {}".format(record.heat_pin_name, record.gpio_pin_code, pin_value))
         # if record.heat_pin_name == 'puffer gas valve':
         #    traceback.print_stack()
