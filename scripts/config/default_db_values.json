@@ -463,11 +463,11 @@
 
 
   "ZoneHeatRelay":[
-    {"zone_id":1, "heat_pin_name":"bucatarie",  "gpio_pin_code":"0:out:3", "gpio_host_name":"homew", "relay_type": "piface"},
-    {"zone_id":2, "heat_pin_name":"living",     "gpio_pin_code":"0:out:4", "gpio_host_name":"homew", "relay_type": "piface"},
-    {"zone_id":47,"heat_pin_name":"birou",      "gpio_pin_code":"0:out:5", "gpio_host_name":"homew", "relay_type": "piface"},
-    {"zone_id":4, "heat_pin_name":"dormitor",   "gpio_pin_code":"0:out:2", "gpio_host_name":"homew", "relay_type": "piface"},
-    {"zone_id":19,"heat_pin_name":"gas heat",   "gpio_pin_code":"0:out:0", "gpio_host_name":"homew", "relay_type": "piface", "is_main_heat_source":true},
+    {"zone_id":1, "heat_pin_name":"bucatarie",  "gpio_pin_code":"bucatarie_heat_relay_s", "gpio_host_name":"homew", "relay_type": "sonoff"},
+    {"zone_id":2, "heat_pin_name":"living",     "gpio_pin_code":"living_heat_relay_s", "gpio_host_name":"homew", "relay_type": "sonoff"},
+    {"zone_id":47,"heat_pin_name":"birou",      "gpio_pin_code":"birou_heat_relay_s", "gpio_host_name":"homew", "relay_type": "sonoff"},
+    {"zone_id":4, "heat_pin_name":"dormitor",   "gpio_pin_code":"etaj_heat_relay_s", "gpio_host_name":"homew", "relay_type": "sonoff"},
+    {"zone_id":19,"heat_pin_name":"gas heat",   "gpio_pin_code":"gas_heat_relay_s", "gpio_host_name":"homew", "relay_type": "sonoff", "is_main_heat_source":true},
     {"zone_id":52,"heat_pin_name":"puffer boiler", "gpio_pin_code":"0:out:1", "gpio_host_name":"homew", "relay_type": "piface"},
     {"zone_id":50,"heat_pin_name":"puffer heat", "gpio_pin_code":"0:out:7", "gpio_host_name":"homew", "relay_type": "piface", "temp_sensor_name":"puffer sus"},
     {"zone_id":51,"heat_pin_name":"puffer gas valve", "gpio_pin_code":"0:out:6", "gpio_host_name":"homew", "relay_type": "piface", "is_alternate_source_switch":true, "temp_sensor_name":"puffer sus"},
