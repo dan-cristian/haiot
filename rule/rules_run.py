@@ -210,19 +210,20 @@ def rule_ups_power(obj=m.Ups(), change=None):
 
 class HeatStateParter:
     heat_state = {"living": False, 'birou': False, 'bucatarie': False}
-
+    pump_relay_name = 'pump_heat_relay'
 
 def rule_heat(obj=m.ZoneHeatRelay(), change=None):
     if change is not None:
-        pump_on_before = HeatStateParter.heat_state['living'] and HeatStateParter.heat_state['birou'] \
-                  and HeatStateParter.heat_state['bucatarie']
         HeatStateParter.heat_state[obj.heat_pin_name] = obj.heat_is_on
         pump_on = HeatStateParter.heat_state['living'] and HeatStateParter.heat_state['birou'] \
                   and HeatStateParter.heat_state['bucatarie']
-        if pump_on_before != pump_on:
-            L.l.info("Pump status is changing to {}".format(pump_on))
-            rule_common.start_custom_relay(relay_pin_name='pump_heat_relay', power_is_on=pump_on)
-
+        # check if relay status matches
+        pump_relay = m.ZoneCustomRelay.find_one(
+            {m.ZoneCustomRelay.relay_pin_name: HeatStateParter.pump_relay_name})
+        if pump_relay is not None:
+            if pump_relay.relay_is_on != pump_on:
+                L.l.info("Pump status is changing to {}".format(pump_on))
+                rule_common.start_custom_relay(relay_pin_name=HeatStateParter.pump_relay_name, power_is_on=pump_on)
 
 
 # VALUE TRIGGER RULES END ###########
