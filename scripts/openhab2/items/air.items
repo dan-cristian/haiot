@@ -37,19 +37,6 @@ Number ozone "Ozone [%.3f V]" <energy>                          {mqtt="<[mosquit
 Number gas_co_beci "Gas CO beci [%.0f]" <gas>                                                       {mqtt="<[mosquitto:iot/openhab/vad_gas CO beci:state:default]"}
 Number gas_ch4_beci "Gas CH4 beci [%.0f]" <gas>                                                     {mqtt="<[mosquitto:iot/openhab/vad_gas CH4 beci:state:default]"}
 
-Group LIVING_THERMO "Living Thermostat" [ "Thermostat", "Celsius" ]
-Number temperature_living "Living [%.1f °C]" <temperature>                 (LIVING_THERMO) [ "CurrentTemperature" ]           {mqtt="<[mosquitto:iot/openhab/temperature_living:state:default]"}
-Number thermo_target_living "Living target [%.1f °C]" <temperature>   (LIVING_THERMO)     [ "TargetTemperature" ]            {mqtt="<[mosquitto:iot/openhab/thermo_target_living:state:default],>[mosquitto:iot/openhab/cmd/thermo_target_living:command:*:default]", autoupdate="false"}
-Switch thermo_state_living "Living status" <fire>                       (LIVING_THERMO) [ "homekit:HeatingCoolingMode" ]   {mqtt="<[mosquitto:iot/openhab/thermo_state_living:state:default],>[mosquitto:iot/openhab/cmd/thermo_state_living:command:*:default]", autoupdate="false"}
-Switch thermo_mode_manual_living "Manual mode" <heating>                       (LIVING_THERMO)                                {mqtt="<[mosquitto:iot/openhab/thermo_mode_manual_living:state:default],>[mosquitto:iot/openhab/cmd/thermo_mode_manual_living:command:*:default]", autoupdate="false"}
-Switch thermo_mode_presence_living "Presence mode" <presence>                       (LIVING_THERMO)                                {mqtt="<[mosquitto:iot/openhab/thermo_mode_presence_living:state:default],>[mosquitto:iot/openhab/cmd/thermo_mode_presence_living:command:*:default]", autoupdate="false"}
-
-Group DORMITOR_THERMO "Dormitor Thermostat" [ "Thermostat", "Celsius" ]
-Number temperature_dormitor "Dormitor [%.1f °C]" <temperature>                  (DORMITOR_THERMO) [ "CurrentTemperature" ]           {mqtt="<[mosquitto:iot/openhab/temperature_dormitor:state:default]"}
-Number thermo_target_dormitor "Dormitor target [%.1f °C]" <temperature>    (DORMITOR_THERMO)  [ "TargetTemperature" ]            {mqtt="<[mosquitto:iot/openhab/thermo_target_dormitor:state:default],>[mosquitto:iot/openhab/cmd/thermo_target_dormitor:command:*:default]", autoupdate="false"}
-Switch thermo_state_dormitor  "Dormitor status" <fire>                       (DORMITOR_THERMO) [ "homekit:HeatingCoolingMode" ]   {mqtt="<[mosquitto:iot/openhab/thermo_state_dormitor:state:default],>[mosquitto:iot/openhab/cmd/thermo_state_dormitor:command:*:default]", autoupdate="false"}
-Switch thermo_mode_manual_dormitor "Manual mode" <heating>                                 (DORMITOR_THERMO)                                {mqtt="<[mosquitto:iot/openhab/thermo_mode_manual_dormitor:state:default],>[mosquitto:iot/openhab/cmd/thermo_mode_manual_dormitor:command:*:default]", autoupdate="false"}
-Switch thermo_mode_presence_dormitor "Presence mode" <presence>                                 (DORMITOR_THERMO)                                {mqtt="<[mosquitto:iot/openhab/thermo_mode_presence_dormitor:state:default],>[mosquitto:iot/openhab/cmd/thermo_mode_presence_dormitor:command:*:default]", autoupdate="false"}
 Number air_humidity_bedroom "Living [%.0f %%]" <humidity>                       {mqtt="<[mosquitto:iot/openhab/airsensor_humidity_wemos-bedroom-air_bme680:state:default]"}
 Number air_temperature_bedroom_ex "Living [%.0f %%]" <temperature>                       {mqtt="<[mosquitto:iot/openhab/airsensor_temperature_wemos-bedroom-air_bme680:state:default]"}
 
