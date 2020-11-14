@@ -221,9 +221,9 @@ def rule_heat(obj=m.ZoneHeatRelay(), change=None):
         pump_relay = m.ZoneCustomRelay.find_one(
             {m.ZoneCustomRelay.relay_pin_name: HeatStateParter.pump_relay_name})
         if pump_relay is not None:
-            if pump_relay.relay_is_on != pump_on:
-                L.l.info("Pump status is changing to {}".format(pump_on))
-                rule_common.start_custom_relay(relay_pin_name=HeatStateParter.pump_relay_name, power_is_on=pump_on)
+            # if pump_relay.relay_is_on != pump_on:
+            # L.l.info("Pump status is changing to {}".format(pump_on))
+            rule_common.start_custom_relay(relay_pin_name=HeatStateParter.pump_relay_name, power_is_on=pump_on)
 
 
 # VALUE TRIGGER RULES END ###########
