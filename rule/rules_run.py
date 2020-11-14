@@ -214,7 +214,7 @@ class HeatStateParter:
 
 
 def rule_heat(obj=m.ZoneHeatRelay(), change=None):
-    if change is not None:
+    if change is not None and obj.heat_pin_name in ['living', 'birou', 'bucatarie']:
         HeatStateParter.heat_state[obj.heat_pin_name] = obj.heat_is_on
         pump_on = HeatStateParter.heat_state['living'] or HeatStateParter.heat_state['birou'] \
                   or HeatStateParter.heat_state['bucatarie']
