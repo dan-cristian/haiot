@@ -18,10 +18,11 @@ Frame {
 }
 
 Frame {
+    Default item=heat_dormitor
     Default item=heat_bucatarie
     Default item=heat_living
     Default item=heat_birou
-    Default item=heat_dormitor
+    Default item=heat_pump_heat_relay
     Default item=heat_gas_heat
     Default item=heat_puffer_boiler
     Default item=heat_puffer_heat
