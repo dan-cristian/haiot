@@ -226,6 +226,7 @@ def rule_heat(obj=m.ZoneHeatRelay(), change=None):
             # L.l.info("Pump status is changing to {}".format(pump_on))
             # rule_common.start_custom_relay(relay_pin_name=HeatStateParter.pump_relay_name, power_is_on=pump_on)
             pump_relay.heat_is_on = pump_on
+            pump_relay.save_changed_fields(broadcast=True, persist=True)
 
 
 # VALUE TRIGGER RULES END ###########
