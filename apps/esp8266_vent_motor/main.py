@@ -2,47 +2,58 @@ import wifi
 import mqtt
 import time
 import machine
+import network
+import webrepl
+import esp
+from ntptime import settime
 from credentials import ssid, password, mqtt_pass, mqtt_user
+import common
+import ubinascii
 
-client_id = "vent-living-1"
+machine_id = ubinascii.hexlify(machine.unique_id()).decode("utf-8")
+client_id = "vent-living-" + machine_id
 mqtt_server = "192.168.0.12"
 topic_sub = "iot/micro/" + client_id
 topic_pub = "iot/sonoff/" + client_id + "/"
 
 
 def restart_and_reconnect():
-    print('Restarting ESP...')
-    time.sleep(5)
-    machine.reset()
+    print('Restarting ESP via deepsleep...')
+    common.init_deep_sleep(sleep_sec=5)
 
 
-def test_stepper():
-    print("Testing stepper")
-    import uln2003
-    from machine import Pin
-    '''
-    IN1 -->  D5
-    IN2 -->  D6
-    IN3 -->  D1
-    IN4 -->  D2
-    '''
-    s1 = uln2003.create(Pin(14, Pin.OUT), Pin(12, Pin.OUT), Pin(5, Pin.OUT), Pin(4, Pin.OUT), delay=2)
-    s1.step(100)
-    s1.step(100, -1)
-    s1.angle(180)
-    s1.angle(360, -1)
+def init_stepper(from_deep_sleep=False):
+    import vent_control
+    vent_control.init_motor()
+    if not from_deep_sleep:
+        print("Testing stepper")
+        vent_control.test_motor()
+    else:
+        print("Not testing due to deep sleep resume")
+    vent_control.read_rtc()
 
 
 def main():
-    test_stepper()
+    vcc = machine.ADC(1).read()
+    print("Main function, VCC={}, flashid={}".format(vcc, machine_id))
+    if machine.reset_cause() == machine.DEEPSLEEP_RESET:
+        init_stepper(from_deep_sleep=True)
+    else:
+        init_stepper(from_deep_sleep=False)
     print("Wifi connect")
     wifi.connect(ssid, password)
-    result = mqtt.connect(client_id, mqtt_server, topic_sub, topic_pub, user=mqtt_user, password=mqtt_pass)
-    if result == 'restart':
-        restart_and_reconnect()
+    station = network.WLAN(network.STA_IF)
+    if station.isconnected():
+        webrepl.start()
+        # settime()
+        result = mqtt.connect(client_id, mqtt_server, topic_sub, topic_pub, user=mqtt_user, password=mqtt_pass)
+        if result == 'restart':
+            print("Restarting due to connectivity error")
+        else:
+            print("Unknown action {}".format(result))
     else:
-        print("Unknown action")
-
+        print("Wifi did not connect")
+    restart_and_reconnect()
 
 
 if __name__ == '__main__':
