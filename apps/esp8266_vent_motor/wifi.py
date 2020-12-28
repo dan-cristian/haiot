@@ -4,7 +4,7 @@ def connect(ssid, password):
     station = network.WLAN(network.STA_IF)
 
     if station.isconnected():
-        print("Already connected")
+        print("Already connected with IP {}".format(station.ifconfig()))
         return
 
     station.active(True)
@@ -13,5 +13,5 @@ def connect(ssid, password):
     while not station.isconnected():
         pass
 
-    print("Wifi connection successful")
-    print(station.ifconfig())
+    print("Wifi connection successful with IP {}".format(station.ifconfig()))
+
