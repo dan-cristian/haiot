@@ -38,6 +38,8 @@ def sub_cb(topic, msg):
                     if key == "close":
                         vent_control.close_full_vent(direction=value)
                         print("Closed vent")
+                    if key == "move":
+                        vent_control.vent_move(angle=value)
                     # elif value is not None:
                     #    for key1, value1 in value.items():
                     #        print("SubParsing {}".format(key1))
@@ -51,7 +53,8 @@ def sub_cb(topic, msg):
 
 
 def publish(message):
-    P.client.publish(P.topic_pub, msg=message)
+    print("Publishing {} to {}".format(message, P.topic_pub))
+    P.client.publish(P.topic_pub, msg=message, retain=True)
 
 
 def connect_and_subscribe(client_id, server, topic_sub, topic_pub, user, password):
@@ -96,3 +99,7 @@ def connect(client_id, server, topic_sub, topic_pub, user, password):
                 print("Error in mqtt listen: {}".format(e))
                 break
         return "restart"
+
+
+def disconnect():
+    P.client.disconnect()
