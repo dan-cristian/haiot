@@ -1,6 +1,6 @@
 def connect(ssid, password):
     import network
-
+    print("Wifi connect")
     station = network.WLAN(network.STA_IF)
 
     if station.isconnected():

@@ -26,6 +26,7 @@ def set_adc_mode(mode):
 
 
 def init_deep_sleep(sleep_sec=60):
+    print("Entering deep sleep")
     # configure RTC.ALARM0 to be able to wake the device
     rtc = machine.RTC()
     rtc.irq(trigger=rtc.ALARM0, wake=machine.DEEPSLEEP)

@@ -14,7 +14,7 @@ machine_id = ubinascii.hexlify(machine.unique_id()).decode("utf-8")
 client_id = "vent-living-" + machine_id
 mqtt_server = "192.168.0.12"
 topic_sub = "iot/micro/" + client_id
-topic_pub = "iot/sonoff/" + client_id + "/"
+topic_pub = "iot/sonoff/" + client_id
 
 
 def restart_and_reconnect():
@@ -34,13 +34,13 @@ def init_stepper(from_deep_sleep=False):
 
 
 def main():
+    common.set_adc_mode(common.ADC_MODE_VCC)
     vcc = machine.ADC(1).read()
-    print("Main function, VCC={}, flashid={}".format(vcc, machine_id))
+    print("Main function, VCC={}, hw_id={}".format(vcc, machine_id))
     if machine.reset_cause() == machine.DEEPSLEEP_RESET:
         init_stepper(from_deep_sleep=True)
     else:
         init_stepper(from_deep_sleep=False)
-    print("Wifi connect")
     wifi.connect(ssid, password)
     station = network.WLAN(network.STA_IF)
     if station.isconnected():
