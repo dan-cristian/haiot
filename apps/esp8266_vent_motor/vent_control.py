@@ -44,9 +44,9 @@ def init_motor():
 def test_motor():
     # P.motor.step(100)
     # P.motor.step(100, -1)
-    P.motor.angle(90)
+    P.motor.angle(10)
     # P.motor.angle(360, -1)
-    P.motor.angle(90, -1)
+    P.motor.angle(10, -1)
 
 
 def calibrate_close():
@@ -62,7 +62,9 @@ def close_full_vent(direction):
         P.motor.angle(P.close_angle, direction)
         P.closed = 1
         P.last_action = utime.time()
-        save_rtc()
+    else:
+        print("Already closed, ignoring")
+    save_rtc()
 
 
 def open_full_vent(direction):
@@ -70,16 +72,23 @@ def open_full_vent(direction):
         P.motor.angle(P.open_angle, direction)
         P.closed = 0
         P.last_action = utime.time()
-        save_rtc()
+    else:
+        print("Already opened, ignoring")
+    save_rtc()
+
+
+def vent_move(angle):
+    direction = int(angle >= 0)  # 1 or 0
+    P.motor.angle(abs(angle), direction)
+    print("Vent moved angle {} direction {}".format(angle, direction))
 
 
 def timer_actions():
     delta = utime.time() - P.last_action
     if delta > 60:
         vcc = machine.ADC(1).read()
-        print("Entering deep sleep, VCC={}".format(vcc))
         # send current state to mqtt
-        mqtt.publish("vcc={},closed={}".format(vcc, P.closed))
+        mqtt.publish('{{"vcc": {},"closed": {}}}'.format(vcc, P.closed))
+        mqtt.disconnect()
         # put the device to sleep
-        common.init_deep_sleep(sleep_sec=300)
-
+        common.init_deep_sleep(sleep_sec=60)
