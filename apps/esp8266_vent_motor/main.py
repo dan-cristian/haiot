@@ -1,14 +1,13 @@
 import wifi
 import mqtt
-import time
 import machine
 import network
 import webrepl
-import esp
-from ntptime import settime
 from credentials import ssid, password, mqtt_pass, mqtt_user
 import common
 import ubinascii
+import esp
+
 
 machine_id = ubinascii.hexlify(machine.unique_id()).decode("utf-8")
 client_id = "vent-living-" + machine_id
@@ -30,10 +29,11 @@ def init_stepper(from_deep_sleep=False):
         vent_control.test_motor()
     else:
         print("Not testing due to deep sleep resume")
-    vent_control.read_rtc()
+    common.read_rtc()
 
 
 def main():
+    esp.osdebug(None)
     common.set_adc_mode(common.ADC_MODE_VCC)
     vcc = machine.ADC(1).read()
     print("Main function, VCC={}, hw_id={}".format(vcc, machine_id))
