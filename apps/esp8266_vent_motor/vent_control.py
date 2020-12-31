@@ -11,23 +11,7 @@ class P:
     close_angle = 90
     open_angle = 90
     motor = None
-    closed = 1
     last_action = utime.time()
-    rtc = None
-
-
-def save_rtc():
-    P.rtc.memory("{}".format(P.closed))
-
-
-def read_rtc():
-    mem = P.rtc.memory()
-    print("Reading rtc memory={}".format(mem))
-    if mem is not None and len(mem) > 0:
-        P.closed = int(mem)
-        print("Read rtc memory={}".format(P.closed))
-    else:
-        print("Read rtc memory is None")
 
 
 def init_motor():
@@ -38,7 +22,6 @@ def init_motor():
     IN4 -->  D2
     """
     P.motor = uln2003.create(Pin(14, Pin.OUT), Pin(12, Pin.OUT), Pin(5, Pin.OUT), Pin(4, Pin.OUT), delay=2)
-    P.rtc = machine.RTC()
 
 
 def test_motor():
@@ -58,23 +41,25 @@ def calibrate_open():
 
 
 def close_full_vent(direction):
-    if P.closed == 0:
+    if common.rtc_storage.closed == 0:
         P.motor.angle(P.close_angle, direction)
-        P.closed = 1
+        common.rtc_storage.closed = 1
         P.last_action = utime.time()
+        print("Closed vent")
     else:
         print("Already closed, ignoring")
-    save_rtc()
+    common.save_rtc()
 
 
 def open_full_vent(direction):
-    if P.closed == 1:
+    if common.rtc_storage.closed == 1:
         P.motor.angle(P.open_angle, direction)
-        P.closed = 0
+        common.rtc_storage.closed = 0
         P.last_action = utime.time()
+        print("Opened vent")
     else:
         print("Already opened, ignoring")
-    save_rtc()
+    common.save_rtc()
 
 
 def vent_move(angle):
@@ -86,9 +71,5 @@ def vent_move(angle):
 def timer_actions():
     delta = utime.time() - P.last_action
     if delta > 60:
-        vcc = machine.ADC(1).read()
-        # send current state to mqtt
-        mqtt.publish('{{"vcc": {},"closed": {}}}'.format(vcc, P.closed))
-        mqtt.disconnect()
-        # put the device to sleep
-        common.init_deep_sleep(sleep_sec=60)
+        common.publish_state()
+        common.init_deep_sleep(sleep_sec=300)
