@@ -392,8 +392,7 @@
     {"id":12, "name":"rulota battery 2", "type":"ina", "host_name":"bat2_rulota_w",  "max_voltage":14.7, "warn_voltage":12.4, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
     {"id":13, "name":"rulota battery main", "type":"ina1", "host_name":"bat0_rulota_w",  "max_voltage":14.7, "warn_voltage":12.4, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
     {"id":14, "name":"rulota battery main ref", "type":"ina2", "host_name":"bat0_rulota_w",  "max_voltage":14.7, "warn_voltage":12.4, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
-
-    {"id":20, "name":"ozone", "type":"ina", "host_name":"wemos-ozone"}
+    {"id":20, "name":"living ozone", "type":"ina", "host_name":"wemos-living-air"}
     ],
 
   "TemperatureTarget": [
