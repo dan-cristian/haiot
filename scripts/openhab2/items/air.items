@@ -7,7 +7,7 @@ Number dust_living_pm1 "Dust living PM1 [%.0f ug/m3]" <smoke>            {mqtt="
 Number dust_living_pm2_5 "Dust living PM2.5 [%.0f ug/m3]" <smoke>        {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_2_5_wemos-living-air_pms5003:state:default]"}
 Number dust_living_pm10 "Dust living PM10 [%.0f ug/m3]" <smoke>          {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_10_wemos-living-air_pms5003:state:default]"}
 Number dust_living_p_2_5 "Dust living P2.5 [%.0f ppd]" <smoke>           {mqtt="<[mosquitto:iot/openhab/dustsensor_p_2_5_wemos-living-air_pms5003:state:default]"}
-Number powermonitor_voltage_o3 "O3 [%.3f V]" <smoke>                     {mqtt="<[mosquitto:iot/openhab/powermonitor_voltage_wemos-living-air:state:default]"}
+Number powermonitor_voltage_o3 "O3 [%.3f V]" <smoke>                     {mqtt="<[mosquitto:iot/openhab/powermonitor_voltage_living ozone:state:default]"}
 
 Number dust_etaj_pm1 "Dust etaj PM1 [%.0f ug/m3]" <smoke>        {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_1_wemos-bedroom-air_pms5003:state:default]"}
 Number dust_etaj_pm2_5 "Dust etaj PM2.5 [%.0f ug/m3]" <smoke>    {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_2_5_wemos-bedroom-air_pms5003:state:default]"}
