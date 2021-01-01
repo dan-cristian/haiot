@@ -3,8 +3,6 @@ from pydispatch import dispatcher
 from main.logger_helper import L
 from common import Constant
 from main import sqlitedb
-if sqlitedb:
-    from storage.sqalc import models
 from gpio import io_common
 from storage.model import m
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
@@ -184,12 +182,8 @@ def post_init_alarm_value(gpio_pin_code):
 def post_init():
     if P.initialised:
         L.l.info('Running post_init rpi_gpio')
-        if sqlitedb:
-            relays = models.ZoneCustomRelay.query.filter_by(
-                gpio_host_name=Constant.HOST_NAME, relay_type=Constant.GPIO_PIN_TYPE_PI_STDGPIO).all()
-        else:
-            relays = m.ZoneCustomRelay.find({m.ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME,
-                                            m.ZoneCustomRelay.relay_type: Constant.GPIO_PIN_TYPE_PI_STDGPIO})
+        relays = m.ZoneCustomRelay.find({m.ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME,
+                                         m.ZoneCustomRelay.relay_type: Constant.GPIO_PIN_TYPE_PI_STDGPIO})
         for relay in relays:
             L.l.info('Reading gpio pin {}'.format(relay.gpio_pin_code))
             if len(relay.gpio_pin_code) <= 2:  # run this only for gpio bcm pins (piface has longer size)
