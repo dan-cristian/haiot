@@ -180,6 +180,21 @@ def parse_text(text, start_key, end_key, end_first=False):
     return None
 
 
+def parse_text_ex(text, start_key, end_key):
+    try:
+        start = text.find(start_key)
+        if start != -1:
+            end = text.find(end_key, start)
+            if end != -1:
+                val_start = start + len(start_key)
+                value_str = text[val_start:end]
+                return value_str
+    except Exception as ex:
+        L.l.error('Unable to parse text {}, err={}'.format(text, ex))
+    return None
+
+
+
 def get_url_content(url, timeout=None):
     if timeout is None:
         return str(urllib.request.urlopen(url).read())
