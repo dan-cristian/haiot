@@ -441,3 +441,12 @@ class Ups(ModelBase):
     test_in_progress = False
     other_status = ''
     updated_on = datetime.now()
+
+
+class Ventilation(ModelBase):
+    """key=id"""
+    id = 0
+    name = ''
+    mode = 0
+    power_level = 0
+    updated_on = datetime.now()
