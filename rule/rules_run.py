@@ -116,6 +116,17 @@ def rule_alarm(obj=m.ZoneAlarm(), change=None):
     return 'zone alarm ok'
 
 
+def rule_dust_extreme(obj=m.DustSensor(), change=None):
+    if hasattr(obj, 'pm_2_5') and obj.pm_2_5 is not None:
+        if obj.address == "vent-air-w_pms5003":
+            vent = m.Ventilation.find_one({m.Ventilation.id: 0})
+            if obj.pm_2_5 > 40:
+                vent.mode = 4
+            else:
+                vent.mode = 2
+            vent.save_changed_fields()
+
+
 # min & max temperatures
 def rule_sensor_temp_target(obj=m.Sensor(), change=None):
     if not change:
@@ -139,17 +150,9 @@ class TempStore:
 # catch sudden changes or extremes (fire or cold)
 def rule_sensor_temp_extreme(obj=m.Sensor(), change=None):
     if hasattr(obj, 'temperature') and obj.temperature is not None:
-        if sqlitedb:
-            # m = ZoneSensor()
-            zonesensor = m().query_filter_first(m.sensor_name == obj.sensor_name)
-        else:
-            zonesensor = m.ZoneSensor.find_one({m.ZoneSensor.sensor_name: obj.sensor_name})
+        zonesensor = m.ZoneSensor.find_one({m.ZoneSensor.sensor_name: obj.sensor_name})
         if zonesensor is not None and zonesensor.target_material is not None:
-            if sqlitedb:
-                # m = m.Zone
-                zone = m().query_filter_first(m.id == zonesensor.zone_id)
-            else:
-                zone = m.Zone.find_one({m.Zone.id: zonesensor.zone_id})
+            zone = m.Zone.find_one({m.Zone.id: zonesensor.zone_id})
             if zone is not None:
                 max = min = None
                 if zone.is_indoor:
