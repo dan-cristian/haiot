@@ -67,6 +67,7 @@
     {"name": "SOLAR_APS_LOCAL_URL", "value": "http://192.168.0.10/cgi-bin/home", "description":"link to aps ecu page with day production"},
     {"name": "SOLAR_APS_LOCAL_REALTIME_URL", "value": "http://192.168.0.10/cgi-bin/parameters", "description":"link to aps ecu page with realtime production"},
     {"name": "SOLAR_UTILITY_NAME", "value": "solar_aps", "description":"utility name from utility table"},
+    {"name": "ATREA_LOCAL_URL", "value": "http://192.168.0.70", "description":"link to atrea ventilation system web server"},
     {"name": "NEXTCLOUD_PHONETRACK_URL", "value": "https://192.168.0.9/index.php/apps/phonetrack/logGet/<token>/<name>?lat=<lat>&lon=<lon>&alt=<alt>&acc=<acc>&bat=<bat>&sat=<sat>&speed=<speed>&bearing=<bearing>&timestamp=<time>"}
   ],
   "Module": [
@@ -101,6 +102,7 @@
     {"id":67, "active":false, "start_order":67, "name":"alarm", "host_name":""},
     {"id":70, "active":false, "start_order":70, "name":"music", "host_name":""},
     {"id":73, "active":false, "start_order":73, "name":"apps.air_sensor_upload", "host_name":""},
+    {"id":75, "active":false, "start_order":75, "name":"devices.vent_atrea", "host_name":""},
     {"id":90, "active":false, "start_order":90, "name":"apps.dashcam", "host_name":""},
     {"id":99, "active":false, "start_order":99, "name":"main.cron", "host_name":""},
     {"id":101, "active":false, "start_order":101, "name":"webui.chart", "host_name":""},
@@ -145,6 +147,7 @@
     {"id":565, "active":true, "start_order":65, "name":"gpio", "host_name":"netbook"},
     {"id":567, "active":true, "start_order":67, "name":"alarm", "host_name":"netbook"},
     {"id":570, "active":true, "start_order":70, "name":"music", "host_name":"netbook"},
+    {"id":575, "active":true, "start_order":75, "name":"devices.vent_atrea", "host_name":"netbook"},
     {"id":520, "active":true, "start_order":20, "name":"test", "host_name":"netbook"},
     {"id":573, "active":true, "start_order":73, "name":"apps.air_sensor_upload", "host_name":"netbook"},
 
@@ -185,6 +188,7 @@
     {"id":867, "active":true, "start_order":67, "name":"alarm", "host_name":"homew"},
     {"id":870, "active":true, "start_order":70, "name":"music", "host_name":"homew"},
     {"id":873, "active":true, "start_order":73, "name":"apps.air_sensor_upload", "host_name":"homew"},
+    {"id":875, "active":true, "start_order":75, "name":"devices.vent_atrea", "host_name":"homew"},
 
 
     {"id":903, "active":true, "start_order":3, "name":"health_monitor", "host_name":"pizero1"},
@@ -581,6 +585,10 @@
 
   "IOSensor": [
     {"sensor_name": "water main", "zone_id":7 , "io_code":"0:in:5", "host_name": "pi-power", "sensor_type": "contact-no", "purpose": "utility", "relay_type": "piface"}
+  ],
+
+  "Ventilation": [
+    {"id":  0, "name":  "Atrea Duplex"}
   ],
 
   "Pwm": [
