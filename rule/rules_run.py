@@ -120,7 +120,7 @@ def rule_dust_extreme(obj=m.DustSensor(), change=None):
     if hasattr(obj, 'pm_2_5') and obj.pm_2_5 is not None:
         if obj.address == "vent-air-w_pms5003":
             vent = m.Ventilation.find_one({m.Ventilation.id: 0})
-            if obj.pm_2_5 > 40:
+            if obj.pm_2_5 > 60:
                 vent.mode = 4
             else:
                 vent.mode = 2
