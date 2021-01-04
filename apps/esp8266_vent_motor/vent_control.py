@@ -63,7 +63,10 @@ def open_full_vent(direction):
 
 
 def vent_move(angle):
-    direction = int(angle >= 0)  # 1 or 0
+    if angle > 0:
+        direction = 1
+    else:
+        direction = -1
     P.motor.angle(abs(angle), direction)
     print("Vent moved angle {} direction {}".format(angle, direction))
 

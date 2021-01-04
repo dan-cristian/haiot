@@ -3,9 +3,6 @@ import socket
 import time
 import binascii
 from main import sqlitedb
-if sqlitedb:
-    from storage.sqalc.model_helper import commit
-    from storage.sqalc import models
 from main.logger_helper import L
 from pydispatch import dispatcher
 from storage.model import m
