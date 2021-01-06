@@ -39,6 +39,7 @@ def auth():
     key = utils.parse_http(server_url, P.auth_resp_start, P.auth_resp_end)
     if key is not None and len(key) == 5:
         P.auth_key = key
+        L.l.info("Got Atrea auth key: {}".format(key))
     else:
         L.l.warning("Unable to get Atrea auth key, response was:{}".format(key))
 
@@ -49,13 +50,19 @@ def keep_alive():
     if P.auth_key is not None:
         server_url = get_json_param(Constant.P_ATREA_LOCAL_URL) + P.state_url
         state_text = utils.get_url_content(server_url.replace("<key>", P.auth_key))
-        mode = int(utils.parse_text_ex(state_text, P.mode_resp_start, P.mode_resp_end))
-        power_level = int(utils.parse_text_ex(state_text, P.power_level_resp_start, P.power_level_resp_end))
-        rec = m.Ventilation.find_one({m.Ventilation.id: 0})
-        rec.mode = mode
-        rec.power_level = power_level
-        rec.save_changed_fields(listeners=False)
-        L.l.info("Atrea mode={}-{} power={}".format(mode, P.mode_values[mode], power_level))
+        if "HTTP: 403 Forbidden AUTH" in state_text:
+            auth()
+        else:
+            try:
+                mode = int(utils.parse_text_ex(state_text, P.mode_resp_start, P.mode_resp_end))
+                power_level = int(utils.parse_text_ex(state_text, P.power_level_resp_start, P.power_level_resp_end))
+                rec = m.Ventilation.find_one({m.Ventilation.id: 0})
+                rec.mode = mode
+                rec.power_level = power_level
+                rec.save_changed_fields(listeners=False)
+                L.l.info("Atrea mode={}-{} power={}".format(mode, P.mode_values[mode], power_level))
+            except Exception as ex:
+                L.l.warning("Unexpected Atrea state response: {}".format(state_text))
     else:
         L.l.warning("Unable to get auth key")
 
