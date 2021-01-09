@@ -1,0 +1,22 @@
+https://github.com/arendst/Tasmota/issues/7770
+https://github.com/arendst/Tasmota/issues/10459
+
+Original:
+RTS Threshold 2347
+Beacon Interval 100
+
+changed to:
+2000
+50
+
+but best to set to static ip:
+
+IPAddress1 = set device IP address
+0.0.0.0 = use dynamic IP address (DHCP)
+XXX.XXX.XXX.XXX = set static IP address
+IPAddress2 = set gateway IP address
+IPAddress3 = set subnet mask
+IPAddress4 = set DNS server IP address
+
+ipaddress1 192.168.0.54
+backlog ipaddress2 192.168.0.1; ipaddress3 255.255.255.0; ipaddress4 192.168.0.1
