@@ -54,6 +54,18 @@ Number air_pressure_bme_tudor "Pressure tudor [%.0f hPa]" <pressure>  {mqtt="<[m
 Number air_humidity_bme_tudor "Humidity tudor [%.0f %%]" <humidity>  {mqtt="<[mosquitto:iot/openhab/airsensor_humidity_tudor-air-w_bme680:state:default]"}
 Number air_co2_tudor "CO2 tudor [%.0f ppm]" <smoke>             {mqtt="<[mosquitto:iot/openhab/airsensor_co2_tudor-air-w_mhz19b:state:default]"}
 
+Number dust_ventout_pm1 "Dust ventout PM1 [%.0f ug/m3]" <smoke>       {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_1_ventout-air-w_pms5003:state:default]"}
+Number dust_ventout_pm2_5 "Dust ventout PM2.5 [%.0f ug/m3]" <smoke>   {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_2_5_ventout-air-w_pms5003:state:default]"}
+Number dust_ventout_pm10 "Dust ventout PM10 [%.0f ug/m3]" <smoke>     {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_10_ventout-air-w_pms5003:state:default]"}
+Number dust_ventout_p_2_5 "Dust ventout P2.5 [%.0f ppd]" <smoke>      {mqtt="<[mosquitto:iot/openhab/dustsensor_p_2_5_ventout-air-w_pms5003:state:default]"}
+Number air_gas_ventout "Gas ventout [%.2f kOhm]" <smoke>            {mqtt="<[mosquitto:iot/openhab/airsensor_gas_ventout-air-w_bme680:state:default]"}
+Number air_temperature_bme_ventout "Temp ventout [%.1f °C]" <temperature>  {mqtt="<[mosquitto:iot/openhab/airsensor_temperature_ventout-air-w_bme680:state:default]"}
+Number air_pressure_bme_ventout "Pressure ventout [%.0f hPa]" <pressure>  {mqtt="<[mosquitto:iot/openhab/airsensor_pressure_ventout-air-w_bme680:state:default]"}
+Number air_humidity_bme_ventout "Humidity ventout [%.0f %%]" <humidity>  {mqtt="<[mosquitto:iot/openhab/airsensor_humidity_ventout-air-w_bme680:state:default]"}
+Number air_co2_ventout "CO2 ventout [%.0f ppm]" <smoke>             {mqtt="<[mosquitto:iot/openhab/airsensor_co2_ventout-air-w_mhz19b:state:default]"}
+
+
+
 Number air_co2_living "CO2 living [%.0f ppm]" <smoke>             {mqtt="<[mosquitto:iot/openhab/airsensor_co2_wemos-living-air_mhz19b:state:default]"}
 
 Number air_gas_living "Gas living [%.2f kOhm]" <smoke>                       {mqtt="<[mosquitto:iot/openhab/airsensor_gas_wemos-living-air_bme680:state:default]"}
