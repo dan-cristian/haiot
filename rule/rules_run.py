@@ -13,6 +13,7 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 class P:
     last_bell = datetime.datetime.min
     has_zwave = False
+    last_vent_mode = 4
 
     def __init__(self):
         pass
@@ -120,10 +121,12 @@ def rule_dust_extreme(obj=m.DustSensor(), change=None):
     if hasattr(obj, 'pm_2_5') and obj.pm_2_5 is not None:
         if obj.address == "vent-air-w_pms5003":
             vent = m.Ventilation.find_one({m.Ventilation.id: 0})
+            if vent.mode != 4:
+                P.last_vent_mode = vent.mode
             if obj.pm_2_5 > 70:
                 vent.mode = 4
             else:
-                vent.mode = 2
+                vent.mode = P.last_vent_mode
             vent.save_changed_fields()
 
 
