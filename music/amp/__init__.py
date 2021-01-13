@@ -21,6 +21,20 @@ _AMP_ZONE2_POWER_OFF = bytes("\x0207EBB\x03", 'utf-8')
 _AMP_ZONE3_POWER_ON = bytes("\x0207AED\x03", 'utf-8')
 _AMP_ZONE3_POWER_OFF = bytes("\x0207AEE\x03", 'utf-8')
 
+_AMP_DSP_7CH_STEREO = bytes("\x0207EFF\x03", 'utf-8')
+_AMP_DSP_2CH_STEREO = bytes("\x0207EC0\x03", 'utf-8')
+
+_AMP_INPUT_CBL_SAT = bytes("\x0207AC0\x03", 'utf-8')
+_AMP_INPUT_DVR_VCR2 = bytes("\x0207A13\x03", 'utf-8')
+
+_AMP_SPEAKER_RELAY_A_ON = bytes("\x0207EAB\x03", 'utf-8')
+_AMP_SPEAKER_RELAY_A_OFF = bytes("\x0207EAC\x03", 'utf-8')
+_AMP_SPEAKER_RELAY_B_ON = bytes("\x0207EAD\x03", 'utf-8')
+_AMP_SPEAKER_RELAY_B_OFF = bytes("\x0207EAE\x03", 'utf-8')
+
+_AMP_MAIN_VOLUME_UP = bytes("\x0207A1A\x03", 'utf-8')
+_AMP_MAIN_VOLUME_DOWN = bytes("\x0207A1B\x03", 'utf-8')
+
 
 class AMP_YMH:
     BI_AMP_ON = None
