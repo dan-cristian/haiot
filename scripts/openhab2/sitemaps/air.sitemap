@@ -15,6 +15,20 @@ Frame  {
  	Default item=dust_kids_pm2_5
  	Chart item=dust_kids_pm2_5 period=D
 
+    Default item=dust_birou_pm2_5
+ 	Chart item=dust_birou_pm2_5 period=D
+
+    Default item=air_co2_living
+ 	Chart item=air_co2_living period=D
+
+ 	Default item=air_co2_kids
+ 	Chart item=air_co2_kids period=D
+
+ 	Default item=air_co2_bedroom
+ 	Chart item=air_co2_bedroom period=D
+
+    Default item=air_co2_birou
+ 	Chart item=air_co2_birou period=D
 
 }
 
