@@ -4,17 +4,23 @@
 With Haiot you can control a huge number of sensors and devices in your house (and not only), setup automation rules and visualise sensors and control the system via Web and Mobile interfaces. It integrates with Openhab via Mqtt.
 The application currently implementes the following automation scripts in my house:
 <br>- Heating control (with multiple sources: gas, solar)
+<br>- Ventilation systems (Interface with Atrea Duplex)
 <br>- Alarm sensors (PIR)
 <br>- Motion sensors (IP cameras via motion)
 <br>- Watering system
-<br>- Audio control via MPD
+<br>- Audio control via MPD (Interface with Yamaha RX-Vx700 via RS232)
 <br>- Gates opening/close control
 <br>- Electricity usage monitoring and grid export control function
 <br>- Presence monitoring (wifi, bluetooth)
 <br>- Location tracking
+<br>- Solar production tracking (APS Microinverters, Sonoff POW)
+<br>- Solar excess export divert to water heater (via ESP8266 PWM and SSR relay) 
+<br>- TV control (LG RS232)
+<br>- Air quality monitoring (PM2.5, CO2, VOC, O3 sensors)
+<br>- Dashboards and UI control with OpenHab and Grafana/Influxdb
 <br>- and many more
 
-<h2>System capabilities</h2>
+<h2>System modules</h2>
 Application is split in modules, each with a set of features. Modules can be enabled or disabled.
 
 <h3>admin (mandatory)</h3>
@@ -40,12 +46,7 @@ RFXCOM device tested is RFXtrx433.
 <h3>alarm</h3>
 
 <h3>heat</h3>
-<h3>io_bbb</h3>
-IO input capability for beaglebone, detects contact states, used as a basis for alarm system
-
-<h3>graph_plotly</h3>
-<deprecated>Automatically creates graphics online using free plot.ly service. 
-Check some samples <a  href="https://plot.ly/~dancri77">here</a>.
+Heat control
 
 <h3>relay</h3>
 Turns on and off relays
@@ -62,7 +63,7 @@ Turns on and off relays
 - Windows 8.1 64 bit
 
 <h3> Supported sensors</h3>
-Sonoff (Basic, Pow)
+ESP8266 with Tasmota: Sonoff, Wemos D1 Mini
 zWave (Qubino and other power meters)
 1wire (temperature, humidity, etc)
 
@@ -103,4 +104,4 @@ https://github.com/woudt/pyRFXtrx
 
 <p><p>
 <b>
-Many thanks to @Jetbrains for providing a full license for PyCharm Professional!
+Many thanks @Jetbrains for providing a full license for PyCharm Professional!
