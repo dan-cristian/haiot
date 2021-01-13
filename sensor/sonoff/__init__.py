@@ -161,7 +161,9 @@ def _process_message(msg):
                     if 'Gas' in v:
                         sensor.gas = v['Gas']
                     if 'CarbonDioxide' in v:
-                        sensor.co2 = v['CarbonDioxide']
+                        val = v['CarbonDioxide']
+                        if val > 0:
+                            sensor.co2 = val
                     sensor.save_changed_fields(broadcast=True, persist=True)
 
                 if k.startswith('INA219'):
