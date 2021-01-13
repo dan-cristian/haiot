@@ -36,6 +36,12 @@ Frame  {
  	Default item=air_co2_tudor
  	Chart item=air_co2_tudor period=D
 
+ 	Default item=air_co2_ventout
+ 	Chart item=air_co2_ventout period=D
+
+    Default item=air_co2_portable
+ 	Chart item=air_co2_portable period=D
+
 }
 
 }
