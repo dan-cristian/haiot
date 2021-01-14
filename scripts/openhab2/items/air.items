@@ -68,10 +68,10 @@ Number dust_portable_pm1 "Dust portable PM1 [%.0f ug/m3]" <smoke>       {mqtt="<
 Number dust_portable_pm2_5 "Dust portable PM2.5 [%.0f ug/m3]" <smoke>   {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_2_5_portable-air-w_pms5003:state:default]"}
 Number dust_portable_pm10 "Dust portable PM10 [%.0f ug/m3]" <smoke>     {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_10_portable-air-w_pms5003:state:default]"}
 Number dust_portable_p_2_5 "Dust portable P2.5 [%.0f ppd]" <smoke>      {mqtt="<[mosquitto:iot/openhab/dustsensor_p_2_5_portable-air-w_pms5003:state:default]"}
-Number air_gas_portable "Gas portable [%.2f kOhm]" <smoke>            {mqtt="<[mosquitto:iot/openhab/airsensor_gas_portable-air-w_bme680:state:default]"}
-Number air_temperature_bme_portable "Temp portable [%.1f °C]" <temperature>  {mqtt="<[mosquitto:iot/openhab/airsensor_temperature_portable-air-w_bme680:state:default]"}
-Number air_pressure_bme_portable "Pressure portable [%.0f hPa]" <pressure>  {mqtt="<[mosquitto:iot/openhab/airsensor_pressure_portable-air-w_bme680:state:default]"}
-Number air_humidity_bme_portable "Humidity portable [%.0f %%]" <humidity>  {mqtt="<[mosquitto:iot/openhab/airsensor_humidity_portable-air-w_bme680:state:default]"}
+Number air_gas_portable "Gas portable [%.2f kOhm]" <smoke>            {mqtt="<[mosquitto:iot/openhab/airsensor_gas_portable-air-w_bme280:state:default]"}
+Number air_temperature_bme_portable "Temp portable [%.1f °C]" <temperature>  {mqtt="<[mosquitto:iot/openhab/airsensor_temperature_portable-air-w_bme280:state:default]"}
+Number air_pressure_bme_portable "Pressure portable [%.0f hPa]" <pressure>  {mqtt="<[mosquitto:iot/openhab/airsensor_pressure_portable-air-w_bme280:state:default]"}
+Number air_humidity_bme_portable "Humidity portable [%.0f %%]" <humidity>  {mqtt="<[mosquitto:iot/openhab/airsensor_humidity_portable-air-w_bme280:state:default]"}
 Number air_co2_portable "CO2 portable [%.0f ppm]" <smoke>             {mqtt="<[mosquitto:iot/openhab/airsensor_co2_portable-air-w_mhz19b:state:default]"}
 
 
