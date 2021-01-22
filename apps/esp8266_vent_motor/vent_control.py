@@ -75,4 +75,5 @@ def timer_actions():
     delta = utime.time() - P.last_action
     if delta > 60:
         common.publish_state()
-        common.init_deep_sleep(sleep_sec=300)
+        P.last_action = utime.time()
+        # common.init_deep_sleep(sleep_sec=300)
