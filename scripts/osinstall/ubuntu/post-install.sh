@@ -1482,6 +1482,7 @@ if [ "$?" == "1" ]; then
     echo "FromLineOverride=YES" >> /etc/ssmtp/ssmtp.conf
     echo "mailhub=smtp.gmail.com:587" >> /etc/ssmtp/ssmtp.conf
     echo "UseSTARTTLS=YES" >> /etc/ssmtp/ssmtp.conf
+    echo "root=$EMAIL_USER" >> /etc/ssmtp/ssmtp.conf
     #echo "Now enter your password in email conf and save with CTRL+x"
     #sleep 3
     #nano /etc/ssmtp/ssmtp.conf
