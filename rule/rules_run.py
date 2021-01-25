@@ -123,7 +123,7 @@ def rule_dust_extreme(obj=m.DustSensor(), change=None):
             vent = m.Ventilation.find_one({m.Ventilation.id: 0})
             if vent.mode != 0:
                 P.last_vent_mode = vent.mode
-            if obj.pm_2_5 > 70:
+            if obj.pm_2_5 > 50:
                 vent.mode = 0
             else:
                 vent.mode = P.last_vent_mode
