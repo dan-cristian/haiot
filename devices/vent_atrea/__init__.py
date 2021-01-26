@@ -85,7 +85,7 @@ def set_power_level(level):
 
 
 def ventilation_upsert_listener(record, changed_fields):
-    L.l.info("RECEIVED ATREA {}".format(record))
+    L.l.info("RECEIVED ATREA {} changed={}".format(record, changed_fields))
     assert isinstance(record, m.Ventilation)
     if record.mode is not None:
         set_mode(record.mode)
