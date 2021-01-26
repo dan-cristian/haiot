@@ -33,4 +33,5 @@ echo2 "Event: Ending record movie=$1 event=$2 path="`pwd`
 #echo2 Mixing sound with video
 #todo
 #$DIR/upload-amazondrive.sh $1 $2 >> $LOG 2>&1
-$DIR/upload-private-cloud.sh $1 $2
+
+# $DIR/upload-private-cloud.sh $1 $2
