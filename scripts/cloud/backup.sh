@@ -12,7 +12,7 @@ sleep 5
 rdiff-backup --print-statistics /mnt/data/hdd-wdr-vsfn/photos $BACKUP_DIFF_DIR/photos.backup
 rdiff-backup --print-statistics /mnt/data/hdd-wdr-vsfn/private $BACKUP_DIFF_DIR/private.backup
 rdiff-backup --print-statistics /mnt/data/hdd-wdr-vsfn/ebooks $BACKUP_DIFF_DIR/ebooks.backup
-rdiff-backup --print-statistics /mnt/data/hdd-wdr-evhk/videos $BACKUP_DIFF_DIR/videos.backup
+rdiff-backup --print-statistics /mnt/data/hdd-wdr-vsfn/videos $BACKUP_DIFF_DIR/videos.backup
 
 echo Backing up system to $FILE_BACKUP
 sleep 5
