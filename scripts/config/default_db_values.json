@@ -134,6 +134,7 @@
     {"id":501, "active":false, "start_order":50, "name":"apps.dashcam", "host_name":"netbook"},
     {"id":503, "active":true, "start_order":3, "name":"health_monitor", "host_name":"netbook"},
     {"id":509, "active":true, "start_order":9, "name":"heat", "host_name":"netbook"},
+    {"id":519, "active":true, "start_order":19, "name":"cloud.ddns", "host_name":"netbook"},
     {"id":525, "active":true, "start_order":25, "name":"rule", "host_name":"netbook"},
     {"id":526, "active":true, "start_order":26, "name":"rule.electricity", "host_name":"netbook"},
     {"id":527, "active":true, "start_order":27, "name":"node", "host_name":"netbook"},
@@ -172,7 +173,7 @@
     {"id":757, "active":true, "start_order":57, "name":"sensor.sonoff", "host_name":"EN610668"},
 
     {"id":809, "active":true, "start_order":9, "name":"heat", "host_name":"homew"},
-    {"id":819, "active":true, "start_order":19, "name":"ddns", "host_name":"homew"},
+    {"id":819, "active":true, "start_order":19, "name":"cloud.ddns", "host_name":"homew"},
     {"id":825, "active":true, "start_order":25, "name":"rule", "host_name":"homew"},
     {"id":826, "active":true, "start_order":26, "name":"rule.electricity", "host_name":"homew"},
     {"id":833, "active":true, "start_order":33, "name":"utility", "host_name":"homew"},
