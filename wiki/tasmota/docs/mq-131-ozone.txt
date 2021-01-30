@@ -1,7 +1,0 @@
-To measure the air quality (e.g. pollution), it's better to use the low concentration MQ131
-because the high concentration is not accurate enough for low concentration.
-
-https://www.ozonesolutions.com/knowledge-center/osha-and-ozone.html
-
-https://github.com/ostaquet/Arduino-MQ131-driver
-https://github.com/ostaquet/Arduino-MQ131-driver/blob/master/extras/datasheet/MQ131-high-concentration.pdf

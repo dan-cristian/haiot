@@ -1,9 +1,0 @@
-Sensor15 5000
-
-#https://tasmota.github.io/docs/Commands/#sensor15
-
-# https://github.com/arendst/Tasmota/issues/3860
-# https://github.com/arendst/Tasmota/issues/5073
-
-
-# https://iotfactory.eu/the-importance-of-indoor-air-quality-iaq-for-business-performance-and-wellbeing/

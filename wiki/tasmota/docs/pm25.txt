@@ -1,9 +1,0 @@
-#RX GPIO3 - PMS5003
-#D7 GPIO13 - Relay1
-Rule1 on Time#Minute|10 do backlog power1 on; status10 endon
-Rule1 on
-pulsetime1 140
-TelePeriod 15
-
-#MQTT
-iot/sonoff/%prefix%/%topic%/

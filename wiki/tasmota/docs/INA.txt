@@ -1,6 +1,0 @@
-VoltRes 3
-wattres 3
-Sensor13 2
-
-TelePeriod 0 or 60
-

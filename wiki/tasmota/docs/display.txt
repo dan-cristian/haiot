@@ -1,9 +1,0 @@
-https://www.optimusdigital.ro/ro/optoelectronice-lcd-uri/1310-modul-oled-albastru-de-091-128x32-px.html?search_query=Modul+OLED+Albastru+de+0.91%27%27+%28128x32+px%29&results=1
-
-3.3V (or 5V), D2 (SCL), D4 (SDA)
-
-{"Display":{"Model":2,"Mode":4,"Dimmer":2,"Size":2,"Font":1,"Rotate":0,"Refresh":2,"Cols":[10,8],"Rows":4}}
-{"DisplayAddress1":60}
-{"I2CScan":"Device(s) found at 0x3c"}
-displaysize 2
-displayrows 4
