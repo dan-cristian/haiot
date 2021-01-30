@@ -239,7 +239,8 @@ def _save_status(zone, status_json, song):
             rec.album = _normalise(song['album'])
         if rec.title and rec.artist:
             rec.song = "{} - {}".format(rec.artist, rec.title)
-    rec.volume = int(status_json['volume'])
+        if 'volume' in status_json:
+            rec.volume = int(status_json['volume'])
     if 'elapsed' in status_json and 'time' in song:
         rec.position = int(100 * (float(status_json['elapsed']) / float(song['time'])))
     rec.save_changed_fields(broadcast=True)
