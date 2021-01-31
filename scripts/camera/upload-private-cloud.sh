@@ -1,29 +1,11 @@
 #!/bin/bash
-source /home/haiot/PYC/.credentials/.general.credentials
+source /home/haiot/private_config/.credentials/.general.credentials
 LOG=/mnt/log/motion.log
-CLOUD_DIR=/mnt/sdd1/motion/
 SRC_DIR=/mnt/motion/tmp/
 OLD_COUNT=1000
-MOTION_URL=http://localhost:9999
-
-#1=thread, 2=param, 3=value
-function check_param(){
-  #echo "Testing $1 $2 $3"
-  wget_out="`wget -qO- $MOTION_URL/$1/config/get?query=$2`"
-  #echo "Got $wget_out"
-  if [[ $wget_out == *"$2 = $3"* ]]
-  then
-    #echo FOUND
-    return 0
-  fi
-return 1
-}
 
 function echo2(){
 echo [`date +%T.%N`] $1 $2 $3 $4 $5 >> $LOG 2>&1
-if [ $be_quiet == "0" ]; then
-	echo [`date +%T.%N`] $1 $2 $3 $4 $5
-fi
 }
 
 #upload to cloud
@@ -34,7 +16,7 @@ if [ $# -ne 0 ]; then
   src_parent=`dirname "$source"`
   replace=''
   #replace root
-  dest="${source/$SRC_DIR/$CLOUD_DIR}"
+  dest="${source/$SRC_DIR/$BACKUP_PATH}"
   dest_parent=`dirname "$dest"`
   #mkdir -p $dest_parent >> $LOG 2>&1
   echo2 "Uploading $source to $dest"
@@ -43,10 +25,10 @@ if [ $# -ne 0 ]; then
   #/usr/sbin/rclone copy $source $dest_parent >> $LOG 2>&1
   echo2 "Creating remote parent folder $dest_parent"
   #echo2 ssh -T -p ${HAIOT_SSH_PORT} -c ${HAIOT_SSH_CIPHER} -o Compression=no ${HAIOT_SSH_SERVER} "mkdir -p $dest_parent"
-  ssh -T -p ${HAIOT_SSH_PORT} -c ${HAIOT_SSH_CIPHER} -o Compression=no ${HAIOT_SSH_SERVER} "mkdir -p $dest_parent" >> $LOG 2>&1
+  ssh -T -p ${BACKUP_SSH_PORT} -c ${BACKUP_SSH_CIPHER} -o Compression=no ${BACKUP_SSH_SERVER} "mkdir -p $dest_parent" >> $LOG 2>&1
   echo2 "Now uploading"
   #echo2 rsync -avPe 'ssh -T -p '${HAIOT_SSH_PORT}' -c '${HAIOT_SSH_CIPHER}' -o Compression=no -x' ${source} ${HAIOT_SSH_SERVER}:${dest_parent}/
-  rsync -avPe 'ssh -T -p '${HAIOT_SSH_PORT}' -c '${HAIOT_SSH_CIPHER}' -o Compression=no -x' ${source} ${HAIOT_SSH_SERVER}:${dest_parent}/ >> $LOG 2>&1
+  rsync -avPe 'ssh -T -p '${BACKUP_SSH_PORT}' -c '${BACKUP_SSH_CIPHER}' -o Compression=no -x' ${source} ${BACKUP_SSH_SERVER}:${dest_parent}/ >> $LOG 2>&1
 
   #cp -f $source $dest >> $LOG 2>&1
   result=$?
@@ -108,48 +90,6 @@ echo2 "Move OK for $source"
 return 0
 }
 
-
-function tune(){
-#tune quality depending on day time
-h=`date +%H`
-if [ $h -lt 6 ]; then
-  #echo Night
-  LAPSE=2
-  BITRATE_OUTDOOR=20
-elif [ $h -lt 21 ]; then
-  #echo Day
-  LAPSE=1
-  BITRATE_OUTDOOR=15
-else
-  #echo Evening Night
-  LAPSE=2
-  BITRATE_OUTDOOR=20
-fi
-OUTDOOR_LIST=(pod-fata back front)
-for thread in 1 2 3 4 5 6 7
-do
-  for cam in "${OUTDOOR_LIST[@]}"
-  do
-    #echo "Check for camera $cam in thread $thread"
-    check_param $thread "text_event" $cam
-    res=$?
-    if [ "$res" == "0" ]; then
-      	check_param $thread "ffmpeg_variable_bitrate" $BITRATE_OUTDOOR
-	res=$?
-	if [ "$res" == "1" ]; then
-		echo2 "Setting values for outdoor $cam thread=$thread bitrate=$BITRATE_OUTDOOR"
-      		wget -q -O /dev/null $MOTION_URL/$thread/config/set?ffmpeg_variable_bitrate=$BITRATE_OUTDOOR
-	fi
-	check_param $thread "ffmpeg_timelapse" $LAPSE
-	res=$?
-	if [ "$res" == "1" ]; then
-      		echo2 "Setting values for outdoor $cam thread=$thread lapse=$LAPSE"
-      		wget -q -O /dev/null $MOTION_URL/$thread/config/set?ffmpeg_timelapse=$LAPSE
-	fi
-    fi
-  done
-done
-}
 
 #move older files that failed to be uploaded
 function move_failed(){
