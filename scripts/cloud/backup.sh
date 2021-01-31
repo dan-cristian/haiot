@@ -2,7 +2,7 @@
 
 DATE=`date +%Y%m%d-%H%M%S`
 HOST=`cat /etc/hostname`
-BACKUP_DIR=/mnt/backup
+BACKUP_DIR=/mnt/backup/system
 BACKUP_DIFF_DIR=/mnt/backup_rdiff
 FILE_BACKUP=$BACKUP_DIR/$HOST-Backup$DATE.tar.gz
 
@@ -18,5 +18,5 @@ rdiff-backup --print-statistics /mnt/data/hdd-wdr-vsfn/db $BACKUP_DIFF_DIR/db.ba
 echo Backing up system to $FILE_BACKUP
 sleep 5
 
-# tar -pczfv $FILE_BACKUP /  --exclude-from=/home/scripts/cloud/backup-exclude.txt
-# chmod 666 $FILE_BACKUP
+tar -pczfv $FILE_BACKUP /  --exclude-from=/home/scripts/cloud/backup-exclude.txt
+chmod 666 $FILE_BACKUP
