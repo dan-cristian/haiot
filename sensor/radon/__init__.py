@@ -54,7 +54,7 @@ def GetRadonValue():
         print("Writing...")
     uuidWrite = btle.UUID("00001524-1212-efde-1523-785feabcd123")
     RadonEyeWrite = RadonEyeService.getCharacteristics(uuidWrite)[0]
-    RadonEyeWrite.write(bytes("\x50"), encoding='utf8')
+    RadonEyeWrite.write(bytes("\x50", encoding='utf8'))
 
     # Read from 3rd to 6th byte of 00001525-1212-efde-1523-785feabcd123
     if args.verbose and not args.silent:
