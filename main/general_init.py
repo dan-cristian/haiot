@@ -97,11 +97,13 @@ def init_modules(init_mod=None):
                 if mod_host_specific is not None:
                     mod_name = mod_host_specific.name
                     mod_active = mod_host_specific.active
-                    L.l.info("Found specific module init for {}, active={}".format(mod_name, mod_active))
+                    L.l.info("Found specific {} module init for {}, active={}".format(
+                        Constant.HOST_NAME, mod_name, mod_active))
                 else:
                     mod_name = mod.name
                     mod_active = mod.active
-                    L.l.info("No specific module init found for {}, active={}".format(mod_name, mod_active))
+                    L.l.info("No specific {} module init found for {}, active={}".format(
+                        Constant.HOST_NAME, mod_name, mod_active))
                 if init_mod is True:
                     init_module(mod_name, mod_active)
                 elif init_mod is False and mod_active is True:
