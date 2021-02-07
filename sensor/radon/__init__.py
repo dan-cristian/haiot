@@ -25,7 +25,7 @@ from storage.model import m
 
 class P:
     initialised = False
-    radoneye_mac = None
+    radoneye_id = 0  # Airsensor record id
 
     def __init__(self):
         pass
@@ -33,42 +33,40 @@ class P:
 
 def GetRadonValue():
     try:
-        DevBT = btle.Peripheral(P.radoneye_mac, "random")
-        RadonEye = btle.UUID("00001523-1212-efde-1523-785feabcd123")
-        RadonEyeService = DevBT.getServiceByUUID(RadonEye)
+        sensor = m.AirSensor.find_one({m.AirSensor.id: P.radoneye_id})
+        if sensor is not None:
+            DevBT = btle.Peripheral(sensor.address, "random")
+            RadonEye = btle.UUID("00001523-1212-efde-1523-785feabcd123")
+            RadonEyeService = DevBT.getServiceByUUID(RadonEye)
 
-        # Write 0x50 to 00001524-1212-efde-1523-785feabcd123
-        uuidWrite = btle.UUID("00001524-1212-efde-1523-785feabcd123")
-        RadonEyeWrite = RadonEyeService.getCharacteristics(uuidWrite)[0]
-        RadonEyeWrite.write(bytes("\x50", encoding='utf8'))
+            # Write 0x50 to 00001524-1212-efde-1523-785feabcd123
+            uuidWrite = btle.UUID("00001524-1212-efde-1523-785feabcd123")
+            RadonEyeWrite = RadonEyeService.getCharacteristics(uuidWrite)[0]
+            RadonEyeWrite.write(bytes("\x50", encoding='utf8'))
 
-        # Read from 3rd to 6th byte of 00001525-1212-efde-1523-785feabcd123
-        uuidRead = btle.UUID("00001525-1212-efde-1523-785feabcd123")
-        RadonEyeValue = RadonEyeService.getCharacteristics(uuidRead)[0]
-        RadonValue = RadonEyeValue.read()
-        RadonValue = struct.unpack('<f', RadonValue[2:6])[0]
+            # Read from 3rd to 6th byte of 00001525-1212-efde-1523-785feabcd123
+            uuidRead = btle.UUID("00001525-1212-efde-1523-785feabcd123")
+            RadonEyeValue = RadonEyeService.getCharacteristics(uuidRead)[0]
+            RadonValue = RadonEyeValue.read()
+            RadonValue = struct.unpack('<f', RadonValue[2:6])[0]
 
-        DevBT.disconnect()
+            DevBT.disconnect()
 
-        # Raise exception (will try get Radon value from RadonEye again) if received a very
-        # high radon value or lower than 0.
-        # Maybe a bug on RD200 or Python BLE Lib?!
-        if (RadonValue > 1000) or (RadonValue < 0):
-            raise Exception("Very strange radon value. Debugging needed.")
-
-        #if args.becquerel:
-        Unit = "Bq/m3"
-        RadonValue = (RadonValue * 37)
-        #else:
-        #    Unit = "pCi/L"
-
-        sensor = m.AirSensor.find_one({m.AirSensor.address: P.radoneye_mac})
-        if sensor is None:
-            sensor = m.AirSensor()
-            sensor.address = P.radoneye_mac
-        sensor.radon = RadonValue
-        sensor.save_changed_fields(broadcast=True, persist=True)
-        L.l.info("Read radoneye {} value {} {}".format(P.radoneye_mac, RadonValue, Unit))
+            # Raise exception (will try get Radon value from RadonEye again) if received a very
+            # high radon value or lower than 0.
+            # Maybe a bug on RD200 or Python BLE Lib?!
+            if (RadonValue > 1000) or (RadonValue < 0):
+                raise Exception("Very strange radon value. Debugging needed.")
+            #if args.becquerel:
+            Unit = "Bq/m3"
+            RadonValue = (RadonValue * 37)
+            #else:
+            #    Unit = "pCi/L"
+            sensor.radon = RadonValue
+            sensor.save_changed_fields(broadcast=True, persist=True)
+            L.l.info("Read radoneye {} value {} {}".format(sensor.address, RadonValue, Unit))
+        else:
+            L.l.erro("Cannot find radoneye record with id={} in config".format(P.radoneye_id))
     except Exception as ex:
         L.l.warning("Exception reading radon value {}".format(ex))
 
