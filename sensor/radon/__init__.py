@@ -11,7 +11,7 @@ __email__ = "candrecn at hotmail dot com"
 __date__ = "2019-10-20"
 
 import argparse, struct, time, re, json
-import paho.mqtt.client as mqtt
+# import paho.mqtt.client as mqtt
 
 from bluepy import btle
 from time import sleep
@@ -84,7 +84,7 @@ def GetRadonValue():
         print(
             "%s - %s - Radon Value: %0.2f %s" % (time.strftime("%Y-%m-%d [%H:%M:%S]"), args.address, RadonValue, Unit))
 
-    if args.mqtt:
+    if False:  # args.mqtt:
         if args.verbose and not args.silent:
             print("Sending to MQTT...")
             if args.mqtt_ha:
