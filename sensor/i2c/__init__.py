@@ -3,8 +3,6 @@ import prctl
 from common import Constant
 from main.logger_helper import L
 from main import sqlitedb
-if sqlitedb:
-    from main.admin import models
 from main import thread_pool
 from storage.model import m
 

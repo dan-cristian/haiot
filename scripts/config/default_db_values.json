@@ -99,7 +99,7 @@
     {"id":57, "active":false, "start_order":57, "name":"sensor.sonoff", "host_name":""},
     {"id":58, "active":false, "start_order":58, "name":"sensor.radon", "host_name":""},
     {"id":59, "active":false, "start_order":59, "name":"sensor.i2c", "host_name":""},
-    {"id":65,  "active":false, "start_order":65, "name":"gpio", "host_name":""},
+    {"id":65, "active":false, "start_order":65, "name":"gpio", "host_name":""},
     {"id":67, "active":false, "start_order":67, "name":"alarm", "host_name":""},
     {"id":70, "active":false, "start_order":70, "name":"music", "host_name":""},
     {"id":73, "active":false, "start_order":73, "name":"apps.air_sensor_upload", "host_name":""},

@@ -5,8 +5,6 @@ from datetime import datetime
 from main.logger_helper import L
 from common import Constant, variable
 from main import thread_pool, sqlitedb
-if sqlitedb:
-    from main.admin import models
 import time
 import six
 from pydispatch import dispatcher as haiot_dispatch

@@ -2,8 +2,6 @@ import unicodedata
 from main.logger_helper import L
 from common import Constant, get_json_param
 from main import sqlitedb
-if sqlitedb:
-    from main.admin import models
 from cloud import lastfm
 from storage.model import m
 
