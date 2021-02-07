@@ -1,5 +1,8 @@
 sitemap air label="Air" {
 Frame  {
+    Default item=air_radon
+    Chart item=air_radon period=D
+
     Default item=dust_curte_pm2_5
  	Chart item=dust_curte_pm2_5 period=D
 

@@ -390,6 +390,9 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
                 echo "Unexpected error on building dependencies. Ignoring!"
             fi
         fi
+        echo "Provide access to haiot user to bluetooth - see comment below"
+        # https://www.raspberrypi.org/forums/viewtopic.php?t=108581
+        sleep 10
     fi
 
     pip -V > /dev/null 2>&1

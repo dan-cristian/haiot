@@ -97,6 +97,7 @@
     {"id":53, "active":false, "start_order":53, "name":"sensor.zwave", "host_name":""},
     {"id":55, "active":false, "start_order":55, "name":"sensor.1wire", "host_name":""},
     {"id":57, "active":false, "start_order":57, "name":"sensor.sonoff", "host_name":""},
+    {"id":58, "active":false, "start_order":58, "name":"sensor.radon", "host_name":""},
     {"id":59, "active":false, "start_order":59, "name":"sensor.i2c", "host_name":""},
     {"id":65,  "active":false, "start_order":65, "name":"gpio", "host_name":""},
     {"id":67, "active":false, "start_order":67, "name":"alarm", "host_name":""},
@@ -144,6 +145,7 @@
     {"id":546, "active":true, "start_order":46, "name":"cloud.owntracks", "host_name":"netbook"},
     {"id":551, "active":true, "start_order":51, "name":"sensor.solar_aps", "host_name":"netbook"},
     {"id":557, "active":true, "start_order":57, "name":"sensor.sonoff", "host_name":"netbook"},
+    {"id":858, "active":true, "start_order":58, "name":"sensor.radon", "host_name":"netbook"},
     {"id":559, "active":false, "start_order":59, "name":"sensor.i2c", "host_name":"netbook"},
     {"id":565, "active":true, "start_order":65, "name":"gpio", "host_name":"netbook"},
     {"id":567, "active":true, "start_order":67, "name":"alarm", "host_name":"netbook"},
@@ -184,6 +186,7 @@
     {"id":853, "active":true, "start_order":53, "name":"sensor.zwave", "host_name":"homew"},
     {"id":855, "active":true, "start_order":55, "name":"sensor.1wire", "host_name":"homew"},
     {"id":857, "active":true, "start_order":57, "name":"sensor.sonoff", "host_name":"homew"},
+    {"id":858, "active":true, "start_order":58, "name":"sensor.radon", "host_name":"homew"},
     {"id":859, "active":true, "start_order":59, "name":"sensor.i2c", "host_name":"homew"},
     {"id":865, "active":true, "start_order":65, "name":"gpio", "host_name":"homew"},
     {"id":867, "active":true, "start_order":67, "name":"alarm", "host_name":"homew"},
@@ -590,6 +593,10 @@
 
   "Ventilation": [
     {"id":  0, "name":  "Atrea Duplex"}
+  ],
+
+  "AirSensor": [
+    {"id":  0, "address": "D6:DE:FC:37:8E:F6"}
   ],
 
   "Pwm": [

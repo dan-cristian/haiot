@@ -74,7 +74,7 @@ Number air_pressure_bme_portable "Pressure portable [%.0f hPa]" <pressure>  {mqt
 Number air_humidity_bme_portable "Humidity portable [%.0f %%]" <humidity>  {mqtt="<[mosquitto:iot/openhab/airsensor_humidity_portable-air-w_bme280:state:default]"}
 Number air_co2_portable "CO2 portable [%.0f ppm]" <smoke>             {mqtt="<[mosquitto:iot/openhab/airsensor_co2_portable-air-w_mhz19b:state:default]"}
 
-
+Number air_radon "Radon [%.0f bq/m3]" <smoke>             {mqtt="<[mosquitto:iot/openhab/airsensor_radon_D6_DE_FC_37_8E_F6:state:default]"}
 Number air_co2_living "CO2 living [%.0f ppm]" <smoke>             {mqtt="<[mosquitto:iot/openhab/airsensor_co2_wemos-living-air_mhz19b:state:default]"}
 
 Number air_gas_living "Gas living [%.2f kOhm]" <smoke>                       {mqtt="<[mosquitto:iot/openhab/airsensor_gas_wemos-living-air_bme680:state:default]"}

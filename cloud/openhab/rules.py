@@ -62,6 +62,7 @@ def rule_openhab_airsensor(obj=m.AirSensor(), change=None):
             if key not in P.ignored_fields:
                 if hasattr(obj, key):
                     val = getattr(obj, key)
+                    address = address.replace(":", "_")  # safety conversion for openhab
                     send_mqtt_openhab(subtopic='airsensor_' + key + '_' + address, payload=val)
                 else:
                     L.l.warning('Field {} in airsensor change list but not in obj={}'.format(key, obj))
