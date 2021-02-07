@@ -93,7 +93,7 @@ def init_modules(init_mod=None):
         for mod in mods:
             if mod.name != 'main':
                 # check if there is a host specific module and use it with priority over generic one
-                mod_host_specific = m.Module.find_one({m.Module.host_name: Constant.HOST_NAME, m.Module.name: mod.name})
+                mod_host_specific = m.Module.find_one({m.Module.name: mod.name, m.Module.host_name: Constant.HOST_NAME})
                 if mod_host_specific is not None:
                     mod_name = mod_host_specific.name
                     mod_active = mod_host_specific.active
