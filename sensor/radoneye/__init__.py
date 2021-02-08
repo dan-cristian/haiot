@@ -55,16 +55,17 @@ def GetRadonValue():
             # Raise exception (will try get Radon value from RadonEye again) if received a very
             # high radoneye value or lower than 0.
             # Maybe a bug on RD200 or Python BLE Lib?!
-            if (RadonValue > 1000) or (RadonValue < 0):
-                raise Exception("Very strange radoneye value. Debugging needed.")
-            #if args.becquerel:
-            Unit = "Bq/m3"
-            RadonValue = (RadonValue * 37)
-            #else:
-            #    Unit = "pCi/L"
-            sensor.radon = RadonValue
-            sensor.save_changed_fields(broadcast=True, persist=True)
-            L.l.info("Read radoneye {} value {} {}".format(sensor.address, RadonValue, Unit))
+            if (RadonValue > 1000) or (RadonValue < 0.1):
+                L.l.error("Very strange radoneye value={}. Debugging needed.".format(RadonValue))
+            else:
+                #if args.becquerel:
+                Unit = "Bq/m3"
+                RadonValue = (RadonValue * 37)
+                #else:
+                #    Unit = "pCi/L"
+                sensor.radon = RadonValue
+                sensor.save_changed_fields(broadcast=True, persist=True)
+                L.l.info("Read radoneye {} value {} {}".format(sensor.address, RadonValue, Unit))
         else:
             L.l.erro("Cannot find radoneye record with id={} in config".format(P.radoneye_id))
     except Exception as ex:
