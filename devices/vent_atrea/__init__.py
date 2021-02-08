@@ -59,7 +59,7 @@ def keep_alive():
                 rec = m.Ventilation.find_one({m.Ventilation.id: 0})
                 rec.mode = mode
                 rec.power_level = power_level
-                rec.save_changed_fields(listeners=False)
+                rec.save_changed_fields(persist=True)
                 L.l.info("Atrea mode={}-{} power={}".format(mode, P.mode_values[mode], power_level))
             except Exception as ex:
                 L.l.warning("Unexpected Atrea state response: {}".format(state_text))

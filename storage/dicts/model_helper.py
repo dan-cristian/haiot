@@ -404,7 +404,9 @@ class ModelBase(metaclass=OrderedClassMembers):
                             if not silent:
                                 L.l.info('Executing listener on device events for {}'.format(cls_name))
                             rec_clone._listener_executed = True
-                            cls._upsert_listener_list[cls_name](record=rec_clone, changed_fields=change_list)
+                            func = cls._upsert_listener_list[cls_name]
+                            if func is not None:
+                                func(record=rec_clone, changed_fields=change_list)
                 dispatcher.send(Constant.SIGNAL_DB_CHANGE_FOR_RULES, obj=rec_clone, change=change_list)
             else:
                 L.l.error('Cannot save changed fields, key is missing for {}'.format(self))

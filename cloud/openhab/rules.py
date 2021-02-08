@@ -68,6 +68,18 @@ def rule_openhab_airsensor(obj=m.AirSensor(), change=None):
                     L.l.warning('Field {} in airsensor change list but not in obj={}'.format(key, obj))
 
 
+def rule_openhab_ventilation(obj=m.Ventilation(), change=None):
+    if change is not None:
+        name = obj.name
+        for key in change:
+            if key not in P.ignored_fields:
+                if hasattr(obj, key):
+                    val = getattr(obj, key)
+                    send_mqtt_openhab(subtopic='vent_' + key + '_' + name, payload=val)
+                else:
+                    L.l.warning('Field {} in ventilation change list but not in obj={}'.format(key, obj))
+
+
 def rule_openhab_utility(obj=m.Utility(), change=None):
     if hasattr(obj, 'utility_type') and hasattr(obj, 'utility_name') and obj.utility_name is not None:
         # L.l.info("PROCESSING utility {}".format(obj.utility_type))
