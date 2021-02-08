@@ -75,7 +75,7 @@ def rule_openhab_ventilation(obj=m.Ventilation(), change=None):
             if key not in P.ignored_fields:
                 if hasattr(obj, key):
                     val = getattr(obj, key)
-                    send_mqtt_openhab(subtopic='vent_' + key + '_' + name, payload=val)
+                    send_mqtt_openhab(subtopic='ventilation_' + key + '_' + name, payload=val)
                 else:
                     L.l.warning('Field {} in ventilation change list but not in obj={}'.format(key, obj))
 
