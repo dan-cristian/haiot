@@ -98,38 +98,41 @@ def upload_luftdaten(pm25, pm10, temp, humidity, pressure):
 
 
 def upload_sensor():
-    pm25 = None
-    pm10 = None
-    temp = None
-    humidity = None
-    pressure = None
-    dust_sensor = m.DustSensor.find_one({m.DustSensor.address: "wemos-curte-air_pms5003"})
-    if dust_sensor is not None and P.pm25_updated_on != dust_sensor.updated_on:
-        pm25 = dust_sensor.pm_2_5
-        pm10 = dust_sensor.pm_10
-        P.pm25_updated_on = dust_sensor.updated_on
+    try:
+        pm25 = None
+        pm10 = None
+        temp = None
+        humidity = None
+        pressure = None
+        dust_sensor = m.DustSensor.find_one({m.DustSensor.address: "wemos-curte-air_pms5003"})
+        if dust_sensor is not None and P.pm25_updated_on != dust_sensor.updated_on:
+            pm25 = dust_sensor.pm_2_5
+            pm10 = dust_sensor.pm_10
+            P.pm25_updated_on = dust_sensor.updated_on
 
-    air_sensor = m.AirSensor.find_one({m.AirSensor.address: "wemos-curte-air_bme280"})
-    if air_sensor is not None and P.humidity_updated_on != air_sensor.updated_on:
-        # pressure = air_sensor.pressure
-        humidity = air_sensor.humidity
-        # sensor_readings.append({'specie': "pressure", 'value': pressure, 'unit': 'hPa'})
-        P.humidity_updated_on = air_sensor.updated_on
+        air_sensor = m.AirSensor.find_one({m.AirSensor.address: "wemos-curte-air_bme280"})
+        if air_sensor is not None and P.humidity_updated_on != air_sensor.updated_on:
+            # pressure = air_sensor.pressure
+            humidity = air_sensor.humidity
+            # sensor_readings.append({'specie': "pressure", 'value': pressure, 'unit': 'hPa'})
+            P.humidity_updated_on = air_sensor.updated_on
 
-    if air_sensor is not None and P.pressure_updated_on != air_sensor.updated_on:
-        pressure = air_sensor.pressure
-        P.pressure_updated_on = air_sensor.updated_on
+        if air_sensor is not None and P.pressure_updated_on != air_sensor.updated_on:
+            pressure = air_sensor.pressure
+            P.pressure_updated_on = air_sensor.updated_on
 
-    air_sensor2 = m.AirSensor.find_one({m.AirSensor.address: "front_garden_we_ds18b20"})
-    if air_sensor2 is not None and P.temp_updated_on != air_sensor2.updated_on:
-        temp = air_sensor2.temperature
-        P.temp_updated_on = air_sensor2.updated_on
+        air_sensor2 = m.AirSensor.find_one({m.AirSensor.address: "front_garden_we_ds18b20"})
+        if air_sensor2 is not None and P.temp_updated_on != air_sensor2.updated_on:
+            temp = air_sensor2.temperature
+            P.temp_updated_on = air_sensor2.updated_on
 
-    if pm25 is pm10 is temp is humidity is pressure is None:
-        L.l.info('No air sensors data to upload dust={} air={} air2={}'.format(dust_sensor, air_sensor, air_sensor2))
-    else:
-        upload_aqicn(pm25=pm25, pm10=pm10, temp=temp, humidity=humidity, pressure=pressure)
-        upload_luftdaten(pm25=pm25, pm10=pm10, temp=temp, humidity=humidity, pressure=pressure)
+        if pm25 is pm10 is temp is humidity is pressure is None:
+            L.l.info('No air sensors data to upload dust={} air={} air2={}'.format(dust_sensor, air_sensor, air_sensor2))
+        else:
+            upload_aqicn(pm25=pm25, pm10=pm10, temp=temp, humidity=humidity, pressure=pressure)
+            upload_luftdaten(pm25=pm25, pm10=pm10, temp=temp, humidity=humidity, pressure=pressure)
+    except Exception as ex:
+        L.l.error("Unable to upload air sensor data, err={}".format(ex))
 
 
 def unload():
