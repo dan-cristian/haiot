@@ -29,6 +29,10 @@ class P:
     mode_values = {0: "off", 1: "automatic", 2: "ventilation", 3: "circulation + ventilation", 4: "circulation",
                    5: "precooling", 6: "disbalance", 7: "overpressure"}
 
+    mode_off = 0
+
+    power_level_min = 12
+
     def __init__(self):
         pass
 

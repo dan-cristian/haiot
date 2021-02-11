@@ -8,15 +8,14 @@ import common
 
 
 class P:
-    close_angle = 90
-    open_angle = 90
     motor = None
+    max_angle = 90  # prevent vent stop from flipping over
     last_action = utime.time()
 
 
 def init_motor():
     """
-    IN1 -->  D5
+    IN1 -->  D5 wemos
     IN2 -->  D6
     IN3 -->  D1
     IN4 -->  D2
@@ -32,43 +31,20 @@ def test_motor():
     P.motor.angle(10, -1)
 
 
-def calibrate_close():
-    pass
-
-
-def calibrate_open():
-    pass
-
-
-def close_full_vent(direction):
-    if common.rtc_storage.closed == 0:
-        P.motor.angle(P.close_angle, direction)
-        common.rtc_storage.closed = 1
-        P.last_action = utime.time()
-        print("Closed vent")
-    else:
-        print("Already closed, ignoring")
-    common.save_rtc()
-
-
-def open_full_vent(direction):
-    if common.rtc_storage.closed == 1:
-        P.motor.angle(P.open_angle, direction)
-        common.rtc_storage.closed = 0
-        P.last_action = utime.time()
-        print("Opened vent")
-    else:
-        print("Already opened, ignoring")
-    common.save_rtc()
-
-
 def vent_move(angle):
-    if angle > 0:
-        direction = 1
+    new_angle = common.rtc_storage.angle + angle
+    if 0 <= new_angle <= P.max_angle:
+        if angle > 0:
+            direction = 1
+        else:
+            direction = -1
+        P.motor.angle(abs(angle), direction)
+        common.rtc_storage.angle = new_angle
+        print("Vent moved angle {} direction {}, new angle={}".format(angle, direction, new_angle))
+        common.save_rtc()
     else:
-        direction = -1
-    P.motor.angle(abs(angle), direction)
-    print("Vent moved angle {} direction {}".format(angle, direction))
+        print("Invalid angle request {}, outside range 0 - {}. Angle is {}".format(angle, P.max_angle,
+                                                                                   common.rtc_storage.angle))
 
 
 def timer_actions():

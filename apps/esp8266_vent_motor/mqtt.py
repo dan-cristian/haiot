@@ -18,7 +18,7 @@ def sub_cb(topic, msg):
     print("Received message #{}".format(P.msg_count))
     try:
         # print("device={}, topic={}, start={}, my_name={}".format(device_id, name, msg[0], mqtt_client_id))
-        if msg[0] != 123:  # check for valid json staring with { character
+        if msg[0] != 123:  # check for valid json starting with { character
             return
         data = str(msg, "utf-8")
         # topic = topic.decode().split('/')
@@ -33,11 +33,7 @@ def sub_cb(topic, msg):
                 # print(js)
                 for key, value in js.items():
                     # print("Parsing {}".format(key))
-                    if key == "open":
-                        vent_control.open_full_vent(direction=value)
-                    if key == "close":
-                        vent_control.close_full_vent(direction=value)
-                    if key == "move":
+                    if key == "angle":
                         vent_control.vent_move(angle=value)
                     # elif value is not None:
                     #    for key1, value1 in value.items():

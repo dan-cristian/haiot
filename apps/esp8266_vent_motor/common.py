@@ -15,6 +15,7 @@ class rtc_storage:
     mqtts = 0
     mqttp = 0
     closed = 1
+    angle = 0
 
 
 def set_adc_mode(mode):
@@ -78,5 +79,5 @@ def read_rtc():
 def publish_state():
     vcc = machine.ADC(1).read()
     # send current state to mqtt
-    mqtt.publish('{{"vcc": {},"closed": {}, "mqttp": {}}}'.format(
-        vcc, rtc_storage.closed, rtc_storage.mqttp))
+    mqtt.publish('{{"vcc": {},"angle": {}, "mqttp": {}}}'.format(
+        vcc, rtc_storage.angle, rtc_storage.mqttp))

@@ -451,3 +451,13 @@ class Ventilation(ModelBase):
     mode = 0
     power_level = 0
     updated_on = datetime.now()
+
+
+class Vent(ModelBase):
+    """key=id"""
+    id = 0
+    name = ''
+    device_id = ''
+    zone_id = 0
+    angle = 0
+    updated_on = datetime.now()

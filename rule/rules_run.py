@@ -118,17 +118,18 @@ def rule_alarm(obj=m.ZoneAlarm(), change=None):
 
 
 def rule_dust_extreme(obj=m.DustSensor(), change=None):
-    if hasattr(obj, 'pm_2_5') and obj.pm_2_5 is not None:
-        if obj.address == "vent-air-w_pms5003":
-            vent = m.Ventilation.find_one({m.Ventilation.id: 0})
-            if vent.mode != 0:
-                P.last_vent_mode = vent.mode
-            if obj.pm_2_5 > 50:
-                vent.mode = 0
-            else:
-                if P.last_vent_mode is not None:
-                    vent.mode = P.last_vent_mode
-            vent.save_changed_fields()
+    if False:  # replaced by hvac.vent
+        if hasattr(obj, 'pm_2_5') and obj.pm_2_5 is not None:
+            if obj.address == "vent-air-w_pms5003":
+                vent = m.Ventilation.find_one({m.Ventilation.id: 0})
+                if vent.mode != 0:
+                    P.last_vent_mode = vent.mode
+                if obj.pm_2_5 > 50:
+                    vent.mode = 0
+                else:
+                    if P.last_vent_mode is not None:
+                        vent.mode = P.last_vent_mode
+                vent.save_changed_fields()
 
 
 # min & max temperatures

@@ -9,11 +9,9 @@ import ubinascii
 import esp
 
 
-machine_id = ubinascii.hexlify(machine.unique_id()).decode("utf-8")
-client_id = "vent-" + machine_id
+#machine_id = ubinascii.hexlify(machine.unique_id()).decode("utf-8")
+#client_id = "vent-" + machine_id
 mqtt_server = "192.168.0.12"
-topic_sub = "iot/micro/" + client_id
-topic_pub = "iot/sonoff/" + client_id
 
 
 def restart_and_reconnect():
@@ -36,16 +34,22 @@ def main():
     esp.osdebug(None)
     common.set_adc_mode(common.ADC_MODE_VCC)
     vcc = machine.ADC(1).read()
+    machine_id = ubinascii.hexlify(machine.unique_id()).decode("utf-8")
     print("Main function, VCC={}, hw_id={}".format(vcc, machine_id))
     if machine.reset_cause() == machine.DEEPSLEEP_RESET:
         init_stepper(from_deep_sleep=True)
     else:
         init_stepper(from_deep_sleep=False)
-    wifi.connect(ssid, password)
-    station = network.WLAN(network.STA_IF)
-    if station.isconnected():
-        webrepl.start()
+    if wifi.connect(ssid, password):
+        print("Starting webrepl")
+        if webrepl.listen_s is None:
+            webrepl.start()
+        else:
+            print("Webrepl already started")
         # settime()
+        client_id = wifi.station.config("dhcp_hostname")
+        topic_sub = "iot/micro/" + client_id
+        topic_pub = "iot/sonoff/" + client_id
         result = mqtt.connect(client_id, mqtt_server, topic_sub, topic_pub, user=mqtt_user, password=mqtt_pass)
         if result == 'restart':
             print("Restarting due to connectivity error")

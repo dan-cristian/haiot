@@ -104,6 +104,7 @@
     {"id":73, "active":false, "start_order":73, "name":"apps.air_sensor_upload", "host_name":""},
     {"id":75, "active":false, "start_order":75, "name":"devices.vent_atrea", "host_name":""},
     {"id":77, "active":false, "start_order":77, "name":"sensor.radoneye", "host_name":""},
+    {"id":79, "active":false, "start_order":79, "name":"hvac.vent", "host_name":""},
     {"id":90, "active":false, "start_order":90, "name":"apps.dashcam", "host_name":""},
     {"id":99, "active":false, "start_order":99, "name":"main.cron", "host_name":""},
     {"id":101, "active":false, "start_order":101, "name":"webui.chart", "host_name":""},
@@ -153,6 +154,7 @@
     {"id":520, "active":true, "start_order":20, "name":"test", "host_name":"netbook"},
     {"id":573, "active":true, "start_order":73, "name":"apps.air_sensor_upload", "host_name":"netbook"},
     {"id":577, "active":true, "start_order":77, "name":"sensor.radoneye", "host_name":"netbook"},
+    {"id":579, "active":true, "start_order":79, "name":"hvac.vent", "host_name":"netbook"},
 
     {"id":809, "active":true, "start_order":9, "name":"heat", "host_name":"homew"},
     {"id":819, "active":true, "start_order":19, "name":"cloud.ddns", "host_name":"homew"},
@@ -172,7 +174,8 @@
     {"id":870, "active":true, "start_order":70, "name":"music", "host_name":"homew"},
     {"id":873, "active":true, "start_order":73, "name":"apps.air_sensor_upload", "host_name":"homew"},
     {"id":875, "active":true, "start_order":75, "name":"devices.vent_atrea", "host_name":"homew"},
-    {"id":877, "active":true, "start_order":77, "name":"sensor.radoneye", "host_name":"homew"}
+    {"id":877, "active":true, "start_order":77, "name":"sensor.radoneye", "host_name":"homew"},
+    {"id":879, "active":true, "start_order":79, "name":"hvac.vent", "host_name":"homew"}
   ],
 
   "People": [
@@ -565,6 +568,14 @@
 
   "Ventilation": [
     {"id":  0, "name":  "atrea"}
+  ],
+
+  "Vent": [
+    {"id": 0, "name":  "living dulap", "device_id": "ESP_A2E744", "zone_id": 2},
+    {"id": 1, "name":  "living tv",    "device_id": "ESP_A1ED05", "zone_id": 2},
+    {"id": 2, "name":  "tudor",        "device_id": "ESP_A1A351", "zone_id": 13},
+    {"id": 3, "name":  "kids",         "device_id": "ESP_C75001", "zone_id": 6},
+    {"id": 4, "name":  "bedroom",      "device_id": "ESP_A1A84F", "zone_id": 4}
   ],
 
   "AirSensor": [
