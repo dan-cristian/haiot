@@ -125,6 +125,7 @@ class AirSensor(ModelBase):
     humidity = 0
     gas = 0  # for BME680
     radon = 0
+    zone_id = 0
     updated_on = datetime.now()
 
 
@@ -458,7 +459,8 @@ class Vent(ModelBase):
     """key=id"""
     id = 0
     name = ''
-    device_id = ''
     zone_id = 0
     angle = 0
+    host_name = ''
+    host_type = ''
     updated_on = datetime.now()

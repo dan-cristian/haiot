@@ -313,3 +313,13 @@ def init_debug():
     except Exception as ex:
         print("Error in remote debug: {}".format(ex))
 
+
+def moving_average(number_list, window_size):
+    i = 0
+    moving_averages = []
+    while i < len(number_list) - window_size + 1:
+        this_window = number_list[i: i + window_size]
+        window_average = sum(this_window) / window_size
+        moving_averages.append(window_average)
+        i += 1
+    return moving_averages

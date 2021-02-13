@@ -317,6 +317,24 @@ class ModelBase(metaclass=OrderedClassMembers):
         history_count = cls._history_enabled_field_name[field_key]
         cls._history_enabled_values[history_key] = val_list[:history_count]
 
+    @classmethod
+    def get_trend(cls, field_name, key):
+        history_key = (cls.__name__, key, field_name)
+        if history_key in cls._history_enabled_values.keys():
+            val_list = cls._history_enabled_values[history_key]
+            field_key = (cls.__name__, field_name)
+            history_count = cls._history_enabled_field_name[field_key]
+            if len(val_list) == history_count:
+                while True:
+                    val_list = utils.moving_average(number_list=val_list, window_size=2)
+                    if len(val_list) == 2:
+                        break
+                if val_list[0] > val_list[1]:
+                    return -1  # decrease trend
+                if val_list[0] < val_list[1]:
+                    return 1  # increase trend
+        return 0  # constant trend or not enough values to asses
+
     @staticmethod
     def _broadcast(record, update, class_name):
         out_rec = None
