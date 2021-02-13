@@ -319,7 +319,7 @@
 
     {"relay_pin_name": "freezer_relay", "zone_id": "10", "gpio_pin_code": "freezer_pow", "relay_type": "sonoff"},
     {"relay_pin_name": "gas_heater_relay", "zone_id": "29", "gpio_pin_code": "gas_pow", "relay_type": "sonoff"},
-    {"relay_pin_name": "solar_relay", "zone_id": "54", "gpio_pin_code": "solar_pow", "relay_type": "sonoff"},
+    {"relay_pin_name": "solar_relay", "zone_id": "54", "gpio_pin_code": "solar_pw", "relay_type": "sonoff"},
     {"relay_pin_name": "floor_bath1_relay", "zone_id": "5", "gpio_pin_code": "bath_pw", "relay_type": "sonoff"},
     {"relay_pin_name": "washing_relay", "zone_id": "29", "gpio_pin_code": "washing_pow", "relay_type": "sonoff"},
     {"relay_pin_name": "other_relay_test", "zone_id": "2", "gpio_pin_code": "sonoff-pow-2", "gpio_host_name": "netbook", "relay_type": "sonoff"},
@@ -516,7 +516,7 @@
 
     {"utility_name":"power freezer", "sensor_name":"freezer_pow", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
     {"utility_name":"power gas heater", "sensor_name":"gas_pow", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
-    {"utility_name":"power solar", "sensor_name":"solar_pow", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
+    {"utility_name":"power solar", "sensor_name":"solar_pw", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
     {"utility_name":"power floor bath1", "sensor_name":"bath_pw", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
     {"utility_name":"power washing", "sensor_name":"washing_pow", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
     {"utility_name":"power boiler", "sensor_name":"boiler_pow", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},

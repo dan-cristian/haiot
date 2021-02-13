@@ -115,7 +115,8 @@ class DustSensor(ModelBase):
 
 
 class AirSensor(ModelBase):
-    """key=address"""
+    """key=address
+    history=co2:10"""
     id = 0
     address = ''
     co2 = 0

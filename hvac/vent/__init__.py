@@ -16,6 +16,7 @@ class P:
     central_vent_sensor_name = "vent-air-w_pms5003"
     co2_ok_value = 550
     co2_warn_value = 1000
+    central_mode_is_min = False
 
     def __init__(self):
         pass
@@ -50,7 +51,7 @@ def adjust():
         co2_ids = []
         air_list = m.AirSensor.find()
         for sensor in air_list:
-            if sensor.co2 is not None and sensor.co2 > 400:  # add all co2 sensors with valid values
+            if sensor.co2 is not None and sensor.co2 >= 400:  # add all co2 sensors with valid values
                 co2_vals.append(sensor.co2)
                 co2_ids.append(sensor.address)
         if len(co2_vals) > 0:
@@ -61,12 +62,14 @@ def adjust():
                 vent_atrea.set_power_level(vent_atrea.P.power_level_min)
                 vent.power_level = vent_atrea.P.power_level_min
                 vent.save_changed_fields()
+                P.central_mode_is_min = True
             else:  # resume initial power level
-                if vent.power_level != P.last_power_level:
+                if P.central_mode_is_min:
                     L.l.info("CO2 levels are increased, resuming system speed to {}".format(P.last_power_level))
                     vent_atrea.set_power_level(P.last_power_level)
                     vent.power_level = P.last_power_level
                     vent.save_changed_fields()
+                    P.central_mode_is_min = False
 
 
 def thread_run():

@@ -188,6 +188,8 @@ class ModelBase(metaclass=OrderedClassMembers):
     _upsert_listener_list = {}
     _ignore_save_change_fields = ['updated_on']
     _is_used_in_module = False
+    _history_enabled_field_name = {}
+    _history_enabled_values = {}
 
     def __repr__(self):
         # cls = self.__class__
@@ -299,6 +301,22 @@ class ModelBase(metaclass=OrderedClassMembers):
     def set_broadcast_topic(cls, mqtt_topic):
         cls._broadcast_mqtt_topic = mqtt_topic
 
+    @classmethod
+    def enable_history(cls, field_name, value_count):
+        cls._history_enabled_field_name[(cls.__name__, field_name)] = value_count
+
+    @classmethod
+    def add_history_value(cls, field_name, key, field_value):
+        history_key = (cls.__name__, key, field_name)
+        field_key = (cls.__name__, field_name)
+        if history_key not in cls._history_enabled_values.keys():
+            val_list = []
+        else:
+            val_list = cls._history_enabled_values[history_key]
+        val_list.append(field_value)
+        history_count = cls._history_enabled_field_name[field_key]
+        cls._history_enabled_values[history_key] = val_list[:history_count]
+
     @staticmethod
     def _broadcast(record, update, class_name):
         out_rec = None
@@ -339,8 +357,8 @@ class ModelBase(metaclass=OrderedClassMembers):
             cls._is_used_in_module = True
         k = cls.get_key(record=self.__dict__)
         key = {k: self.__dict__[k]}
-        update = {}
-        current = self.reference
+        update = {}  # holder of changed fields/values
+        current = self.reference  # holder of original record
         for fld in cls._column_list:
             if fld == 'updated_on':  # and self.updated_on is None:
                 # fixme: not sure if working well
@@ -367,6 +385,12 @@ class ModelBase(metaclass=OrderedClassMembers):
                     if current is not None:
                         # update storage fields
                         self.reference[fld] = new_val
+                    # save history fields
+                    if (cls_name, fld) in self._history_enabled_field_name:
+                        self.add_history_value(fld, key[cls._main_key], new_val)
+                else:
+                    # field value not changed
+                    pass
 
         if len(update) > 0:
             if key is not None:
@@ -437,8 +461,16 @@ class ModelBase(metaclass=OrderedClassMembers):
             cls._column_list += ('source_host',)
             cls._class_initialised = True
             cls.reference = None
-            if cls.__doc__ is not None and 'key=' in cls.__doc__:
-                cls._main_key = cls.__doc__.split('key=')[1]
+            if cls.__doc__ is not None:
+                for line in cls.__doc__.split("\n"):
+                    strip = line.replace(' ', '')
+                    if 'key=' in strip:
+                        cls._main_key = strip.split('key=')[1]
+                    elif 'history=' in strip:
+                        fields = strip.split('history=')[1]
+                        for pair in fields.split(','):
+                            atoms = pair.split(':')
+                            cls.enable_history(atoms[0], int(atoms[1]))
             else:
                 cls._main_key = obj_fields[0]
 
