@@ -72,7 +72,7 @@ def adjust():
                     trend = max_sensor.get_trend("co2", max_address)
                     L.l.info("CO2 max trend for {} is {}".format(max_address, trend))
                     if trend == 1:  # co2 increasing
-                        new_power = vent.power_level + 2
+                        new_power = vent.power_level + 1
                         vent_atrea.set_power_level(new_power)
             # adjust vent openings based on co2 room levels
             adjust_vents(co2_sensors, max_address)
