@@ -315,7 +315,7 @@ class ModelBase(metaclass=OrderedClassMembers):
             val_list = cls._history_enabled_values[history_key]
         val_list.append(field_value)
         history_count = cls._history_enabled_field_name[field_key]
-        cls._history_enabled_values[history_key] = val_list[:history_count]
+        cls._history_enabled_values[history_key] = val_list[-history_count:]
 
     @classmethod
     def get_trend(cls, field_name, key):
