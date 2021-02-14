@@ -32,7 +32,8 @@ class P:
     mode_off = 0
 
     power_level_min = 12
-    power_level_default = 50
+    power_level_default = 40
+    power_level_max = 70
 
     def __init__(self):
         pass
@@ -81,12 +82,15 @@ def set_mode(mode):
 
 
 def set_power_level(level):
-    L.l.info("Setting ventilation power level to {}".format(level))
-    server_url = get_json_param(Constant.P_ATREA_LOCAL_URL) + P.power_level_set_url
-    level_text = f'{level:03}'
-    server_url = server_url.replace("XXX", level_text)
-    state_text = utils.get_url_content(server_url.replace("<key>", P.auth_key))
-    L.l.info("Setting ventilation power level to {} returned {}".format(level, state_text))
+    if level <= P.power_level_max:
+        L.l.info("Setting ventilation power level to {}".format(level))
+        server_url = get_json_param(Constant.P_ATREA_LOCAL_URL) + P.power_level_set_url
+        level_text = f'{level:03}'
+        server_url = server_url.replace("XXX", level_text)
+        state_text = utils.get_url_content(server_url.replace("<key>", P.auth_key))
+        L.l.info("Setting ventilation power level to {} returned {}".format(level, state_text))
+    else:
+        L.l.info("Ignoring set power level {} as is higher than max {}".format(level, P.power_level_max))
 
 
 def ventilation_upsert_listener(record, changed_fields):
