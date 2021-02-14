@@ -55,7 +55,7 @@ def adjust():
         for sensor in air_list:
             if sensor.co2 is not None and sensor.co2 >= 400:  # add all co2 sensors with valid values
                 # check if this is a house sensor (indoor)
-                zone = m.Zone.find({m.Vent.zone_id: sensor.zone_id})
+                zone = m.Zone.find({m.Zone.id: sensor.zone_id})
                 if zone is not None and zone.is_indoor:
                     co2_vals.append(sensor.co2)
                     co2_ids.append(sensor.address)
