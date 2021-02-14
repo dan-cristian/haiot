@@ -584,7 +584,9 @@
     {"id": 2, "address": "wemos-living-air_mhz19b", "zone_id": 2},
     {"id": 3, "address": "wemos-bedroom-air_mhz19b", "zone_id": 4},
     {"id": 4, "address": "birou-air-w_mhz19b", "zone_id": 47},
-    {"id": 5, "address": "tudor-air-w_mhz19b", "zone_id": 13}
+    {"id": 5, "address": "tudor-air-w_mhz19b", "zone_id": 13},
+    {"id": 10, "address": "ventout-air-w_mhz19b", "zone_id": 7},
+    {"id": 11, "address": "portable-air-w_mhz19b", "zone_id": 7}
   ],
 
   "Pwm": [

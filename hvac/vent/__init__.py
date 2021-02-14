@@ -17,6 +17,7 @@ class P:
     co2_ok_value = 600
     co2_warn_value = 1000
     central_mode_is_min = False
+    max_outdoor_pm25 = 50
 
     def __init__(self):
         pass
@@ -35,7 +36,7 @@ def adjust():
 
         if vent.mode != vent_atrea.P.mode_off:
             P.last_vent_mode = vent.mode
-        if pm25 > 50:  # max pm level to shutdown
+        if pm25 > P.max_outdoor_pm25:  # max pm level to shutdown
             vent.mode = vent_atrea.P.mode_off
         else:
             if P.last_vent_mode is not None:
@@ -53,9 +54,12 @@ def adjust():
         air_list = m.AirSensor.find()
         for sensor in air_list:
             if sensor.co2 is not None and sensor.co2 >= 400:  # add all co2 sensors with valid values
-                co2_vals.append(sensor.co2)
-                co2_ids.append(sensor.address)
-                co2_sensors[sensor.address] = sensor
+                # check if this is a house sensor (indoor)
+                zone = m.Zone.find({m.Vent.zone_id: sensor.zone_id})
+                if zone is not None and zone.is_indoor:
+                    co2_vals.append(sensor.co2)
+                    co2_ids.append(sensor.address)
+                    co2_sensors[sensor.address] = sensor
         if len(co2_vals) > 0:
             max_co2 = max(co2_vals)
             max_address = co2_ids[co2_vals.index(max_co2)]
@@ -69,6 +73,8 @@ def adjust():
             else:  # resume initial power level
                 if P.central_mode_is_min:
                     L.l.info("CO2 levels are increased, resuming system speed to {}".format(P.last_power_level))
+                    if P.last_power_level == vent_atrea.P.power_level_min:
+                        P.last_power_level = vent_atrea.P.power_level_default
                     vent_atrea.set_power_level(P.last_power_level)
                     vent.power_level = P.last_power_level
                     vent.save_changed_fields()

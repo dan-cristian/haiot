@@ -32,6 +32,7 @@ class P:
     mode_off = 0
 
     power_level_min = 12
+    power_level_default = 50
 
     def __init__(self):
         pass
