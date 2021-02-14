@@ -10,9 +10,7 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
 class P:
     initialised = False
-
     last_vent_mode = None
-    # last_power_level = None
     central_vent_sensor_name = "vent-air-w_pms5003"
     co2_ok_value = 600
     co2_warn_value = 1000
@@ -25,6 +23,7 @@ class P:
 
 def adjust():
     dust_sensor = m.DustSensor.find_one({m.DustSensor.address: P.central_vent_sensor_name})
+    # assumes vent system has id 0 in conf file
     vent = m.Ventilation.find_one({m.Ventilation.id: 0})
     if vent is None:
         L.l.error("Ventilation system not defined in conf, exit")
@@ -32,8 +31,6 @@ def adjust():
     # shutoff vent system on high pm25
     if dust_sensor is not None:
         pm25 = dust_sensor.pm_2_5
-        # assumes vent system has id 0 in conf file
-
         if vent.mode != vent_atrea.P.mode_off:
             P.last_vent_mode = vent.mode
         if pm25 > P.max_outdoor_pm25:  # max pm level to shutdown
@@ -42,9 +39,6 @@ def adjust():
             if P.last_vent_mode is not None:
                 vent.mode = P.last_vent_mode
         vent.save_changed_fields()
-
-    # if P.last_power_level is None:
-    #    P.last_power_level = vent.power_level
 
     # adjust vent system power based on CO2 levels
     if vent.mode != vent_atrea.P.mode_off:
@@ -65,19 +59,12 @@ def adjust():
             max_address = co2_ids[co2_vals.index(max_co2)]
             if max_co2 < P.co2_ok_value:  # reduce power level to minimum, no need
                 L.l.info("CO2 levels are low, {}, reducing system speed to minimum".format(max_co2))
-                # P.last_power_level = vent.power_level
                 vent_atrea.set_power_level(vent_atrea.P.power_level_min)
-                # vent.power_level = vent_atrea.P.power_level_min
-                # vent.save_changed_fields()
                 P.central_mode_is_min = True
             else:  # resume initial power level
                 if P.central_mode_is_min:
                     L.l.info("CO2 levels are increased, resuming system speed")
-                    # if P.last_power_level == vent_atrea.P.power_level_min:
-                    #    P.last_power_level = vent_atrea.P.power_level_default
                     vent_atrea.set_power_level(vent_atrea.P.power_level_default)
-                    # vent.power_level = P.last_power_level
-                    # vent.save_changed_fields()
                     P.central_mode_is_min = False
                 else:
                     # adjust vent system power if needed to remove co2 faster
@@ -85,7 +72,7 @@ def adjust():
                     trend = max_sensor.get_trend("co2", max_address)
                     L.l.info("CO2 max trend for {} is {}".format(max_address, trend))
                     if trend == 1:  # co2 increasing
-                        new_power = vent.power_level + 1
+                        new_power = vent.power_level + 2
                         vent_atrea.set_power_level(new_power)
             # adjust vent openings based on co2 room levels
             adjust_vents(co2_sensors, max_address)

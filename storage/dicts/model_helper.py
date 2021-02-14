@@ -325,10 +325,11 @@ class ModelBase(metaclass=OrderedClassMembers):
             field_key = (cls.__name__, field_name)
             history_count = cls._history_enabled_field_name[field_key]
             if len(val_list) == history_count:
-                while True:
-                    val_list = utils.moving_average(number_list=val_list, window_size=2)
-                    if len(val_list) == 2:
-                        break
+                # while True:
+                #    val_list = utils.moving_average(number_list=val_list, window_size=2)
+                #    if len(val_list) == 2:
+                #        break
+                val_list = utils.split_average(val_list)
                 if val_list[0] > val_list[1]:
                     return -1  # decrease trend
                 if val_list[0] < val_list[1]:

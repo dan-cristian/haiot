@@ -323,3 +323,13 @@ def moving_average(number_list, window_size):
         moving_averages.append(window_average)
         i += 1
     return moving_averages
+
+
+def split_average(number_list):
+    first_count = int(len(number_list) / 2)
+    first_list = number_list[first_count:]
+    first_avg = sum(first_list) / len(first_list)
+    second_count = len(number_list) - first_count
+    second_list = number_list[:second_count]
+    second_avg = sum(second_list) / len(second_list)
+    return [first_avg, second_avg]
