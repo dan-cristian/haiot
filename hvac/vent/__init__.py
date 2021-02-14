@@ -14,7 +14,7 @@ class P:
     last_vent_mode = None
     last_power_level = None
     central_vent_sensor_name = "vent-air-w_pms5003"
-    co2_ok_value = 550
+    co2_ok_value = 600
     co2_warn_value = 1000
     central_mode_is_min = False
 
