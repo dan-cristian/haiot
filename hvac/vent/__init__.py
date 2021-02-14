@@ -72,7 +72,7 @@ def adjust():
                 P.central_mode_is_min = True
             else:  # resume initial power level
                 if P.central_mode_is_min:
-                    L.l.info("CO2 levels are increased, resuming system speed to {}".format(P.last_power_level))
+                    L.l.info("CO2 levels are increased, resuming system speed")
                     # if P.last_power_level == vent_atrea.P.power_level_min:
                     #    P.last_power_level = vent_atrea.P.power_level_default
                     vent_atrea.set_power_level(vent_atrea.P.power_level_default)
