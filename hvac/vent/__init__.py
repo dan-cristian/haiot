@@ -95,7 +95,7 @@ def adjust_vents(sensors, max_sensor_address):
 
 
 def vent_upsert_listener(record, changed_fields):
-    L.l.info("Ignoring vent upsert {} changed={}".format(record, changed_fields))
+    # L.l.info("Ignoring vent upsert {} changed={}".format(record, changed_fields))
     assert isinstance(record, m.Vent)
     # if "angle" in changed_fields and record.angle is not None:
     #    set_angle(record.host_name, record.angle)

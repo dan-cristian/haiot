@@ -32,8 +32,8 @@ class P:
     mode_off = 0
 
     power_level_min = 12
-    power_level_default = 40
-    power_level_max = 70
+    power_level_default = 35
+    power_level_max = 65
 
     def __init__(self):
         pass
@@ -94,7 +94,7 @@ def set_power_level(level):
 
 
 def ventilation_upsert_listener(record, changed_fields):
-    L.l.info("RECEIVED ATREA {} changed={}".format(record, changed_fields))
+    # L.l.info("RECEIVED ATREA {} changed={}".format(record, changed_fields))
     assert isinstance(record, m.Ventilation)
     if "mode" in changed_fields and record.mode is not None:
         set_mode(record.mode)
