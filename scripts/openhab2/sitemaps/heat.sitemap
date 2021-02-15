@@ -64,13 +64,11 @@ Frame {
 }
 
 Frame {
-    Group item=CON_VENT {
         Default item=vent_living_dulap
         Default item=vent_living_tv
         Default item=vent_bedroom
         Default item=vent_kids
         Default item=vent_tudor
-        }
 }
 
 Frame {
