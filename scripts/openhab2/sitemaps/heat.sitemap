@@ -64,6 +64,16 @@ Frame {
 }
 
 Frame {
+    Group item=CON_VENT {
+        Default item=vent_living_dulap
+        Default item=vent_living_tv
+        Default item=vent_bedroom
+        Default item=vent_kids
+        Default item=vent_tudor
+        }
+}
+
+Frame {
     Group item=TEMP_BOI {
         Text item=temperature_boiler_sus {
             Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
