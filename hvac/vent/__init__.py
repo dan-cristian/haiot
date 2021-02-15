@@ -46,18 +46,24 @@ def adjust():
         co2_ids = []
         co2_sensors = {}
         air_list = m.AirSensor.find()
+        max_co2_count = 0
         for sensor in air_list:
             if sensor.co2 is not None and sensor.co2 >= 400:  # add all co2 sensors with valid values
                 # check if this is a house sensor (indoor)
                 zone = m.Zone.find_one({m.Zone.id: sensor.zone_id})
                 if zone is not None and zone.is_indoor:
-                    co2_vals.append(sensor.co2)
-                    co2_ids.append(sensor.address)
-                    co2_sensors[sensor.address] = sensor
+                    # check if there is an adjustable vent
+                    vent = m.Vent.find_one({m.Vent.zone_id: sensor.zone_id})
+                    if vent is not None:
+                        co2_vals.append(sensor.co2)
+                        co2_ids.append(sensor.address)
+                        co2_sensors[sensor.address] = sensor
+                        if sensor.co2 > P.co2_ok_value:
+                            max_co2_count += 1
         if len(co2_vals) > 0:
             max_co2 = max(co2_vals)
             max_address = co2_ids[co2_vals.index(max_co2)]
-            if max_co2 < P.co2_ok_value:  # reduce power level to minimum, no need
+            if max_co2 <= P.co2_ok_value:  # reduce power level to minimum, no need
                 L.l.info("CO2 levels are low, {}, reducing system speed to minimum".format(max_co2))
                 vent_atrea.set_power_level(vent_atrea.P.power_level_min)
                 P.central_mode_is_min = True
@@ -71,8 +77,8 @@ def adjust():
                     max_sensor = co2_sensors[max_address]
                     trend = max_sensor.get_trend("co2", max_address)
                     L.l.info("CO2 max trend for {} is {}".format(max_address, trend))
-                    if trend == 1:  # co2 increasing
-                        new_power = vent.power_level + 1
+                    if trend == 1:  # co2 increasing, faster if there are multiple rooms above max co2
+                        new_power = vent.power_level + max_co2_count
                         vent_atrea.set_power_level(new_power)
             # adjust vent openings based on co2 room levels
             adjust_vents(co2_sensors, max_address)
