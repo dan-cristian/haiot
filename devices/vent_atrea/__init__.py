@@ -77,8 +77,11 @@ def set_mode(mode):
     L.l.info("Setting ventilation mode to {}".format(mode))
     server_url = get_json_param(Constant.P_ATREA_LOCAL_URL) + P.mode_url
     server_url = server_url.replace("X", str(mode))
-    state_text = utils.get_url_content(server_url.replace("<key>", P.auth_key))
-    L.l.info("Setting ventilation mode to {} returned {}".format(mode, state_text))
+    if P.auth_key is not None:
+        state_text = utils.get_url_content(server_url.replace("<key>", P.auth_key))
+        L.l.info("Setting ventilation mode to {} returned {}".format(mode, state_text))
+    else:
+        L.l.info("Failed setting ventilation mode, not authenticated")
 
 
 def set_power_level(level):
@@ -87,8 +90,11 @@ def set_power_level(level):
         server_url = get_json_param(Constant.P_ATREA_LOCAL_URL) + P.power_level_set_url
         level_text = f'{level:03}'
         server_url = server_url.replace("XXX", level_text)
-        state_text = utils.get_url_content(server_url.replace("<key>", P.auth_key))
-        L.l.info("Setting ventilation power level to {} returned {}".format(level, state_text))
+        if P.auth_key is not None:
+            state_text = utils.get_url_content(server_url.replace("<key>", P.auth_key))
+            L.l.info("Setting ventilation power level to {} returned {}".format(level, state_text))
+        else:
+            L.l.info("Failed setting ventilation power, not authenticated")
     else:
         L.l.info("Ignoring set power level {} as is higher than max {}".format(level, P.power_level_max))
 
