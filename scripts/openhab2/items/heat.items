@@ -39,8 +39,8 @@ Switch thermo_state_dormitor  "Dormitor status" <fire>                       (DO
 Switch thermo_mode_manual_dormitor "Manual mode" <heating>                                 (DORMITOR_THERMO)                                {mqtt="<[mosquitto:iot/openhab/thermo_mode_manual_dormitor:state:default],>[mosquitto:iot/openhab/cmd/thermo_mode_manual_dormitor:command:*:default]", autoupdate="false"}
 Switch thermo_mode_presence_dormitor "Presence mode" <presence>                                 (DORMITOR_THERMO)                                {mqtt="<[mosquitto:iot/openhab/thermo_mode_presence_dormitor:state:default],>[mosquitto:iot/openhab/cmd/thermo_mode_presence_dormitor:command:*:default]", autoupdate="false"}
 
-Contact vent_living_dulap "Vent living dulap" <rollershutter>      {mqtt="<[mosquitto:iot/openhab/vent_angle_living dulap:state:default]"}
-Contact vent_living_tv "Vent living tv" <rollershutter>            {mqtt="<[mosquitto:iot/openhab/vent_angle_living tv:state:default]"}
-Contact vent_bedroom "Vent bedroom" <rollershutter>                {mqtt="<[mosquitto:iot/openhab/vent_angle_bedroom:state:default]"}
-Contact vent_kids "Vent kids" <rollershutter>                      {mqtt="<[mosquitto:iot/openhab/vent_angle_kids:state:default]"}
-Contact vent_tudor "Vent tudor dulap" <rollershutter>              {mqtt="<[mosquitto:iot/openhab/vent_angle_tudor:state:default]"}
+Number vent_living_dulap "Vent living dulap" <rollershutter>      {mqtt="<[mosquitto:iot/openhab/vent_angle_living dulap:state:default]"}
+Number vent_living_tv "Vent living tv" <rollershutter>            {mqtt="<[mosquitto:iot/openhab/vent_angle_living tv:state:default]"}
+Number vent_bedroom "Vent bedroom" <rollershutter>                {mqtt="<[mosquitto:iot/openhab/vent_angle_bedroom:state:default]"}
+Number vent_kids "Vent kids" <rollershutter>                      {mqtt="<[mosquitto:iot/openhab/vent_angle_kids:state:default]"}
+Number vent_tudor "Vent tudor dulap" <rollershutter>              {mqtt="<[mosquitto:iot/openhab/vent_angle_tudor:state:default]"}
