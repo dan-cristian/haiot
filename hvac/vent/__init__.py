@@ -53,8 +53,8 @@ def adjust():
                 zone = m.Zone.find_one({m.Zone.id: sensor.zone_id})
                 if zone is not None and zone.is_indoor:
                     # check if there is an adjustable vent
-                    vent = m.Vent.find_one({m.Vent.zone_id: sensor.zone_id})
-                    if vent is not None:
+                    check_vent = m.Vent.find_one({m.Vent.zone_id: sensor.zone_id})
+                    if check_vent is not None:
                         co2_vals.append(sensor.co2)
                         co2_ids.append(sensor.address)
                         co2_sensors[sensor.address] = sensor
