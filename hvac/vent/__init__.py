@@ -4,6 +4,7 @@ from main.logger_helper import L
 from main import thread_pool
 from storage.model import m
 from devices import vent_atrea
+import datetime
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
@@ -12,10 +13,12 @@ class P:
     initialised = False
     last_vent_mode = None
     central_vent_sensor_name = "vent-air-w_pms5003"
-    co2_ok_value = 600
+    co2_ok_value = 700
     co2_warn_value = 1000
     central_mode_is_min = False
     max_outdoor_pm25 = 50
+    last_power_increase = datetime.datetime.now()
+    increase_delta_minutes = 5
 
     def __init__(self):
         pass
@@ -77,9 +80,12 @@ def adjust():
                     max_sensor = co2_sensors[max_address]
                     trend = max_sensor.get_trend("co2", max_address)
                     L.l.info("CO2 max trend for {} is {}".format(max_address, trend))
-                    if trend == 1:  # co2 increasing, faster if there are multiple rooms above max co2
+                    delta_power_increase = (datetime.datetime.now() - P.last_power_increase).total_seconds() / 60
+                    if trend == 1 and delta_power_increase >= P.increase_delta_minutes:
+                        # co2 increasing, faster if there are multiple rooms above max co2
                         new_power = vent.power_level + max_co2_count
                         vent_atrea.set_power_level(new_power)
+                        P.last_power_increase = datetime.datetime.now()
             # adjust vent openings based on co2 room levels
             adjust_vents(co2_sensors, max_address)
 
