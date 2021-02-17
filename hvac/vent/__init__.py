@@ -110,7 +110,7 @@ def adjust_vents_co2(sensors, max_sensor_address):
 
 def adjust_vents_radon():
     radon_sensor = m.AirSensor.find_one({m.AirSensor.id: radoneye.P.radoneye_id})
-    if radon_sensor is not None:
+    if radon_sensor is not None and radon_sensor.radon is not None:
         if radon_sensor.radon > P.radon_ok_value:
             vents = m.Vent.find()
             for vent in vents:
