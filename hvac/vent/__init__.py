@@ -106,38 +106,17 @@ def adjust_vents(co2_sensors, max_co2_sensor, radon_sensor, radon_is_high):
             vent.angle = -90  # close if not in a room with max co2 or radon
         vent.save_changed_fields(broadcast=True)  # this also sends mqtt command to vent
 
-    # open one vent
+    # open vent/s in one room
     if max_co2_sensor.co2 <= P.co2_ok_value and radon_is_high:
         # open zone vent with radon high and co2 ok
         zone_id_open = radon_sensor.zone_id
     else:
         # open if co2 is high
         zone_id_open = max_co2_sensor.zone_id
-    vent = m.Vent.find({m.Vent.zone_id: zone_id_open})
-    vent.angle = 90
-    vent.save_changed_fields(broadcast=True)
-
-
-def adjust_vents_radon():
-    radon_sensor = m.AirSensor.find_one({m.AirSensor.id: radoneye.P.radoneye_id})
-    if radon_sensor is not None and radon_sensor.radon is not None:
-        if radon_sensor.radon > P.radon_ok_value:
-            if P.central_mode_is_min:
-                L.l.info("Radon levels are high at {}, resuming system speed".format(radon_sensor.radon))
-                vent_atrea.set_power_level(vent_atrea.P.power_level_default)
-                P.central_mode_is_min = False
-                vents = m.Vent.find()
-                for vent in vents:
-                    if vent.zone_id == radon_sensor.zone_id:
-                        vent.angle = 90
-                    else:
-                        vent.angle = -90
-                    vent.save_changed_fields(broadcast=True)  # this also sends mqtt command to vent
-        else:
-            if not P.central_mode_is_min:
-                L.l.info("Radon levels are ok at {}, system speed to minimum".format(radon_sensor.radon))
-                vent_atrea.set_power_level(vent_atrea.P.power_level_min)
-                P.central_mode_is_min = True
+    vents = m.Vent.find({m.Vent.zone_id: zone_id_open})
+    for vent in vents:
+        vent.angle = 90
+        vent.save_changed_fields(broadcast=True)
 
 
 # def set_angle(host_name, angle):
