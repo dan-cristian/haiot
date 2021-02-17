@@ -100,12 +100,6 @@ def adjust():
 
 def adjust_vents(co2_sensors, max_co2_sensor, radon_sensor, radon_is_high):
     # adjust vents based on co2 room level or radon. CO2 takes priority.
-    vents = m.Vent.find()
-    for vent in vents:
-        if vent.zone_id != max_co2_sensor.zone_id and vent.zone_id != radon_sensor.zone_id:
-            vent.angle = -90  # close if not in a room with max co2 or radon
-        vent.save_changed_fields(broadcast=True)  # this also sends mqtt command to vent
-
     # open vent/s in one room
     if max_co2_sensor.co2 <= P.co2_ok_value and radon_is_high:
         # open zone vent with radon high and co2 ok
@@ -117,6 +111,13 @@ def adjust_vents(co2_sensors, max_co2_sensor, radon_sensor, radon_is_high):
     for vent in vents:
         vent.angle = 90
         vent.save_changed_fields(broadcast=True)
+
+    # close the rest
+    vents = m.Vent.find()
+    for vent in vents:
+        if vent.zone_id != zone_id_open:
+            vent.angle = -90  # close if not in a room with max co2 or radon
+        vent.save_changed_fields(broadcast=True)  # this also sends mqtt command to vent
 
 
 # def set_angle(host_name, angle):
