@@ -4,6 +4,7 @@ from main.logger_helper import L
 from main import thread_pool
 from storage.model import m
 from devices import vent_atrea
+from sensor import radoneye
 import datetime
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
@@ -13,8 +14,10 @@ class P:
     initialised = False
     last_vent_mode = None
     central_vent_sensor_name = "vent-air-w_pms5003"
-    co2_ok_value = 700
+    co2_ok_value = 650
     co2_warn_value = 1000
+    radon_ok_value = 70
+    # https://www.engineeringtoolbox.com/co2-comfort-level-d_1024.html
     central_mode_is_min = False
     max_outdoor_pm25 = 50
     last_power_increase = datetime.datetime.now()
@@ -87,10 +90,13 @@ def adjust():
                         vent_atrea.set_power_level(new_power)
                         P.last_power_increase = datetime.datetime.now()
             # adjust vent openings based on co2 room levels
-            adjust_vents(co2_sensors, max_address)
+            adjust_vents_co2(co2_sensors, max_address)
+
+        # adjust vent based on radon level
+        adjust_vents_radon()
 
 
-def adjust_vents(sensors, max_sensor_address):
+def adjust_vents_co2(sensors, max_sensor_address):
     # adjust vents based on co2 room level
     max_sensor = sensors[max_sensor_address]
     vents = m.Vent.find()
@@ -100,6 +106,28 @@ def adjust_vents(sensors, max_sensor_address):
         else:
             vent.angle = -90
         vent.save_changed_fields(broadcast=True)  # this also sends mqtt command to vent
+
+
+def adjust_vents_radon():
+    radon_sensor = m.AirSensor.find_one({m.AirSensor.id: radoneye.P.radoneye_id})
+    if radon_sensor is not None:
+        if radon_sensor.radon > P.radon_ok_value:
+            vents = m.Vent.find()
+            for vent in vents:
+                if vent.zone_id == radon_sensor.zone_id:
+                    vent.angle = 90
+                else:
+                    vent.angle = -90
+                vent.save_changed_fields(broadcast=True)  # this also sends mqtt command to vent
+            if P.central_mode_is_min:
+                L.l.info("Radon levels are high at {}, resuming system speed".format(radon_sensor.radon))
+                vent_atrea.set_power_level(vent_atrea.P.power_level_default)
+                P.central_mode_is_min = False
+        else:
+            if not P.central_mode_is_min:
+                L.l.info("Radon levels are ok at {}, system speed to minimum".format(radon_sensor.radon))
+                vent_atrea.set_power_level(vent_atrea.P.power_level_min)
+                P.central_mode_is_min = True
 
 
 # def set_angle(host_name, angle):
