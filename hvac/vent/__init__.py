@@ -66,63 +66,73 @@ def adjust():
                         co2_sensors[sensor.address] = sensor
                         if sensor.co2 > P.co2_ok_value:
                             max_co2_count += 1
+        radon_sensor = m.AirSensor.find_one({m.AirSensor.id: radoneye.P.radoneye_id})
+        radon_is_high = (radon_sensor is not None) and (radon_sensor.radon is not None) and \
+                        (radon_sensor.radon > P.radon_ok_value)
+        new_power_level = None
         if len(co2_vals) > 0:
             max_co2 = max(co2_vals)
             max_address = co2_ids[co2_vals.index(max_co2)]
-            if max_co2 <= P.co2_ok_value:  # reduce power level to minimum, no need
-                L.l.info("CO2 levels are low, {}, reducing system speed to minimum".format(max_co2))
-                vent_atrea.set_power_level(vent_atrea.P.power_level_min)
+            max_co2_sensor = co2_sensors[max_address]
+            if max_co2 <= P.co2_ok_value and not radon_is_high:  # reduce power level to minimum, no need
+                L.l.info("CO2/radon levels are low: {}, reducing system speed to minimum".format(max_co2))
+                new_power_level = vent_atrea.P.power_level_min
                 P.central_mode_is_min = True
             else:  # resume initial power level
                 if P.central_mode_is_min:
-                    L.l.info("CO2 levels are increased, resuming system speed")
-                    vent_atrea.set_power_level(vent_atrea.P.power_level_default)
+                    L.l.info("CO2/radon levels are increased, resuming system speed")
+                    new_power_level = vent_atrea.P.power_level_default
                     P.central_mode_is_min = False
                 else:
                     # adjust vent system power if needed to remove co2 faster
-                    max_sensor = co2_sensors[max_address]
-                    trend = max_sensor.get_trend("co2", max_address)
+                    trend = max_co2_sensor.get_trend("co2", max_address)
                     L.l.info("CO2 max trend for {} is {}".format(max_address, trend))
                     delta_power_increase = (datetime.datetime.now() - P.last_power_increase).total_seconds() / 60
                     if trend == 1 and delta_power_increase >= P.increase_delta_minutes:
                         # co2 increasing, faster if there are multiple rooms above max co2
-                        new_power = vent.power_level + max_co2_count
-                        vent_atrea.set_power_level(new_power)
+                        new_power_level = vent.power_level + max_co2_count
                         P.last_power_increase = datetime.datetime.now()
             # adjust vent openings based on co2 room levels
-            adjust_vents_co2(co2_sensors, max_address)
+            adjust_vents(co2_sensors, max_co2_sensor, radon_sensor, radon_is_high)
+            if new_power_level is not None:
+                vent_atrea.set_power_level(new_power_level)
 
-        # adjust vent based on radon level
-        adjust_vents_radon()
 
-
-def adjust_vents_co2(sensors, max_sensor_address):
-    # adjust vents based on co2 room level
-    max_sensor = sensors[max_sensor_address]
+def adjust_vents(co2_sensors, max_co2_sensor, radon_sensor, radon_is_high):
+    # adjust vents based on co2 room level or radon. CO2 takes priority.
     vents = m.Vent.find()
     for vent in vents:
-        if vent.zone_id == max_sensor.zone_id:
-            vent.angle = 90
-        else:
-            vent.angle = -90
+        if vent.zone_id != max_co2_sensor.zone_id and vent.zone_id != radon_sensor.zone_id:
+            vent.angle = -90  # close if not in a room with max co2 or radon
         vent.save_changed_fields(broadcast=True)  # this also sends mqtt command to vent
+
+    # open one vent
+    if max_co2_sensor.co2 <= P.co2_ok_value and radon_is_high:
+        # open zone vent with radon high and co2 ok
+        zone_id_open = radon_sensor.zone_id
+    else:
+        # open if co2 is high
+        zone_id_open = max_co2_sensor.zone_id
+    vent = m.Vent.find({m.Vent.zone_id: zone_id_open})
+    vent.angle = 90
+    vent.save_changed_fields(broadcast=True)
 
 
 def adjust_vents_radon():
     radon_sensor = m.AirSensor.find_one({m.AirSensor.id: radoneye.P.radoneye_id})
     if radon_sensor is not None and radon_sensor.radon is not None:
         if radon_sensor.radon > P.radon_ok_value:
-            vents = m.Vent.find()
-            for vent in vents:
-                if vent.zone_id == radon_sensor.zone_id:
-                    vent.angle = 90
-                else:
-                    vent.angle = -90
-                vent.save_changed_fields(broadcast=True)  # this also sends mqtt command to vent
             if P.central_mode_is_min:
                 L.l.info("Radon levels are high at {}, resuming system speed".format(radon_sensor.radon))
                 vent_atrea.set_power_level(vent_atrea.P.power_level_default)
                 P.central_mode_is_min = False
+                vents = m.Vent.find()
+                for vent in vents:
+                    if vent.zone_id == radon_sensor.zone_id:
+                        vent.angle = 90
+                    else:
+                        vent.angle = -90
+                    vent.save_changed_fields(broadcast=True)  # this also sends mqtt command to vent
         else:
             if not P.central_mode_is_min:
                 L.l.info("Radon levels are ok at {}, system speed to minimum".format(radon_sensor.radon))
