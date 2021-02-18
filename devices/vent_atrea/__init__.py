@@ -30,6 +30,7 @@ class P:
                    5: "precooling", 6: "disbalance", 7: "overpressure"}
 
     mode_off = 0
+    mode_default = 2
 
     power_level_min = 12
     power_level_default = 35

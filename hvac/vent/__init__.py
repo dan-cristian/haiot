@@ -34,6 +34,7 @@ def adjust():
     if vent is None:
         L.l.error("Ventilation system not defined in conf, exit")
         return
+
     # shutoff vent system on high pm25
     if dust_sensor is not None:
         pm25 = dust_sensor.pm_2_5
@@ -44,6 +45,8 @@ def adjust():
         else:
             if P.last_vent_mode is not None:
                 vent.mode = P.last_vent_mode
+            else:
+                vent.mode = vent_atrea.P.mode_default
         vent.save_changed_fields()
 
     # adjust vent system power based on CO2 levels
@@ -118,10 +121,6 @@ def adjust_vents(co2_sensors, max_co2_sensor, radon_sensor, radon_is_high):
         if vent.zone_id != zone_id_open:
             vent.angle = -90  # close if not in a room with max co2 or radon
         vent.save_changed_fields(broadcast=True)  # this also sends mqtt command to vent
-
-
-# def set_angle(host_name, angle):
-#    pass
 
 
 def vent_upsert_listener(record, changed_fields):
