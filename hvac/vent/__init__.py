@@ -17,6 +17,7 @@ class P:
     co2_ok_value = 650
     co2_warn_value = 1000
     radon_ok_value = 70
+    radon_warn_value = 100
     # https://www.engineeringtoolbox.com/co2-comfort-level-d_1024.html
     central_mode_is_min = False
     max_outdoor_pm25 = 50
@@ -35,12 +36,18 @@ def adjust():
         L.l.error("Ventilation system not defined in conf, exit")
         return
 
+    radon_sensor = m.AirSensor.find_one({m.AirSensor.id: radoneye.P.radoneye_id})
+    radon_is_high = (radon_sensor is not None) and (radon_sensor.radon is not None) and \
+                    (radon_sensor.radon > P.radon_ok_value)
+    radon_is_warn = (radon_sensor is not None) and (radon_sensor.radon is not None) and \
+                    (radon_sensor.radon > P.radon_warn_value)
+
     # shutoff vent system on high pm25
     if dust_sensor is not None:
         pm25 = dust_sensor.pm_2_5
         if vent.mode != vent_atrea.P.mode_off:
             P.last_vent_mode = vent.mode
-        if pm25 > P.max_outdoor_pm25:  # max pm level to shutdown
+        if pm25 > P.max_outdoor_pm25 and not radon_is_high:  # max pm level to shutdown
             vent.mode = vent_atrea.P.mode_off
         else:
             if P.last_vent_mode is not None:
@@ -48,6 +55,9 @@ def adjust():
             else:
                 vent.mode = vent_atrea.P.mode_default
         vent.save_changed_fields()
+        if vent.mode == vent_atrea.P.mode_off:
+            # no point in doing other vent adjustments
+            return
 
     # adjust vent system power based on CO2 levels
     if vent.mode != vent_atrea.P.mode_off:
@@ -69,9 +79,7 @@ def adjust():
                         co2_sensors[sensor.address] = sensor
                         if sensor.co2 > P.co2_ok_value:
                             max_co2_count += 1
-        radon_sensor = m.AirSensor.find_one({m.AirSensor.id: radoneye.P.radoneye_id})
-        radon_is_high = (radon_sensor is not None) and (radon_sensor.radon is not None) and \
-                        (radon_sensor.radon > P.radon_ok_value)
+
         new_power_level = None
         if len(co2_vals) > 0:
             max_co2 = max(co2_vals)
