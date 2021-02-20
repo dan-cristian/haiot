@@ -47,7 +47,7 @@ def adjust():
         pm25 = dust_sensor.pm_2_5
         if vent.mode != vent_atrea.P.mode_off:
             P.last_vent_mode = vent.mode
-        if pm25 > P.max_outdoor_pm25 and not radon_is_high:  # max pm level to shutdown
+        if pm25 > P.max_outdoor_pm25 and not radon_is_warn:  # max pm level to shutdown
             vent.mode = vent_atrea.P.mode_off
         else:
             if P.last_vent_mode is not None:
