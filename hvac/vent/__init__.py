@@ -20,7 +20,9 @@ class P:
     radon_warn_value = 100
     # https://www.engineeringtoolbox.com/co2-comfort-level-d_1024.html
     central_mode_is_min = False
-    max_outdoor_pm25 = 50
+    pm25_outdoor_warn = 50
+    pm25_outdoor_critical = 75
+
     last_power_increase = datetime.datetime.now()
     increase_delta_minutes = 5
 
@@ -47,7 +49,8 @@ def adjust():
         pm25 = dust_sensor.pm_2_5
         if vent.mode != vent_atrea.P.mode_off:
             P.last_vent_mode = vent.mode
-        if pm25 > P.max_outdoor_pm25 and not radon_is_warn:  # max pm level to shutdown
+        if (pm25 > P.pm25_outdoor_warn and not radon_is_warn) or pm25 > P.pm25_outdoor_critical:
+            # max outdoor pm level to shutdown ventilation
             vent.mode = vent_atrea.P.mode_off
         else:
             if P.last_vent_mode is not None and P.last_vent_mode != vent_atrea.P.mode_off:
