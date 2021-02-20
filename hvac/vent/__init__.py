@@ -50,7 +50,7 @@ def adjust():
         if pm25 > P.max_outdoor_pm25 and not radon_is_warn:  # max pm level to shutdown
             vent.mode = vent_atrea.P.mode_off
         else:
-            if P.last_vent_mode is not None:
+            if P.last_vent_mode is not None and P.last_vent_mode != vent_atrea.P.mode_off:
                 vent.mode = P.last_vent_mode
             else:
                 vent.mode = vent_atrea.P.mode_default
