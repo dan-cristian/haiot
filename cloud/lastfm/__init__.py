@@ -8,15 +8,9 @@ import music.mpd
 from music import gmusicproxy
 from main.logger_helper import L
 import json
-
-from common import fix_module
-while True:
-    try:
-        import pylast
-        break
-    except ImportError as iex:
-        if not fix_module(iex):
-            break
+from difflib import get_close_matches
+import pylast
+import re
 
 
 class P:
@@ -114,9 +108,54 @@ def set_current_loved(loved):
     return res
 
 
+def _complex_search(artist, title, mpd_client):
+    #artist = 'PLAYROOM - STANDERWICK'.lower()
+    #title = 'Apricus (ASOT 1002) [Progressive Pick]'.lower()
+    #item = 'Trance/asot/asot1002/Armin van Buuren - A State Of Trance 1002 (04.02.2021) SBD Split Track/08. STANDERWICK - Apricus [PROGRESSIVE PICK].mp3'.lower()
+    #song_list = ['AC_DC/Back In Black/00 Freebird.mp3'.lower(), item]
+    #match = get_close_matches(title, song_list, n=2, cutoff=0.2)
+    #if len(match) == 0:
+    #    match = get_close_matches(artist, song_list, n=2, cutoff=0.2)
+    #return match
+    res = []
+    clean_title = re.sub(re.compile(r'[^a-zA-Z ]+'), '', title).lower().strip()
+    clean_artist = re.sub(re.compile(r'[^a-zA-Z ]+'), '', artist).lower().strip()
+    splits = clean_title.split()
+    for prev, curr in zip(splits, splits[1:]):
+        res = mpd_client.search("title", prev)
+        if len(res) == 1:
+            return res
+        elif len(res) > 1:
+            res = mpd_client.search("title", '{} {}'.format(prev, curr))
+            if len(res) == 1:
+                return res
+            else:
+                for song in res:
+                    if ('title' in song and title in song['title'].lower()) \
+                            or ('artist' in song and artist in song['artist'].lower()) \
+                            or ('artist' in song and clean_artist in song['artist'].lower()) \
+                            or ('albumartist' in song and artist in song['albumartist'].lower())\
+                            or ('albumartist' in song and clean_artist in song['albumartist'].lower()):
+                        return [song]
+
+    splits = clean_artist.split()
+    for prev, curr in zip(splits, splits[1:]):
+        res = mpd_client.search("artist", prev)
+        if len(res) == 1:
+            return res
+        elif len(res) > 1:
+            res = mpd_client.search("artist", '{} {}'.format(prev, curr))
+            if len(res) == 1:
+                return res
+    return []
+
+
 def _add_to_playlist(tracks):
     mpd_client = music.mpd.get_first_active_mpd()
+    all_songs = None
+    song_list = []
     added = 0
+    missed = 0
     if mpd_client is not None:
         mpd_client.clear()
         for track in tracks:
@@ -130,9 +169,23 @@ def _add_to_playlist(tracks):
             L.l.info("Searching for {} - {}".format(artist.encode('utf-8'), title.encode('utf-8')))
             res = mpd_client.search("any", title)
             if len(res) == 0:
-                L.l.info("Search again in mpd")
+                # L.l.info("Search again in mpd")
                 res = mpd_client.search("file", title)
-            if len(res) == 0:
+                if len(res) == 0:
+                    if all_songs is None:
+                        all_songs = mpd_client.listall('/')
+                        for song in all_songs:
+                            if 'file' in song:
+                                song_list.append(song['file'].lower())
+                    res = _complex_search(artist, title, mpd_client)
+            if len(res) > 0:
+                mpd_client.add(res[0]['file'])
+                L.l.info("Added file {}".format(res[0]['file']))
+                added += 1
+            else:
+                L.l.warning("Could not find music track {}".format(title))
+                missed += 1
+            if False:  # len(res) == 0:
                 L.l.info("Searching in Google Music as song not found in mpd")
                 gsong_id = gmusicproxy.get_song_id(artist=artist, title=title)
                 if gsong_id is not None:
@@ -146,15 +199,12 @@ def _add_to_playlist(tracks):
                     added += 1
                 else:
                     L.l.warning("Could not find the song in Google Music")
-            else:
-                mpd_client.add(res[0]['file'])
-                L.l.info("Added file {}".format(res[0]['file']))
-                added += 1
+
             if added == 1:  # fixme: might re-play several times
                 mpd_client.play(0)
         mpd_client.close()
         mpd_client.disconnect()
-        result = 'Added {} songs'.format(added)
+        result = 'Added {}, missed {} songs'.format(added, missed)
     else:
         result = 'Lastfm: No active mpd instance found'
         L.l.warning(result)

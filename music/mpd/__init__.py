@@ -4,15 +4,7 @@ from common import Constant, get_json_param
 from main import sqlitedb
 from cloud import lastfm
 from storage.model import m
-
-from common import fix_module
-while True:
-    try:
-        from mpd import MPDClient
-        break
-    except ImportError as iex:
-        if not fix_module(iex):
-            break
+from mpd import MPDClient
 
 
 class P:
