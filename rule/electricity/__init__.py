@@ -359,16 +359,20 @@ def _update_devices():
 
 
 # energy rule
-def rule_energy_export(obj=m.Utility(), change=None):
-    if change is not None and 'units_2_delta' in change:
-        if obj.utility_name == 'power main mono':
+def rule_energy_export(obj=m.PowerMonitor(), change=None):
+    if change is not None and 'power' in change:
+        if obj.name == 'main l1':
             if P.emulate_export is True:
                 P.grid_watts = random.randint(-800, -300)
             else:
-                P.grid_watts = obj.units_2_delta
+                P.grid_watts = obj.power
             # L.l.info('Got rule main watts {}'.format(P.grid_watts))
             _update_devices()
-        else:
+
+
+def rule_energy_utility(obj=m.Utility(), change=None):
+    if change is not None and 'units_2_delta' in change:
+        if obj.utility_name != 'power main mono':
             # L.l.info('Got energy utility {}'.format(obj.utility_name))
             if obj.utility_name in P.utility_list:
                 inst = P.utility_list[obj.utility_name]
@@ -377,9 +381,6 @@ def rule_energy_export(obj=m.Utility(), change=None):
                     inst.set_watts(obj.units_2_delta)
                 else:
                     L.l.info('Discarding utility {}, not relevant'.format(obj.utility_name))
-    else:
-        # L.l.info('Got utility with no changes {}'.format(obj.utility_name))
-        pass
 
 
 def init():
