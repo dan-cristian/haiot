@@ -149,8 +149,8 @@ def thread_run():
             P.event_list.remove(obj)
         except Exception as ex:
             L.l.critical("Error processing openhab rule err={} obj={}".format(ex, obj), exc_info=True)
-    prctl.set_name("idle")
-    threading.current_thread().name = "idle"
+    prctl.set_name("idle_openhab")
+    threading.current_thread().name = "idle_openhab"
 
 
 def unload():

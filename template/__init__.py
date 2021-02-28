@@ -17,8 +17,8 @@ def thread_run():
     prctl.set_name("")
     threading.current_thread().name = ""
     #
-    prctl.set_name("idle")
-    threading.current_thread().name = "idle"
+    prctl.set_name("idle_")
+    threading.current_thread().name = "idle_"
     return 'Processed template_run'
 
 

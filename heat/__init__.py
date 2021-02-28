@@ -426,8 +426,8 @@ def thread_run():
     P.season = "summer" if month in range(5, 9) else "winter"
     _set_main_heat_source()
     _loop_zones()
-    prctl.set_name("idle")
-    threading.current_thread().name = "idle"
+    prctl.set_name("idle_heat")
+    threading.current_thread().name = "idle_heat"
     return 'Heat ok'
 
 

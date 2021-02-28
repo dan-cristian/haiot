@@ -106,8 +106,8 @@ class poller:
                     target.do_read(one_ready[0])
         except Exception as ex:
             L.l.error("Error in wemo poll: {}".format(ex), exc_info=True)
-        prctl.set_name("idle")
-        threading.current_thread().name = "idle"
+        prctl.set_name("idle_alexa_wemo")
+        threading.current_thread().name = "idle_alexa_wemo"
 
 
 # Base class for a generic UPnP device. This is far from complete

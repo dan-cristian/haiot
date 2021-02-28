@@ -73,11 +73,11 @@ def GetRadonValue():
 
 
 def thread_run():
-    prctl.set_name("Radoneye")
-    threading.current_thread().name = "Radoneye"
+    prctl.set_name("radoneye")
+    threading.current_thread().name = "radoneye"
     GetRadonValue()
-    prctl.set_name("idle")
-    threading.current_thread().name = "idle"
+    prctl.set_name("idle_radoneye")
+    threading.current_thread().name = "idle_radoneye"
     return 'Processed Radoneye'
 
 

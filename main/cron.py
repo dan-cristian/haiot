@@ -28,8 +28,8 @@ def thread_run():
     prctl.set_name("cron")
     threading.current_thread().name = "cron"
     schedule.run_pending()
-    prctl.set_name("idle")
-    threading.current_thread().name = "idle"
+    prctl.set_name("idle_cron")
+    threading.current_thread().name = "idle_cron"
 
 
 def unload():

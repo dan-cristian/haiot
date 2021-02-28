@@ -200,8 +200,8 @@ def thread_run():
     if P.initialised and P.serial is not None:
         P.thread_pool_status = 'read status'
         __read_ups_status()
-    prctl.set_name("idle")
-    threading.current_thread().name = "idle"
+    prctl.set_name("idle_ups_legrand")
+    threading.current_thread().name = "idle_ups_legrand"
 
 
 def unload():

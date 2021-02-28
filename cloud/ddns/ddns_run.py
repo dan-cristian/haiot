@@ -106,6 +106,6 @@ def thread_run():
     threading.current_thread().name = "ddns"
     L.l.debug('Processing ddns_run')
     __update_ddns_rackspace()
-    prctl.set_name("idle")
-    threading.current_thread().name = "idle"
+    prctl.set_name("idle_ddns")
+    threading.current_thread().name = "idle_ddns"
     return 'Processed ddns_run'

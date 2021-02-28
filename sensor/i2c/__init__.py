@@ -49,8 +49,8 @@ def thread_run():
     threading.current_thread().name = "i2c"
     if P.has_bmp280:
         _read_bmp280()
-    prctl.set_name("idle")
-    threading.current_thread().name = "idle"
+    prctl.set_name("idle_i2c")
+    threading.current_thread().name = "idle_i2c"
 
 
 def _init_bmp280():

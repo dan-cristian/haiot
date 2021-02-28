@@ -160,16 +160,16 @@ def resumable_upload(insert_request):
                 L.l.info('Video id {} file {} was successfully uploaded.'.format(response['id'], file))
             else:
                 L.l.warning('The upload for {} failed with an unexpected response {}'.format(file, response))
-        except errors.HttpError, e:
+        except errors.HttpError as e:
             if e.resp.status in RETRIABLE_STATUS_CODES:
                 error = "A retriable HTTP error %d occurred:\n%s" % (e.resp.status, e.content)
             else:
                 raise
-        except RETRIABLE_EXCEPTIONS, e:
+        except RETRIABLE_EXCEPTIONS as e:
             error = "A retriable error occurred: %s" % e
 
         if error is not None:
-            print error
+            print(error)
             retry += 1
             if retry > MAX_RETRIES:
                 L.l.warning('No longer attempting to retry upload for file {}'.format(file))
@@ -200,11 +200,11 @@ def upload_file(file):
                         initialize_upload(__youtube, __args)
                         __uploaded_file_list_date[file] = utils.get_base_location_now_date()
                         del __file_list_last_change[file]
-                    except errors.HttpError, ex:
+                    except errors.HttpError as ex:
                         L.l.warning('Error while uploading file={}, err={}'.format(file, ex))
-                    except Exception, ex:
+                    except Exception as ex:
                         L.l.info('Unexpected error on upload, file {}, err={}'.format(file, ex))
-                except Exception, ex:
+                except Exception as ex:
                     L.l.info('Locked file {}, err={}'.format(file, ex))
 
     else:
@@ -257,8 +257,8 @@ if __name__ == '__main__':
     youtube = get_authenticated_service(args)
     try:
         initialize_upload(youtube, args)
-    except errors.HttpError, e:
-        print "An HTTP error %d occurred:\n%s" % (e.resp.status, e.content)
+    except errors.HttpError as e:
+        print("An HTTP error %d occurred:\n%s" % (e.resp.status, e.content))
 
 
 def thread_run():
@@ -284,8 +284,8 @@ def thread_run():
                         break
     except Exception as ex:
         L.l.warning('Exception on youtube thread run, err={}'.format(ex))
-    prctl.set_name("idle")
-    threading.current_thread().name = "idle"
+    prctl.set_name("idle_youtube")
+    threading.current_thread().name = "idle_youtube"
 
 
 def init():

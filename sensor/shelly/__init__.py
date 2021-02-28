@@ -107,8 +107,8 @@ def mqtt_on_message(client, userdata, msg):
     except Exception as ex:
         L.l.error("Error processing shelly mqtt {}, err={}, msg={}".format(msg.topic, ex, msg), exc_info=True)
     finally:
-        prctl.set_name("idle")
-        threading.current_thread().name = "idle"
+        prctl.set_name("idle_mqtt_shelly")
+        threading.current_thread().name = "idle_mqtt_shelly"
 
 
 def set_relay_state(relay_name, relay_is_on):
@@ -128,8 +128,8 @@ def post_init():
 def thread_run():
     prctl.set_name("shelly")
     threading.current_thread().name = "shelly"
-    prctl.set_name("idle")
-    threading.current_thread().name = "idle"
+    prctl.set_name("idle_shelly")
+    threading.current_thread().name = "idle_shelly"
 
 
 def unload():

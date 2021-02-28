@@ -36,8 +36,8 @@ def thread_run():
     threading.current_thread().name = "usb"
     if _check_usb_change():
         dispatcher.send(Constant.SIGNAL_USB_DEVICE_CHANGE)
-    prctl.set_name("idle")
-    threading.current_thread().name = "idle"
+    prctl.set_name("idle_usb")
+    threading.current_thread().name = "idle_usb"
     return 'Processed usb'
 
 

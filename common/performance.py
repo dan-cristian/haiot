@@ -82,8 +82,8 @@ def thread_run():
     prctl.set_name("performance")
     threading.current_thread().name = "performance"
     # _cpu_profiling()
-    prctl.set_name("idle")
-    threading.current_thread().name = "idle"
+    prctl.set_name("idle_performance")
+    threading.current_thread().name = "idle_performance"
 
 
 def init(log_file):

@@ -165,8 +165,8 @@ def thread_run():
         P.initialised = False
         P.init_failed_count += 1
         utils.sleep(10)
-    prctl.set_name("idle")
-    threading.current_thread().name = "idle"
+    prctl.set_name("idle_rfxcom")
+    threading.current_thread().name = "idle_rfxcom"
 
 
 def get_progress():

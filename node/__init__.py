@@ -164,8 +164,8 @@ def thread_run():
     progress_status = 'Announcing node state'
     announce_node_state()
     progress_status = 'Completed'
-    prctl.set_name("idle")
-    threading.current_thread().name = "idle"
+    prctl.set_name("idle_node_run")
+    threading.current_thread().name = "idle_node_run"
     return 'Processed node_run'
 
 

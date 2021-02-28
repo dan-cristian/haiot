@@ -285,8 +285,8 @@ def _dynamic_thread_run(ow_conn, ow_bus):
         prctl.set_name("owsensor-bus")
         threading.current_thread().name = "{}{}".format("owsensor", ow_bus)
         do_device(ow=ow_conn, path=ow_bus)
-        prctl.set_name("idle")
-        threading.current_thread().name = "idle"
+        prctl.set_name("idle_owsensor-bus")
+        threading.current_thread().name = "idle_owsensor-bus"
     return _function
 
 
@@ -333,8 +333,8 @@ def thread_run():
         check_inactive()
     else:
         _init_comm()
-    prctl.set_name("idle")
-    threading.current_thread().name = "idle"
+    prctl.set_name("idle_owsensor")
+    threading.current_thread().name = "idle_owsensor"
 
 
 def unload():

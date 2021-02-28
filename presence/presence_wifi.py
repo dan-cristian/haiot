@@ -70,6 +70,6 @@ def thread_run():
     L.l.debug('Processing presence_run')
     if Constant.is_os_linux():
         _check_wifi()
-    prctl.set_name("idle")
-    threading.current_thread().name = "idle"
+    prctl.set_name("idle_presence_wifi")
+    threading.current_thread().name = "idle_presence_wifi"
 
