@@ -197,8 +197,8 @@ def thread_run():
     prctl.set_name("gpio")
     threading.current_thread().name = "gpio"
     _process_expire()
-    prctl.set_name("idle")
-    threading.current_thread().name = "idle"
+    prctl.set_name("idle_gpio")
+    threading.current_thread().name = "idle_gpio"
 
 
 def unload():

@@ -142,6 +142,8 @@ def on_message(client, userdata, msg):
             pass
     except Exception as ex:
         L.l.warning('Unknown attribute error in msg {} err {}'.format(json, ex))
+    prctl.set_name("idle_mqtt_loop")
+    threading.current_thread().name = "idle_mqtt_loop"
 
 
 def unload():

@@ -238,8 +238,8 @@ def mqtt_on_message(client, userdata, msg):
     except Exception as ex:
         L.l.error("Error processing sonoff mqtt {}, err={}, msg={}".format(msg.topic, ex, msg), exc_info=True)
     finally:
-        prctl.set_name("idle")
-        threading.current_thread().name = "idle"
+        prctl.set_name("idle_mqtt_sonoff")
+        threading.current_thread().name = "idle_mqtt_sonoff"
 
 
 # iot/sonoff/stat/sonoff-basic-5/POWER = ON/OFF
@@ -364,8 +364,8 @@ def thread_run():
     prctl.set_name("sonoff")
     threading.current_thread().name = "sonoff"
     #_tasmota_discovery()
-    prctl.set_name("idle")
-    threading.current_thread().name = "idle"
+    prctl.set_name("idle_sonoff")
+    threading.current_thread().name = "idle_sonoff"
 
 
 def unload():

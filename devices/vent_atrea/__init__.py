@@ -113,8 +113,8 @@ def thread_run():
     prctl.set_name("atrea")
     threading.current_thread().name = "atrea"
     keep_alive()
-    prctl.set_name("idle")
-    threading.current_thread().name = "idle"
+    prctl.set_name("idle_atrea")
+    threading.current_thread().name = "idle_atrea"
     return 'Processed template_run'
 
 

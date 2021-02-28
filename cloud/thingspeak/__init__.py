@@ -270,8 +270,8 @@ def thread_run():
         _upload_bulk()
     except Exception as ex:
         L.l.error("Error on thingspeak thread_run, ex={}".format(ex))
-    prctl.set_name("idle")
-    threading.current_thread().name = "idle"
+    prctl.set_name("idle_thingspeak")
+    threading.current_thread().name = "idle_thingspeak"
 
 def unload():
     thread_pool.remove_callable(thread_run)

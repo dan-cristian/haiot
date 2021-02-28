@@ -60,6 +60,8 @@ def _process_obj(obj):
 
 
 def mqtt_thread_run():
+    prctl.set_name("mqtt_thread_run")
+    threading.current_thread().name = "mqtt_thread_run"
     P.mqtt_lock.acquire()
     try:
         last_count = len(P.mqtt_event_list)
@@ -74,8 +76,8 @@ def mqtt_thread_run():
         L.l.error("General error processing mqtt: {}".format(ex), exc_info=True)
     finally:
         P.mqtt_lock.release()
-        prctl.set_name("idle")
-        threading.current_thread().name = "idle"
+        prctl.set_name("idle_thread_run")
+        threading.current_thread().name = "idle_thread_run"
 
 
 # http://pydispatcher.sourceforge.net/

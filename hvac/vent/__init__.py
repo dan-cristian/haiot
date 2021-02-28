@@ -142,11 +142,11 @@ def vent_upsert_listener(record, changed_fields):
 
 
 def thread_run():
-    prctl.set_name("hvac vent")
-    threading.current_thread().name = "hvac vent"
+    prctl.set_name("hvac_vent")
+    threading.current_thread().name = "hvac_vent"
     adjust()
-    prctl.set_name("idle")
-    threading.current_thread().name = "idle"
+    prctl.set_name("idle_hvac_vent")
+    threading.current_thread().name = "idle_hvac_vent"
     return 'Processed hvac vent'
 
 

@@ -67,8 +67,8 @@ def thread_run_send():
         if elapsed > 10:
             L.l.info("Initialising mqtt as message needs to be sent, elapsed={}".format(elapsed))
             mqtt_io.init()
-    prctl.set_name("idle")
-    threading.current_thread().name = "idle"
+    prctl.set_name("idle_mqtt_send")
+    threading.current_thread().name = "idle_mqtt_send"
 
 
 def thread_run_recv():
@@ -89,8 +89,8 @@ def thread_run_recv():
     except Exception as ex:
         L.l.error('Error on mqtt receive process, err={}, obj={}'.format(ex, obj))
     finally:
-        prctl.set_name("idle")
-        threading.current_thread().name = "idle"
+        prctl.set_name("idle_mqtt_recv")
+        threading.current_thread().name = "idlem_qtt_recv"
 
 
 def unload():

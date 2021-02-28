@@ -468,8 +468,8 @@ def thread_run():
             _initial_node_init()
     except Exception as ex:
         L.l.error("Error in zwave thread run={}".format(ex), exc_info=True)
-    prctl.set_name("idle")
-    threading.current_thread().name = "idle"
+    prctl.set_name("idle_zwave")
+    threading.current_thread().name = "idle_zwave"
 
 
 def unload():

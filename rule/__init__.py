@@ -100,8 +100,8 @@ def thread_run():
     prctl.set_name("rule_run")
     threading.current_thread().name = "rule_run"
     _process_events()
-    prctl.set_name("idle")
-    threading.current_thread().name = "idle"
+    prctl.set_name("idle_rule_run")
+    threading.current_thread().name = "idle_rule_run"
     return 'Processed rules thread_run'
 
 
@@ -228,8 +228,8 @@ def reload_rules():
         rules_run.test_code()
     # else:
     #    Log.logger.info('Reloading {} skip timestamp {} != {}'.format(path, P.timestamp, new_stamp))
-    prctl.set_name("idle")
-    threading.current_thread().name = "idle"
+    prctl.set_name("idle_rule_reload")
+    threading.current_thread().name = "idle_rule_reload"
 
 
 def _process_sub_rules():
@@ -239,8 +239,8 @@ def _process_sub_rules():
     for thread_func in P.sub_modules.values():
         thread_func()
 
-    prctl.set_name("idle")
-    threading.current_thread().name = "idle"
+    prctl.set_name("idle_subrule_run")
+    threading.current_thread().name = "idle_subrule_run"
 
 
 def init_sub_rule(thread_run_func, rule_module):
