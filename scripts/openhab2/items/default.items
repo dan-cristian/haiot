@@ -2,11 +2,6 @@ Group   PRO     "Our Home"   <house>
 Group   HOU     "Our House"   <house>    (PRO)
 Group   CEL     "Cellar"   <cellar>     (HOU)
 
-Switch ups_power_failed "UPS Power" <switch>                                {mqtt="<[mosquitto:iot/openhab/ups_power_failed:state:default]"}
-Number ups_load_percent "UPS Load [%.0f %%]" <light>                        {mqtt="<[mosquitto:iot/openhab/ups_load_percent:state:default]"}
-Number ups_battery_voltage "UPS Battery [%.1f V]" <batterylevel>            {mqtt="<[mosquitto:iot/openhab/ups_battery_voltage:state:default]"}
-Number ups_input_voltage "UPS Input [%.0f V]" <poweroutlet_us>              {mqtt="<[mosquitto:iot/openhab/ups_input_voltage:state:default]"}
-Number ups_power_frequency "UPS Frequency [%.0f Hz]" <poweroutlet_us>              {mqtt="<[mosquitto:iot/openhab/ups_power_frequency:state:default]"}
 
 Switch relay_dishwasher "Plug dishwasher" <switch>                     {mqtt="<[mosquitto:iot/openhab/relay_plug_dishwasher:state:default],>[mosquitto:iot/openhab/cmd/relay_plug_dishwasher:command:*:default]", autoupdate="false"}
 Switch relay_fridge "Plug fridge" <switch>                             {mqtt="<[mosquitto:iot/openhab/relay_plug_fridge:state:default],>[mosquitto:iot/openhab/cmd/relay_plug_fridge:command:*:default]", autoupdate="false"}
@@ -48,54 +43,9 @@ Switch relay_back_valve_relay "Back valve" <switch>                         (REL
 Switch relay_front_clean_water_relay "Front clean water" <switch>                 (RELAY_FRONT_WATER) {mqtt="<[mosquitto:iot/openhab/relay_front_clean_water_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_front_clean_water_relay:command:*:default]", autoupdate="false"}
 Switch relay_front_valve_relay "Front valve" <switch>             (RELAY_FRONT_WATER) {mqtt="<[mosquitto:iot/openhab/relay_front_valve_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_front_valve_relay:command:*:default]", autoupdate="false"}
 
-
-Number electricity_power_main_mono "Power main mono [%.0fw]" <energy>   {mqtt="<[mosquitto:iot/openhab/electricity_power main mono:state:default]"}
-Number electricity_kWh_power_main_mono "KWh main mono [%.2f kWh]" <energy>  {mqtt="<[mosquitto:iot/openhab/electricity_kWh_power main mono:state:default]"}
-Number electricity_power_factor_mono "Main power factor [%.2f]" <flow>      {mqtt="<[mosquitto:iot/openhab/vdd_zwave main power meter:state:default]"}
-Number electricity_voltage_mono "Main voltage [%.0f V]" <energy>            {mqtt="<[mosquitto:iot/openhab/vad_zwave main power meter:state:default]"}
-Number electricity_current_mono "Main current [%.1f A]" <poweroutlet_eu>    {mqtt="<[mosquitto:iot/openhab/iad_zwave main power meter:state:default]"}
-
-Number electricity_power_ups "Power ups [%.0fw]" <energy>                 {mqtt="<[mosquitto:iot/openhab/electricity_power ups:state:default]"}
-Number electricity_kWh_power_ups "KWh ups [%.2f kWh]" <energy>            {mqtt="<[mosquitto:iot/openhab/electricity_kWh_power ups:state:default]"}
-Number electricity_power_factor_ups "Ups power factor [%.2f]" <flow>      {mqtt="<[mosquitto:iot/openhab/vdd_power ups:state:default]"}
-Number electricity_voltage_ups "Ups voltage [%.0f V]" <energy>            {mqtt="<[mosquitto:iot/openhab/vad_power ups:state:default]"}
-Number electricity_current_ups "Ups current [%.1f A]" <poweroutlet_eu>    {mqtt="<[mosquitto:iot/openhab/iad_power ups:state:default]"}
-
-Number electricity_solar_aps "Power solar [%.0fw]" <solarplant>             {mqtt="<[mosquitto:iot/openhab/electricity_solar_aps:state:default]"}
-Number electricity_kWh_solar_aps "KWh solar [%.2f kWh]" <solarplant>        {mqtt="<[mosquitto:iot/openhab/electricity_kWh_solar_aps:state:default]"}
-
-Number electricity_power_dishwasher "Power dishwasher [%.0fw]" <energy>                 {mqtt="<[mosquitto:iot/openhab/electricity_power dishwasher:state:default]"}
-Number electricity_kWh_power_dishwasher "KWh dishwasher [%.2f kWh]" <energy>            {mqtt="<[mosquitto:iot/openhab/electricity_kWh_power dishwasher:state:default]"}
-Number electricity_power_factor_dishwasher "Dishwasher power factor [%.2f]" <flow>      {mqtt="<[mosquitto:iot/openhab/vdd_zwave dishwasher:state:default]"}
-Number electricity_voltage_dishwasher "Dishwasher voltage [%.0f V]" <energy>            {mqtt="<[mosquitto:iot/openhab/vad_zwave dishwasher:state:default]"}
-Number electricity_current_dishwasher "Dishwasher current [%.1f A]" <poweroutlet_eu>    {mqtt="<[mosquitto:iot/openhab/iad_zwave dishwasher:state:default]"}
-
-Number electricity_power_fridge "Power fridge [%.0fw]" <energy>                 {mqtt="<[mosquitto:iot/openhab/electricity_power fridge:state:default]"}
-Number electricity_kWh_power_fridge "KWh fridge [%.2f kWh]" <energy>            {mqtt="<[mosquitto:iot/openhab/electricity_kWh_power fridge:state:default]"}
-Number electricity_power_factor_fridge "Fridge power factor [%.2f]" <flow>      {mqtt="<[mosquitto:iot/openhab/vdd_zwave fridge:state:default]"}
-Number electricity_voltage_fridge "Fridge voltage [%.0f V]" <energy>            {mqtt="<[mosquitto:iot/openhab/vad_zwave fridge:state:default]"}
-Number electricity_current_fridge "Fridge current [%.1f A]" <poweroutlet_eu>    {mqtt="<[mosquitto:iot/openhab/iad_zwave fridge:state:default]"}
-
-Number electricity_power_freezer "Power freezer [%.0fw]" <energy>           {mqtt="<[mosquitto:iot/openhab/electricity_power freezer:state:default]"}
-Number electricity_power_gas_heater "Power gas heater[%.0fw]" <energy>      {mqtt="<[mosquitto:iot/openhab/electricity_power gas heater:state:default]"}
-Number electricity_power_washing "Power washing[%.0fw]" <energy>            {mqtt="<[mosquitto:iot/openhab/electricity_power washing:state:default]"}
-Number electricity_power_floor_bath1 "Power floor bath1[%.0fw]" <energy>    {mqtt="<[mosquitto:iot/openhab/electricity_power floor bath1:state:default]"}
-Number electricity_power_solar "Power solar[%.0fw]" <energy>                {mqtt="<[mosquitto:iot/openhab/electricity_power solar:state:default]"}
-Number electricity_power_boiler "Power boiler[%.0fw]" <energy>              {mqtt="<[mosquitto:iot/openhab/electricity_power boiler:state:default]"}
-Number electricity_power_solar_rulota "Power solar rulota[%.0fw]" <energy>                  {mqtt="<[mosquitto:iot/openhab/electricity_power solar rulota:state:default]"}
-Number electricity_power_grid_rulota "Power grid rulota[%.0fw]" <energy>                    {mqtt="<[mosquitto:iot/openhab/electricity_power grid rulota:state:default]"}
-
-Number powermonitor_voltage_big_battery_1 "Big battery 1 [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_voltage_big battery 1:state:default]"}
-Number powermonitor_voltage_big_battery_2 "Big battery 2 [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_voltage_big battery 2:state:default]"}
-Number powermonitor_voltage_big_battery_3 "Big battery 3 [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_voltage_big battery 3:state:default]"}
-Number powermonitor_voltage_big_battery_4 "Big battery 4 [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_voltage_big battery 4:state:default]"}
-
-
 Number gas_gas "Gas [%.1f mc]" <gas>                                        {mqtt="<[mosquitto:iot/openhab/gas_gas:state:default]"}
 Number water_main "Water main [%.0f l]" <water>                             {mqtt="<[mosquitto:iot/openhab/water_water main:state:default]"}
 Number water_hot "Water hot [%.0f l]" <faucet>                              {mqtt="<[mosquitto:iot/openhab/water_water hot:state:default]"}
 Number water_house "Water house [%.0f l]" <water>                           {mqtt="<[mosquitto:iot/openhab/water_water house:state:default]"}
-
-
 
 Number p_switch                         ""
