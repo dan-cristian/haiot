@@ -138,7 +138,9 @@ class PowerMonitor(ModelBase):
     current = 0.0  # miliamps
     power = 0.0
     power_factor = 0.0
+    energy = 0.0
     total_energy = 0.0  # total energy consumed
+    energy_export = 0.0
     total_energy_export = 0.0  # total energy returned/exported to grid
     sensor_index = 0  # if device has multiple sensors for same target (i.e. 3 phase meter)
     raw_voltage = 0.0  # volts, read from sensor without

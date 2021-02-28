@@ -81,8 +81,12 @@ def _process_message(msg):
                     sensor.power_factor = float(val)
                 elif atoms[4] == 'current':
                     sensor.current = float(val)
+                elif atoms[4] == 'energy':
+                    sensor.energy = float(val)
                 elif atoms[4] == "total":
                     sensor.total_energy = float(val)
+                elif atoms[4] == "returned_energy":
+                    sensor.energy_export = float(val)
                 elif atoms[4] == "total_returned":
                     sensor.total_energy_export = float(val)
                 else:
