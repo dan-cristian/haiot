@@ -91,7 +91,7 @@ def _process_message(msg):
                     sensor.total_energy_export = float(val)
                 else:
                     L.l.warning("Unprocessed shelly value {}".format(atoms[4]))
-                L.l.info("Shelly {} {}={}".format(sensor.name, atoms[4], val))
+                # L.l.info("Shelly {} {}={}".format(sensor.name, atoms[4], val))
                 sensor.save_changed_fields(broadcast=True, persist=True)
             else:
                 L.l.warning("No shelly sensor {} in config file".format(atoms[1]))
