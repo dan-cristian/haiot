@@ -57,3 +57,7 @@ Number powermonitor_energy_export_main_l1 "Export L1 [%.3f W]" <energy> {mqtt="<
 Number powermonitor_energy_export_main_l2 "Export L2 [%.3f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_total_energy_export_main l2:state:default]"}
 Number powermonitor_energy_export_main_l3 "Export L3 [%.3f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_total_energy_export_main l3:state:default]"}
 
+Number powermonitor_power_factor_main_l1 "Power factor L1 [%.3f %]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_power_factor_main l1:state:default]"}
+Number powermonitor_power_factor_main_l2 "Power factor L2 [%.3f %]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_power_factor_main l2:state:default]"}
+Number powermonitor_power_factor_main_l3 "Power factor L3 [%.3f %]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_power_factor_main l3:state:default]"}
+
