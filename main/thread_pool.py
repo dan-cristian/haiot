@@ -78,14 +78,14 @@ def get_thread_status():
 
 
 def run_thread_pool():
-    prctl.set_name("thread_pool")
-    threading.current_thread().name = "thread_pool"
     P.tpool = True
     # https://docs.python.org/3.3/library/concurrent.futures.html
     P.ff = {}
     P.executor = concurrent.futures.ThreadPoolExecutor(max_workers=20)
     # with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
     while P.tpool:
+        prctl.set_name("thread_pool")
+        threading.current_thread().name = "thread_pool"
         try:
             if len(P.thread_func_list) != len(P.ff):
                 P.ff.clear()
@@ -94,6 +94,8 @@ def run_thread_pool():
                     P.ff[P.executor.submit(tf)] = P.thread_func_list[tf].func
 
             for future_obj in dict(P.ff):
+                prctl.set_name("thread_pool_loop")
+                threading.current_thread().name = "thread_pool_loop"
                 func = P.ff[future_obj]
                 print_name = __get_print_name_callable(func)
                 if func in P.thread_func_list:
