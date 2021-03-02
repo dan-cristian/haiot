@@ -1,0 +1,97 @@
+sitemap default label="Electricity" {
+
+Frame {
+	Default item=ups_power_failed
+	Default item=ups_load_percent
+	Default item=ups_input_voltage
+	Default item=ups_battery_voltage
+	Default item=ups_power_frequency
+	Default item=electricity_power_factor_mono
+	Default item=electricity_voltage_mono
+	Default item=electricity_current_mono
+	Default item=electricity_power_dishwasher
+	Default item=electricity_power_factor_dishwasher
+	Default item=electricity_voltage_dishwasher
+	Default item=electricity_current_dishwasher
+	Default item=electricity_power_fridge
+	Default item=electricity_power_factor_fridge
+	Default item=electricity_voltage_fridge
+	Default item=electricity_current_fridge
+	Default item=electricity_power_freezer
+	Default item=electricity_power_gas_heater
+	Default item=electricity_power_washing
+	Default item=electricity_power_floor_bath1
+	Default item=electricity_power_boiler
+	Default item=electricity_power_ups
+	Default item=powermonitor_voltage_battery_1
+}
+
+Frame label="Charts" {
+    Text item=powermonitor_power_main_l1 {
+        Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M"]
+        Chart item=powermonitor_power_main_l1 period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
+        Chart item=powermonitor_power_main_l1 period=D refresh=10000 visibility=[p_switch==1]
+        Chart item=powermonitor_power_main_l1 period=W refresh=10000 visibility=[p_switch==2]
+        Chart item=powermonitor_power_main_l1 period=M refresh=10000 visibility=[p_switch==3]
+
+        }
+    Text item=powermonitor_power_main_l2 {
+        Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M"]
+        Chart item=powermonitor_power_main_l2 period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
+        Chart item=powermonitor_power_main_l2 period=D refresh=10000 visibility=[p_switch==1]
+        Chart item=powermonitor_power_main_l2 period=W refresh=10000 visibility=[p_switch==2]
+        Chart item=powermonitor_power_main_l2 period=M refresh=10000 visibility=[p_switch==3]
+        }
+    Text item=powermonitor_power_main_l3 {
+        Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M"]
+        Chart item=powermonitor_power_main_l3 period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
+        Chart item=powermonitor_power_main_l3 period=D refresh=10000 visibility=[p_switch==1]
+        Chart item=powermonitor_power_main_l3 period=W refresh=10000 visibility=[p_switch==2]
+        Chart item=powermonitor_power_main_l3 period=M refresh=10000 visibility=[p_switch==3]
+        }
+    Text item=electricity_power_main_mono {
+        Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M"]
+        Chart item=electricity_power_main_mono period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
+        Chart item=electricity_power_main_mono period=D refresh=10000 visibility=[p_switch==1]
+        Chart item=electricity_power_main_mono period=W refresh=10000 visibility=[p_switch==2]
+        Chart item=electricity_power_main_mono period=M refresh=10000 visibility=[p_switch==3]
+        }
+    Text item=electricity_power_solar {
+        Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M"]
+        Chart item=electricity_power_solar period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
+        Chart item=electricity_power_solar period=D refresh=10000 visibility=[p_switch==1]
+        Chart item=electricity_power_solar period=W refresh=10000 visibility=[p_switch==2]
+        Chart item=electricity_power_solar period=M refresh=10000 visibility=[p_switch==3]
+    }
+    Text item=powermonitor_energy_export_main_l1 {
+        Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M"]
+        Chart item=powermonitor_energy_export_main_l1 period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
+        Chart item=powermonitor_energy_export_main_l1 period=D refresh=10000 visibility=[p_switch==1]
+        Chart item=powermonitor_energy_export_main_l1 period=W refresh=10000 visibility=[p_switch==2]
+        Chart item=powermonitor_energy_export_main_l1 period=M refresh=10000 visibility=[p_switch==3]
+        }
+    Text item=electricity_power_solar_rulota {
+        Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M"]
+        Chart item=electricity_power_solar_rulota period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
+        Chart item=electricity_power_solar_rulota period=D refresh=10000 visibility=[p_switch==1]
+        Chart item=electricity_power_solar_rulota period=W refresh=10000 visibility=[p_switch==2]
+        Chart item=electricity_power_solar_rulota period=M refresh=10000 visibility=[p_switch==3]
+    }
+    Text item=electricity_power_grid_rulota {
+        Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M"]
+        Chart item=electricity_power_grid_rulota period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
+        Chart item=electricity_power_grid_rulota period=D refresh=10000 visibility=[p_switch==1]
+        Chart item=electricity_power_grid_rulota period=W refresh=10000 visibility=[p_switch==2]
+        Chart item=electricity_power_grid_rulota period=M refresh=10000 visibility=[p_switch==3]
+    }
+    Text item=electricity_solar_aps {
+        Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M"]
+        Chart item=electricity_solar_aps period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
+        Chart item=electricity_solar_aps period=D refresh=10000 visibility=[p_switch==1]
+        Chart item=electricity_solar_aps period=W refresh=10000 visibility=[p_switch==2]
+        Chart item=electricity_solar_aps period=M refresh=10000 visibility=[p_switch==3]
+    }
+
+}
+
+}
