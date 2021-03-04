@@ -37,6 +37,7 @@ Number air_humidity_bme_vent "Humidity vent [%.0f %%]" <humidity>  {mqtt="<[mosq
 Number dust_air_filtered_pm1 "Vent filtered PM1 [%.0f ug/m3]" <smoke>   {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_1_air_filtered_w_pms5003:state:default]"}
 Number dust_air_filtered_pm2_5 "Vent filtered PM2.5 [%.0f ug/m3]" <smoke>   {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_2_5_air_filtered_w_pms5003:state:default]"}
 Number dust_air_filtered_pm10 "Vent filtered PM10 [%.0f ug/m3]" <smoke>     {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_10_air_filtered_w_pms5003:state:default]"}
+Number air_filtered_nox "NOx [%.2f V]" <smoke>                     {mqtt="<[mosquitto:iot/openhab/powermonitor_voltage_airfiltered nox:state:default]"}
 
 Number dust_birou_pm1 "Dust birou PM1 [%.0f ug/m3]" <smoke>       {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_1_birou-air-w_pms5003:state:default]"}
 Number dust_birou_pm2_5 "Dust birou PM2.5 [%.0f ug/m3]" <smoke>   {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_2_5_birou-air-w_pms5003:state:default]"}

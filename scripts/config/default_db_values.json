@@ -381,10 +381,11 @@
     {"id":14, "name":"rulota battery main ref", "type":"ina2", "host_name":"bat0_rulota_w",  "max_voltage":14.7, "warn_voltage":12.4, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
 
     {"id":20, "name":"living ozone", "type":"ina", "host_name":"wemos-living-air"},
+    {"id":21, "name":"airfiltered nox", "type":"ina", "host_name":"air_filtered_w"},
 
-    {"id":21, "name":"main l1", "type":"shelly", "sensor_index": 0, "host_name":"shellyem3-ECFABCC7F0F4"},
-    {"id":22, "name":"main l2", "type":"shelly", "sensor_index": 1, "host_name":"shellyem3-ECFABCC7F0F4"},
-    {"id":23, "name":"main l3", "type":"shelly", "sensor_index": 2, "host_name":"shellyem3-ECFABCC7F0F4"}
+    {"id":31, "name":"main l1", "type":"shelly", "sensor_index": 0, "host_name":"shellyem3-ECFABCC7F0F4"},
+    {"id":32, "name":"main l2", "type":"shelly", "sensor_index": 1, "host_name":"shellyem3-ECFABCC7F0F4"},
+    {"id":33, "name":"main l3", "type":"shelly", "sensor_index": 2, "host_name":"shellyem3-ECFABCC7F0F4"}
   ],
 
   "TemperatureTarget": [
