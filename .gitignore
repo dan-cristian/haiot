@@ -22,3 +22,4 @@ scripts/osinstall/ubuntu/etc/motion/thread*.conf
 /apps/esp8266_pwm_load/venv/
 /apps/esp8266_pwm_load/credentials.py
 /tasmota/device_config/
+/apps/esp8266_vent_motor/credentials.py

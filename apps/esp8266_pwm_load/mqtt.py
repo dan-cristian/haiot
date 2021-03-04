@@ -16,13 +16,9 @@ def sub_cb(topic, msg):
         # print("device={}, topic={}, start={}, my_name={}".format(device_id, name, msg[0], mqtt_client_id))
         if msg[0] != 123:  # check for valid json staring with { character
             return
-        data = msg.decode()
-        # topic = topic.decode().split('/')
-        # device_id = topic.pop(-1)
-        # name = topic[-1]
-        # print(data)
+        data = str(msg, "utf-8")
         # ensure message if addressed to us and contains Pwm info
-        if True or "'host_name': '{}'".format(mqtt_client_id) in data:
+        if "'host_name': '{}'".format(mqtt_client_id) in data:
             if 'Pwm' in data:
                 print("'host_name': '{}'".format(mqtt_client_id) in data)
                 js = ujson.loads(data)
@@ -65,21 +61,12 @@ def connect(client_id, server, topic_sub, topic_pub, user, password):
     try:
         global mqtt_client_id
         mqtt_client_id = client_id
-        client = connect_and_subscribe(
-            client_id=client_id, server=server, topic_sub=topic_sub, topic_pub=topic_pub, user=user, password=password)
+        client = connect_and_subscribe(client_id=client_id, server=server,
+                                       topic_sub=topic_sub, topic_pub=topic_pub, user=user, password=password)
         while True:
             try:
-                # new_message = client.check_msg()
                 new_message = client.wait_msg()
-                # print(new_message)
-                # if new_message is not None:
-                    # print(new_message)
-                    #    pass
-                # else:
-                #   time.sleep(1)
             except OSError as e:
                 print(e)
-                return "restart"
     except OSError as e:
         print(e)
-        return "restart"

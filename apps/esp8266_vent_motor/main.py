@@ -9,8 +9,6 @@ import ubinascii
 import esp
 
 
-#machine_id = ubinascii.hexlify(machine.unique_id()).decode("utf-8")
-#client_id = "vent-" + machine_id
 mqtt_server = "192.168.0.12"
 
 

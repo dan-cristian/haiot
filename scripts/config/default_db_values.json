@@ -599,7 +599,7 @@
   ],
 
   "Pwm": [
-    {"id": 3, "name": "boiler", "frequency": 55, "duty_cycle": 0, "gpio_pin_code": 13, "host_name": "pwm_we", "host_type": "micro"},
+    {"id": 3, "name": "boiler", "frequency": 55, "duty_cycle": 0, "gpio_pin_code": 13, "host_name": "ESP_5B5F86", "host_type": "micro"},
     {"id": 4, "name": "boiler2", "frequency": 55, "duty_cycle": 0, "gpio_pin_code": 18, "host_name": "netbook", "host_type": "pi"}
   ],
 

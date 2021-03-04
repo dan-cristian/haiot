@@ -44,6 +44,11 @@ def adjust():
     radon_is_warn = (radon_sensor is not None) and (radon_sensor.radon is not None) and \
                     (radon_sensor.radon > P.radon_warn_value)
 
+    # !!! disable radon rules temporarily !!!
+    radon_is_high = False
+    radon_is_warn = False
+    # fixme: review above
+
     # shutoff vent system on high pm25
     if dust_sensor is not None:
         pm25 = dust_sensor.pm_2_5

@@ -21,12 +21,8 @@ def sub_cb(topic, msg):
         if msg[0] != 123:  # check for valid json starting with { character
             return
         data = str(msg, "utf-8")
-        # topic = topic.decode().split('/')
-        # device_id = topic.pop(-1)
-        # name = topic[-1]
-        # print(data)
         # ensure message if addressed to us and contains Pwm info
-        if True or "'host_name': '{}'".format(P.mqtt_client_id) in data:
+        if "'host_name': '{}'".format(P.mqtt_client_id) in data:
             if 'Vent' in data:
                 print("Received Vent mqtt command {}".format(data))
                 js = ujson.loads(data)
