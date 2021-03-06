@@ -14,7 +14,7 @@ class P:
     initialised = False
     last_vent_mode = None
     central_vent_sensor_name = "vent-air-w_pms5003"
-    co2_ok_value = 650
+    co2_ok_value = 750
     co2_warn_value = 1000
     radon_ok_value = 70
     radon_warn_value = 100

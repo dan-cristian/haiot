@@ -34,7 +34,7 @@ class P:
 
     power_level_min = 12
     power_level_default = 35
-    power_level_max = 65
+    power_level_max = 60
 
     def __init__(self):
         pass

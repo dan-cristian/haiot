@@ -132,12 +132,13 @@ def on_message(client, userdata, msg):
                 delta = (start - utils.parse_to_date(x['_sent_on'])).total_seconds()
                 # L.l.info('Mqtt age={}'.format(delta))
                 if delta > 5:
-                    L.l.info('Mqtt delta {} OLD={}'.format(delta, json))
+                    if 'source_host' in x:
+                        host = x['source_host']
+                    else:
+                        host = 'N/A'
+                    L.l.info('Mqtt delta {} source_host='.format(delta, host))
             x['is_event_external'] = True
             P.received_mqtt_list.append(x)
-            elapsed = (utils.get_base_location_now_date() - start).total_seconds()
-            if elapsed > 1:
-                L.l.warning('Command mqtt received took {} seconds'.format(elapsed))
         else:
             pass
     except Exception as ex:
