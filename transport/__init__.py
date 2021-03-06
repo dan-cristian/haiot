@@ -90,7 +90,7 @@ def thread_run_recv():
         L.l.error('Error on mqtt receive process, err={}, obj={}'.format(ex, obj))
     finally:
         prctl.set_name("idle_mqtt_recv")
-        threading.current_thread().name = "idlem_qtt_recv"
+        threading.current_thread().name = "idle_mqtt_recv"
 
 
 def unload():
@@ -104,8 +104,8 @@ def unload():
 def init():
     from main import thread_pool
     L.l.info('Transport initialising')
-    thread_pool.add_interval_callable(thread_run_send, run_interval_second=0.2)
-    thread_pool.add_interval_callable(thread_run_recv, run_interval_second=0.2)
+    thread_pool.add_interval_callable(thread_run_send, run_interval_second=0.1)
+    thread_pool.add_interval_callable(thread_run_recv, run_interval_second=0.1)
     mqtt_io.init()
     # utils.init_debug()
     P.initialised = True
