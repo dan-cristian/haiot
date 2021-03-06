@@ -119,7 +119,7 @@ def _process_message(msg):
                         if factor is not None:
                             record.vdd = round(factor, 1)
                         if voltage is not None or current is not None or factor is not None:
-                            record.save_changed_fields(broadcast=True, persist=True)
+                            record.save_changed_fields(broadcast=False, persist=True)
                 # dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=current, unit='kWh')
             if 'POWER' in obj:
                 power_is_on = obj['POWER'] == 'ON'
@@ -129,7 +129,7 @@ def _process_message(msg):
                 if relay is not None:
                     L.l.info("Got relay {} state={}".format(sensor_name, power_is_on))
                     relay.relay_is_on = power_is_on
-                    relay.save_changed_fields(broadcast=True, persist=True)
+                    relay.save_changed_fields(broadcast=False, persist=True)
                 else:
                     L.l.warning("ZoneCustomRelay {} not defined in db".format(sensor_name))
             if 'COUNTER' in obj:
@@ -163,7 +163,7 @@ def _process_message(msg):
                         val = v['CarbonDioxide']
                         if val > 0:
                             sensor.co2 = val
-                    sensor.save_changed_fields(broadcast=True, persist=True)
+                    sensor.save_changed_fields(broadcast=False, persist=True)
 
                 if k.startswith('INA219'):
                     ina = v  # obj['INA219']
@@ -187,7 +187,7 @@ def _process_message(msg):
                     if 'Power' in ina:
                         power = ina['Power']
                         sensor.power = power
-                    sensor.save_changed_fields(broadcast=True, persist=True)
+                    sensor.save_changed_fields(broadcast=False, persist=True)
             if 'ANALOG' in obj:
                 # "ANALOG":{"A0":7}
                 an = obj['ANALOG']
@@ -195,7 +195,7 @@ def _process_message(msg):
                 sensor_address = '{}_{}'.format(sensor_name, 'a0')
                 zone_sensor, sensor = _get_sensor(sensor_address=sensor_address, sensor_type='ANALOG')
                 sensor.vad = a0
-                sensor.save_changed_fields(broadcast=True, persist=True)
+                sensor.save_changed_fields(broadcast=False, persist=True)
             if 'PMS5003' in obj:
                 # "PMS5003":{"CF1":0,"CF2.5":1,"CF10":3,"PM1":0,"PM2.5":1,"PM10":3,"PB0.3":444,"PB0.5":120,"PB1":12,
                 # "PB2.5":6,"PB5":2,"PB10":2}
@@ -216,7 +216,7 @@ def _process_message(msg):
                 # sometimes first read after power on returns invalid 0 values
                 if sensor.pm_1 + sensor.pm_2_5 + sensor.pm_10 + sensor.p_0_3 + sensor.p_0_5 + sensor.p_1 \
                         + sensor.p_2_5 + sensor.p_5 + sensor.p_10 != 0:
-                    sensor.save_changed_fields(broadcast=True, persist=True)
+                    sensor.save_changed_fields(broadcast=False, persist=True)
             if 'RfReceived' in obj:
                 rf = obj['RfReceived']
                 sensor_id = rf['Data']

@@ -65,38 +65,39 @@ def _get_air_sensor(sensor_address, sensor_type):
 # Tasmota MQTT - put iot/sonoff/%prefix%/%topic%/ in MQTT settings
 def _process_message(msg):
     # L.l.info("Topic={} payload={}".format(msg.topic, msg.payload))
-    atoms = msg.topic.split('/')
-    if len(atoms) == 5:
-        if atoms[2] == "emeter":
-            val = "{}".format(msg.payload).replace("b", "").replace("\\", "").replace("'", "")
-            sensor = m.PowerMonitor.find_one({m.PowerMonitor.host_name: atoms[1],
-                                              m.PowerMonitor.type: "shelly",
-                                              m.PowerMonitor.sensor_index: int(atoms[3])})
-            if sensor is not None:
-                if atoms[4] == "power":
-                    sensor.power = float(val)
-                elif atoms[4] == "voltage":
-                    sensor.voltage = float(val)
-                elif atoms[4] == "pf":
-                    sensor.power_factor = float(val)
-                elif atoms[4] == 'current':
-                    sensor.current = float(val)
-                elif atoms[4] == 'energy':
-                    sensor.energy = float(val)
-                elif atoms[4] == "total":
-                    sensor.total_energy = float(val)
-                elif atoms[4] == "returned_energy":
-                    sensor.energy_export = float(val)
-                elif atoms[4] == "total_returned":
-                    sensor.total_energy_export = float(val)
+    if "emeter" in msg.topic:
+        atoms = msg.topic.split('/')
+        if len(atoms) == 5:
+            if atoms[2] == "emeter":
+                val = "{}".format(msg.payload).replace("b", "").replace("\\", "").replace("'", "")
+                sensor = m.PowerMonitor.find_one({m.PowerMonitor.host_name: atoms[1],
+                                                  m.PowerMonitor.type: "shelly",
+                                                  m.PowerMonitor.sensor_index: int(atoms[3])})
+                if sensor is not None:
+                    if atoms[4] == "power":
+                        sensor.power = float(val)
+                    elif atoms[4] == "voltage":
+                        sensor.voltage = float(val)
+                    elif atoms[4] == "pf":
+                        sensor.power_factor = float(val)
+                    elif atoms[4] == 'current':
+                        sensor.current = float(val)
+                    elif atoms[4] == 'energy':
+                        sensor.energy = float(val)
+                    elif atoms[4] == "total":
+                        sensor.total_energy = float(val)
+                    elif atoms[4] == "returned_energy":
+                        sensor.energy_export = float(val)
+                    elif atoms[4] == "total_returned":
+                        sensor.total_energy_export = float(val)
+                    else:
+                        L.l.warning("Unprocessed shelly value {}".format(atoms[4]))
+                    # L.l.info("Shelly {} {}={}".format(sensor.name, atoms[4], val))
+                    sensor.save_changed_fields(broadcast=False, persist=True)
                 else:
-                    L.l.warning("Unprocessed shelly value {}".format(atoms[4]))
-                # L.l.info("Shelly {} {}={}".format(sensor.name, atoms[4], val))
-                sensor.save_changed_fields(broadcast=True, persist=True)
+                    L.l.warning("No shelly sensor {} in config file".format(atoms[1]))
             else:
-                L.l.warning("No shelly sensor {} in config file".format(atoms[1]))
-        else:
-            L.l.warning("Invalid sensor topic {}".format(msg.topic))
+                L.l.warning("Invalid sensor topic {}".format(msg.topic))
 
 
 def mqtt_on_message(client, userdata, msg):
@@ -128,12 +129,13 @@ def post_init():
 def thread_run():
     prctl.set_name("shelly")
     threading.current_thread().name = "shelly"
+    # not used
     prctl.set_name("idle_shelly")
     threading.current_thread().name = "idle_shelly"
 
 
 def unload():
-    thread_pool.remove_callable(thread_run)
+    # thread_pool.remove_callable(thread_run)
     P.initialised = False
 
 
@@ -141,5 +143,5 @@ def init():
     L.l.info('Shelly module initialising')
     P.shelly_topic = str(get_json_param(Constant.P_MQTT_TOPIC_SHELLY)) + "/#"
     mqtt_io.add_message_callback(P.shelly_topic, mqtt_on_message)
-    thread_pool.add_interval_callable(thread_run, P.check_period)
+    # thread_pool.add_interval_callable(thread_run, P.check_period)
     P.initialised = True
