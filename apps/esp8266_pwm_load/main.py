@@ -30,7 +30,7 @@ def main():
             print("Webrepl already started")
         # pwm.init(pin=pwm_pin, frequency=pwm_frequency)
         client_id = wifi.station.config("dhcp_hostname")
-        topic_sub = "iot/micro/" + client_id
+        topic_sub = "shellies/shellyem3-ECFABCC7F0F4/emeter/0/power"
         topic_pub = "iot/sonoff/" + client_id + "/"
         mqtt.connect(client_id, mqtt_server, topic_sub, topic_pub, user=mqtt_user, password=mqtt_pass)
     else:

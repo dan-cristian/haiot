@@ -61,6 +61,7 @@ def _get_air_sensor(sensor_address, sensor_type):
 # 'shellies/shellyem3-ECFABCC7F0F4/emeter/0/current'
 # 'shellies/shellyem3-ECFABCC7F0F4/emeter/0/voltage'
 # 'shellies/shellyem3-ECFABCC7F0F4/emeter/0/total'
+# http://192.168.0.31/settings?mqtt_update_period=2
 
 # Tasmota MQTT - put iot/sonoff/%prefix%/%topic%/ in MQTT settings
 def _process_message(msg):

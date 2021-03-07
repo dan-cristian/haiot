@@ -103,7 +103,7 @@ def _set_custom_relay_state(sensor_address, state):
         current_relay.relay_is_on = state
         current_relay.is_event_external = True
         current_relay.is_device_event = True
-        current_relay.save_changed_fields(broadcast=True, persist=True)
+        current_relay.save_changed_fields(broadcast=False, persist=True)
     else:
         L.l.info("ZoneCustomRelay with code={} not defined in database".format(sensor_address))
 
@@ -161,15 +161,15 @@ def set_value(network, node, value):
                     record.is_event_external = True
                     if value.label == "Voltage":
                         record.vad = round(value.data, 0)
-                        record.save_changed_fields(broadcast=True, persist=True)
+                        record.save_changed_fields(broadcast=False, persist=True)
                         # L.l.info("Saving voltage {} {}".format(sensor_name, value.data))
                     elif value.label == "Current":
                         record.iad = round(value.data, 1)
-                        record.save_changed_fields(broadcast=True, persist=True)
+                        record.save_changed_fields(broadcast=False, persist=True)
                         # L.l.info("Saving current {} {}".format(sensor_name, value.data))
                     elif value.label == "Power Factor":
                         record.vdd = round(value.data, 1)
-                        record.save_changed_fields(broadcast=True, persist=True)
+                        record.save_changed_fields(broadcast=False, persist=True)
                         # L.l.info("Saving power factor {} {}".format(sensor_name, value.data))
                     else:
                         # L.l.warning("Doing nothing on zwave set value {}".format(value))

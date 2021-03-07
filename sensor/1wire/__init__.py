@@ -160,7 +160,7 @@ def save_to_db(dev):
             record.sensed_b = dev['sensed_b']
         # force field changed detection for delta_counters to enable save in history
         # but allow one 0 record to be saved for nicer graphics
-        record.save_changed_fields(broadcast=True, persist=True)
+        record.save_changed_fields(broadcast=False, persist=True)
         if record.delta_counters_a is not None or record.delta_counters_b is not None:
             dispatcher.send(Constant.SIGNAL_UTILITY, sensor_name=record.sensor_name,
                             units_delta_a=record.delta_counters_a, units_delta_b=record.delta_counters_b,

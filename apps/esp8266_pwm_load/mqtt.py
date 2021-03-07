@@ -5,44 +5,17 @@ import ujson
 
 # Complete project details at https://RandomNerdTutorials.com
 mqtt_client_id = None
-msg_count = 0
+# msg_count = 0
 
 
 def sub_cb(topic, msg):
-    global msg_count
-    msg_count += 1
-    print(msg_count)
+    # global msg_count
+    # msg_count += 1
+    # print(msg_count)
     try:
-        # print("device={}, topic={}, start={}, my_name={}".format(device_id, name, msg[0], mqtt_client_id))
-        if msg[0] != 123:  # check for valid json staring with { character
-            return
-        data = str(msg, "utf-8")
-        # ensure message if addressed to us and contains Pwm info
-        if "'host_name': '{}'".format(mqtt_client_id) in data:
-            if 'Pwm' in data:
-                print("'host_name': '{}'".format(mqtt_client_id) in data)
-                js = ujson.loads(data)
-                # print(js)
-                for key, value in js.items():
-                    # print("Parsing {}".format(key))
-                    if key == "duty_cycle":
-                        pwm.set_duty(duty=value)
-                        print("Set duty to {}".format(value))
-                    elif key == "frequency":
-                        pwm.set_frequency(frequency=value)
-                        print("Set frequency to {}".format(value))
-                    elif key == "gpio_pin_code":
-                        pwm.set_pin(pin=value)
-                        print("Set pin to {}".format(value))
-                    # elif value is not None:
-                    #    for key1, value1 in value.items():
-                    #        print("SubParsing {}".format(key1))
-
-            else:
-                print("Got a message without Pwm payload: {}".format(data))
-                pass
-        else:
-            print("Ignoring message: {}".format(data[:40]))
+        msg = msg.decode('utf-8')
+        val = "{}".format(msg).replace("b", "").replace("\\", "").replace("'", "")
+        pwm.update(power=float(val))
     except Exception as ex:
         print('Got exception {}, string={}'.format(ex, msg))
 
@@ -65,7 +38,7 @@ def connect(client_id, server, topic_sub, topic_pub, user, password):
                                        topic_sub=topic_sub, topic_pub=topic_pub, user=user, password=password)
         while True:
             try:
-                new_message = client.wait_msg()
+                client.wait_msg()
             except OSError as e:
                 print(e)
     except OSError as e:
