@@ -53,9 +53,13 @@ Number powermonitor_power_main_l1 "Main L1 [%.0f W]" <energy> {mqtt="<[mosquitto
 Number powermonitor_power_main_l2 "Main L2 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_power_main l2:state:default]"}
 Number powermonitor_power_main_l3 "Main L3 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_power_main l3:state:default]"}
 
-Number powermonitor_energy_export_main_l1 "Export L1 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_total_energy_export_main l1:state:default]"}
-Number powermonitor_energy_export_main_l2 "Export L2 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_total_energy_export_main l2:state:default]"}
-Number powermonitor_energy_export_main_l3 "Export L3 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_total_energy_export_main l3:state:default]"}
+Number powermonitor_energy_export_main_l1 "Export L1 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_energy_export_main l1:state:default]"}
+Number powermonitor_energy_export_main_l2 "Export L2 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_energy_export_main l2:state:default]"}
+Number powermonitor_energy_export_main_l3 "Export L3 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_energy_export_main l3:state:default]"}
+
+Number powermonitor_total_energy_export_main_l1 "Total export L1 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_total_energy_export_main l1:state:default]"}
+Number powermonitor_total_energy_export_main_l2 "Total export L2 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_total_energy_export_main l2:state:default]"}
+Number powermonitor_total_energy_export_main_l3 "Total export L3 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_total_energy_export_main l3:state:default]"}
 
 Number powermonitor_power_factor_main_l1 "Power factor L1 [%.1f %]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_power_factor_main l1:state:default]"}
 Number powermonitor_power_factor_main_l2 "Power factor L2 [%.1f %]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_power_factor_main l2:state:default]"}
