@@ -1,8 +1,5 @@
 from common import Constant
 
-from main import sqlitedb
-if sqlitedb:
-    from storage.sqalc import models
 from storage.model import m
 from main.logger_helper import L
 import abc

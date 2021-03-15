@@ -7,11 +7,8 @@ import threading
 import prctl
 from pydispatch import dispatcher
 from main.logger_helper import L
-from main import sqlitedb
 from common import Constant, utils, variable
 from sensor import serial_common
-if sqlitedb:
-    from storage.sqalc import models
 from main import thread_pool
 from storage.model import m
 
