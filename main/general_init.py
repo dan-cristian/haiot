@@ -27,15 +27,19 @@ class P:
 
 def my_import(name):
     # http://stackoverflow.com/questions/547829/how-to-dynamically-load-a-python-class
-    try:
-        mod = __import__(name)
-        components = name.split('.')
-        for comp in components[1:]:
-            mod = getattr(mod, comp)
-        return mod
-    except Exception as ex:
-        L.l.error("Unable to import module {}, err={}".format(name, ex), exc_info=True)
-        return None
+    while True:
+        try:
+            mod = __import__(name)
+            components = name.split('.')
+            for comp in components[1:]:
+                mod = getattr(mod, comp)
+            return mod
+        except ImportError as iex:
+            if not fix_module(iex):
+                break
+        except Exception as ex:
+            L.l.error("Unable to import module {}, err={}".format(name, ex), exc_info=True)
+            return None
 
 
 def init_module(module_name, module_is_active):

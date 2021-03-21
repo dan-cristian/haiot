@@ -158,6 +158,7 @@
     {"id":573, "active":true, "start_order":73, "name":"apps.air_sensor_upload", "host_name":"netbook"},
     {"id":577, "active":true, "start_order":77, "name":"sensor.radoneye", "host_name":"netbook"},
     {"id":579, "active":true, "start_order":79, "name":"hvac.vent", "host_name":"netbook"},
+    {"id":581, "active":true, "start_order":81, "name":"devices.smartbms", "host_name":"netbook"},
 
     {"id":809, "active":true, "start_order":9, "name":"heat", "host_name":"homew"},
     {"id":819, "active":true, "start_order":19, "name":"cloud.ddns", "host_name":"homew"},

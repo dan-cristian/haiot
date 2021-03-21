@@ -1,13 +1,17 @@
-import gatt
 import time
 import threading
 import prctl
+import gatt
 from main.logger_helper import L
 from main import thread_pool
 from storage.model import m
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 # reused: https://github.com/stefanandres/bms-monitoring-stack
+
+# gatt/dbus install issues:
+# https://github.com/getsenic/gatt-python/issues/31
+# https://stackoverflow.com/questions/61285415/no-package-dbus-1-found
 
 
 class P:
@@ -218,7 +222,6 @@ def init():
     P.manager = gatt.DeviceManager(adapter_name='hci0')
     P.bluetooth_manager = threading.Thread(target=bluetooth_manager_thread, args=[P.manager, ])
     P.initialised = True
-
 
 
 
