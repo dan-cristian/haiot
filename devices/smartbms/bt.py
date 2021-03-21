@@ -3,7 +3,7 @@ import time
 import serial
 import struct
 from binascii import unhexlify
-import requests as req
+
 
 #Define RS485 serial port
 ser = serial.Serial(
@@ -14,9 +14,9 @@ ser = serial.Serial(
     bytesize=serial.EIGHTBITS,
     timeout=0)
 
-test = 'DBDB00000000'
+test = bytes([0xDB, 0xDB, 0x00, 0x00, 0x00, 0x00])
 try:
-    ser.write(test.decode('hex'))
+    ser.write(test)
 except Exception as ex:
     print("Unable to write, ex={}".format(ex))
     ser.close()
