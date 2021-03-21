@@ -13,6 +13,9 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 # https://github.com/getsenic/gatt-python/issues/31
 # https://stackoverflow.com/questions/61285415/no-package-dbus-1-found
 
+# gi.repository fix
+# https://pygobject.readthedocs.io/en/latest/getting_started.html
+
 
 class P:
     initialised = False
@@ -34,9 +37,8 @@ class AnyDevice(gatt.Device):
     rawdat = None
     get_voltages = False
 
-
     def connect(self, bms_rec):
-        print("[%s] Connecting" % self.mac_address)
+        print("Connecting {} {}".format(self.mac_address, bms_rec.name))
         self.bms_rec = bms_rec
         self.event = threading.Event()
         super().connect()
@@ -72,7 +74,7 @@ class AnyDevice(gatt.Device):
             if c.uuid == '0000ff02-0000-1000-8000-00805f9b34fb')
 
         print("BMS found")
-        self.bms_read_characteristic.enable_notifications()
+        self.bms_read_characteristic.enable_notifications(enabled=True)
 
     def characteristic_enable_notifications_succeeded(self, characteristic):
         super().characteristic_enable_notifications_succeeded(characteristic)
@@ -181,8 +183,9 @@ def connect_bt(bms_rec):
                 time.sleep(1)
             else:
                 break
-        P.bt_device.bms_read_characteristic.disable_notifications()
-        P.bt_device.disconnect()
+        P.bt_device.bms_read_characteristic.enable_notifications(enabled=False)
+        if P.bt_device.is_connected():
+            P.bt_device.disconnect()
         # P.bluetooth_manager.stop()
         P.bt_device = None
     except Exception as ex:
