@@ -73,11 +73,15 @@ class AnyDevice(gatt.Device):
             print("BMS answer:", self.response.hex())
             self.response = self.response[4:]
             if self.get_voltages:
+                print("Read voltages")
                 packVolts = 0
                 for i in range(int(len(self.response) / 2) - 1):
                     cell = int.from_bytes(self.response[i * 2:i * 2 + 2], byteorder='big') / 1000
-                    self.rawdat['V{0:0=2}'.format(i + 1)] = cell
+                    volt_name = 'V{0:0=2}'.format(i + 1)
+                    self.rawdat[volt_name] = cell
+                    print("Volt {}={}".format(volt_name, cell))
                     packVolts += cell
+
                 # + self.rawdat['V{0:0=2}'.format(i)]
                 self.rawdat['Vbat'] = packVolts
                 self.rawdat['P'] = round(self.rawdat['Vbat'] * self.rawdat['Ibat'], 1)
@@ -94,7 +98,9 @@ class AnyDevice(gatt.Device):
                     ))
                 # self.manager.stop()
                 self.response = bytearray()
+                self.get_voltages = False
             else:
+                print("Read alternate")
                 self.rawdat['packV'] = int.from_bytes(self.response[0:2], byteorder='big', signed=True) / 100.0
                 self.rawdat['Ibat'] = int.from_bytes(self.response[2:4], byteorder='big', signed=True) / 100.0
                 self.rawdat['Bal'] = int.from_bytes(self.response[12:14], byteorder='big', signed=False)
@@ -103,9 +109,12 @@ class AnyDevice(gatt.Device):
                 self.rawdat['Ah_percent'] = round(self.rawdat['Ah_remaining'] / self.rawdat['Ah_full'] * 100, 2)
                 self.rawdat['Cycles'] = int.from_bytes(self.response[8:10], byteorder='big', signed=True)
 
-                for i in range(int.from_bytes(self.response[22:23], 'big')):  # read temperatures
-                    self.rawdat['T{0:0=1}'.format(i + 1)] = (int.from_bytes(self.response[23 + i * 2:i * 2 + 25],
-                                                                            'big') - 2731) / 10
+                for ti in range(int.from_bytes(self.response[22:23], 'big')):  # read temperatures
+                    temp_name = 'T{0:0=1}'.format(ti + 1)
+                    temp_val = (int.from_bytes(self.response[23 + ti * 2:ti * 2 + 25], 'big') - 2731) / 10
+                    self.rawdat[temp_name] = temp_val
+                    print("Temp {}={}".format(temp_name, temp_val))
+
                 # print("BMS request voltages")
                 print("raw=".format(self.rawdat))
                 self.get_voltages = True
