@@ -3,6 +3,30 @@ import time
 import serial
 import struct
 from binascii import unhexlify
+import socket
+
+serverMACAddress = 'A4:C1:38:EC:1B:B0'
+port = 1
+s = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
+s.connect((serverMACAddress, port))
+
+test = bytes([0xDB, 0xDB, 0x00, 0x00, 0x00, 0x00])
+s.send(test)
+time.sleep(3)
+
+resp = s.recv()
+
+print("received:{}".format(resp))
+s.close()
+
+
+exit(0)
+
+
+
+
+
+
 
 
 #Define RS485 serial port
