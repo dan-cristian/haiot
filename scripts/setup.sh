@@ -14,7 +14,7 @@ if [ "$?" != "0" ]; then
     #https://raspberrypi.stackexchange.com/questions/9246/how-to-install-smbus-to-virtualenv
     sudo apt install python3-venv
     python3 -m venv 3venv
-    source venv/bin/activate
+    source 3venv/bin/activate
 fi
 
 # echo "Installing mysql connector"
