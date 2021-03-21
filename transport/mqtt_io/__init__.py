@@ -168,10 +168,7 @@ def init():
             retry_count = 0
             while (not P.client_connected) and (retry_count < Constant.ERROR_CONNECT_MAX_RETRY_COUNT):
                 try:
-                    if P.mqtt_mosquitto_exists:
-                        P.mqtt_client.on_connect = on_connect_mosquitto
-                    if P.mqtt_paho_exists:
-                        P.mqtt_client.on_connect = on_connect_paho
+                    P.mqtt_client.on_connect = on_connect_paho
                     P.mqtt_client.on_subscribe = on_subscribe
                     P.mqtt_client.on_unsubscribe = on_unsubscribe
                     P.mqtt_client.username_pw_set(user, passwd)
