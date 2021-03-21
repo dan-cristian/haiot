@@ -5,8 +5,6 @@ import json
 import sys
 import time
 
-bind_ip = '0.0.0.0'
-
 
 class AnyDevice(gatt.Device):
     def connect(self):
@@ -47,12 +45,16 @@ class AnyDevice(gatt.Device):
 
         print("Bms write characteristic is {}".format(self.bms_write_characteristic))
 
-        print("BMS found")
+        # print("BMS found")
         self.bms_read_characteristic.enable_notifications()
 
     def characteristic_enable_notifications_succeeded(self, characteristic):
         super().characteristic_enable_notifications_succeeded(characteristic)
         print("Notifications enabled")
+        self.response = bytearray()
+        self.rawdat = {}
+        self.get_voltages = False
+        self.bms_write_characteristic.write_value(bytes([0xDD, 0xA5, 0x03, 0x00, 0xFF, 0xFD, 0x77]))
 
     def request_bms_data(self, request):
         print("BMS write data {}".format(request))
@@ -69,7 +71,46 @@ class AnyDevice(gatt.Device):
         self.response += value
         if self.response.endswith(b'w'):
             print("BMS answer:", self.response.hex())
-            self.event.set()
+            self.response = self.response[4:]
+            if (self.get_voltages):
+                packVolts = 0
+                for i in range(int(len(self.response) / 2) - 1):
+                    cell = int.from_bytes(self.response[i * 2:i * 2 + 2], byteorder='big') / 1000
+                    self.rawdat['V{0:0=2}'.format(i + 1)] = cell
+                    packVolts += cell
+                # + self.rawdat['V{0:0=2}'.format(i)]
+                self.rawdat['Vbat'] = packVolts
+                self.rawdat['P'] = round(self.rawdat['Vbat'] * self.rawdat['Ibat'], 1)
+                self.rawdat['State'] = int.from_bytes(self.response[16:18], byteorder='big', signed=True)
+
+                print(
+                    "Capacity: {capacity}% ({Ah_remaining} of {Ah_full}Ah)\nPower: {power}W ({I}Ah)\nTemperature: {temp}°C\nCycles: {cycles}".format(
+                        capacity=self.rawdat['Ah_percent'],
+                        Ah_remaining=self.rawdat['Ah_remaining'],
+                        Ah_full=self.rawdat['Ah_full'],
+                        power=self.rawdat['P'],
+                        I=self.rawdat['Ibat'],
+                        temp=self.rawdat['T1'],
+                        cycles=self.rawdat['Cycles'],
+                    ))
+                self.manager.stop()
+            else:
+                self.rawdat['packV'] = int.from_bytes(self.response[0:2], byteorder='big', signed=True) / 100.0
+                self.rawdat['Ibat'] = int.from_bytes(self.response[2:4], byteorder='big', signed=True) / 100.0
+                self.rawdat['Bal'] = int.from_bytes(self.response[12:14], byteorder='big', signed=False)
+                self.rawdat['Ah_remaining'] = int.from_bytes(self.response[4:6], byteorder='big', signed=True) / 100
+                self.rawdat['Ah_full'] = int.from_bytes(self.response[6:8], byteorder='big', signed=True) / 100
+                self.rawdat['Ah_percent'] = round(self.rawdat['Ah_remaining'] / self.rawdat['Ah_full'] * 100, 2)
+                self.rawdat['Cycles'] = int.from_bytes(self.response[8:10], byteorder='big', signed=True)
+
+                for i in range(int.from_bytes(self.response[22:23], 'big')):  # read temperatures
+                    self.rawdat['T{0:0=1}'.format(i + 1)] = (int.from_bytes(self.response[23 + i * 2:i * 2 + 25],
+                                                                            'big') - 2731) / 10
+                # print("BMS request voltages")
+                self.get_voltages = True
+                self.response = bytearray()
+                self.bms_write_characteristic.write_value(bytes([0xDD, 0xA5, 0x04, 0x00, 0xFF, 0xFC, 0x77]))
+            #self.event.set()
 
     def characteristic_write_value_failed(self, characteristic, error):
         print("BMS write failed:", error)
@@ -83,7 +124,7 @@ def bluetooth_manager_thread(manager):
     manager.run()
 
 
-bluetooth_device = "A4:C1:38:EC:1B:B0"
+bluetooth_device = "A4:C1:38:C6:30:57"
 
 manager = gatt.DeviceManager(adapter_name='hci0')
 bluetooth_manager = threading.Thread(target=bluetooth_manager_thread, args=[manager, ])
@@ -95,7 +136,7 @@ print('BMS server for {} started'.format(bluetooth_device))
 
 # device.request_bms_data(bytes([0xDD, 0xA5, 0x03, 0x00, 0xFF, 0xFD, 0x77]))
 # device.request_bms_data(bytes([0xDD, 0xA5, 0x05, 0x00, 0xFF, 0xFB, 0x77]))
-device.request_bms_data(bytes([0xDB, 0xDB, 0x00, 0x00, 0x00, 0x00]))
+# device.request_bms_data(bytes([0xDB, 0xDB, 0x00, 0x00, 0x00, 0x00]))
 # device.request_bms_data(bytes([0x5A, 0x5A, 0x00, 0x00, 0x00, 0x00]))
 if device.wait():
     print(device.response)
