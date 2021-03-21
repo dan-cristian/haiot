@@ -197,8 +197,9 @@ def connect_bt(bms_rec):
                 break
         if P.bt_device is not None:
             if P.bt_device.is_connected():
-                L.l.info("Disconnecting BT")
-                P.bt_device.disconnect()
+                # L.l.info("Disconnecting BT")
+                # P.bt_device.disconnect()
+                pass
             else:
                 L.l.info("BT not connected")
             # P.bluetooth_manager.stop()

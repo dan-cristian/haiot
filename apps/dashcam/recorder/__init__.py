@@ -17,11 +17,11 @@ except Exception:
     class L:
         class l:
             @staticmethod
-            def info(msg): print msg
+            def info(msg): print(msg)
             @staticmethod
-            def warning(msg): print msg
+            def warning(msg): print(msg)
             @staticmethod
-            def error(msg): print msg
+            def error(msg): print(msg)
 
 try:
     from common import Constant
@@ -272,7 +272,7 @@ def _start_usb_cam(cam):
                 cp.is_recording = True
             else:
                 L.l.info("Recording process not created for usb cam {}".format(cam.name))
-        except Exception, ex:
+        except Exception as ex:
             L.l.info("Unable to initialise usb camera, ex={}".format(ex))
             traceback.print_exc()
     else:
@@ -385,7 +385,7 @@ def _pi_init():
                 L.l.info("Recording PI started")
                 P.is_recording_pi = True
                 P.is_pi_camera_detected = True
-        except Exception, ex:
+        except Exception as ex:
             if 'Camera is not enabled' in str(ex):
                 _has_picamera_module = False
                 P.is_pi_camera_detected = False
@@ -409,19 +409,19 @@ def _pi_stop():
             try:
                 #L.l.info("Camera closed={} recording={}".format(P.pi_camera.closed, P.pi_camera.recording))
                 P.pi_camera.stop_recording()
-            except Exception, ex:
+            except Exception as ex:
                 L.l.info("Exception on pi camera stop, ex={}".format(ex))
             try:
                 #L.l.info("Camera closed={} recording={}".format(P.pi_camera.closed, P.pi_camera.recording))
                 P.pi_camera.close()
-            except Exception, ex:
+            except Exception as ex:
                 L.l.info("Exception on pi camera close, ex={}".format(ex))
             L.l.info("Camera closed={} recording={}".format(P.pi_camera.closed, P.pi_camera.recording))
             if P.pi_out_std is not None:
                 P.pi_out_std.close()
             if P.pi_out_err is not None:
                 P.pi_out_err.close()
-    except Exception, ex:
+    except Exception as ex:
         L.l.info("Error in pi_stop, ex={}".format(ex))
         L.l.info(traceback.print_exc())
 
@@ -532,7 +532,7 @@ def init():
     try:
         dispatcher.connect(_handle_event_alarm, signal=Constant.SIGNAL_ALARM, sender=dispatcher.Any)
         dispatcher.connect(_handle_event_gps, signal=Constant.SIGNAL_GPS, sender=dispatcher.Any)
-    except Exception, ex:
+    except Exception as ex:
         L.l.error("Unable to connect to alarm dispatch, ex={}".format(ex))
     initialised = True
 
@@ -570,7 +570,7 @@ def thread_run():
             if _usb_is_recording_count() > 0:
                 L.l.info("Stopping USB recording")
                 _usb_stop_all()
-    except Exception, ex:
+    except Exception as ex:
         print "Error in recorder thread_run, ex={}".format(ex)
         print traceback.print_exc()
 
