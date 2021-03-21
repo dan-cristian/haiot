@@ -40,6 +40,7 @@ class AnyDevice(gatt.Device):
         self.bms_rec = bms_rec
         self.event = threading.Event()
         super().connect()
+        print("Connecting exit: {}".format(self.mac_address))
 
     def connect_succeeded(self):
         super().connect_succeeded()
