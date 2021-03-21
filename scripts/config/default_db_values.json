@@ -6,7 +6,7 @@
     {"id":7,  "priority": 7, "name":"pidash", "machine_type":"raspberry"},
     {"id":8,  "priority": 8, "name":"pizero", "machine_type":"raspberry"},
     {"id":9,  "priority": 9, "name":"odroid", "machine_type":"odroid"},
-    {"id":11,  "priority": 11, "name":"pizero1", "machine_type":"raspberry"},
+    {"id":11,  "priority": 11, "name":"pibms", "machine_type":"raspberry"},
     {"id":12,  "priority": 4, "name":"homew", "machine_type":"raspberry"},
     {"id":13,  "priority": 13, "name":"pizero3", "machine_type":"raspberry"}
   ],
@@ -107,6 +107,7 @@
     {"id":75, "active":false, "start_order":75, "name":"devices.vent_atrea", "host_name":""},
     {"id":77, "active":false, "start_order":77, "name":"sensor.radoneye", "host_name":""},
     {"id":79, "active":false, "start_order":79, "name":"hvac.vent", "host_name":""},
+    {"id":81, "active":false, "start_order":81, "name":"devices.smartbms", "host_name":""},
     {"id":90, "active":false, "start_order":90, "name":"apps.dashcam", "host_name":""},
     {"id":99, "active":false, "start_order":99, "name":"main.cron", "host_name":""},
     {"id":101, "active":false, "start_order":101, "name":"webui.chart", "host_name":""},
@@ -130,10 +131,9 @@
     {"id":303, "active":true, "start_order":103, "name":"webui", "host_name":"pi-power"},
 
 
-    {"id":401, "active":true, "start_order":50, "name":"apps.dashcam", "host_name":"pidash"},
-    {"id":411, "active":true, "start_order":11, "name":"alarm", "host_name":"pidash"},
-    {"id":427, "active":false, "start_order":27, "name":"node", "host_name":"pidash"},
-    {"id":443, "active":false, "start_order":43, "name":"cloud.thingspeak", "host_name":"pidash"},
+    {"id":445, "active":true, "start_order":45, "name":"cloud.openhab", "host_name":"pibms"},
+    {"id":481, "active":true, "start_order":81, "name":"devices.smartbms", "host_name":"pibms"},
+
 
     {"id":501, "active":false, "start_order":50, "name":"apps.dashcam", "host_name":"netbook"},
     {"id":503, "active":true, "start_order":3, "name":"health_monitor", "host_name":"netbook"},
@@ -602,6 +602,11 @@
   "Pwm": [
     {"id": 3, "name": "boiler", "frequency": 55, "duty_cycle": 0, "gpio_pin_code": 13, "host_name": "ESP_5B5F86", "host_type": "micro"},
     {"id": 4, "name": "boiler2", "frequency": 55, "duty_cycle": 0, "gpio_pin_code": 18, "host_name": "netbook", "host_type": "pi"}
+  ],
+
+  "Bms": [
+    {"id": 1, "name": "60ah_battery", "mac_address": "A4:C1:38:C6:30:57"},
+    {"id": 2, "name": "40ah_battery", "mac_address": "A4:C1:38:EC:1B:B0"}
   ],
 
   "_disabled": [

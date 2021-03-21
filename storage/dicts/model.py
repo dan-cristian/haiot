@@ -470,3 +470,28 @@ class Vent(ModelBase):
     host_name = ''
     host_type = ''
     updated_on = datetime.now()
+
+
+class Bms(ModelBase):
+    """key=id"""
+    id = 0
+    name = ''
+    mac_address = ''  # bms bluetooth mac
+    voltage = 0.0  # pack voltage
+    voltage_cells = 0.0  # total cells voltage
+    current = 0.0
+    v01 = 0  # cell 1 voltage
+    v02 = 0
+    v03 = 0
+    v04 = 0
+    v05 = 0
+    v06 = 0
+    v07 = 0
+    v08 = 0
+    t01 = 0  # cell temperature no 1
+    t02 = 0
+    power = 0  # current consumption in watts
+    full_capacity = 0  # total battery ah
+    remaining_capacity = 0  # capacity left
+    capacity_percent = 0.0  # % capacity
+    cycles = 0  # charge cycles

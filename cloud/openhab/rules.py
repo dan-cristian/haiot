@@ -92,6 +92,18 @@ def rule_openhab_vent(obj=m.Vent(), change=None):
                     L.l.warning('Field {} in vent change list but not in obj={}'.format(key, obj))
 
 
+def rule_openhab_bms(obj=m.Bms(), change=None):
+    if change is not None:
+        name = obj.name
+        for key in change:
+            if key not in P.ignored_fields:
+                if hasattr(obj, key):
+                    val = getattr(obj, key)
+                    send_mqtt_openhab(subtopic='bms_' + key + '_' + name, payload=val)
+                else:
+                    L.l.warning('Field {} in Bms change list but not in obj={}'.format(key, obj))
+
+
 def rule_openhab_utility(obj=m.Utility(), change=None):
     if hasattr(obj, 'utility_type') and hasattr(obj, 'utility_name') and obj.utility_name is not None:
         # L.l.info("PROCESSING utility {}".format(obj.utility_type))
