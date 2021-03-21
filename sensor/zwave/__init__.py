@@ -4,11 +4,12 @@ import prctl
 from datetime import datetime
 from main.logger_helper import L
 from common import Constant, variable
-from main import thread_pool, sqlitedb
+from main import thread_pool
 import time
 import six
 from pydispatch import dispatcher as haiot_dispatch
 from storage.model import m
+import sys, traceback
 
 
 class P:
@@ -47,6 +48,7 @@ try:
     P.module_imported = True
 except Exception as e:
     L.l.info("Cannot import openzwave")
+    traceback.print_exc(file=sys.stdout)
 
 
 # http://openzwave.github.io/python-openzwave/network.html

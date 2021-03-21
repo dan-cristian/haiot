@@ -123,7 +123,7 @@ class AnyDevice(gatt.Device):
                         Ah_full=self.rawdat['Ah_full'],
                         power=self.rawdat['P'],
                         I=self.rawdat['Ibat'],
-                        temp=self.rawdat['T1'],
+                        temp=self.rawdat['t1'],
                         cycles=self.rawdat['Cycles'],
                     ))
                 # close everything
