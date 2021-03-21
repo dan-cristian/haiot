@@ -218,7 +218,7 @@ def get_status():
     if rec is not None:
         connect_bt(rec)
         # rec.save_changed_fields(persist=True)
-        L.l.info("v={} v1={} t1={}".format(rec.voltage, rec.v01, rec.t01))
+        L.l.info("v={} v1={} t1={}".format(rec.voltage, rec.v01, rec.t1))
     else:
         L.l.warning("No bms config record defined for this host={}".format(Constant.HOST_NAME))
 
