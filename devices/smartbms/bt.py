@@ -17,11 +17,13 @@ ser = serial.Serial(
 test = bytes([0xDB, 0xDB, 0x00, 0x00, 0x00, 0x00])
 try:
     ser.write(test)
+    print("Write ok")
 except Exception as ex:
     print("Unable to write, ex={}".format(ex))
-    ser.close()
+
 time.sleep(3)
 Antw33 = ser.read(140)
+print("Read:{}".format(Antw33))
 
 #SoC
 data = (Antw33.encode('hex')[(74*2):(75*2)])
@@ -36,3 +38,5 @@ if int(data, 16) > 2147483648:
 else:
     data = int(data, 16)
     print(data)
+
+ser.close()
