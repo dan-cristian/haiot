@@ -93,6 +93,7 @@ class AnyDevice(gatt.Device):
                         cycles=self.rawdat['Cycles'],
                     ))
                 # self.manager.stop()
+                self.response = bytearray()
             else:
                 self.rawdat['packV'] = int.from_bytes(self.response[0:2], byteorder='big', signed=True) / 100.0
                 self.rawdat['Ibat'] = int.from_bytes(self.response[2:4], byteorder='big', signed=True) / 100.0
@@ -106,6 +107,7 @@ class AnyDevice(gatt.Device):
                     self.rawdat['T{0:0=1}'.format(i + 1)] = (int.from_bytes(self.response[23 + i * 2:i * 2 + 25],
                                                                             'big') - 2731) / 10
                 # print("BMS request voltages")
+                print("raw=".format(self.rawdat))
                 self.get_voltages = True
                 self.response = bytearray()
                 self.bms_write_characteristic.write_value(bytes([0xDD, 0xA5, 0x04, 0x00, 0xFF, 0xFC, 0x77]))
