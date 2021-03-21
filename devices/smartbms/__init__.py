@@ -126,6 +126,7 @@ class AnyDevice(gatt.Device):
                         cycles=self.rawdat['Cycles'],
                     ))
                 # self.manager.stop()
+                self.bms_rec.save_changed_fields(persist=True)
                 self.clean_vars()
                 P.processing = False
             else:
@@ -151,6 +152,7 @@ class AnyDevice(gatt.Device):
                     print("Temp {}={}".format(temp_name, temp_val))
 
                 # print("BMS request voltages")
+                self.bms_rec.save_changed_fields(persist=True)
                 self.get_voltages = True
                 self.response = bytearray()
                 self.bms_write_characteristic.write_value(P.voltage_cmd)
@@ -216,7 +218,6 @@ def get_status():
     if rec is not None:
         connect_bt(rec)
         L.l.info("v={} v1={} t1={}".format(rec.voltage, rec.v01, rec.t01))
-        rec.save_changed_fields(persist=True)
     else:
         L.l.warning("No bms config record defined for this host={}".format(Constant.HOST_NAME))
 
