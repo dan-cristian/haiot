@@ -3,11 +3,15 @@ import time
 import serial
 import struct
 from binascii import unhexlify
-import socket
+# import socket
+import bluetooth
 
-serverMACAddress = 'A4:C1:38:EC:1B:B0'
+
+serverMACAddress = 'B8:27:EB:4F:6F:16'
 port = 1
-s = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
+# s = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
+s = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+
 s.connect((serverMACAddress, port))
 
 test = bytes([0xDB, 0xDB, 0x00, 0x00, 0x00, 0x00])
@@ -15,8 +19,8 @@ s.send(test)
 time.sleep(3)
 
 resp = s.recv()
-
 print("received:{}".format(resp))
+
 s.close()
 
 
