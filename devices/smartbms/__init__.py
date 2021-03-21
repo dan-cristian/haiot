@@ -165,7 +165,7 @@ class AnyDevice(gatt.Device):
 
 
 def bluetooth_manager_thread(manager):
-    print("Running BT manager")
+    # print("Running BT manager")
     manager.run()
 
 
@@ -181,6 +181,7 @@ def connect_bt(bms_rec):
                 time.sleep(1)
             else:
                 break
+        P.bt_device.bms_read_characteristic.disable_notifications()
         P.bt_device.disconnect()
         # P.bluetooth_manager.stop()
         P.bt_device = None
@@ -221,7 +222,7 @@ def unload():
 
 def init():
     L.l.info('BMS module initialising')
-    thread_pool.add_interval_callable(thread_run, run_interval_second=30)
+    thread_pool.add_interval_callable(thread_run, run_interval_second=60)
     m.Bms.add_upsert_listener(bms_upsert_listener)
     P.manager = gatt.DeviceManager(adapter_name='hci0')
     P.bluetooth_manager = threading.Thread(target=bluetooth_manager_thread, args=[P.manager, ])
