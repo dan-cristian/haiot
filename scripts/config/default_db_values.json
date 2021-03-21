@@ -87,7 +87,7 @@
     {"id":33, "active":false, "start_order":33, "name":"utility", "host_name":""},
     {"id":35, "active":false, "start_order":35, "name":"cloud.newtifry", "host_name":""},
     {"id":37, "active":false, "start_order":37, "name":"cloud.hipchat", "host_name":""},
-    {"id":39, "active":true, "start_order":39, "name":"presence", "host_name":""},
+    {"id":39, "active":false, "start_order":39, "name":"presence", "host_name":""},
     {"id":41, "active":false, "start_order":41, "name":"cloud.alexa", "host_name":""},
     {"id":43, "active":false, "start_order":43, "name":"cloud.thingspeak", "host_name":""},
     {"id":45, "active":false, "start_order":45, "name":"cloud.openhab", "host_name":""},

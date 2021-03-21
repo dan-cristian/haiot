@@ -380,6 +380,8 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
     if [ "$bluez" == "y" ]; then
         echo "Instaling bluetooth modules"
         apt install -y bluez python-bluez libglib2.0-dev
+        # needed for gatt / dbus / bms bluetooth
+        apt install -y libgirepository1.0-dev # libcairo2-dev
         apt-get -y build-dep python-bluez
         if [ "$?" != "0" ]; then
             # https://askubuntu.com/questions/312767/installing-pygame-with-pip
