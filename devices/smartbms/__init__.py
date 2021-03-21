@@ -32,19 +32,26 @@ class AnyDevice(gatt.Device):
             s for s in self.services
             if s.uuid == '0000ff00-0000-1000-8000-00805f9b34fb')
 
+        print("Device info service is {}".format(device_information_service))
+
         self.bms_read_characteristic = next(
             c for c in device_information_service.characteristics
             if c.uuid == '0000ff01-0000-1000-8000-00805f9b34fb')
 
+        print("Bms read characteristic is {}".format(self.bms_read_characteristic))
+
         self.bms_write_characteristic = next(
             c for c in device_information_service.characteristics
             if c.uuid == '0000ff02-0000-1000-8000-00805f9b34fb')
+
+        print("Bms write characteristic is {}".format(self.bms_write_characteristic))
 
         print("BMS found")
         self.bms_read_characteristic.enable_notifications()
 
     def characteristic_enable_notifications_succeeded(self, characteristic):
         super().characteristic_enable_notifications_succeeded(characteristic)
+        print("Notifications enabled")
 
     def request_bms_data(self, request):
         print("BMS request data")
@@ -67,10 +74,11 @@ class AnyDevice(gatt.Device):
         print("BMS write failed:", error)
 
     def wait(self):
-        return self.event.wait(timeout=2)
+        return self.event.wait(timeout=5)
 
 
 def bluetooth_manager_thread(manager):
+    print("Running BT manager")
     manager.run()
 
 
@@ -89,3 +97,4 @@ if device.wait():
     print(device.response)
 else:
     print('BMS timed out')
+    device.disconnect()
