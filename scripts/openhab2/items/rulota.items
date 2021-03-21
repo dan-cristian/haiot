@@ -9,5 +9,6 @@ Number powermonitor_power_rulota_battery_main "Rulota battery main [%.3f W]" <en
 
 Number powermonitor_current_rulota_battery_main "Rulota battery main [%.3f A]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_current_rulota battery main:state:default]"}
 
-Number bms_voltage_60ah_battery "Voltage [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/bms_voltage_60ah_battery:state:default]"}
+Number bms_voltage_60ah_battery "Voltage 60ah [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/bms_voltage_60ah_battery:state:default]"}
+Number bms_voltage_cells_60ah_battery "Voltage cells 60ah [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/bms_voltage_cells_60ah_battery:state:default]"}
 Number bms_power_60ah_battery "Power [%.1f W]" <energy> {mqtt="<[mosquitto:iot/openhab/bms_power_60ah_battery:state:default]"}
