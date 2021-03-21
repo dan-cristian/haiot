@@ -189,7 +189,7 @@ def connect_bt(bms_rec):
         # for i in range(0, 5):
         #    time.sleep(30)
         #    device.bms_write_characteristic.write_value(P.status_cmd)
-        for i in range(0, 200):
+        for i in range(0, 300):
             if P.processing:
                 time.sleep(0.1)
             else:
