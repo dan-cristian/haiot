@@ -126,6 +126,7 @@ class AnyDevice(gatt.Device):
                         cycles=self.rawdat['Cycles'],
                     ))
                 # self.manager.stop()
+                L.l.info("Saving t1={} t2={}".format(self.bms_rec.t01, self.bms_rec.t02))
                 self.bms_rec.save_changed_fields(persist=True)
                 self.clean_vars()
                 P.processing = False
