@@ -1,4 +1,5 @@
 import threading
+import traceback
 from common import fix_module
 while True:
     try:
@@ -35,6 +36,7 @@ def my_import(name):
                 mod = getattr(mod, comp)
             return mod
         except ImportError as iex:
+            traceback.print_exc(file=sys.stdout)
             if not fix_module(iex):
                 break
         except Exception as ex:

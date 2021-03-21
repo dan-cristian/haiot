@@ -9,7 +9,6 @@ import time
 import six
 from pydispatch import dispatcher as haiot_dispatch
 from storage.model import m
-import sys, traceback
 
 
 class P:
@@ -32,23 +31,22 @@ class P:
         pass
 
 
-try:
-    import openzwave
-    if six.PY3:
-        from pydispatch import dispatcher
-    else:
-        from louie import dispatcher
-    from openzwave.node import ZWaveNode
-    from openzwave.value import ZWaveValue
-    from openzwave.scene import ZWaveScene
-    from openzwave.controller import ZWaveController
-    from openzwave.network import ZWaveNetwork
-    from openzwave.option import ZWaveOption
-    from openzwave.object import ZWaveException
-    P.module_imported = True
-except Exception as e:
-    L.l.info("Cannot import openzwave")
-    traceback.print_exc(file=sys.stdout)
+import openzwave
+if six.PY3:
+    from pydispatch import dispatcher
+else:
+    from louie import dispatcher
+from openzwave.node import ZWaveNode
+from openzwave.value import ZWaveValue
+from openzwave.scene import ZWaveScene
+from openzwave.controller import ZWaveController
+from openzwave.network import ZWaveNetwork
+from openzwave.option import ZWaveOption
+from openzwave.object import ZWaveException
+P.module_imported = True
+#except Exception as e:
+#    L.l.info("Cannot import openzwave")
+#    traceback.print_exc(file=sys.stdout)
 
 
 # http://openzwave.github.io/python-openzwave/network.html
