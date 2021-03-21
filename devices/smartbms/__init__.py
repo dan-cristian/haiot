@@ -175,8 +175,11 @@ def connect_bt(bms_rec):
         # for i in range(0, 5):
         #    time.sleep(30)
         #    device.bms_write_characteristic.write_value(P.status_cmd)
-        while P.processing:
-            time.sleep(1)
+        for i in range(0, 40):
+            if P.processing:
+                time.sleep(1)
+            else:
+                break
         P.bt_device.disconnect()
         # P.bluetooth_manager.stop()
         P.bt_device = None
