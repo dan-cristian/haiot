@@ -204,7 +204,7 @@ class Constant:
 
 def _install(package):
     print('Installing missing module {}'.format(package))
-    return subprocess.call([sys.executable, "-m", "pip", "install", package])
+    return subprocess.call([sys.executable, "-m", "pip", "--user", "install", package])
 
 
 def fix_module(ex):

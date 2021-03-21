@@ -13,19 +13,19 @@ if [ "$?" != "0" ]; then
     #python3 install
     #https://raspberrypi.stackexchange.com/questions/9246/how-to-install-smbus-to-virtualenv
     sudo apt install python3-venv
-    python3 -m venv venv
+    python3 -m venv 3venv
     source venv/bin/activate
 fi
 
-echo "Installing mysql connector"
-wget http://dev.mysql.com/get/Downloads/Connector-Python/mysql-connector-python-2.1.3.zip
-unzip mysql-connector-python-2.1.3.zip
-cd mysql-connector-python-2.1.3/
-python setup.py install
-echo "Installing done for mysql connector"
-cd ..
-rm mysql-connector-python-2.1.3.zip
-rm -r mysql-connector-python-2.1.3
+# echo "Installing mysql connector"
+# wget http://dev.mysql.com/get/Downloads/Connector-Python/mysql-connector-python-2.1.3.zip
+# unzip mysql-connector-python-2.1.3.zip
+# cd mysql-connector-python-2.1.3/
+# python setup.py install
+# echo "Installing done for mysql connector"
+# cd ..
+# rm mysql-connector-python-2.1.3.zip
+# rm -r mysql-connector-python-2.1.3
 
 #setuptools latest needed for apscheduler
 echo "Updating pip etc."
