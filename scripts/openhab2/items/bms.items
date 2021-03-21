@@ -15,5 +15,5 @@ Number bms_v06_60ah_battery "V06 60ah [%.3f V]" <energy> {mqtt="<[mosquitto:iot/
 Number bms_v07_60ah_battery "V07 60ah [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/bms_v07_60ah_battery:state:default]"}
 Number bms_v08_60ah_battery "V08 60ah [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/bms_v08_60ah_battery:state:default]"}
 
-Number bms_t01_60ah_battery "Temp1 60ah [%.2f]" <temperature> {mqtt="<[mosquitto:iot/openhab/bms_t01_60ah_battery:state:default]"}
-Number bms_t02_60ah_battery "Temp2 60ah [%.2f]" <temperature> {mqtt="<[mosquitto:iot/openhab/bms_t02_60ah_battery:state:default]"}
+Number bms_t1_60ah_battery "Temp1 60ah [%.2f]" <temperature> {mqtt="<[mosquitto:iot/openhab/bms_t1_60ah_battery:state:default]"}
+Number bms_t2_60ah_battery "Temp2 60ah [%.2f]" <temperature> {mqtt="<[mosquitto:iot/openhab/bms_t2_60ah_battery:state:default]"}
