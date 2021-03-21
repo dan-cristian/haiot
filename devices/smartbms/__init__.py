@@ -48,7 +48,6 @@ class AnyDevice(gatt.Device):
     def connect_succeeded(self):
         super().connect_succeeded()
         L.l.info("[%s] Connected" % self.mac_address)
-        P.processing = True
 
     def connect_failed(self, error):
         super().connect_failed(error)
@@ -80,7 +79,7 @@ class AnyDevice(gatt.Device):
 
     def characteristic_enable_notifications_succeeded(self, characteristic):
         super().characteristic_enable_notifications_succeeded(characteristic)
-        print("Notifications enabled")
+        L.l.info("Notifications enabled")
         self.clean_vars()
         self.bms_write_characteristic.write_value(P.status_cmd)
 
@@ -179,11 +178,13 @@ def connect_bt(bms_rec):
         if P.bt_device is None:
             P.bt_device = AnyDevice(mac_address=bms_rec.mac_address, manager=P.manager)
             L.l.info("BT Connect first time")
+            P.processing = True
             P.bt_device.connect(bms_rec)
         else:
             if not P.bt_device.is_connected():
                 L.l.info("BT reconnect")
                 P.bt_device.connect(bms_rec)
+            P.processing = True
             P.bt_device.bms_write_characteristic.write_value(P.status_cmd)
 
         # for i in range(0, 5):
