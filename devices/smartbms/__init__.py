@@ -5,6 +5,7 @@ import gatt
 from main.logger_helper import L
 from main import thread_pool
 from storage.model import m
+from common import Constant
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 # reused: https://github.com/stefanandres/bms-monitoring-stack
@@ -173,19 +174,26 @@ def bluetooth_manager_thread(manager):
 
 def connect_bt(bms_rec):
     try:
-        P.bt_device = AnyDevice(mac_address=bms_rec.mac_address, manager=P.manager)
-        P.bt_device.connect(bms_rec)
+        if P.bt_device is None:
+            P.bt_device = AnyDevice(mac_address=bms_rec.mac_address, manager=P.manager)
+        #    P.bt_device.connect(bms_rec)
+        # else:
+        #    if not P.bt_device.is_connected():
+        #        P.bt_device.connect(bms_rec)
+        #    P.bt_device.bms_write_characteristic.write_value(P.status_cmd)
+
+        if not P.bt_device.is_connected():
+            P.bt_device.connect(bms_rec)
+
         # for i in range(0, 5):
         #    time.sleep(30)
         #    device.bms_write_characteristic.write_value(P.status_cmd)
-        for i in range(0, 40):
+        for i in range(0, 20):
             if P.processing:
-                time.sleep(1)
+                time.sleep(0.1)
             else:
                 break
         if P.bt_device is not None:
-            if P.bt_device.bms_read_characteristic is not None:
-                P.bt_device.bms_read_characteristic.enable_notifications(enabled=False)
             if P.bt_device.is_connected():
                 P.bt_device.disconnect()
             # P.bluetooth_manager.stop()
@@ -195,12 +203,14 @@ def connect_bt(bms_rec):
 
 
 def get_status():
-    recs = m.Bms.find()
-    for rec in recs:
-        # rec = m.Bms.find_one({m.Bms.mac_address: mac})
-        # if rec is not None:
+    # recs = m.Bms.find()
+    # for rec in recs:
+    rec = m.Bms.find_one({m.Bms.host_name: Constant.HOST_NAME})
+    if rec is not None:
         connect_bt(rec)
         rec.save_changed_fields(persist=True)
+    else:
+        L.l.warning("No bms config record defined for this host={}".format(Constant.HOST_NAME))
 
 
 def bms_upsert_listener(record, changed_fields):
