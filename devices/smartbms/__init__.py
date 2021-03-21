@@ -39,27 +39,28 @@ class AnyDevice(gatt.Device):
     get_voltages = False
 
     def connect(self, bms_rec):
-        print("Connecting {} {}".format(self.mac_address, bms_rec.name))
+        L.l.info("Connecting {} {}".format(self.mac_address, bms_rec.name))
         self.bms_rec = bms_rec
         self.event = threading.Event()
         super().connect()
-        print("Connecting exit: {}".format(self.mac_address))
+        L.l.info("Connecting exit: {}".format(self.mac_address))
 
     def connect_succeeded(self):
         super().connect_succeeded()
-        print("[%s] Connected" % self.mac_address)
+        L.l.info("[%s] Connected" % self.mac_address)
         P.processing = True
 
     def connect_failed(self, error):
         super().connect_failed(error)
-        print("[%s] Connection failed: %s" % (self.mac_address, str(error)))
+        L.l.warning("[%s] Connection failed: %s" % (self.mac_address, str(error)))
         self.disconnect()
 
     def disconnect_succeeded(self):
         super().disconnect_succeeded()
-        print("[%s] Disconnected" % self.mac_address)
+        L.l.info("[%s] Disconnected ok" % self.mac_address)
 
     def services_resolved(self):
+        L.l.info("BT services resolved")
         super().services_resolved()
 
         device_information_service = next(
@@ -74,15 +75,13 @@ class AnyDevice(gatt.Device):
             c for c in device_information_service.characteristics
             if c.uuid == '0000ff02-0000-1000-8000-00805f9b34fb')
 
-        print("BMS found")
+        L.l.info("BMS found")
         self.bms_read_characteristic.enable_notifications(enabled=True)
 
     def characteristic_enable_notifications_succeeded(self, characteristic):
         super().characteristic_enable_notifications_succeeded(characteristic)
         print("Notifications enabled")
-        self.response = bytearray()
-        self.rawdat = {}
-        self.get_voltages = False
+        self.clean_vars()
         self.bms_write_characteristic.write_value(P.status_cmd)
 
     def request_bms_data(self, request):
@@ -127,10 +126,8 @@ class AnyDevice(gatt.Device):
                         temp=self.rawdat['t1'],
                         cycles=self.rawdat['Cycles'],
                     ))
-                # close everything
-                self.manager.stop()
-                self.response = bytearray()
-                self.get_voltages = False
+                # self.manager.stop()
+                self.clean_vars()
                 P.processing = False
             else:
                 self.rawdat['packV'] = int.from_bytes(self.response[0:2], byteorder='big', signed=True) / 100.0
@@ -165,6 +162,11 @@ class AnyDevice(gatt.Device):
     # unused?
     def wait(self):
         return self.event.wait(timeout=2)
+
+    def clean_vars(self):
+        self.response = bytearray()
+        self.rawdat = {}
+        self.get_voltages = False
 
 
 def bluetooth_manager_thread(manager):
