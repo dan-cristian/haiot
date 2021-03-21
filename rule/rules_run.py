@@ -19,11 +19,11 @@ class P:
         pass
 
 
-try:
-    from sensor import zwave
-    P.has_zwave = True
-except ImportError as ie:
-    L.l.info("Zwave module cannot be imported")
+# try:
+#    from sensor import zwave
+#    P.has_zwave = True
+# except ImportError as ie:
+#    L.l.info("Zwave module cannot be imported")
 
 try:
     # sometimes I get "ImportError: cannot import name scheduler" so trying two import methods
@@ -394,13 +394,15 @@ def front_lights_on():
 
 
 def zwave_start_inclusion():
-    if P.has_zwave:
-        zwave.include_node()
+    # if P.has_zwave:
+    #    zwave.include_node()
+    pass
 
 
 def zwave_stop_inclusion():
-    if P.has_zwave:
-        zwave.stop_include_node()
+    # if P.has_zwave:
+    #    zwave.stop_include_node()
+    pass
 
 # ##### MACROS END ##############
 
