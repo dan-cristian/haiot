@@ -154,7 +154,7 @@ class AnyDevice(gatt.Device):
                     setattr(self.bms_rec, temp_name, temp_val)
                     print("Temp {}={}".format(temp_name, temp_val))
 
-                print("BMS request voltages")
+                # print("BMS request voltages")
                 self.get_voltages = True
                 self.response = bytearray()
                 self.bms_write_characteristic.write_value(P.voltage_cmd)
@@ -176,15 +176,13 @@ def connect_bt(bms_rec):
     try:
         if P.bt_device is None:
             P.bt_device = AnyDevice(mac_address=bms_rec.mac_address, manager=P.manager)
-        #    P.bt_device.connect(bms_rec)
-        # else:
-        #    if not P.bt_device.is_connected():
-        #        P.bt_device.connect(bms_rec)
-        #    P.bt_device.bms_write_characteristic.write_value(P.status_cmd)
-
-        if not P.bt_device.is_connected():
-            L.l.info("BT not connected, connecting")
+            L.l.info("BT Connect first time")
             P.bt_device.connect(bms_rec)
+        else:
+            if not P.bt_device.is_connected():
+                L.l.info("BT reconnect")
+                P.bt_device.connect(bms_rec)
+            P.bt_device.bms_write_characteristic.write_value(P.status_cmd)
 
         # for i in range(0, 5):
         #    time.sleep(30)
