@@ -54,7 +54,7 @@ class AnyDevice(gatt.Device):
         print("Notifications enabled")
 
     def request_bms_data(self, request):
-        print("BMS request data")
+        print("BMS write data {}".format(request))
         self.response = bytearray()
         self.event.clear()
         self.bms_write_characteristic.write_value(request)
@@ -94,7 +94,8 @@ print('BMS server for {} started'.format(bluetooth_device))
 
 # device.request_bms_data(bytes([0xDD, 0xA5, 0x03, 0x00, 0xFF, 0xFD, 0x77]))
 # device.request_bms_data(bytes([0xDD, 0xA5, 0x05, 0x00, 0xFF, 0xFB, 0x77]))
-device.request_bms_data(bytes([0xDB, 0xDB, 0x00, 0x00, 0x00, 0x00, 0x00]))
+# device.request_bms_data(bytes([0xDB, 0xDB, 0x00, 0x00, 0x00, 0x00]))
+device.request_bms_data(bytes([0x5A, 0x5A, 0x00, 0x00, 0x00, 0x00]))
 if device.wait():
     print(device.response)
 else:
