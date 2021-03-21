@@ -3,6 +3,7 @@ import threading
 import gatt
 import json
 import sys
+import time
 
 bind_ip = '0.0.0.0'
 
@@ -89,7 +90,7 @@ bluetooth_manager = threading.Thread(target=bluetooth_manager_thread, args=[mana
 bluetooth_manager.start()
 device = AnyDevice(mac_address=bluetooth_device, manager=manager)
 device.connect()
-
+time.sleep(2)
 print('BMS server for {} started'.format(bluetooth_device))
 
 # device.request_bms_data(bytes([0xDD, 0xA5, 0x03, 0x00, 0xFF, 0xFD, 0x77]))
@@ -99,5 +100,5 @@ device.request_bms_data(bytes([0xDB, 0xDB, 0x00, 0x00, 0x00, 0x00]))
 if device.wait():
     print(device.response)
 else:
-    print('BMS timed out')
+    print('BMS timed out, disconnecting')
     device.disconnect()
