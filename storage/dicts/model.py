@@ -488,8 +488,8 @@ class Bms(ModelBase):
     v06 = 0.0
     v07 = 0.0
     v08 = 0.0
-    t01 = 0.0  # cell temperature no 1
-    t02 = 0.0
+    t1 = 0.0  # cell temperature no 1
+    t2 = 0.0
     power = 0  # current consumption in watts
     full_capacity = 0  # total battery ah
     remaining_capacity = 0.0  # capacity left
