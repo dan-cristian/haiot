@@ -183,21 +183,26 @@ def connect_bt(bms_rec):
         #    P.bt_device.bms_write_characteristic.write_value(P.status_cmd)
 
         if not P.bt_device.is_connected():
+            L.l.info("BT not connected, connecting")
             P.bt_device.connect(bms_rec)
 
         # for i in range(0, 5):
         #    time.sleep(30)
         #    device.bms_write_characteristic.write_value(P.status_cmd)
-        for i in range(0, 20):
+        for i in range(0, 200):
             if P.processing:
                 time.sleep(0.1)
             else:
+                L.l.info("BT processing done")
                 break
         if P.bt_device is not None:
             if P.bt_device.is_connected():
+                L.l.info("Disconnecting BT")
                 P.bt_device.disconnect()
+            else:
+                L.l.info("BT not connected")
             # P.bluetooth_manager.stop()
-            P.bt_device = None
+            # P.bt_device = None
     except Exception as ex:
         L.l.error("Exception on connect btle, ex={}".format(ex))
 
