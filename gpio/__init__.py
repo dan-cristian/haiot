@@ -6,9 +6,6 @@ from main.logger_helper import L
 from common import Constant
 from common import utils
 from pydispatch import dispatcher
-if sqlitedb:
-    from storage.sqalc import models
-# from storage.tiny.tinydb_model import GpioPin
 from main import thread_pool
 from sensor import sonoff
 from gpio import io_common
