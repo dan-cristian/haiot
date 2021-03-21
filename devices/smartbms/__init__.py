@@ -106,7 +106,7 @@ class AnyDevice(gatt.Device):
                 pack_volts = 0
                 for i in range(int(len(self.response) / 2) - 1):
                     cell_voltage = int.from_bytes(self.response[i * 2:i * 2 + 2], byteorder='big') / 1000
-                    volt_name = 'V{0:0=2}'.format(i + 1)
+                    volt_name = 'v{0:0=2}'.format(i + 1)
                     self.rawdat[volt_name] = cell_voltage
                     setattr(self.bms_rec, volt_name, cell_voltage)
                     print("Volt {}={}".format(volt_name, cell_voltage))
@@ -147,7 +147,7 @@ class AnyDevice(gatt.Device):
                 self.bms_rec.cycles = self.rawdat['Cycles']
 
                 for ti in range(int.from_bytes(self.response[22:23], 'big')):  # read temperatures
-                    temp_name = 'T{0:0=1}'.format(ti + 1)
+                    temp_name = 't{0:0=1}'.format(ti + 1)
                     temp_val = (int.from_bytes(self.response[23 + ti * 2:ti * 2 + 25], 'big') - 2731) / 10
                     self.rawdat[temp_name] = temp_val
                     setattr(self.bms_rec, temp_name, temp_val)
@@ -184,7 +184,8 @@ def connect_bt(bms_rec):
             else:
                 break
         if P.bt_device is not None:
-            P.bt_device.bms_read_characteristic.enable_notifications(enabled=False)
+            if P.bt_device.bms_read_characteristic is not None:
+                P.bt_device.bms_read_characteristic.enable_notifications(enabled=False)
             if P.bt_device.is_connected():
                 P.bt_device.disconnect()
             # P.bluetooth_manager.stop()
