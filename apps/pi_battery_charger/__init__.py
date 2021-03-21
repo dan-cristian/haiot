@@ -22,7 +22,7 @@ class C:
     voltage = 0
     default_voltage = 28.0  # set all as float
     max_voltage = 28.4
-    max_current = 12.0
+    max_current = 4.0
 
 
 # http://www.tutorialspoint.com/python/python_command_line_arguments.htm
@@ -138,7 +138,7 @@ def charge_cmd_read(cmd):
 def charge_cmd_set(cmd, value):
     if P.serial_port is not None:
         if value != 0:
-            full_cmd = "{}".format(value * 100)[:4].zfill(4)
+            full_cmd = "{}".format(value * 100)[:4].split(".", 1)[0].zfill(4)
         else:
             full_cmd = "0"
         full_cmd = "{}{}".format(cmd, full_cmd)
@@ -188,7 +188,10 @@ def charger_init():
 
 
 def set_voltage_set(voltage):
-    return charge_cmd_set("awu", voltage)
+    charge_cmd_set("awu", voltage)
+    C.voltage_set = charge_cmd_read("arv")
+    if C.voltage_set != voltage:
+        print("Error voltage set, new={} actual={}".format(voltage, C.voltage_set))
 
 
 def set_current_set(current):
