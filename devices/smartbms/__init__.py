@@ -54,7 +54,7 @@ class AnyDevice(gatt.Device):
         self.response = bytearray()
         self.rawdat = {}
         self.get_voltages = False
-        self.bms_write_characteristic.write_value(bytes([0xDD, 0xA5, 0x03, 0x00, 0xFF, 0xFD, 0x77]))
+        self.bms_write_characteristic.write_value(status_cmd)
 
     def request_bms_data(self, request):
         print("BMS write data {}".format(request))
@@ -124,6 +124,7 @@ def bluetooth_manager_thread(manager):
 
 
 bluetooth_device = "A4:C1:38:C6:30:57"
+status_cmd = bytes([0xDD, 0xA5, 0x03, 0x00, 0xFF, 0xFD, 0x77])
 
 manager = gatt.DeviceManager(adapter_name='hci0')
 bluetooth_manager = threading.Thread(target=bluetooth_manager_thread, args=[manager, ])
@@ -137,5 +138,7 @@ print('BMS server for {} started'.format(bluetooth_device))
 # device.request_bms_data(bytes([0xDD, 0xA5, 0x05, 0x00, 0xFF, 0xFB, 0x77]))
 # device.request_bms_data(bytes([0xDB, 0xDB, 0x00, 0x00, 0x00, 0x00]))
 # device.request_bms_data(bytes([0x5A, 0x5A, 0x00, 0x00, 0x00, 0x00]))
-while True:
-    time.sleep(1)
+for i in range(0, 5):
+    time.sleep(30)
+    device.bms_write_characteristic.write_value(status_cmd)
+device.disconnect()
