@@ -25,3 +25,4 @@ scripts/osinstall/ubuntu/etc/motion/thread*.conf
 /apps/esp8266_vent_motor/credentials.py
 /apps/esp8266_battery_charger/credentials.py
 /apps/pi_battery_charger/credentials.py
+/apps/esp8266_battery_charger/.idea/
