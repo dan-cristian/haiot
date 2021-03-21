@@ -168,7 +168,6 @@ def bluetooth_manager_thread(manager):
 
 def connect_bt(bms_rec):
     try:
-        P.bluetooth_manager.start()
         P.bt_device = AnyDevice(mac_address=bms_rec.mac_address, manager=P.manager)
         P.bt_device.connect(bms_rec)
         P.processing = True
@@ -178,10 +177,10 @@ def connect_bt(bms_rec):
         while P.processing:
             time.sleep(1)
         P.bt_device.disconnect()
-        P.bluetooth_manager.stop()
+        # P.bluetooth_manager.stop()
         P.bt_device = None
     except Exception as ex:
-        pass
+        L.l.error("Exception on connect btle, ex={}".format(ex))
 
 
 def get_status():
@@ -221,7 +220,5 @@ def init():
     m.Bms.add_upsert_listener(bms_upsert_listener)
     P.manager = gatt.DeviceManager(adapter_name='hci0')
     P.bluetooth_manager = threading.Thread(target=bluetooth_manager_thread, args=[P.manager, ])
+    P.bluetooth_manager.start()
     P.initialised = True
-
-
-
