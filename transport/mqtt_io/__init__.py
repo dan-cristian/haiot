@@ -5,17 +5,10 @@ import json
 from main.logger_helper import L
 from common import Constant, utils
 import common
-
+from pydispatch import dispatcher
+import prctl
 from common import fix_module
-while True:
-    try:
-        from pydispatch import dispatcher
-        import paho.mqtt.client as mqtt
-        import prctl
-        break
-    except ImportError as iex:
-        if not fix_module(iex):
-            break
+import paho.mqtt.client as mqtt
 
 
 class P:
@@ -35,14 +28,6 @@ class P:
 
     def __init__(self):
         pass
-
-
-try:
-    if not P.mqtt_mosquitto_exists:
-        import paho.mqtt.client as mqtt
-        P.mqtt_paho_exists = True
-except Exception:
-    P.mqtt_paho_exists = False
 
 
 __author__ = 'dcristian'
@@ -157,14 +142,6 @@ def unload():
 
 
 def init():
-    if P.mqtt_mosquitto_exists:
-        L.l.info("INIT, Using mosquitto as mqtt client")
-    elif P.mqtt_paho_exists:
-        L.l.info("INIT, Using paho as mqtt client")
-    else:
-        L.l.critical("No mqtt client enabled via import")
-        raise Exception("No mqtt client enabled via import")
-
     # not a good ideea to set a timeout as it will crash pigpio_gpio callback
     # socket.setdefaulttimeout(10)
     try:
@@ -182,12 +159,7 @@ def init():
             passwd = config['mqtt_password']
         P.topic = str(common.get_json_param(Constant.P_MQTT_TOPIC))
         P.topic_main = str(common.get_json_param(Constant.P_MQTT_TOPIC_MAIN))
-        if P.mqtt_paho_exists:
-            P.mqtt_client = mqtt.Client(client_id=Constant.HOST_NAME)
-        elif P.mqtt_mosquitto_exists:
-            P.mqtt_client = mqtt.Mosquitto(client_id=Constant.HOST_NAME)
-        else:
-            L.l.error("Unable to create the Mqtt client")
+        P.mqtt_client = mqtt.Client(client_id=Constant.HOST_NAME)
 
         for host_port in host_list:
             host = host_port[0]
@@ -235,6 +207,7 @@ def init():
             L.l.critical('MQTT connection not available, all connect attempts failed')
     except Exception as ex:
         L.l.error('Exception on mqtt init, err={}'.format(ex))
+        exit(0)
 
     finally:
         P.is_client_connecting = False
