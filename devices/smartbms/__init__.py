@@ -183,11 +183,12 @@ def connect_bt(bms_rec):
                 time.sleep(1)
             else:
                 break
-        P.bt_device.bms_read_characteristic.enable_notifications(enabled=False)
-        if P.bt_device.is_connected():
-            P.bt_device.disconnect()
-        # P.bluetooth_manager.stop()
-        P.bt_device = None
+        if P.bt_device is not None:
+            P.bt_device.bms_read_characteristic.enable_notifications(enabled=False)
+            if P.bt_device.is_connected():
+                P.bt_device.disconnect()
+            # P.bluetooth_manager.stop()
+            P.bt_device = None
     except Exception as ex:
         L.l.error("Exception on connect btle, ex={}".format(ex))
 
