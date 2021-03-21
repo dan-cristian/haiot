@@ -126,7 +126,6 @@ class AnyDevice(gatt.Device):
                         cycles=self.rawdat['Cycles'],
                     ))
                 # self.manager.stop()
-                L.l.info("Saving t1={} t2={}".format(self.bms_rec.t01, self.bms_rec.t02))
                 self.bms_rec.save_changed_fields(persist=True)
                 self.clean_vars()
                 P.processing = False
@@ -151,7 +150,7 @@ class AnyDevice(gatt.Device):
                     self.rawdat[temp_name] = temp_val
                     setattr(self.bms_rec, temp_name, temp_val)
                     print("Temp {}={}".format(temp_name, temp_val))
-
+                L.l.info("Saving t1={} t2={}".format(self.bms_rec.t01, self.bms_rec.t02))
                 # print("BMS request voltages")
                 self.bms_rec.save_changed_fields(persist=True)
                 self.get_voltages = True
