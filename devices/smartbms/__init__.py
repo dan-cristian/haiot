@@ -67,12 +67,12 @@ class AnyDevice(gatt.Device):
         print("BMS notification failed:", error)
 
     def characteristic_value_updated(self, characteristic, value):
-        print("BMS answering")
+        print("BMS answering: {}".format(value))
         self.response += value
         if self.response.endswith(b'w'):
             print("BMS answer:", self.response.hex())
             self.response = self.response[4:]
-            if (self.get_voltages):
+            if self.get_voltages:
                 packVolts = 0
                 for i in range(int(len(self.response) / 2) - 1):
                     cell = int.from_bytes(self.response[i * 2:i * 2 + 2], byteorder='big') / 1000
@@ -82,7 +82,6 @@ class AnyDevice(gatt.Device):
                 self.rawdat['Vbat'] = packVolts
                 self.rawdat['P'] = round(self.rawdat['Vbat'] * self.rawdat['Ibat'], 1)
                 self.rawdat['State'] = int.from_bytes(self.response[16:18], byteorder='big', signed=True)
-
                 print(
                     "Capacity: {capacity}% ({Ah_remaining} of {Ah_full}Ah)\nPower: {power}W ({I}Ah)\nTemperature: {temp}°C\nCycles: {cycles}".format(
                         capacity=self.rawdat['Ah_percent'],
@@ -93,7 +92,7 @@ class AnyDevice(gatt.Device):
                         temp=self.rawdat['T1'],
                         cycles=self.rawdat['Cycles'],
                     ))
-                self.manager.stop()
+                # self.manager.stop()
             else:
                 self.rawdat['packV'] = int.from_bytes(self.response[0:2], byteorder='big', signed=True) / 100.0
                 self.rawdat['Ibat'] = int.from_bytes(self.response[2:4], byteorder='big', signed=True) / 100.0
@@ -138,8 +137,5 @@ print('BMS server for {} started'.format(bluetooth_device))
 # device.request_bms_data(bytes([0xDD, 0xA5, 0x05, 0x00, 0xFF, 0xFB, 0x77]))
 # device.request_bms_data(bytes([0xDB, 0xDB, 0x00, 0x00, 0x00, 0x00]))
 # device.request_bms_data(bytes([0x5A, 0x5A, 0x00, 0x00, 0x00, 0x00]))
-if device.wait():
-    print(device.response)
-else:
-    print('BMS timed out, disconnecting')
-    device.disconnect()
+while True:
+    time.sleep(1)
