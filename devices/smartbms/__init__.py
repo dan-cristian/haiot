@@ -45,11 +45,12 @@ class AnyDevice(gatt.Device):
     def connect_succeeded(self):
         super().connect_succeeded()
         print("[%s] Connected" % self.mac_address)
+        P.processing = True
 
     def connect_failed(self, error):
         super().connect_failed(error)
         print("[%s] Connection failed: %s" % (self.mac_address, str(error)))
-        P.processing = False
+        self.disconnect()
 
     def disconnect_succeeded(self):
         super().disconnect_succeeded()
@@ -172,7 +173,6 @@ def connect_bt(bms_rec):
     try:
         P.bt_device = AnyDevice(mac_address=bms_rec.mac_address, manager=P.manager)
         P.bt_device.connect(bms_rec)
-        P.processing = True
         # for i in range(0, 5):
         #    time.sleep(30)
         #    device.bms_write_characteristic.write_value(P.status_cmd)
