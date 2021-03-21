@@ -150,7 +150,8 @@ class AnyDevice(gatt.Device):
                     self.rawdat[temp_name] = temp_val
                     setattr(self.bms_rec, temp_name, temp_val)
                     print("Temp {}={}".format(temp_name, temp_val))
-                #L.l.info("Saving t1={} t2={}".format(self.bms_rec.t01, self.bms_rec.t02))
+                L.l.info("Saving t1={} t2={}".format(self.bms_rec.t1, self.bms_rec.t2))
+                self.bms_rec.save_changed_fields(persist=True)
                 # print("BMS request voltages")
                 self.get_voltages = True
                 self.response = bytearray()
