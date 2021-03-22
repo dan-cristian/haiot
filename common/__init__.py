@@ -225,19 +225,23 @@ def fix_module(ex):
             mod_err = error_message[start:end]
         if mod_err is not None:
             mod_name = mod_err.replace("'", "")
-            package_name = get_package_name(mod_name)
-            if package_name is None:
-                package_name = mod_name
-            if package_name not in P.module_failed:
-                res = _install(package_name)
-                print('Install package {} returned {}'.format(package_name, res))
-                if res != 0:
-                    P.module_failed[package_name] = res
-                    return False
+            package_names = get_package_name(mod_name)
+            if package_names is None:
+                package_names = [mod_name]
+            failed = None
+            for package_name in package_names:
+                if package_name not in P.module_failed:
+                    res = _install(package_name)
+                    print('Install package {} returned {}'.format(package_name, res))
+                    if res != 0:
+                        P.module_failed[package_name] = res
+                        failed = True
                 else:
-                    return True
-            print('Not retrying a failed package install for {}'.format(package_name))
-            return False
+                    print('Not retrying a failed package install for {}'.format(package_name))
+            if failed is None:
+                return True
+            else:
+                return False
     except Exception as ex:
         msg = 'Fixmodule exception err={}'.format(ex)
     print(msg)
@@ -286,12 +290,16 @@ def get_json_param(name):
 def get_package_name(module_name):
     """ retrieves parameter value from json config file"""
     param_fields = Constant.db_auto_module_json["Package"]
-    value = None
+    values = None
     for config_record in param_fields:
         if config_record["module"] == module_name:
             value = config_record["package"]
+            if ',' in value:
+                values = value.split(',')
+            else:
+                values = [value]
             break
-    return value
+    return values
 
 
 def get_table(table_name):

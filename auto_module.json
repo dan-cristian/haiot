@@ -10,6 +10,6 @@
   {"module": "prctl", "package": "python-prctl"},
   {"module": "RPi", "package": "RPi.GPIO"},
   {"module": "openzwave", "package": "python_openzwave"},
-  {"module": "dbus", "package": "dbus-python"}
+  {"module": "gatt", "package": "dbus-python, gatt"}
 ]
 }
