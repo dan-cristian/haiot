@@ -428,16 +428,16 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
         source 3venv/bin/activate
     fi
 
-    echo "Installing mysql connector"
-    wget http://dev.mysql.com/get/Downloads/Connector-Python/mysql-connector-python-2.1.3.zip
-    apt-get -y install unzip
-    unzip mysql-connector-python-2.1.3.zip
-    cd mysql-connector-python-2.1.3/
-    python setup.py install
-    echo "Installing done for mysql connector"
-    cd ..
-    rm mysql-connector-python-2.1.3.zip
-    rm -r mysql-connector-python-2.1.3
+    #echo "Installing mysql connector"
+    #wget http://dev.mysql.com/get/Downloads/Connector-Python/mysql-connector-python-2.1.3.zip
+    #apt-get -y install unzip
+    #unzip mysql-connector-python-2.1.3.zip
+    #cd mysql-connector-python-2.1.3/
+    #python setup.py install
+    #echo "Installing done for mysql connector"
+    #cd ..
+    #rm mysql-connector-python-2.1.3.zip
+    #rm -r mysql-connector-python-2.1.3
 
     #setuptools latest needed for apscheduler
     echo "Updating pip etc."
@@ -450,17 +450,18 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
     echo "Install mandatory requirements from folder: " `pwd`
     # needed for python-prctl, other packages
     apt-get install -y libcap2-dev libffi-dev python-dev python3-dev libssl-dev
-    pip install -r requirements.txt
+    # pip install -r requirements.txt
 
     echo "Install RPI requirements. I am in folder:" `pwd`
     res=`cat /etc/os-release | grep raspbian -q ; echo $?`
     if [ "$res" == "0" ]; then
         # for openzwave
         apt-get install -y libudev-dev libyaml-dev
-        pip install -r requirements-rpi.txt
+        # pip install -r requirements-rpi.txt
         if [ "$?" != "0" ]; then
-            echo "Failed to install RPI requirements. Check errors. Interrupting."
-            exit 1
+            #echo "Failed to install RPI requirements. Check errors. Interrupting."
+            #exit 1
+            echo skip
         fi
         # make sound as we need user input
         echo -ne '\007'
@@ -468,10 +469,12 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
         read -t 30 extra
         if [ "$extra" == "y" ]; then
             # this can fail due to pygame
-            pip install --no-cache-dir -r requirements-rpi-extra.txt
+            # pip install --no-cache-dir -r requirements-rpi-extra.txt
+            echo skip
         fi
     else
-        pip install --no-cache-dir -r requirements-beaglebone.txt
+        # pip install --no-cache-dir -r requirements-beaglebone.txt
+        echo skip
     fi
 
     echo "Setup python done"

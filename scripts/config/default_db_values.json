@@ -8,7 +8,8 @@
     {"id":9,  "priority": 9, "name":"odroid", "machine_type":"odroid"},
     {"id":11,  "priority": 11, "name":"pibms", "machine_type":"raspberry"},
     {"id":12,  "priority": 4, "name":"homew", "machine_type":"raspberry"},
-    {"id":13,  "priority": 13, "name":"pizero3", "machine_type":"raspberry"}
+    {"id":13,  "priority": 13, "name":"pizero3", "machine_type":"raspberry"},
+    {"id":14,  "priority": 14, "name":"pibms2", "machine_type":"raspberry"}
   ],
 
   "Parameter": [
@@ -133,6 +134,9 @@
 
     {"id":445, "active":true, "start_order":45, "name":"cloud.openhab", "host_name":"pibms"},
     {"id":481, "active":true, "start_order":81, "name":"devices.smartbms", "host_name":"pibms"},
+
+    {"id":945, "active":true, "start_order":45, "name":"cloud.openhab", "host_name":"pibms2"},
+    {"id":981, "active":true, "start_order":81, "name":"devices.smartbms", "host_name":"pibms2"},
 
 
     {"id":501, "active":false, "start_order":50, "name":"apps.dashcam", "host_name":"netbook"},

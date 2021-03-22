@@ -17,6 +17,9 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 # gi.repository fix
 # https://pygobject.readthedocs.io/en/latest/getting_started.html
 
+# other interfacing methods
+# https://secondlifestorage.com/index.php?threads/jdb-xiaoxiang-bms-tool.10329/
+
 
 class P:
     initialised = False
