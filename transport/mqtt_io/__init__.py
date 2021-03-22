@@ -5,10 +5,15 @@ import json
 from main.logger_helper import L
 from common import Constant, utils
 import common
-from pydispatch import dispatcher
 import prctl
 from common import fix_module
-import paho.mqtt.client as mqtt
+while True:
+    try:
+        import paho.mqtt.client as mqtt
+        break
+    except ImportError as iex:
+        if not fix_module(iex):
+            break
 
 
 class P:
