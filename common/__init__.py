@@ -210,7 +210,7 @@ def _install(package):
 def _install_apt(apt_list):
     for apt in apt_list:
         print('Installing missing apt {}'.format(apt))
-        return subprocess.call(["sudo", "apt", "install", "-y", apt])
+        subprocess.call(["sudo", "apt", "install", "-y", apt])
 
 
 def fix_module(ex):
