@@ -98,7 +98,7 @@ class AnyDevice(gatt.Device):
         # print("BMS answering: {}".format(value))
         self.response += value
         if self.response.endswith(b'w'):
-            L.l.info("BMS answer:", self.response.hex())
+            # L.l.info("BMS answer:", self.response.hex())
             self.response = self.response[4:]
             if self.get_voltages:
                 # print("Read voltages")
