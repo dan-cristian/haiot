@@ -4,7 +4,7 @@ from flask import abort, send_file, render_template, request
 from main.flask_app import app
 from main.logger_helper import L
 from common import Constant, utils
-from music import mpd, amp
+from music import amp
 
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
@@ -12,6 +12,7 @@ __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 class P:
     alexa_initialised = False
     lastfm_initialised = False
+    mpd_initialised = False
 
 
 def init_alexa():
@@ -22,6 +23,11 @@ def init_alexa():
 def init_lastfm():
     from cloud import lastfm
     P.lastfm_initialised = True
+
+
+def init_mpd():
+    from music import mpd
+    P.mpd_initialised = True
 
 
 def return_web_message(pin_value, ok_message='', err_message=''):
@@ -78,6 +84,8 @@ def api():
 def alexa_mpd():
     if not P.alexa_initialised:
         init_alexa()
+    if not P.mpd_initialised:
+        init_mpd()
     return cloud.alexa.mpd_run.mpd(request)
 
 
@@ -144,11 +152,15 @@ def test_lastfm_play_loved():
 
 @app.route('/mpd/next', methods=['GET'])
 def mpd_next():
+    if not P.mpd_initialised:
+        init_mpd()
     return mpd.next()
 
 
 @app.route('/mpd/toggle', methods=['GET'])
 def mpd_toggle():
+    if not P.mpd_initialised:
+        init_mpd()
     return mpd.toggle()
 
 

@@ -611,7 +611,7 @@
 
   "Bms": [
     {"id": 1, "name": "60ah_battery", "mac_address": "A4:C1:38:C6:30:57", "host_name": "pibms"},
-    {"id": 2, "name": "40ah_battery", "mac_address": "A4:C1:38:EC:1B:B0", "host_name": "homew"}
+    {"id": 2, "name": "40ah_battery", "mac_address": "A4:C1:38:EC:1B:B0", "host_name": "pibms2"}
   ],
 
   "_disabled": [
