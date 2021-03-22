@@ -11,6 +11,6 @@
   {"module": "RPi", "package": "RPi.GPIO"},
   {"module": "openzwave", "package": "python_openzwave"},
   {"module": "gatt", "package": "dbus-python,gatt"},
-  {"module": "gi.repository", "package": "PyGObject"}
+  {"module": "gi.repository", "package": "pycairo,PyGObject"}
 ]
 }
