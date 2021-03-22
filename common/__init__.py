@@ -207,6 +207,12 @@ def _install(package):
     return subprocess.call([sys.executable, "-m", "pip", "install", package])
 
 
+def _install_apt(apt_list):
+    for apt in apt_list:
+        print('Installing missing apt {}'.format(apt))
+        return subprocess.call(["sudo", "apt", "install", "-y", apt])
+
+
 def fix_module(ex):
     try:
         error_message = '{}'.format(ex)
@@ -225,9 +231,11 @@ def fix_module(ex):
             mod_err = error_message[start:end]
         if mod_err is not None:
             mod_name = mod_err.replace("'", "")
-            package_names = get_package_name(mod_name)
+            package_names, apt_names = get_package_name(mod_name)
             if package_names is None:
                 package_names = [mod_name]
+            if apt_names is not None:
+                _install_apt(apt_names)
             failed = None
             for package_name in package_names:
                 if package_name not in P.module_failed:
@@ -291,6 +299,7 @@ def get_package_name(module_name):
     """ retrieves parameter value from json config file"""
     param_fields = Constant.db_auto_module_json["Package"]
     values = None
+    apts = None
     for config_record in param_fields:
         if config_record["module"] == module_name:
             value = config_record["package"]
@@ -298,8 +307,14 @@ def get_package_name(module_name):
                 values = value.split(',')
             else:
                 values = [value]
+            if "apt" in config_record.keys():
+                apt = config_record["apt"]
+                if ',' in apt:
+                    apts = apt.split(',')
+                else:
+                    apts = [apt]
             break
-    return values
+    return values, apts
 
 
 def get_table(table_name):
