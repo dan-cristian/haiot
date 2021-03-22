@@ -84,24 +84,24 @@ class AnyDevice(gatt.Device):
         self.bms_write_characteristic.write_value(P.status_cmd)
 
     def request_bms_data(self, request):
-        print("BMS write data {}".format(request))
+        L.l.info("BMS write data {}".format(request))
         self.response = bytearray()
         self.event.clear()
         self.bms_write_characteristic.write_value(request)
 
     def characteristic_enable_notifications_failed(self, characteristic, error):
         super.characteristic_enable_notifications_failed(characteristic, error)
-        print("BMS notification failed:", error)
+        L.l.info("BMS notification failed:", error)
 
     def characteristic_value_updated(self, characteristic, value):
         assert isinstance(self.bms_rec, m.Bms)
-        print("BMS answering: {}".format(value))
+        # print("BMS answering: {}".format(value))
         self.response += value
         if self.response.endswith(b'w'):
-            print("BMS answer:", self.response.hex())
+            L.l.info("BMS answer:", self.response.hex())
             self.response = self.response[4:]
             if self.get_voltages:
-                print("Read voltages")
+                # print("Read voltages")
                 pack_volts = 0
                 for i in range(int(len(self.response) / 2) - 1):
                     cell_voltage = int.from_bytes(self.response[i * 2:i * 2 + 2], byteorder='big') / 1000
@@ -148,8 +148,11 @@ class AnyDevice(gatt.Device):
                     temp_name = 't{0:0=1}'.format(ti + 1)
                     temp_val = (int.from_bytes(self.response[23 + ti * 2:ti * 2 + 25], 'big') - 2731) / 10
                     self.rawdat[temp_name] = temp_val
-                    setattr(self.bms_rec, temp_name, temp_val)
-                    print("Temp {}={}".format(temp_name, temp_val))
+                    if -200 < temp_val < 1000:
+                        setattr(self.bms_rec, temp_name, temp_val)
+                        # L.l.info("Temp {}={}".format(temp_name, temp_val))
+                    else:
+                        L.l.warning("Invalid temp range")
                 L.l.info("Saving t1={} t2={}".format(self.bms_rec.t1, self.bms_rec.t2))
                 self.bms_rec.save_changed_fields(persist=True)
                 # print("BMS request voltages")
@@ -158,7 +161,7 @@ class AnyDevice(gatt.Device):
                 self.bms_write_characteristic.write_value(P.voltage_cmd)
 
     def characteristic_write_value_failed(self, characteristic, error):
-        print("BMS write failed:", error)
+        L.l.error("BMS write failed:", error)
 
     # unused?
     def wait(self):
@@ -192,9 +195,9 @@ def connect_bt(bms_rec):
         # for i in range(0, 5):
         #    time.sleep(30)
         #    device.bms_write_characteristic.write_value(P.status_cmd)
-        for i in range(0, 300):
+        for i in range(0, 150):
             if P.processing:
-                time.sleep(0.1)
+                time.sleep(0.2)
             else:
                 L.l.info("BT processing done")
                 break
