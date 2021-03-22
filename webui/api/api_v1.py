@@ -1,18 +1,27 @@
 import os
 from pydispatch import dispatcher
 from flask import abort, send_file, render_template, request
-from main import sqlitedb
 from main.flask_app import app
 from main.logger_helper import L
-if sqlitedb:
-    from main import app, db
-    from storage.sqalc.model_helper import commit
 from common import Constant, utils
-import cloud.alexa.mpd_run
-from cloud import lastfm
 from music import mpd, amp
 
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
+
+
+class P:
+    alexa_initialised = False
+    lastfm_initialised = False
+
+
+def init_alexa():
+    import cloud.alexa.mpd_run
+    P.alexa_initialised = True
+
+
+def init_lastfm():
+    from cloud import lastfm
+    P.lastfm_initialised = True
 
 
 def return_web_message(pin_value, ok_message='', err_message=''):
@@ -28,30 +37,7 @@ def generic_db_update(model_name, filter_name, filter_value, field_name, field_v
     try:
         L.l.info("Execute API generic_db_update model={} filter={} filtervalue={} field={} fieldvalue={}"
                  .format(model_name, filter_name, filter_value, field_name, field_value))
-        if sqlitedb:
-            table = utils.class_for_name('main.admin.models', model_name)
-            # http://stackoverflow.com/questions/19506105/flask-sqlalchemy-query-with-keyword-as-variable
-            kwargs = {filter_name: filter_value}
-            # avoid getting "This session is in 'committed' state; no further SQL can be emitted within this transaction"
-            db.session.remove()
-            # db.session = db.create_scoped_session()
-            record = table.query.filter_by(**kwargs).first()
-            if record:
-                if hasattr(record, field_name):
-                    setattr(record, field_name, field_value)
-                    db.session.add(record)
-                    commit()
-                    # dispatch as UI action otherwise change actions are not triggered
-                    dispatcher.send(signal=Constant.SIGNAL_UI_DB_POST, model=table, row=record)
-                    return '%s: %s' % (Constant.SCRIPT_RESPONSE_OK, record)
-                else:
-                    msg = 'Field {} not found in record {}'.format(field_name, record)
-                    L.l.warning(msg)
-                    return '%s: %s' % (Constant.SCRIPT_RESPONSE_NOTOK, msg)
-            else:
-                msg = 'No records returned for filter_name={} and filter_value={}'.format(filter_name, filter_value)
-                L.l.warning(msg)
-                return '%s: %s' % (Constant.SCRIPT_RESPONSE_NOTOK, msg)
+        pass
     except Exception as ex:
         msg = 'Exception on /apiv1/db_update: {}'.format(ex)
         L.l.error(msg, exc_info=1)
@@ -90,16 +76,22 @@ def api():
 
 @app.route('/alexa/mpd', methods=['GET', 'POST'])
 def alexa_mpd():
+    if not P.alexa_initialised:
+        init_alexa()
     return cloud.alexa.mpd_run.mpd(request)
 
 
 @app.route('/test/lastfm/love', methods=['GET', 'POST'])
 def test_lastfm_love():
+    if not P.lastfm_initialised:
+        init_lastfm()
     return lastfm.love(request)
 
 
 @app.route('/lastfm/love', methods=['GET', 'POST'])
 def lastfm_love():
+    if not P.lastfm_initialised:
+        init_lastfm()
     try:
         result = lastfm.love(request)
     except Exception as e:
@@ -109,6 +101,8 @@ def lastfm_love():
 
 @app.route('/test/lastfm/current', methods=['GET'])
 def test_lastfm_current():
+    if not P.lastfm_initialised:
+        init_lastfm()
     try:
         result = lastfm.current()
     except Exception as e:
@@ -118,6 +112,8 @@ def test_lastfm_current():
 
 @app.route('/lastfm/current', methods=['GET'])
 def lastfm_current():
+    if not P.lastfm_initialised:
+        init_lastfm()
     try:
         result = lastfm.current()
     except Exception as e:
@@ -127,16 +123,22 @@ def lastfm_current():
 
 @app.route('/lastfm/play_loved', methods=['GET'])
 def lastfm_play_loved():
+    if not P.lastfm_initialised:
+        init_lastfm()
     return lastfm.get_loved_tracks_to_mpd()
 
 
 @app.route('/lastfm/get_by_tag/<tag_name>', methods=['GET'])
 def lastfm_get_by_tag(tag_name):
+    if not P.lastfm_initialised:
+        init_lastfm()
     return lastfm.get_by_tag(tag_name)
 
 
 @app.route('/test/lastfm/play_loved', methods=['GET'])
 def test_lastfm_play_loved():
+    if not P.lastfm_initialised:
+        init_lastfm()
     return lastfm.get_loved_tracks_to_mpd()
 
 
