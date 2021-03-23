@@ -119,14 +119,14 @@ class AnyDevice(gatt.Device):
         # print("BMS answering: {}".format(value))
         self.response += value
         if self.response.endswith(b'w'):
-            # dd0400100cf30cf60cf10cf20cfa0cf60cf70cf8f7e577
-            L.l.info("BMS answer:", self.response)
-            self.response = self.response[4:]
-            data = self.response[6:len(self.response) - 6]
-            check = self.response[-6:-2]
+            # L.l.info("BMS answer:", self.response)
+            data = self.response[3:len(self.response) - 3]
+            check = self.response[-3:-1]
             valid_record = crc_check(data, check)
             if valid_record:
+                self.response = self.response[4:]
                 if self.get_voltages:
+                    # dd0400100cf30cf60cf10cf20cfa0cf60cf70cf8f7e577
                     # print("Read voltages")
                     pack_volts = 0
                     for i in range(int(len(self.response) / 2) - 1):
@@ -214,12 +214,9 @@ class AnyDevice(gatt.Device):
 
 def crc_check(data, check):
     crc = 0x10000
-    # data_bytes = bytes.fromhex(data)
-    # data_bytes = data
     check_int = int.from_bytes(check, byteorder='big', signed=False)
     for i in data:
         crc = crc - int(i)
-    # crc_b = crc.to_bytes(2, byteorder='big')
     return check_int == crc
 
 
@@ -242,7 +239,7 @@ def connect_bt(bms_rec):
             P.processing = True
             P.bt_device.bms_write_characteristic.write_value(P.status_cmd)
 
-        for i in range(0, 200):
+        for i in range(0, 300):
             if P.processing:
                 time.sleep(0.2)
             else:
