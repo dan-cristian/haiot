@@ -118,7 +118,7 @@ class AnyDevice(gatt.Device):
         # print("BMS answering: {}".format(value))
         self.response += value
         if self.response.endswith(b'w'):
-            # L.l.info("BMS answer:", self.response.hex())
+            L.l.info("BMS answer:", self.response.hex())
             self.response = self.response[4:]
             if self.get_voltages:
                 # print("Read voltages")
@@ -223,15 +223,14 @@ def connect_bt(bms_rec):
             P.processing = True
             P.bt_device.bms_write_characteristic.write_value(P.status_cmd)
 
-        # for i in range(0, 5):
-        #    time.sleep(30)
-        #    device.bms_write_characteristic.write_value(P.status_cmd)
-        for i in range(0, 150):
+        for i in range(0, 200):
             if P.processing:
                 time.sleep(0.2)
             else:
                 L.l.info("BT processing done")
                 break
+        if P.processing:
+            L.l.warning("No response from BMS, timeout!")
         if P.bt_device is not None:
             if P.bt_device.is_connected():
                 # L.l.info("Disconnecting BT")
@@ -281,7 +280,7 @@ def unload():
 
 def init():
     L.l.info('BMS module initialising')
-    thread_pool.add_interval_callable(thread_run, run_interval_second=60)
+    thread_pool.add_interval_callable(thread_run, run_interval_second=90)
     m.Bms.add_upsert_listener(bms_upsert_listener)
     P.manager = gatt.DeviceManager(adapter_name='hci0')
     P.bluetooth_manager = threading.Thread(target=bluetooth_manager_thread, args=[P.manager, ])
