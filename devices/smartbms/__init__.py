@@ -179,7 +179,7 @@ class AnyDevice(gatt.Device):
                             setattr(self.bms_rec, temp_name, temp_val)
                             # L.l.info("Temp {}={}".format(temp_name, temp_val))
                         else:
-                            L.l.warning("Invalid temp range, unexpected as CRC is ok")
+                            L.l.warning("Invalid temp range {}={}, unexpected as CRC ok".format(temp_name, temp_val))
                             invalid_record = True
 
                         self.bms_rec.voltage = self.rawdat['packV']
@@ -196,6 +196,7 @@ class AnyDevice(gatt.Device):
                         self.bms_write_characteristic.write_value(P.voltage_cmd)
             else:
                 L.l.warning("Invalid CRC BMS response detected={}".format(self.response))
+                L.l.warning("Response was={}".format(binascii.hexlify(self.response)))
                 self.clean_vars()
                 P.processing = False
 
@@ -217,6 +218,9 @@ def crc_check(data, check):
     check_int = int.from_bytes(check, byteorder='big', signed=False)
     for i in data:
         crc = crc - int(i)
+    if check_int != crc:
+        crc_b = crc.to_bytes(2, byteorder='big')
+        L.l.warning("Invalid CRC, expected {}/{}, got {}/{}".format(check, check_int, crc_b, crc))
     return check_int == crc
 
 
