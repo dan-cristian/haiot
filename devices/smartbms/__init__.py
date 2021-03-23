@@ -119,7 +119,7 @@ class AnyDevice(gatt.Device):
         L.l.info("BMS answering:{}".format(value))
         self.response += value
         if self.response.endswith(b'w'):
-            # L.l.info("BMS answer:", self.response)
+            L.l.info("BMS answer:{}".format(self.response))
             data = self.response[3:len(self.response) - 3]
             check = self.response[-3:-1]
             valid_record = crc_check(data, check)
