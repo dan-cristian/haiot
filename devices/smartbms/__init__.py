@@ -118,78 +118,85 @@ class AnyDevice(gatt.Device):
         # print("BMS answering: {}".format(value))
         self.response += value
         if self.response.endswith(b'w'):
+            # dd0400100cf30cf60cf10cf20cfa0cf60cf70cf8f7e577
             L.l.info("BMS answer:", self.response.hex())
             self.response = self.response[4:]
-            if self.get_voltages:
-                # print("Read voltages")
-                pack_volts = 0
-                for i in range(int(len(self.response) / 2) - 1):
-                    cell_voltage = int.from_bytes(self.response[i * 2:i * 2 + 2], byteorder='big') / 1000
-                    volt_name = 'v{0:0=2}'.format(i + 1)
-                    self.rawdat[volt_name] = cell_voltage
-                    setattr(self.bms_rec, volt_name, cell_voltage)
-                    print("Volt {}={}".format(volt_name, cell_voltage))
-                    pack_volts += cell_voltage
-                self.rawdat['Vbat'] = pack_volts
-                self.bms_rec.voltage_cells = pack_volts
-                self.rawdat['P'] = round(self.rawdat['Vbat'] * self.rawdat['Ibat'], 1)
-                self.bms_rec.power = self.rawdat['P']
-                self.rawdat['State'] = int.from_bytes(self.response[16:18], byteorder='big', signed=True)
-                print(
-                    "Capacity: {capacity}% ({Ah_remaining} of {Ah_full}Ah)\nPower: {power}W ({I}Ah)\nTemperature: {temp}°C\nCycles: {cycles}".format(
-                        capacity=self.rawdat['Ah_percent'],
-                        Ah_remaining=self.rawdat['Ah_remaining'],
-                        Ah_full=self.rawdat['Ah_full'],
-                        power=self.rawdat['P'],
-                        I=self.rawdat['Ibat'],
-                        temp=self.rawdat['t1'],
-                        cycles=self.rawdat['Cycles'],
-                    ))
-                # self.manager.stop()
-                self.bms_rec.save_changed_fields(persist=True)
-                self.clean_vars()
-                P.processing = False
-            else:
-                invalid_record = False
-                self.rawdat['packV'] = int.from_bytes(self.response[0:2], byteorder='big', signed=True) / 100.0
-                self.rawdat['Ibat'] = int.from_bytes(self.response[2:4], byteorder='big', signed=True) / 100.0
-                self.rawdat['Bal'] = int.from_bytes(self.response[12:14], byteorder='big', signed=False)
-                self.rawdat['Ah_remaining'] = int.from_bytes(self.response[4:6], byteorder='big', signed=True) / 100
-                self.rawdat['Ah_full'] = int.from_bytes(self.response[6:8], byteorder='big', signed=True) / 100
-                self.rawdat['Ah_percent'] = round(self.rawdat['Ah_remaining'] / self.rawdat['Ah_full'] * 100, 2)
-                self.rawdat['Cycles'] = int.from_bytes(self.response[8:10], byteorder='big', signed=True)
-
-                if self.rawdat['Ah_full'] < 0:
-                    invalid_record = True
-
-                for ti in range(int.from_bytes(self.response[22:23], 'big')):  # read temperatures
-                    temp_name = 't{0:0=1}'.format(ti + 1)
-                    temp_val = (int.from_bytes(self.response[23 + ti * 2:ti * 2 + 25], 'big') - 2731) / 10
-                    self.rawdat[temp_name] = temp_val
-                    if -30 < temp_val < 500:
-                        setattr(self.bms_rec, temp_name, temp_val)
-                        # L.l.info("Temp {}={}".format(temp_name, temp_val))
-                    else:
-                        L.l.warning("Invalid temp range")
-                        invalid_record = True
-
-                if not invalid_record:
-                    self.bms_rec.voltage = self.rawdat['packV']
-                    self.bms_rec.current = self.rawdat['Ibat']
-                    self.bms_rec.remaining_capacity = self.rawdat['Ah_remaining']
-                    self.bms_rec.full_capacity = self.rawdat['Ah_full']
-                    self.bms_rec.capacity_percent = self.rawdat['Ah_percent']
-                    self.bms_rec.cycles = self.rawdat['Cycles']
-                    L.l.info("Saving t1={} t2={}".format(self.bms_rec.t1, self.bms_rec.t2))
+            data = self.response[6:len(self.response) - 6]
+            crc = self.response[-6:-2]
+            valid_record = crc_check(data, crc)
+            if valid_record:
+                if self.get_voltages:
+                    # print("Read voltages")
+                    pack_volts = 0
+                    for i in range(int(len(self.response) / 2) - 1):
+                        cell_voltage = int.from_bytes(self.response[i * 2:i * 2 + 2], byteorder='big') / 1000
+                        volt_name = 'v{0:0=2}'.format(i + 1)
+                        self.rawdat[volt_name] = cell_voltage
+                        setattr(self.bms_rec, volt_name, cell_voltage)
+                        print("Volt {}={}".format(volt_name, cell_voltage))
+                        pack_volts += cell_voltage
+                    self.rawdat['Vbat'] = pack_volts
+                    self.bms_rec.voltage_cells = pack_volts
+                    self.rawdat['P'] = round(self.rawdat['Vbat'] * self.rawdat['Ibat'], 1)
+                    self.bms_rec.power = self.rawdat['P']
+                    self.rawdat['State'] = int.from_bytes(self.response[16:18], byteorder='big', signed=True)
+                    print(
+                        "Capacity: {capacity}% ({Ah_remaining} of {Ah_full}Ah)\nPower: {power}W ({I}Ah)\nTemperature: {temp}°C\nCycles: {cycles}".format(
+                            capacity=self.rawdat['Ah_percent'],
+                            Ah_remaining=self.rawdat['Ah_remaining'],
+                            Ah_full=self.rawdat['Ah_full'],
+                            power=self.rawdat['P'],
+                            I=self.rawdat['Ibat'],
+                            temp=self.rawdat['t1'],
+                            cycles=self.rawdat['Cycles'],
+                        ))
+                    # self.manager.stop()
                     self.bms_rec.save_changed_fields(persist=True)
-                    # print("BMS request voltages")
-                    self.get_voltages = True
-                    self.response = bytearray()
-                    self.bms_write_characteristic.write_value(P.voltage_cmd)
-                else:
-                    L.l.warning("Invalid BMS response detected={}".format(self.response))
                     self.clean_vars()
                     P.processing = False
+                else:
+                    # dd03001b0a5dffe416f817700001290700000000000016620308020ada0adbf98777
+                    # command  LEN data                                                                              CRC
+                    # dd 03 00 1b 0a.5d.ff.e4.16.f8.17.70.00.01.29.07.00.00.00.00.00.00.16.62.03.08.02.0a.da.0a.db. f987 77
+                    self.rawdat['packV'] = int.from_bytes(self.response[0:2], byteorder='big', signed=True) / 100.0
+                    self.rawdat['Ibat'] = int.from_bytes(self.response[2:4], byteorder='big', signed=True) / 100.0
+                    self.rawdat['Bal'] = int.from_bytes(self.response[12:14], byteorder='big', signed=False)
+                    self.rawdat['Ah_remaining'] = int.from_bytes(self.response[4:6], byteorder='big', signed=True) / 100
+                    self.rawdat['Ah_full'] = int.from_bytes(self.response[6:8], byteorder='big', signed=True) / 100
+                    self.rawdat['Ah_percent'] = round(self.rawdat['Ah_remaining'] / self.rawdat['Ah_full'] * 100, 2)
+                    self.rawdat['Cycles'] = int.from_bytes(self.response[8:10], byteorder='big', signed=True)
+
+                    if self.rawdat['Ah_full'] < 0:
+                        L.l.warning("Invalid Ah capacity range, unexpected as CRC is ok")
+                        invalid_record = True
+
+                    for ti in range(int.from_bytes(self.response[22:23], 'big')):  # read temperatures
+                        temp_name = 't{0:0=1}'.format(ti + 1)
+                        temp_val = (int.from_bytes(self.response[23 + ti * 2:ti * 2 + 25], 'big') - 2731) / 10
+                        self.rawdat[temp_name] = temp_val
+                        if -30 < temp_val < 500:
+                            setattr(self.bms_rec, temp_name, temp_val)
+                            # L.l.info("Temp {}={}".format(temp_name, temp_val))
+                        else:
+                            L.l.warning("Invalid temp range, unexpected as CRC is ok")
+                            invalid_record = True
+
+                        self.bms_rec.voltage = self.rawdat['packV']
+                        self.bms_rec.current = self.rawdat['Ibat']
+                        self.bms_rec.remaining_capacity = self.rawdat['Ah_remaining']
+                        self.bms_rec.full_capacity = self.rawdat['Ah_full']
+                        self.bms_rec.capacity_percent = self.rawdat['Ah_percent']
+                        self.bms_rec.cycles = self.rawdat['Cycles']
+                        L.l.info("Saving t1={} t2={}".format(self.bms_rec.t1, self.bms_rec.t2))
+                        self.bms_rec.save_changed_fields(persist=True)
+                        # print("BMS request voltages")
+                        self.get_voltages = True
+                        self.response = bytearray()
+                        self.bms_write_characteristic.write_value(P.voltage_cmd)
+            else:
+                L.l.warning("Invalid CRC BMS response detected={}".format(self.response))
+                self.clean_vars()
+                P.processing = False
 
     def characteristic_write_value_failed(self, characteristic, error):
         L.l.error("BMS write failed:", error)
@@ -202,6 +209,15 @@ class AnyDevice(gatt.Device):
         self.response = bytearray()
         self.rawdat = {}
         self.get_voltages = False
+
+
+def crc_check(data, check):
+    crc = 0x10000
+    data_bytes = bytes.fromhex(data)
+    check_int = int(check, 16)
+    for i in data_bytes:
+        crc = crc - int(i)
+    return check_int == crc
 
 
 def bluetooth_manager_thread(manager):
