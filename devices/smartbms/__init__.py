@@ -119,7 +119,7 @@ class AnyDevice(gatt.Device):
         self.response += value
         if self.response.endswith(b'w'):
             # dd0400100cf30cf60cf10cf20cfa0cf60cf70cf8f7e577
-            L.l.info("BMS answer:", self.response.hex())
+            # L.l.info("BMS answer:", self.response.hex())
             self.response = self.response[4:]
             data = self.response[6:len(self.response) - 6]
             crc = self.response[-6:-2]
