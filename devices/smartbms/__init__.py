@@ -213,7 +213,8 @@ class AnyDevice(gatt.Device):
 
 def crc_check(data, check):
     crc = 0x10000
-    data_bytes = bytes.fromhex(data)
+    #data_bytes = bytes.fromhex(data)
+    data_bytes = data
     check_int = int(check, 16)
     for i in data_bytes:
         crc = crc - int(i)
