@@ -9,6 +9,9 @@ from common import Constant
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 # reused: https://github.com/stefanandres/bms-monitoring-stack
+# https://blog.ja-ke.tech/2020/02/07/ltt-power-bms-chinese-protocol.html
+# https://github.com/simat/BatteryMonitor/wiki/Generic-Chinese-Bluetooth-BMS-communication-protocol
+# https://mono.software/2018/11/15/multiple-bms-monitor/
 
 # gatt/dbus install issues:
 # https://github.com/getsenic/gatt-python/issues/31
@@ -20,12 +23,26 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 # other interfacing methods
 # https://secondlifestorage.com/index.php?threads/jdb-xiaoxiang-bms-tool.10329/
 
+# set BT to compat
+# sudo nano /lib/systemd/system/bluetooth.service
+# ExecStart=/usr/lib/bluetooth/bluetoothd --compat --noplugin=sap
+# ExecStartPost=/usr/bin/sdptool add SP
+# sudo systemctl daemon-reload
+# sudo systemctl restart bluetooth
+
+
+# init BT
+# sudo bluetoothctl
+# scan on
+# trust xx:xx
+# connect xx:xx
 
 class P:
     initialised = False
-    # active_bms_mac_list = None
+
     status_cmd = bytes([0xDD, 0xA5, 0x03, 0x00, 0xFF, 0xFD, 0x77])
     voltage_cmd = bytes([0xDD, 0xA5, 0x04, 0x00, 0xFF, 0xFC, 0x77])
+    status_old = bytes([0xDB, 0xDB, 0x00, 0x00, 0x00, 0x00])
     manager = None
     bluetooth_manager = None
     bt_device = None
@@ -46,7 +63,7 @@ class AnyDevice(gatt.Device):
         self.bms_rec = bms_rec
         self.event = threading.Event()
         super().connect()
-        L.l.info("Connecting exit: {}".format(self.mac_address))
+        L.l.info("Connecting done: {}".format(self.mac_address))
 
     def connect_succeeded(self):
         super().connect_succeeded()
@@ -55,7 +72,7 @@ class AnyDevice(gatt.Device):
     def connect_failed(self, error):
         super().connect_failed(error)
         L.l.warning("[%s] Connection failed: %s" % (self.mac_address, str(error)))
-        self.disconnect()
+        self.disconnect()  # needed?
 
     def disconnect_succeeded(self):
         super().disconnect_succeeded()
@@ -78,7 +95,7 @@ class AnyDevice(gatt.Device):
             if c.uuid == '0000ff02-0000-1000-8000-00805f9b34fb')
 
         L.l.info("BMS found")
-        self.bms_read_characteristic.enable_notifications(enabled=True)
+        self.bms_read_characteristic.enable_notifications()  # enabled=True)
 
     def characteristic_enable_notifications_succeeded(self, characteristic):
         super().characteristic_enable_notifications_succeeded(characteristic)
@@ -93,7 +110,7 @@ class AnyDevice(gatt.Device):
         self.bms_write_characteristic.write_value(request)
 
     def characteristic_enable_notifications_failed(self, characteristic, error):
-        super.characteristic_enable_notifications_failed(characteristic, error)
+        super().characteristic_enable_notifications_failed(characteristic, error)
         L.l.info("BMS notification failed:", error)
 
     def characteristic_value_updated(self, characteristic, value):
@@ -133,35 +150,46 @@ class AnyDevice(gatt.Device):
                 self.clean_vars()
                 P.processing = False
             else:
+                invalid_record = False
                 self.rawdat['packV'] = int.from_bytes(self.response[0:2], byteorder='big', signed=True) / 100.0
-                self.bms_rec.voltage = self.rawdat['packV']
                 self.rawdat['Ibat'] = int.from_bytes(self.response[2:4], byteorder='big', signed=True) / 100.0
-                self.bms_rec.current = self.rawdat['Ibat']
                 self.rawdat['Bal'] = int.from_bytes(self.response[12:14], byteorder='big', signed=False)
                 self.rawdat['Ah_remaining'] = int.from_bytes(self.response[4:6], byteorder='big', signed=True) / 100
-                self.bms_rec.remaining_capacity = self.rawdat['Ah_remaining']
                 self.rawdat['Ah_full'] = int.from_bytes(self.response[6:8], byteorder='big', signed=True) / 100
-                self.bms_rec.full_capacity = self.rawdat['Ah_full']
                 self.rawdat['Ah_percent'] = round(self.rawdat['Ah_remaining'] / self.rawdat['Ah_full'] * 100, 2)
-                self.bms_rec.capacity_percent = self.rawdat['Ah_percent']
                 self.rawdat['Cycles'] = int.from_bytes(self.response[8:10], byteorder='big', signed=True)
-                self.bms_rec.cycles = self.rawdat['Cycles']
+
+                if self.rawdat['Ah_full'] < 0:
+                    invalid_record = True
 
                 for ti in range(int.from_bytes(self.response[22:23], 'big')):  # read temperatures
                     temp_name = 't{0:0=1}'.format(ti + 1)
                     temp_val = (int.from_bytes(self.response[23 + ti * 2:ti * 2 + 25], 'big') - 2731) / 10
                     self.rawdat[temp_name] = temp_val
-                    if -200 < temp_val < 1000:
+                    if -30 < temp_val < 500:
                         setattr(self.bms_rec, temp_name, temp_val)
                         # L.l.info("Temp {}={}".format(temp_name, temp_val))
                     else:
                         L.l.warning("Invalid temp range")
-                L.l.info("Saving t1={} t2={}".format(self.bms_rec.t1, self.bms_rec.t2))
-                self.bms_rec.save_changed_fields(persist=True)
-                # print("BMS request voltages")
-                self.get_voltages = True
-                self.response = bytearray()
-                self.bms_write_characteristic.write_value(P.voltage_cmd)
+                        invalid_record = True
+
+                if not invalid_record:
+                    self.bms_rec.voltage = self.rawdat['packV']
+                    self.bms_rec.current = self.rawdat['Ibat']
+                    self.bms_rec.remaining_capacity = self.rawdat['Ah_remaining']
+                    self.bms_rec.full_capacity = self.rawdat['Ah_full']
+                    self.bms_rec.capacity_percent = self.rawdat['Ah_percent']
+                    self.bms_rec.cycles = self.rawdat['Cycles']
+                    L.l.info("Saving t1={} t2={}".format(self.bms_rec.t1, self.bms_rec.t2))
+                    self.bms_rec.save_changed_fields(persist=True)
+                    # print("BMS request voltages")
+                    self.get_voltages = True
+                    self.response = bytearray()
+                    self.bms_write_characteristic.write_value(P.voltage_cmd)
+                else:
+                    L.l.warning("Invalid BMS response detected={}".format(self.response))
+                    self.clean_vars()
+                    P.processing = False
 
     def characteristic_write_value_failed(self, characteristic, error):
         L.l.error("BMS write failed:", error)

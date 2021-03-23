@@ -394,6 +394,16 @@ if [ "$ENABLE_HAIOT" == "1" ]; then
         fi
         echo "Provide access to haiot user to bluetooth - see comment below"
         # https://www.raspberrypi.org/forums/viewtopic.php?t=108581
+        export policy_bt='
+          <policy user="${USERNAME}">
+          <allow send_destination="org.bluez"/>
+          <allow send_interface="org.bluez.Agent1"/>
+          <allow send_interface="org.bluez.GattCharacteristic1"/>
+          <allow send_interface="org.bluez.GattDescriptor1"/>
+          <allow send_interface="org.freedesktop.DBus.ObjectManager"/>
+          <allow send_interface="org.freedesktop.DBus.Properties"/>
+          </policy>'
+          nano /etc/dbus-1/system.d/bluetooth.conf
         sleep 10
     fi
 
