@@ -213,12 +213,13 @@ class AnyDevice(gatt.Device):
 
 def crc_check(data, check):
     crc = 0x10000
-    #data_bytes = bytes.fromhex(data)
+    # data_bytes = bytes.fromhex(data)
     data_bytes = data
-    check_int = int(check, 16)
+    # check_int = int(check, 16)
     for i in data_bytes:
         crc = crc - int(i)
-    return check_int == crc
+    crc_b = crc.to_bytes(2, byteorder='big')
+    return check == crc_b
 
 
 def bluetooth_manager_thread(manager):
