@@ -6,6 +6,7 @@ from main.logger_helper import L
 from main import thread_pool
 from storage.model import m
 from common import Constant
+import binascii
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 # reused: https://github.com/stefanandres/bms-monitoring-stack
@@ -119,11 +120,11 @@ class AnyDevice(gatt.Device):
         self.response += value
         if self.response.endswith(b'w'):
             # dd0400100cf30cf60cf10cf20cfa0cf60cf70cf8f7e577
-            # L.l.info("BMS answer:", self.response.hex())
+            L.l.info("BMS answer:", self.response)
             self.response = self.response[4:]
             data = self.response[6:len(self.response) - 6]
-            crc = self.response[-6:-2]
-            valid_record = crc_check(data, crc)
+            check = self.response[-6:-2]
+            valid_record = crc_check(data, check)
             if valid_record:
                 if self.get_voltages:
                     # print("Read voltages")
@@ -214,12 +215,12 @@ class AnyDevice(gatt.Device):
 def crc_check(data, check):
     crc = 0x10000
     # data_bytes = bytes.fromhex(data)
-    data_bytes = data
-    # check_int = int(check, 16)
-    for i in data_bytes:
+    # data_bytes = data
+    check_int = int.from_bytes(check, byteorder='big', signed=False)
+    for i in data:
         crc = crc - int(i)
-    crc_b = crc.to_bytes(2, byteorder='big')
-    return check == crc_b
+    # crc_b = crc.to_bytes(2, byteorder='big')
+    return check_int == crc
 
 
 def bluetooth_manager_thread(manager):
