@@ -116,7 +116,7 @@ class AnyDevice(gatt.Device):
 
     def characteristic_value_updated(self, characteristic, value):
         assert isinstance(self.bms_rec, m.Bms)
-        # print("BMS answering: {}".format(value))
+        L.l.info("BMS answering:{}".format(value))
         self.response += value
         if self.response.endswith(b'w'):
             # L.l.info("BMS answer:", self.response)
