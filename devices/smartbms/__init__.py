@@ -167,6 +167,7 @@ class AnyDevice(gatt.Device):
                     # cmd      LEN data                                                                              CRC
                     # dd 03 00 1b 0a.5d.ff.e4.16.f8.17.70.00.01.29.07.00.00.00.00.00.00.16.62.03.08.02.0a.da.0a.db. f987 77
                     L.l.info("Read main status")
+                    invalid_record = False
                     self.rawdat['packV'] = int.from_bytes(self.response[0:2], byteorder='big', signed=True) / 100.0
                     self.rawdat['Ibat'] = int.from_bytes(self.response[2:4], byteorder='big', signed=True) / 100.0
                     if self.rawdat['Ibat'] > 100 or self.rawdat['Ibat'] < -100:
