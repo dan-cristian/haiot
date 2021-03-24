@@ -202,7 +202,7 @@ class AnyDevice(gatt.Device):
                         else:
                             L.l.warning("Invalid temp range {}={}, unexpected as CRC ok".format(temp_name, temp_val))
                             invalid_record = True
-                    if invalid_record:
+                    if not invalid_record:
                         self.bms_rec.voltage = self.rawdat['packV']
                         self.bms_rec.current = self.rawdat['Ibat']
                         self.bms_rec.remaining_capacity = self.rawdat['Ah_remaining']
