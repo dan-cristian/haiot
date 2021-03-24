@@ -122,9 +122,9 @@ class AnyDevice(gatt.Device):
         self.response += value
         if self.response.endswith(b'w'):
             L.l.info("BMS answer:{}".format(self.response))
-            data = self.response[3:len(self.response) - 3]
+            data_for_crc = self.response[3:len(self.response) - 3]
             check = self.response[-3:-1]
-            valid_record = crc_check(data, check)
+            valid_record = crc_check(data_for_crc, check)
             if valid_record:
                 self.response = self.response[4:]
                 if self.get_voltages:
@@ -143,6 +143,7 @@ class AnyDevice(gatt.Device):
                     self.rawdat['P'] = round(self.rawdat['Vbat'] * self.rawdat['Ibat'], 1)
                     self.bms_rec.power = self.rawdat['P']
                     self.rawdat['State'] = int.from_bytes(self.response[16:18], byteorder='big', signed=True)
+                    ''' 
                     print(
                         "Capacity: {capacity}% ({Ah_remaining} of {Ah_full}Ah)\nPower: {power}W ({I}Ah)\nTemperature: {temp}°C\nCycles: {cycles}".format(
                             capacity=self.rawdat['Ah_percent'],
@@ -153,19 +154,28 @@ class AnyDevice(gatt.Device):
                             temp=self.rawdat['t1'],
                             cycles=self.rawdat['Cycles'],
                         ))
+                    '''
                     # self.manager.stop()
                     self.bms_rec.save_changed_fields(persist=True)
                     self.clean_vars()
                     P.processing = False
                 else:
                     # dd03001b0a5dffe416f817700001290700000000000016620308020ada0adbf98777
-                    # command  LEN data                                                                              CRC
+                    # cmd      LEN data                                                                              CRC
                     # dd 03 00 1b 0a.5d.ff.e4.16.f8.17.70.00.01.29.07.00.00.00.00.00.00.16.62.03.08.02.0a.da.0a.db. f987 77
                     L.l.info("Read main status")
                     self.rawdat['packV'] = int.from_bytes(self.response[0:2], byteorder='big', signed=True) / 100.0
                     self.rawdat['Ibat'] = int.from_bytes(self.response[2:4], byteorder='big', signed=True) / 100.0
+                    if self.rawdat['Ibat'] > 100:
+                        L.l.warning("Potential invalid (too high) current {}".format(self.rawdat['Ibat']))
+                        invalid_record = True
+
                     self.rawdat['Bal'] = int.from_bytes(self.response[12:14], byteorder='big', signed=False)
                     self.rawdat['Ah_remaining'] = int.from_bytes(self.response[4:6], byteorder='big', signed=True) / 100
+                    if self.rawdat['Ah_remaining'] < 1:
+                        L.l.warning("Potential invalid (too low) remaining {}Ah".format(self.rawdat['Ah_remaining']))
+                        invalid_record = True
+
                     self.rawdat['Ah_full'] = int.from_bytes(self.response[6:8], byteorder='big', signed=True) / 100
                     self.rawdat['Ah_percent'] = round(self.rawdat['Ah_remaining'] / self.rawdat['Ah_full'] * 100, 2)
                     self.rawdat['Cycles'] = int.from_bytes(self.response[8:10], byteorder='big', signed=True)
