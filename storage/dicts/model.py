@@ -495,4 +495,5 @@ class Bms(ModelBase):
     remaining_capacity = 0.0  # capacity left
     capacity_percent = 0.0  # % capacity
     cycles = 0  # charge cycles
+    factory_full_capacity = 0  # battery max capacity, user defined
     host_name = ''  # which host will connect to this bms

@@ -119,8 +119,10 @@ class AnyDevice(gatt.Device):
         assert isinstance(self.bms_rec, m.Bms)
         L.l.info("BMS answering:{}".format(value))
         if value == b'\x00':
+            # drop empty responses
             L.l.warning("Potential BMS communication freeze")
-        self.response += value
+        else:
+            self.response += value
         if self.response.endswith(b'w'):
             L.l.info("BMS answer:{}".format(self.response))
             data_for_crc = self.response[3:len(self.response) - 3]
@@ -167,8 +169,8 @@ class AnyDevice(gatt.Device):
                     L.l.info("Read main status")
                     self.rawdat['packV'] = int.from_bytes(self.response[0:2], byteorder='big', signed=True) / 100.0
                     self.rawdat['Ibat'] = int.from_bytes(self.response[2:4], byteorder='big', signed=True) / 100.0
-                    if self.rawdat['Ibat'] > 100:
-                        L.l.warning("Potential invalid (too high) current {}".format(self.rawdat['Ibat']))
+                    if self.rawdat['Ibat'] > 100 or self.rawdat['Ibat'] < -100:
+                        L.l.warning("Potential invalid current {}".format(self.rawdat['Ibat']))
                         invalid_record = True
 
                     self.rawdat['Bal'] = int.from_bytes(self.response[12:14], byteorder='big', signed=False)
@@ -178,6 +180,10 @@ class AnyDevice(gatt.Device):
                         invalid_record = True
 
                     self.rawdat['Ah_full'] = int.from_bytes(self.response[6:8], byteorder='big', signed=True) / 100
+                    if self.rawdat['Ah_full'] > self.bms_rec.factory_full_capacity:
+                        L.l.warning("Invalid full capacity {}Ah".format(self.rawdat['Ah_full']))
+                        invalid_record = True
+
                     self.rawdat['Ah_percent'] = round(self.rawdat['Ah_remaining'] / self.rawdat['Ah_full'] * 100, 2)
                     self.rawdat['Cycles'] = int.from_bytes(self.response[8:10], byteorder='big', signed=True)
 
@@ -195,19 +201,22 @@ class AnyDevice(gatt.Device):
                         else:
                             L.l.warning("Invalid temp range {}={}, unexpected as CRC ok".format(temp_name, temp_val))
                             invalid_record = True
-
-                    self.bms_rec.voltage = self.rawdat['packV']
-                    self.bms_rec.current = self.rawdat['Ibat']
-                    self.bms_rec.remaining_capacity = self.rawdat['Ah_remaining']
-                    self.bms_rec.full_capacity = self.rawdat['Ah_full']
-                    self.bms_rec.capacity_percent = self.rawdat['Ah_percent']
-                    self.bms_rec.cycles = self.rawdat['Cycles']
-                    L.l.info("Saving t1={} t2={}".format(self.bms_rec.t1, self.bms_rec.t2))
-                    self.bms_rec.save_changed_fields(persist=True)
-                    # print("BMS request voltages")
-                    self.get_voltages = True
-                    self.response = bytearray()
-                    self.bms_write_characteristic.write_value(P.voltage_cmd)
+                    if invalid_record:
+                        self.bms_rec.voltage = self.rawdat['packV']
+                        self.bms_rec.current = self.rawdat['Ibat']
+                        self.bms_rec.remaining_capacity = self.rawdat['Ah_remaining']
+                        self.bms_rec.full_capacity = self.rawdat['Ah_full']
+                        self.bms_rec.capacity_percent = self.rawdat['Ah_percent']
+                        self.bms_rec.cycles = self.rawdat['Cycles']
+                        L.l.info("Saving t1={} t2={}".format(self.bms_rec.t1, self.bms_rec.t2))
+                        self.bms_rec.save_changed_fields(persist=True)
+                        # print("BMS request voltages")
+                        self.get_voltages = True
+                        self.response = bytearray()
+                        self.bms_write_characteristic.write_value(P.voltage_cmd)
+                    else:
+                        self.response = bytearray()
+                        P.processing = False
             else:
                 L.l.warning("Invalid CRC BMS response detected={}".format(self.response))
                 L.l.warning("Response was={}".format(binascii.hexlify(self.response)))

@@ -610,8 +610,8 @@
   ],
 
   "Bms": [
-    {"id": 1, "name": "60ah_battery", "mac_address": "A4:C1:38:C6:30:57", "host_name": "pibms"},
-    {"id": 2, "name": "40ah_battery", "mac_address": "A4:C1:38:EC:1B:B0", "host_name": "pibms2"}
+    {"id": 1, "name": "60ah_battery", "mac_address": "A4:C1:38:C6:30:57", "factory_full_capacity": 60, "host_name": "pibms"},
+    {"id": 2, "name": "40ah_battery", "mac_address": "A4:C1:38:EC:1B:B0", "factory_full_capacity": 40, "host_name": "pibms2"}
   ],
 
   "_disabled": [
