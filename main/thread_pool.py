@@ -125,7 +125,7 @@ def run_thread_pool():
                         tf.last_exec = datetime.now()
                 elif future_obj.running():
                     if elapsed_seconds > 1*20 and not tf.long_running:
-                        L.l.info('Threaded func{} is running for {} sec'.format(print_name, elapsed_seconds))
+                        L.l.info('long running {} {}s'.format(print_name, int(elapsed_seconds)))
                         if 'P' in func.__globals__ and hasattr(func.__globals__['P'], 'thread_pool_status'):
                             progress_status = func.__globals__['P'].thread_pool_status
                             L.l.warning('Progress Status since {} sec is [{}]'.format(elapsed_seconds, progress_status))
