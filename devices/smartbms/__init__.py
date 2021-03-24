@@ -117,7 +117,7 @@ class AnyDevice(gatt.Device):
     def characteristic_value_updated(self, characteristic, value):
         assert isinstance(self.bms_rec, m.Bms)
         L.l.info("BMS answering:{}".format(value))
-        if value == 0:
+        if value == b'\x00':
             L.l.warning("Potential BMS communication freeze")
         self.response += value
         if self.response.endswith(b'w'):
