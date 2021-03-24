@@ -48,6 +48,7 @@ class P:
     bluetooth_manager = None
     bt_device = None
     processing = False
+    timeout_count = 0
 
 
 class AnyDevice(gatt.Device):
@@ -263,7 +264,11 @@ def connect_bt(bms_rec):
                 L.l.info("BT processing done")
                 break
         if P.processing:
-            L.l.warning("No response from BMS, timeout!")
+            P.timeout_count += 1
+            L.l.warning("No response from BMS, timeout count={}".format(P.timeout_count))
+        else:
+            P.timeout_count = 0
+
         if P.bt_device is not None:
             if P.bt_device.is_connected():
                 # L.l.info("Disconnecting BT")
