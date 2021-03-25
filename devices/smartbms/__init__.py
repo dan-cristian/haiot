@@ -80,6 +80,10 @@ class AnyDevice(gatt.Device):
         super().disconnect_succeeded()
         L.l.info("[%s] Disconnected ok" % self.mac_address)
 
+    def properties_changed(self, sender, changed_properties, invalidated_properties):
+        super().properties_changed(sender, changed_properties, invalidated_properties)
+        L.l.info("BT properties changed")
+
     def services_resolved(self):
         L.l.info("BT services resolved")
         super().services_resolved()
@@ -113,7 +117,7 @@ class AnyDevice(gatt.Device):
 
     def characteristic_enable_notifications_failed(self, characteristic, error):
         super().characteristic_enable_notifications_failed(characteristic, error)
-        L.l.info("BMS notification failed:", error)
+        L.l.error("BMS notification failed:", error)
 
     def characteristic_value_updated(self, characteristic, value):
         assert isinstance(self.bms_rec, m.Bms)
@@ -227,6 +231,9 @@ class AnyDevice(gatt.Device):
     def characteristic_write_value_failed(self, characteristic, error):
         L.l.error("BMS write failed:", error)
 
+    def characteristic_read_value_failed(self, characteristic, error):
+        L.l.error("BT read value failed")
+
     # unused?
     def wait(self):
         return self.event.wait(timeout=2)
@@ -276,16 +283,12 @@ def connect_bt(bms_rec):
         if P.processing:
             P.timeout_count += 1
             L.l.warning("No response from BMS, timeout count={}".format(P.timeout_count))
+            if P.timeout_count > 5:
+                L.l.info("Trying to recover BT connection, disconnecting")
+                P.bt_device.disconnect()
+                P.timeout_count = 0
         else:
             P.timeout_count = 0
-
-        if P.bt_device is not None:
-            if P.bt_device.is_connected():
-                # L.l.info("Disconnecting BT")
-                # P.bt_device.disconnect()
-                pass
-            else:
-                L.l.info("BT not connected")
             # P.bluetooth_manager.stop()
             # P.bt_device = None
     except Exception as ex:
