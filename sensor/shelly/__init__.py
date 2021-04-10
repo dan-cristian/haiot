@@ -91,6 +91,8 @@ def _process_message(msg):
                         sensor.energy_export = float(val)
                     elif atoms[4] == "total_returned":
                         sensor.total_energy_export = float(val)
+                    elif atoms[4] == "reactive_power":
+                        sensor.reactive_power = float(val)
                     else:
                         L.l.warning("Unprocessed shelly value {}".format(atoms[4]))
                     # L.l.info("Shelly {} {}={}".format(sensor.name, atoms[4], val))
