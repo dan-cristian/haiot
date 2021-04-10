@@ -1,7 +1,3 @@
-Group:Number:MAX TEMP_PUF "Max Puffer [%.1f °C]" <temperature_hot>
-Group:Number:MAX TEMP_BOI "Max Boiler [%.1f °C]" <temperature_hot>
-Group   PUF     "Puffer"   <heating>    (CEL)
-Group   BOI     "Boiler"   <heating>    (CEL)
 
 Number dust_living_pm1 "Dust living PM1 [%.0f ug/m3]" <smoke>            {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_1_wemos-living-air_pms5003:state:default]"}
 Number dust_living_pm2_5 "Dust living PM2.5 [%.0f ug/m3]" <smoke>        {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_2_5_wemos-living-air_pms5003:state:default]"}
@@ -101,23 +97,12 @@ Number gas_ch4_beci "Gas CH4 beci [%.0f]" <gas>                                 
 Number air_humidity_bedroom "Living [%.0f %%]" <humidity>                       {mqtt="<[mosquitto:iot/openhab/airsensor_humidity_wemos-bedroom-air_bme680:state:default]"}
 Number air_temperature_bedroom_ex "Living [%.0f %%]" <temperature>                       {mqtt="<[mosquitto:iot/openhab/airsensor_temperature_wemos-bedroom-air_bme680:state:default]"}
 
-Number temperature_boiler_sus "Boiler sus [%.1f °C]" <temperature_hot>                      (BOI, TEMP_BOI) ["CurrentTemperature"] {mqtt="<[mosquitto:iot/openhab/temperature_boiler sus:state:default]"}
-Number temperature_boiler_mijloc "Boiler mijloc [%.1f °C]" <temperature_hot>                (BOI, TEMP_BOI) {mqtt="<[mosquitto:iot/openhab/temperature_boiler mijloc:state:default]"}
-Number temperature_boiler_jos "Boiler jos [%.1f °C]" <temperature_hot>                      (BOI, TEMP_BOI) {mqtt="<[mosquitto:iot/openhab/temperature_boiler jos:state:default]"}
-Number temperature_puffer_sus "Puffer sus [%.1f °C]" <temperature_hot>                      (PUF, TEMP_PUF) ["CurrentTemperature"] {mqtt="<[mosquitto:iot/openhab/temperature_puffer sus:state:default]"}
-Number temperature_puffer_mijloc "Puffer mijloc [%.1f °C]" <temperature_hot>                        (PUF, TEMP_PUF) {mqtt="<[mosquitto:iot/openhab/temperature_puffer mijloc:state:default]"}
-Number temperature_puffer_jos "Puffer jos [%.1f °C]" <temperature_hot>                              (PUF, TEMP_PUF) {mqtt="<[mosquitto:iot/openhab/temperature_puffer jos:state:default]"}
-Number temperature_solar_jos "Solar jos[%.1f °C]" <temperature_hot>                                 {mqtt="<[mosquitto:iot/openhab/temperature_solar jos:state:default]"}
 Number temperature_curte_fata "Curte fata [%.1f °C]" <garden> ["CurrentTemperature"]                {mqtt="<[mosquitto:iot/openhab/temperature_curte fata:state:default]"}
 Number temperature_birou "Birou [%.1f °C]" <temperature>      ["CurrentTemperature"]                {mqtt="<[mosquitto:iot/openhab/temperature_birou:state:default]"}
 Number temperature_bucatarie "Bucatarie [%.1f °C]" <temperature> ["CurrentTemperature"]             {mqtt="<[mosquitto:iot/openhab/temperature_bucatarie:state:default]"}
 Number temperature_dormitor_spate "Dormitor spate [%.1f °C]" <temperature>  ["CurrentTemperature"]  {mqtt="<[mosquitto:iot/openhab/temperature_dormitor spate:state:default]"}
 Number temperature_pod_fata "Pod fata [%.1f °C]" <temperature> ["CurrentTemperature"]               {mqtt="<[mosquitto:iot/openhab/temperature_pod fata:state:default]"}
 Number temperature_horn "Horn [%.1f °C]" <temperature>                                              {mqtt="<[mosquitto:iot/openhab/temperature_horn:state:default]"}
-Number temperature_gas_boiler "Gas boiler [%.1f °C]" <heating>                                      {mqtt="<[mosquitto:iot/openhab/temperature_gas boiler:state:default]"}
-Number temperature_gas_heater "Gas heater [%.1f °C]" <heating>                                      {mqtt="<[mosquitto:iot/openhab/temperature_gas heater:state:default]"}
-Number temperature_solar_back "Solar back [%.1f °C]" <temperature>                                  {mqtt="<[mosquitto:iot/openhab/temperature_solar back:state:default]"}
-Number temperature_soba_beci "Soba beci [%.1f °C]" <temperature>                                    {mqtt="<[mosquitto:iot/openhab/temperature_soba beci:state:default]"}
 Number temperature_fridge "Fridge [%.1f °C]" <temperature> ["CurrentTemperature"]                   {mqtt="<[mosquitto:iot/openhab/temperature_fridge:state:default]"}
 Number temperature_air_duct "Air duct [%.1f °C]" <temperature>                                  {mqtt="<[mosquitto:iot/openhab/temperature_air duct:state:default]"}
 

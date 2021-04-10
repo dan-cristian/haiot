@@ -49,6 +49,7 @@ class P:
     bt_device = None
     processing = False
     timeout_count = 0
+    recover_count = 0
 
 
 class AnyDevice(gatt.Device):

@@ -1,3 +1,21 @@
+Group:Number:MAX TEMP_PUF "Max Puffer [%.1f °C]" <temperature_hot>
+Group:Number:MAX TEMP_BOI "Max Boiler [%.1f °C]" <temperature_hot>
+Group   PUF     "Puffer"   <heating>    (CEL)
+Group   BOI     "Boiler"   <heating>    (CEL)
+
+Number temperature_boiler_sus "Boiler sus [%.1f °C]" <temperature_hot>                      (BOI, TEMP_BOI) ["CurrentTemperature"] {mqtt="<[mosquitto:iot/openhab/temperature_boiler sus:state:default]"}
+Number temperature_boiler_mijloc "Boiler mijloc [%.1f °C]" <temperature_hot>                (BOI, TEMP_BOI) {mqtt="<[mosquitto:iot/openhab/temperature_boiler mijloc:state:default]"}
+Number temperature_boiler_jos "Boiler jos [%.1f °C]" <temperature_hot>                      (BOI, TEMP_BOI) {mqtt="<[mosquitto:iot/openhab/temperature_boiler jos:state:default]"}
+Number temperature_puffer_sus "Puffer sus [%.1f °C]" <temperature_hot>                      (PUF, TEMP_PUF) ["CurrentTemperature"] {mqtt="<[mosquitto:iot/openhab/temperature_puffer sus:state:default]"}
+Number temperature_puffer_mijloc "Puffer mijloc [%.1f °C]" <temperature_hot>                        (PUF, TEMP_PUF) {mqtt="<[mosquitto:iot/openhab/temperature_puffer mijloc:state:default]"}
+Number temperature_puffer_jos "Puffer jos [%.1f °C]" <temperature_hot>                              (PUF, TEMP_PUF) {mqtt="<[mosquitto:iot/openhab/temperature_puffer jos:state:default]"}
+Number temperature_solar_jos "Solar jos[%.1f °C]" <temperature_hot>                                 {mqtt="<[mosquitto:iot/openhab/temperature_solar jos:state:default]"}
+Number temperature_gas_boiler "Gas boiler [%.1f °C]" <heating>                                      {mqtt="<[mosquitto:iot/openhab/temperature_gas boiler:state:default]"}
+Number temperature_gas_heater "Gas heater [%.1f °C]" <heating>                                      {mqtt="<[mosquitto:iot/openhab/temperature_gas heater:state:default]"}
+Number temperature_solar_back "Solar back [%.1f °C]" <temperature>                                  {mqtt="<[mosquitto:iot/openhab/temperature_solar back:state:default]"}
+Number temperature_soba_beci "Soba beci [%.1f °C]" <temperature>                                    {mqtt="<[mosquitto:iot/openhab/temperature_soba beci:state:default]"}
+
+
 Switch heat_dormitor "Heat dormitor" <fire>                                 {mqtt="<[mosquitto:iot/openhab/heat_dormitor:state:default],>[mosquitto:iot/openhab/cmd/heat_dormitor:command:*:default]", autoupdate="false"}
 Switch heat_bucatarie "Heat bucatarie" <fire>                               {mqtt="<[mosquitto:iot/openhab/heat_bucatarie:state:default],>[mosquitto:iot/openhab/cmd/heat_bucatarie:command:*:default]", autoupdate="false"}
 Switch heat_living "Heat living" <fire>                                     {mqtt="<[mosquitto:iot/openhab/heat_living:state:default],>[mosquitto:iot/openhab/cmd/heat_living:command:*:default]", autoupdate="false"}
