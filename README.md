@@ -2,7 +2,7 @@
 <h1>Home Automation &amp; Internet of Things</h1>
 <h2>Overview</h2>
 With Haiot you can control a huge number of sensors and devices in your house (and not only), setup automation rules and visualise sensors and control the system via Web and Mobile interfaces. It integrates with Openhab via Mqtt.
-The application currently implementes the following automation scripts in my house:
+The application currently covers the following automation scripts in my house:
 <br>- Heating control (with multiple sources: gas, solar)
 <br>- Ventilation systems (Interface with Atrea Duplex)
 <br>- Alarm sensors (PIR)
@@ -10,11 +10,13 @@ The application currently implementes the following automation scripts in my hou
 <br>- Watering system
 <br>- Audio control via MPD (Interface with Yamaha RX-Vx700 via RS232)
 <br>- Gates opening/close control
-<br>- Electricity usage monitoring and grid export control function
+<br>- Electricity usage monitoring and grid export control function (Qubino, Shelly3M)
 <br>- Presence monitoring (wifi, bluetooth)
 <br>- Location tracking
-<br>- Solar production tracking (APS Microinverters, Sonoff POW)
-<br>- Solar excess export divert to water heater (via ESP8266 PWM and SSR relay) 
+<br>- Solar production tracking (APS Microinverters / ECU, Sonoff POW)
+<br>- Solar excess export divert to water heater (via ESP8266 PWM and SSR relay)
+<br>- Solar excess divert to battery charger (via DROK 720W Buck Converter)
+<br>- Battery BMS monitoring integration via bluetooth (SmartBMS)
 <br>- TV control (LG RS232)
 <br>- Air quality monitoring (PM2.5, CO2, VOC, O3 sensors)
 <br>- Dashboards and UI control with OpenHab and Grafana/Influxdb

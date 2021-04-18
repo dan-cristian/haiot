@@ -47,6 +47,8 @@ def update(power):
         print("          delta -d={}".format(required_duty))
         new_duty = max(last_duty - required_duty, 0)
         set_duty(new_duty)
+    else:
+        set_duty(0)
 
 
 def init():
