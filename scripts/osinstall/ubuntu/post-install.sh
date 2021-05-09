@@ -1340,6 +1340,7 @@ if [ "$ENABLE_DASHCAM_PI_LCD_DF" == "1" ]; then
         echo "Probing module"
         modprobe rp_usbdisplay
 
+        # font:VGA8x8
         if ! grep -q "fbcon[=_]map:1" /boot/cmdline.txt; then echo -n " fbcon=font:ProFont6x11 fbcon=map:1" >> /boot/cmdline.txt; fi
         #remove new line
         tr -d '\n' < /boot/cmdline.txt > /boot/cmdline.new

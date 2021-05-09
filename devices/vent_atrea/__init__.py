@@ -32,7 +32,7 @@ class P:
     mode_off = 0
     mode_default = 2
 
-    power_level_min = 20  # 12 is lowest possible
+    power_level_min = 25  # 12 is lowest possible
     power_level_default = 35
     power_level_max = 60
 

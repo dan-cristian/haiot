@@ -96,6 +96,8 @@ if [ "$ENABLE_DFROBOT" == "1" ]; then
 	# https://www.kernel.org/doc/Documentation/fb/fbcon.txt
 	# page 19: http://www.robopeak.com/data/doc/rpusbdisp/RPUD02-rpusbdisp_usermanual-enUS.1.1.pdf
 	# https://learn.adafruit.com/adafruit-pitft-28-inch-resistive-touchscreen-display-raspberry-pi/using-the-console
+	# ABOVE NOT WORKING for PIZEROW, try DKMS below
+	# https://github.com/pimoroni/rp_usbdisplay/tree/master/dkms
 	# stty rows 30 cols 40
 	# setfont -f Uni2-VGA8
     apt-get -y install gpm
