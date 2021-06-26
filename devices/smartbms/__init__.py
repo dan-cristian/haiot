@@ -283,7 +283,7 @@ def connect_bt(bms_rec):
                 break
         if P.processing:
             P.timeout_count += 1
-            L.l.warning("No response from BMS, timeout count={}".format(P.timeout_count))
+            L.l.warning("No response from BMS {}, timeout count={}".format(bms_rec.name, P.timeout_count))
             if P.timeout_count > 5:
                 L.l.info("Trying to recover BT connection, disconnecting")
                 P.bt_device.disconnect()
