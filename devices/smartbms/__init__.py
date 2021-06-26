@@ -297,15 +297,15 @@ def connect_bt(bms_rec):
 
 
 def get_status():
-    # recs = m.Bms.find()
-    # for rec in recs:
-    rec = m.Bms.find_one({m.Bms.host_name: Constant.HOST_NAME})
-    if rec is not None:
-        connect_bt(rec)
-        # rec.save_changed_fields(persist=True)
-        L.l.info("v={} v1={} t1={}".format(rec.voltage, rec.v01, rec.t1))
-    else:
-        L.l.warning("No bms config record defined for this host={}".format(Constant.HOST_NAME))
+    recs = m.Bms.find({m.Bms.host_name: Constant.HOST_NAME})
+    for rec in recs:
+        # rec = m.Bms.find_one({m.Bms.host_name: Constant.HOST_NAME})
+        if rec is not None:
+            connect_bt(rec)
+            # rec.save_changed_fields(persist=True)
+            L.l.info("v={} v1={} t1={}".format(rec.voltage, rec.v01, rec.t1))
+        else:
+            L.l.warning("No bms config record defined for this host={}".format(Constant.HOST_NAME))
 
 
 def bms_upsert_listener(record, changed_fields):
