@@ -265,12 +265,12 @@ def connect_bt(bms_rec):
     try:
         if P.bt_device is None:
             P.bt_device = AnyDevice(mac_address=bms_rec.mac_address, manager=P.manager)
-            L.l.info("BT Connect first time")
+            L.l.info("BT Connect first time to {}".format(bms_rec.name))
             P.processing = True
             P.bt_device.connect(bms_rec)
         else:
             if not P.bt_device.is_connected():
-                L.l.info("BT reconnect")
+                L.l.info("BT reconnect to {}".format(bms_rec.name))
                 P.bt_device.connect(bms_rec)
             P.processing = True
             P.bt_device.bms_write_characteristic.write_value(P.status_cmd)
