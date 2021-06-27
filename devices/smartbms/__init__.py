@@ -186,7 +186,7 @@ class AnyDevice(gatt.Device):
                         invalid_record = True
 
                     self.rawdat['Ah_full'] = int.from_bytes(self.response[6:8], byteorder='big', signed=True) / 100
-                    if self.rawdat['Ah_full'] > self.bms_rec.factory_full_capacity:
+                    if self.rawdat['Ah_full'] > (self.bms_rec.factory_full_capacity * 1.20):  # some tolerance on max c
                         L.l.warning("Invalid full capacity {}Ah".format(self.rawdat['Ah_full']))
                         invalid_record = True
 
