@@ -386,5 +386,5 @@ def init():
     # mqtt_io.P.mqtt_client.message_callback_add(P.sonoff_topic, mqtt_on_message)
     mqtt_io.add_message_callback(P.sonoff_topic, mqtt_on_message)
     _read_mac_files()
-    thread_pool.add_interval_callable(thread_run, P.check_period)
+    thread_pool.add_interval_callable(thread_run, P.check_period, long_running=True)
     P.initialised = True
