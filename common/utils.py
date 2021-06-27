@@ -212,7 +212,8 @@ def encode_url_request(request):
 def parse_http(url, start_key, end_key, end_first=False, timeout=None):
     try:
         text = get_url_content(url=url, timeout=timeout)
-        return parse_text(text, start_key, end_key, end_first)
+        if text is not None:
+            return parse_text(text, start_key, end_key, end_first)
     except Exception as ex:
         # L.l.error('Unable to open url {}, err={}'.format(url, ex))
         pass
