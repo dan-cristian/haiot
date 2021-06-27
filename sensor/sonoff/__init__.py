@@ -182,18 +182,17 @@ def _process_message(msg):
                         sensor = m.PowerMonitor.find_one({m.PowerMonitor.host_name: sensor_name})
                     if sensor is None:
                         L.l.warning('Sensor INA on {} not defined in db'.format(sensor_name))
-                        sensor = m.PowerMonitor()
-                        sensor.id = sensor.id
-                    if 'Voltage' in ina:
-                        voltage = ina['Voltage']
-                        sensor.voltage = voltage
-                    if 'Current' in ina:
-                        current = ina['Current']
-                        sensor.current = current
-                    if 'Power' in ina:
-                        power = ina['Power']
-                        sensor.power = power
-                    sensor.save_changed_fields(broadcast=False, persist=True)
+                    else:
+                        if 'Voltage' in ina:
+                            voltage = ina['Voltage']
+                            sensor.voltage = voltage
+                        if 'Current' in ina:
+                            current = ina['Current']
+                            sensor.current = current
+                        if 'Power' in ina:
+                            power = ina['Power']
+                            sensor.power = power
+                        sensor.save_changed_fields(broadcast=False, persist=True)
             if 'ANALOG' in obj:
                 # "ANALOG":{"A0":7}
                 an = obj['ANALOG']
