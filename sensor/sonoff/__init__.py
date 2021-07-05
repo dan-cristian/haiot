@@ -81,12 +81,12 @@ def _process_message(msg):
                 sensor_name = msg.topic.split(topic_clean)[1].split('/')[1]
                 obj = utils.json2obj(transport.mqtt_io.payload2json(msg.payload))
             except Exception as ex:
-                L.l.error("Error decoding sensor name {}".format(msg.payload))
-                return
+                L.l.error("Error decoding sensor name, topic={} payload={}".format(msg.topic, msg.payload))
+                return False
 
             if obj is None:
                 L.l.error("Unable to decode tasmota {}".format(msg.payload))
-                return
+                return False
             #################################################################
 
             if 'ENERGY' in obj:
@@ -243,7 +243,8 @@ def mqtt_on_message(client, userdata, msg):
     try:
         prctl.set_name("mqtt_sonoff")
         threading.current_thread().name = "mqtt_sonoff"
-        _process_message(msg)
+        if not _process_message(msg):
+            L.l.warning("Error processing tasmota mqtt")
     except Exception as ex:
         L.l.error("Error processing sonoff mqtt {}, err={}, msg={}".format(msg.topic, ex, msg), exc_info=True)
     finally:
@@ -300,8 +301,8 @@ def _tasmota_config(config_file, device_name, ip):
                     line = line.replace("<name>", device_name)
                 if "<day>" in line:
                     line = line.replace("<day>", str(utils.get_base_location_now_date().day))
-                #line = utils.encode_url_request(line)
-                line = line.replace(" ", "%20").replace(";", "%3B")
+                line = utils.encode_url_request(line)
+                #line = line.replace(" ", "%20").replace(";", "%3B")
                 request = tasmota_url.format(ip, line)
                 done = False
                 for i in range(0, 5):
