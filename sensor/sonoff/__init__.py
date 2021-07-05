@@ -77,8 +77,12 @@ def _process_message(msg):
     if '/SENSOR' in msg.topic or '/RESULT' in msg.topic:
         topic_clean = P.sonoff_topic.replace('#', '')
         if topic_clean in msg.topic:
-            sensor_name = msg.topic.split(topic_clean)[1].split('/')[1]
-            obj = utils.json2obj(transport.mqtt_io.payload2json(msg.payload))
+            try:
+                sensor_name = msg.topic.split(topic_clean)[1].split('/')[1]
+                obj = utils.json2obj(transport.mqtt_io.payload2json(msg.payload))
+            except Exception as ex:
+                L.l.error("Error decoding sensor name {}".format(msg.payload))
+                return
 
             if obj is None:
                 L.l.error("Unable to decode tasmota {}".format(msg.payload))
@@ -296,12 +300,16 @@ def _tasmota_config(config_file, device_name, ip):
                     line = line.replace("<name>", device_name)
                 if "<day>" in line:
                     line = line.replace("<day>", str(utils.get_base_location_now_date().day))
-                line = utils.encode_url_request(line)
+                #line = utils.encode_url_request(line)
+                line = line.replace(" ", "%20").replace(";", "%3B")
                 request = tasmota_url.format(ip, line)
                 done = False
                 for i in range(0, 5):
                     try:
                         response = utils.get_url_content(url=request, timeout=10)
+                        if response is None:
+                            L.l.warning("Set {}: {}={}".format(device_name, request, response))
+                            break
                         if command in response.lower():
                             L.l.info("Set {}: {}={}".format(device_name, request, response))
                             break
@@ -338,9 +346,12 @@ def _tasmota_discovery():
                             file_name = os.path.basename(config_file)
                             # dev_name = utils.parse_http(url="http://{}/cm?cmnd=friendlyname1".format(ip),
                             #                            start_key='{"FriendlyName1":"', end_key='"}')
+                            mqtt_topic = utils.parse_http(url="http://{}/cm?cmnd=Topic".format(ip),
+                                                          start_key='{"Topic":"', end_key='"}', timeout=3)
                             last_update = utils.parse_http(url="http://{}/cm?cmnd=friendlyname2".format(ip),
                                                             start_key='{"FriendlyName2":"', end_key='"}', timeout=3)
-                            if dev_name != file_name or last_update != str(utils.get_base_location_now_date().day):
+                            if dev_name != file_name or mqtt_topic != file_name \
+                                    or last_update != str(utils.get_base_location_now_date().day):
                                 # tasmota device is not configured
                                 L.l.info("Configuring tasmota device {} as {}".format(ip, file_name))
                                 _tasmota_config(config_file=P.TASMOTA_CONFIG, device_name=file_name, ip=ip)
