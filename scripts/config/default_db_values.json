@@ -555,7 +555,7 @@
     {"id":15, "zone_id":2 ,  "gpio_pin_code":"0:in:2", "gpio_host_name": "homew", "alarm_pin_name": "living", "sensor_type": "pir", "relay_type": "piface"},
     {"id":16, "zone_id":3 ,  "gpio_pin_code":"0:in:3", "gpio_host_name": "homew", "alarm_pin_name": "beci mic", "sensor_type": "pir", "relay_type": "piface", "target_relay": "beci_mic_lights"},
     {"id":17, "zone_id":47 , "gpio_pin_code":"0:in:4", "gpio_host_name": "homew", "alarm_pin_name": "birou", "sensor_type": "pir", "relay_type": "piface"},
-    {"id":18, "zone_id":10 , "gpio_pin_code":"0:in:5", "gpio_host_name": "homew", "alarm_pin_name": "scari beci", "sensor_type": "pir", "relay_type": "piface", "target_relay": "camara_lights"},
+    {"id":18, "zone_id":10 , "gpio_pin_code":"0:in:5", "gpio_host_name": "homew", "alarm_pin_name": "scari beci", "sensor_type": "pir", "relay_type": "piface"},
     {"id":19, "zone_id":11 , "gpio_pin_code":"0:in:6", "gpio_host_name": "homew", "alarm_pin_name": "etaj hol", "sensor_type": "pir", "relay_type": "piface"},
     {"id":20, "zone_id":8 ,  "gpio_pin_code":"0:in:7", "gpio_host_name": "homew", "alarm_pin_name": "intrare", "sensor_type": "pir", "relay_type": "piface"},
 
