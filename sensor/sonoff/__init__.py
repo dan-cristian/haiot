@@ -237,6 +237,7 @@ def _process_message(msg):
                     L.l.warning('Unknown Sonoff RF packet received {}'.format(sensor_id))
         else:
             L.l.warning("Invalid sensor topic {}".format(msg.topic))
+    return True
 
 
 def mqtt_on_message(client, userdata, msg):
