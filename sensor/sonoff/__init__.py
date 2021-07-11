@@ -2,6 +2,7 @@ import os
 import glob
 import errno
 import threading
+import time
 from socket import timeout
 from ipaddress import IPv4Address
 from urllib.error import HTTPError, URLError
@@ -357,11 +358,12 @@ def _tasmota_discovery():
                                 # tasmota device is not configured
                                 L.l.info("Configuring tasmota device {} as {}".format(ip, file_name))
                                 _tasmota_config(config_file=P.TASMOTA_CONFIG, device_name=file_name, ip=ip)
+                                _tasmota_config(config_file=config_file, device_name=file_name, ip=ip)
+                                time.sleep(20)
                                 mqtt_topic = utils.parse_http(url="http://{}/cm?cmnd=Topic".format(ip),
                                                               start_key='{"Topic":"', end_key='"}', timeout=3)
                                 if mqtt_topic != file_name:
                                     L.l.error("Failed to set mqtt topic {}, actual={}".format(file_name, mqtt_topic))
-                                _tasmota_config(config_file=config_file, device_name=file_name, ip=ip)
                         else:
                             L.l.warning("Found tasmota device {} {} without config file".format(dev_name, ip))
                         break
