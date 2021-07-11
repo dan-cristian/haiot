@@ -316,40 +316,40 @@
 
     {"relay_pin_name": "puffer_pump_heat_relay", "zone_id": "38", "gpio_pin_code": "0:out:7", "gpio_host_name": "homew", "relay_type": "piface"},
     {"relay_pin_name": "puffer_pump_water_relay", "zone_id": "38", "gpio_pin_code": "5", "gpio_host_name": "pi-face", "relay_type": "gpio"},
-    {"relay_pin_name": "pump_recirculation_relay", "zone_id": "29", "gpio_pin_code": "sonoff_recirculation_pump", "relay_type": "sonoff", "expire": 120},
-    {"relay_pin_name": "pump_heat_relay", "zone_id": "8", "gpio_pin_code": "pump_heat_relay_s", "relay_type": "sonoff"},
+    {"relay_pin_name": "pump_recirculation_relay", "zone_id": "29", "gpio_pin_code": "sonoff-recirculation-pump", "relay_type": "sonoff", "expire": 120},
+    {"relay_pin_name": "pump_heat_relay", "zone_id": "8", "gpio_pin_code": "pump-heat-relay-s", "relay_type": "sonoff"},
     {"relay_pin_name": "other_heat_relay", "zone_id": "29", "gpio_pin_code": "26", "gpio_host_name": "pi-face", "relay_type": "gpio"},
-    {"relay_pin_name": "front_garden_lights_relay", "zone_id": "14", "gpio_pin_code": "front_garden_lights_s", "relay_type": "sonoff"},
+    {"relay_pin_name": "front_garden_lights_relay", "zone_id": "14", "gpio_pin_code": "front-garden-lights-s", "relay_type": "sonoff"},
     {"relay_pin_name": "puffer_gas_valve_relay", "zone_id": "38", "gpio_pin_code": "0:out:6", "gpio_host_name": "homew", "relay_type": "piface"},
     {"relay_pin_name": "unused_beci_relay", "zone_id": "14", "gpio_pin_code": "19", "gpio_host_name": "pi-face", "relay_type": "gpio"},
 
     {"relay_pin_name": "beci_contactor_relay", "zone_id": "10", "gpio_pin_code": "0:out:2", "gpio_host_name": "pi-face", "relay_type": "piface"},
     {"relay_pin_name": "beci_upscharge_relay", "zone_id": "10", "gpio_pin_code": "sonoff-basic-8", "relay_type": "sonoff"},
     {"relay_pin_name": "beci_extra_relay", "zone_id": "10", "gpio_pin_code": "0:out:4", "gpio_host_name": "pi-face", "relay_type": "piface"},
-    {"relay_pin_name": "beci_ups_relay", "zone_id": "10", "gpio_pin_code": "ups_pw", "relay_type": "sonoff"},
+    {"relay_pin_name": "beci_ups_relay", "zone_id": "10", "gpio_pin_code": "ups-pw", "relay_type": "sonoff"},
 
-    {"relay_pin_name": "freezer_relay", "zone_id": "10", "gpio_pin_code": "freezer_pw", "relay_type": "sonoff"},
-    {"relay_pin_name": "gas_heater_relay", "zone_id": "29", "gpio_pin_code": "gas_pw", "relay_type": "sonoff"},
-    {"relay_pin_name": "solar_relay", "zone_id": "54", "gpio_pin_code": "solar_pw", "relay_type": "sonoff"},
-    {"relay_pin_name": "floor_bath1_relay", "zone_id": "5", "gpio_pin_code": "bath_pw", "relay_type": "sonoff"},
-    {"relay_pin_name": "washing_relay", "zone_id": "29", "gpio_pin_code": "washing_pw", "relay_type": "sonoff"},
+    {"relay_pin_name": "freezer_relay", "zone_id": "10", "gpio_pin_code": "freezer-pw", "relay_type": "sonoff"},
+    {"relay_pin_name": "gas_heater_relay", "zone_id": "29", "gpio_pin_code": "gas-pw", "relay_type": "sonoff"},
+    {"relay_pin_name": "solar_relay", "zone_id": "54", "gpio_pin_code": "solar-pw", "relay_type": "sonoff"},
+    {"relay_pin_name": "floor_bath1_relay", "zone_id": "5", "gpio_pin_code": "bath-pw", "relay_type": "sonoff"},
+    {"relay_pin_name": "washing_relay", "zone_id": "29", "gpio_pin_code": "washing-pw", "relay_type": "sonoff"},
     {"relay_pin_name": "other_relay_test", "zone_id": "2", "gpio_pin_code": "sonoff-pow-2", "gpio_host_name": "netbook", "relay_type": "sonoff"},
-    {"relay_pin_name": "boiler_relay", "zone_id": "29", "gpio_pin_code": "boiler_pw", "relay_type": "sonoff"},
+    {"relay_pin_name": "boiler_relay", "zone_id": "29", "gpio_pin_code": "boiler-pw", "relay_type": "sonoff"},
     {"relay_pin_name": "tv_relay", "zone_id": "2", "gpio_pin_code": "sonoff-basic-1", "relay_type": "sonoff"},
     {"relay_pin_name": "sonoff-2", "zone_id": "2", "gpio_pin_code": "sonoff-basic-2", "relay_type": "sonoff"},
-    {"relay_pin_name": "blackwater_pump_relay", "zone_id": "9", "gpio_pin_code": "sewage_s", "relay_type": "sonoff"},
+    {"relay_pin_name": "blackwater_pump_relay", "zone_id": "9", "gpio_pin_code": "fosa-s", "relay_type": "sonoff"},
     {"relay_pin_name": "sonoff-4", "zone_id": "2", "gpio_pin_code": "sonoff-basic-4", "relay_type": "sonoff"},
     {"relay_pin_name": "sonoff-5", "zone_id": "2", "gpio_pin_code": "sonoff-basic-5", "relay_type": "sonoff"},
-    {"relay_pin_name": "fan_bucatarie_relay", "zone_id": "2", "gpio_pin_code": "fan_bucatarie_s", "relay_type": "sonoff", "expire": 240},
-    {"relay_pin_name": "fan_baie_parter_relay", "zone_id": "56", "gpio_pin_code": "fan_wc_parter_s", "relay_type": "sonoff", "expire": 240},
+    {"relay_pin_name": "fan_bucatarie_relay", "zone_id": "2", "gpio_pin_code": "fan-bucatarie-s", "relay_type": "sonoff", "expire": 240},
+    {"relay_pin_name": "fan_baie_parter_relay", "zone_id": "56", "gpio_pin_code": "fan-wc-parter-s", "relay_type": "sonoff", "expire": 240},
     {"relay_pin_name": "fan_baie_etaj_relay", "zone_id": "5", "gpio_pin_code": "sonoff-basic-14", "relay_type": "sonoff", "expire": 240},
     {"relay_pin_name": "big_battery_relay", "zone_id": "54", "gpio_pin_code": "sonoff-basic-12", "relay_type": "sonoff"},
     {"relay_pin_name": "small_battery_relay", "zone_id": "54", "gpio_pin_code": "sonoff-basic-11", "relay_type": "sonoff"},
 
     {"relay_pin_name": "unused_relay", "zone_id": "2", "gpio_pin_code": "sonoff-basic-13", "relay_type": "sonoff"},
-    {"relay_pin_name": "camara_lights", "zone_id": "58", "gpio_pin_code": "camara_lights_s", "relay_type": "sonoff"},
-    {"relay_pin_name": "beci_mic_lights", "zone_id": "3", "gpio_pin_code": "beci_mic_lights_s", "relay_type": "sonoff"},
-    {"relay_pin_name": "beci_mare_lights", "zone_id": "9", "gpio_pin_code": "beci_mare_lights_s", "relay_type": "sonoff"},
+    {"relay_pin_name": "camara_lights", "zone_id": "58", "gpio_pin_code": "camara-lights-s", "relay_type": "sonoff"},
+    {"relay_pin_name": "beci_mic_lights", "zone_id": "3", "gpio_pin_code": "beci-mic-lights-s", "relay_type": "sonoff"},
+    {"relay_pin_name": "beci_mare_lights", "zone_id": "9", "gpio_pin_code": "beci-mare-lights-s", "relay_type": "sonoff"},
 
     {"relay_pin_name": "portita_relay", "zone_id": "7", "gpio_pin_code": "26", "gpio_host_name": "pi-power", "relay_type": "gpio"},
 
@@ -358,11 +358,11 @@
     {"relay_pin_name": "plug_2_old", "zone_id": "29", "gpio_pin_code": "TZ69 Smart energy plug in switch_5", "relay_type": "zwave", "gpio_host_name": "homew"},
     {"relay_pin_name": "plug_fridge", "zone_id": "29", "gpio_pin_code": "Unknown: type=0004, id=0002_5", "relay_type": "zwave", "gpio_host_name": "homew"},
 
-    {"relay_pin_name": "living_music_relay",    "zone_id": "2", "gpio_pin_code": "living_music_relay_s", "relay_type": "sonoff"},
+    {"relay_pin_name": "living_music_relay",    "zone_id": "2", "gpio_pin_code": "living-music-relay-s", "relay_type": "sonoff"},
     {"relay_pin_name": "living_sub_relay",      "zone_id": "2", "gpio_pin_code": "17", "gpio_host_name": "pi-power", "relay_type": "gpio"},
     {"relay_pin_name": "baie_mare_music_relay", "zone_id": "5", "gpio_pin_code": "17", "gpio_host_name": "pi-power", "relay_type": "gpio"},
     {"relay_pin_name": "beci_music_relay",      "zone_id": "3", "gpio_pin_code": "17", "gpio_host_name": "pi-power", "relay_type": "gpio"},
-    {"relay_pin_name": "dormitor_music_relay",  "zone_id": "4", "gpio_pin_code": "dormitor_music_relay_s", "relay_type": "sonoff"},
+    {"relay_pin_name": "dormitor_music_relay",  "zone_id": "4", "gpio_pin_code": "dormitor-music-relay-s", "relay_type": "sonoff"},
     {"relay_pin_name": "pod_music_relay",       "zone_id": "1", "gpio_pin_code": "22", "gpio_host_name": "pi-power", "relay_type": "gpio"},
 
 
@@ -385,8 +385,8 @@
     {"id":13, "name":"rulota battery main", "type":"ina1", "host_name":"bat0-rulota-w",  "max_voltage":14.7, "warn_voltage":12.4, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
     {"id":14, "name":"rulota battery main ref", "type":"ina2", "host_name":"bat0-rulota-w",  "max_voltage":14.7, "warn_voltage":12.4, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
 
-    {"id":20, "name":"living ozone", "type":"ina", "host_name":"wemos_living_air"},
-    {"id":21, "name":"airfiltered nox", "type":"ina", "host_name":"air_filtered_w"},
+    {"id":20, "name":"living ozone", "type":"ina", "host_name":"wemos-living-air"},
+    {"id":21, "name":"airfiltered nox", "type":"ina", "host_name":"air-filtered-w"},
 
     {"id":31, "name":"main l1", "type":"shelly", "sensor_index": 0, "host_name":"shellyem3-8CAAB561F716"},
     {"id":32, "name":"main l2", "type":"shelly", "sensor_index": 1, "host_name":"shellyem3-8CAAB561F716"},
@@ -461,15 +461,15 @@
 
 
   "ZoneHeatRelay":[
-    {"zone_id":1, "heat_pin_name":"bucatarie",  "gpio_pin_code":"bucatarie_heat_relay_s", "relay_type": "sonoff"},
-    {"zone_id":2, "heat_pin_name":"living",     "gpio_pin_code":"living_heat_relay_s", "relay_type": "sonoff"},
-    {"zone_id":47,"heat_pin_name":"birou",      "gpio_pin_code":"birou_heat_relay_s", "relay_type": "sonoff"},
-    {"zone_id":4, "heat_pin_name":"dormitor",   "gpio_pin_code":"etaj_heat_relay_s", "relay_type": "sonoff"},
-    {"zone_id":19,"heat_pin_name":"gas heat",   "gpio_pin_code":"gas_heat_relay_s", "relay_type": "sonoff", "is_main_heat_source":true},
+    {"zone_id":1, "heat_pin_name":"bucatarie",  "gpio_pin_code":"bucatarie-heat-relay-s", "relay_type": "sonoff"},
+    {"zone_id":2, "heat_pin_name":"living",     "gpio_pin_code":"living-heat-relay-s", "relay_type": "sonoff"},
+    {"zone_id":47,"heat_pin_name":"birou",      "gpio_pin_code":"birou-heat-relay-s", "relay_type": "sonoff"},
+    {"zone_id":4, "heat_pin_name":"dormitor",   "gpio_pin_code":"etaj-heat-relay-s", "relay_type": "sonoff"},
+    {"zone_id":19,"heat_pin_name":"gas heat",   "gpio_pin_code":"gas-heat-relay-s", "relay_type": "sonoff", "is_main_heat_source":true},
     {"zone_id":52,"heat_pin_name":"puffer boiler", "gpio_pin_code":"0:out:1", "gpio_host_name":"homew", "relay_type": "piface"},
     {"zone_id":50,"heat_pin_name":"puffer heat", "gpio_pin_code":"0:out:7", "gpio_host_name":"homew", "relay_type": "piface", "temp_sensor_name":"puffer sus"},
     {"zone_id":51,"heat_pin_name":"puffer gas valve", "gpio_pin_code":"0:out:6", "gpio_host_name":"homew", "relay_type": "piface", "is_alternate_source_switch":true, "temp_sensor_name":"puffer sus"},
-    {"zone_id":8, "heat_pin_name": "pump_heat_relay", "gpio_pin_code": "pump_heat_relay_s", "relay_type": "sonoff"},
+    {"zone_id":8, "heat_pin_name": "pump_heat_relay", "gpio_pin_code": "pump-heat-relay-s", "relay_type": "sonoff"},
     {"zone_id":23, "heat_pin_name":"fridge",  "gpio_pin_code":"Unknown: type=0004, id=0002_5", "gpio_host_name":"homew", "relay_type": "zwave"}
   ],
 
@@ -514,9 +514,9 @@
     {"zone_id":29 , "sensor_address": "esp12-1_a0",                                 "sensor_name": "gas CO beci"},
     {"zone_id":29 , "sensor_address": "esp12-2_a0",                                 "sensor_name": "gas CH4 beci"},
     {"zone_id":54 , "sensor_address": "sonoff-pow-3",                               "sensor_name": "solar meter"},
-    {"zone_id":7 ,  "sensor_address": "wemos_curte_air",                        "sensor_name": "curte_bme"},
+    {"zone_id":7 ,  "sensor_address": "wemos-curte-air",                        "sensor_name": "curte_bme"},
     {"zone_id":7 ,  "sensor_address": "wemosmini5_a0",                            "sensor_name": "curte_CO"},
-    {"zone_id":2 ,  "sensor_address": "wemos_living_air",                           "sensor_name": "living_bme"},
+    {"zone_id":2 ,  "sensor_address": "wemos-living-air",                           "sensor_name": "living_bme"},
 
     {"zone_id":2  , "sensor_address": "sonoff-basic-1_bme280",                        "sensor_name": "living_atmo"},
     {"zone_id":1  , "sensor_address": "sonoff-basic-6_bme280",                        "sensor_name": "bucatarie_atmo"},
@@ -529,19 +529,19 @@
     {"utility_name":"power dishwasher", "sensor_name":"zwave dishwasher", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
     {"utility_name":"power fridge", "sensor_name":"zwave fridge", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
 
-    {"utility_name":"power freezer", "sensor_name":"freezer_pw", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
-    {"utility_name":"power gas heater", "sensor_name":"gas_pw", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
-    {"utility_name":"power solar", "sensor_name":"solar_pw", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
-    {"utility_name":"power floor bath1", "sensor_name":"bath_pw", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
-    {"utility_name":"power washing", "sensor_name":"washing_pw", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
-    {"utility_name":"power boiler", "sensor_name":"boiler_pw", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
-    {"utility_name":"power ups", "sensor_name":"ups_pw", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
-    {"utility_name":"power solar rulota", "sensor_name":"rulota_solar_pw", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
-    {"utility_name":"power grid rulota", "sensor_name":"rulota_grid_pw", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
+    {"utility_name":"power freezer", "sensor_name":"freezer-pw", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
+    {"utility_name":"power gas heater", "sensor_name":"gas-pw", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
+    {"utility_name":"power solar", "sensor_name":"solar-pw", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
+    {"utility_name":"power floor bath1", "sensor_name":"bath-pw", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
+    {"utility_name":"power washing", "sensor_name":"washing-pw", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
+    {"utility_name":"power boiler", "sensor_name":"boiler-pw", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
+    {"utility_name":"power ups", "sensor_name":"ups-pw", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
+    {"utility_name":"power solar rulota", "sensor_name":"rulota-solar-pw", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
+    {"utility_name":"power grid rulota", "sensor_name":"rulota-grid-pw", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
 
-    {"utility_name":"water house", "sensor_name":"meter_house_w", "sensor_index":1, "ticks_per_unit":1, "unit_name":"l", "utility_type":"water", "unit_cost":2.9388},
-    {"utility_name":"water hot", "sensor_name":"meter_house_w", "sensor_index":2, "ticks_per_unit":1, "unit_name":"l", "utility_type":"water", "unit_cost":2.9388},
-    {"utility_name":"gas", "sensor_name":"meter_house_w", "sensor_index":4, "ticks_per_unit":100, "unit_name":"mc", "utility_type":"gas", "unit_cost":1.5675},
+    {"utility_name":"water house", "sensor_name":"meter-house-w", "sensor_index":1, "ticks_per_unit":1, "unit_name":"l", "utility_type":"water", "unit_cost":2.9388},
+    {"utility_name":"water hot", "sensor_name":"meter-house-w", "sensor_index":2, "ticks_per_unit":1, "unit_name":"l", "utility_type":"water", "unit_cost":2.9388},
+    {"utility_name":"gas", "sensor_name":"meter-house-w", "sensor_index":4, "ticks_per_unit":100, "unit_name":"mc", "utility_type":"gas", "unit_cost":1.5675},
 
     {"utility_name":"unused 1", "sensor_name":"sonoff-basic-4", "sensor_index":2, "ticks_per_unit":1, "unit_name":"l", "utility_type":"water", "unit_cost":0},
     {"utility_name":"water main", "sensor_name":"water main", "sensor_index":0, "ticks_per_unit":0.1, "unit_name":"l", "utility_type":"water", "unit_cost":2.9388},
@@ -595,13 +595,13 @@
 
   "AirSensor": [
     {"id": 0, "address": "D6:DE:FC:37:8E:F6", "zone_id": 2},
-    {"id": 1, "address": "wemos_kids_air_mhz19b", "zone_id": 6},
-    {"id": 2, "address": "wemos_living_air_mhz19b", "zone_id": 2},
+    {"id": 1, "address": "wemos-kids-air_mhz19b", "zone_id": 6},
+    {"id": 2, "address": "wemos-living-air_mhz19b", "zone_id": 2},
     {"id": 3, "address": "wemos_bedroom_air_mhz19b", "zone_id": 4},
-    {"id": 4, "address": "birou_air_w_mhz19b", "zone_id": 47},
-    {"id": 5, "address": "tudor_air_w_mhz19b", "zone_id": 13},
-    {"id": 10, "address": "ventout_air_w_mhz19b", "zone_id": 7},
-    {"id": 11, "address": "portable_air_w_mhz19b", "zone_id": 7}
+    {"id": 4, "address": "birou-air-w_mhz19b", "zone_id": 47},
+    {"id": 5, "address": "tudor-air-w_mhz19b", "zone_id": 13},
+    {"id": 10, "address": "ventout-air-w_mhz19b", "zone_id": 7},
+    {"id": 11, "address": "portable-air-w_mhz19b", "zone_id": 7}
   ],
 
   "Pwm": [
