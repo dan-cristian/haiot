@@ -13,7 +13,7 @@ __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 class P:
     initialised = False
     last_vent_mode = None
-    central_vent_sensor_name = "vent-air-w_pms5003"
+    central_vent_sensor_name = "ventair_pms5003"
     co2_ok_value = 750
     co2_warn_value = 1000
     radon_ok_value = 70
