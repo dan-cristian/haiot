@@ -597,10 +597,10 @@
     {"id": 0, "address": "D6:DE:FC:37:8E:F6", "zone_id": 2},
     {"id": 1, "address": "wemoskidsair_mhz19b", "zone_id": 6},
     {"id": 2, "address": "wemoslivingair_mhz19b", "zone_id": 2},
-    {"id": 3, "address": "wemos_bedroom_air_mhz19b", "zone_id": 4},
-    {"id": 4, "address": "birou-air-w_mhz19b", "zone_id": 47},
+    {"id": 3, "address": "wemosbedroomair_mhz19b", "zone_id": 4},
+    {"id": 4, "address": "birouair_mhz19b", "zone_id": 47},
     {"id": 5, "address": "tudorair_mhz19b", "zone_id": 13},
-    {"id": 10, "address": "ventout-air-w_mhz19b", "zone_id": 7},
+    {"id": 10, "address": "ventoutair_mhz19b", "zone_id": 7},
     {"id": 11, "address": "portable-air-w_mhz19b", "zone_id": 7}
   ],
 
