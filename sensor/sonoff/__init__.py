@@ -320,11 +320,12 @@ def _tasmota_config(config_file, device_name, ip):
                             L.l.info("Set {}: {}={}".format(device_name, request, response))
                             break
                         else:
-                            L.l.warning("Error setting tasmota param {}".format(response))
+                            L.l.warning("Unexpected response setting tasmota param {}".format(response))
                     except IOError as eio:
                         L.l.error("Tasmota config IO error {}".format(eio))
                     except (URLError, HTTPError, timeout) as et:
                         L.l.error("Tasmota timeout error {}".format(et))
+                        time.sleep(10)
                     except Exception as ex:
                         L.l.error("Tasmota config exception {}".format(ex))
 
@@ -359,7 +360,6 @@ def _tasmota_discovery():
                                 L.l.info("Configuring tasmota device {} as {}".format(ip, file_name))
                                 _tasmota_config(config_file=P.TASMOTA_CONFIG, device_name=file_name, ip=ip)
                                 _tasmota_config(config_file=config_file, device_name=file_name, ip=ip)
-                                time.sleep(20)
                                 mqtt_topic = utils.parse_http(url="http://{}/cm?cmnd=Topic".format(ip),
                                                               start_key='{"Topic":"', end_key='"}', timeout=3)
                                 if mqtt_topic != file_name:
