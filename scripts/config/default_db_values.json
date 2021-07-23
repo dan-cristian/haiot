@@ -612,8 +612,8 @@
   "Bms": [
     {"id": 1, "name": "60ah_battery_wi_57", "mac_address": "A4:C1:38:C6:30:57", "factory_full_capacity": 60, "host_name": "pibms2"},
     {"id": 2, "name": "40ah_battery_wi_b0", "mac_address": "A4:C1:38:EC:1B:B0", "factory_full_capacity": 40, "host_name": "pibms2"},
-    {"id": 3, "name": "60ah_battery_zg_cd", "mac_address": "A4:C1:38:8B:97:CD", "factory_full_capacity": 60, "host_name": "pibms"},
-    {"id": 4, "name": "60ah_battery_zg_56", "mac_address": "A4:C1:38:8A:A8:56", "factory_full_capacity": 60, "host_name": "pibms2"}
+    {"id": 3, "name": "60ah_battery_zg_cd", "mac_address": "A4:C1:38:8B:97:CD", "factory_full_capacity": 60, "host_name": "pibms2"},
+    {"id": 4, "name": "60ah_battery_zg_56", "mac_address": "A4:C1:38:8A:A8:56", "factory_full_capacity": 60, "host_name": "pibms"}
   ],
 
   "_disabled": [
