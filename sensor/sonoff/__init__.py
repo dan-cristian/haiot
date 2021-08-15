@@ -140,7 +140,8 @@ def _process_message(msg):
                 if relay is not None:
                     L.l.info("Got relay {} state={}".format(sensor_name, power_is_on))
                     relay.relay_is_on = power_is_on
-                    relay.save_changed_fields(broadcast=False, persist=True)
+                    # set listeners to false as otherwise on reboot sonoff relays that were on will power- cycle
+                    relay.save_changed_fields(broadcast=False, persist=True, listeners=False)
                 else:
                     L.l.warning("ZoneCustomRelay {} not defined in db".format(sensor_name))
             if 'COUNTER' in obj:
