@@ -55,15 +55,15 @@ Number air_pressure_bme_tudor "Pressure tudor [%.0f hPa]" <pressure>  {mqtt="<[m
 Number air_humidity_bme_tudor "Humidity tudor [%.0f %%]" <humidity>  {mqtt="<[mosquitto:iot/openhab/airsensor_humidity_tudorair_bme680:state:default]"}
 Number air_co2_tudor "CO2 tudor [%.0f ppm]" <carbondioxide>             {mqtt="<[mosquitto:iot/openhab/airsensor_co2_tudorair_mhz19b:state:default]"}
 
-Number dust_ventout_pm1 "Dust ventout PM1 [%.0f ug/m3]" <smoke>       {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_1_ventoutair_pms5003:state:default]"}
-Number dust_ventout_pm2_5 "Dust ventout PM2.5 [%.0f ug/m3]" <smoke>   {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_2_5_ventoutair_pms5003:state:default]"}
-Number dust_ventout_pm10 "Dust ventout PM10 [%.0f ug/m3]" <smoke>     {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_10_ventoutair_pms5003:state:default]"}
-Number dust_ventout_p_2_5 "Dust ventout P2.5 [%.0f ppd]" <smoke>      {mqtt="<[mosquitto:iot/openhab/dustsensor_p_2_5_ventoutair_pms5003:state:default]"}
-Number air_gas_ventout "Gas ventout [%.2f kOhm]" <smoke>            {mqtt="<[mosquitto:iot/openhab/airsensor_gas_ventoutair_bme680:state:default]"}
-Number air_temperature_bme_ventout "Temp ventout [%.1f °C]" <temperature>  {mqtt="<[mosquitto:iot/openhab/airsensor_temperature_ventoutair_bme680:state:default]"}
-Number air_pressure_bme_ventout "Pressure ventout [%.0f hPa]" <pressure>  {mqtt="<[mosquitto:iot/openhab/airsensor_pressure_ventoutair_bme680:state:default]"}
-Number air_humidity_bme_ventout "Humidity ventout [%.0f %%]" <humidity>  {mqtt="<[mosquitto:iot/openhab/airsensor_humidity_ventoutair_bme680:state:default]"}
-Number air_co2_ventout "CO2 ventout [%.0f ppm]" <carbondioxide>             {mqtt="<[mosquitto:iot/openhab/airsensor_co2_ventoutair_mhz19b:state:default]"}
+Number dust_rulota_pm1 "Dust rulota PM1 [%.0f ug/m3]" <smoke>       {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_1_rulotaair_pms5003:state:default]"}
+Number dust_rulota_pm2_5 "Dust rulota PM2.5 [%.0f ug/m3]" <smoke>   {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_2_5_rulotaair_pms5003:state:default]"}
+Number dust_rulota_pm10 "Dust rulota PM10 [%.0f ug/m3]" <smoke>     {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_10_rulotaair_pms5003:state:default]"}
+Number dust_rulota_p_2_5 "Dust rulota P2.5 [%.0f ppd]" <smoke>      {mqtt="<[mosquitto:iot/openhab/dustsensor_p_2_5_rulotaair_pms5003:state:default]"}
+Number air_gas_rulota "Gas rulota [%.2f kOhm]" <smoke>            {mqtt="<[mosquitto:iot/openhab/airsensor_gas_rulotaair_bme680:state:default]"}
+Number air_temperature_bme_rulota "Temp rulota [%.1f °C]" <temperature>  {mqtt="<[mosquitto:iot/openhab/airsensor_temperature_rulotaair_bme680:state:default]"}
+Number air_pressure_bme_rulota "Pressure rulota [%.0f hPa]" <pressure>  {mqtt="<[mosquitto:iot/openhab/airsensor_pressure_rulotaair_bme680:state:default]"}
+Number air_humidity_bme_rulota "Humidity rulota [%.0f %%]" <humidity>  {mqtt="<[mosquitto:iot/openhab/airsensor_humidity_rulotaair_bme680:state:default]"}
+Number air_co2_rulota "CO2 rulota [%.0f ppm]" <carbondioxide>             {mqtt="<[mosquitto:iot/openhab/airsensor_co2_rulotaair_mhz19b:state:default]"}
 
 Number dust_portable_pm1 "Dust portable PM1 [%.0f ug/m3]" <smoke>       {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_1_portable-air-w_pms5003:state:default]"}
 Number dust_portable_pm2_5 "Dust portable PM2.5 [%.0f ug/m3]" <smoke>   {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_2_5_portable-air-w_pms5003:state:default]"}
