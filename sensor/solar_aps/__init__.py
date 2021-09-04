@@ -87,7 +87,7 @@ def thread_run():
                         else:
                             L.l.info('Solar production is {}'.format(record.units_delta))
                 record.units_2_delta = last_power
-                L.l.info('Solar watts is {}'.format(last_power))
+                # L.l.info('Solar watts is {}'.format(last_power))
                 if record.unit_cost is None:
                     record.unit_cost = 0.0
                 record.cost = 1.0 * record.units_delta * record.unit_cost

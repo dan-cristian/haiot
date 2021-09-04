@@ -326,12 +326,12 @@ class P:
                 P.device_list[relay] = obj
                 P.utility_list[utility] = obj
 
-            relay = 'boiler'
-            utility = 'power boiler'
+            # relay = 'boiler'
+            #utility = 'power boiler'
 
-            obj = PwmHeater(relay_name=relay, relay_id=3, utility_name=utility, max_watts=2400, frequency=freq)
-            P.device_list[relay] = obj
-            P.utility_list[utility] = obj
+            # obj = PwmHeater(relay_name=relay, relay_id=3, utility_name=utility, max_watts=2400, frequency=freq)
+            # P.device_list[relay] = obj
+            # P.utility_list[utility] = obj
 
     def __init__(self):
         pass
@@ -345,7 +345,7 @@ def _update_devices():
         dev_list = []
         if P.grid_exporting:
             dev_list = P.device_list.values()
-        if P.grid_importing:
+        elif P.grid_importing:
             dev_list = reversed(P.device_list.values())
         for device in dev_list:
             changed = device.grid_updated(P.grid_watts)
