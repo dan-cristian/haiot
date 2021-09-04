@@ -301,22 +301,21 @@ class P:
                 P.device_list[relay] = obj
                 P.utility_list[utility] = obj
 
-        relay = 'washing_relay'
-        utility = 'power washing'
-        # obj = Washingmachine(relay_name=relay, utility_name=utility, avg_consumption=70)
+        relay = 'batterycharger_relay'
+        P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=400, supports_breaks=True)
         # P.device_list[relay] = obj
         # P.utility_list[utility] = obj
-        relay = 'plug_1'
-        utility = 'power plug 1'
+        #relay = 'plug_1'
+        #utility = 'power plug 1'
         # obj = Dishwasher(relay_name=relay, utility_name=utility, avg_consumption=80)
         # P.device_list[relay] = obj
         # P.utility_list[utility] = obj
-        relay = 'big_battery_relay'
-        P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=50, supports_breaks=True)
-        relay = 'beci_upscharge_relay'
-        P.device_list[relay] = Upscharger(relay_name=relay, avg_consumption=200)
-        relay = 'blackwater_pump_relay'
-        P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=50, supports_breaks=True)
+        #relay = 'big_battery_relay'
+        #P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=50, supports_breaks=True)
+        #relay = 'beci_upscharge_relay'
+        #P.device_list[relay] = Upscharger(relay_name=relay, avg_consumption=200)
+        #relay = 'blackwater_pump_relay'
+        #P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=50, supports_breaks=True)
 
         if not P.emulate_export:
             if False:

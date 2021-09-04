@@ -335,6 +335,7 @@
     {"relay_pin_name": "washing_relay", "zone_id": "29", "gpio_pin_code": "washing-pw", "relay_type": "sonoff"},
     {"relay_pin_name": "other_relay_test", "zone_id": "2", "gpio_pin_code": "sonoff-pow-2", "gpio_host_name": "netbook", "relay_type": "sonoff"},
     {"relay_pin_name": "boiler_relay", "zone_id": "29", "gpio_pin_code": "boiler-pw", "relay_type": "sonoff"},
+    {"relay_pin_name": "batterycharger_relay", "zone_id": "29", "gpio_pin_code": "batterycharger", "relay_type": "sonoff"},
     {"relay_pin_name": "tv_relay", "zone_id": "2", "gpio_pin_code": "sonoff-basic-1", "relay_type": "sonoff"},
     {"relay_pin_name": "sonoff-2", "zone_id": "2", "gpio_pin_code": "sonoff-basic-2", "relay_type": "sonoff"},
     {"relay_pin_name": "blackwater_pump_relay", "zone_id": "9", "gpio_pin_code": "fosa", "relay_type": "sonoff"},
