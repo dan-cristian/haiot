@@ -340,7 +340,7 @@ def _tasmota_discovery():
         try:
             L.l.info("Tasmota discovery IP {}".format(ip))
             dev_name = utils.parse_http(url="http://{}/cm?cmnd=friendlyname1".format(ip),
-                                        start_key='{"FriendlyName1":"', end_key='"}', timeout=3)
+                                        start_key='{"FriendlyName1":"', end_key='"}', timeout=3, silent=True)
             if dev_name is not None:
                 arp = python_arptable.get_arp_table()
                 for entry in arp:

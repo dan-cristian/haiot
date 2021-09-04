@@ -210,9 +210,9 @@ def encode_url_request(request):
     return urllib.parse.quote_plus(request)
 
 
-def parse_http(url, start_key, end_key, end_first=False, timeout=None):
+def parse_http(url, start_key, end_key, end_first=False, timeout=None, silent=False):
     try:
-        text = get_url_content(url=url, timeout=timeout)
+        text = get_url_content(url=url, timeout=timeout, silent=silent)
         if text is not None:
             return parse_text(text, start_key, end_key, end_first)
     except Exception as ex:
