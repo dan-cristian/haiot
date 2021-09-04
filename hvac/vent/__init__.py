@@ -14,6 +14,7 @@ class P:
     initialised = False
     last_vent_mode = None
     central_vent_sensor_name = "ventair_pms5003"
+    co2_min_value = 400
     co2_ok_value = 750
     co2_warn_value = 1000
     radon_ok_value = 70
@@ -25,6 +26,9 @@ class P:
 
     last_power_increase = datetime.datetime.now()
     increase_delta_minutes = 5
+
+    last_co2_zone_open = None
+    co2_vent_threshold = 50  # ppm co2 delta to change open vent
 
     def __init__(self):
         pass
@@ -75,7 +79,7 @@ def adjust():
         air_list = m.AirSensor.find()
         max_co2_count = 0
         for sensor in air_list:
-            if sensor.co2 is not None and sensor.co2 >= 400:  # add all co2 sensors with valid values
+            if sensor.co2 is not None and sensor.co2 >= P.co2_min_value:  # add all co2 sensors with valid values
                 # check if this is a house sensor (indoor)
                 zone = m.Zone.find_one({m.Zone.id: sensor.zone_id})
                 if zone is not None and zone.is_indoor:
@@ -124,8 +128,18 @@ def adjust_vents(co2_sensors, max_co2_sensor, radon_sensor, radon_is_high):
         # open zone vent with radon high and co2 ok
         zone_id_open = radon_sensor.zone_id
     else:
-        # open if co2 is high
-        zone_id_open = max_co2_sensor.zone_id
+        # open if co2 is high and if threshold is met
+        if P.last_co2_zone_open is not None:
+            if P.last_co2_zone_open.co2 - max_co2_sensor.co2 > P.co2_vent_threshold:
+                # change open zone
+                zone_id_open = max_co2_sensor.zone_id
+                P.last_co2_zone_open = max_co2_sensor
+            else:
+                # keep as is, threshold not reached
+                zone_id_open = P.last_co2_zone_open.zone_id
+        else:
+            zone_id_open = max_co2_sensor.zone_id
+            P.last_co2_zone_open = max_co2_sensor
     vents = m.Vent.find({m.Vent.zone_id: zone_id_open})
     for vent in vents:
         vent.angle = 90
