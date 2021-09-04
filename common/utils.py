@@ -194,14 +194,15 @@ def parse_text_ex(text, start_key, end_key):
     return None
 
 
-def get_url_content(url, timeout=None):
+def get_url_content(url, timeout=None, silent=False):
     try:
         if timeout is None:
             return str(urllib.request.urlopen(url).read())
         else:
             return str(urllib.request.urlopen(url, timeout=timeout).read())
     except Exception as ex:
-        L.l.error("Failed to get url content, ex={}".format(ex))
+        if not silent:
+            L.l.error("Failed to get url content, ex={}".format(ex))
         return None
 
 

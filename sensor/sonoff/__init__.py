@@ -310,7 +310,7 @@ def _tasmota_config(config_file, device_name, ip):
                 done = False
                 for i in range(0, 5):
                     try:
-                        response = utils.get_url_content(url=request, timeout=10)
+                        response = utils.get_url_content(url=request, timeout=10, silent=True)
                         if response is None:
                             L.l.warning("Set {}: {}={}".format(device_name, request, response))
                             break
