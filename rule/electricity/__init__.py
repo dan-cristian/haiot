@@ -22,7 +22,7 @@ class DeviceState(Enum):
 
 class Relaydevice:
     RELAY_NAME = None
-    STATE_CHANGE_INTERVAL = 30  # how often can change state, in seconds
+    STATE_CHANGE_INTERVAL = 1  # how often can change state, in seconds
     MAX_OFF_INTERVAL = 600  # seconds, how long can stay off after job has started, if device supports breaks
     MIN_ON_INTERVAL = 60  # how long to run before auto stop, in seconds
     DEVICE_SUPPORTS_BREAKS = False  # can this device be started/stopped several times during the job
