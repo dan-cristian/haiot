@@ -369,6 +369,8 @@ def rule_energy_export(obj=m.PowerMonitor(), change=None):
                 P.grid_watts = obj.power
             L.l.info('Got rule main watts {}'.format(P.grid_watts))
             _update_devices()
+    else:
+        L.l.info('Got alternate power {} change={}'.format(obj, change))
 
 
 def rule_energy_utility(obj=m.Utility(), change=None):
