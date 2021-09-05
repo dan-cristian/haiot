@@ -23,7 +23,6 @@ Frame {
 	Default item=electricity_power_floor_bath1
 	Default item=electricity_power_boiler
 	Default item=electricity_power_ups
-	Default item=powermonitor_voltage_battery_1
 	Default item=relay_batterycharger_relay
 }
 
