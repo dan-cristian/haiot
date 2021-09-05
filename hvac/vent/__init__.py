@@ -130,7 +130,7 @@ def adjust_vents(co2_sensors, max_co2_sensor, radon_sensor, radon_is_high):
     else:
         # open if co2 is high and if threshold is met
         if P.last_co2_zone_open is not None:
-            if P.last_co2_zone_open.co2 - max_co2_sensor.co2 > P.co2_vent_threshold:
+            if abs(P.last_co2_zone_open.co2 - max_co2_sensor.co2) > P.co2_vent_threshold:
                 # change open zone
                 zone_id_open = max_co2_sensor.zone_id
                 P.last_co2_zone_open = max_co2_sensor
