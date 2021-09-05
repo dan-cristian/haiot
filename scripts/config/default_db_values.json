@@ -169,7 +169,7 @@
     {"id":809, "active":true, "start_order":9, "name":"heat", "host_name":"homew"},
     {"id":819, "active":true, "start_order":19, "name":"cloud.ddns", "host_name":"homew"},
     {"id":825, "active":true, "start_order":25, "name":"rule", "host_name":"homew"},
-    {"id":826, "active":false, "start_order":26, "name":"rule.electricity", "host_name":"homew"},
+    {"id":826, "active":true, "start_order":26, "name":"rule.electricity", "host_name":"homew"},
     {"id":833, "active":true, "start_order":33, "name":"utility", "host_name":"homew"},
     {"id":841, "active":true, "start_order":41, "name":"cloud.alexa", "host_name":"homew"},
     {"id":845, "active":true, "start_order":45, "name":"cloud.openhab", "host_name":"homew"},
