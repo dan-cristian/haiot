@@ -285,8 +285,8 @@ class P:
     @staticmethod
     # init in order of priority
     def init_dev():
-        pwm = m.Pwm.find_one({m.Pwm.name: "boiler"})
-        freq = pwm.frequency
+        # pwm = m.Pwm.find_one({m.Pwm.name: "boiler"})
+        # freq = pwm.frequency
         if P.emulate_export:
             if False:
                 relay = 'boiler2'
@@ -367,7 +367,7 @@ def rule_energy_export(obj=m.PowerMonitor(), change=None):
                 P.grid_watts = random.randint(-800, -300)
             else:
                 P.grid_watts = obj.power
-            # L.l.info('Got rule main watts {}'.format(P.grid_watts))
+            L.l.info('Got rule main watts {}'.format(P.grid_watts))
             _update_devices()
 
 
