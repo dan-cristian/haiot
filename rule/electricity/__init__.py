@@ -24,7 +24,7 @@ class Relaydevice:
     RELAY_NAME = None
     STATE_CHANGE_INTERVAL = 1  # how often can change state, in seconds
     MAX_OFF_INTERVAL = 600  # seconds, how long can stay off after job has started, if device supports breaks
-    MIN_ON_INTERVAL = 60  # how long to run before auto stop, in seconds
+    MIN_ON_INTERVAL = 1  # how long to run before auto stop, in seconds
     DEVICE_SUPPORTS_BREAKS = False  # can this device be started/stopped several times during the job
     AVG_CONSUMPTION = 1
     JOB_DURATION = 3600 * 4  # max duration if device does not support breaks
@@ -41,10 +41,11 @@ class Relaydevice:
             L.l.info("Not stopping forced start device {}, power={}".format(self.RELAY_NAME, self.is_power_on()))
             valid_power_status = None
         if not power_is_on and self.is_power_on() and not self.can_state_change():
-            L.l.info("Cannot stop already started device {}".format(self.RELAY_NAME))
+            L.l.info("Cannot stop already started device {}, breaks={}".format(
+                self.RELAY_NAME, self.DEVICE_SUPPORTS_BREAKS))
             valid_power_status = None
         if not power_is_on and not self.can_stop_relay():
-            L.l.info("Cannot stop device {} yet".format(self.RELAY_NAME))
+            L.l.info("Cannot stop device {} yet, breaks={}".format(self.RELAY_NAME, ))
             valid_power_status = None
         if valid_power_status is not None and self.is_power_on() != valid_power_status:
             rule_common.update_custom_relay(relay_pin_name=self.RELAY_NAME, power_is_on=valid_power_status)
