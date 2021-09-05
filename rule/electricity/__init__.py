@@ -111,7 +111,7 @@ class Relaydevice:
                         self.set_power_status(power_is_on=False)
                         changed_relay_status = True
                     else:
-                        # L.l.info("Keep device {} consumption {} import power {} power_on={} thresh {}".format(
+                        #L.l.info("Keep device {} consumption {} import power {} power_on={} thresh {}".format(
                         #    self.RELAY_NAME, current_watts, grid_watts, power_on, P.MIN_WATTS_THRESHOLD))
                         pass
                 else:
