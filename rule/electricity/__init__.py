@@ -91,8 +91,8 @@ class Relaydevice:
                     self.RELAY_NAME, self.state, self.watts, export_watts))
                 changed_relay_status = True
             else:
-                # L.l.info('No action {} on export watts {} thresh {} avg_cons {} power_on {}'.format(
-                #    self.RELAY_NAME, export_watts, P.MIN_WATTS_THRESHOLD, self.AVG_CONSUMPTION, power_on))
+                L.l.info('No action {} on export watts {} thresh {} avg_cons {} power_on {}'.format(
+                    self.RELAY_NAME, export_watts, P.MIN_WATTS_THRESHOLD, self.AVG_CONSUMPTION, power_on))
                 pass
         else:
             # L.l.info("Not exporting, import={}".format(grid_watts))
@@ -111,8 +111,8 @@ class Relaydevice:
                         self.set_power_status(power_is_on=False)
                         changed_relay_status = True
                     else:
-                        #L.l.info("Keep device {} consumption {} import power {} power_on={} thresh {}".format(
-                        #    self.RELAY_NAME, current_watts, grid_watts, power_on, P.MIN_WATTS_THRESHOLD))
+                        L.l.info("Keep device {} consumption {} import power {} power_on={} thresh {}".format(
+                            self.RELAY_NAME, current_watts, grid_watts, power_on, P.MIN_WATTS_THRESHOLD))
                         pass
                 else:
                     L.l.info('No change as watts {} are in idle zone {}'.format(current_watts, P.IDLE_WATTS))
