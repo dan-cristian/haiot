@@ -30,6 +30,8 @@ class P:
     thread_local = None
     heat_status = ''
 
+    verbose = False
+
     def __init__(self):
         pass
 
@@ -167,10 +169,13 @@ def _get_heat_on_keep_warm(schedule_pattern, temp_code, temp_target, temp_actual
                 force_on = ((schedule_pattern.keep_warm_pattern[interval] == "1") and
                             temp_code is not P.TEMP_NO_HEAT)
                 # if force_on:
-                L.l.info("Forcing heat {} keep warm, zone {} interval {} pattern {}".format(
-                    force_on, schedule_pattern.name, interval, schedule_pattern.keep_warm_pattern[interval]))
+                if P.verbose:
+                    L.l.info("Forcing heat {} keep warm, zone {} interval {} pattern {}".format(
+                        force_on, schedule_pattern.name, interval, schedule_pattern.keep_warm_pattern[interval]))
             else:
-                L.l.info("Temp too high in {} with {}, ignoring keep warm".format(schedule_pattern.name, delta_warm))
+                if P.verbose:
+                    L.l.info("Temp too high in {} with {}, ignoring keep warm".format(
+                        schedule_pattern.name, delta_warm))
         else:
             L.l.critical("Missing or incorrect keep warm pattern for zone {}={}".format(
                 schedule_pattern.name, schedule_pattern.keep_warm_pattern))
@@ -403,8 +408,9 @@ def _zoneheatrelay_upsert_listener(record, changed_fields):
         #    L.l.info('Debug 2 {} ---- {}'.format(record, changed_fields))
         pin_state = gpio.set_relay_state(
             pin_code=record.gpio_pin_code, relay_is_on=record.heat_is_on, relay_type=record.relay_type)
-        L.l.info("Setting heat pin {}:{}:{} to {} returned {}".format(
-            record.heat_pin_name, record.gpio_pin_code, record.relay_type, record.heat_is_on, pin_state))
+        if P.verbose:
+            L.l.info("Setting heat pin {}:{}:{} to {} returned {}".format(
+                record.heat_pin_name, record.gpio_pin_code, record.relay_type, record.heat_is_on, pin_state))
 
 
 def _zonethermostat_upsert_listener(record, changed_fields):
