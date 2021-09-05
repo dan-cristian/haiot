@@ -23,7 +23,7 @@ Frame {
 	Default item=electricity_power_floor_bath1
 	Default item=electricity_power_boiler
 	Default item=electricity_power_ups
-	Default item=relay_batterycharger_relay
+	Default item=battery_charger
 }
 
 Frame label="Charts" {
