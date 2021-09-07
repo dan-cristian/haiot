@@ -305,7 +305,7 @@ class P:
                 P.utility_list[utility] = obj
 
         relay = 'batterycharger_relay'
-        P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=400, supports_breaks=True)
+        P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=600, supports_breaks=True)
         # P.device_list[relay] = obj
         # P.utility_list[utility] = obj
         #relay = 'plug_1'
