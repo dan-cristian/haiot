@@ -86,7 +86,8 @@ class Relaydevice:
             # start device if exporting and there is enough surplus
             export_watts = -grid_watts
             # only trigger power on if over treshold
-            if export_watts > P.MIN_WATTS_THRESHOLD and self.AVG_CONSUMPTION <= export_watts and not power_on:
+            if export_watts > P.MIN_WATTS_THRESHOLD \
+                    and self.AVG_CONSUMPTION <= (export_watts + P.MIN_WATTS_THRESHOLD) and not power_on:
                 self.set_power_status(power_is_on=True, exported_watts=export_watts)
                 L.l.info("Starting relay {} state={} consuming={} surplus={}".format(
                     self.RELAY_NAME, self.state, self.watts, export_watts))
@@ -279,7 +280,7 @@ class P:
     grid_exporting = None
     device_list = collections.OrderedDict()  # key is utility name
     utility_list = {}
-    MIN_WATTS_THRESHOLD = 100
+    MIN_WATTS_THRESHOLD = 100  # variation allowed for import/export
     IDLE_WATTS = 70
     emulate_export = False # used to test export energy scenarios
 
@@ -305,7 +306,7 @@ class P:
                 P.utility_list[utility] = obj
 
         relay = 'batterycharger_relay'
-        P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=600, supports_breaks=True)
+        P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=580, supports_breaks=True)
         # P.device_list[relay] = obj
         # P.utility_list[utility] = obj
         #relay = 'plug_1'
