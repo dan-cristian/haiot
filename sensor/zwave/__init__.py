@@ -27,6 +27,8 @@ class P:
     init_done = False
     DELTA_SAVE_SECONDS = 30
     MAX_SENSOR_POWER_WATTS = 30000  # cap faulty readings
+    MAX_SENSOR_VOLTAGE = 1000 # cap faulty readings
+    MAX_POWER_FACTOR = 1 # cap faulty readings
 
     def __init__(self):
         pass
@@ -136,7 +138,7 @@ def set_value(network, node, value):
                 if value.units == "W":
                     units_adjusted = "watt"  # this should match Utility unit name in models definition
                     value_adjusted = round(value.data, 0)
-                    if abs(value_adjusted) > P.MAX_SENSOR_POWER_WATTS:
+                    if abs(value_adjusted) < P.MAX_SENSOR_POWER_WATTS:
                         haiot_dispatch.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=value_adjusted,
                                             unit=units_adjusted)
                     else:
@@ -165,16 +167,24 @@ def set_value(network, node, value):
                             delta_last_save = (datetime.now() - record.updated_on).total_seconds()
                     record.is_event_external = True
                     if value.label == "Voltage":
-                        record.vad = round(value.data, 0)
-                        record.save_changed_fields(broadcast=False, persist=True)
+                        if abs(value.data) < P.MAX_SENSOR_VOLTAGE:
+                            record.vad = round(value.data, 0)
+                            record.save_changed_fields(broadcast=False, persist=True)
+                        else:
+                            L.l.warning("Faulty voltage reading, value={}, cap={}".format(
+                                value.data, P.MAX_SENSOR_VOLTAGE))
                         # L.l.info("Saving voltage {} {}".format(sensor_name, value.data))
                     elif value.label == "Current":
                         record.iad = round(value.data, 1)
                         record.save_changed_fields(broadcast=False, persist=True)
                         # L.l.info("Saving current {} {}".format(sensor_name, value.data))
                     elif value.label == "Power Factor":
-                        record.vdd = round(value.data, 1)
-                        record.save_changed_fields(broadcast=False, persist=True)
+                        if abs(value.data) < P.MAX_POWER_FACTOR:
+                            record.vdd = round(value.data, 1)
+                            record.save_changed_fields(broadcast=False, persist=True)
+                        else:
+                            L.l.warning("Faulty pf reading, value={}, cap={}".format(
+                                value.data, P.MAX_POWER_FACTOR))
                         # L.l.info("Saving power factor {} {}".format(sensor_name, value.data))
                     else:
                         # L.l.warning("Doing nothing on zwave set value {}".format(value))
