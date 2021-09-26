@@ -26,6 +26,7 @@ class P:
     MAX_SILENCE_SEC = 120
     init_done = False
     DELTA_SAVE_SECONDS = 30
+    MAX_SENSOR_POWER_WATTS = 30000  # cap faulty readings
 
     def __init__(self):
         pass
@@ -135,8 +136,12 @@ def set_value(network, node, value):
                 if value.units == "W":
                     units_adjusted = "watt"  # this should match Utility unit name in models definition
                     value_adjusted = round(value.data, 0)
-                    haiot_dispatch.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=value_adjusted,
-                                        unit=units_adjusted)
+                    if abs(value_adjusted) > P.MAX_SENSOR_POWER_WATTS:
+                        haiot_dispatch.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=value_adjusted,
+                                            unit=units_adjusted)
+                    else:
+                        L.l.warning("Faulty power reading, value={}, cap={}".format(value_adjusted,
+                                                                                    P.MAX_SENSOR_POWER_WATTS))
                 else:
                     L.l.warning("Unknown power units {} for sensor {}".format(value.units, sensor_name))
                 # L.l.info("Saving power utility {} {} {}".format(sensor_name, value.units, value.data))
