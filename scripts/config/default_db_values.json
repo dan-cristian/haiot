@@ -463,7 +463,7 @@
 
 
   "ZoneHeatRelay":[
-    {"zone_id":1, "heat_pin_name":"bucatarie",  "gpio_pin_code":"bucatarie-heat-relay-s", "relay_type": "sonoff"},
+    {"zone_id":1, "heat_pin_name":"bucatarie",  "gpio_pin_code":"bucatarieheatrelay", "relay_type": "sonoff"},
     {"zone_id":2, "heat_pin_name":"living",     "gpio_pin_code":"livingheatrelay", "relay_type": "sonoff"},
     {"zone_id":47,"heat_pin_name":"birou",      "gpio_pin_code":"birouheatrelay", "relay_type": "sonoff"},
     {"zone_id":4, "heat_pin_name":"dormitor",   "gpio_pin_code":"etajheatrelay", "relay_type": "sonoff"},
