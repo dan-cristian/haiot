@@ -1,0 +1,9 @@
+#haiot
+@daily /home/scripts/camera/managestorage.sh
+@daily /home/scripts/cloud/backup-private-cloud.sh
+
+#root
+@reboot /home/scripts/audio/mpd-init.sh
+@reboot /home/scripts/audio/get-set-card-hw.sh init
+@weekly certbot renew --pre-hook "service nginx stop" --post-hook "service nginx start"
+@daily /home/scripts/cloud/backup.sh

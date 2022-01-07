@@ -78,16 +78,22 @@ else
 fi
 }
 
+if [ "$1" == "init" ]; then
+    echo Initialising audio card defaults
+    # set loopback linked card input as optical
+    get_hw $loop_input_device
+    loop_device_hw=$?
+    amixer -c$loop_device_hw sset 'PCM Capture Source' 'IEC958 In'
 
-if [ "$1" == "shairport" ]; then
-	for i in ${!CARD_NAME[*]}; do
-		echo2 "Updating zone ${NAME[$i]}"
-		do_shairport ${CARD_NAME[$i]}
-	done
-else
-	get_card_name $1
-	get_hw $CARD_NAME
-	hw=$?
-	echo $hw
-	exit $hw
+    echo Initialising shairport
+    for i in ${!CARD_NAME[*]}; do
+		  echo2 "Updating zone ${NAME[$i]}"
+		  do_shairport ${CARD_NAME[$i]}
+	  done
+  else
+    get_card_name $1
+    get_hw $CARD_NAME
+    hw=$?
+    echo $hw
+    exit $hw
 fi

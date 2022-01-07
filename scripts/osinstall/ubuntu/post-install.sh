@@ -624,10 +624,14 @@ if [ "$ENABLE_MEDIA" == "1" ]; then
     echo "snd_aloop" >> /etc/modules
     # this is loaded with index 0
     echo "options snd_aloop pcm_substreams=1" >> /etc/modprobe.d/alsa-base.conf
+    # set input source for loopback as optical
+
+
     echo "TODO: Setting sound card order - useful for kodi if default is busy with audio chose the next one. Find correct index!"
     # set here the next one (in a safe zone, kodi picks this one if others are busy)
     # http://superuser.com/questions/626606/how-to-make-alsa-pick-a-preferred-sound-device-automatically
     #echo "options snd_oxygen index=1" >> /etc/modprobe.d/alsa-base.conf
+
 
     # https://github.com/mikebrady/shairport-sync
     echo "Configure AirPlay default sound card"
