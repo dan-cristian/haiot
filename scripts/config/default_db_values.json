@@ -316,7 +316,7 @@
 
     {"relay_pin_name": "puffer_pump_heat_relay", "zone_id": "38", "gpio_pin_code": "0:out:7", "gpio_host_name": "homew", "relay_type": "piface"},
     {"relay_pin_name": "puffer_pump_water_relay", "zone_id": "38", "gpio_pin_code": "5", "gpio_host_name": "pi-face", "relay_type": "gpio"},
-    {"relay_pin_name": "pump_recirculation_relay", "zone_id": "29", "gpio_pin_code": "sonoff-recirculation-pump", "relay_type": "sonoff", "expire": 120},
+    {"relay_pin_name": "pump_recirculation_relay", "zone_id": "29", "gpio_pin_code": "recirculationpump", "relay_type": "sonoff", "expire": 120},
     {"relay_pin_name": "pump_heat_relay", "zone_id": "8", "gpio_pin_code": "pumpheatrelay", "relay_type": "sonoff"},
     {"relay_pin_name": "other_heat_relay", "zone_id": "29", "gpio_pin_code": "26", "gpio_host_name": "pi-face", "relay_type": "gpio"},
     {"relay_pin_name": "front_garden_lights_relay", "zone_id": "14", "gpio_pin_code": "frontgardenlights", "relay_type": "sonoff"},

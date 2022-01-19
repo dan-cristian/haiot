@@ -281,7 +281,7 @@ class P:
     device_list = collections.OrderedDict()  # key is utility name
     utility_list = {}
     MIN_WATTS_THRESHOLD = 100  # variation allowed for import/export
-    IDLE_WATTS = 70
+    IDLE_WATTS = 300  # use high value, as the inverter compensates from batteries. without inverter keep low, at 70.
     emulate_export = False # used to test export energy scenarios
 
     @staticmethod
@@ -306,7 +306,7 @@ class P:
                 P.utility_list[utility] = obj
 
         relay = 'batterychargermain_relay'
-        P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=580, supports_breaks=True)
+        P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=500, supports_breaks=True)
         # P.device_list[relay] = obj
         # P.utility_list[utility] = obj
         #relay = 'plug_1'
