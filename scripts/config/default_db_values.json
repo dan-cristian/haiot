@@ -538,8 +538,8 @@
     {"utility_name":"power washing", "sensor_name":"washing-pw", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
     {"utility_name":"power boiler", "sensor_name":"boiler-pw", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
     {"utility_name":"power ups", "sensor_name":"ups-pw", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
-    {"utility_name":"power solar rulota", "sensor_name":"rulota-solarpw", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
-    {"utility_name":"power grid rulota", "sensor_name":"rulota-grid-pw", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
+    {"utility_name":"power solar rulota", "sensor_name":"rulotasolarpw", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
+    {"utility_name":"power grid rulota", "sensor_name":"rulotagridpw", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
 
     {"utility_name":"water house", "sensor_name":"meterhouse", "sensor_index":1, "ticks_per_unit":1, "unit_name":"l", "utility_type":"water", "unit_cost":2.9388},
     {"utility_name":"water hot", "sensor_name":"meterhouse", "sensor_index":2, "ticks_per_unit":1, "unit_name":"l", "utility_type":"water", "unit_cost":2.9388},
