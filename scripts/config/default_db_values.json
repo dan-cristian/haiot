@@ -429,7 +429,7 @@
     {"id":11, "name":"week-birou-summer",        "pattern":".... .... .... .... ..bb bbbb", "main_source_needed":true},
     {"id":12, "name":"weekend-birou-summer",     "pattern":".... .... .bbb bbbb bbbb bbbb", "main_source_needed":true},
     {"id":13, "name":"week-dormitor-winter",     "pattern":"2222 2222 .... .... .222 2222", "main_source_needed":true},
-    {"id":14, "name":"weekend-dormitor-winter",  "pattern":"2222 2222 .... .222 .222 2222", "main_source_needed":true},
+    {"id":14, "name":"weekend-dormitor-winter",  "pattern":"2222 2222 2222 2222 2222 2222", "main_source_needed":true},
     {"id":15, "name":"week-dormitor-summer",     "pattern":"bbbb bbbb .... .... ...b bbbb", "main_source_needed":true},
     {"id":16, "name":"weekend-dormitor-summer",  "pattern":"bbbb bbbb .... .bbb ...b bbbb", "main_source_needed":true},
     {"id":17, "name":"week-boiler-winter",       "pattern":"hhhh hhhh hhhh hhhh hhhh hhhh", "activate_on_condition":true, "activate_condition_relay":"puffer gas valve", "activate_condition_temp_sensor":"puffer sus", "main_source_needed":false},
