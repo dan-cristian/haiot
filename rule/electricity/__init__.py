@@ -123,11 +123,12 @@ class Relaydevice:
         self.update_job_finished()
         return changed_relay_status
 
-    def __init__(self, relay_name, relay_id, avg_consumption, supports_breaks=False):
+    def __init__(self, relay_name, relay_id, avg_consumption, supports_breaks=False, min_on_interval=1):
         self.AVG_CONSUMPTION = avg_consumption
         self.RELAY_NAME = relay_name
         self.RELAY_ID = relay_id
         self.DEVICE_SUPPORTS_BREAKS = supports_breaks
+        self.MIN_ON_INTERVAL = min_on_interval
 
 
 class Powerdevice(Relaydevice):
@@ -306,7 +307,8 @@ class P:
                 P.utility_list[utility] = obj
 
         relay = 'batterychargermain_relay'
-        P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=600, supports_breaks=True)
+        P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=600,
+                                           supports_breaks=True, min_on_interval=10)
         # P.device_list[relay] = obj
         # P.utility_list[utility] = obj
         #relay = 'plug_1'
