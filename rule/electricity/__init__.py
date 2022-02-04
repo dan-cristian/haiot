@@ -45,7 +45,7 @@ class Relaydevice:
                 self.RELAY_NAME, self.DEVICE_SUPPORTS_BREAKS))
             valid_power_status = None
         if not power_is_on and not self.can_stop_relay():
-            L.l.info("Cannot stop device {} yet, breaks={}".format(self.RELAY_NAME, ))
+            L.l.info("Cannot stop device {} yet, breaks={}".format(self.RELAY_NAME, self.DEVICE_SUPPORTS_BREAKS))
             valid_power_status = None
         if valid_power_status is not None and self.is_power_on() != valid_power_status:
             rule_common.update_custom_relay(relay_pin_name=self.RELAY_NAME, power_is_on=valid_power_status)
