@@ -108,8 +108,9 @@ class Relaydevice:
             if current_watts is not None:
                 if current_watts > P.IDLE_WATTS:
                     if import_watts > P.MIN_WATTS_THRESHOLD and power_on:
-                        L.l.info("Stopping relay {} state={} consuming={} surplus={}".format(
-                            self.RELAY_NAME, self.state, current_watts, grid_watts))
+                        L.l.info("Stopping relay {} state={} consuming={} surplus={} import={} min_w={}".format(
+                            self.RELAY_NAME, self.state, current_watts, grid_watts, import_watts,
+                            P.MIN_WATTS_THRESHOLD))
                         self.set_power_status(power_is_on=False)
                         changed_relay_status = True
                     else:
