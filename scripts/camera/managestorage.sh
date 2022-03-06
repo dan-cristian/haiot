@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DIRSRV=/mnt/motion/
-MAX_REPO_SIZE="1100100100" # in bytes
+MAX_REPO_SIZE="5100100100" # in bytes
 FILE_AGE=30
 
 function clean() {
