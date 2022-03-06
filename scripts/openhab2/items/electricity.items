@@ -66,4 +66,7 @@ Number powermonitor_power_factor_main_l1 "Power factor L1 [%.1f %]" <energy> {mq
 Number powermonitor_power_factor_main_l2 "Power factor L2 [%.1f %]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_power_factor_main l2:state:default]"}
 Number powermonitor_power_factor_main_l3 "Power factor L3 [%.1f %]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_power_factor_main l3:state:default]"}
 
+Number house_battery "House battery [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_voltage_house battery:state:default]"}
+
+
 Switch battery_charger_main "Battery charger" <switch>                     {mqtt="<[mosquitto:iot/openhab/relay_batterychargermain_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_batterychargermain_relay:command:*:default]", autoupdate="false"}

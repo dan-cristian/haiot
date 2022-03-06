@@ -372,20 +372,15 @@
     {"relay_pin_name": "front_gate_relay_test", "zone_id": "7", "gpio_pin_code": "0:out:1", "gpio_host_name": "pi-power", "relay_type": "piface", "expire":  2},
 
     {"relay_pin_name": "front_gate_relay_test_2", "zone_id": "7", "gpio_pin_code": "0:out:1", "gpio_host_name": "netbook", "relay_type": "piface", "expire":  2},
-    {"relay_pin_name": "blackwater_pump_relay_test", "zone_id": "9", "gpio_pin_code": "sonoff-basic-3", "relay_type": "sonoff"}
+    {"relay_pin_name": "blackwater_pump_relay_test", "zone_id": "9", "gpio_pin_code": "sonoff-basic-3", "relay_type": "sonoff"},
+
+    {"relay_pin_name": "batterychargectrl_high", "zone_id": "8", "gpio_pin_code": "batterychargectrl", "relay_type": "sonoff", "relay_index": 1},
+    {"relay_pin_name": "batterychargectrl_low", "zone_id": "8", "gpio_pin_code": "batterychargectrl", "relay_type": "sonoff", "relay_index": 2}
   ],
 
   "PowerMonitor": [
-    {"id":1, "name":"dashcam lipo", "type":"ina", "i2c_addr":"0x41", "host_name":"pidash", "max_voltage":4.2, "warn_voltage":3.2, "critical_voltage":3.1, "min_voltage":3, "warn_current":900, "critical_current":1000},
-    {"id":2, "name":"dashcam car", "type":"ina", "i2c_addr":"0x40", "host_name":"pidash", "max_voltage":14.7, "warn_voltage":12.5, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
-    {"id":3, "name":"big battery 1", "type":"ina", "host_name":"sonoff-basic-9",  "max_voltage":14.7, "warn_voltage":12.5, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
-    {"id":4, "name":"big battery 2", "type":"ina", "host_name":"sonoff-basic-8",  "max_voltage":14.7, "warn_voltage":12.5, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
-    {"id":5, "name":"big battery 3", "type":"ina", "host_name":"sonoff-basic-11", "max_voltage":14.7, "warn_voltage":12.5, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
-    {"id":6, "name":"big battery 4", "type":"ina", "host_name":"sonoff-basic-12", "max_voltage":14.7, "warn_voltage":12.5, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
-    {"id":11, "name":"rulota battery 1", "type":"ina", "host_name":"bat1-rulota-w",  "max_voltage":14.7, "warn_voltage":12.4, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
-    {"id":12, "name":"rulota battery 2", "type":"ina", "host_name":"bat2-rulota-w",  "max_voltage":14.7, "warn_voltage":12.4, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
-    {"id":13, "name":"rulota battery main", "type":"ina1", "host_name":"bat0-rulota-w",  "max_voltage":14.7, "warn_voltage":12.4, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
-    {"id":14, "name":"rulota battery main ref", "type":"ina2", "host_name":"bat0-rulota-w",  "max_voltage":14.7, "warn_voltage":12.4, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
+
+    {"id":15, "name":"house battery", "type":"ina", "host_name":"batterychargectrl"},
 
     {"id":20, "name":"living ozone", "type":"ina", "host_name":"wemoslivingair"},
     {"id":21, "name":"airfiltered nox", "type":"ina", "host_name":"airfiltered"},
@@ -620,6 +615,17 @@
   ],
 
   "_disabled": [
+    {"id":1, "name":"dashcam lipo", "type":"ina", "i2c_addr":"0x41", "host_name":"pidash", "max_voltage":4.2, "warn_voltage":3.2, "critical_voltage":3.1, "min_voltage":3, "warn_current":900, "critical_current":1000},
+    {"id":2, "name":"dashcam car", "type":"ina", "i2c_addr":"0x40", "host_name":"pidash", "max_voltage":14.7, "warn_voltage":12.5, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
+    {"id":3, "name":"big battery 1", "type":"ina", "host_name":"sonoff-basic-9",  "max_voltage":14.7, "warn_voltage":12.5, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
+    {"id":4, "name":"big battery 2", "type":"ina", "host_name":"sonoff-basic-8",  "max_voltage":14.7, "warn_voltage":12.5, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
+    {"id":5, "name":"big battery 3", "type":"ina", "host_name":"sonoff-basic-11", "max_voltage":14.7, "warn_voltage":12.5, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
+    {"id":6, "name":"big battery 4", "type":"ina", "host_name":"sonoff-basic-12", "max_voltage":14.7, "warn_voltage":12.5, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
+    {"id":11, "name":"rulota battery 1", "type":"ina", "host_name":"bat1-rulota-w",  "max_voltage":14.7, "warn_voltage":12.4, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
+    {"id":12, "name":"rulota battery 2", "type":"ina", "host_name":"bat2-rulota-w",  "max_voltage":14.7, "warn_voltage":12.4, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
+    {"id":13, "name":"rulota battery main", "type":"ina1", "host_name":"bat0-rulota-w",  "max_voltage":14.7, "warn_voltage":12.4, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
+    {"id":14, "name":"rulota battery main ref", "type":"ina2", "host_name":"bat0-rulota-w",  "max_voltage":14.7, "warn_voltage":12.4, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
+
     {"zone_id":29 , "sensor_address": "TZ69 Smart energy plug in switch_5",         "sensor_name": "zwave fridge"},
     {"zone_id":29 , "sensor_address": "TZ69 Smart energy plug in switch_4",         "sensor_name": "zwave dishwasher"},
     {"zone_id":8 ,  "sensor_address": "ZMNHTDx Smart meter S4 S5 S6_2",             "sensor_name": "zwave main power meter"},

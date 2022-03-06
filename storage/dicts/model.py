@@ -85,6 +85,7 @@ class ZoneCustomRelay(ModelBase):
     gpio_host_name = ''
     relay_is_on = False
     relay_type = ''
+    relay_index = 0
     expire = 0  # after how many seconds state goes back to original state
     updated_on = datetime.now()
 

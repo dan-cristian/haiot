@@ -98,6 +98,13 @@ Frame label="Charts" {
         Chart item=electricity_solar_aps period=W refresh=10000 visibility=[p_switch==2]
         Chart item=electricity_solar_aps period=M refresh=10000 visibility=[p_switch==3]
     }
+    Text item=house_battery {
+        Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M"]
+        Chart item=house_battery period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
+        Chart item=house_battery period=D refresh=10000 visibility=[p_switch==1]
+        Chart item=house_battery period=W refresh=10000 visibility=[p_switch==2]
+        Chart item=house_battery period=M refresh=10000 visibility=[p_switch==3]
+    }
 
 }
 

@@ -132,18 +132,37 @@ def _process_message(msg):
                         if voltage is not None or current is not None or factor is not None:
                             record.save_changed_fields(broadcast=False, persist=True)
                 # dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=current, unit='kWh')
+            # check for single relay
             if 'POWER' in obj:
                 power_is_on = obj['POWER'] == 'ON'
                 # relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.gpio_pin_code: sensor_name,
                 #                                    m.ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME})
                 relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.gpio_pin_code: sensor_name})
                 if relay is not None:
-                    L.l.info("Got relay {} state={}".format(sensor_name, power_is_on))
+                    L.l.info("Got single relay {} state={}".format(sensor_name, power_is_on))
                     relay.relay_is_on = power_is_on
                     # set listeners to false as otherwise on reboot sonoff relays that were on will power- cycle
                     relay.save_changed_fields(broadcast=False, persist=True, listeners=False)
                 else:
-                    L.l.warning("ZoneCustomRelay {} not defined in db".format(sensor_name))
+                    L.l.warning("ZoneCustomRelay single {} not defined in db".format(sensor_name))
+            # check for multiple relays
+            multiple_relays_list = []
+            if 'POWER1' in obj:
+                multiple_relays_list.append(1)
+            if 'POWER2' in obj:
+                multiple_relays_list.append(2)
+            if len(multiple_relays_list) > 0:
+                for index in multiple_relays_list:
+                    power_is_on = obj['POWER' + str(index)] == 'ON'
+                    relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.gpio_pin_code: sensor_name,
+                                                        m.ZoneCustomRelay.relay_index: index})
+                    if relay is not None:
+                        L.l.info("Got multiple relay {} state={}".format(sensor_name, power_is_on))
+                        relay.relay_is_on = power_is_on
+                        # set listeners to false as otherwise on reboot sonoff relays that were on will power- cycle
+                        relay.save_changed_fields(broadcast=False, persist=True, listeners=False)
+                    else:
+                        L.l.warning("ZoneCustomRelay multiple {} not defined in db".format(sensor_name))
             if 'COUNTER' in obj:
                 # TelePeriod 60
                 counter = obj['COUNTER']
