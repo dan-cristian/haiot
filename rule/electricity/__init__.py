@@ -307,8 +307,11 @@ class P:
                 P.device_list[relay] = obj
                 P.utility_list[utility] = obj
 
-        relay = 'batterychargermain_relay'
-        P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=600,
+        relay = 'batterychargectrl_low'
+        P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=300,
+                                           supports_breaks=True, min_on_interval=10)
+        relay = 'batterychargectrl_high'
+        P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=700,
                                            supports_breaks=True, min_on_interval=10)
         # P.device_list[relay] = obj
         # P.utility_list[utility] = obj
