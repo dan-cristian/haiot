@@ -2,7 +2,7 @@
 
 DIRSRV=/mnt/motion/
 MAX_REPO_SIZE="5100100100" # in bytes
-FILE_AGE=30
+FILE_AGE=60
 
 function clean() {
 echo "Cleaning oldest files"
