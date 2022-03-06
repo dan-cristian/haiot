@@ -23,7 +23,8 @@ def start_custom_relay(relay_pin_name, power_is_on):
         L.l.info("Start relay {} on rule common to {}, current state={}".format(
             relay_pin_name, power_is_on, current_relay.relay_is_on))
         gpio.set_relay_state(
-            pin_code=current_relay.gpio_pin_code, relay_is_on=True, relay_type=current_relay.relay_type)
+            pin_code=current_relay.gpio_pin_code, relay_is_on=True, relay_type=current_relay.relay_type,
+            relay_index=current_relay.relay_index)
     else:
         L.l.info("Unable to find relay {} to start".format(relay_pin_name))
 

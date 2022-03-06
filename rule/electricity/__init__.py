@@ -118,7 +118,8 @@ class Relaydevice:
                         #    self.RELAY_NAME, current_watts, grid_watts, power_on, P.MIN_WATTS_THRESHOLD))
                         pass
                 else:
-                    L.l.info('No change as watts {} are in idle zone {}'.format(current_watts, P.IDLE_WATTS))
+                    # L.l.info('No change as watts {} are in idle zone {}'.format(current_watts, P.IDLE_WATTS))
+                    pass
             else:
                 L.l.info('Current watts on import is None for device {}'.format(self))
         self.update_job_finished()
@@ -308,10 +309,10 @@ class P:
                 P.utility_list[utility] = obj
 
         relay = 'batterychargectrl_low'
-        P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=300,
+        P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=200,
                                            supports_breaks=True, min_on_interval=10)
         relay = 'batterychargectrl_high'
-        P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=700,
+        P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=500,
                                            supports_breaks=True, min_on_interval=10)
         # P.device_list[relay] = obj
         # P.utility_list[utility] = obj

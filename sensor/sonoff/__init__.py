@@ -275,7 +275,7 @@ def mqtt_on_message(client, userdata, msg):
 
 
 # iot/sonoff/stat/sonoff-basic-5/POWER = ON/OFF
-def set_relay_state(relay_name, relay_is_on):
+def set_relay_state(relay_name, relay_is_on, relay_index=None):
     if not P.initialised:
         return None
     if relay_is_on:
@@ -283,8 +283,12 @@ def set_relay_state(relay_name, relay_is_on):
     else:
         payload = 'OFF'
     topic = P.sonoff_topic.replace('#', '')
+    if relay_index is None or relay_index == 0:
+        relay_suffix = ''
+    else:
+        relay_suffix = str(relay_index)
     L.l.info('Set sonoff relay {} to {}'.format(relay_name, relay_is_on))
-    transport.send_message_topic(payload, topic + 'cmnd/' + relay_name + '/POWER')
+    transport.send_message_topic(payload, topic + 'cmnd/' + relay_name + '/POWER' + relay_suffix)
     return relay_is_on
 
 

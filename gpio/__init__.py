@@ -110,9 +110,9 @@ def relay_set(gpio_pin_index_bcm=None, gpio_pin_type=None, gpio_board_index=None
     return pin_value
 
 
-def set_relay_state(pin_code, relay_is_on, relay_type):
+def set_relay_state(pin_code, relay_is_on, relay_type, relay_index):
     if relay_type == Constant.GPIO_PIN_TYPE_SONOFF and sonoff.P.initialised:
-        res = sonoff.set_relay_state(relay_name=pin_code, relay_is_on=relay_is_on)
+        res = sonoff.set_relay_state(relay_name=pin_code, relay_is_on=relay_is_on, relay_index=relay_index)
     elif relay_type == Constant.GPIO_PIN_TYPE_PI_PCF8574 and pcf8574_gpio.P.initialised:
         res = pcf8574_gpio.set_pin_value(pin_index=int(pin_code), pin_value=not relay_is_on)
     elif P.has_zwave and relay_type == Constant.GPIO_PIN_TYPE_ZWAVE and zwave.P.initialised:
@@ -133,10 +133,11 @@ def set_relay_state(pin_code, relay_is_on, relay_type):
 
 def zone_custom_relay_upsert_listener(record, changed_fields):
     assert isinstance(record, m.ZoneCustomRelay)
-    if record.gpio_host_name not in [Constant.HOST_NAME, '', None] or m.ZoneCustomRelay.relay_is_on not in changed_fields:
+    if record.gpio_host_name not in [Constant.HOST_NAME, '', None] \
+            or m.ZoneCustomRelay.relay_is_on not in changed_fields:
         return
     L.l.info('Upsert listener {} pin {} value {}'.format(record.relay_type, record.gpio_pin_code, record.relay_is_on))
-    set_relay_state(record.gpio_pin_code, record.relay_is_on, record.relay_type)
+    set_relay_state(record.gpio_pin_code, record.relay_is_on, record.relay_type, record.relay_index)
     # L.l.info('Upsert after pin {} value {}'.format(record.gpio_pin_code, record.relay_is_on))
     expire_func = None
     # apply expire action only for relay ON events
