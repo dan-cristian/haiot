@@ -88,9 +88,9 @@ class Relaydevice:
             # only trigger power on if over treshold
             if export_watts > P.MIN_WATTS_THRESHOLD \
                     and self.AVG_CONSUMPTION <= (export_watts + P.MIN_WATTS_THRESHOLD) and not power_on:
-                self.set_power_status(power_is_on=True, exported_watts=export_watts)
                 L.l.info("Starting relay {} state={} consuming={} surplus={}".format(
                     self.RELAY_NAME, self.state, self.watts, export_watts))
+                self.set_power_status(power_is_on=True, exported_watts=export_watts)
                 changed_relay_status = True
             else:
                 # L.l.info('No action {} on export watts {} thresh {} avg_cons {} power_on {}'.format(
@@ -309,7 +309,7 @@ class P:
                 P.utility_list[utility] = obj
 
         relay = 'batterychargectrl_low'
-        P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=200,
+        P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=400,
                                            supports_breaks=True, min_on_interval=10)
         relay = 'batterychargectrl_high'
         P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=500,
