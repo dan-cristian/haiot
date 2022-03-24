@@ -50,6 +50,8 @@ class Relaydevice:
         if valid_power_status is not None and self.is_power_on() != valid_power_status:
             rule_common.update_custom_relay(relay_pin_name=self.RELAY_NAME, power_is_on=valid_power_status)
             self.last_state_change = datetime.now()
+            P.system_wait_time = self.STATE_CHANGE_INTERVAL  # signal to wider system that it needs to wait
+            P.last_state_change = datetime.now()
             if valid_power_status:
                 self.last_state_on = datetime.now()
 
@@ -71,7 +73,7 @@ class Relaydevice:
         return delta >= self.MIN_ON_INTERVAL and (self.DEVICE_SUPPORTS_BREAKS or delta >= self.JOB_DURATION)
 
     def update_job_finished(self):
-        # job is never finished for devices without power metering
+        # job is never finished for devices without power meteringtrue
         pass
 
     def set_watts(self, watts):
@@ -288,6 +290,12 @@ class P:
     MIN_WATTS_THRESHOLD = 300  # variation allowed for import/export
     IDLE_WATTS = 300  # use high value, as the inverter compensates from batteries. without inverter keep low, at 70.
     emulate_export = False # used to test export energy scenarios
+    last_state_change = datetime.min
+    system_wait_time = 0  # seconds to wait until any device can change state (some relays have latency)
+
+    @staticmethod
+    def can_state_change():
+        return (datetime.now() - P.last_state_change).total_seconds() >= P.system_wait_time
 
     @staticmethod
     # init in order of priority
@@ -312,7 +320,7 @@ class P:
 
         relay = 'batterychargectrl_low'
         P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=400,
-                                           supports_breaks=True, min_on_interval=10, state_change_interval=9)
+                                           supports_breaks=True, min_on_interval=10, state_change_interval=5)
         relay = 'batterychargectrl_high'
         P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=500,
                                            supports_breaks=True, min_on_interval=10, state_change_interval=5)
