@@ -189,7 +189,7 @@
     {"id":875, "active":true, "start_order":75, "name":"devices.vent_atrea", "host_name":"homew"},
     {"id":877, "active":true, "start_order":77, "name":"sensor.radoneye", "host_name":"homew"},
     {"id":879, "active":true, "start_order":79, "name":"hvac.vent", "host_name":"homew"},
-    {"id":892, "active":true, "start_order":92, "name":"apps.tesla", "host_name":"homew"}
+    {"id":892, "active":false, "start_order":92, "name":"apps.tesla", "host_name":"homew"}
   ],
 
   "People": [
