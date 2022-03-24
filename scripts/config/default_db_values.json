@@ -112,6 +112,7 @@
     {"id":79, "active":false, "start_order":79, "name":"hvac.vent", "host_name":""},
     {"id":81, "active":false, "start_order":81, "name":"devices.smartbms", "host_name":""},
     {"id":90, "active":false, "start_order":90, "name":"apps.dashcam", "host_name":""},
+    {"id":92, "active":false, "start_order":92, "name":"apps.tesla", "host_name":""},
     {"id":99, "active":false, "start_order":99, "name":"main.cron", "host_name":""},
     {"id":101, "active":false, "start_order":101, "name":"webui.chart", "host_name":""},
     {"id":102, "active":true, "start_order":102, "name":"webui.api", "host_name":""},
@@ -165,6 +166,7 @@
     {"id":577, "active":true, "start_order":77, "name":"sensor.radoneye", "host_name":"netbook"},
     {"id":579, "active":true, "start_order":79, "name":"hvac.vent", "host_name":"netbook"},
     {"id":581, "active":true, "start_order":81, "name":"devices.smartbms", "host_name":"netbook"},
+    {"id":592, "active":true, "start_order":92, "name":"apps.tesla", "host_name":"netbook"},
 
     {"id":809, "active":true, "start_order":9, "name":"heat", "host_name":"homew"},
     {"id":819, "active":true, "start_order":19, "name":"cloud.ddns", "host_name":"homew"},
@@ -186,7 +188,8 @@
     {"id":873, "active":true, "start_order":73, "name":"apps.air_sensor_upload", "host_name":"homew"},
     {"id":875, "active":true, "start_order":75, "name":"devices.vent_atrea", "host_name":"homew"},
     {"id":877, "active":true, "start_order":77, "name":"sensor.radoneye", "host_name":"homew"},
-    {"id":879, "active":true, "start_order":79, "name":"hvac.vent", "host_name":"homew"}
+    {"id":879, "active":true, "start_order":79, "name":"hvac.vent", "host_name":"homew"},
+    {"id":892, "active":true, "start_order":92, "name":"apps.tesla", "host_name":"homew"}
   ],
 
   "People": [
