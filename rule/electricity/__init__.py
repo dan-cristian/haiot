@@ -287,8 +287,8 @@ class P:
     grid_exporting = None
     device_list = collections.OrderedDict()  # key is utility name
     utility_list = {}
-    MIN_WATTS_THRESHOLD = 300  # variation allowed for import/export
-    IDLE_WATTS = 300  # use high value, as the inverter compensates from batteries. without inverter keep low, at 70.
+    MIN_WATTS_THRESHOLD = 200  # variation allowed for import/export
+    IDLE_WATTS = 200  # use high value, as the inverter compensates from batteries. without inverter keep low, at 70.
     emulate_export = False # used to test export energy scenarios
     last_state_change = datetime.min
     system_wait_time = 0  # seconds to wait until any device can change state (some relays have latency)
