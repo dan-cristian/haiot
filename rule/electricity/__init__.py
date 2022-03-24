@@ -312,10 +312,10 @@ class P:
 
         relay = 'batterychargectrl_low'
         P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=400,
-                                           supports_breaks=True, min_on_interval=10, state_change_interval=5)
+                                           supports_breaks=True, min_on_interval=10, state_change_interval=6)
         relay = 'batterychargectrl_high'
         P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=500,
-                                           supports_breaks=True, min_on_interval=10, state_change_interval=5)
+                                           supports_breaks=True, min_on_interval=10, state_change_interval=4)
         # P.device_list[relay] = obj
         # P.utility_list[utility] = obj
         #relay = 'plug_1'
