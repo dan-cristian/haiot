@@ -359,7 +359,7 @@ class P:
 
 
 def _update_devices():
-    if P.grid_watts is not None:
+    if P.grid_watts is not None and P.can_state_change():
         P.grid_importing = (P.grid_watts > P.MIN_WATTS_THRESHOLD)
         P.grid_exporting = (P.grid_watts < -P.MIN_WATTS_THRESHOLD)
         # let all devices know grid status and make power changes
