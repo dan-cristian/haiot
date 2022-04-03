@@ -3,9 +3,6 @@ from enum import Enum
 import collections
 import random
 import sys
-
-import teslapy
-
 import apps.tesla
 from main.logger_helper import L
 from rule import rule_common
