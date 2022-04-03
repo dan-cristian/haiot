@@ -172,8 +172,6 @@
 
     {"id":809, "active":true, "start_order":9, "name":"heat", "host_name":"homew"},
     {"id":819, "active":true, "start_order":19, "name":"cloud.ddns", "host_name":"homew"},
-    {"id":825, "active":true, "start_order":25, "name":"rule", "host_name":"homew"},
-    {"id":826, "active":true, "start_order":26, "name":"rule.electricity", "host_name":"homew"},
     {"id":833, "active":true, "start_order":33, "name":"utility", "host_name":"homew"},
     {"id":841, "active":true, "start_order":41, "name":"cloud.alexa", "host_name":"homew"},
     {"id":845, "active":true, "start_order":45, "name":"cloud.openhab", "host_name":"homew"},
@@ -191,7 +189,9 @@
     {"id":875, "active":true, "start_order":75, "name":"devices.vent_atrea", "host_name":"homew"},
     {"id":877, "active":true, "start_order":77, "name":"sensor.radoneye", "host_name":"homew"},
     {"id":879, "active":true, "start_order":79, "name":"hvac.vent", "host_name":"homew"},
-    {"id":892, "active":false, "start_order":92, "name":"apps.tesla", "host_name":"homew"}
+    {"id":892, "active":true, "start_order":92, "name":"apps.tesla", "host_name":"homew"},
+    {"id":895, "active":true, "start_order":95, "name":"rule", "host_name":"homew"},
+    {"id":896, "active":true, "start_order":96, "name":"rule.electricity", "host_name":"homew"}
   ],
 
   "People": [

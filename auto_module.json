@@ -12,6 +12,7 @@
   {"module": "openzwave", "package": "python_openzwave"},
   {"module": "gatt", "package": "dbus-python,gatt"},
   {"module": "gi.repository", "package": "pycairo,PyGObject", "apt": "libglib2.0-dev,libgirepository1.0-dev,libcairo2-dev"},
-  {"module": "requests_oauthlib", "package": "requests-oauthlib"}
+  {"module": "requests_oauthlib", "package": "requests-oauthlib"},
+  {"module": "websocket", "package": "websocket_client"}
 ]
 }
