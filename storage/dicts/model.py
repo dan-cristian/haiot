@@ -506,6 +506,7 @@ class ElectricCar(ModelBase):
     id = 0
     name = ''
     vin = ''
+    state = ''
     outside_temperature = 0
     inside_temperature = 0
     is_climate_on = False
@@ -517,6 +518,7 @@ class ElectricCar(ModelBase):
     charger_voltage = 0  # V
     charger_power = 0  # kW
     charger_current = 0  # Amp
+    is_charging = False
     battery_level = 0  # %
     battery_range = 0  # km
     estimated_battery_range = 0  # km

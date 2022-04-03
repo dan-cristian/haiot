@@ -2,8 +2,9 @@ import threading
 import prctl
 from main.logger_helper import L
 from main import thread_pool
-
+from storage.model import m
 from apps.tesla.TeslaPy.teslapy import Tesla
+from common import Constant, get_secure_general
 
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
@@ -44,12 +45,20 @@ def get_actual_charging_amps(idx=0):
                 vehicle_data = vehicle.get_vehicle_data()
                 ch = vehicle_data['charge_state']
                 act_amps = ch['charger_actual_current']
-                if ch['charger_voltage'] is not None:
-                    P.voltage = ch['charger_voltage']
+                act_voltage = ch['charger_voltage']
+                if act_voltage is not None:
+                    P.voltage = act_voltage
                 P.is_charging[idx] = ch['charging_state'] == 'Charging'
                 if act_amps > 0:
                     if not P.is_charging[idx]:
                         L.l.error("I was expecting vehicle to charge")
+                car = m.ElectricCar.find({m.ElectricCar.id: idx})
+                if car is not None:
+                    car.charger_current = act_amps
+                    if act_voltage is not None:
+                        car.actual_voltage = act_voltage
+                    car.is_charging = P.is_charging[idx]
+                    car.save_changed_fields(broadcast=False, persist=True)
                 return act_amps
             else:
                 L.l.error("Vehicle not online, state={}".format(vehicle['state']))
@@ -99,11 +108,20 @@ def unload():
 def init():
     L.l.info('Tesla module initialising')
     thread_pool.add_interval_callable(thread_run, run_interval_second=60)
-
-    email = 'dan.cristian@gmail.com'
+    email = get_secure_general("tesla_account_email")
     P.tesla = Tesla(email=email, cache_file="../private_config/.credentials/tesla_cache.json")
     P.vehicles = P.tesla.vehicle_list()
     for i, vehicle in enumerate(P.vehicles):
-        L.l.info("Tesla {} vin={} state={}".format(vehicle['display_name'], vehicle['vin'], vehicle['state']))
+        name = vehicle['display_name']
+        vin = vehicle['vin']
+        state = vehicle['state']
+        car = m.ElectricCar.find({m.ElectricCar.name: name})
+        if car is not None:
+            car.vin = vin
+            car.state = state
+            car.save_changed_fields(broadcast=False, persist=True)
+        else:
+            L.l.warning("Cannot find electric car = {} in config file".format(name))
+        L.l.info("Electric car {} vin={} state={}".format(name, vin, state))
     if len(P.vehicles) > 0:
         P.initialised = True
