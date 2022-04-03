@@ -67,12 +67,20 @@ def get_actual_charging_amps(idx=0):
             P.api_requests += 1
             P.last_refresh_request = datetime.now()
             ch = vehicle_data['charge_state']
+            charging_mode = ch['scheduled_charging_mode']
+            user_charging_mode = ch['user_charge_enable_request']
+            L.l.info('User charging request={}, mode={}'.format(user_charging_mode, charging_mode))
+            #act_amps = 0
+            #if charging_mode == 'StartAt':
+            #    L.l.info("Manual override detected, car will not stop charging")
+            #else:
             act_amps = ch['charger_actual_current']
             P.charging_amp[idx] = act_amps
             act_voltage = ch['charger_voltage']
             if act_voltage is not None:
                 P.voltage = act_voltage
             P.is_charging[idx] = (ch['charging_state'] == 'Charging')
+
             L.l.info("Car charging status = {}".format(ch['charging_state']))
             L.l.info("Car charging amp = {}".format(act_amps))
             if act_amps > 0:
