@@ -3,7 +3,7 @@ import prctl
 from main.logger_helper import L
 from main import thread_pool
 # force import of modules used in TeslaPy
-# import requests_oauthlib
+import requests_oauthlib
 
 from apps.tesla.TeslaPy.teslapy import Tesla
 
