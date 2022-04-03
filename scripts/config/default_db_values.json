@@ -84,8 +84,6 @@
     {"id":21, "active":false, "start_order":21, "name":"cloud.youtube", "host_name":""},
     {"id":23, "active":false, "start_order":23, "name":"sysutils.filewatch", "host_name":""},
     {"id":24, "active":false, "start_order":24, "name":"sysutils.usb", "host_name":""},
-    {"id":25, "active":false, "start_order":25, "name":"rule", "host_name":""},
-    {"id":26, "active":false, "start_order":26, "name":"rule.electricity", "host_name":""},
     {"id":27, "active":true, "start_order":27, "name":"node", "host_name":""},
     {"id":33, "active":false, "start_order":33, "name":"utility", "host_name":""},
     {"id":35, "active":false, "start_order":35, "name":"cloud.newtifry", "host_name":""},
@@ -118,6 +116,9 @@
     {"id":102, "active":true, "start_order":102, "name":"webui.api", "host_name":""},
     {"id":103, "active":true, "start_order":103, "name":"webui", "host_name":""},
     {"id":120, "active":false, "start_order":120, "name":"test", "host_name":""},
+    {"id":125, "active":false, "start_order":125, "name":"rule", "host_name":""},
+    {"id":126, "active":false, "start_order":126, "name":"rule.electricity", "host_name":""},
+
 
 
     {"id":121, "active":false, "start_order":21, "name":"cloud.youtube", "host_name":"nas"},
@@ -146,8 +147,6 @@
     {"id":503, "active":true, "start_order":3, "name":"health_monitor", "host_name":"netbook"},
     {"id":509, "active":true, "start_order":9, "name":"heat", "host_name":"netbook"},
     {"id":519, "active":true, "start_order":19, "name":"cloud.ddns", "host_name":"netbook"},
-    {"id":525, "active":true, "start_order":25, "name":"rule", "host_name":"netbook"},
-    {"id":526, "active":true, "start_order":26, "name":"rule.electricity", "host_name":"netbook"},
     {"id":527, "active":true, "start_order":27, "name":"node", "host_name":"netbook"},
     {"id":533, "active":true, "start_order":33, "name":"utility", "host_name":"netbook"},
     {"id":541, "active":false, "start_order":41, "name":"cloud.alexa", "host_name":"netbook"},
@@ -167,6 +166,9 @@
     {"id":579, "active":true, "start_order":79, "name":"hvac.vent", "host_name":"netbook"},
     {"id":581, "active":true, "start_order":81, "name":"devices.smartbms", "host_name":"netbook"},
     {"id":592, "active":true, "start_order":92, "name":"apps.tesla", "host_name":"netbook"},
+    {"id":595, "active":true, "start_order":595, "name":"rule", "host_name":"netbook"},
+    {"id":596, "active":true, "start_order":596, "name":"rule.electricity", "host_name":"netbook"},
+
 
     {"id":809, "active":true, "start_order":9, "name":"heat", "host_name":"homew"},
     {"id":819, "active":true, "start_order":19, "name":"cloud.ddns", "host_name":"homew"},

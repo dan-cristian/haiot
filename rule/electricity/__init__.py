@@ -3,6 +3,10 @@ from enum import Enum
 import collections
 import random
 import sys
+
+import teslapy
+
+import apps.tesla
 from main.logger_helper import L
 from rule import rule_common
 import rule
@@ -34,6 +38,10 @@ class Relaydevice:
     state = DeviceState.NO_INIT
     power_is_on = None
 
+    def power_status_changed(self):
+        P.system_wait_time = self.STATE_CHANGE_INTERVAL  # signal to wider system that it needs to wait
+        P.last_state_change = datetime.now()
+
     def set_power_status(self, power_is_on, exported_watts=None):
         valid_power_status = power_is_on
         if not power_is_on and self.state == DeviceState.USER_FORCED_START:
@@ -50,8 +58,7 @@ class Relaydevice:
         if valid_power_status is not None and self.is_power_on() != valid_power_status:
             rule_common.update_custom_relay(relay_pin_name=self.RELAY_NAME, power_is_on=valid_power_status)
             self.last_state_change = datetime.now()
-            P.system_wait_time = self.STATE_CHANGE_INTERVAL  # signal to wider system that it needs to wait
-            P.last_state_change = datetime.now()
+            self.power_status_changed()
             if valid_power_status:
                 self.last_state_on = datetime.now()
 
@@ -127,7 +134,7 @@ class Relaydevice:
         self.update_job_finished()
         return changed_relay_status
 
-    def __init__(self, relay_name, relay_id, avg_consumption, supports_breaks=False, min_on_interval=1,
+    def __init__(self, relay_name, avg_consumption, relay_id=None, supports_breaks=False, min_on_interval=1,
                  state_change_interval=1):
         self.AVG_CONSUMPTION = avg_consumption
         self.RELAY_NAME = relay_name
@@ -280,6 +287,49 @@ class PwmHeater(LoadPowerDevice):
         self.target_watts = 0
 
 
+class TeslaCharger(Relaydevice):
+    vehicle_idx = None
+
+    def __init__(self, relay_name, vehicle_idx, state_change_interval):
+        self.vehicle_idx = vehicle_idx
+        Relaydevice.__init__(self, relay_name=relay_name, avg_consumption=220,
+                             state_change_interval=state_change_interval)
+
+    def grid_updated(self, grid_watts):
+        act_amps = apps.tesla.get_actual_charging_amps(self.vehicle_idx)
+        tesla_charging_watts = act_amps * apps.tesla.get_voltage()
+
+        if grid_watts > 0:
+            # consuming from grid
+            if act_amps > 0:
+                # reduce tesla charging to reduce grid energy usage
+                target_watts = max(tesla_charging_watts - grid_watts, 0)
+                target_amps = int(target_watts / apps.tesla.get_voltage())
+                if target_amps != act_amps:
+                    L.l.info("Reducing Tesla charging to {} Amps".format(target_amps))
+                    apps.tesla.set_charging_amps(target_amps)
+                    self.power_status_changed()
+                    return True
+            else:
+                # nothing to do to reduce grid power consumption. stop charging
+                if apps.tesla.is_charging(self.vehicle_idx):
+                    apps.tesla.stop_charge(self.vehicle_idx)
+        else:
+            # exporting to grid, need to increase charging amps
+            if act_amps == apps.tesla.P.max_amps:
+                L.l.info("Tesla already charging at max amps {}".format(act_amps))
+            else:
+                target_watts = tesla_charging_watts - grid_watts
+                target_amps = int(target_watts / apps.tesla.get_voltage())
+                if target_amps != act_amps:
+                    L.l.info("Increasing Tesla charging to {} Amps".format(target_amps))
+                    apps.tesla.set_charging_amps(target_amps)
+                    self.power_status_changed()
+                if not apps.tesla.is_charging(self.vehicle_idx):
+                    apps.tesla.start_charge(self.vehicle_idx)
+                return True
+        return False
+
 class P:
     initialised = False
     grid_watts = None
@@ -318,11 +368,15 @@ class P:
                 P.device_list[relay] = obj
                 P.utility_list[utility] = obj
 
+        if apps.tesla.P.initialised:
+            relay = 'tesla_charger'
+            P.device_list[relay] = TeslaCharger(relay_name=relay, vehicle_idx=0, state_change_interval=20)
+
         relay = 'batterychargectrl_low'
-        P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=400,
+        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=500,
                                            supports_breaks=True, min_on_interval=10, state_change_interval=5)
         relay = 'batterychargectrl_high'
-        P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=500,
+        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=600,
                                            supports_breaks=True, min_on_interval=10, state_change_interval=5)
         # P.device_list[relay] = obj
         # P.utility_list[utility] = obj
