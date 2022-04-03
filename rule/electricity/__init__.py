@@ -295,8 +295,10 @@ class TeslaCharger(Relaydevice):
     def grid_updated(self, grid_watts):
         act_amps = apps.tesla.get_actual_charging_amps(self.vehicle_idx)
         if act_amps is None:
-            L.l.warning("Unable to read actual charging amps, assume = 0")
-            act_amps = 0
+            # L.l.warning("Unable to read actual charging amps, #API={}".format(apps.tesla.P.api_requests))
+            act_amps = apps.tesla.get_last_charging_amps(self.vehicle_idx)
+            if act_amps is None:
+                act_amps = 0
         tesla_charging_watts = act_amps * apps.tesla.get_voltage()
 
         if grid_watts > 0:
@@ -329,6 +331,7 @@ class TeslaCharger(Relaydevice):
                     apps.tesla.start_charge(self.vehicle_idx)
                 return True
         return False
+
 
 class P:
     initialised = False

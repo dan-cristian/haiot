@@ -42,6 +42,7 @@ class P:
     timestamp = None
     rules_modules = []
     sub_modules = {}
+    thread_pool_status = 'init'
 
 
 class Obj:
@@ -88,6 +89,7 @@ def _process_events():
             for rule_mod in P.rules_modules:
                 # result = getattr(rules_run, obj[1])(obj=obj[0], field_changed_list=obj[2])
                 if hasattr(rule_mod, obj[1]):
+                    P.thread_pool_status = obj[1]
                     result = getattr(rule_mod, obj[1])(obj=obj[0], change=obj[2])
                     L.l.debug('Rule returned {}'.format(result))
                     # set remove at the end to allow for all rules with same object to execute
