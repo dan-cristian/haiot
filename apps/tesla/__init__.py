@@ -2,8 +2,6 @@ import threading
 import prctl
 from main.logger_helper import L
 from main import thread_pool
-# force import of modules used in TeslaPy
-import requests_oauthlib
 
 from apps.tesla.TeslaPy.teslapy import Tesla
 
@@ -46,7 +44,8 @@ def get_actual_charging_amps(idx=0):
                 vehicle_data = vehicle.get_vehicle_data()
                 ch = vehicle_data['charge_state']
                 act_amps = ch['charger_actual_current']
-                P.voltage = ch['charger_voltage']
+                if ch['charger_voltage'] is not None:
+                    P.voltage = ch['charger_voltage']
                 P.is_charging[idx] = ch['charging_state'] == 'Charging'
                 if act_amps > 0:
                     if not P.is_charging[idx]:

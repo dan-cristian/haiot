@@ -499,3 +499,26 @@ class Bms(ModelBase):
     cycles = 0  # charge cycles
     factory_full_capacity = 0  # battery max capacity, user defined
     host_name = ''  # which host will connect to this bms
+
+
+class ElectricCar(ModelBase):
+    """key=id"""
+    id = 0
+    name = ''
+    vin = ''
+    outside_temperature = 0
+    inside_temperature = 0
+    is_climate_on = False
+    is_user_present = False
+    power = 0  # kw
+    speed = 0  # km/h
+    odometer = 0  # km
+    gps = ''  # gps coords
+    charger_voltage = 0  # V
+    charger_power = 0  # kW
+    charger_current = 0  # Amp
+    battery_level = 0  # %
+    battery_range = 0  # km
+    estimated_battery_range = 0  # km
+    time_to_full_charge = 0  # minutes
+
