@@ -1,0 +1,9 @@
+.idea
+cache.json
+gui.ini
+**/__pycache__
+**/*.pyc
+build/
+dist/
+TeslaPy.egg-info/
+geckodriver.log
