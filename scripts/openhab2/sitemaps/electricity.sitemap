@@ -49,6 +49,13 @@ Frame label="Charts" {
         Chart item=powermonitor_power_main_l3 period=W refresh=10000 visibility=[p_switch==2]
         Chart item=powermonitor_power_main_l3 period=M refresh=10000 visibility=[p_switch==3]
         }
+    Text item=powermonitor_power_main_n {
+        Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M"]
+        Chart item=powermonitor_power_main_n period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
+        Chart item=powermonitor_power_main_n period=D refresh=10000 visibility=[p_switch==1]
+        Chart item=powermonitor_power_main_n period=W refresh=10000 visibility=[p_switch==2]
+        Chart item=powermonitor_power_main_n period=M refresh=10000 visibility=[p_switch==3]
+        }
     Text item=electricity_power_main_mono {
         Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M"]
         Chart item=electricity_power_main_mono period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
