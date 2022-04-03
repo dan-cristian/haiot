@@ -18,8 +18,9 @@ class P:
     voltage = 220  # default one
     max_amps = 16
     api_requests = 0
-    refresh_request_pause = 60  # seconds between each status update request
+    refresh_request_pause = 30  # seconds between each status update request
     last_refresh_request = datetime.min
+    user_charging_mode = False  # True is user started the charging, so don't run automatic charging setup
     # save car params
     is_charging = dict()
     charging_amp = dict()
@@ -43,6 +44,7 @@ def vehicle_valid(idx):
 def set_charging_amps(amps, idx=0):
     if vehicle_valid(idx):
         P.vehicles[idx].command('CHARGING_AMPS', charging_amps=amps)
+        P.charging_amp[idx] = amps
         P.api_requests += 1
 
 
@@ -68,12 +70,10 @@ def get_actual_charging_amps(idx=0):
             P.last_refresh_request = datetime.now()
             ch = vehicle_data['charge_state']
             charging_mode = ch['scheduled_charging_mode']
-            user_charging_mode = ch['user_charge_enable_request']
-            L.l.info('User charging request={}, mode={}'.format(user_charging_mode, charging_mode))
-            #act_amps = 0
-            #if charging_mode == 'StartAt':
-            #    L.l.info("Manual override detected, car will not stop charging")
-            #else:
+            P.user_charging_mode = ch['user_charge_enable_request']
+            L.l.info('User charging request={}, mode={}'.format(P.user_charging_mode, charging_mode))
+            if P.user_charging_mode:
+                L.l.info("Manual override detected, car will not stop charging")
             act_amps = ch['charger_actual_current']
             P.charging_amp[idx] = act_amps
             act_voltage = ch['charger_voltage']
@@ -118,6 +118,7 @@ def stop_charge(idx=0):
     if vehicle_valid(idx):
         L.l.info("Stopping tesla charging")
         P.vehicles[idx].command('STOP_CHARGE')
+        P.is_charging[idx] = False
         P.api_requests += 1
 
 
