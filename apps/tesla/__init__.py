@@ -1,12 +1,12 @@
-import argparse
-import ssl
 import threading
 import prctl
 from main.logger_helper import L
 from main import thread_pool
+# force import of modules used in TeslaPy
+import requests_oauthlib
 
 from apps.tesla.TeslaPy.teslapy import Tesla
-#from apps.tesla.TeslaPy import menu
+
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
