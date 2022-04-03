@@ -98,6 +98,7 @@ def is_charging(idx):
     if idx in P.is_charging.keys():
         return P.is_charging[idx]
     else:
+        L.l.warning("Cannot find charging flag for id {}".format(idx))
         return None
 
 
