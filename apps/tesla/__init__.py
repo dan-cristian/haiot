@@ -52,7 +52,7 @@ def get_actual_charging_amps(idx=0):
                 if act_amps > 0:
                     if not P.is_charging[idx]:
                         L.l.error("I was expecting vehicle to charge")
-                car = m.ElectricCar.find({m.ElectricCar.id: idx})
+                car = m.ElectricCar.find_one({m.ElectricCar.id: idx})
                 if car is not None:
                     car.charger_current = act_amps
                     if act_voltage is not None:
@@ -115,7 +115,7 @@ def init():
         name = vehicle['display_name']
         vin = vehicle['vin']
         state = vehicle['state']
-        car = m.ElectricCar.find({m.ElectricCar.name: name})
+        car = m.ElectricCar.find_one({m.ElectricCar.name: name})
         if car is not None:
             car.vin = vin
             car.state = state
