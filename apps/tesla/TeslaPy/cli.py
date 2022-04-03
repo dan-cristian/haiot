@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-""" Tesla Owner API CLI application using TeslaPy1 module """
+""" Tesla Owner API CLI application using TeslaPy module """
 
 # Author: Tim Dorssers
 

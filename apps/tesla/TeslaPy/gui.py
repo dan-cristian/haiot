@@ -1,4 +1,4 @@
-""" Tesla Owner API GUI application using TeslaPy1 module """
+""" Tesla Owner API GUI application using TeslaPy module """
 
 # Author: Tim Dorssers
 
@@ -1169,7 +1169,7 @@ class UpdateThread(threading.Thread):
                 self.location = coords
                 try:
                     # Lookup address at coordinates
-                    osm = Nominatim(user_agent='TeslaPy1',
+                    osm = Nominatim(user_agent='TeslaPy',
                                     proxies=self.vehicle.tesla.proxies)
                     self.location = osm.reverse(coords).address
                 except (GeocoderTimedOut, GeocoderUnavailable):

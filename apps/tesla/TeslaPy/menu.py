@@ -1,4 +1,4 @@
-""" Tesla API menu-based console application using TeslaPy1 module """
+""" Tesla API menu-based console application using TeslaPy module """
 
 # Author: Tim Dorssers
 
@@ -36,7 +36,7 @@ def show_vehicle_data(vehicle):
     # Lookup address at coordinates
     coords = '%s, %s' % (dr['latitude'], dr['longitude'])
     try:
-        osm = Nominatim(user_agent='TeslaPy1', proxies=vehicle.tesla.proxies)
+        osm = Nominatim(user_agent='TeslaPy', proxies=vehicle.tesla.proxies)
         location = osm.reverse(coords).address
     except (GeocoderTimedOut, GeocoderUnavailable) as e:
         logging.error(e)

@@ -5,8 +5,8 @@ import prctl
 from main.logger_helper import L
 from main import thread_pool
 
-from apps.tesla.TeslaPy1.teslapy import Tesla
-#from apps.tesla.TeslaPy1 import menu
+from apps.tesla.TeslaPy.teslapy import Tesla
+#from apps.tesla.TeslaPy import menu
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
