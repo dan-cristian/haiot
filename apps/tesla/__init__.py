@@ -18,7 +18,7 @@ class P:
     voltage = 220  # default one
     max_amps = 16
     api_requests = 0
-    refresh_request_pause = 60  # 30 seconds between each status update request
+    refresh_request_pause = 120  # seconds between each status update request
     last_refresh_request = datetime.min
     # save car params
     is_charging = dict()
