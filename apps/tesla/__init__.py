@@ -72,7 +72,9 @@ def get_actual_charging_amps(idx=0):
             act_voltage = ch['charger_voltage']
             if act_voltage is not None:
                 P.voltage = act_voltage
-            P.is_charging[idx] = ch['charging_state'] == 'Charging'
+            P.is_charging[idx] = (ch['charging_state'] == 'Charging')
+            L.l.info("Car charging status = {}".format(ch['charging_state']))
+            L.l.info("Car charging amp = {}".format(act_amps))
             if act_amps > 0:
                 if not P.is_charging[idx]:
                     L.l.error("I was expecting vehicle to charge")
@@ -87,7 +89,7 @@ def get_actual_charging_amps(idx=0):
         else:
             L.l.error("Vehicle not online, state={}".format(vehicle['state']))
     except Exception as ex:
-        L.l.error("Unable to get vehicle charging data, er={}".format(ex))
+        L.l.error("Unable to get vehicle charging data, #API{}, er={}".format(P.api_requests, ex))
         P.last_refresh_request = datetime.now()
         P.vehicles = P.tesla.vehicle_list()
 

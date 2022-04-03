@@ -314,7 +314,9 @@ class TeslaCharger(Relaydevice):
                     return True
             else:
                 # nothing to do to reduce grid power consumption. stop charging
-                if apps.tesla.is_charging(self.vehicle_idx):
+                is_charging = apps.tesla.is_charging(self.vehicle_idx)
+                if is_charging:
+                    L.l.info("Car is charging, stopping")
                     apps.tesla.stop_charge(self.vehicle_idx)
         else:
             # exporting to grid, need to increase charging amps
