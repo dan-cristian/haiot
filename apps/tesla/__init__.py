@@ -61,7 +61,7 @@ def get_actual_charging_amps(idx=0):
 
     vehicle = P.vehicles[idx]
     try:
-        if vehicle['state'] == 'asleep':
+        if vehicle['state'] in ['asleep', 'offline']:
             vehicle.sync_wake_up()
             P.api_requests += 1
         if vehicle['state'] == 'online':
