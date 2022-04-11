@@ -298,7 +298,7 @@ class TeslaCharger(Relaydevice):
         act_amps = apps.tesla.get_last_charging_amps(self.vehicle_id)
         if act_amps is None:
             act_amps = 0
-        tesla_charging_watts = act_amps * apps.tesla.get_voltage()
+        tesla_charging_watts = act_amps * apps.tesla.get_nonzero_voltage()
 
         if grid_watts > 0:
             # consuming from grid
@@ -327,7 +327,7 @@ class TeslaCharger(Relaydevice):
                 L.l.info("Tesla already charging at max amps {}".format(act_amps))
             else:
                 target_watts = tesla_charging_watts - grid_watts
-                target_amps = int(target_watts / apps.tesla.get_voltage())
+                target_amps = int(target_watts / apps.tesla.get_nonzero_voltage())
                 if target_amps != act_amps:
                     L.l.info("Increasing Tesla charging to {} Amps".format(target_amps))
                     apps.tesla.set_charging_amps(target_amps)
