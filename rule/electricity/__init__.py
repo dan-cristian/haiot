@@ -317,7 +317,7 @@ class TeslaCharger(Relaydevice):
                 if apps.tesla.should_stop_charge(self.vehicle_id):
                     apps.tesla.stop_charge(self.vehicle_id)
                 # is_charging = apps.tesla.is_charging(self.vehicle_id)
-                #if is_charging:
+                # if is_charging:
                 #    L.l.info("Car is charging, stopping")
                 #    apps.tesla.stop_charge(self.vehicle_id)
                 #pass

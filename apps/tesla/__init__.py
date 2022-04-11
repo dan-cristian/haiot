@@ -29,6 +29,7 @@ class P:
     teslamate_can_charge = False  # do not trigger automatic charging, car maybe not be at home etc
     teslamate_charging_amp = dict()
     teslamate_last_charging_update = datetime.min
+    teslamate_voltage = dict()
     # save car params
     is_charging = dict()
     charging_amp = dict()
@@ -58,7 +59,8 @@ def vehicle_valid(car_id):
 
 
 def should_stop_charge(car_id):
-    if car_id not in P.last_charging_stopped.keys() or P.last_charging_stopped[car_id] is None:
+    if car_id not in P.last_charging_stopped.keys() or P.last_charging_stopped[car_id] is None \
+            or not is_charging(car_id):
         return False
     else:
         return (datetime.now() - P.last_charging_stopped[car_id]).total_seconds() > P.stop_charge_interval
@@ -147,16 +149,25 @@ def vehicle_update(car_id=1):
         P.vehicles = P.tesla.vehicle_list()
 
 
-def get_voltage():
-    return P.voltage
+def get_voltage(car_id=1):
+    if car_id in P.teslamate_voltage.keys():
+        return P.teslamate_voltage[car_id]
+    else:
+        return None
 
 
 def is_charging(car_id=1):
-    if car_id in P.is_charging.keys():
-        return P.is_charging[car_id]
+    voltage = get_voltage(car_id)
+    if voltage is not None:
+        return P.teslamate_voltage[car_id] > 0
     else:
-        L.l.warning("Cannot find charging flag for id {}".format(car_id))
         return None
+
+    # if car_id in P.is_charging.keys():
+    #    return P.is_charging[car_id]
+    # else:
+    #    L.l.warning("Cannot find charging flag for id {}".format(car_id))
+    #    return None
 
 
 def stop_charge(car_id=1):
@@ -187,6 +198,9 @@ def _process_message(msg):
     if "charger_power" in msg.topic:
         value = int(msg.payload)
         P.is_charging[car_id] = (value == 1)
+    if "charger_voltage" in msg.topic:
+        value = int(msg.payload)
+        P.teslamate_voltage[car_id] = value
     if "state" in msg.topic:
         value = "{}".format(msg.payload).replace("b", "").replace("\\", "").replace("'", "")
         P.car_state[car_id] == value
@@ -196,6 +210,7 @@ def _process_message(msg):
         P.teslamate_can_charge = (value.lower() == "home")
     if "battery_level" in msg.topic:
         value = int(msg.payload)
+
 
 
 def mqtt_on_message(client, userdata, msg):
