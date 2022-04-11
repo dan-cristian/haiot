@@ -5,8 +5,8 @@ from main.logger_helper import L
 from main import thread_pool
 from storage.model import m
 from apps.tesla.TeslaPy.teslapy import Tesla
-from common import Constant, get_secure_general
-
+from common import Constant, get_secure_general, utils, get_json_param
+from transport import mqtt_io
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 
@@ -21,9 +21,18 @@ class P:
     refresh_request_pause = 30  # seconds between each status update request
     last_refresh_request = datetime.min
     user_charging_mode = False  # True is user started the charging, so don't run automatic charging setup
+    home_latitude = None
+    home_longitude = None
+    can_charge_at_home = False  # True if car is at home, so automatic charging can happen
+    teslamate_topic = None
+    teslamate_can_charge = False  # do not trigger automatic charging, car maybe not be at home etc
+    teslamate_charging_amp = dict()
+    teslamate_last_charging_update = datetime.min
     # save car params
     is_charging = dict()
     charging_amp = dict()
+    car_latitude = dict()
+    car_longitude = dict()
 
     def __init__(self):
         pass
@@ -33,33 +42,39 @@ def can_refresh():
     return (datetime.now() - P.last_refresh_request).total_seconds() >= P.refresh_request_pause
 
 
-def vehicle_valid(idx):
-    if P.vehicles is None or len(P.vehicles) <= idx:
+def vehicle_valid(car_id):
+    if P.vehicles is None or len(P.vehicles) <= (car_id - 1):  # first id can be 1
         L.l.error("Vehicle id not on list or list is empty")
         return False
     else:
         return True
 
 
-def set_charging_amps(amps, idx=0):
-    if vehicle_valid(idx):
-        P.vehicles[idx].command('CHARGING_AMPS', charging_amps=amps)
-        P.charging_amp[idx] = amps
+def set_charging_amps(amps, car_id=1):
+    if vehicle_valid(car_id):
+        P.vehicles[car_id - 1].command('CHARGING_AMPS', charging_amps=amps)
+        P.charging_amp[car_id] = amps
         P.api_requests += 1
 
 
-def get_last_charging_amps(idx=0):
-    if idx in P.charging_amp.keys():
-        return P.charging_amp[idx]
+def get_last_charging_amps(car_id=1):
+    # return first teslamate values
+    if car_id in P.teslamate_charging_amp.keys():
+        return P.teslamate_charging_amp[car_id]
     else:
+        # if teslamate is not updated, return last known from direct read
+        if car_id in P.charging_amp.keys():
+            return P.charging_amp[car_id]
+        else:
+            return None
+
+
+# https://github.com/tdorssers/TeslaPy
+def vehicle_update(car_id=1):
+    if (not vehicle_valid(car_id)) or (not can_refresh()):
         return None
 
-
-def get_actual_charging_amps(idx=0):
-    if (not vehicle_valid(idx)) or (not can_refresh()):
-        return None
-
-    vehicle = P.vehicles[idx]
+    vehicle = P.vehicles[car_id - 1]
     try:
         if vehicle['state'] in ['asleep', 'offline']:
             vehicle.sync_wake_up()
@@ -75,24 +90,33 @@ def get_actual_charging_amps(idx=0):
             if P.user_charging_mode:
                 L.l.info("Manual override detected, car will not stop charging")
             act_amps = ch['charger_actual_current']
-            P.charging_amp[idx] = act_amps
+            P.charging_amp[car_id] = act_amps
             act_voltage = ch['charger_voltage']
             if act_voltage is not None:
                 P.voltage = act_voltage
-            P.is_charging[idx] = (ch['charging_state'] == 'Charging')
+            P.is_charging[car_id] = (ch['charging_state'] == 'Charging')
 
             L.l.info("Car charging status = {}".format(ch['charging_state']))
             L.l.info("Car charging amp = {}".format(act_amps))
             if act_amps > 0:
-                if not P.is_charging[idx]:
+                if not P.is_charging[car_id]:
                     L.l.error("I was expecting vehicle to charge")
-            car = m.ElectricCar.find_one({m.ElectricCar.id: idx})
+            car = m.ElectricCar.find_one({m.ElectricCar.id: car_id})
             if car is not None:
                 car.charger_current = act_amps
                 if act_voltage is not None:
                     car.actual_voltage = act_voltage
-                car.is_charging = P.is_charging[idx]
+                car.is_charging = P.is_charging[car_id]
                 car.save_changed_fields(broadcast=False, persist=True)
+            ds = vehicle_data['drive_state']
+            if ds is not None:
+                P.car_latitude[car_id] = ds['latitude']
+                P.car_longitude[car_id] = ds['longitude']
+                if (abs(P.home_latitude - P.car_latitude[1]) < 0.0002) \
+                        and (abs(P.home_longitude - P.car_longitude[1]) < 0.0002):
+                    P.can_charge_at_home = True
+                else:
+                    P.can_charge_at_home = False
             return act_amps
         else:
             L.l.error("Vehicle not online, state={}".format(vehicle['state']))
@@ -106,27 +130,60 @@ def get_voltage():
     return P.voltage
 
 
-def is_charging(idx):
-    if idx in P.is_charging.keys():
-        return P.is_charging[idx]
+def is_charging(car_id=1):
+    if car_id in P.is_charging.keys():
+        return P.is_charging[car_id]
     else:
-        L.l.warning("Cannot find charging flag for id {}".format(idx))
+        L.l.warning("Cannot find charging flag for id {}".format(car_id))
         return None
 
 
-def stop_charge(idx=0):
-    if vehicle_valid(idx):
+def stop_charge(car_id=1):
+    if vehicle_valid(car_id):
         L.l.info("Stopping tesla charging")
-        P.vehicles[idx].command('STOP_CHARGE')
-        P.is_charging[idx] = False
+        P.vehicles[car_id - 1].command('STOP_CHARGE')
+        P.is_charging[car_id] = False
         P.api_requests += 1
 
 
-def start_charge(idx=0):
-    if vehicle_valid(idx):
+def start_charge(car_id=1):
+    if vehicle_valid(car_id):
         L.l.info("Starting tesla charging")
-        P.vehicles[idx].command('START_CHARGE')
+        P.vehicles[car_id - 1].command('START_CHARGE')
         P.api_requests += 1
+
+
+# https://docs.teslamate.org/docs/integrations/mqtt/
+def _process_message(msg):
+    car_id = int(msg.topic.split("teslamate/cars/")[1][:2].replace("/", ""))
+    if "plugged_in" in msg.topic:
+        value = msg.payload
+    if "charger_actual_current" in msg.topic:
+        value = int(msg.payload)
+        P.teslamate_charging_amp[car_id] = value
+        P.teslamate_last_charging_update = datetime.now()
+    if "charger_power" in msg.topic:
+        value = int(msg.payload)
+    if "state" in msg.topic:
+        value = "{}".format(msg.payload).replace("b", "").replace("\\", "").replace("'", "")
+        # online, asleep, charging
+    if "geofence" in msg.topic:
+        value = "{}".format(msg.payload).replace("b", "").replace("\\", "").replace("'", "")
+        P.teslamate_can_charge = (value.lower() == "home")
+    if "battery_level" in msg.topic:
+        value = int(msg.payload)
+
+
+def mqtt_on_message(client, userdata, msg):
+    try:
+        prctl.set_name("mqtt_teslamate")
+        threading.current_thread().name = "mqtt_teslamate"
+        _process_message(msg)
+    except Exception as ex:
+        L.l.error("Error processing teslamate mqtt {}, err={}, msg={}".format(msg.topic, ex, msg), exc_info=True)
+    finally:
+        prctl.set_name("idle_mqtt_teslamate")
+        threading.current_thread().name = "idle_mqtt_teslamate"
 
 
 def thread_run():
@@ -148,6 +205,8 @@ def init():
     L.l.info('Tesla module initialising')
     thread_pool.add_interval_callable(thread_run, run_interval_second=60)
     email = get_secure_general("tesla_account_email")
+    P.home_latitude = get_secure_general("home_latitude")
+    P.home_longitude = get_secure_general("home_longitude")
     P.tesla = Tesla(email=email, cache_file="../private_config/.credentials/tesla_cache.json")
     P.vehicles = P.tesla.vehicle_list()
     P.api_requests += 1
@@ -160,6 +219,11 @@ def init():
             car.vin = vin
             car.state = state
             car.save_changed_fields(broadcast=False, persist=True)
+            P.teslamate_topic = str(get_json_param(Constant.P_MQTT_TOPIC_TESLAMATE)).replace("<car_id>", str(car.id))
+            P.teslamate_topic += "#"
+            mqtt_io.add_message_callback(P.teslamate_topic, mqtt_on_message)
+            L.l.info("Teslamate connected to mqtt topic: {}".format(P.teslamate_topic))
+            vehicle_update(car.id)
         else:
             L.l.warning("Cannot find electric car = {} in config file".format(name))
         L.l.info("Electric car {} vin={} state={}".format(name, vin, state))

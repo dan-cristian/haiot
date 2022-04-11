@@ -285,20 +285,17 @@ class PwmHeater(LoadPowerDevice):
 
 
 class TeslaCharger(Relaydevice):
-    vehicle_idx = None
+    vehicle_id = None
 
-    def __init__(self, relay_name, vehicle_idx, state_change_interval):
-        self.vehicle_idx = vehicle_idx
+    def __init__(self, relay_name, vehicle_id, state_change_interval):
+        self.vehicle_id = vehicle_id
         Relaydevice.__init__(self, relay_name=relay_name, avg_consumption=220,
                              state_change_interval=state_change_interval)
 
     def grid_updated(self, grid_watts):
-        act_amps = apps.tesla.get_actual_charging_amps(self.vehicle_idx)
+        act_amps = apps.tesla.get_last_charging_amps(self.vehicle_id)
         if act_amps is None:
-            # L.l.warning("Unable to read actual charging amps, #API={}".format(apps.tesla.P.api_requests))
-            act_amps = apps.tesla.get_last_charging_amps(self.vehicle_idx)
-            if act_amps is None:
-                act_amps = 0
+            act_amps = 0
         tesla_charging_watts = act_amps * apps.tesla.get_voltage()
 
         if grid_watts > 0:
@@ -309,20 +306,20 @@ class TeslaCharger(Relaydevice):
                 target_watts = max(tesla_charging_watts - grid_watts, 0)
                 target_amps = int(target_watts / apps.tesla.get_voltage())
                 if target_amps != act_amps:
-                    if apps.tesla.P.user_charging_mode:
-                        # L.l.info("Ignoring automatic charging as user started charging")
-                        pass
-                    else:
+                    if (not apps.tesla.P.user_charging_mode) and apps.tesla.P.can_charge_at_home:
                         L.l.info("Reducing Tesla charging to {} Amps".format(target_amps))
                         apps.tesla.set_charging_amps(target_amps)
                         self.power_status_changed()
                         return True
+                    else:
+                        # car is not at home or user started manual charging
+                        pass
             else:
                 # nothing to do to reduce grid power consumption. stop charging
-                is_charging = apps.tesla.is_charging(self.vehicle_idx)
+                is_charging = apps.tesla.is_charging(self.vehicle_id)
                 if is_charging:
                     L.l.info("Car is charging, stopping")
-                    apps.tesla.stop_charge(self.vehicle_idx)
+                    apps.tesla.stop_charge(self.vehicle_id)
         else:
             # exporting to grid, need to increase charging amps
             if act_amps == apps.tesla.P.max_amps:
@@ -330,13 +327,15 @@ class TeslaCharger(Relaydevice):
             else:
                 target_watts = tesla_charging_watts - grid_watts
                 target_amps = int(target_watts / apps.tesla.get_voltage())
-                if target_amps != act_amps:
-                    L.l.info("Increasing Tesla charging to {} Amps".format(target_amps))
-                    apps.tesla.set_charging_amps(target_amps)
-                    self.power_status_changed()
-                if not apps.tesla.is_charging(self.vehicle_idx):
-                    apps.tesla.start_charge(self.vehicle_idx)
-                return True
+                if apps.tesla.P.can_charge_at_home:
+                    # only update amps charge if at home
+                    if target_amps != act_amps:
+                        L.l.info("Increasing Tesla charging to {} Amps".format(target_amps))
+                        apps.tesla.set_charging_amps(target_amps)
+                        self.power_status_changed()
+                    if not apps.tesla.is_charging(self.vehicle_id):
+                        apps.tesla.start_charge(self.vehicle_id)
+                    return True
         return False
 
 
@@ -363,24 +362,11 @@ class P:
         # pwm = m.Pwm.find_one({m.Pwm.name: "boiler"})
         # freq = pwm.frequency
         if P.emulate_export:
-            if False:
-                relay = 'boiler2'
-                utility = 'power boiler'
-                obj = PwmHeater(relay_name=relay, relay_id=4, utility_name='power boiler', max_watts=2400,
-                                frequency=freq)
-                P.device_list[relay] = obj
-                P.utility_list[utility] = obj
-
-            if False:
-                relay = 'boiler'
-                utility = 'power boiler'
-                obj = PwmHeater(relay_name=relay, relay_id=3, utility_name=utility, max_watts=2400, frequency=freq)
-                P.device_list[relay] = obj
-                P.utility_list[utility] = obj
+            pass
 
         if apps.tesla.P.initialised:
             relay = 'tesla_charger'
-            P.device_list[relay] = TeslaCharger(relay_name=relay, vehicle_idx=0, state_change_interval=20)
+            P.device_list[relay] = TeslaCharger(relay_name=relay, vehicle_id=1, state_change_interval=20)
 
         relay = 'batterychargectrl_low'
         P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=500,
@@ -388,35 +374,9 @@ class P:
         relay = 'batterychargectrl_high'
         P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=600,
                                            supports_breaks=True, min_on_interval=10, state_change_interval=5)
-        # P.device_list[relay] = obj
-        # P.utility_list[utility] = obj
-        #relay = 'plug_1'
-        #utility = 'power plug 1'
-        # obj = Dishwasher(relay_name=relay, utility_name=utility, avg_consumption=80)
-        # P.device_list[relay] = obj
-        # P.utility_list[utility] = obj
-        #relay = 'big_battery_relay'
-        #P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=50, supports_breaks=True)
-        #relay = 'beci_upscharge_relay'
-        #P.device_list[relay] = Upscharger(relay_name=relay, avg_consumption=200)
-        #relay = 'blackwater_pump_relay'
-        #P.device_list[relay] = Relaydevice(relay_name=relay, relay_id=None, avg_consumption=50, supports_breaks=True)
 
         if not P.emulate_export:
-            if False:
-                relay = 'boiler2'
-                utility = 'power boiler'
-                obj = PwmHeater(relay_name=relay, relay_id=4, utility_name='power boiler', max_watts=2400,
-                                frequency=freq)
-                P.device_list[relay] = obj
-                P.utility_list[utility] = obj
-
-            # relay = 'boiler'
-            #utility = 'power boiler'
-
-            # obj = PwmHeater(relay_name=relay, relay_id=3, utility_name=utility, max_watts=2400, frequency=freq)
-            # P.device_list[relay] = obj
-            # P.utility_list[utility] = obj
+            pass
 
     def __init__(self):
         pass

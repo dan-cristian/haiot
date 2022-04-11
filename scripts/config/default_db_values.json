@@ -31,6 +31,7 @@
     {"name": "MQTT_TOPIC_SONOFF_1", "value": "iot/sonoff/#", "description": "sonoff-tasmota integration mqtt channel"},
     {"name": "MQTT_TOPIC_MICRO", "value": "iot/micro", "description": "mqtt publish channel for micropython devices"},
     {"name": "MQTT_TOPIC_SHELLY", "value": "shellies", "description": "mqtt read/publish channel for shelly devices"},
+    {"name": "MQTT_TOPIC_TESLAMATE", "value": "teslamate/cars/<car_id>/", "description": "mqtt read channel for teslamate updates"},
     {"name": "MQTT_HOST_2", "value": "127.0.0.1"},
     {"name": "MQTT_PORT_2", "value": "1883"},
     {"name": "DDNS_RACKSPACE_CONFIG_FILE", "value": "../private_config/.credentials/.rackspace.ddnsupdate.config.json",
