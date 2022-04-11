@@ -45,6 +45,10 @@ def can_refresh():
     return (datetime.now() - P.last_refresh_request).total_seconds() >= P.refresh_request_pause
 
 
+def can_auto_charge():
+    return (not P.user_charging_mode) and P.can_charge_at_home
+
+
 def vehicle_valid(car_id):
     if P.vehicles is None or len(P.vehicles) <= (car_id - 1):  # first id can be 1
         L.l.error("Vehicle id not on list or list is empty")
@@ -206,30 +210,7 @@ def mqtt_on_message(client, userdata, msg):
         threading.current_thread().name = "idle_mqtt_teslamate"
 
 
-def thread_run():
-    prctl.set_name("")
-    threading.current_thread().name = "tesla"
-    #
-    prctl.set_name("idle_tesla")
-    threading.current_thread().name = "idle_tesla"
-    return 'Processed tesla'
-
-
-def unload():
-    L.l.info('Tesla module unloading')
-    thread_pool.remove_callable(thread_run)
-    P.initialised = False
-
-
-def init():
-    L.l.info('Tesla module initialising')
-    thread_pool.add_interval_callable(thread_run, run_interval_second=60)
-    email = get_secure_general("tesla_account_email")
-    P.home_latitude = get_secure_general("home_latitude")
-    P.home_longitude = get_secure_general("home_longitude")
-    P.tesla = Tesla(email=email, cache_file="../private_config/.credentials/tesla_cache.json", timeout=30)
-    P.vehicles = P.tesla.vehicle_list()
-    P.api_requests += 1
+def first_read_all_vehicles():
     for i, vehicle in enumerate(P.vehicles):
         name = vehicle['display_name']
         vin = vehicle['vin']
@@ -247,5 +228,46 @@ def init():
         else:
             L.l.warning("Cannot find electric car = {} in config file".format(name))
         L.l.info("Electric car {} vin={} state={}".format(name, vin, state))
+
+
+def read_all_vehicles():
+    L.l.info("Updating all Tesla vehicles")
+    for i, vehicle in enumerate(P.vehicles):
+        name = vehicle['display_name']
+        car = m.ElectricCar.find_one({m.ElectricCar.name: name})
+        if car is not None:
+            vehicle_update(car.id)
+        else:
+            L.l.warning("Cannot find car = {} in config file".format(name))
+
+
+def thread_run():
+    prctl.set_name("")
+    threading.current_thread().name = "tesla"
+
+    if P.user_charging_mode:
+        read_all_vehicles()
+
+    prctl.set_name("idle_tesla")
+    threading.current_thread().name = "idle_tesla"
+    return 'Processed tesla'
+
+
+def unload():
+    L.l.info('Tesla module unloading')
+    thread_pool.remove_callable(thread_run)
+    P.initialised = False
+
+
+def init():
+    L.l.info('Tesla module initialising')
+    thread_pool.add_interval_callable(thread_run, run_interval_second=300)
+    email = get_secure_general("tesla_account_email")
+    P.home_latitude = get_secure_general("home_latitude")
+    P.home_longitude = get_secure_general("home_longitude")
+    P.tesla = Tesla(email=email, cache_file="../private_config/.credentials/tesla_cache.json", timeout=30)
+    P.vehicles = P.tesla.vehicle_list()
+    P.api_requests += 1
+    first_read_all_vehicles()
     if len(P.vehicles) > 0:
         P.initialised = True

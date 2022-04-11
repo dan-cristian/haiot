@@ -293,6 +293,8 @@ class TeslaCharger(Relaydevice):
                              state_change_interval=state_change_interval)
 
     def grid_updated(self, grid_watts):
+        if not apps.tesla.can_auto_charge():
+            return
         act_amps = apps.tesla.get_last_charging_amps(self.vehicle_id)
         if act_amps is None:
             act_amps = 0
@@ -306,14 +308,10 @@ class TeslaCharger(Relaydevice):
                 target_watts = max(tesla_charging_watts - grid_watts, 0)
                 target_amps = int(target_watts / apps.tesla.get_voltage())
                 if target_amps != act_amps:
-                    if (not apps.tesla.P.user_charging_mode) and apps.tesla.P.can_charge_at_home:
-                        L.l.info("Reducing Tesla charging to {} Amps".format(target_amps))
-                        apps.tesla.set_charging_amps(target_amps)
-                        self.power_status_changed()
-                        return True
-                    else:
-                        # car is not at home or user started manual charging
-                        pass
+                    L.l.info("Reducing Tesla charging to {} Amps".format(target_amps))
+                    apps.tesla.set_charging_amps(target_amps)
+                    self.power_status_changed()
+                    return True
             else:
                 # nothing to do to reduce grid power consumption. stop charging after staying for too long on 0 charge
                 if apps.tesla.should_stop_charge(self.vehicle_id):
@@ -330,15 +328,13 @@ class TeslaCharger(Relaydevice):
             else:
                 target_watts = tesla_charging_watts - grid_watts
                 target_amps = int(target_watts / apps.tesla.get_voltage())
-                if apps.tesla.P.can_charge_at_home:
-                    # only update amps charge if at home
-                    if target_amps != act_amps:
-                        L.l.info("Increasing Tesla charging to {} Amps".format(target_amps))
-                        apps.tesla.set_charging_amps(target_amps)
-                        self.power_status_changed()
-                    if not apps.tesla.is_charging(self.vehicle_id):
-                        apps.tesla.start_charge(self.vehicle_id)
-                    return True
+                if target_amps != act_amps:
+                    L.l.info("Increasing Tesla charging to {} Amps".format(target_amps))
+                    apps.tesla.set_charging_amps(target_amps)
+                    self.power_status_changed()
+                if not apps.tesla.is_charging(self.vehicle_id):
+                    apps.tesla.start_charge(self.vehicle_id)
+                return True
         return False
 
 
