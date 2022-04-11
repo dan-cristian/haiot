@@ -315,11 +315,14 @@ class TeslaCharger(Relaydevice):
                         # car is not at home or user started manual charging
                         pass
             else:
-                # nothing to do to reduce grid power consumption. stop charging
-                is_charging = apps.tesla.is_charging(self.vehicle_id)
-                if is_charging:
-                    L.l.info("Car is charging, stopping")
+                # nothing to do to reduce grid power consumption. stop charging after staying for too long on 0 charge
+                if apps.tesla.should_stop_charge(self.vehicle_id):
                     apps.tesla.stop_charge(self.vehicle_id)
+                # is_charging = apps.tesla.is_charging(self.vehicle_id)
+                #if is_charging:
+                #    L.l.info("Car is charging, stopping")
+                #    apps.tesla.stop_charge(self.vehicle_id)
+                #pass
         else:
             # exporting to grid, need to increase charging amps
             if act_amps == apps.tesla.P.max_amps:

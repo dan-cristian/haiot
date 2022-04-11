@@ -19,6 +19,7 @@ class P:
     max_amps = 16
     api_requests = 0
     refresh_request_pause = 30  # seconds between each status update request
+    stop_charge_interval = 60  # seconds interval with amps set to 0 after which charging is stopped
     last_refresh_request = datetime.min
     user_charging_mode = False  # True is user started the charging, so don't run automatic charging setup
     home_latitude = None
@@ -33,6 +34,8 @@ class P:
     charging_amp = dict()
     car_latitude = dict()
     car_longitude = dict()
+    car_state = dict()
+    last_charging_stopped = dict()  # timestamps when car charging was stopped
 
     def __init__(self):
         pass
@@ -50,11 +53,23 @@ def vehicle_valid(car_id):
         return True
 
 
+def should_stop_charge(car_id):
+    if car_id not in P.last_charging_stopped.keys() or P.last_charging_stopped[car_id] is None:
+        return False
+    else:
+        return (datetime.now() - P.last_charging_stopped[car_id]).total_seconds() > P.stop_charge_interval
+
+
 def set_charging_amps(amps, car_id=1):
     if vehicle_valid(car_id):
         P.vehicles[car_id - 1].command('CHARGING_AMPS', charging_amps=amps)
         P.charging_amp[car_id] = amps
         P.api_requests += 1
+        if amps == 0:
+            if P.last_charging_stopped[car_id] is None:  # only update if previously was charging
+                P.last_charging_stopped[car_id] = datetime.now()
+        else:
+            P.last_charging_stopped[car_id] = None  # reset timestamp
 
 
 def get_last_charging_amps(car_id=1):
@@ -74,8 +89,10 @@ def vehicle_update(car_id=1):
     if (not vehicle_valid(car_id)) or (not can_refresh()):
         return None
 
+    P.last_charging_stopped[car_id] = None
     vehicle = P.vehicles[car_id - 1]
     try:
+        P.car_state[car_id] = vehicle['state']
         if vehicle['state'] in ['asleep', 'offline']:
             vehicle.sync_wake_up()
             P.api_requests += 1
@@ -143,6 +160,7 @@ def stop_charge(car_id=1):
         L.l.info("Stopping tesla charging")
         P.vehicles[car_id - 1].command('STOP_CHARGE')
         P.is_charging[car_id] = False
+        P.last_charging_stopped[car_id] = None
         P.api_requests += 1
 
 
@@ -164,8 +182,10 @@ def _process_message(msg):
         P.teslamate_last_charging_update = datetime.now()
     if "charger_power" in msg.topic:
         value = int(msg.payload)
+        P.is_charging[car_id] = (value == 1)
     if "state" in msg.topic:
         value = "{}".format(msg.payload).replace("b", "").replace("\\", "").replace("'", "")
+        P.car_state[car_id] == value
         # online, asleep, charging
     if "geofence" in msg.topic:
         value = "{}".format(msg.payload).replace("b", "").replace("\\", "").replace("'", "")
@@ -207,7 +227,7 @@ def init():
     email = get_secure_general("tesla_account_email")
     P.home_latitude = get_secure_general("home_latitude")
     P.home_longitude = get_secure_general("home_longitude")
-    P.tesla = Tesla(email=email, cache_file="../private_config/.credentials/tesla_cache.json")
+    P.tesla = Tesla(email=email, cache_file="../private_config/.credentials/tesla_cache.json", timeout=30)
     P.vehicles = P.tesla.vehicle_list()
     P.api_requests += 1
     for i, vehicle in enumerate(P.vehicles):
