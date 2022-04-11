@@ -306,7 +306,7 @@ class TeslaCharger(Relaydevice):
             if act_amps > 0:
                 # reduce tesla charging to reduce grid energy usage
                 target_watts = max(tesla_charging_watts - grid_watts, 0)
-                target_amps = int(target_watts / apps.tesla.get_voltage())
+                target_amps = int(target_watts / apps.tesla.get_nonzero_voltage())
                 if target_amps != act_amps:
                     L.l.info("Reducing Tesla charging to {} Amps".format(target_amps))
                     apps.tesla.set_charging_amps(target_amps)

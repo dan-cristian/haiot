@@ -115,7 +115,7 @@ def vehicle_update(car_id=1):
             act_amps = ch['charger_actual_current']
             P.charging_amp[car_id] = act_amps
             act_voltage = ch['charger_voltage']
-            if act_voltage is not None:
+            if act_voltage > 0:
                 P.voltage = act_voltage
             P.is_charging[car_id] = (ch['charging_state'] == 'Charging')
 
@@ -147,6 +147,10 @@ def vehicle_update(car_id=1):
         L.l.error("Unable to get vehicle charging data, #API{}, er={}".format(P.api_requests, ex))
         P.last_refresh_request = datetime.now()
         P.vehicles = P.tesla.vehicle_list()
+
+
+def get_nonzero_voltage():
+    return P.voltage
 
 
 def get_voltage(car_id=1):
@@ -201,6 +205,8 @@ def _process_message(msg):
     if "charger_voltage" in msg.topic:
         value = int(msg.payload)
         P.teslamate_voltage[car_id] = value
+        if value > 0:
+            P.voltage = value
     if "state" in msg.topic:
         value = "{}".format(msg.payload).replace("b", "").replace("\\", "").replace("'", "")
         P.car_state[car_id] == value
