@@ -15,6 +15,7 @@ class P:
     initialised = False
     tesla = None
     vehicles = None
+    email = None
     voltage = 220  # default one
     max_amps = 16
     api_requests = 0
@@ -66,9 +67,31 @@ def should_stop_charge(car_id):
         return (datetime.now() - P.last_charging_stopped[car_id]).total_seconds() > P.stop_charge_interval
 
 
+def try_connection_recovery(car_id):
+    L.l.info("Trying to recover tesla cloud connection")
+    try:
+        P.tesla.close()
+        P.tesla = Tesla(email=P.email, cache_file="../private_config/.credentials/tesla_cache.json", timeout=60)
+        P.vehicles = P.tesla.vehicle_list()
+        vehicle = P.vehicles[car_id - 1]
+        P.car_state[car_id] = vehicle['state']
+        state = vehicle['state']
+        if state in ['asleep', 'offline']:
+            L.l.info("Car is {}, trying to wake it ...".format(state))
+            vehicle.sync_wake_up()
+        else:
+            L.l.info("Car is {}, nothing to do on recovery".format(state))
+    except Exception as ex:
+        L.l.error("Unable to recover tesla connection, er={}".format(ex))
+
+
 def set_charging_amps(amps, car_id=1):
     if vehicle_valid(car_id):
-        P.vehicles[car_id - 1].command('CHARGING_AMPS', charging_amps=amps)
+        try:
+            P.vehicles[car_id - 1].command('CHARGING_AMPS', charging_amps=amps)
+        except Exception as ex:
+            L.l.error("Unable to set charging amps: {}".format(ex))
+            try_connection_recovery(car_id)
         P.charging_amp[car_id] = amps
         P.api_requests += 1
         if amps == 0:
@@ -113,13 +136,15 @@ def vehicle_update(car_id=1):
                 L.l.info("Manual override detected, car will not stop charging")
             act_amps = ch['charger_actual_current']
             P.charging_amp[car_id] = act_amps
-            if act_amps == 0:
-                P.last_charging_stopped[car_id] = datetime.now()
-            else:
-                P.last_charging_stopped[car_id] = None
+            if car_id not in P.last_charging_stopped.keys():
+                if act_amps == 0:
+                    P.last_charging_stopped[car_id] = datetime.now()
+                else:
+                    P.last_charging_stopped[car_id] = None
             act_voltage = ch['charger_voltage']
             if act_voltage > 0:
                 P.voltage = act_voltage
+                P.teslamate_voltage[car_id] = act_voltage
             P.is_charging[car_id] = (ch['charging_state'] == 'Charging')
 
             L.l.info("Car charging status = {}".format(ch['charging_state']))
@@ -221,7 +246,6 @@ def _process_message(msg):
         value = int(msg.payload)
 
 
-
 def mqtt_on_message(client, userdata, msg):
     try:
         prctl.set_name("mqtt_teslamate")
@@ -286,10 +310,10 @@ def unload():
 def init():
     L.l.info('Tesla module initialising')
     thread_pool.add_interval_callable(thread_run, run_interval_second=300)
-    email = get_secure_general("tesla_account_email")
+    P.email = get_secure_general("tesla_account_email")
     P.home_latitude = get_secure_general("home_latitude")
     P.home_longitude = get_secure_general("home_longitude")
-    P.tesla = Tesla(email=email, cache_file="../private_config/.credentials/tesla_cache.json", timeout=30)
+    P.tesla = Tesla(email=P.email, cache_file="../private_config/.credentials/tesla_cache.json", timeout=30)
     P.vehicles = P.tesla.vehicle_list()
     P.api_requests += 1
     first_read_all_vehicles()

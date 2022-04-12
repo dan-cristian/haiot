@@ -111,7 +111,7 @@ def adjust():
                     trend = max_co2_sensor.get_trend("co2", max_address)
                     L.l.info("CO2 max trend for {} is {}".format(max_address, trend))
                     delta_power_increase = (datetime.datetime.now() - P.last_power_increase).total_seconds() / 60
-                    if trend == 1 and delta_power_increase >= P.increase_delta_minutes:
+                    if trend == 1 and delta_power_increase >= P.increase_delta_minutes and vent.power_level is not None:
                         # co2 increasing, faster if there are multiple rooms above max co2
                         new_power_level = vent.power_level + max_co2_count
                         P.last_power_increase = datetime.datetime.now()
