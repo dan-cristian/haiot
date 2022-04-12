@@ -9,7 +9,7 @@ from rule import rule_common
 import rule
 from gpio import pigpio_gpio
 from storage.model import m
-
+import math
 
 class DeviceState(Enum):
     NO_INIT = 0
@@ -306,7 +306,7 @@ class TeslaCharger(Relaydevice):
             if act_amps > 0:
                 # reduce tesla charging to reduce grid energy usage
                 target_watts = max(tesla_charging_watts - grid_watts, 0)
-                target_amps = int(target_watts / apps.tesla.get_nonzero_voltage())
+                target_amps = math.ceil(target_watts / apps.tesla.get_nonzero_voltage())
                 if target_amps != act_amps:
                     L.l.info("Reducing Tesla charging to {} Amps".format(target_amps))
                     apps.tesla.set_charging_amps(target_amps)
@@ -327,7 +327,7 @@ class TeslaCharger(Relaydevice):
                 L.l.info("Tesla already charging at max amps {}".format(act_amps))
             else:
                 target_watts = tesla_charging_watts - grid_watts
-                target_amps = int(target_watts / apps.tesla.get_nonzero_voltage())
+                target_amps = math.ceil(target_watts / apps.tesla.get_nonzero_voltage())
                 if target_amps != act_amps:
                     L.l.info("Increasing Tesla charging to {} Amps".format(target_amps))
                     apps.tesla.set_charging_amps(target_amps)
