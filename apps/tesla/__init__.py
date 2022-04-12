@@ -95,7 +95,6 @@ def vehicle_update(car_id=1):
     if (not vehicle_valid(car_id)) or (not can_refresh()):
         return None
 
-    P.last_charging_stopped[car_id] = None
     vehicle = P.vehicles[car_id - 1]
     try:
         P.car_state[car_id] = vehicle['state']
@@ -114,6 +113,10 @@ def vehicle_update(car_id=1):
                 L.l.info("Manual override detected, car will not stop charging")
             act_amps = ch['charger_actual_current']
             P.charging_amp[car_id] = act_amps
+            if act_amps == 0:
+                P.last_charging_stopped[car_id] = datetime.now()
+            else:
+                P.last_charging_stopped[car_id] = None
             act_voltage = ch['charger_voltage']
             if act_voltage > 0:
                 P.voltage = act_voltage
