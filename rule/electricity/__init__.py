@@ -11,6 +11,7 @@ from gpio import pigpio_gpio
 from storage.model import m
 import math
 
+
 class DeviceState(Enum):
     NO_INIT = 0
     FIRST_START = 1
@@ -309,9 +310,9 @@ class TeslaCharger(Relaydevice):
                 target_amps = math.ceil(target_watts / apps.tesla.get_nonzero_voltage())
                 if target_amps != act_amps:
                     L.l.info("Reducing Tesla charging to {} Amps".format(target_amps))
-                    apps.tesla.set_charging_amps(target_amps)
-                    self.power_status_changed()
-                    return True
+                    if apps.tesla.set_charging_amps(target_amps):
+                        self.power_status_changed()
+                        return True
             else:
                 # nothing to do to reduce grid power consumption. stop charging after staying for too long on 0 charge
                 if apps.tesla.should_stop_charge(self.vehicle_id):
@@ -330,11 +331,12 @@ class TeslaCharger(Relaydevice):
                 target_amps = math.ceil(target_watts / apps.tesla.get_nonzero_voltage())
                 if target_amps != act_amps:
                     L.l.info("Increasing Tesla charging to {} Amps".format(target_amps))
-                    apps.tesla.set_charging_amps(target_amps)
-                    self.power_status_changed()
+                    if apps.tesla.set_charging_amps(target_amps):
+                        self.power_status_changed()
+                        return True
                 if not apps.tesla.is_charging(self.vehicle_id):
                     apps.tesla.start_charge(self.vehicle_id)
-                return True
+                    return True
         return False
 
 
@@ -435,3 +437,4 @@ def init():
     current_module = sys.modules[__name__]
     rule.init_sub_rule(thread_run_func=None, rule_module=current_module)
     L.l.info("Initialised solar rules with {} devices".format(len(P.device_list)))
+

@@ -89,16 +89,18 @@ def set_charging_amps(amps, car_id=1):
     if vehicle_valid(car_id):
         try:
             P.vehicles[car_id - 1].command('CHARGING_AMPS', charging_amps=amps)
+            P.charging_amp[car_id] = amps
+            P.api_requests += 1
+            if amps == 0:
+                if P.last_charging_stopped[car_id] is None:  # only update if previously was charging
+                    P.last_charging_stopped[car_id] = datetime.now()
+            else:
+                P.last_charging_stopped[car_id] = None  # reset timestamp
+            return True
         except Exception as ex:
             L.l.error("Unable to set charging amps: {}".format(ex))
             try_connection_recovery(car_id)
-        P.charging_amp[car_id] = amps
-        P.api_requests += 1
-        if amps == 0:
-            if P.last_charging_stopped[car_id] is None:  # only update if previously was charging
-                P.last_charging_stopped[car_id] = datetime.now()
-        else:
-            P.last_charging_stopped[car_id] = None  # reset timestamp
+    return False
 
 
 def get_last_charging_amps(car_id=1):
