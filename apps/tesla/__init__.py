@@ -4,9 +4,9 @@ from datetime import datetime
 from main.logger_helper import L
 from main import thread_pool
 from storage.model import m
-from apps.tesla.TeslaPy.teslapy import Tesla
-from common import Constant, get_secure_general, utils, get_json_param
+from common import Constant, get_secure_general, get_json_param
 from transport import mqtt_io
+from apps.tesla.TeslaPy.teslapy import Tesla
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
 

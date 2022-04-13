@@ -56,8 +56,18 @@ def init_module(module_name, module_is_active):
                 inited = dynclass.P.initialised
             if not inited:
                 L.l.info('Module {} initialising'.format(module_name))
-                dynclass.init()
-                P.init_mod_list.append(module_name)
+                while True:
+                    try:
+                        dynclass.init()
+                        P.init_mod_list.append(module_name)
+                        break
+                    except ImportError as iex:
+                        traceback.print_exc(file=sys.stdout)
+                        if not fix_module(iex):
+                            break
+                    except Exception as ex:
+                        L.l.error("Unable to import the module, er={}".format(ex))
+                        break
             else:
                 L.l.info('Module {} already initialised, skipping init'.format(module_name))
         else:
