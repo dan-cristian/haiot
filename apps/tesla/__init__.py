@@ -17,10 +17,11 @@ class P:
     vehicles = None
     email = None
     voltage = 220  # default one
+    MAX_AMP = 16
     max_amps = 16
     api_requests = 0
     refresh_request_pause = 30  # seconds between each status update request
-    stop_charge_interval = 60  # seconds interval with amps set to 0 after which charging is stopped
+    stop_charge_interval = 300  # seconds interval with amps set to 0 after which charging is stopped
     last_refresh_request = datetime.min
     user_charging_mode = False  # True is user started the charging, so don't run automatic charging setup
     home_latitude = None
@@ -87,19 +88,22 @@ def try_connection_recovery(car_id):
 
 def set_charging_amps(amps, car_id=1):
     if vehicle_valid(car_id):
-        try:
-            P.vehicles[car_id - 1].command('CHARGING_AMPS', charging_amps=amps)
-            P.charging_amp[car_id] = amps
-            P.api_requests += 1
-            if amps == 0:
-                if P.last_charging_stopped[car_id] is None:  # only update if previously was charging
-                    P.last_charging_stopped[car_id] = datetime.now()
-            else:
-                P.last_charging_stopped[car_id] = None  # reset timestamp
-            return True
-        except Exception as ex:
-            L.l.error("Unable to set charging amps: {}".format(ex))
-            try_connection_recovery(car_id)
+        if amps <= P.MAX_AMP:
+            try:
+                P.vehicles[car_id - 1].command('CHARGING_AMPS', charging_amps=amps)
+                P.charging_amp[car_id] = amps
+                P.api_requests += 1
+                if amps == 0:
+                    if P.last_charging_stopped[car_id] is None:  # only update if previously was charging
+                        P.last_charging_stopped[car_id] = datetime.now()
+                else:
+                    P.last_charging_stopped[car_id] = None  # reset timestamp
+                return True
+            except Exception as ex:
+                L.l.error("Unable to set charging amps: {}".format(ex))
+                try_connection_recovery(car_id)
+        else:
+            L.l.warning("Set amperage too high, {} A".format(amps))
     return False
 
 
