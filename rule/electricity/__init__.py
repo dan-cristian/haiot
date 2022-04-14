@@ -89,6 +89,8 @@ class Relaydevice:
         changed_relay_status = False
         # get relay status to check for user forced start
         power_on = self.is_power_on()
+        if power_on is None:
+            power_on = True
         if grid_watts <= 0:
             # start device if exporting and there is enough surplus
             export_watts = -grid_watts
