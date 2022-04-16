@@ -311,6 +311,7 @@ class TeslaCharger(Relaydevice):
                 target_watts = max(tesla_charging_watts - grid_watts, 0)
                 target_amps = math.ceil(target_watts / apps.tesla.get_nonzero_voltage())
                 if target_amps != act_amps:
+                    # fixme: detect when user started charging from app and don't stop charging
                     L.l.info("Reducing Tesla charging to {} Amps".format(target_amps))
                     if apps.tesla.set_charging_amps(target_amps):
                         self.power_status_changed()

@@ -250,6 +250,16 @@ def _process_message(msg):
         P.teslamate_can_charge = (value.lower() == "home")
     if "battery_level" in msg.topic:
         value = int(msg.payload)
+    if "power" in msg.topic:
+        value = int(msg.payload)
+        if value == -1:  # charging started
+            # refresh vehicle state to detect if user started the charging
+            # temporarily set user charging to true to avoid automatic stop
+            P.user_charging_mode = True
+            vehicle_update(car_id)
+    if "user_charge_enable_request" in msg.topic:  # not working
+        value = "{}".format(msg.payload).replace("b", "").replace("\\", "").replace("'", "")
+        P.user_charging_mode = value == "True"
 
 
 def mqtt_on_message(client, userdata, msg):
