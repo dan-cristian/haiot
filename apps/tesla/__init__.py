@@ -1,6 +1,7 @@
 import threading
 import prctl
 from datetime import datetime
+from apps.tesla.TeslaPy.teslapy import VehicleError
 from main.logger_helper import L
 from main import thread_pool
 from storage.model import m
@@ -16,6 +17,8 @@ class P:
     tesla = None
     vehicles = None
     email = None
+    DEFAULT_VOLTAGE = 220
+    MIN_VOLTAGE = 120
     voltage = 220  # default one
     MAX_AMP = 16
     max_amps = 16
@@ -32,6 +35,7 @@ class P:
     teslamate_charging_amp = dict()
     teslamate_last_charging_update = datetime.min
     teslamate_voltage = dict()
+    teslamate_plugged_in = dict()
     # save car params
     is_charging = dict()
     charging_amp = dict()
@@ -72,7 +76,7 @@ def try_connection_recovery(car_id):
     L.l.info("Trying to recover tesla cloud connection")
     try:
         P.tesla.close()
-        P.tesla = Tesla(email=P.email, cache_file="../private_config/.credentials/tesla_cache.json", timeout=60)
+        P.tesla = Tesla(email=P.email, cache_file="../private_config/.credentials/tesla_cache.json", timeout=120)
         P.vehicles = P.tesla.vehicle_list()
         vehicle = P.vehicles[car_id - 1]
         P.car_state[car_id] = vehicle['state']
@@ -180,11 +184,15 @@ def vehicle_update(car_id=1):
     except Exception as ex:
         L.l.error("Unable to get vehicle charging data, #API{}, er={}".format(P.api_requests, ex))
         P.last_refresh_request = datetime.now()
+        summary = vehicle.get_vehicle_summary()
         P.vehicles = P.tesla.vehicle_list()
 
 
 def get_nonzero_voltage():
-    return P.voltage
+    if P.voltage < P.MIN_VOLTAGE:
+        return P.DEFAULT_VOLTAGE
+    else:
+        return P.voltage
 
 
 def get_voltage(car_id=1):
@@ -220,15 +228,27 @@ def stop_charge(car_id=1):
 def start_charge(car_id=1):
     if vehicle_valid(car_id):
         L.l.info("Starting tesla charging")
-        P.vehicles[car_id - 1].command('START_CHARGE')
-        P.api_requests += 1
-
+        vehicle = P.vehicles[car_id - 1]
+        try:
+            vehicle.command('START_CHARGE')
+            P.api_requests += 1
+            return True
+        except VehicleError as vex:
+            if "{}".format(vex) == "disconnected":
+                L.l.warning("Vehicle is disconnected, cannot start charging")
+            return False
+        except Exception as ex:
+            if "vehicle unavailable" in "{}".format(ex):
+                L.l.warning("Vehicle unavailable on start charge, trying to wake")
+                vehicle.sync_wake_up()
+            L.l.error("Got error when trying to start charging, err={}".format(ex))
 
 # https://docs.teslamate.org/docs/integrations/mqtt/
 def _process_message(msg):
     car_id = int(msg.topic.split("teslamate/cars/")[1][:2].replace("/", ""))
     if "plugged_in" in msg.topic:
         value = msg.payload
+        P.teslamate_plugged_in[car_id] = value
     if "charger_actual_current" in msg.topic:
         value = int(msg.payload)
         P.teslamate_charging_amp[car_id] = value
@@ -329,7 +349,7 @@ def init():
     P.email = get_secure_general("tesla_account_email")
     P.home_latitude = get_secure_general("home_latitude")
     P.home_longitude = get_secure_general("home_longitude")
-    P.tesla = Tesla(email=P.email, cache_file="../private_config/.credentials/tesla_cache.json", timeout=30)
+    P.tesla = Tesla(email=P.email, cache_file="../private_config/.credentials/tesla_cache.json", timeout=120)
     P.vehicles = P.tesla.vehicle_list()
     P.api_requests += 1
     first_read_all_vehicles()

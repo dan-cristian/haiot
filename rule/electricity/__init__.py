@@ -297,14 +297,14 @@ class TeslaCharger(Relaydevice):
 
     def grid_updated(self, grid_watts):
         P.thread_pool_status = "Tesla grid_updated start"
-        if not apps.tesla.can_auto_charge():
-            return
         act_amps = apps.tesla.get_last_charging_amps(self.vehicle_id)
         if act_amps is None:
             act_amps = 0
         tesla_charging_watts = act_amps * apps.tesla.get_nonzero_voltage()
 
         if grid_watts > 0:
+            if not apps.tesla.can_auto_charge():
+                return
             # consuming from grid
             P.thread_pool_status = "Tesla grid_updated grid consumption"
             if act_amps > 0:
@@ -331,9 +331,15 @@ class TeslaCharger(Relaydevice):
             P.thread_pool_status = "Tesla grid_updated grid export"
             if act_amps == apps.tesla.P.max_amps:
                 L.l.info("Tesla already charging at max amps {}".format(act_amps))
+                # force charge start
+                apps.tesla.start_charge(self.vehicle_id)
+                return True
             else:
                 target_watts = tesla_charging_watts - grid_watts
                 target_amps = math.ceil(target_watts / apps.tesla.get_nonzero_voltage())
+                if act_amps == 0:
+                    apps.tesla.start_charge(self.vehicle_id)
+                    return True
                 if target_amps != act_amps:
                     L.l.info("Increasing Tesla charging to {} Amps".format(target_amps))
                     if apps.tesla.set_charging_amps(target_amps):
