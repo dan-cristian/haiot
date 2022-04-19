@@ -339,7 +339,7 @@ class TeslaCharger(Relaydevice):
                 target_amps = math.ceil(target_watts / apps.tesla.get_nonzero_voltage())
                 if act_amps == 0:
                     apps.tesla.start_charge(self.vehicle_id)
-                    return True
+                    # return True
                 if target_amps != act_amps:
                     L.l.info("Increasing Tesla charging to {} Amps".format(target_amps))
                     if apps.tesla.set_charging_amps(target_amps):

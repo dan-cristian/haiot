@@ -26,6 +26,7 @@ class P:
     refresh_request_pause = 30  # seconds between each status update request
     stop_charge_interval = 300  # seconds interval with amps set to 0 after which charging is stopped
     last_refresh_request = datetime.min
+    scheduled_charging_mode = None
     user_charging_mode = False  # True is user started the charging, so don't run automatic charging setup
     home_latitude = None
     home_longitude = None
@@ -52,8 +53,11 @@ def can_refresh():
     return (datetime.now() - P.last_refresh_request).total_seconds() >= P.refresh_request_pause
 
 
+# allow variable charging when car is at home and scheduling is not enabled
+# when scheduling is enabled the car charging parameters will not change - allows manual user adjustments only
 def can_auto_charge():
-    return (not P.user_charging_mode) and P.can_charge_at_home
+    return P.can_charge_at_home and not P.scheduled_charging_mode
+        #(not P.user_charging_mode) and P.can_charge_at_home
 
 
 def vehicle_valid(car_id):
@@ -132,6 +136,7 @@ def vehicle_update(car_id=1):
     try:
         P.car_state[car_id] = vehicle['state']
         if vehicle['state'] in ['asleep', 'offline']:
+            # fixme: do no wake the car
             vehicle.sync_wake_up()
             P.api_requests += 1
         if vehicle['state'] == 'online':
@@ -139,11 +144,12 @@ def vehicle_update(car_id=1):
             P.api_requests += 1
             P.last_refresh_request = datetime.now()
             ch = vehicle_data['charge_state']
-            charging_mode = ch['scheduled_charging_mode']
+            P.scheduled_charging_mode = ch['scheduled_charging_mode']
             P.user_charging_mode = ch['user_charge_enable_request']
-            L.l.info('User charging request={}, mode={}'.format(P.user_charging_mode, charging_mode))
+            L.l.info('User charging request={}, schedule mode={}'.format(P.user_charging_mode,
+                                                                         P.scheduled_charging_mode))
             if P.user_charging_mode:
-                L.l.info("Manual override detected, car will not stop charging")
+                L.l.info("Manual user charging detected")
             act_amps = ch['charger_actual_current']
             P.charging_amp[car_id] = act_amps
             if car_id not in P.last_charging_stopped.keys():
@@ -236,12 +242,15 @@ def start_charge(car_id=1):
         except VehicleError as vex:
             if "{}".format(vex) == "disconnected":
                 L.l.warning("Vehicle is disconnected, cannot start charging")
+            if "{}".format(vex) == "is_charging":
+                return True
             return False
         except Exception as ex:
             if "vehicle unavailable" in "{}".format(ex):
                 L.l.warning("Vehicle unavailable on start charge, trying to wake")
                 vehicle.sync_wake_up()
             L.l.error("Got error when trying to start charging, err={}".format(ex))
+
 
 # https://docs.teslamate.org/docs/integrations/mqtt/
 def _process_message(msg):
@@ -280,6 +289,10 @@ def _process_message(msg):
     if "user_charge_enable_request" in msg.topic:  # not working
         value = "{}".format(msg.payload).replace("b", "").replace("\\", "").replace("'", "")
         P.user_charging_mode = value == "True"
+    if "scheduled_charging_start_time" in msg.topic:
+        value = "{}".format(msg.payload).replace("b", "").replace("\\", "").replace("'", "")
+        L.l.info("Detected start charge schedule change={}".format(value))
+        P.scheduled_charging_mode = (value is not "")
 
 
 def mqtt_on_message(client, userdata, msg):
