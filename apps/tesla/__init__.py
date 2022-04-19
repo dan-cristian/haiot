@@ -144,7 +144,7 @@ def vehicle_update(car_id=1):
             P.api_requests += 1
             P.last_refresh_request = datetime.now()
             ch = vehicle_data['charge_state']
-            P.scheduled_charging_mode = ch['scheduled_charging_mode']
+            P.scheduled_charging_mode = (ch['scheduled_charging_mode'] != "Off")
             P.user_charging_mode = ch['user_charge_enable_request']
             L.l.info('User charging request={}, schedule mode={}'.format(P.user_charging_mode,
                                                                          P.scheduled_charging_mode))
