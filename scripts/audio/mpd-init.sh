@@ -14,6 +14,9 @@ $DIR/mpc-play.sh dormitor init
 $DIR/mpc-play.sh baie init
 $DIR/mpc-play.sh headset init
 #$DIR/mpc-play.sh bucatarie init
+# load default alsa settings
+alsactl --file /root/.config/asound.state restore
+# save settings with alsactl --file /root/.config/asound.state store
 }
 
 init_output
