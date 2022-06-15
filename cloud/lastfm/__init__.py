@@ -233,6 +233,25 @@ def get_loved_tracks_to_mpd():
     return '{"result": "' + _multify(result) + '"}'
 
 
+def set_tag_loved_tracks(tag):
+    if P.network is None:
+        init()
+    if P.network is not None:
+        loved_tracks = P.network.get_user(P.USERNAME).get_loved_tracks(limit=None)
+        count = len(loved_tracks)
+        index = 0
+        for loved_track in loved_tracks:
+            index += 1
+            try:
+                loved_track.track.set_tags([tag])
+                L.l.info("Set {}/{} tag={} to {}".format(index, count, tag, loved_track.track.title))
+            except Exception as ex:
+                L.l.error("Cannot set tag to {}, err={}".format(loved_track.track.title, ex))
+    else:
+        result = 'not init'
+    return '{"result": "' + _multify(result) + '"}'
+
+
 def init():
     config_file = get_json_param(Constant.P_LASTFM_CONFIG_FILE)
     if os.path.isfile(config_file):
@@ -247,6 +266,7 @@ def init():
         try:
             P.network = pylast.LastFMNetwork(
                 api_key=API_KEY, api_secret=API_SECRET, username=P.USERNAME, password_hash=password_hash)
+            #set_tag_loved_tracks('love')
         except Exception as ex:
             L.l.error("Cannot init lastfm, ex={}".format(ex))
     else:

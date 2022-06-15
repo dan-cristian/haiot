@@ -28,6 +28,7 @@ class P:
     last_refresh_request = datetime.min
     scheduled_charging_mode = None
     user_charging_mode = False  # True is user started the charging, so don't run automatic charging setup
+    charging_state = None
     home_latitude = None
     home_longitude = None
     can_charge_at_home = False  # True if car is at home, so automatic charging can happen
@@ -56,7 +57,7 @@ def can_refresh():
 # allow variable charging when car is at home and scheduling is not enabled
 # when scheduling is enabled the car charging parameters will not change - allows manual user adjustments only
 def can_auto_charge():
-    return P.can_charge_at_home and not P.scheduled_charging_mode
+    return P.can_charge_at_home and not P.scheduled_charging_mode and P.charging_state != 'Disconnected'
         #(not P.user_charging_mode) and P.can_charge_at_home
 
 
@@ -146,6 +147,7 @@ def vehicle_update(car_id=1):
             ch = vehicle_data['charge_state']
             P.scheduled_charging_mode = (ch['scheduled_charging_mode'] != "Off")
             P.user_charging_mode = ch['user_charge_enable_request']
+            P.charging_state = ch['charging_state']
             L.l.info('User charging request={}, schedule mode={}'.format(P.user_charging_mode,
                                                                          P.scheduled_charging_mode))
             if P.user_charging_mode:
@@ -244,13 +246,12 @@ def start_charge(car_id=1):
                 L.l.warning("Vehicle is disconnected, cannot start charging")
             if "{}".format(vex) == "is_charging":
                 return True
-            return False
         except Exception as ex:
             if "vehicle unavailable" in "{}".format(ex):
                 L.l.warning("Vehicle unavailable on start charge, trying to wake")
                 vehicle.sync_wake_up()
             L.l.error("Got error when trying to start charging, err={}".format(ex))
-
+        return False
 
 # https://docs.teslamate.org/docs/integrations/mqtt/
 def _process_message(msg):

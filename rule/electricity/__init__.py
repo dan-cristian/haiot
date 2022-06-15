@@ -302,9 +302,10 @@ class TeslaCharger(Relaydevice):
             act_amps = 0
         tesla_charging_watts = act_amps * apps.tesla.get_nonzero_voltage()
 
+        if not apps.tesla.can_auto_charge():
+            return
+
         if grid_watts > 0:
-            if not apps.tesla.can_auto_charge():
-                return
             # consuming from grid
             P.thread_pool_status = "Tesla grid_updated grid consumption"
             if act_amps > 0:
