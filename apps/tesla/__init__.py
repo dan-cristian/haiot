@@ -38,6 +38,7 @@ class P:
     teslamate_last_charging_update = datetime.min
     teslamate_voltage = dict()
     teslamate_plugged_in = dict()
+    teslamate_time_to_full_charge = None
     # save car params
     is_charging = dict()
     charging_amp = dict()
@@ -57,7 +58,8 @@ def can_refresh():
 # allow variable charging when car is at home and scheduling is not enabled
 # when scheduling is enabled the car charging parameters will not change - allows manual user adjustments only
 def can_auto_charge():
-    return P.can_charge_at_home and not P.scheduled_charging_mode and P.charging_state != 'Disconnected'
+    return P.can_charge_at_home and not P.scheduled_charging_mode and P.charging_state != 'Disconnected' \
+           and P.teslamate_time_to_full_charge > 0
         #(not P.user_charging_mode) and P.can_charge_at_home
 
 
@@ -271,6 +273,10 @@ def _process_message(msg):
         P.teslamate_voltage[car_id] = value
         if value > 0:
             P.voltage = value
+    if "charge_limit_soc" in msg.topic:
+        value = int(msg.payload)
+    if "time_to_full_charge" in msg.topic:
+        P.teslamate_time_to_full_charge = int(msg.payload)
     if "state" in msg.topic:
         value = "{}".format(msg.payload).replace("b", "").replace("\\", "").replace("'", "")
         P.car_state[car_id] == value
@@ -363,7 +369,7 @@ def init():
     P.email = get_secure_general("tesla_account_email")
     P.home_latitude = get_secure_general("home_latitude")
     P.home_longitude = get_secure_general("home_longitude")
-    P.tesla = Tesla(email=P.email, cache_file="../private_config/.credentials/tesla_cache.json", timeout=120)
+    P.tesla = Tesla(email=P.email, cache_file="../private_config/.credentials/tesla_cache.json", timeout=180)
     P.vehicles = P.tesla.vehicle_list()
     P.api_requests += 1
     first_read_all_vehicles()
