@@ -276,7 +276,7 @@ def _process_message(msg):
     if "charge_limit_soc" in msg.topic:
         value = int(msg.payload)
     if "time_to_full_charge" in msg.topic:
-        P.teslamate_time_to_full_charge = int(msg.payload)
+        P.teslamate_time_to_full_charge = float(msg.payload)
     if "state" in msg.topic:
         value = "{}".format(msg.payload).replace("b", "").replace("\\", "").replace("'", "")
         P.car_state[car_id] == value
