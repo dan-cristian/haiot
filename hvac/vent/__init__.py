@@ -72,7 +72,7 @@ def adjust():
             return
 
     # adjust vent system power based on CO2 levels
-    if vent.mode != vent_atrea.P.mode_off:
+    if vent.mode == vent_atrea.P.mode_automatic or vent.mode == vent_atrea.P.mode_default:
         co2_vals = []
         co2_ids = []
         co2_sensors = {}
@@ -117,8 +117,9 @@ def adjust():
                         P.last_power_increase = datetime.datetime.now()
             # adjust vent openings based on co2 room levels
             adjust_vents(co2_sensors, max_co2_sensor, radon_sensor, radon_is_high)
-            if new_power_level is not None:
-                vent_atrea.set_power_level(new_power_level)
+            if new_power_level is not None and vent.mode == vent_atrea.P.mode_automatic:
+                if new_power_level <= vent_atrea.P.power_level_max:
+                    vent_atrea.set_power_level(new_power_level)
 
 
 def adjust_vents(co2_sensors, max_co2_sensor, radon_sensor, radon_is_high):

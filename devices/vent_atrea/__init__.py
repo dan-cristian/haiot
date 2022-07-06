@@ -31,6 +31,7 @@ class P:
 
     mode_off = 0
     mode_default = 2
+    mode_automatic = 1
 
     power_level_min = 25  # 12 is lowest possible
     power_level_default = 35
@@ -86,18 +87,15 @@ def set_mode(mode):
 
 
 def set_power_level(level):
-    if level <= P.power_level_max:
-        L.l.info("Setting ventilation power level to {}".format(level))
-        server_url = get_json_param(Constant.P_ATREA_LOCAL_URL) + P.power_level_set_url
-        level_text = f'{level:03}'
-        server_url = server_url.replace("XXX", level_text)
-        if P.auth_key is not None:
-            state_text = utils.get_url_content(server_url.replace("<key>", P.auth_key))
-            L.l.info("Setting ventilation power level to {} returned {}".format(level, state_text))
-        else:
-            L.l.info("Failed setting ventilation power, not authenticated")
+    L.l.info("Setting ventilation power level to {}".format(level))
+    server_url = get_json_param(Constant.P_ATREA_LOCAL_URL) + P.power_level_set_url
+    level_text = f'{level:03}'
+    server_url = server_url.replace("XXX", level_text)
+    if P.auth_key is not None:
+        state_text = utils.get_url_content(server_url.replace("<key>", P.auth_key))
+        L.l.info("Setting ventilation power level to {} returned {}".format(level, state_text))
     else:
-        L.l.info("Ignoring set power level {} as is higher than max {}".format(level, P.power_level_max))
+        L.l.info("Failed setting ventilation power, not authenticated")
 
 
 def ventilation_upsert_listener(record, changed_fields):
