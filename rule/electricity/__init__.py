@@ -343,7 +343,7 @@ class TeslaCharger(Relaydevice):
                     # return True
                 if target_amps != act_amps:
                     L.l.info("Increasing Tesla charging to {} Amps".format(target_amps))
-                    if apps.tesla.set_charging_amps(target_amps):
+                    if apps.tesla.set_charging_amps(min(target_amps, apps.tesla.P.MAX_AMP)):
                         self.power_status_changed()
                         return True
                 if not apps.tesla.is_charging(self.vehicle_id):
