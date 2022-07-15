@@ -381,11 +381,11 @@ class P:
             relay = 'tesla_charger'
             P.device_list[relay] = TeslaCharger(relay_name=relay, vehicle_id=1, state_change_interval=20)
 
-        relay = 'batterychargectrl_low'
-        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=500,
+        relay = 'batterychargectrl_low'  # index 2, right
+        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=750,
                                            supports_breaks=True, min_on_interval=10, state_change_interval=5)
-        relay = 'batterychargectrl_high'
-        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=600,
+        relay = 'batterychargectrl_high'  # index 1, left
+        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=770,
                                            supports_breaks=True, min_on_interval=10, state_change_interval=5)
 
         if not P.emulate_export:
