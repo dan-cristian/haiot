@@ -229,10 +229,19 @@ def is_charging(car_id=1):
 def stop_charge(car_id=1):
     if vehicle_valid(car_id):
         L.l.info("Stopping tesla charging")
-        P.vehicles[car_id - 1].command('STOP_CHARGE')
-        P.is_charging[car_id] = False
-        P.last_charging_stopped[car_id] = None
-        P.api_requests += 1
+        try:
+            P.vehicles[car_id - 1].command('STOP_CHARGE')
+            P.is_charging[car_id] = False
+            P.last_charging_stopped[car_id] = None
+            P.api_requests += 1
+            return True
+        except VehicleError as vex:
+            L.l.warning("Vehicle error, cannot stop charging, er={}".format(vex))
+            if "{}".format(vex) == "not_charging":
+                return True
+        except Exception as ex:
+            L.l.warning("Vehicle exception, cannot stop charging, er={}".format(ex))
+        return False
 
 
 def start_charge(car_id=1):
