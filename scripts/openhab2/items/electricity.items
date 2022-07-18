@@ -43,6 +43,8 @@ Number electricity_power_solar_rulota "Power solar rulota[%.0f W]" <energy>     
 Number electricity_power_grid_rulota "Power grid rulota[%.0f W]" <energy>                    {mqtt="<[mosquitto:iot/openhab/electricity_power grid rulota:state:default]"}
 Number electricity_power_battery_charger "Power battery charger[%.0f W]" <energy>            {mqtt="<[mosquitto:iot/openhab/electricity_power battery charger:state:default]"}
 
+Number powermonitor_total_energy_solar_l1 "Total energy solar L1 [%.0f kw]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_total_solar l1:state:default]"}
+
 Number powermonitor_voltage_big_battery_1 "Big battery 1 [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_voltage_big battery 1:state:default]"}
 Number powermonitor_voltage_big_battery_2 "Big battery 2 [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_voltage_big battery 2:state:default]"}
 Number powermonitor_voltage_big_battery_3 "Big battery 3 [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_voltage_big battery 3:state:default]"}
