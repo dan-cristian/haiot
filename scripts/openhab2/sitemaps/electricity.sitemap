@@ -63,12 +63,12 @@ Frame label="Charts" {
         Chart item=electricity_power_main_mono period=W refresh=10000 visibility=[p_switch==2]
         Chart item=electricity_power_main_mono period=M refresh=10000 visibility=[p_switch==3]
         }
-    Text item=electricity_power_solar {
+    Text item=powermonitor_power_solar_l1 {
         Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M"]
-        Chart item=electricity_power_solar period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
-        Chart item=electricity_power_solar period=D refresh=10000 visibility=[p_switch==1]
-        Chart item=electricity_power_solar period=W refresh=10000 visibility=[p_switch==2]
-        Chart item=electricity_power_solar period=M refresh=10000 visibility=[p_switch==3]
+        Chart item=powermonitor_power_solar_l1 period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
+        Chart item=powermonitor_power_solar_l1 period=D refresh=10000 visibility=[p_switch==1]
+        Chart item=powermonitor_power_solar_l1 period=W refresh=10000 visibility=[p_switch==2]
+        Chart item=powermonitor_power_solar_l1 period=M refresh=10000 visibility=[p_switch==3]
     }
     Text item=powermonitor_energy_export_main_l1 {
         Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M"]

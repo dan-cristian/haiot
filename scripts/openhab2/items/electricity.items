@@ -35,7 +35,9 @@ Number electricity_power_freezer "Power freezer [%.0f W]" <energy>           {mq
 Number electricity_power_gas_heater "Power gas heater[%.0f W]" <energy>      {mqtt="<[mosquitto:iot/openhab/electricity_power gas heater:state:default]"}
 Number electricity_power_washing "Power washing[%.0f W]" <energy>            {mqtt="<[mosquitto:iot/openhab/electricity_power washing:state:default]"}
 Number electricity_power_floor_bath1 "Power floor bath1[%.0f W]" <energy>    {mqtt="<[mosquitto:iot/openhab/electricity_power floor bath1:state:default]"}
+
 Number electricity_power_solar "Power solar[%.0f W]" <energy>                {mqtt="<[mosquitto:iot/openhab/electricity_power solar:state:default]"}
+
 Number electricity_power_boiler "Power boiler[%.0f W]" <energy>              {mqtt="<[mosquitto:iot/openhab/electricity_power boiler:state:default]"}
 Number electricity_power_solar_rulota "Power solar rulota[%.0f W]" <energy>                  {mqtt="<[mosquitto:iot/openhab/electricity_power solar rulota:state:default]"}
 Number electricity_power_grid_rulota "Power grid rulota[%.0f W]" <energy>                    {mqtt="<[mosquitto:iot/openhab/electricity_power grid rulota:state:default]"}
@@ -55,6 +57,8 @@ Number powermonitor_power_main_l1 "Main L1 [%.0f W]" <energy> {mqtt="<[mosquitto
 Number powermonitor_power_main_l2 "Main L2 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_power_main l2:state:default]"}
 Number powermonitor_power_main_l3 "Main L3 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_power_main l3:state:default]"}
 Number powermonitor_power_main_n "Main N [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_power_main n:state:default]"}
+
+Number powermonitor_power_solar_l1 "Solar L1 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_power_solar l1:state:default]"}
 
 Number powermonitor_energy_export_main_l1 "Export L1 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_energy_export_main l1:state:default]"}
 Number powermonitor_energy_export_main_l2 "Export L2 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_energy_export_main l2:state:default]"}

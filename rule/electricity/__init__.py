@@ -287,6 +287,10 @@ class PwmHeater(LoadPowerDevice):
         self.target_watts = 0
 
 
+class InverterRelay(Relaydevice):
+    pass
+
+
 class TeslaCharger(Relaydevice):
     vehicle_id = None
 
@@ -380,7 +384,11 @@ class P:
         if apps.tesla.P.initialised:
             relay = 'tesla_charger'
             P.device_list[relay] = TeslaCharger(relay_name=relay, vehicle_id=1, state_change_interval=20)
-
+        # keep energy producing devices first in the list
+        # order energy consumption with highest consumption first
+        relay = 'inverterpw'
+        P.device_list[relay] = InverterRelay(relay_name=relay, avg_consumption=-500,
+                                           supports_breaks=True, min_on_interval=60, state_change_interval=120)
         relay = 'batterychargectrl_low'  # index 2, right
         P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=750,
                                            supports_breaks=True, min_on_interval=10, state_change_interval=5)
