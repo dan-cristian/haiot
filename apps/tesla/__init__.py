@@ -58,8 +58,10 @@ def can_refresh():
 # allow variable charging when car is at home and scheduling is not enabled
 # when scheduling is enabled the car charging parameters will not change - allows manual user adjustments only
 def can_auto_charge():
-    return P.can_charge_at_home and not P.scheduled_charging_mode and P.charging_state != 'Disconnected' \
-           and (P.teslamate_time_to_full_charge is None or P.teslamate_time_to_full_charge > 0)
+    res = P.can_charge_at_home and not P.scheduled_charging_mode and P.charging_state != 'Disconnected' \
+          and (P.teslamate_time_to_full_charge is None
+               or (P.teslamate_time_to_full_charge is None or P.teslamate_time_to_full_charge > 0))
+    return res
         #(not P.user_charging_mode) and P.can_charge_at_home
 
 

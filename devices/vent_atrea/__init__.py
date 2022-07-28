@@ -58,7 +58,7 @@ def keep_alive():
     if P.auth_key is not None:
         server_url = get_json_param(Constant.P_ATREA_LOCAL_URL) + P.state_url
         state_text = utils.get_url_content(server_url.replace("<key>", P.auth_key))
-        if "HTTP: 403 Forbidden AUTH" in state_text:
+        if state_text is None or "HTTP: 403 Forbidden AUTH" in state_text:
             auth()
         else:
             try:
