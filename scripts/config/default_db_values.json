@@ -597,7 +597,8 @@
     {"id": 1, "name":  "living tv",    "zone_id": 2,  "host_name": "ESP_A1ED05", "host_type": "micro"},
     {"id": 2, "name":  "tudor",        "zone_id": 13, "host_name": "ESP_A1A351", "host_type": "micro"},
     {"id": 3, "name":  "kids",         "zone_id": 6,  "host_name": "ESP_C75001", "host_type": "micro"},
-    {"id": 4, "name":  "bedroom",      "zone_id": 4,  "host_name": "ESP_A1A84F", "host_type": "micro"}
+    {"id": 4, "name":  "bedroom",      "zone_id": 4,  "host_name": "ESP_A1A84F", "host_type": "micro"},
+    {"id": 5, "name":  "birou",      "zone_id": 47,  "host_name": "ESP_DUMMY", "host_type": "micro"}
   ],
 
   "AirSensor": [
