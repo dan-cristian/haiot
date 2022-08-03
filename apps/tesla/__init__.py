@@ -36,6 +36,7 @@ class P:
     teslamate_geo_home = False  # do not trigger automatic charging, car maybe not be at home etc
     teslamate_charging_amp = dict()
     teslamate_last_charging_update = datetime.min
+    charging_stopped = None  # update charging state when sending charge start/stop commands
     teslamate_voltage = dict()
     teslamate_plugged_in = dict()
     teslamate_time_to_full_charge = None
@@ -221,7 +222,7 @@ def get_voltage(car_id=1):
 def is_charging(car_id=1):
     voltage = get_voltage(car_id)
     if voltage is not None:
-        return P.teslamate_voltage[car_id] > 0
+        return P.teslamate_voltage[car_id] > P.MIN_VOLTAGE  # sometimes voltage is higher then 0 when not charging
     else:
         return None
 
@@ -240,10 +241,12 @@ def stop_charge(car_id=1):
             P.is_charging[car_id] = False
             P.last_charging_stopped[car_id] = None
             P.api_requests += 1
+            P.charging_stopped = True
             return True
         except VehicleError as vex:
             L.l.warning("Tesla error, cannot stop charging, er={}".format(vex))
             if "{}".format(vex) == "not_charging":
+                P.charging_stopped = True
                 return True
         except Exception as ex:
             L.l.warning("Tesla exception, cannot stop charging, er={}".format(ex))
@@ -257,6 +260,7 @@ def start_charge(car_id=1):
         try:
             vehicle.command('START_CHARGE')
             P.api_requests += 1
+            P.charging_stopped = False
             return True
         except VehicleError as vex:
             if "{}".format(vex) == "disconnected":

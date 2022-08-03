@@ -319,12 +319,14 @@ class TeslaCharger(Relaydevice):
                 if target_amps != act_amps:
                     # fixme: detect when user started charging from app and don't stop charging
                     L.l.info("Reducing Tesla charging to {} Amps".format(target_amps))
+                    P.thread_pool_status = 'tesla.set_charging_amps 1'
                     if apps.tesla.set_charging_amps(target_amps):
                         self.power_status_changed()
                         return True
             else:
                 # nothing to do to reduce grid power consumption. stop charging after staying for too long on 0 charge
                 if apps.tesla.should_stop_charge(self.vehicle_id):
+                    P.thread_pool_status = 'tesla.stop_charge'
                     apps.tesla.stop_charge(self.vehicle_id)
                 # is_charging = apps.tesla.is_charging(self.vehicle_id)
                 # if is_charging:
@@ -337,20 +339,24 @@ class TeslaCharger(Relaydevice):
             if act_amps == apps.tesla.P.max_amps:
                 L.l.info("Tesla already charging at max amps {}".format(act_amps))
                 # force charge start
+                P.thread_pool_status = 'tesla.start_charge 1'
                 apps.tesla.start_charge(self.vehicle_id)
                 return True
             else:
                 target_watts = tesla_charging_watts - grid_watts
                 target_amps = math.ceil(target_watts / apps.tesla.get_nonzero_voltage())
                 if act_amps == 0:
+                    P.thread_pool_status = 'tesla.start_charge 2'
                     apps.tesla.start_charge(self.vehicle_id)
                     # return True
                 if target_amps != act_amps:
                     L.l.info("Increasing Tesla charging to {} Amps".format(target_amps))
+                    P.thread_pool_status = 'tesla.set_charging_amps 2'
                     if apps.tesla.set_charging_amps(min(target_amps, apps.tesla.P.MAX_AMP)):
                         self.power_status_changed()
                         return True
                 if not apps.tesla.is_charging(self.vehicle_id):
+                    P.thread_pool_status = 'tesla.start_charge 3'
                     apps.tesla.start_charge(self.vehicle_id)
                     return True
         return False
@@ -368,6 +374,8 @@ class P:
     emulate_export = False # used to test export energy scenarios
     last_state_change = datetime.min
     system_wait_time = 0  # seconds to wait until any device can change state (some relays have latency)
+
+    thread_pool_status = None
 
     @staticmethod
     def can_state_change():
