@@ -306,7 +306,7 @@ class TeslaCharger(Relaydevice):
             act_amps = 0
         tesla_charging_watts = act_amps * apps.tesla.get_nonzero_voltage()
 
-        if not apps.tesla.can_auto_charge():
+        if not apps.tesla.can_auto_charge(self.vehicle_id):
             return
 
         if grid_watts > 0:
