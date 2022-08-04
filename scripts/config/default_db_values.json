@@ -386,7 +386,7 @@
 
   "PowerMonitor": [
 
-    {"id":15, "name":"house battery", "type":"ina", "host_name":"batterychargectrl"},
+    {"id":15, "name":"house battery", "type":"ina", "host_name":"batterychargectrl", "min_voltage":10},
 
     {"id":20, "name":"living ozone", "type":"ina", "host_name":"wemoslivingair"},
     {"id":21, "name":"airfiltered nox", "type":"ina", "host_name":"airfiltered"},

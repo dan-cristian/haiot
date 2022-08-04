@@ -210,7 +210,9 @@ def _process_message(msg):
                     else:
                         if 'Voltage' in ina:
                             voltage = ina['Voltage']
-                            sensor.voltage = voltage
+                            # only log valid values
+                            if sensor.min_voltage is None or voltage >= sensor.min_voltage:
+                                sensor.voltage = voltage
                         if 'Current' in ina:
                             current = ina['Current']
                             sensor.current = current
