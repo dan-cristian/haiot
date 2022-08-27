@@ -47,6 +47,7 @@ class P:
     car_longitude = dict()
     car_state = dict()
     last_charging_stopped = dict()  # timestamps when car charging was stopped
+    DEBUG = True
 
     def __init__(self):
         pass
@@ -66,6 +67,10 @@ def can_auto_charge(vehicle_id=1):
     res = P.can_charge_at_home and not P.scheduled_charging_mode and plugged_in and\
           (P.teslamate_time_to_full_charge is None or (P.teslamate_time_to_full_charge is None
                                                        or P.teslamate_time_to_full_charge > 0))
+    if P.DEBUG and res is False:
+        L.l.info("Tesla debug auto_charge: at_home={} scheduled={} plugged_in={} time_full={}".format(
+            P.can_charge_at_home, P.scheduled_charging_mode, plugged_in, P.teslamate_time_to_full_charge
+        ))
     return res
 
 
@@ -321,6 +326,8 @@ def _process_message(msg):
         value = "{}".format(msg.payload).replace("b", "").replace("\\", "").replace("'", "")
         L.l.info("Detected tesla start charge as schedule changed={}".format(value))
         P.scheduled_charging_mode = (value is not "")
+    if P.DEBUG:
+        L.l.info("Teslamate: msg={}".format(msg))
 
 
 def mqtt_on_message(client, userdata, msg):

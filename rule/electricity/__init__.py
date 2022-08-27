@@ -293,6 +293,7 @@ class InverterRelay(Relaydevice):
 
 class TeslaCharger(Relaydevice):
     vehicle_id = None
+    DEBUG = True
 
     def __init__(self, relay_name, vehicle_id, state_change_interval):
         self.vehicle_id = vehicle_id
@@ -311,7 +312,7 @@ class TeslaCharger(Relaydevice):
 
         if grid_watts > 0:
             # consuming from grid
-            P.thread_pool_status = "Tesla grid_updated grid consumption"
+            P.thread_pool_status = "Tesla grid_updated we have grid consumption"
             if act_amps > 0:
                 # reduce tesla charging to reduce grid energy usage
                 target_watts = max(tesla_charging_watts - grid_watts, 0)
@@ -323,6 +324,9 @@ class TeslaCharger(Relaydevice):
                     if apps.tesla.set_charging_amps(target_amps):
                         self.power_status_changed()
                         return True
+                else:
+                    if TeslaCharger.DEBUG:
+                        L.l.info("Tesla target-1 amp={}, act_amp={}".format(target_amps, act_amps))
             else:
                 # nothing to do to reduce grid power consumption. stop charging after staying for too long on 0 charge
                 if apps.tesla.should_stop_charge(self.vehicle_id):
@@ -347,7 +351,8 @@ class TeslaCharger(Relaydevice):
                 target_amps = math.ceil(target_watts / apps.tesla.get_nonzero_voltage())
                 if act_amps == 0:
                     P.thread_pool_status = 'tesla.start_charge 2'
-                    apps.tesla.start_charge(self.vehicle_id)
+                    res = apps.tesla.start_charge(self.vehicle_id)
+                    L.l.info("Tesla start charging={}".format(res))
                     # return True
                 if target_amps != act_amps:
                     L.l.info("Increasing Tesla charging to {} Amps".format(target_amps))
@@ -355,10 +360,19 @@ class TeslaCharger(Relaydevice):
                     if apps.tesla.set_charging_amps(min(target_amps, apps.tesla.P.MAX_AMP)):
                         self.power_status_changed()
                         return True
+                    else:
+                        if TeslaCharger.DEBUG:
+                            L.l.info("Tesla set charging did not returned True")
+                else:
+                    if TeslaCharger.DEBUG:
+                        L.l.info("Tesla target-2 amp={}, act_amp={}".format(target_amps, act_amps))
                 if not apps.tesla.is_charging(self.vehicle_id):
                     P.thread_pool_status = 'tesla.start_charge 3'
                     apps.tesla.start_charge(self.vehicle_id)
                     return True
+                else:
+                    if TeslaCharger.DEBUG:
+                        L.l.info("Tesla is charging, nothing to do".format(target_amps, act_amps))
         return False
 
 
