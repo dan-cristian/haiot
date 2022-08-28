@@ -64,13 +64,17 @@ def can_auto_charge(vehicle_id=1):
         plugged_in = P.teslamate_plugged_in[vehicle_id]
     else:
         plugged_in = P.charging_state != 'Disconnected'
-    res = P.can_charge_at_home and not P.scheduled_charging_mode and plugged_in and\
-          (P.teslamate_time_to_full_charge is None or (P.teslamate_time_to_full_charge is None
-                                                       or P.teslamate_time_to_full_charge > 0))
+    res = P.can_charge_at_home and not P.scheduled_charging_mode and plugged_in
     if P.DEBUG and res is False:
         L.l.info("Tesla debug auto_charge: at_home={} scheduled={} plugged_in={} time_full={}".format(
             P.can_charge_at_home, P.scheduled_charging_mode, plugged_in, P.teslamate_time_to_full_charge
         ))
+    return res
+
+
+def is_battery_full():
+    res = (P.teslamate_time_to_full_charge is None or (P.teslamate_time_to_full_charge is None
+                                                       or P.teslamate_time_to_full_charge > 0))
     return res
 
 
@@ -300,6 +304,7 @@ def _process_message(msg):
             P.voltage = value
     if "charge_limit_soc" in msg.topic:
         value = int(msg.payload)
+    # time to full charge does not get reported all time, stays at 0.0. not reliable.
     if "time_to_full_charge" in msg.topic:
         P.teslamate_time_to_full_charge = float(msg.payload)
     if "state" in msg.topic:

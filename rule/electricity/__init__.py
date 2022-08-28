@@ -341,7 +341,8 @@ class TeslaCharger(Relaydevice):
             # exporting to grid, need to increase charging amps
             P.thread_pool_status = "Tesla grid_updated grid export"
             if act_amps == apps.tesla.P.max_amps:
-                L.l.info("Tesla already charging at max amps {}".format(act_amps))
+                L.l.info("Tesla already charging at max amps {}, battery_full={}".format(act_amps,
+                                                                                         apps.tesla.is_battery_full()))
                 # force charge start
                 P.thread_pool_status = 'tesla.start_charge 1'
                 apps.tesla.start_charge(self.vehicle_id)
