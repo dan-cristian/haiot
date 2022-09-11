@@ -1,3 +1,4 @@
+import datetime
 import threading
 import prctl
 from pydispatch import dispatcher
@@ -87,6 +88,12 @@ def _process_message(msg):
                         sensor.energy = float(val)
                     elif atoms[4] == "total":
                         sensor.total_energy = float(val)
+                        if sensor.updated_on.day != datetime.datetime.now().day:
+                            sensor.total_energy_day_start = sensor.total_energy
+                        else:
+                            if sensor.total_energy_day_start is None:
+                                sensor.total_energy_day_start = 0
+                            sensor.total_energy_daily = sensor.total_energy - sensor.total_energy_day_start
                     elif atoms[4] == "returned_energy":
                         sensor.energy_export = float(val)
                     elif atoms[4] == "total_returned":

@@ -141,6 +141,8 @@ class PowerMonitor(ModelBase):
     power_factor = 0.0
     energy = 0.0
     total_energy = 0.0  # total energy consumed
+    total_energy_day_start = 0.0
+    total_energy_daily = 0.0
     energy_export = 0.0
     total_energy_export = 0.0  # total energy returned/exported to grid
     reactive_power = 0.0
