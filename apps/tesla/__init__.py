@@ -148,7 +148,7 @@ def get_last_charging_amps(car_id=1):
 # https://github.com/tdorssers/TeslaPy
 def vehicle_update(car_id=1):
     if (not vehicle_valid(car_id)) or (not can_refresh()):
-        L.l.info("Not updating tesla vehicle, valid={}, can_refresh={}".format(vehicle_valid(car_id)), can_refresh())
+        L.l.info("Not updating tesla vehicle, valid={}, can_refresh={}".format(vehicle_valid(car_id), can_refresh()))
         return None
 
     vehicle = P.vehicles[car_id - 1]
