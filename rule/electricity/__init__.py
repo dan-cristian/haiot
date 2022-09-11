@@ -307,7 +307,7 @@ class TeslaCharger(Relaydevice):
             act_amps = 0
         tesla_charging_watts = act_amps * apps.tesla.get_nonzero_voltage()
 
-        if not apps.tesla.can_auto_charge(self.vehicle_id):
+        if not apps.tesla.can_auto_charge(self.vehicle_id) or apps.tesla.is_battery_full():
             return
 
         if grid_watts > 0:
@@ -340,6 +340,15 @@ class TeslaCharger(Relaydevice):
         else:
             # exporting to grid, need to increase charging amps
             P.thread_pool_status = "Tesla grid_updated grid export"
+            # check if charging is started before changing amps
+            if not apps.tesla.is_charging(self.vehicle_id):
+                P.thread_pool_status = 'tesla.start_charge 3'
+                res = apps.tesla.start_charge(self.vehicle_id)
+                if not res:
+                    if TeslaCharger.DEBUG:
+                        L.l.info("Tesla cannot start charging")
+                    return False
+
             if act_amps == apps.tesla.P.max_amps:
                 L.l.info("Tesla already charging at max amps {}, battery_full={}".format(act_amps,
                                                                                          apps.tesla.is_battery_full()))
@@ -363,17 +372,10 @@ class TeslaCharger(Relaydevice):
                         return True
                     else:
                         if TeslaCharger.DEBUG:
-                            L.l.info("Tesla set charging did not returned True")
+                            L.l.info("Tesla set charging amp did not returned True")
                 else:
                     if TeslaCharger.DEBUG:
                         L.l.info("Tesla target-2 amp={}, act_amp={}".format(target_amps, act_amps))
-                if not apps.tesla.is_charging(self.vehicle_id):
-                    P.thread_pool_status = 'tesla.start_charge 3'
-                    apps.tesla.start_charge(self.vehicle_id)
-                    return True
-                else:
-                    if TeslaCharger.DEBUG:
-                        L.l.info("Tesla is charging, nothing to do".format(target_amps, act_amps))
         return False
 
 
@@ -415,7 +417,7 @@ class P:
         #P.device_list[relay] = InverterRelay(relay_name=relay, avg_consumption=-500,
         #                                   supports_breaks=True, min_on_interval=60, state_change_interval=120)
         relay = 'batterychargectrl_low'  # index 2, right
-        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=750,
+        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=700,
                                            supports_breaks=True, min_on_interval=10, state_change_interval=5)
         relay = 'batterychargectrl_high'  # index 1, left
         P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=770,

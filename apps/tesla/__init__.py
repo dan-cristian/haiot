@@ -40,6 +40,7 @@ class P:
     teslamate_voltage = dict()
     teslamate_plugged_in = dict()
     teslamate_time_to_full_charge = None
+    battery_full = None
     # save car params
     is_charging = dict()
     charging_amp = dict()
@@ -73,8 +74,7 @@ def can_auto_charge(vehicle_id=1):
 
 
 def is_battery_full():
-    res = (P.teslamate_time_to_full_charge is None or (P.teslamate_time_to_full_charge is None
-                                                       or P.teslamate_time_to_full_charge > 0))
+    res = P.battery_full or (P.teslamate_time_to_full_charge is not None and P.teslamate_time_to_full_charge == 0)
     return res
 
 
@@ -274,6 +274,10 @@ def start_charge(car_id=1):
         except VehicleError as vex:
             if "{}".format(vex) == "disconnected":
                 L.l.warning("Tesla is disconnected, cannot start charging")
+            if "{}".format(vex) == "complete":
+                L.l.info("Tesla charge is already complete, cannot start charging")
+                P.battery_full = True
+                return False
             if "{}".format(vex) == "is_charging":
                 return True
         except Exception as ex:
@@ -317,6 +321,7 @@ def _process_message(msg):
         L.l.info("Tesla geo={}".format(value))
     if "battery_level" in msg.topic:
         value = int(msg.payload)
+        P.battery_full = None
     if "power" in msg.topic:
         value = int(msg.payload)
         if value == -1:  # charging started
