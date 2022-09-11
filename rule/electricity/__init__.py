@@ -406,7 +406,7 @@ class P:
 
         if apps.tesla.P.initialised:
             relay = 'tesla_charger'
-            P.device_list[relay] = TeslaCharger(relay_name=relay, vehicle_id=1, state_change_interval=20)
+            P.device_list[relay] = TeslaCharger(relay_name=relay, vehicle_id=1, state_change_interval=15)
 
         # keep energy producing devices first in the list
         # order energy consumption with highest consumption first

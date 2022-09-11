@@ -24,6 +24,7 @@ Frame {
 	Default item=electricity_power_boiler
 	Default item=electricity_power_ups
 	Default item=battery_charger_main
+	Default item=inverter_main
 }
 
 Frame label="Charts" {
@@ -97,6 +98,13 @@ Frame label="Charts" {
         Chart item=electricity_power_battery_charger period=D refresh=10000 visibility=[p_switch==1]
         Chart item=electricity_power_battery_charger period=W refresh=10000 visibility=[p_switch==2]
         Chart item=electricity_power_battery_charger period=M refresh=10000 visibility=[p_switch==3]
+    }
+    Text item=electricity_power_inverter {
+        Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M"]
+        Chart item=electricity_power_inverter period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
+        Chart item=electricity_power_inverter period=D refresh=10000 visibility=[p_switch==1]
+        Chart item=electricity_power_inverter period=W refresh=10000 visibility=[p_switch==2]
+        Chart item=electricity_power_inverter period=M refresh=10000 visibility=[p_switch==3]
     }
     Text item=electricity_solar_aps {
         Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M"]
