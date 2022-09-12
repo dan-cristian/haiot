@@ -316,7 +316,8 @@ class TeslaCharger(Relaydevice):
             if act_amps > 0:
                 # reduce tesla charging to reduce grid energy usage
                 target_watts = max(tesla_charging_watts - grid_watts, 0)
-                target_amps = math.ceil(target_watts / apps.tesla.get_nonzero_voltage())
+                # using floor rounding to always export
+                target_amps = math.floor(target_watts / apps.tesla.get_nonzero_voltage())
                 if target_amps != act_amps:
                     # fixme: detect when user started charging from app and don't stop charging
                     L.l.info("Reducing Tesla charging to {} Amps".format(target_amps))
@@ -358,7 +359,8 @@ class TeslaCharger(Relaydevice):
                 return True
             else:
                 target_watts = tesla_charging_watts - grid_watts
-                target_amps = math.ceil(target_watts / apps.tesla.get_nonzero_voltage())
+                # using floor round down
+                target_amps = math.floor(target_watts / apps.tesla.get_nonzero_voltage())
                 if act_amps == 0:
                     P.thread_pool_status = 'tesla.start_charge 2'
                     res = apps.tesla.start_charge(self.vehicle_id)
