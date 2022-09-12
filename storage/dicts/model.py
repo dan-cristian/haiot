@@ -141,12 +141,16 @@ class PowerMonitor(ModelBase):
     power_factor = 0.0
     energy = 0.0
     total_energy = 0.0  # total energy consumed
+    total_energy_last = 0.0  # total energy consumed
     total_energy_day_start = 0.0  # total energy at day start (used to calculate total daily energy)
     total_energy_daily = 0.0
+    total_energy_now = 0.0  # energy produced since last update
     energy_export = 0.0
     total_energy_returned = 0.0  # total energy returned/exported to grid
+    total_energy_returned_last = 0.0  # last reported total
     total_energy_returned_day_start = 0.0
     total_energy_returned_daily = 0.0
+    total_energy_returned_now = 0.0
     reactive_power = 0.0
     sensor_index = 0  # if device has multiple sensors for same target (i.e. 3 phase meter)
     raw_voltage = 0.0  # volts, read from sensor without

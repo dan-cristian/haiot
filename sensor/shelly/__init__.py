@@ -94,6 +94,9 @@ def _process_message(msg):
                             if sensor.total_energy_day_start is None:
                                 sensor.total_energy_day_start = sensor.total_energy
                             sensor.total_energy_daily = sensor.total_energy - sensor.total_energy_day_start
+                        if sensor.total_energy_last is not None:
+                            sensor.total_energy_now = sensor.total_energy - sensor.total_energy_last
+                        sensor.total_energy_last = sensor.total_energy
                     elif atoms[4] == "returned_energy":
                         sensor.energy_export = float(val)
                     elif atoms[4] == "total_returned":
@@ -105,6 +108,10 @@ def _process_message(msg):
                                 sensor.total_energy_returned_day_start = sensor.total_energy_returned
                             sensor.total_energy_returned_daily = \
                                 sensor.total_energy_returned - sensor.total_energy_returned_day_start
+                        if sensor.total_energy_returned_last is not None:
+                            sensor.total_energy_returned_now = \
+                                sensor.total_energy_returned - sensor.total_energy_returned_last
+                        sensor.total_energy_returned_last = sensor.total_energy_returned
                     elif atoms[4] == "reactive_power":
                         sensor.reactive_power = float(val)
                     else:
