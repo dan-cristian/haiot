@@ -24,3 +24,4 @@ def load_db():
             obj = cls()
             _populate_db(cls, obj)
             cls.reset_usage()
+

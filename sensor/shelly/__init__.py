@@ -88,11 +88,12 @@ def _process_message(msg):
                         sensor.energy = float(val)
                     elif atoms[4] == "total":
                         sensor.total_energy = float(val)
+                        if sensor.total_energy_day_start is None:
+                            sensor.total_energy_day_start = sensor.total_energy
                         if sensor.updated_on.day != datetime.datetime.now().day:
                             sensor.total_energy_day_start = sensor.total_energy
+                            sensor.total_energy_day_end = sensor.total_energy - sensor.total_energy_day_start
                         else:
-                            if sensor.total_energy_day_start is None:
-                                sensor.total_energy_day_start = sensor.total_energy
                             sensor.total_energy_daily = sensor.total_energy - sensor.total_energy_day_start
                         if sensor.total_energy_last is not None:
                             sensor.total_energy_now = sensor.total_energy - sensor.total_energy_last
@@ -101,11 +102,13 @@ def _process_message(msg):
                         sensor.energy_export = float(val)
                     elif atoms[4] == "total_returned":
                         sensor.total_energy_returned = float(val)
+                        if sensor.total_energy_returned_day_start is None:
+                            sensor.total_energy_returned_day_start = sensor.total_energy_returned
                         if sensor.updated_on.day != datetime.datetime.now().day:
                             sensor.total_energy_returned_day_start = sensor.total_energy_returned
+                            sensor.total_energy_returned_day_end = sensor.total_energy_returned - \
+                                                                   sensor.total_energy_returned_day_start
                         else:
-                            if sensor.total_energy_returned_day_start is None:
-                                sensor.total_energy_returned_day_start = sensor.total_energy_returned
                             sensor.total_energy_returned_daily = \
                                 sensor.total_energy_returned - sensor.total_energy_returned_day_start
                         if sensor.total_energy_returned_last is not None:
