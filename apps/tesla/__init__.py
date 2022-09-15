@@ -314,7 +314,7 @@ def _process_message(msg):
     if "state" in msg.topic:
         value = "{}".format(msg.payload).replace("b", "").replace("\\", "").replace("'", "")
         P.car_state[car_id] == value
-        # online, asleep, charging
+        # online, asleep, charging, suspended
     if "geofence" in msg.topic:
         value = "{}".format(msg.payload).replace("b", "").replace("\\", "").replace("'", "")
         P.teslamate_geo_home = (value.lower() == "home")

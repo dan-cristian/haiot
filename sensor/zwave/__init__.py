@@ -203,11 +203,11 @@ def louie_button_off(network, node):
     L.l.info('Louie signal: Button off: {}.'.format(node))
 
 
-def louie_node_event(network, node, value, extra=None):
+def louie_node_event(network, node, value=None, extra=None):
     L.l.info('Louie signal: Node event: {} = {}, extra={}.'.format(node, value, extra))
 
 
-def louie_node_event(network, node, value):
+def louie_node_event(network, node, value=None):
     L.l.info('Louie signal: Node event: {} = {}'.format(node, value))
 
 
