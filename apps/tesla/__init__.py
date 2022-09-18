@@ -29,6 +29,8 @@ class P:
     scheduled_charging_mode = None
     user_charging_mode = False  # True is user started the charging, so don't run automatic charging setup
     charging_state = None
+    charge_limit_soc = None
+    battery_level = None
     home_latitude = None
     home_longitude = None
     can_charge_at_home = False  # True if car is at home, so automatic charging can happen
@@ -74,7 +76,10 @@ def can_auto_charge(vehicle_id=1):
 
 
 def is_battery_full():
-    res = P.battery_full or (P.teslamate_time_to_full_charge is not None and P.teslamate_time_to_full_charge == 0)
+    res = P.battery_full or (P.charge_limit_soc is not None and P.charge_limit_soc == P.battery_level)
+          # (P.teslamate_time_to_full_charge is not None and P.teslamate_time_to_full_charge == 0)
+    # if res is True and P.DEBUG:
+    #    L.l.info("Tesla battery is full, time={}".format(P.teslamate_time_to_full_charge))
     return res
 
 
@@ -166,6 +171,8 @@ def vehicle_update(car_id=1):
             P.scheduled_charging_mode = (ch['scheduled_charging_mode'] != "Off")
             P.user_charging_mode = ch['user_charge_enable_request']
             P.charging_state = ch['charging_state']
+            P.charge_limit_soc = ch['charge_limit_soc']
+            P.battery_level = ch['battery_level']
             L.l.info('Tesla user charging request={}, schedule mode={}'.format(P.user_charging_mode,
                                                                          P.scheduled_charging_mode))
             if P.user_charging_mode:
@@ -291,6 +298,8 @@ def start_charge(car_id=1):
 # https://docs.teslamate.org/docs/integrations/mqtt/
 def _process_message(msg):
     car_id = int(msg.topic.split("teslamate/cars/")[1][:2].replace("/", ""))
+    if "inside_temp" in msg.topic:
+        value = "{}".format(msg.payload).replace("b", "").replace("\\", "").replace("'", "")
     if "plugged_in" in msg.topic:
         value = msg.payload
         P.teslamate_plugged_in[car_id] = (value == b'true')
@@ -321,7 +330,7 @@ def _process_message(msg):
         L.l.info("Tesla geo={}".format(value))
     if "battery_level" in msg.topic:
         value = int(msg.payload)
-        P.battery_full = None
+        # P.battery_full = None
     if "power" in msg.topic:
         value = int(msg.payload)
         if value == -1:  # charging started
