@@ -33,9 +33,9 @@ class P:
     battery_level = None
     home_latitude = None
     home_longitude = None
-    can_charge_at_home = False  # True if car is at home, so automatic charging can happen
+    can_charge_at_home = None  # True if car is at home, so automatic charging can happen
     teslamate_topic = None
-    teslamate_geo_home = False  # do not trigger automatic charging, car maybe not be at home etc
+    teslamate_geo_home = None  # do not trigger automatic charging, car maybe not be at home etc
     teslamate_charging_amp = dict()
     teslamate_last_charging_update = datetime.min
     charging_stopped = None  # update charging state when sending charge start/stop commands
@@ -67,10 +67,11 @@ def can_auto_charge(vehicle_id=1):
         plugged_in = P.teslamate_plugged_in[vehicle_id]
     else:
         plugged_in = P.charging_state != 'Disconnected'
-    res = P.can_charge_at_home and not P.scheduled_charging_mode and plugged_in
+    res = (P.can_charge_at_home or P.teslamate_geo_home) and not P.scheduled_charging_mode and plugged_in
     if P.DEBUG and res is False:
-        L.l.info("Tesla debug auto_charge: at_home={} scheduled={} plugged_in={} time_full={}".format(
-            P.can_charge_at_home, P.scheduled_charging_mode, plugged_in, P.teslamate_time_to_full_charge
+        L.l.info("Tesla debug auto_charge: at_home={} geo={} scheduled={} plugged_in={} time_full={}".format(
+            P.can_charge_at_home, P.teslamate_geo_home, P.scheduled_charging_mode, plugged_in,
+            P.teslamate_time_to_full_charge
         ))
     return res
 
