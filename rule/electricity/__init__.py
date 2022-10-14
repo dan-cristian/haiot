@@ -471,7 +471,7 @@ def rule_energy_export(obj=m.PowerMonitor(), change=None):
             L.l.info('Using backup sensor for rule main watts={}'.format(P.grid_watts))
             _update_devices()
     else:
-        L.l.info('Got alternate power {} change={}'.format(obj.name, change))
+        # L.l.info('Got alternate power {} change={}'.format(obj.name, change))
         pass
 
 
