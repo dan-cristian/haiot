@@ -384,6 +384,7 @@ class TeslaCharger(Relaydevice):
 class P:
     initialised = False
     grid_watts = None
+    grid_watts_last_update = datetime.min  # used to detect if main meter is down, to switch to secondary
     grid_importing = None
     grid_exporting = None
     device_list = collections.OrderedDict()  # key is utility name
@@ -460,7 +461,13 @@ def rule_energy_export(obj=m.PowerMonitor(), change=None):
                 P.grid_watts = random.randint(-800, -300)
             else:
                 P.grid_watts = obj.power
+                P.grid_watts_last_update = datetime.now()
             # L.l.info('Got rule main watts {}'.format(P.grid_watts))
+            _update_devices()
+        main_sensor_lapsed = (datetime.now() - P.grid_watts_last_update).total_seconds()
+        if obj.name == 'power main mono' and main_sensor_lapsed > 120:
+            P.grid_watts = obj.power
+            L.l.info('Using backup sensor for rule main watts={}'.format(P.grid_watts))
             _update_devices()
     else:
         #L.l.info('Got alternate power {} change={}'.format(obj, change))

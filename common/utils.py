@@ -202,7 +202,7 @@ def get_url_content(url, timeout=None, silent=False):
             return str(urllib.request.urlopen(url, timeout=timeout).read())
     except Exception as ex:
         if not silent:
-            L.l.error("Failed to get url content, ex={}".format(ex))
+            L.l.error("Failed to get url content {}, ex={}".format(url, ex))
         return None
 
 
@@ -216,7 +216,7 @@ def parse_http(url, start_key, end_key, end_first=False, timeout=None, silent=Fa
         if text is not None:
             return parse_text(text, start_key, end_key, end_first)
     except Exception as ex:
-        # L.l.error('Unable to open url {}, err={}'.format(url, ex))
+        L.l.error('Unable to open url {}, err={}'.format(url, ex))
         pass
     return None
 
