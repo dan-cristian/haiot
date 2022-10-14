@@ -20,6 +20,7 @@ class P:
     end_key_temp = '&nbsp;<sup>o</sup>C'
     start_key_panel = '<td align=center>'
     end_key_panel = '-A</td>'
+    APS_TIMEOUT = 10
 
     def __init__(self):
         pass
@@ -27,7 +28,8 @@ class P:
 
 def init_solar_aps():
     try:
-        production = utils.parse_http(get_json_param(Constant.P_SOLAR_APS_LOCAL_URL), P.start_keyword, P.end_keyword)
+        production = utils.parse_http(get_json_param(Constant.P_SOLAR_APS_LOCAL_URL), P.start_keyword, P.end_keyword,
+                                      timeout=P.APS_TIMEOUT)
         if production is not None and production is not '':
             P.initialised = True
         else:
