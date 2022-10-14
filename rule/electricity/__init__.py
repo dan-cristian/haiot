@@ -456,6 +456,7 @@ def _update_devices():
 # energy rule
 def rule_energy_export(obj=m.PowerMonitor(), change=None):
     if change is not None and 'power' in change:
+        L.l.info('Got power {} change={}'.format(obj, change))
         if obj.name == 'main l1':
             if P.emulate_export is True:
                 P.grid_watts = random.randint(-800, -300)
@@ -470,7 +471,7 @@ def rule_energy_export(obj=m.PowerMonitor(), change=None):
             L.l.info('Using backup sensor for rule main watts={}'.format(P.grid_watts))
             _update_devices()
     else:
-        #L.l.info('Got alternate power {} change={}'.format(obj, change))
+        L.l.info('Got alternate power {} change={}'.format(obj, change))
         pass
 
 
