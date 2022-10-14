@@ -465,11 +465,6 @@ def rule_energy_export(obj=m.PowerMonitor(), change=None):
                 P.grid_watts_last_update = datetime.now()
             # L.l.info('Got rule main watts {}'.format(P.grid_watts))
             _update_devices()
-        main_sensor_lapsed = (datetime.now() - P.grid_watts_last_update).total_seconds()
-        if obj.name == 'power main mono' and main_sensor_lapsed > 120:
-            P.grid_watts = obj.power
-            L.l.info('Using backup sensor for rule main watts={}'.format(P.grid_watts))
-            _update_devices()
     else:
         # L.l.info('Got alternate power {} change={}'.format(obj.name, change))
         pass
@@ -486,7 +481,12 @@ def rule_energy_utility(obj=m.Utility(), change=None):
                     inst.set_watts(obj.units_2_delta)
                 else:
                     L.l.info('Discarding utility {}, not relevant'.format(obj.utility_name))
-
+        else:
+            main_sensor_lapsed = (datetime.now() - P.grid_watts_last_update).total_seconds()
+            if main_sensor_lapsed > 120:
+                P.grid_watts = obj.power
+                L.l.info('Using backup sensor for rule main watts={}'.format(P.grid_watts))
+                _update_devices()
 
 def init():
     P.emulate_export = False
