@@ -30,7 +30,7 @@ class P:
                    5: "precooling", 6: "disbalance", 7: "overpressure"}
 
     mode_off = 0
-    mode_default = 2
+    mode_default = 2  # mode ventilation
     mode_automatic = 1
 
     power_level_min = 25  # 12 is lowest possible
