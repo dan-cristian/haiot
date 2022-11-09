@@ -392,7 +392,8 @@
     {"id":20, "name":"living ozone", "type":"ina", "host_name":"wemoslivingair"},
     {"id":21, "name":"airfiltered nox", "type":"ina", "host_name":"airfiltered"},
 
-    {"id":31, "name":"main l1", "type":"shelly", "sensor_index": 0, "host_name":"shellyem-A4E57CBAABA1"},
+    {"id":31, "name":"main l1",     "type":"shelly", "sensor_index": 0, "host_name":"shellyem-A4E57CBAABA1"},
+    {"id":31, "name":"main l1 aux", "type":"shelly", "sensor_index": 1, "host_name":"shellyem-A4E57CBAABA1"},
     {"id":32, "name":"main l2", "type":"shelly", "sensor_index": 1, "host_name":"shellyem-98CDAC1F0B0C"},
     {"id":33, "name":"main l3", "type":"shelly", "sensor_index": 0, "host_name":"shellyem-BCFF4DFCDD55"},
     {"id":34, "name":"main n",  "type":"shelly", "sensor_index": 1, "host_name":"shellyem-BCFF4DFCDD55"},

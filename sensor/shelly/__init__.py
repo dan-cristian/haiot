@@ -122,7 +122,7 @@ def _process_message(msg):
                     # L.l.info("Shelly {} {}={}".format(sensor.name, atoms[4], val))
                     sensor.save_changed_fields(broadcast=False, persist=True)
                 else:
-                    L.l.warning("No shelly sensor {} in config file".format(atoms[1]))
+                    L.l.warning("No shelly sensor {} index={} in config file".format(atoms[1], atoms[3]))
             else:
                 L.l.warning("Invalid sensor topic {}".format(msg.topic))
 
