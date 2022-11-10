@@ -395,7 +395,8 @@
     {"id":31, "name":"main l1",     "type":"shelly", "sensor_index": 0, "host_name":"shellyem-A4E57CBAABA1"},
     {"id":32, "name":"main l1 aux", "type":"shelly", "sensor_index": 1, "host_name":"shellyem-A4E57CBAABA1"},
     {"id":34, "name":"main l2", "type":"shelly", "sensor_index": 1, "host_name":"shellyem-98CDAC1F0B0C"},
-    {"id":35, "name":"main l3", "type":"shelly", "sensor_index": 0, "host_name":"shellyem-BCFF4DFCDD55"},
+    {"id":35, "name":"main l3",     "type":"shelly", "sensor_index": 0, "host_name":"shellyem-244CAB41796F"},
+    {"id":36, "name":"main l3 aux", "type":"shelly", "sensor_index": 1, "host_name":"shellyem-244CAB41796F"},
     {"id":37, "name":"main n",  "type":"shelly", "sensor_index": 1, "host_name":"shellyem-BCFF4DFCDD55"},
     {"id":40, "name":"solar l1","type":"shelly", "sensor_index": 0, "host_name":"shellyem-244CAB4317EC"},
     {"id":41, "name":"solar unused","type":"shelly", "sensor_index": 1, "host_name":"shellyem-244CAB4317EC"}
