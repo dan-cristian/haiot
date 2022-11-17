@@ -50,7 +50,7 @@ class P:
     car_longitude = dict()
     car_state = dict()
     last_charging_stopped = dict()  # timestamps when car charging was stopped
-    DEBUG = True
+    DEBUG = False
 
     def __init__(self):
         pass
