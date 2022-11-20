@@ -10,16 +10,23 @@ from storage.model import m
 class P:
     initialised = False
     interval = 60
-    # APS SOLAR ECU LINK: http://192.168.0.10/cgi-bin/home
-    start_keyword = 'Lifetime generation</td><td align=center>'
-    end_keyword = ' kWh</td>'
-    start_keyword_now = 'Last System Power</td><td align=center>'
-    end_keyword_now = ' W</td>'
-    # APS Temperature params: 192.168.0.10/cgi-bin/parameters
-    start_key_temp = '<td align=center> '
-    end_key_temp = '&nbsp;<sup>o</sup>C'
-    start_key_panel = '<td align=center>'
-    end_key_panel = '-A</td>'
+    # APS SOLAR ECU OLD LINK: http://192.168.0.10/cgi-bin/home
+    start_keyword_ecu_old = 'Lifetime generation</td><td align=center>'
+    end_keyword_ecu_old = ' kWh</td>'
+    start_keyword_now_ecu_old = 'Last System Power</td><td align=center>'
+    end_keyword_now_ecu_old = ' W</td>'
+    # APS ECU OLD Temperature params: 192.168.0.10/cgi-bin/parameters
+    start_key_temp_ecu_old = '<td align=center> '
+    end_key_temp_ecu_old = '&nbsp;<sup>o</sup>C'
+    start_key_panel_ecu_old = '<td align=center>'
+    end_key_panel_ecu_old = '-A</td>'
+
+    # APS SOLAR ECU NEW LINK: http://192.168.0.40/index.php/home
+    start_keyword_ecu_new = 'Lifetime generation</td><td>'
+    end_keyword_ecu_new = ' kWh </td>'
+    start_keyword_now_ecu_new = 'Last System Power</td><td>'
+    end_keyword_now_ecu_new = ' W </td>'
+
     APS_TIMEOUT = 10
 
     def __init__(self):
@@ -28,8 +35,8 @@ class P:
 
 def init_solar_aps():
     try:
-        production = utils.parse_http(get_json_param(Constant.P_SOLAR_APS_LOCAL_URL), P.start_keyword, P.end_keyword,
-                                      timeout=P.APS_TIMEOUT)
+        production = utils.parse_http(get_json_param(Constant.P_SOLAR_APS_LOCAL_URL),
+                                      P.start_keyword_ecu_old, P.end_keyword_ecu_old, timeout=P.APS_TIMEOUT)
         if production is not None and production is not '':
             P.initialised = True
         else:
@@ -45,10 +52,10 @@ def thread_run():
     if P.initialised:
         try:
             aps_text = str(urllib.request.urlopen(get_json_param(Constant.P_SOLAR_APS_LOCAL_URL)).read())
-            production = utils.parse_text(aps_text, P.start_keyword, P.end_keyword)
-            last_power = utils.parse_text(aps_text, P.start_keyword_now, P.end_keyword_now)
-            temperature = utils.parse_text(aps_text, P.start_key_temp, P.end_key_temp, end_first=True)
-            panel_id = utils.parse_text(aps_text, P.start_key_panel, P.end_key_panel, end_first=True)
+            production = utils.parse_text(aps_text, P.start_keyword_ecu_old, P.end_keyword_ecu_old)
+            last_power = utils.parse_text(aps_text, P.start_keyword_now_ecu_old, P.end_keyword_now_ecu_old)
+            temperature = utils.parse_text(aps_text, P.start_key_temp_ecu_old, P.end_key_temp_ecu_old, end_first=True)
+            panel_id = utils.parse_text(aps_text, P.start_key_panel_ecu_old, P.end_key_panel_ecu_old, end_first=True)
             utility_name = get_json_param(Constant.P_SOLAR_UTILITY_NAME)
             if temperature is not None:
                 zone_sensor = m.ZoneSensor.find_one({m.ZoneSensor.sensor_address: panel_id})
