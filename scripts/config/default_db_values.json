@@ -433,7 +433,7 @@
     {"id":6, "name":"weekend-living-winter",     "pattern":"3... .... 3333 3333 3333 3333", "main_source_needed":true},
     {"id":7, "name":"week-living-summer",        "pattern":".... ..22 .... .... 2222 2222", "main_source_needed":true},
     {"id":8, "name":"weekend-living-summer",     "pattern":".... .... 2222 2222 2222 2222", "main_source_needed":true},
-    {"id":9, "name":"week-birou-winter",         "pattern":".... .... bbbb bbbb bb22 2222", "main_source_needed":true},
+    {"id":9, "name":"week-birou-winter",         "pattern":".... .... 2222 2222 2222 2222", "main_source_needed":true},
     {"id":10, "name":"weekend-birou-winter",     "pattern":".... .... ..bb bbbb bbbb bbbb", "main_source_needed":true},
     {"id":11, "name":"week-birou-summer",        "pattern":".... .... .... .... ..bb bbbb", "main_source_needed":true},
     {"id":12, "name":"weekend-birou-summer",     "pattern":".... .... .bbb bbbb bbbb bbbb", "main_source_needed":true},
