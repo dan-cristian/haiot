@@ -94,12 +94,11 @@ def _process_message(msg):
                             sensor.total_energy_day_start = sensor.total_energy
                         if sensor.name not in P.total_energy_day_update.keys():
                             P.total_energy_day_update[sensor.name] = datetime.datetime.now().hour
+                        sensor.total_energy_daily = sensor.total_energy - sensor.total_energy_day_start
                         if P.total_energy_day_update[sensor.name] != datetime.datetime.now().hour:  #
-                            sensor.total_energy_day_start = sensor.total_energy
                             sensor.total_energy_day_end = sensor.total_energy - sensor.total_energy_day_start
+                            sensor.total_energy_day_start = sensor.total_energy
                             P.total_energy_day_update[sensor.name] = datetime.datetime.now().hour  #
-                        else:
-                            sensor.total_energy_daily = sensor.total_energy - sensor.total_energy_day_start
                         if sensor.total_energy_last is not None:
                             sensor.total_energy_now = sensor.total_energy - sensor.total_energy_last
                         sensor.total_energy_last = sensor.total_energy
@@ -111,14 +110,13 @@ def _process_message(msg):
                             sensor.total_energy_returned_day_start = sensor.total_energy_returned
                         if sensor.name not in P.total_energy_returned_day_update.keys():
                             P.total_energy_returned_day_update[sensor.name] = datetime.datetime.now().hour
+                        sensor.total_energy_returned_daily = \
+                            sensor.total_energy_returned - sensor.total_energy_returned_day_start
                         if P.total_energy_returned_day_update[sensor.name] != datetime.datetime.now().hour:
-                            sensor.total_energy_returned_day_start = sensor.total_energy_returned
                             sensor.total_energy_returned_day_end = sensor.total_energy_returned - \
                                                                    sensor.total_energy_returned_day_start
+                            sensor.total_energy_returned_day_start = sensor.total_energy_returned
                             P.total_energy_returned_day_update[sensor.name] = datetime.datetime.now().hour
-                        else:
-                            sensor.total_energy_returned_daily = \
-                                sensor.total_energy_returned - sensor.total_energy_returned_day_start
                         if sensor.total_energy_returned_last is not None:
                             sensor.total_energy_returned_now = \
                                 sensor.total_energy_returned - sensor.total_energy_returned_last
