@@ -80,7 +80,7 @@
     {"id":1,  "active":true, "start_order": 1, "name":"main", "host_name":""},
     {"id":2,  "active":true, "start_order": 3, "name":"cloud.email", "host_name":""},
     {"id":3,  "active":false, "start_order": 2, "name":"health_monitor", "host_name":""},
-    {"id":9,  "active":false, "start_order":9, "name":"heat", "host_name":""},
+    {"id":9,  "active":false, "start_order":9, "name":"hvac.heat", "host_name":""},
     {"id":13, "active":false, "start_order":13, "name":"cloud.graph_plotly", "host_name":""},
     {"id":19, "active":false, "start_order":19, "name":"cloud.ddns", "host_name":""},
     {"id":21, "active":false, "start_order":21, "name":"cloud.youtube", "host_name":""},
@@ -126,7 +126,7 @@
     {"id":121, "active":false, "start_order":21, "name":"cloud.youtube", "host_name":"nas"},
     {"id":123, "active":false, "start_order":23, "name":"sysutils.filewatch", "host_name":"nas"},
 
-    {"id":209, "active":false, "start_order":9, "name":"heat", "host_name":"pi-power"},
+    {"id":209, "active":false, "start_order":9, "name":"hvac.heat", "host_name":"pi-power"},
     {"id":225, "active":true, "start_order":25, "name":"rule", "host_name":"pi-power"},
     {"id":247, "active":true, "start_order":47, "name":"sensor.rfxcom", "host_name":"pi-power"},
     {"id":249, "active":true, "start_order":49, "name":"sensor.ups_legrand", "host_name":"pi-power"},
@@ -147,7 +147,7 @@
 
     {"id":501, "active":false, "start_order":50, "name":"apps.dashcam", "host_name":"netbook"},
     {"id":503, "active":true, "start_order":3, "name":"health_monitor", "host_name":"netbook"},
-    {"id":509, "active":true, "start_order":9, "name":"heat", "host_name":"netbook"},
+    {"id":509, "active":true, "start_order":9, "name":"hvac.heat", "host_name":"netbook"},
     {"id":519, "active":true, "start_order":19, "name":"cloud.ddns", "host_name":"netbook"},
     {"id":527, "active":true, "start_order":27, "name":"node", "host_name":"netbook"},
     {"id":533, "active":true, "start_order":33, "name":"utility", "host_name":"netbook"},
@@ -172,7 +172,7 @@
     {"id":596, "active":true, "start_order":596, "name":"rule.electricity", "host_name":"netbook"},
 
 
-    {"id":809, "active":true, "start_order":9, "name":"heat", "host_name":"homew"},
+    {"id":809, "active":true, "start_order":9, "name":"hvac.heat", "host_name":"homew"},
     {"id":819, "active":true, "start_order":19, "name":"cloud.ddns", "host_name":"homew"},
     {"id":833, "active":true, "start_order":33, "name":"utility", "host_name":"homew"},
     {"id":841, "active":true, "start_order":41, "name":"cloud.alexa", "host_name":"homew"},

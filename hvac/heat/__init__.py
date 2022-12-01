@@ -25,7 +25,7 @@ class P:
     PRESENCE_SEC = 60 * 60 * 1  # no of secs after a move considered to be presence
     AWAY_SEC = 60 * 60 * 6  # no of secs after no move to be considered away
     initialised = False
-    debug = False
+    DEBUG = False
     thread_pool_status = None
     thread_local = None
     heat_status = ''
@@ -393,6 +393,7 @@ def _handle_presence(zone_name=None, zone_id=None):
         heat_thermo = m.ZoneThermostat.find_one({m.ZoneThermostat.zone_id: zone_id})
         if heat_thermo is not None:
             heat_thermo.last_presence_set = datetime.datetime.now()
+            heat_thermo.save_changed_fields()
         else:
             L.l.info("No heat thermo for zone {}:{}".format(zone_name, zone_id))
 
@@ -433,6 +434,16 @@ def thread_run():
     P.season = "summer" if month in range(5, 9) else "winter"
     _set_main_heat_source()
     _loop_zones()
+    if P.DEBUG:
+        sensor = m.Sensor.find_one({m.Sensor.sensor_name: "living"})
+        if sensor is None:
+            sensor = m.Sensor()
+            sensor.address = "41000003BE099C28"
+            sensor.sensor_name = "living"
+        sensor.temperature = 21
+        sensor.updated_on = utils.get_base_location_now_date()
+        sensor.save_changed_fields(broadcast=False, persist=True)
+        _handle_presence("living", 2)
     prctl.set_name("idle_heat")
     threading.current_thread().name = "idle_heat"
     return 'Heat ok'

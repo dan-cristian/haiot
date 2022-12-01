@@ -2,15 +2,14 @@ from pydispatch import dispatcher
 import threading
 import prctl
 from main.logger_helper import L
-from main import thread_pool, persistence, db
+from main import thread_pool, persistence
 from common import Constant, variable, utils
 import transport
 import models
 import main
 import model_helper
 import node
-import sensor
-import heat
+from hvac import heat
 import gpio
 import utility
 import health_monitor
