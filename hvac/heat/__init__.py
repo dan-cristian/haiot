@@ -129,8 +129,9 @@ def _get_schedule_pattern(heat_schedule):
         delta = (datetime.datetime.now() - heat_thermo.last_presence_set).total_seconds()
         if delta <= P.PRESENCE_SEC and heat_schedule.pattern_id_presence is not None:
             # we have recent move
-            L.l.info("Move detected, set move heat pattern in zone id {}".format(heat_schedule.zone_id))
             schedule_pattern = m.SchedulePattern.find_one({m.SchedulePattern.id: heat_schedule.pattern_id_presence})
+            L.l.info("Move detected, set move heat pattern {} in zone id {}".format(
+                schedule_pattern.name, heat_schedule.zone_id))
         if delta >= P.AWAY_SEC and heat_schedule.pattern_id_no_presence is not None:
             # no move for a while, switch to away
             L.l.info("No move detected, set away heat pattern in zone id {}".format(heat_schedule.zone_id))
@@ -443,6 +444,16 @@ def thread_run():
         sensor.temperature = 21
         sensor.updated_on = utils.get_base_location_now_date()
         sensor.save_changed_fields(broadcast=False, persist=True)
+
+        sensor = m.Sensor.find_one({m.Sensor.sensor_name: "puffer sus"})
+        if sensor is None:
+            sensor = m.Sensor()
+            sensor.address = "AE000003BDFFB928"
+            sensor.sensor_name = "puffer sus"
+        sensor.temperature = 41
+        sensor.updated_on = utils.get_base_location_now_date()
+        sensor.save_changed_fields(broadcast=False, persist=True)
+
         _handle_presence("living", 2)
     prctl.set_name("idle_heat")
     threading.current_thread().name = "idle_heat"
