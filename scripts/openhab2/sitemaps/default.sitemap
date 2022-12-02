@@ -7,10 +7,12 @@ Frame label="Mains"{
         {Chart item=powermonitor_power_main_l2 period=D}
     Text item=powermonitor_power_main_l3
         {Chart item=powermonitor_power_main_l3 period=D}
-    Text item=battery_charger_main
+    Text item=electricity_power_battery_charger
         {Chart item=battery_charger_main period=D}
-	Text item=inverter_main
+    Default item=battery_charger_main
+	Text item=electricity_power_inverter
 	    {Chart item=inverter_main period=D}
+    Default item=inverter_main
     }
 
 Frame label="Solar" {
