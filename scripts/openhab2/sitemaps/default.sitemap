@@ -1,28 +1,12 @@
 sitemap default label="Home" {
 
 Frame {
-    Text item=powermonitor_power_main_l1 {
-        Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M"]
-        Chart item=powermonitor_power_main_l1 period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
-        Chart item=powermonitor_power_main_l1 period=D refresh=10000 visibility=[p_switch==1]
-        Chart item=powermonitor_power_main_l1 period=W refresh=10000 visibility=[p_switch==2]
-        Chart item=powermonitor_power_main_l1 period=M refresh=10000 visibility=[p_switch==3]
-
-        }
-    Text item=powermonitor_power_main_l2 {
-        Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M"]
-        Chart item=powermonitor_power_main_l2 period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
-        Chart item=powermonitor_power_main_l2 period=D refresh=10000 visibility=[p_switch==1]
-        Chart item=powermonitor_power_main_l2 period=W refresh=10000 visibility=[p_switch==2]
-        Chart item=powermonitor_power_main_l2 period=M refresh=10000 visibility=[p_switch==3]
-        }
-    Text item=powermonitor_power_main_l3 {
-        Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M"]
-        Chart item=powermonitor_power_main_l3 period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
-        Chart item=powermonitor_power_main_l3 period=D refresh=10000 visibility=[p_switch==1]
-        Chart item=powermonitor_power_main_l3 period=W refresh=10000 visibility=[p_switch==2]
-        Chart item=powermonitor_power_main_l3 period=M refresh=10000 visibility=[p_switch==3]
-        }
+    Text item=powermonitor_power_main_l1
+        {Chart item=powermonitor_power_main_l1 period=D}
+    Text item=powermonitor_power_main_l2
+        {Chart item=powermonitor_power_main_l2 period=D}
+    Text item=powermonitor_power_main_l3
+        {Chart item=powermonitor_power_main_l3 period=D}
     }
 
 Frame {
@@ -46,69 +30,34 @@ Frame {
     Default item=heat_gas_heat
     Default item=heat_puffer_gas_valve
     Group item=TEMP_BOI {
-        Text item=temperature_boiler_sus {
-            Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
-            Chart item=temperature_boiler_sus service="mysql" period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
-            Chart item=temperature_boiler_sus service="mysql" period=D refresh=10000 visibility=[p_switch==1]
-            Chart item=temperature_boiler_sus service="mysql" period=W refresh=10000 visibility=[p_switch==2]
-            Chart item=temperature_boiler_sus service="mysql" period=M refresh=10000 visibility=[p_switch==3]
-            Chart item=temperature_boiler_sus service="mysql" period=3M refresh=10000 visibility=[p_switch==4]
-            Chart item=temperature_boiler_sus service="mysql" period=Y refresh=10000 visibility=[p_switch==5]
-            }
-        Text item=temperature_boiler_mijloc {
-            Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
-            Chart item=temperature_boiler_mijloc service="mysql" period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
-            Chart item=temperature_boiler_mijloc service="mysql" period=D refresh=10000 visibility=[p_switch==1]
-            Chart item=temperature_boiler_mijloc service="mysql" period=W refresh=10000 visibility=[p_switch==2]
-            Chart item=temperature_boiler_mijloc service="mysql" period=M refresh=10000 visibility=[p_switch==3]
-            Chart item=temperature_boiler_mijloc service="mysql" period=3M refresh=10000 visibility=[p_switch==4]
-            Chart item=temperature_boiler_mijloc service="mysql" period=Y refresh=10000 visibility=[p_switch==5]
-            }
-        Text item=temperature_boiler_jos {
-            Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
-            Chart item=temperature_boiler_jos service="mysql" period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
-            Chart item=temperature_boiler_jos service="mysql" period=D refresh=10000 visibility=[p_switch==1]
-            Chart item=temperature_boiler_jos service="mysql" period=W refresh=10000 visibility=[p_switch==2]
-            Chart item=temperature_boiler_jos service="mysql" period=M refresh=10000 visibility=[p_switch==3]
-            Chart item=temperature_boiler_jos service="mysql" period=3M refresh=10000 visibility=[p_switch==4]
-            Chart item=temperature_boiler_jos service="mysql" period=Y refresh=10000 visibility=[p_switch==5]
-            }
+        Text item=temperature_boiler_sus
+            {Chart item=temperature_boiler_sus period=D}
+        Text item=temperature_boiler_mijloc
+            {Chart item=temperature_boiler_mijloc period=D}
+        Text item=temperature_boiler_jos
+            {Chart item=temperature_boiler_jos period=D}
         }
 
 	Group item=TEMP_PUF {
         Text item=temperature_puffer_sus {
-            Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
-            Chart item=temperature_puffer_sus service="mysql" period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
-            Chart item=temperature_puffer_sus service="mysql" period=D refresh=10000 visibility=[p_switch==1]
-            Chart item=temperature_puffer_sus service="mysql" period=W refresh=10000 visibility=[p_switch==2]
-            Chart item=temperature_puffer_sus service="mysql" period=M refresh=10000 visibility=[p_switch==3]
-            Chart item=temperature_puffer_sus service="mysql" period=3M refresh=10000 visibility=[p_switch==4]
-            Chart item=temperature_puffer_sus service="mysql" period=Y refresh=10000 visibility=[p_switch==5]
-            }
+            Chart item=temperature_puffer_sus period=D}
         Text item=temperature_puffer_mijloc {
-            Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
-            Chart item=temperature_puffer_mijloc service="mysql" period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
-            Chart item=temperature_puffer_mijloc service="mysql" period=D refresh=10000 visibility=[p_switch==1]
-            Chart item=temperature_puffer_mijloc service="mysql" period=W refresh=10000 visibility=[p_switch==2]
-            Chart item=temperature_puffer_mijloc service="mysql" period=M refresh=10000 visibility=[p_switch==3]
-            Chart item=temperature_puffer_mijloc service="mysql" period=3M refresh=10000 visibility=[p_switch==4]
-            Chart item=temperature_puffer_mijloc service="mysql" period=Y refresh=10000 visibility=[p_switch==5]
-            }
+            Chart item=temperature_puffer_mijloc period=D}
         Text item=temperature_puffer_jos {
-            Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M", 4="3M", 5="Y"]
-            Chart item=temperature_puffer_jos service="mysql" period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
-            Chart item=temperature_puffer_jos service="mysql" period=D refresh=10000 visibility=[p_switch==1]
-            Chart item=temperature_puffer_jos service="mysql" period=W refresh=10000 visibility=[p_switch==2]
-            Chart item=temperature_puffer_jos service="mysql" period=M refresh=10000 visibility=[p_switch==3]
-            Chart item=temperature_puffer_jos service="mysql" period=3M refresh=10000 visibility=[p_switch==4]
-            Chart item=temperature_puffer_jos service="mysql" period=Y refresh=10000 visibility=[p_switch==5]
-            }
+            Chart item=temperature_puffer_jos period=D}
         }
     }
 
 Frame {
-    Default item=air_radon
+    Text item=temperature_living {
+        Chart item=temperature_living period=D}
     Default item=air_co2_living
+    Text item=humidity_living {
+        Chart item=humidity_living period=D}
+}
+
+Frame {
+    Default item=air_radon
     Default item=air_co2_kids
     Default item=air_co2_bedroom
     Default item=air_co2_birou
