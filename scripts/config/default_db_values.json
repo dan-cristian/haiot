@@ -383,7 +383,8 @@
     {"relay_pin_name": "blackwater_pump_relay_test", "zone_id": "9", "gpio_pin_code": "sonoff-basic-3", "relay_type": "sonoff"},
 
     {"relay_pin_name": "batterychargectrl_high", "zone_id": "8", "gpio_pin_code": "batterychargectrl", "relay_type": "sonoff", "relay_index": 1},
-    {"relay_pin_name": "batterychargectrl_low", "zone_id": "8", "gpio_pin_code": "batterychargectrl", "relay_type": "sonoff", "relay_index": 2}
+    {"relay_pin_name": "batterychargectrl_med", "zone_id": "8", "gpio_pin_code": "batterychargectrl", "relay_type": "sonoff", "relay_index": 2},
+    {"relay_pin_name": "batterychargectrl_low", "zone_id": "8", "gpio_pin_code": "batterychargectrl", "relay_type": "sonoff", "relay_index": 3}
   ],
 
   "PowerMonitor": [
