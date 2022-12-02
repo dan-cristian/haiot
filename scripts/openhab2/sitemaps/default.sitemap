@@ -1,7 +1,5 @@
 sitemap default label="Home" {
 
-
-
 Frame {
     Text item=powermonitor_power_main_l1 {
         Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M"]
