@@ -57,6 +57,11 @@ Frame {
     }
 
 Frame {
+    Default item=temperature_garden_air {
+        Chart item=temperature_garden_air period=D
+    }
+    Default item=dust_vent_pm2_5
+    Default item=dust_living_pm2_5
     Default item=heat_gas_heat
     Default item=heat_puffer_gas_valve
     Group item=TEMP_BOI {
