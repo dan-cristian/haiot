@@ -406,7 +406,8 @@
     {"id":42, "name":"solar l2",    "type":"shelly", "sensor_index": 0, "host_name":"shellyem-244CAB43242A"},
     {"id":43, "name":"heatpump l2", "type":"shelly", "sensor_index": 1, "host_name":"shellyem-244CAB43242A"},
 
-    {"id":60, "name":"battery charger", "type":"tasmota", "host_name":"batterychargermain"}
+    {"id":60, "name":"battery charger", "type":"tasmota", "host_name":"batterychargermain"},
+    {"id":61, "name":"invertermain", "type":"tasmota", "host_name":"inverterpw"}
   ],
 
   "TemperatureTarget": [

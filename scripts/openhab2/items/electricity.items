@@ -117,6 +117,7 @@ Number powermonitor_total_energy_day_end_solar_l2 "Total day end solar energy L2
 Number powermonitor_total_energy_day_end_solar_l3 "Total day end solar energy L3 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_total_energy_day_end_solar l3:state:default]"}
 
 Number powermonitor_current_batterycharger_now "Battery charger [%.0f Wh]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_current_battery charger:state:default]"}
+Number powermonitor_current_invertermain_now "Inverter [%.0f Wh]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_current_invertermain:state:default]"}
 
 Switch battery_charger_main "Battery charger" <switch>  {mqtt="<[mosquitto:iot/openhab/relay_batterychargermain_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_batterychargermain_relay:command:*:default]", autoupdate="false"}
 Switch inverter_main "Inverter" <switch>                {mqtt="<[mosquitto:iot/openhab/relay_invertermain_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_invertermain_relay:command:*:default]", autoupdate="false"}
