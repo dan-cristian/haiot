@@ -113,6 +113,7 @@ def _process_message(msg):
                 dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=power, unit='watt')
                 # todo: save total energy utility
                 if voltage or factor or current:
+                    # obsolete, delete sometime
                     zone_sensor = m.ZoneSensor.find_one({m.ZoneSensor.sensor_address: sensor_name})
                     if zone_sensor is not None:
                         record = m.Sensor.find_one({m.Sensor.address: sensor_name})
@@ -131,6 +132,13 @@ def _process_message(msg):
                             record.vdd = round(factor, 1)
                         if voltage is not None or current is not None or factor is not None:
                             record.save_changed_fields(broadcast=False, persist=True)
+                    # new way to save power values
+                    sensor = m.PowerMonitor.find_one({m.PowerMonitor.host_name: sensor_name,
+                                                      m.PowerMonitor.type: "tasmota"})
+                    if sensor is not None:
+                        if current is not None:
+                            sensor.current = current
+                        sensor.save_changed_fields(broadcast=False, persist=True)
                 # dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=current, unit='kWh')
             # check for single relay
             if 'POWER' in obj:
