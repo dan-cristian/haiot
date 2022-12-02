@@ -419,16 +419,15 @@ class P:
         #relay = 'inverterpw'
         #P.device_list[relay] = InverterRelay(relay_name=relay, avg_consumption=-500,
         #                                   supports_breaks=True, min_on_interval=60, state_change_interval=120)
-        relay = 'batterychargectrl_low'  # index 3, right
-        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=300,
-                                           supports_breaks=True, min_on_interval=10, state_change_interval=5)
         relay = 'batterychargectrl_med'  # index 2, right
         P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=720,
                                            supports_breaks=True, min_on_interval=10, state_change_interval=5)
         relay = 'batterychargectrl_high'  # index 1, left
         P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=730,
                                            supports_breaks=True, min_on_interval=10, state_change_interval=5)
-
+        relay = 'batterychargectrl_low'  # index 3, right
+        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=300,
+                                           supports_breaks=True, min_on_interval=10, state_change_interval=5)
         if not P.emulate_export:
             pass
 
