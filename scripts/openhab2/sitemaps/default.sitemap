@@ -52,8 +52,8 @@ Frame {
     Text item=temperature_living {
         Chart item=temperature_living period=D}
     Default item=air_co2_living
-    Text item=humidity_living {
-        Chart item=humidity_living period=D}
+    Text item=air_humidity_bme_living {
+        Chart item=air_humidity_bme_living period=D}
 }
 
 Frame {
