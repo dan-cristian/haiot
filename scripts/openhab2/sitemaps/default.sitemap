@@ -58,8 +58,7 @@ Frame {
 
 Frame {
     Text item=temperature_garden_air {
-        Switch item=p_switch mappings=[0="D"]
-        Chart item=temperature_garden_air period=D visibility=[p_switch==0, p_switch=="Uninitialized"]
+        Chart item=temperature_garden_air period=D
     }
 
     Default item=dust_vent_pm2_5
