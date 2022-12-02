@@ -151,6 +151,10 @@ def _process_message(msg):
                 multiple_relays_list.append(1)
             if 'POWER2' in obj:
                 multiple_relays_list.append(2)
+            if 'POWER3' in obj:
+                multiple_relays_list.append(3)
+            if 'POWER4' in obj:
+                multiple_relays_list.append(4)
             if len(multiple_relays_list) > 0:
                 for index in multiple_relays_list:
                     power_is_on = obj['POWER' + str(index)] == 'ON'
