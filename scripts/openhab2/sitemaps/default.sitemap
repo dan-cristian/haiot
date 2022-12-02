@@ -1,6 +1,6 @@
 sitemap default label="Home" {
 
-Frame {
+Frame label="Mains"{
     Text item=powermonitor_power_main_l1
         {Chart item=powermonitor_power_main_l1 period=D}
     Text item=powermonitor_power_main_l2
@@ -9,7 +9,7 @@ Frame {
         {Chart item=powermonitor_power_main_l3 period=D}
     }
 
-Frame {
+Frame label="Solar" {
     Text item=powermonitor_power_solar_l1
         {Chart item=powermonitor_power_solar_l1 period=D}
     Text item=powermonitor_power_solar_l2
@@ -20,7 +20,7 @@ Frame {
         {Chart item=house_battery period=D}
     }
 
-Frame {
+Frame label="Heating" {
     Text item=temperature_garden_air {
         Chart item=temperature_garden_air period=D
     }
@@ -46,7 +46,7 @@ Frame {
         }
     }
 
-Frame {
+Frame label="Living" {
     Text item=air_radon {
         Chart item=air_radon period=D}
     Text item=temperature_living {
