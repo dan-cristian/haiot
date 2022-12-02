@@ -26,34 +26,14 @@ Frame {
     }
 
 Frame {
-    Text item=powermonitor_power_solar_l1 {
-        Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M"]
-        Chart item=powermonitor_power_solar_l1 period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
-        Chart item=powermonitor_power_solar_l1 period=D refresh=10000 visibility=[p_switch==1]
-        Chart item=powermonitor_power_solar_l1 period=W refresh=10000 visibility=[p_switch==2]
-        Chart item=powermonitor_power_solar_l1 period=M refresh=10000 visibility=[p_switch==3]
-        }
-    Text item=powermonitor_power_solar_l2 {
-        Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M"]
-        Chart item=powermonitor_power_solar_l2 period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
-        Chart item=powermonitor_power_solar_l2 period=D refresh=10000 visibility=[p_switch==1]
-        Chart item=powermonitor_power_solar_l2 period=W refresh=10000 visibility=[p_switch==2]
-        Chart item=powermonitor_power_solar_l2 period=M refresh=10000 visibility=[p_switch==3]
-        }
-    Text item=powermonitor_power_solar_l3 {
-        Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M"]
-        Chart item=powermonitor_power_solar_l3 period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
-        Chart item=powermonitor_power_solar_l3 period=D refresh=10000 visibility=[p_switch==1]
-        Chart item=powermonitor_power_solar_l3 period=W refresh=10000 visibility=[p_switch==2]
-        Chart item=powermonitor_power_solar_l3 period=M refresh=10000 visibility=[p_switch==3]
-        }
-    Text item=house_battery {
-        Switch item=p_switch mappings=[0="h", 1="D", 2="W", 3="M"]
-        Chart item=house_battery period=h refresh=10000 visibility=[p_switch==0, p_switch=="Uninitialized"]
-        Chart item=house_battery period=D refresh=10000 visibility=[p_switch==1]
-        Chart item=house_battery period=W refresh=10000 visibility=[p_switch==2]
-        Chart item=house_battery period=M refresh=10000 visibility=[p_switch==3]
-        }
+    Text item=powermonitor_power_solar_l1
+        {Chart item=powermonitor_power_solar_l1 period=D}
+    Text item=powermonitor_power_solar_l2
+        {Chart item=powermonitor_power_solar_l2 period=D}
+    Text item=powermonitor_power_solar_l3
+        {Chart item=powermonitor_power_solar_l3 period=D}
+    Text item=house_battery
+        {Chart item=house_battery period=D}
     }
 
 Frame {
