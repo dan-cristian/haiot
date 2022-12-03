@@ -70,6 +70,10 @@ Number powermonitor_power_solar_l1 "Solar L1 [%.0f W]" <energy> {mqtt="<[mosquit
 Number powermonitor_power_solar_l2 "Solar L2 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_power_solar l2:state:default]"}
 Number powermonitor_power_solar_l3 "Solar L3 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_power_solar l3:state:default]"}
 
+Number powermonitor_total_energy_now_main_l1 "Main L1 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_total_energy_now_main l1:state:default]"}
+Number powermonitor_total_energy_now_main_l2 "Main L2 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_total_energy_now_main l2:state:default]"}
+Number powermonitor_total_energy_now_main_l3 "Main L3 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_total_energy_now_main l3:state:default]"}
+
 Number powermonitor_energy_export_main_l1 "Export L1 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_energy_export_main l1:state:default]"}
 Number powermonitor_energy_export_main_l2 "Export L2 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_energy_export_main l2:state:default]"}
 Number powermonitor_energy_export_main_l3 "Export L3 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_energy_export_main l3:state:default]"}
