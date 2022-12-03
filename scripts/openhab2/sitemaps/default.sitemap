@@ -7,12 +7,6 @@ Frame label="Mains"{
         {Chart item=powermonitor_power_main_l2 period=D}
     Text item=powermonitor_power_main_l3
         {Chart item=powermonitor_power_main_l3 period=D}
-    Text item=electricity_power_battery_charger
-        {Chart item=electricity_power_battery_charger period=D}
-    Default item=battery_charger_main
-	Text item=electricity_power_inverter
-	    {Chart item=electricity_power_inverter period=D}
-    Default item=inverter_main
     }
 
 Frame label="Solar" {
@@ -24,6 +18,12 @@ Frame label="Solar" {
         {Chart item=powermonitor_power_solar_l3 period=D}
     Text item=house_battery
         {Chart item=house_battery period=D}
+    Text item=electricity_power_battery_charger
+        {Chart item=electricity_power_battery_charger period=D}
+    Default item=battery_charger_main
+	Text item=electricity_power_inverter
+	    {Chart item=electricity_power_inverter period=D}
+    Default item=inverter_main
     }
 
 Frame label="Heating" {
