@@ -105,6 +105,10 @@ def _process_message(msg):
                     current = float(energy['Current'])
                 else:
                     current = None
+                if 'Period' in energy:
+                    energy_now = float(energy['Period'])
+                else:
+                    energy_now = None
                 if 'Today' in energy:
                     today_energy = energy['Today']
                 else:
@@ -138,6 +142,8 @@ def _process_message(msg):
                     if sensor is not None:
                         if current is not None:
                             sensor.current = current
+                        if energy_now is not None:
+                            sensor.total_energy_now = energy_now
                         sensor.save_changed_fields(broadcast=False, persist=True)
                 # dispatcher.send(Constant.SIGNAL_UTILITY_EX, sensor_name=sensor_name, value=current, unit='kWh')
             # check for single relay
