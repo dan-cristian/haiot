@@ -394,12 +394,12 @@
     {"id":20, "name":"living ozone", "type":"ina", "host_name":"wemoslivingair"},
     {"id":21, "name":"airfiltered nox", "type":"ina", "host_name":"airfiltered"},
 
-    {"id":31, "name":"main l1",     "type":"shelly", "sensor_index": 0, "host_name":"shellyem-A4E57CBAABA1"},
-    {"id":32, "name":"main l1 aux", "type":"shelly", "sensor_index": 1, "host_name":"shellyem-A4E57CBAABA1"},
-    {"id":33, "name":"main l2",     "type":"shelly", "sensor_index": 0, "host_name":"shellyem-A4E57CBA5578"},
-    {"id":34, "name":"main l2 aux", "type":"shelly", "sensor_index": 1, "host_name":"shellyem-A4E57CBA5578"},
-    {"id":35, "name":"main l3",     "type":"shelly", "sensor_index": 0, "host_name":"shellyem-244CAB41796F"},
-    {"id":36, "name":"main l3 aux", "type":"shelly", "sensor_index": 1, "host_name":"shellyem-244CAB41796F"},
+    {"id":31, "name":"charger l1",  "type":"shelly", "sensor_index": 0, "host_name":"shellyem-A4E57CBAABA1"},
+    {"id":32, "name":"main l1",     "type":"shelly", "sensor_index": 1, "host_name":"shellyem-A4E57CBAABA1"},
+    {"id":33, "name":"charger l2",  "type":"shelly", "sensor_index": 0, "host_name":"shellyem-A4E57CBA5578"},
+    {"id":34, "name":"main l2",     "type":"shelly", "sensor_index": 1, "host_name":"shellyem-A4E57CBA5578"},
+    {"id":35, "name":"charger l3",  "type":"shelly", "sensor_index": 0, "host_name":"shellyem-244CAB41796F"},
+    {"id":36, "name":"main l3",     "type":"shelly", "sensor_index": 1, "host_name":"shellyem-244CAB41796F"},
     {"id":37, "name":"main n",      "type":"shelly", "sensor_index": 1, "host_name":"shellyem-BCFF4DFCDD55"},
     {"id":40, "name":"solar l1",    "type":"shelly", "sensor_index": 0, "host_name":"shellyem-244CAB4317EC"},
     {"id":41, "name":"heatpump l1", "type":"shelly", "sensor_index": 1, "host_name":"shellyem-244CAB4317EC"},
@@ -408,8 +408,9 @@
     {"id":44, "name":"solar l3",    "type":"shelly", "sensor_index": 0, "host_name":"shellyem-244CAB431B3A"},
     {"id":45, "name":"heatpump l3", "type":"shelly", "sensor_index": 1, "host_name":"shellyem-244CAB431B3A"},
 
-    {"id":60, "name":"battery charger", "type":"tasmota", "host_name":"batterychargermain"},
-    {"id":61, "name":"invertermain", "type":"tasmota", "host_name":"inverterpw"}
+    {"id":61, "name":"inverter l1",  "type":"shelly", "sensor_index": 0, "host_name":"shellyem3-485519C9ED73"},
+    {"id":62, "name":"unused l2",    "type":"shelly", "sensor_index": 1, "host_name":"shellyem3-485519C9ED73"},
+    {"id":63, "name":"unused l3",    "type":"shelly", "sensor_index": 2, "host_name":"shellyem3-485519C9ED73"}
   ],
 
   "TemperatureTarget": [
