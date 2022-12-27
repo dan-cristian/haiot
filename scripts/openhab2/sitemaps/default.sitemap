@@ -26,6 +26,15 @@ Frame label="Solar" {
     Default item=inverter_main
     }
 
+Frame label="Charger"{
+    Text item=powermonitor_power_charger_l1
+        {Chart item=powermonitor_power_charger_l1 period=D}
+    Text item=powermonitor_power_charger_l2
+        {Chart item=powermonitor_power_charger_l2 period=D}
+    Text item=powermonitor_power_charger_l3
+        {Chart item=powermonitor_power_charger_l3 period=D}
+    }
+
 Frame label="Heating" {
     Text item=temperature_garden_air {
         Chart item=temperature_garden_air period=D
