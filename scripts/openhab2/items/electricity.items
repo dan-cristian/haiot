@@ -66,6 +66,10 @@ Number powermonitor_power_main_l2 "Main L2 [%.0f W]" <energy> {mqtt="<[mosquitto
 Number powermonitor_power_main_l3 "Main L3 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_power_main l3:state:default]"}
 Number powermonitor_power_main_n "Main N [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_power_main n:state:default]"}
 
+Number powermonitor_power_charger_l1 "Charger L1 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_power_charger l1:state:default]"}
+Number powermonitor_power_charger_l2 "Charger L2 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_power_charger l2:state:default]"}
+Number powermonitor_power_charger_l3 "Charger L3 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_power_charger l3:state:default]"}
+
 Number powermonitor_power_solar_l1 "Solar L1 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_power_solar l1:state:default]"}
 Number powermonitor_power_solar_l2 "Solar L2 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_power_solar l2:state:default]"}
 Number powermonitor_power_solar_l3 "Solar L3 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_power_solar l3:state:default]"}
