@@ -18,8 +18,8 @@ Frame label="Solar" {
         {Chart item=powermonitor_power_solar_l3 period=D}
     Text item=house_battery
         {Chart item=house_battery period=D}
-	Text item=electricity_power_inverter
-	    {Chart item=electricity_power_inverter period=D}
+	Text item=powermonitor_power_invertermain
+	    {Chart item=powermonitor_power_invertermain period=D}
     Default item=inverter_main
     }
 
