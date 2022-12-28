@@ -33,6 +33,7 @@ Frame label="Charger"{
         {Chart item=powermonitor_power_charger_l2 period=D}
     Text item=powermonitor_power_charger_l3
         {Chart item=powermonitor_power_charger_l3 period=D}
+    Default item=temperature_charger
     }
 
 Frame label="Heating" {
