@@ -419,15 +419,18 @@ class P:
         #relay = 'inverterpw'
         #P.device_list[relay] = InverterRelay(relay_name=relay, avg_consumption=-500,
         #                                   supports_breaks=True, min_on_interval=60, state_change_interval=120)
-        relay = 'batterychargectrl_high'  # index 1, left
-        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=730,
-                                           supports_breaks=True, min_on_interval=10, state_change_interval=5)
-        relay = 'batterychargectrl_med'  # index 2, right
-        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=720,
-                                           supports_breaks=True, min_on_interval=10, state_change_interval=5)
-        relay = 'batterychargectrl_low'  # index 3, right
-        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=300,
-                                           supports_breaks=True, min_on_interval=10, state_change_interval=5)
+        relay = 'batterychargectrl_1'  # index 1, right, stable
+        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=650,
+                                           supports_breaks=True, min_on_interval=6, state_change_interval=3)
+        relay = 'batterychargectrl_2'  # index 2, flaky
+        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=650,
+                                           supports_breaks=True, min_on_interval=6, state_change_interval=3)
+        relay = 'batterychargectrl_3'  # index 3, right, stable
+        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=650,
+                                           supports_breaks=True, min_on_interval=6, state_change_interval=3)
+        relay = 'batterychargectrl_4'  # index 4, left, somewhat stable
+        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=650,
+                                           supports_breaks=True, min_on_interval=6, state_change_interval=3)
         if not P.emulate_export:
             pass
 

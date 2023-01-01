@@ -382,9 +382,10 @@
     {"relay_pin_name": "front_gate_relay_test_2", "zone_id": "7", "gpio_pin_code": "0:out:1", "gpio_host_name": "netbook", "relay_type": "piface", "expire":  2},
     {"relay_pin_name": "blackwater_pump_relay_test", "zone_id": "9", "gpio_pin_code": "sonoff-basic-3", "relay_type": "sonoff"},
 
-    {"relay_pin_name": "batterychargectrl_high", "zone_id": "8", "gpio_pin_code": "batterychargectrl", "relay_type": "sonoff", "relay_index": 1},
-    {"relay_pin_name": "batterychargectrl_med", "zone_id": "8", "gpio_pin_code": "batterychargectrl", "relay_type": "sonoff", "relay_index": 2},
-    {"relay_pin_name": "batterychargectrl_low", "zone_id": "8", "gpio_pin_code": "batterychargectrl", "relay_type": "sonoff", "relay_index": 3}
+    {"relay_pin_name": "batterychargectrl_1", "zone_id": "8", "gpio_pin_code": "batterychargectrl", "relay_type": "sonoff", "relay_index": 1},
+    {"relay_pin_name": "batterychargectrl_2", "zone_id": "8", "gpio_pin_code": "batterychargectrl", "relay_type": "sonoff", "relay_index": 2},
+    {"relay_pin_name": "batterychargectrl_3", "zone_id": "8", "gpio_pin_code": "batterychargectrl", "relay_type": "sonoff", "relay_index": 3},
+    {"relay_pin_name": "batterychargectrl_4", "zone_id": "8", "gpio_pin_code": "batterychargectrl", "relay_type": "sonoff", "relay_index": 4}
   ],
 
   "PowerMonitor": [
@@ -559,7 +560,6 @@
     {"utility_name":"power solar rulota", "sensor_name":"rulotasolarpw", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
     {"utility_name":"power grid rulota", "sensor_name":"rulotagridpw", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
     {"utility_name":"power battery charger", "sensor_name":"batterychargermain", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
-    {"utility_name":"power inverter", "sensor_name":"inverterpw", "sensor_index":0, "ticks_per_unit":0, "unit_name":"kWh", "unit_2_name":"watt", "utility_type":"electricity", "unit_cost":0.5259},
 
     {"utility_name":"water house", "sensor_name":"meterhouse", "sensor_index":1, "ticks_per_unit":1, "unit_name":"l", "utility_type":"water", "unit_cost":2.9388},
     {"utility_name":"water hot", "sensor_name":"meterhouse", "sensor_index":2, "ticks_per_unit":1, "unit_name":"l", "utility_type":"water", "unit_cost":2.9388},
