@@ -409,9 +409,7 @@ class P:
         if P.emulate_export:
             pass
 
-        if apps.tesla.P.initialised:
-            relay = 'tesla_charger'
-            P.device_list[relay] = TeslaCharger(relay_name=relay, vehicle_id=1, state_change_interval=15)
+
 
         # keep energy producing devices first in the list
         # order energy consumption with highest consumption first
@@ -431,6 +429,10 @@ class P:
         relay = 'batterychargectrl_2'  # index 2, flaky
         P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=650,
                                            supports_breaks=True, min_on_interval=6, state_change_interval=3)
+        if apps.tesla.P.initialised:
+            relay = 'tesla_charger'
+            P.device_list[relay] = TeslaCharger(relay_name=relay, vehicle_id=1, state_change_interval=15)
+
         if not P.emulate_export:
             pass
 
