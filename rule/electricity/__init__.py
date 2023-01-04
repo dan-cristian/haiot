@@ -422,13 +422,13 @@ class P:
         relay = 'batterychargectrl_1'  # index 1, right, stable
         P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=650,
                                            supports_breaks=True, min_on_interval=6, state_change_interval=3)
-        relay = 'batterychargectrl_2'  # index 2, flaky
-        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=650,
-                                           supports_breaks=True, min_on_interval=6, state_change_interval=3)
         relay = 'batterychargectrl_3'  # index 3, right, stable
         P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=650,
                                            supports_breaks=True, min_on_interval=6, state_change_interval=3)
         relay = 'batterychargectrl_4'  # index 4, left, somewhat stable
+        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=650,
+                                           supports_breaks=True, min_on_interval=6, state_change_interval=3)
+        relay = 'batterychargectrl_2'  # index 2, flaky
         P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=650,
                                            supports_breaks=True, min_on_interval=6, state_change_interval=3)
         if not P.emulate_export:
