@@ -90,7 +90,7 @@ class Relaydevice:
         # get relay status to check for user forced start
         power_on = self.is_power_on()
         if power_on is None:
-            power_on = True
+            power_on = False
         if grid_watts <= 0:
             # start device if exporting and there is enough surplus
             export_watts = -grid_watts
@@ -420,7 +420,7 @@ class P:
         #P.device_list[relay] = InverterRelay(relay_name=relay, avg_consumption=-500,
         #                                   supports_breaks=True, min_on_interval=60, state_change_interval=120)
         relay = 'batterychargectrl_1'  # index 1, right, stable
-        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=650,
+        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=670,
                                            supports_breaks=True, min_on_interval=6, state_change_interval=3)
         relay = 'batterychargectrl_3'  # index 3, right, stable
         P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=650,
