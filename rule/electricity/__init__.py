@@ -418,16 +418,16 @@ class P:
         #P.device_list[relay] = InverterRelay(relay_name=relay, avg_consumption=-500,
         #                                   supports_breaks=True, min_on_interval=60, state_change_interval=120)
         relay = 'batterychargectrl_1'  # index 1, right, stable
-        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=760, # 730
+        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=780, # 730
                                            supports_breaks=True, min_on_interval=6, state_change_interval=3)
         relay = 'batterychargectrl_3'  # index 3, right, stable
-        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=760, # 735
+        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=780, # 735
                                            supports_breaks=True, min_on_interval=6, state_change_interval=3)
         relay = 'batterychargectrl_4'  # index 4, left, somewhat stable
-        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=760, # 730
+        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=780, # 730
                                            supports_breaks=True, min_on_interval=6, state_change_interval=3)
         relay = 'batterychargectrl_2'  # index 2, flaky
-        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=760, # 725
+        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=780, # 725
                                            supports_breaks=True, min_on_interval=6, state_change_interval=3)
         if apps.tesla.P.initialised:
             relay = 'tesla_charger'
