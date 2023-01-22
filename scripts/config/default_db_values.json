@@ -1,6 +1,7 @@
 {
   "Node": [
     {"id":1,  "priority": 10, "name":"netbook", "machine_type":"raspberry"},
+    {"id":2,  "priority": 12, "name":"tuf", "machine_type":"raspberry"},
     {"id":3,  "priority": 3, "name":"pi-face", "machine_type":"raspberry"},
     {"id":6,  "priority": 6, "name":"pi-power", "machine_type":"raspberry"},
     {"id":7,  "priority": 7, "name":"pidash", "machine_type":"raspberry"},
@@ -32,6 +33,7 @@
     {"name": "MQTT_TOPIC_MICRO", "value": "iot/micro", "description": "mqtt publish channel for micropython devices"},
     {"name": "MQTT_TOPIC_SHELLY", "value": "shellies", "description": "mqtt read/publish channel for shelly devices"},
     {"name": "MQTT_TOPIC_TESLAMATE", "value": "teslamate/cars/<car_id>/", "description": "mqtt read channel for teslamate updates"},
+    {"name": "MQTT_TOPIC_JKBMS", "value": "jk-bms/#", "description": "mqtt root topic for jk-bms "},
     {"name": "MQTT_HOST_2", "value": "127.0.0.1"},
     {"name": "MQTT_PORT_2", "value": "1883"},
     {"name": "DDNS_RACKSPACE_CONFIG_FILE", "value": "../private_config/.credentials/.rackspace.ddnsupdate.config.json",
@@ -111,6 +113,7 @@
     {"id":77, "active":false, "start_order":77, "name":"sensor.radoneye", "host_name":""},
     {"id":79, "active":false, "start_order":79, "name":"hvac.vent", "host_name":""},
     {"id":81, "active":false, "start_order":81, "name":"devices.smartbms", "host_name":""},
+    {"id":82, "active":false, "start_order":81, "name":"devices.jkbms", "host_name":""},
     {"id":90, "active":false, "start_order":90, "name":"apps.dashcam", "host_name":""},
     {"id":92, "active":false, "start_order":92, "name":"apps.tesla", "host_name":""},
     {"id":99, "active":false, "start_order":99, "name":"main.cron", "host_name":""},
@@ -170,6 +173,33 @@
     {"id":592, "active":true, "start_order":92, "name":"apps.tesla", "host_name":"netbook"},
     {"id":595, "active":true, "start_order":595, "name":"rule", "host_name":"netbook"},
     {"id":596, "active":true, "start_order":596, "name":"rule.electricity", "host_name":"netbook"},
+
+
+    {"id":603, "active":true, "start_order":3, "name":"health_monitor", "host_name":"tuf"},
+    {"id":609, "active":true, "start_order":9, "name":"hvac.heat", "host_name":"tuf"},
+    {"id":619, "active":true, "start_order":19, "name":"cloud.ddns", "host_name":"tuf"},
+    {"id":627, "active":true, "start_order":27, "name":"node", "host_name":"tuf"},
+    {"id":633, "active":true, "start_order":33, "name":"utility", "host_name":"tuf"},
+    {"id":641, "active":false, "start_order":41, "name":"cloud.alexa", "host_name":"tuf"},
+    {"id":645, "active":true, "start_order":45, "name":"cloud.openhab", "host_name":"tuf"},
+    {"id":646, "active":true, "start_order":46, "name":"cloud.owntracks", "host_name":"tuf"},
+    {"id":651, "active":true, "start_order":51, "name":"sensor.solar_aps", "host_name":"tuf"},
+    {"id":657, "active":true, "start_order":57, "name":"sensor.sonoff", "host_name":"tuf"},
+    {"id":659, "active":false, "start_order":59, "name":"sensor.i2c", "host_name":"tuf"},
+    {"id":661, "active":true, "start_order":61, "name":"sensor.shelly", "host_name":"tuf"},
+    {"id":665, "active":true, "start_order":65, "name":"gpio", "host_name":"tuf"},
+    {"id":667, "active":true, "start_order":67, "name":"alarm", "host_name":"tuf"},
+    {"id":670, "active":true, "start_order":70, "name":"music", "host_name":"tuf"},
+    {"id":675, "active":true, "start_order":75, "name":"devices.vent_atrea", "host_name":"tuf"},
+    {"id":620, "active":true, "start_order":20, "name":"test", "host_name":"tuf"},
+    {"id":673, "active":true, "start_order":73, "name":"apps.air_sensor_upload", "host_name":"tuf"},
+    {"id":677, "active":true, "start_order":77, "name":"sensor.radoneye", "host_name":"tuf"},
+    {"id":679, "active":true, "start_order":79, "name":"hvac.vent", "host_name":"tuf"},
+    {"id":681, "active":true, "start_order":81, "name":"devices.smartbms", "host_name":"tuf"},
+    {"id":682, "active":true, "start_order":81, "name":"devices.jkbms", "host_name":"tuf"},
+    {"id":692, "active":false, "start_order":92, "name":"apps.tesla", "host_name":"tuf"},
+    {"id":695, "active":true, "start_order":595, "name":"rule", "host_name":"tuf"},
+    {"id":696, "active":true, "start_order":596, "name":"rule.electricity", "host_name":"tuf"},
 
 
     {"id":809, "active":true, "start_order":9, "name":"hvac.heat", "host_name":"homew"},
@@ -636,7 +666,8 @@
     {"id": 1, "name": "60ah_battery_wi_57", "mac_address": "A4:C1:38:C6:30:57", "factory_full_capacity": 60, "host_name": "pibms2"},
     {"id": 2, "name": "40ah_battery_wi_b0", "mac_address": "A4:C1:38:EC:1B:B0", "factory_full_capacity": 40, "host_name": "pibms2"},
     {"id": 3, "name": "60ah_battery_zg_cd", "mac_address": "A4:C1:38:8B:97:CD", "factory_full_capacity": 60, "host_name": "pibms2"},
-    {"id": 4, "name": "60ah_battery_zg_56", "mac_address": "A4:C1:38:8A:A8:56", "factory_full_capacity": 60, "host_name": "pibms"}
+    {"id": 4, "name": "60ah_battery_zg_56", "mac_address": "A4:C1:38:8A:A8:56", "factory_full_capacity": 60, "host_name": "pibms"},
+    {"id": 10, "name": "jkbms_100ah_be_a9",             "mac_address": "C8:47:8C:EA:BE:A9", "factory_full_capacity": 100, "host_name": ""}
   ],
 
   "ElectricCar": [
