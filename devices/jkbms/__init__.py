@@ -13,7 +13,7 @@ class P:
 
 
 def _process_message(msg):
-    L.l.info("Topic={} payload={}".format(msg.topic, msg.payload))
+    # L.l.info("Topic={} payload={}".format(msg.topic, msg.payload))
     # fixme: identify bms name from mqtt data
     rec = m.Bms.find_one({m.Bms.name: 'jkbms_100ah_be_a9'})
     if 'sensor/' in msg.topic:
@@ -22,6 +22,7 @@ def _process_message(msg):
             total_voltage = float(msg.payload)
             rec.voltage = total_voltage
             rec.save_changed_fields(persist=True)
+            L.l.info("Total jk battery voltage={}".format(total_voltage))
         # 'jk-bms/sensor/jk-bms_cell_voltage_1/state' 3.301
         elif 'jk-bms_cell_voltage' in msg.topic:
             cell_no = msg.topic.split(topic_clean + 'sensor/jk-bms_cell_voltage_')[1].split('/state')[0]
@@ -44,9 +45,10 @@ def _process_message(msg):
             rec.capacity_percent = bms_capacity_remaining
             rec.save_changed_fields(persist=True)
         else:
-            L.l.info("Unprocessed topic jkbms: {}=".format(msg.topic, msg.payload))
-
+            # L.l.info("Unprocessed topic jkbms: {}=".format(msg.topic, msg.payload))
+            pass
     return True
+
 
 def mqtt_on_message(client, userdata, msg):
     try:
@@ -59,6 +61,7 @@ def mqtt_on_message(client, userdata, msg):
     finally:
         prctl.set_name("idle_mqtt_jkbms")
         threading.current_thread().name = "idle_mqtt_jkbms"
+
 
 def init():
     L.l.info('Jkbms module initialising')
