@@ -1,9 +1,7 @@
-# Battery JK 100 AH Grey BE:A9
 
 Number bms_voltage_jkbms_100ah_be_a9 "Voltage 100ah [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/bms_voltage_jkbms_100ah_be_a9:state:default]"}
 Number bms_capacity_percent_jkbms_100ah_be_a9 "Capacity [%.2f %%]" <energy> {mqtt="<[mosquitto:iot/openhab/bms_capacity_percent_jkbms_100ah_be_a9:state:default]"}
 Number bms_power_jkbms_100ah_be_a9 "Power [%.1f W]" <energy> {mqtt="<[mosquitto:iot/openhab/bms_power_jkbms_100ah_be_a9:state:default]"}
-
 Number bms_v01_jkbms_100ah_be_a9 "V01 60ah [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/bms_v01_jkbms_100ah_be_a9:state:default]"}
 Number bms_v02_jkbms_100ah_be_a9 "V02 60ah [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/bms_v02_jkbms_100ah_be_a9:state:default]"}
 Number bms_v03_jkbms_100ah_be_a9 "V03 60ah [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/bms_v03_jkbms_100ah_be_a9:state:default]"}
@@ -13,8 +11,6 @@ Number bms_v06_jkbms_100ah_be_a9 "V06 60ah [%.3f V]" <energy> {mqtt="<[mosquitto
 Number bms_v07_jkbms_100ah_be_a9 "V07 60ah [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/bms_v07_jkbms_100ah_be_a9:state:default]"}
 Number bms_v08_jkbms_100ah_be_a9 "V08 60ah [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/bms_v08_jkbms_100ah_be_a9:state:default]"}
 
-
-# Battery 60 AH Winston Yellow
 
 Number bms_voltage_60ah_battery_wi_57 "Voltage 60ah [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/bms_voltage_60ah_battery_wi_57:state:default]"}
 Number bms_voltage_cells_60ah_battery_wi_57 "Voltage cells 60ah [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/bms_voltage_cells_60ah_battery_wi_57:state:default]"}
@@ -36,7 +32,6 @@ Number bms_v08_60ah_battery_wi_57 "V08 60ah [%.3f V]" <energy> {mqtt="<[mosquitt
 Number bms_t1_60ah_battery_wi_57 "Temp1 60ah [%.2f]" <temperature> {mqtt="<[mosquitto:iot/openhab/bms_t1_60ah_battery_wi_57:state:default]"}
 Number bms_t2_60ah_battery_wi_57 "Temp2 60ah [%.2f]" <temperature> {mqtt="<[mosquitto:iot/openhab/bms_t2_60ah_battery_wi_57:state:default]"}
 
-# Battery 60AH ZG Green CD
 
 Number bms_voltage_60ah_battery_zg_cd "Voltage 60ah [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/bms_voltage_60ah_battery_zg_cd:state:default]"}
 Number bms_voltage_cells_60ah_battery_zg_cd "Voltage cells 60ah [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/bms_voltage_cells_60ah_battery_zg_cd:state:default]"}
@@ -58,7 +53,6 @@ Number bms_v08_60ah_battery_zg_cd "V08 60ah [%.3f V]" <energy> {mqtt="<[mosquitt
 Number bms_t1_60ah_battery_zg_cd "Temp1 60ah [%.2f]" <temperature> {mqtt="<[mosquitto:iot/openhab/bms_t1_60ah_battery_zg_cd:state:default]"}
 Number bms_t2_60ah_battery_zg_cd "Temp2 60ah [%.2f]" <temperature> {mqtt="<[mosquitto:iot/openhab/bms_t2_60ah_battery_zg_cd:state:default]"}
 
-# Battery 60AH ZG Green 56
 
 Number bms_voltage_60ah_battery_zg_56 "Voltage 60ah [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/bms_voltage_60ah_battery_zg_56:state:default]"}
 Number bms_voltage_cells_60ah_battery_zg_56 "Voltage cells 60ah [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/bms_voltage_cells_60ah_battery_zg_56:state:default]"}
