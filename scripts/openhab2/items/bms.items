@@ -1,4 +1,5 @@
 # Battery JK 100 AH Grey BE:A9
+
 Number bms_voltage_jkbms_100ah_be_a9 "Voltage 100ah [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/bms_voltage_jkbms_100ah_be_a9:state:default]"}
 Number bms_capacity_percent_jkbms_100ah_be_a9 "Capacity [%.2f %%]" <energy> {mqtt="<[mosquitto:iot/openhab/bms_capacity_percent_jkbms_100ah_be_a9:state:default]"}
 Number bms_power_jkbms_100ah_be_a9 "Power [%.1f W]" <energy> {mqtt="<[mosquitto:iot/openhab/bms_power_jkbms_100ah_be_a9:state:default]"}
@@ -78,3 +79,4 @@ Number bms_v08_60ah_battery_zg_56 "V08 60ah [%.3f V]" <energy> {mqtt="<[mosquitt
 
 Number bms_t1_60ah_battery_zg_56 "Temp1 60ah [%.2f]" <temperature> {mqtt="<[mosquitto:iot/openhab/bms_t1_60ah_battery_zg_56:state:default]"}
 Number bms_t2_60ah_battery_zg_56 "Temp2 60ah [%.2f]" <temperature> {mqtt="<[mosquitto:iot/openhab/bms_t2_60ah_battery_zg_56:state:default]"}
+
