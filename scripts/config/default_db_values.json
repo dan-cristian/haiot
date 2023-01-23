@@ -670,7 +670,8 @@
     {"id": 4, "name": "60ah_battery_zg_56", "mac_address": "A4:C1:38:8A:A8:56", "factory_full_capacity": 60, "host_name": "pibms"},
 
     {"id": 10, "name": "100ah_battery_be_a9", "mac_address": "C8:47:8C:EA:BE:A9", "factory_full_capacity": 100, "host_name": ""},
-    {"id": 11, "name": "100ah_battery_c4_23", "mac_address": "A4:C1:38:22:C4:23", "factory_full_capacity": 100, "host_name": ""}
+    {"id": 11, "name": "100ah_battery_c4_23", "mac_address": "A4:C1:38:22:C4:23", "factory_full_capacity": 100, "host_name": ""},
+    {"id": 12, "name": "60ah_battery_97_cd",  "mac_address": "A4:C1:38:8B:97:CD", "factory_full_capacity": 60, "host_name": ""}
   ],
 
   "ElectricCar": [
