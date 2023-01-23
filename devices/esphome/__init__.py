@@ -34,10 +34,10 @@ def _process_message(msg):
                 volt_name = 'v{0:0=2}'.format(int(cell_no))
                 setattr(rec, volt_name, cell_voltage)
                 rec.save_changed_fields(persist=True)
-            elif 'power' in topic:
+            elif '/power/' in topic:
                 rec.power = float(msg.payload)
                 rec.save_changed_fields(persist=True)
-            elif 'current' in topic:
+            elif '/current/' in topic:
                 rec.current = float(msg.payload)
                 rec.save_changed_fields(persist=True)
             elif 'charging_power' in topic:
