@@ -70,3 +70,12 @@ Number bms_v05_60ah_battery_30_57 "V05 60ah [%.3f V]" <energy> {mqtt="<[mosquitt
 Number bms_v06_60ah_battery_30_57 "V06 60ah [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/bms_v06_60ah_battery_30_57:state:default]"}
 Number bms_v07_60ah_battery_30_57 "V07 60ah [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/bms_v07_60ah_battery_30_57:state:default]"}
 Number bms_v08_60ah_battery_30_57 "V08 60ah [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/bms_v08_60ah_battery_30_57:state:default]"}
+
+Number bms_voltage_100ah_battery_1b_b0 "Voltage [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/bms_voltage_100ah_battery_1b_b0:state:default]"}
+Number bms_capacity_percent_100ah_battery_1b_b0 "Capacity [%.2f %%]" <energy> {mqtt="<[mosquitto:iot/openhab/bms_capacity_percent_100ah_battery_1b_b0:state:default]"}
+Number bms_power_100ah_battery_1b_b0 "Power [%.1f W]" <energy> {mqtt="<[mosquitto:iot/openhab/bms_power_100ah_battery_1b_b0:state:default]"}
+Number bms_v01_100ah_battery_1b_b0 "V01 60ah [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/bms_v01_100ah_battery_1b_b0:state:default]"}
+Number bms_v02_100ah_battery_1b_b0 "V02 60ah [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/bms_v02_100ah_battery_1b_b0:state:default]"}
+Number bms_v03_100ah_battery_1b_b0 "V03 60ah [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/bms_v03_100ah_battery_1b_b0:state:default]"}
+Number bms_v04_100ah_battery_1b_b0 "V04 60ah [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/bms_v04_100ah_battery_1b_b0:state:default]"}
+
