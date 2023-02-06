@@ -417,6 +417,11 @@ class P:
         #relay = 'inverterpw'
         #P.device_list[relay] = InverterRelay(relay_name=relay, avg_consumption=-500,
         #                                   supports_breaks=True, min_on_interval=60, state_change_interval=120)
+
+        if apps.tesla.P.initialised:
+            relay = 'tesla_charger'
+            P.device_list[relay] = TeslaCharger(relay_name=relay, vehicle_id=1, state_change_interval=15)
+
         relay = 'batterychargectrl_1'  # index 1, right, stable
         P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=780, # 730
                                            supports_breaks=True, min_on_interval=6, state_change_interval=3)
@@ -429,9 +434,6 @@ class P:
         relay = 'batterychargectrl_2'  # index 2, flaky
         P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=780, # 725
                                            supports_breaks=True, min_on_interval=6, state_change_interval=3)
-        if apps.tesla.P.initialised:
-            relay = 'tesla_charger'
-            P.device_list[relay] = TeslaCharger(relay_name=relay, vehicle_id=1, state_change_interval=15)
 
         if not P.emulate_export:
             pass
