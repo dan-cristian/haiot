@@ -26,6 +26,9 @@ class P:
     AWAY_SEC = 60 * 60 * 6  # no of secs after no move to be considered away
     initialised = False
     DEBUG = False
+    DEBUG_LOOP = 0
+    DEBUG_LIVING_TEMP = [21, 21, 21, 21, 21]
+    DEBUG_PUFFER_TEMP = [35, 38, 40, 38, 36]
     thread_pool_status = None
     thread_local = None
     heat_status = ''
@@ -340,8 +343,8 @@ def _set_main_heat_source():
             # if alternate source is valid
             # fixok: add temp threshold to avoid quick on/offs
             if temp_rec is not None \
-                    and ((temp_rec.temperature >= up_limit and not heat_source_relay.is_alternate_source_switch)
-                         or (temp_rec.temperature >= P.temp_limit and heat_source_relay.is_alternate_source_switch)):
+                    and ((temp_rec.temperature >= P.temp_limit and not heat_source_relay.is_alternate_source_switch)
+                         or (temp_rec.temperature >= up_limit and heat_source_relay.is_alternate_source_switch)):  # turn alternate on when temp above target + thresh
                 if heat_source_relay.is_alternate_source_switch:
                     # stop main heat source
                     heatrelay_main_source = m.ZoneHeatRelay.find_one({m.ZoneHeatRelay.is_main_heat_source: True})
@@ -441,7 +444,7 @@ def thread_run():
             sensor = m.Sensor()
             sensor.address = "41000003BE099C28"
             sensor.sensor_name = "living"
-        sensor.temperature = 21
+        sensor.temperature = P.DEBUG_LIVING_TEMP[P.DEBUG_LOOP]
         sensor.updated_on = utils.get_base_location_now_date()
         sensor.save_changed_fields(broadcast=False, persist=True)
 
@@ -450,10 +453,10 @@ def thread_run():
             sensor = m.Sensor()
             sensor.address = "AE000003BDFFB928"
             sensor.sensor_name = "puffer sus"
-        sensor.temperature = 41
+        sensor.temperature = P.DEBUG_PUFFER_TEMP[P.DEBUG_LOOP]
         sensor.updated_on = utils.get_base_location_now_date()
         sensor.save_changed_fields(broadcast=False, persist=True)
-
+        P.DEBUG_LOOP += 1
         _handle_presence("living", 2)
     prctl.set_name("idle_heat")
     threading.current_thread().name = "idle_heat"
@@ -469,7 +472,10 @@ def unload():
 def init():
     L.l.info('Heat module initialising')
     dispatcher.connect(_handle_presence, signal=Constant.SIGNAL_PRESENCE, sender=dispatcher.Any)
-    thread_pool.add_interval_callable(thread_run, 30)
+    if P.DEBUG:
+        thread_pool.add_interval_callable(thread_run, 10)
+    else:
+        thread_pool.add_interval_callable(thread_run, 30)
     P.initialised = True
     m.ZoneHeatRelay.add_upsert_listener(_zoneheatrelay_upsert_listener)
     m.ZoneThermostat.add_upsert_listener(_zonethermostat_upsert_listener)
