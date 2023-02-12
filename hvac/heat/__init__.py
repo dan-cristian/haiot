@@ -28,7 +28,7 @@ class P:
     DEBUG = False
     DEBUG_LOOP = 0
     DEBUG_LIVING_TEMP = [21, 21, 21, 21, 21]
-    DEBUG_PUFFER_TEMP = [35, 38, 40, 38, 36]
+    DEBUG_PUFFER_TEMP = [35, 38, 38, 38, 38]
     thread_pool_status = None
     thread_local = None
     heat_status = ''
@@ -386,6 +386,7 @@ def _set_main_heat_source():
                         utils.sleep(60)
                     else:
                         # stop heat puffer alt source
+                        L.l.info("Stopping heat source")
                         heat_source_relay.heat_is_on = False
                     heat_source_relay.is_alternate_heat_source = False
                     heat_source_relay.save_changed_fields()
@@ -456,7 +457,8 @@ def thread_run():
         sensor.temperature = P.DEBUG_PUFFER_TEMP[P.DEBUG_LOOP]
         sensor.updated_on = utils.get_base_location_now_date()
         sensor.save_changed_fields(broadcast=False, persist=True)
-        P.DEBUG_LOOP += 1
+        if P.DEBUG_LOOP < len(P.DEBUG_PUFFER_TEMP):
+            P.DEBUG_LOOP += 1
         _handle_presence("living", 2)
     prctl.set_name("idle_heat")
     threading.current_thread().name = "idle_heat"
