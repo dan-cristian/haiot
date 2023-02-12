@@ -316,8 +316,8 @@ def _loop_zones():
                 # check when thermo is none
                 if main_thermo is None or (main_thermo.heat_is_on != heat_is_on or update_age_mins >=
                                            int(get_json_param(Constant.P_HEAT_STATE_REFRESH_PERIOD))):
-                    # L.l.info("Setting main heat on={}, zone={}, status={}".format(
-                    #    heat_is_on, main_source_zone.name, P.heat_status))
+                    L.l.info("Setting main heat on={}, zone={}, status={}".format(
+                        heat_is_on, main_source_zone.name, P.heat_status))
                     _save_heat_state_db(zone=main_source_zone, heat_is_on=heat_is_on)
                     P.last_main_heat_update = utils.get_base_location_now_date()
             else:
