@@ -359,7 +359,7 @@ class TeslaCharger(Relaydevice):
                 # force charge start
                 P.thread_pool_status = 'tesla.start_charge 1'
                 apps.tesla.start_charge(self.vehicle_id)
-                return True
+                return False
             else:
                 target_watts = tesla_charging_watts - grid_watts
                 # using floor round down
