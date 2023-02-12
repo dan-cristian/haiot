@@ -324,7 +324,7 @@ def _loop_zones():
                 _save_heat_state_db(zone=main_source_zone, heat_is_on=heat_is_on)
                 P.last_main_heat_update = utils.get_base_location_now_date()
                 if P.current_heat_source_relay is not None \
-                        and P.current_heat_source_relay.name != heat_source_relay.name:
+                        and P.current_heat_source_relay.heat_pin_name != heat_source_relay.heat_pin_name:
                     L.l.info("Pausing for 60 secs to allow source switch to complete")
                     utils.sleep(60)
                 P.current_heat_source_relay = heat_source_relay
