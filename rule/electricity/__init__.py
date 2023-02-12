@@ -353,7 +353,7 @@ class TeslaCharger(Relaydevice):
                         L.l.info("Tesla cannot start charging")
                     return False
 
-            if act_amps == apps.tesla.P.max_amps:
+            if act_amps == apps.tesla.P.MAX_AMP:
                 L.l.info("Tesla already charging at max amps {}, battery_full={}".format(act_amps,
                                                                                          apps.tesla.is_battery_full()))
                 # force charge start

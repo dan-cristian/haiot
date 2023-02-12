@@ -21,8 +21,7 @@ class P:
     DEFAULT_VOLTAGE = 220
     MIN_VOLTAGE = 120
     voltage = 220  # default one
-    MAX_AMP = 16
-    max_amps = 16
+    MAX_AMP = 22  # maximum charging amps for tesla. # todo: can auto detect this, but depends on house breakers too
     api_requests = 0
     refresh_request_pause = 30  # seconds between each status update request
     stop_charge_interval = 300  # seconds interval with amps set to 0 after which charging is stopped
