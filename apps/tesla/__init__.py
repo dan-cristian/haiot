@@ -1,3 +1,4 @@
+import os
 import threading
 import prctl
 from datetime import datetime
@@ -412,7 +413,7 @@ def unload():
 
 
 def init():
-    L.l.info('Tesla module initialising')
+    L.l.info('Tesla module initialising, current dir={}'.format(os.getcwd()))
     thread_pool.add_interval_callable(thread_run, run_interval_second=300)
     P.email = get_secure_general("tesla_account_email")
     P.home_latitude = get_secure_general("home_latitude")

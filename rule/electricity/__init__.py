@@ -308,6 +308,9 @@ class TeslaCharger(Relaydevice):
         tesla_charging_watts = act_amps * apps.tesla.get_nonzero_voltage()
 
         if not apps.tesla.can_auto_charge(self.vehicle_id) or apps.tesla.is_battery_full():
+            if act_amps > 0:
+                L.l.info("Exit tesla charge control, can_auto_charge={}, full={}".format(
+                    apps.tesla.can_auto_charge(self.vehicle_id)), apps.tesla.is_battery_full())
             return
 
         if grid_watts > 0:
@@ -320,7 +323,7 @@ class TeslaCharger(Relaydevice):
                 target_amps = math.floor(target_watts / apps.tesla.get_nonzero_voltage())
                 if target_amps != act_amps:
                     # fixme: detect when user started charging from app and don't stop charging
-                    L.l.info("Reducing Tesla charging to {} Amps".format(target_amps))
+                    L.l.info("Reducing Tesla charging from {} to {} Amps".format(act_amps, target_amps))
                     P.thread_pool_status = 'tesla.set_charging_amps 1'
                     if apps.tesla.set_charging_amps(target_amps):
                         self.power_status_changed()
@@ -367,7 +370,7 @@ class TeslaCharger(Relaydevice):
                     L.l.info("Tesla start charging={}".format(res))
                     # return True
                 if target_amps != act_amps:
-                    L.l.info("Increasing Tesla charging to {} Amps".format(target_amps))
+                    L.l.info("Increasing Tesla charging from {} to {} Amps".format(act_amps, target_amps))
                     P.thread_pool_status = 'tesla.set_charging_amps 2'
                     if apps.tesla.set_charging_amps(min(target_amps, apps.tesla.P.MAX_AMP)):
                         self.power_status_changed()
@@ -496,6 +499,7 @@ def rule_energy_utility(obj=m.Utility(), change=None):
                 P.grid_watts = obj.units_2_delta
                 L.l.info('Using backup sensor for rule main watts={}'.format(P.grid_watts))
                 _update_devices()
+
 
 def init():
     P.emulate_export = False
