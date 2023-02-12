@@ -32,6 +32,7 @@ class P:
     thread_pool_status = None
     thread_local = None
     heat_status = ''
+    current_heat_source_relay = None
 
     verbose = False
 
@@ -304,30 +305,85 @@ def _loop_zones():
                         P.heat_status += ' sched={} zonesensor={}'.format(heat_schedule, zonesensor)
         # turn on/off the main heating system based on zone heat needs
         # check first to find alternate valid heat sources
-        heatrelay_main_source = m.ZoneHeatRelay.find_one({m.ZoneHeatRelay.is_alternate_heat_source: True})
-        if heatrelay_main_source is None:
-            heatrelay_main_source = m.ZoneHeatRelay.find_one({m.ZoneHeatRelay.is_main_heat_source: True})
-        if heatrelay_main_source is not None:
-            main_source_zone = m.Zone.find_one({m.Zone.id: heatrelay_main_source.zone_id})
+        # fixme: select the right valid source, not always the alternate one
+        # heatrelay_main_source = m.ZoneHeatRelay.find_one({m.ZoneHeatRelay.is_alternate_heat_source: True})
+        # if heatrelay_main_source is None:
+        #    heatrelay_main_source = m.ZoneHeatRelay.find_one({m.ZoneHeatRelay.is_main_heat_source: True})
+
+        heat_source_relay = get_valid_heat_source_relay()
+        if heat_source_relay is not None:
+            main_source_zone = m.Zone.find_one({m.Zone.id: heat_source_relay.zone_id})
             main_thermo = m.ZoneThermostat.find_one({m.ZoneThermostat.zone_id: main_source_zone.id})
-            if main_source_zone is not None:
-                update_age_mins = (utils.get_base_location_now_date() - P.last_main_heat_update).total_seconds() / 60
-                # # avoid setting relay state too often but do periodic refreshes every x minutes
-                # check when thermo is none
-                if main_thermo is None or (main_thermo.heat_is_on != heat_is_on or update_age_mins >=
-                                           int(get_json_param(Constant.P_HEAT_STATE_REFRESH_PERIOD))):
-                    L.l.info("Setting main heat on={}, zone={}, status={}".format(
-                        heat_is_on, main_source_zone.name, P.heat_status))
-                    _save_heat_state_db(zone=main_source_zone, heat_is_on=heat_is_on)
-                    P.last_main_heat_update = utils.get_base_location_now_date()
-                else:
-                    L.l.info("Doing nothing, main heat source zone={}".format(main_source_zone.name))
-            else:
-                L.l.critical('No heat main_src found using zone id {}'.format(heatrelay_main_source.zone_id))
-        else:
-            L.l.critical('No heat main source is defined in db')
+
+            update_age_mins = (utils.get_base_location_now_date() - P.last_main_heat_update).total_seconds() / 60
+            # # avoid setting relay state too often but do periodic refreshes every x minutes
+            if main_thermo is None or (main_thermo.heat_is_on != heat_is_on or update_age_mins >=
+                                       int(get_json_param(Constant.P_HEAT_STATE_REFRESH_PERIOD))):
+                L.l.info("Setting main heat on={}, zone={}, status={}".format(
+                    heat_is_on, main_source_zone.name, P.heat_status))
+                _save_heat_state_db(zone=main_source_zone, heat_is_on=heat_is_on)
+                P.last_main_heat_update = utils.get_base_location_now_date()
+                if P.current_heat_source_relay is not None \
+                        and P.current_heat_source_relay.name != heat_source_relay.name:
+                    L.l.info("Pausing for 60 secs to allow source switch to complete")
+                    utils.sleep(60)
+                P.current_heat_source_relay = heat_source_relay
+
+        # if heatrelay_main_source is not None:
+        #     main_source_zone = m.Zone.find_one({m.Zone.id: heatrelay_main_source.zone_id})
+        #     main_thermo = m.ZoneThermostat.find_one({m.ZoneThermostat.zone_id: main_source_zone.id})
+        #     if main_source_zone is not None:
+        #         update_age_mins = (utils.get_base_location_now_date() - P.last_main_heat_update).total_seconds() / 60
+        #         # # avoid setting relay state too often but do periodic refreshes every x minutes
+        #         # check when thermo is none
+        #         if main_thermo is None or (main_thermo.heat_is_on != heat_is_on or update_age_mins >=
+        #                                    int(get_json_param(Constant.P_HEAT_STATE_REFRESH_PERIOD))):
+        #             L.l.info("Setting main heat on={}, zone={}, status={}".format(
+        #                 heat_is_on, main_source_zone.name, P.heat_status))
+        #             _save_heat_state_db(zone=main_source_zone, heat_is_on=heat_is_on)
+        #             P.last_main_heat_update = utils.get_base_location_now_date()
+        #         else:
+        #             L.l.info("Doing nothing, main heat source zone={}".format(main_source_zone.name))
+        #     else:
+        #         L.l.critical('No heat main_src found using zone id {}'.format(heatrelay_main_source.zone_id))
+        # else:
+        #     L.l.critical('No heat main source is defined in db')
+
     except Exception as ex:
         L.l.error('Error loop_zones, err={}'.format(ex), exc_info=True)
+
+
+# return the heat source that is valid at this point (alternate one if temp is high enough, otherwise main one)
+def get_valid_heat_source_relay():
+    heat_source_relay = m.ZoneHeatRelay.find_one({m.ZoneHeatRelay.is_alternate_source_switch: True})
+    heatrelay_main_source = m.ZoneHeatRelay.find_one({m.ZoneHeatRelay.is_main_heat_source: True})
+    if heat_source_relay is not None:
+        up_limit = P.temp_limit + P.threshold
+        if heat_source_relay.temp_sensor_name is not None:
+            temp_rec = m.Sensor.find_one({m.Sensor.sensor_name: heat_source_relay.temp_sensor_name})
+            if temp_rec is not None:
+                # alternate source is valid as temp rise above threshold
+                if temp_rec.temperature >= up_limit:
+                    L.l.info("Heat source is alternate, above threshold")
+                    result = heat_source_relay
+                # alternate source  valid if temp is declining but still above minimum and alternate source already on
+                elif temp_rec.temperature >= P.temp_limit \
+                        and P.current_heat_source_relay.name == heat_source_relay.name:
+                    L.l.info("Heat source is alternate, above minimum")
+                    result = heat_source_relay
+                else:
+                    L.l.info("Heat source is main, under minimum or not yet over threshold")
+                    result = heatrelay_main_source
+            else:
+                L.l.warning("Could not find temp sensor for alternate heat source")
+                result = heatrelay_main_source
+        else:
+            L.l.warning("No temp sensor defined for alternate heat source")
+            result = heatrelay_main_source
+    else:
+        L.l.warning("No alternate heat source defined")
+        result = heatrelay_main_source
+    return result
 
 
 # set which is the main heat source relay that must be set on
@@ -439,7 +495,7 @@ def thread_run():
         P.MAX_DELTA_TEMP_KEEP_WARM = float(get_json_param(Constant.P_MAX_DELTA_TEMP_KEEP_WARM))
     month = datetime.datetime.today().month
     P.season = "summer" if month in range(5, 9) else "winter"
-    _set_main_heat_source()
+    #_set_main_heat_source()
     _loop_zones()
     if P.DEBUG:
         sensor = m.Sensor.find_one({m.Sensor.sensor_name: "living"})
