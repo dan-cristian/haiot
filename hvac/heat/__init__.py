@@ -320,6 +320,8 @@ def _loop_zones():
                         heat_is_on, main_source_zone.name, P.heat_status))
                     _save_heat_state_db(zone=main_source_zone, heat_is_on=heat_is_on)
                     P.last_main_heat_update = utils.get_base_location_now_date()
+                else:
+                    L.l.info("Doing nothing, main heat source zone={}".format(main_source_zone.name))
             else:
                 L.l.critical('No heat main_src found using zone id {}'.format(heatrelay_main_source.zone_id))
         else:
