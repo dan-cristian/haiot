@@ -345,7 +345,7 @@ def _process_message(msg):
     if "scheduled_charging_start_time" in msg.topic:
         value = "{}".format(msg.payload).replace("b", "").replace("\\", "").replace("'", "")
         L.l.info("Detected tesla start charge as schedule changed={}".format(value))
-        P.scheduled_charging_mode = (value is not "")
+        P.scheduled_charging_mode = (value != "")
     if P.DEBUG:
         L.l.info("Teslamate: {}={}".format(msg.topic, msg.payload))
 

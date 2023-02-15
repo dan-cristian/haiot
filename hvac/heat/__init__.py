@@ -310,6 +310,7 @@ def _loop_zones():
         # if heatrelay_main_source is None:
         #    heatrelay_main_source = m.ZoneHeatRelay.find_one({m.ZoneHeatRelay.is_main_heat_source: True})
 
+        # set heat source zone (main or alternate)
         heat_source_relay = get_valid_heat_source_relay()
         if heat_source_relay is not None:
             main_source_zone = m.Zone.find_one({m.Zone.id: heat_source_relay.zone_id})
@@ -319,14 +320,19 @@ def _loop_zones():
             # # avoid setting relay state too often but do periodic refreshes every x minutes
             if main_thermo is None or (main_thermo.heat_is_on != heat_is_on or update_age_mins >=
                                        int(get_json_param(Constant.P_HEAT_STATE_REFRESH_PERIOD))):
+                # stop previous heat source if needed
+                if P.current_heat_source_relay is not None \
+                        and P.current_heat_source_relay.heat_pin_name != heat_source_relay.heat_pin_name:
+                    previous_source_zone = m.Zone.find_one({m.Zone.id: P.current_heat_source_relay.zone_id})
+                    L.l.info("Stopping previous heat zone {}".format(P.current_heat_source_relay.heat_pin_name))
+                    _save_heat_state_db(zone=previous_source_zone, heat_is_on=False)
+                    L.l.info("Pausing for 60 secs to allow source switch to complete")
+                    utils.sleep(60)
+                # start current heat source / this will repeat several times even if source already started
                 L.l.info("Setting main heat on={}, zone={}, status={}".format(
                     heat_is_on, main_source_zone.name, P.heat_status))
                 _save_heat_state_db(zone=main_source_zone, heat_is_on=heat_is_on)
                 P.last_main_heat_update = utils.get_base_location_now_date()
-                if P.current_heat_source_relay is not None \
-                        and P.current_heat_source_relay.heat_pin_name != heat_source_relay.heat_pin_name:
-                    L.l.info("Pausing for 60 secs to allow source switch to complete")
-                    utils.sleep(60)
                 P.current_heat_source_relay = heat_source_relay
 
         # if heatrelay_main_source is not None:
