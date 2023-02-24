@@ -34,6 +34,13 @@ Frame label="Charger"{
         {Chart item=temperature_charger period=D}
     }
 
+Frame label="Outdoor"{
+    Text item=powermonitor_power_outdoor_l1
+	    {Chart item=powermonitor_power_outdoor_l1 period=D}
+	Text item=powermonitor_power_outdoor_l2
+	    {Chart item=powermonitor_power_outdoor_l2 period=D}
+}
+
 Frame label="Heating" {
     Text item=temperature_garden_air {
         Chart item=temperature_garden_air period=D
