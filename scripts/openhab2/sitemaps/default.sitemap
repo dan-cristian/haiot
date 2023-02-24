@@ -20,6 +20,8 @@ Frame label="Solar" {
         {Chart item=house_battery period=D}
 	Text item=powermonitor_power_invertermain
 	    {Chart item=powermonitor_power_invertermain period=D}
+	Text item=powermonitor_current_invertermain
+	    {Chart item=powermonitor_current_invertermain period=D}
     Default item=inverter_main
     }
 
@@ -37,8 +39,13 @@ Frame label="Charger"{
 Frame label="Outdoor"{
     Text item=powermonitor_power_outdoor_l1
 	    {Chart item=powermonitor_power_outdoor_l1 period=D}
+	Text item=powermonitor_current_outdoor_l1
+	    {Chart item=powermonitor_current_outdoor_l1 period=D}
 	Text item=powermonitor_power_outdoor_l2
 	    {Chart item=powermonitor_power_outdoor_l2 period=D}
+	Text item=powermonitor_current_outdoor_l2
+	    {Chart item=powermonitor_current_outdoor_l2 period=D}
+
 }
 
 Frame label="Heating" {

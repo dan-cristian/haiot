@@ -1,4 +1,4 @@
-sitemap default label="Electricity" {
+sitemap electricity label="Electricity" {
 
 Frame {
 	Default item=ups_power_failed

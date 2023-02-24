@@ -108,6 +108,11 @@ Number powermonitor_power_invertermain "Power inverter [%.0f W]" <energy> {mqtt=
 Number powermonitor_power_outdoor_l1 "Power outdoor L1 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_power_outdoor l1:state:default]"}
 Number powermonitor_power_outdoor_l2 "Power outdoor L2 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_power_outdoor l2:state:default]"}
 
+Number powermonitor_current_invertermain "Current inverter [%.0f A]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_current_invertermain:state:default]"}
+Number powermonitor_current_outdoor_l1 "Current outdoor L1 [%.0f A]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_current_outdoor l1:state:default]"}
+Number powermonitor_current_outdoor_l2 "Current outdoor L2 [%.0f A]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_current_outdoor l2:state:default]"}
+
+
 Number powermonitor_total_energy_daily_solar_l1 "Total daily solar energy L1 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_total_energy_daily_solar l1:state:default]"}
 Number powermonitor_total_energy_daily_solar_l2 "Total daily solar energy L2 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_total_energy_daily_solar l2:state:default]"}
 Number powermonitor_total_energy_daily_solar_l3 "Total daily solar energy L3 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_total_energy_daily_solar l3:state:default]"}
