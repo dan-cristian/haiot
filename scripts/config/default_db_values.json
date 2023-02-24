@@ -441,8 +441,8 @@
     {"id":45, "name":"heatpump l3", "type":"shelly", "sensor_index": 1, "host_name":"shellyem-244CAB431B3A"},
 
     {"id":61, "name":"invertermain",  "type":"shelly", "sensor_index": 0, "host_name":"shellyem3-485519C9ED73"},
-    {"id":62, "name":"unused l2",    "type":"shelly", "sensor_index": 1, "host_name":"shellyem3-485519C9ED73"},
-    {"id":63, "name":"unused l3",    "type":"shelly", "sensor_index": 2, "host_name":"shellyem3-485519C9ED73"}
+    {"id":62, "name":"outdoor l2",    "type":"shelly", "sensor_index": 1, "host_name":"shellyem3-485519C9ED73"},
+    {"id":63, "name":"outdoor l1",    "type":"shelly", "sensor_index": 2, "host_name":"shellyem3-485519C9ED73"}
   ],
 
   "TemperatureTarget": [
