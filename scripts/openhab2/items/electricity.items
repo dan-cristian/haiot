@@ -104,7 +104,9 @@ Number powermonitor_power_factor_solar_l2 "Solar pf L2 [%.1f %]" <energy> {mqtt=
 Number powermonitor_power_factor_solar_l3 "Solar pf L3 [%.1f %]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_power_factor_solar l3:state:default]"}
 
 Number house_battery "House battery [%.3f V]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_voltage_house battery:state:default]"}
-Number powermonitor_power_invertermain "Power inverter[%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_power_invertermain:state:default]"}
+Number powermonitor_power_invertermain "Power inverter [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_power_invertermain:state:default]"}
+Number powermonitor_power_outdoor_l1 "Power outdoor L1 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_power_outdoor l1:state:default]"}
+Number powermonitor_power_outdoor_l2 "Power outdoor L2 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_power_outdoor l2:state:default]"}
 
 Number powermonitor_total_energy_daily_solar_l1 "Total daily solar energy L1 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_total_energy_daily_solar l1:state:default]"}
 Number powermonitor_total_energy_daily_solar_l2 "Total daily solar energy L2 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_total_energy_daily_solar l2:state:default]"}
@@ -132,6 +134,9 @@ Number powermonitor_total_energy_day_end_solar_l3 "Total day end solar energy L3
 
 Number powermonitor_total_energy_batterycharger_now "Battery charger [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_total_energy_now_battery charger:state:default]"}
 Number powermonitor_total_energy_now_invertermain "Inverter [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_total_energy_now_invertermain:state:default]"}
+Number powermonitor_total_energy_now_outdoor_l1 "Outdoor L1 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_total_energy_now_outdoor l1:state:default]"}
+Number powermonitor_total_energy_now_outdoor_l2 "Outdoor L2 [%.0f W]" <energy> {mqtt="<[mosquitto:iot/openhab/powermonitor_total_energy_now_outdoor l2:state:default]"}
+
 
 Switch battery_charger_main "Battery charger" <switch>  {mqtt="<[mosquitto:iot/openhab/relay_batterychargermain_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_batterychargermain_relay:command:*:default]", autoupdate="false"}
 Switch inverter_main "Inverter" <switch>                {mqtt="<[mosquitto:iot/openhab/relay_invertermain_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_invertermain_relay:command:*:default]", autoupdate="false"}
