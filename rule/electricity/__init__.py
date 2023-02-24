@@ -309,8 +309,8 @@ class TeslaCharger(Relaydevice):
 
         if not apps.tesla.can_auto_charge(self.vehicle_id) or apps.tesla.is_battery_full():
             if act_amps > 0:
-                L.l.info("Exit tesla charge control, can_auto_charge={}, full={}").format(
-                    apps.tesla.can_auto_charge(self.vehicle_id), apps.tesla.is_battery_full())
+                L.l.info("Exit tesla charge control, can_auto_charge={}, full={}".format(
+                    apps.tesla.can_auto_charge(self.vehicle_id), apps.tesla.is_battery_full()))
             return
 
         if grid_watts > 0:
