@@ -508,6 +508,7 @@ class Bms(ModelBase):
     capacity_percent = 0.0  # % capacity
     cycles = 0  # charge cycles
     factory_full_capacity = 0  # battery max capacity, user defined
+    device_model = ''  # bms device model
     host_name = ''  # which host will connect to this bms
 
 

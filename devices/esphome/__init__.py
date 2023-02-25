@@ -68,6 +68,9 @@ def _process_message(msg):
                 pass
                 # rec.t2 = float(msg.payload)
                 # rec.save_changed_fields(persist=True)
+            elif '_device_model' in topic:
+                rec.device_model = msg.payload
+                rec.save_changed_fields(persist=True)
             else:
                 # L.l.info("Unprocessed topic esphome: {}=".format(msg.topic, msg.payload))
                 pass
