@@ -309,9 +309,11 @@ def _process_message(msg):
         value = int(msg.payload)
         P.teslamate_charging_amp[car_id] = value
         P.teslamate_last_charging_update = datetime.now()
+        L.l.info("Tesla charger actual current = {}".format(value))
     if "charger_power" in msg.topic:
         value = int(msg.payload)
         P.is_charging[car_id] = (value == 1)
+        L.l.info("Tesla charger power={}".format(value))
     if "charger_voltage" in msg.topic:
         value = int(msg.payload)
         P.teslamate_voltage[car_id] = value
@@ -322,6 +324,7 @@ def _process_message(msg):
     # time to full charge does not get reported all time, stays at 0.0. not reliable.
     if "time_to_full_charge" in msg.topic:
         P.teslamate_time_to_full_charge = float(msg.payload)
+        L.l.info("Tesla time to full charge={}".format(P.teslamate_time_to_full_charge))
     if "state" in msg.topic:
         value = "{}".format(msg.payload).replace("b", "").replace("\\", "").replace("'", "")
         P.car_state[car_id] == value
