@@ -26,7 +26,7 @@ def _process_message(msg):
             if 'total_voltage' in topic:
                 rec.voltage = float(msg.payload)
                 rec.save_changed_fields(persist=True)
-                L.l.info("Total bms battery {} voltage={}".format(rec.name, rec.voltage))
+                # L.l.info("Total bms battery {} voltage={}".format(rec.name, rec.voltage))
             # 'jk-bms/sensor/jk-bms_cell_voltage_1/state' 3.301
             elif 'cell_voltage_' in topic:
                 cell_no = topic.split('sensor/cell_voltage_')[1].split('/state')[0]
