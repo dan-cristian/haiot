@@ -101,7 +101,7 @@ def should_stop_charge(car_id):
 
 
 def try_connection_recovery(car_id):
-    L.l.info("Trying to recover tesla cloud connection")
+    L.l.info("Trying to recover Tesla cloud connection")
     try:
         P.tesla.close()
         P.tesla = Tesla(email=P.email, cache_file="../private_config/.credentials/tesla_cache.json", timeout=120)
@@ -115,7 +115,7 @@ def try_connection_recovery(car_id):
         else:
             L.l.info("Tesla is {}, nothing to do on recovery".format(state))
     except Exception as ex:
-        L.l.error("Unable to recover tesla connection, er={}".format(ex))
+        L.l.error("Unable to recover Tesla connection, er={}".format(ex))
 
 
 def set_charging_amps(amps, car_id=1):
@@ -132,10 +132,10 @@ def set_charging_amps(amps, car_id=1):
                     P.last_charging_stopped[car_id] = None  # reset timestamp
                 return True
             except Exception as ex:
-                L.l.error("Unable to set tesla charging amps: {}".format(ex))
+                L.l.error("Unable to set Tesla charging amps: {}".format(ex))
                 try_connection_recovery(car_id)
         else:
-            L.l.warning("Set tesla amperage too high, {} A".format(amps))
+            L.l.warning("Set Tesla amperage too high, {} A".format(amps))
     return False
 
 
@@ -154,7 +154,7 @@ def get_last_charging_amps(car_id=1):
 # https://github.com/tdorssers/TeslaPy
 def vehicle_update(car_id=1):
     if (not vehicle_valid(car_id)) or (not can_refresh()):
-        L.l.info("Not updating tesla vehicle, valid={}, can_refresh={}".format(vehicle_valid(car_id), can_refresh()))
+        L.l.info("Not updating Tesla vehicle, valid={}, can_refresh={}".format(vehicle_valid(car_id), can_refresh()))
         return None
 
     vehicle = P.vehicles[car_id - 1]
@@ -195,7 +195,7 @@ def vehicle_update(car_id=1):
             L.l.info("Tesla charging amp = {}".format(act_amps))
             if act_amps > 0:
                 if not P.is_charging[car_id]:
-                    L.l.error("I was expecting vehicle to charge")
+                    L.l.error("I was expecting Tesla vehicle to charge")
             car = m.ElectricCar.find_one({m.ElectricCar.id: car_id})
             if car is not None:
                 car.charger_current = act_amps
@@ -216,7 +216,7 @@ def vehicle_update(car_id=1):
         else:
             L.l.error("Tesla not online, state={}".format(vehicle['state']))
     except Exception as ex:
-        L.l.error("Unable to get tesla charging data, #API{}, er={}".format(P.api_requests, ex))
+        L.l.error("Unable to get Tesla charging data, #API{}, er={}".format(P.api_requests, ex))
         P.last_refresh_request = datetime.now()
         summary = vehicle.get_vehicle_summary()
         P.vehicles = P.tesla.vehicle_list()
@@ -252,7 +252,7 @@ def is_charging(car_id=1):
 
 def stop_charge(car_id=1):
     if vehicle_valid(car_id):
-        L.l.info("Stopping tesla charging")
+        L.l.info("Stopping Tesla charging")
         try:
             P.vehicles[car_id - 1].command('STOP_CHARGE')
             P.is_charging[car_id] = False
@@ -272,7 +272,7 @@ def stop_charge(car_id=1):
 
 def start_charge(car_id=1):
     if vehicle_valid(car_id):
-        L.l.info("Starting tesla charging")
+        L.l.info("Starting Tesla charging")
         vehicle = P.vehicles[car_id - 1]
         try:
             vehicle.command('START_CHARGE')
@@ -292,7 +292,7 @@ def start_charge(car_id=1):
             if "vehicle unavailable" in "{}".format(ex):
                 L.l.warning("Tesla unavailable on start charge, trying to wake")
                 vehicle.sync_wake_up()
-            L.l.error("Got error when trying to start tesla charging, err={}".format(ex))
+            L.l.error("Got error when trying to start Tesla charging, err={}".format(ex))
         return False
 
 
@@ -304,6 +304,7 @@ def _process_message(msg):
     if "plugged_in" in msg.topic:
         value = msg.payload
         P.teslamate_plugged_in[car_id] = (value == b'true')
+        L.l.info("Tesla is plugged in={}".format(P.teslamate_plugged_in[car_id]))
     if "charger_actual_current" in msg.topic:
         value = int(msg.payload)
         P.teslamate_charging_amp[car_id] = value
@@ -325,6 +326,7 @@ def _process_message(msg):
         value = "{}".format(msg.payload).replace("b", "").replace("\\", "").replace("'", "")
         P.car_state[car_id] == value
         # online, asleep, charging, suspended
+        L.l.info("Tesla_mate state={}".format(value))
     if "geofence" in msg.topic:
         value = "{}".format(msg.payload).replace("b", "").replace("\\", "").replace("'", "")
         P.teslamate_geo_home = (value.lower() == "home")
@@ -339,12 +341,13 @@ def _process_message(msg):
             # temporarily set user charging to true to avoid automatic stop
             P.user_charging_mode = True
             vehicle_update(car_id)
+        L.l.info("Tesla_mate power={}".format(value))
     if "user_charge_enable_request" in msg.topic:  # not working
         value = "{}".format(msg.payload).replace("b", "").replace("\\", "").replace("'", "")
         P.user_charging_mode = value == "True"
     if "scheduled_charging_start_time" in msg.topic:
         value = "{}".format(msg.payload).replace("b", "").replace("\\", "").replace("'", "")
-        L.l.info("Detected tesla start charge as schedule changed={}".format(value))
+        L.l.info("Detected Tesla start charge as schedule changed={}".format(value))
         P.scheduled_charging_mode = (value != "")
     if P.DEBUG:
         L.l.info("Teslamate: {}={}".format(msg.topic, msg.payload))
