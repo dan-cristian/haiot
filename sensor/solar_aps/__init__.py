@@ -10,11 +10,21 @@ from storage.model import m
 class P:
     initialised = False
     interval = 60
+    start_keyword_ecu = {}
+    end_keyword_ecu = {}
+    start_keyword_now_ecu = {}
+    end_keyword_now_ecu = {}
+    start_first_panel = {}
+    end_panel = {}
+    start_next_panel = {}
+
     # APS SOLAR ECU OLD LINK: http://192.168.0.10/cgi-bin/home
-    start_keyword_ecu_old = 'Lifetime generation</td><td align=center>'
-    end_keyword_ecu_old = ' kWh</td>'
-    start_keyword_now_ecu_old = 'Last System Power</td><td align=center>'
-    end_keyword_now_ecu_old = ' W</td>'
+    # type 1
+    start_keyword_ecu[0] = 'Lifetime generation</td><td align=center>'
+    end_keyword_ecu[0] = ' kWh</td>'
+    start_keyword_now_ecu[0] = 'Last System Power</td><td align=center>'
+    end_keyword_now_ecu[0] = ' W</td>'
+
     # APS ECU OLD Temperature params: 192.168.0.10/cgi-bin/parameters
     start_key_temp_ecu_old = '<td align=center> '
     end_key_temp_ecu_old = '&nbsp;<sup>o</sup>C'
@@ -22,10 +32,15 @@ class P:
     end_key_panel_ecu_old = '-A</td>'
 
     # APS SOLAR ECU NEW LINK: http://192.168.0.40/index.php/home
-    start_keyword_ecu_new = 'Lifetime generation</td><td>'
-    end_keyword_ecu_new = ' kWh </td>'
-    start_keyword_now_ecu_new = 'Last System Power</td><td>'
-    end_keyword_now_ecu_new = ' W </td>'
+    start_keyword_ecu[1] = 'Lifetime generation</th>\\r\\n        <td>'
+    end_keyword_ecu[1] = ' kWh </td>'
+    start_keyword_now_ecu[1] = 'Last System Power</th>\\r\\n        <td>'
+    end_keyword_now_ecu[1] = ' W </td>'
+
+    start_first_panel[1] = "Reporting Time</th>\\r\\n      </tr>\\r\\n    </thead>\\r\\n    <tbody>\\r\\n        <div>\\r\\n            <tr class=\\'active\\'>\\r\\n        <td>"
+    end_panel[1] = " </td>"
+    start_next_panel[1] = "<tr class=\\'active\\'>\\r\\n        <td>"
+
 
     APS_TIMEOUT = 10
 
@@ -33,78 +48,72 @@ class P:
         pass
 
 
-def init_solar_aps():
+def parse_general(inverter):
+    index = inverter.type
     try:
-        production = utils.parse_http(get_json_param(Constant.P_SOLAR_APS_LOCAL_URL),
-                                      P.start_keyword_ecu_old, P.end_keyword_ecu_old, timeout=P.APS_TIMEOUT)
-        if production is not None and production is not '':
-            P.initialised = True
-        else:
-            P.initialised = False
-        return P.initialised
+        aps_text = str(urllib.request.urlopen(inverter.general_url).read())
+        last_power = utils.parse_text(aps_text, P.start_keyword_now_ecu[index], P.end_keyword_now_ecu[index])
+        production = utils.parse_text(aps_text, P.start_keyword_ecu[index], P.end_keyword_ecu[index])
     except Exception as ex:
-        L.l.warning("Unable to connect to aps solar server, ex={}".format(ex))
+        L.l.error("Exception on inverter {} general run, ex={}".format(inverter.name, ex), exc_info=True)
+
+
+def parse_panels(inverter):
+    index = inverter.type
+    try:
+        aps_text = str(urllib.request.urlopen(inverter.panels_url).read())
+        found_panel = True
+        end_index = 0
+        while found_panel:
+            next_panel, end_index = utils.parse_text(
+                aps_text, P.start_next_panel[index], P.end_panel[index], start_index=end_index, return_end_index=True)
+            found_panel = next_panel is not None
+            if found_panel:
+                watts, ind = utils.parse_text(aps_text, "<td>", " </td>",
+                                              start_index=end_index, return_end_index=True)
+                if watts == "-":
+                    watts = None
+                hertz, ind = utils.parse_text(aps_text, "middle;\\'>", " </td>",
+                                             start_index=ind, return_end_index=True)
+                if hertz == "-":
+                    hertz = None
+                else:
+                    hertz = hertz.split(" ")[0]
+                volt, ind = utils.parse_text(aps_text, "<td>", " </td>",
+                                             start_index=ind, return_end_index=True)
+                if volt == "-":
+                    volt = None
+                else:
+                    volt = volt.split(" ")[0]
+                temp, ind = utils.parse_text(aps_text, "middle;\\'>", " </td>",
+                                             start_index=ind, return_end_index=True)
+                if temp == "-":
+                    temp = None
+                else:
+                    temp = temp.split(" ")[0]
+                panel = m.SolarPanel.find_one({"id": next_panel})
+                if panel is None:
+                    panel = m.SolarPanel()
+                    panel.id = next_panel
+                if watts is not None:
+                    panel.power = watts
+                if volt is not None:
+                    panel.voltage = volt
+                if hertz is not None:
+                    panel.grid_frequency = hertz
+                if temp is not None:
+                    panel.temperature = temp
+                if watts or volt or hertz or temp:
+                    panel.save_changed_fields(persist=True)
+    except Exception as ex:
+        L.l.error("Exception on inverter {} panels run, ex={}".format(inverter.name, ex), exc_info=True)
 
 
 def thread_run():
-    if not P.initialised:
-        init_solar_aps()
-    if P.initialised:
-        try:
-            aps_text = str(urllib.request.urlopen(get_json_param(Constant.P_SOLAR_APS_LOCAL_URL)).read())
-            production = utils.parse_text(aps_text, P.start_keyword_ecu_old, P.end_keyword_ecu_old)
-            last_power = utils.parse_text(aps_text, P.start_keyword_now_ecu_old, P.end_keyword_now_ecu_old)
-            temperature = utils.parse_text(aps_text, P.start_key_temp_ecu_old, P.end_key_temp_ecu_old, end_first=True)
-            panel_id = utils.parse_text(aps_text, P.start_key_panel_ecu_old, P.end_key_panel_ecu_old, end_first=True)
-            utility_name = get_json_param(Constant.P_SOLAR_UTILITY_NAME)
-            if temperature is not None:
-                zone_sensor = m.ZoneSensor.find_one({m.ZoneSensor.sensor_address: panel_id})
-                if zone_sensor is None:
-                    L.l.warning('Solar panel id {} is not defined in zone sensor list'.format(panel_id))
-                record = m.Sensor.find_one({m.Sensor.address: panel_id})
-                if record is None:
-                    record = m.Sensor()
-                    record.address = panel_id
-                    record.type = 'solar'
-                    if zone_sensor:
-                        record.sensor_name = zone_sensor.sensor_name
-                    else:
-                        record.sensor_name = record.type + panel_id
-                record.temperature = temperature
-                record.updated_on = utils.get_base_location_now_date()
-                # fixme: keeps saving same temp even when panels are off. stop during night.
-                record.save_changed_fields(broadcast=True, persist=True)
-            if production is not None:
-                production = float(production)
-                record = m.Utility.find_one({m.Utility.utility_name: utility_name})
-                if record is None:
-                    record = m.Utility()
-                    record.utility_name = utility_name
-                    record.units_delta = production
-                    record.units_total = production
-                else:
-                    if record.units_total is None:
-                        record.units_total = production
-                        record.units_delta = 0
-                    else:
-                        record.units_delta = production - record.units_total
-                        if record.units_delta == 0:
-                            # do not waste db space if no power generated
-                            L.l.info('Solar production is energy={} watts={} temp={}'.format(
-                                production, last_power, temperature))
-                            # return
-                        else:
-                            L.l.info('Solar production is {}'.format(record.units_delta))
-                record.units_2_delta = last_power
-                # L.l.info('Solar watts is {}'.format(last_power))
-                if record.unit_cost is None:
-                    record.unit_cost = 0.0
-                record.cost = 1.0 * record.units_delta * record.unit_cost
-                record.save_changed_fields(broadcast=True, persist=True)
-            else:
-                L.l.info('Solar production is none')
-        except Exception as ex:
-            L.l.error("Got exception on solar thread run, ex={}".format(ex), exc_info=True)
+    inverters = m.Inverter.find({"enabled": True})
+    for inv in inverters:
+        parse_general(inv)
+        parse_panels(inv)
 
 
 def unload():
@@ -113,4 +122,5 @@ def unload():
 
 
 def init():
+    L.l.info("Starting solar_aps module")
     thread_pool.add_interval_callable(thread_run, run_interval_second=P.interval)

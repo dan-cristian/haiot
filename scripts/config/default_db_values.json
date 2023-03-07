@@ -678,7 +678,14 @@
     {"id": 1, "name": "YCE"}
   ],
 
+  "Inverter": [
+    {"id": 2, "name": "APS PLC ECU", "general_url": "http://192.168.0.40/index.php/home", "panels_url": "http://192.168.0.40/index.php/realtimedata", "type": 1, "enabled": false},
+    {"id": 3, "name": "APS ZIGBEE ECU", "general_url": "http://192.168.0.41/index.php/home", "panels_url": "http://192.168.0.41/index.php/realtimedata", "type": 1, "enabled": false}
+  ],
+
   "_disabled": [
+    {"id": 1, "name": "APS PLC ORIG", "general_url": "http://192.168.0.10/cgi-bin/home", "panels_url": "", "type": 0},
+
     {"id":1, "name":"dashcam lipo", "type":"ina", "i2c_addr":"0x41", "host_name":"pidash", "max_voltage":4.2, "warn_voltage":3.2, "critical_voltage":3.1, "min_voltage":3, "warn_current":900, "critical_current":1000},
     {"id":2, "name":"dashcam car", "type":"ina", "i2c_addr":"0x40", "host_name":"pidash", "max_voltage":14.7, "warn_voltage":12.5, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},
     {"id":3, "name":"big battery 1", "type":"ina", "host_name":"sonoff-basic-9",  "max_voltage":14.7, "warn_voltage":12.5, "critical_voltage":12.1, "min_voltage":12, "warn_current":900, "critical_current":1000},

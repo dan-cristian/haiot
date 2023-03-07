@@ -535,3 +535,23 @@ class ElectricCar(ModelBase):
     estimated_battery_range = 0  # km
     time_to_full_charge = 0  # minutes
 
+
+class Inverter(ModelBase):
+    """key=id"""
+    id = 0
+    name = ''
+    general_url = ''
+    panels_url = ''
+    type = ''
+    enabled = False
+
+
+class SolarPanel(ModelBase):
+    """key=id"""
+    id = ''  # 408000059274-1
+    power = 0
+    voltage = 0
+    temperature = 0
+    grid_frequency = 0
+    grid_voltage = 0
+    updated_on = datetime.now()

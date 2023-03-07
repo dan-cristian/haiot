@@ -164,20 +164,27 @@ def json_to_record(table, json_object):
     return table
 
 
-def parse_text(text, start_key, end_key, end_first=False):
+def parse_text(text, start_key, end_key, start_index=0, end_first=False, return_end_index=False):
     try:
-        end = text.find(end_key)
         if end_first:
+            end = text.find(end_key, start_index)
             start = text.rfind(start_key, 0, end)
         else:
-            start = text.find(start_key)
+            start = text.find(start_key, start_index)
+            end = text.find(end_key, start)
         if start != -1 and end != -1:
             val_start = start + len(start_key)
             value_str = text[val_start:end]
-            return value_str
+            if return_end_index:
+                return value_str, val_start + len(value_str) + len(end_key)
+            else:
+                return value_str
     except Exception as ex:
         L.l.error('Unable to parse text {}, err={}'.format(text, ex))
-    return None
+    if return_end_index:
+        return None, 0
+    else:
+        return None
 
 
 def parse_text_ex(text, start_key, end_key):

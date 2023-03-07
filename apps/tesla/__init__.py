@@ -42,6 +42,8 @@ class P:
     teslamate_voltage = dict()
     teslamate_plugged_in = dict()
     teslamate_time_to_full_charge = None
+    teslamate_soc = None
+    teslamate_battery_level = None
     battery_full = None
     # save car params
     is_charging = dict()
@@ -313,7 +315,7 @@ def _process_message(msg):
     if "charger_power" in msg.topic:
         value = int(msg.payload)
         P.is_charging[car_id] = (value == 1)
-        L.l.info("Tesla charger power={}".format(value))
+        L.l.info("Tesla is charging power={}".format(value))
     if "charger_voltage" in msg.topic:
         value = int(msg.payload)
         P.teslamate_voltage[car_id] = value
@@ -321,10 +323,15 @@ def _process_message(msg):
             P.voltage = value
     if "charge_limit_soc" in msg.topic:
         value = int(msg.payload)
+        P.teslamate_soc = value
+        L.l.info("Tesla charge limit soc={}".format(value))
     # time to full charge does not get reported all time, stays at 0.0. not reliable.
     if "time_to_full_charge" in msg.topic:
         P.teslamate_time_to_full_charge = float(msg.payload)
         L.l.info("Tesla time to full charge={}".format(P.teslamate_time_to_full_charge))
+        if P.teslamate_time_to_full_charge == 0.0:
+            L.l.info("Tesla possibly needs charging, soc={}, bat mate level={}, level={}".format(
+                P.teslamate_soc, P.teslamate_battery_level, P.battery_level))
     if "state" in msg.topic:
         value = "{}".format(msg.payload).replace("b", "").replace("\\", "").replace("'", "")
         P.car_state[car_id] == value
@@ -336,7 +343,9 @@ def _process_message(msg):
         L.l.info("Tesla geo={}".format(value))
     if "battery_level" in msg.topic:
         value = int(msg.payload)
+        P.teslamate_battery_level = value
         # P.battery_full = None
+        L.l.info("Tesla battery level={}".format(value))
     if "power" in msg.topic:
         value = int(msg.payload)
         if value == -1:  # charging started
