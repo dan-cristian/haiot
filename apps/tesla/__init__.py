@@ -39,6 +39,7 @@ class P:
     teslamate_charging_amp = dict()
     teslamate_last_charging_update = datetime.min
     charging_stopped = None  # update charging state when sending charge start/stop commands
+    charging_status_date = datetime.min
     teslamate_voltage = dict()
     teslamate_plugged_in = dict()
     teslamate_time_to_full_charge = None
@@ -192,9 +193,9 @@ def vehicle_update(car_id=1):
                 P.voltage = act_voltage
                 P.teslamate_voltage[car_id] = act_voltage
             P.is_charging[car_id] = (ch['charging_state'] == 'Charging')
-
             L.l.info("Tesla charging status = {}".format(ch['charging_state']))
             L.l.info("Tesla charging amp = {}".format(act_amps))
+            P.charging_status_date = datetime.now()
             if act_amps > 0:
                 if not P.is_charging[car_id]:
                     L.l.error("I was expecting Tesla vehicle to charge")
@@ -241,9 +242,18 @@ def get_voltage(car_id=1):
 def is_charging(car_id=1):
     voltage = get_voltage(car_id)
     if voltage is not None:
-        return P.teslamate_voltage[car_id] > P.MIN_VOLTAGE  # sometimes voltage is higher then 0 when not charging
+        # sometimes voltage is higher than 0 when not charging
+        voltage_charge = P.teslamate_voltage[car_id] > P.MIN_VOLTAGE
     else:
-        return None
+        voltage_charge = False
+
+    if voltage_charge:
+        # dbl check if really charging
+        last_delta = (datetime.now()-P.charging_status_date).total_seconds()
+        L.l.info("Tesla on charge check charge_stopped={}, last update={}s".format(P.charging_stopped, last_delta))
+        return True
+    else:
+        return False
 
     # if car_id in P.is_charging.keys():
     #    return P.is_charging[car_id]
@@ -261,11 +271,13 @@ def stop_charge(car_id=1):
             P.last_charging_stopped[car_id] = None
             P.api_requests += 1
             P.charging_stopped = True
+            P.charging_status_date = datetime.now()
             return True
         except VehicleError as vex:
             L.l.warning("Tesla error, cannot stop charging, er={}".format(vex))
             if "{}".format(vex) == "not_charging":
                 P.charging_stopped = True
+                P.charging_status_date = datetime.now()
                 return True
         except Exception as ex:
             L.l.warning("Tesla exception, cannot stop charging, er={}".format(ex))
@@ -280,15 +292,22 @@ def start_charge(car_id=1):
             vehicle.command('START_CHARGE')
             P.api_requests += 1
             P.charging_stopped = False
+            P.charging_status_date = datetime.now()
             return True
         except VehicleError as vex:
             if "{}".format(vex) == "disconnected":
                 L.l.warning("Tesla is disconnected, cannot start charging")
+                P.charging_stopped = True
+                P.charging_status_date = datetime.now()
             if "{}".format(vex) == "complete":
                 L.l.info("Tesla charge is already complete, cannot start charging")
                 P.battery_full = True
+                P.charging_stopped = True
+                P.charging_status_date = datetime.now()
                 return False
             if "{}".format(vex) == "is_charging":
+                P.charging_stopped = False
+                P.charging_status_date = datetime.now()
                 return True
         except Exception as ex:
             if "vehicle unavailable" in "{}".format(ex):

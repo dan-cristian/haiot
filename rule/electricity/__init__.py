@@ -365,10 +365,12 @@ class TeslaCharger(Relaydevice):
                 # using floor round down
                 target_amps = math.floor(target_watts / apps.tesla.get_nonzero_voltage())
                 if act_amps == 0:
-                    P.thread_pool_status = 'tesla.start_charge 2'
-                    res = apps.tesla.start_charge(self.vehicle_id)
-                    L.l.info("Tesla start charging={}".format(res))
-                    # return True
+                    if not apps.tesla.is_charging(self.vehicle_id):
+                        P.thread_pool_status = 'tesla.start_charge 2'
+                        res = apps.tesla.start_charge(self.vehicle_id)
+                        L.l.info("Tesla start charging={}".format(res))
+                    else:
+                        L.l.info("Tesla is already charging, no need to start charge")
                 if target_amps != act_amps:
                     L.l.info("Increasing Tesla charging from {} to {} Amps".format(act_amps, target_amps))
                     P.thread_pool_status = 'tesla.set_charging_amps 2'
