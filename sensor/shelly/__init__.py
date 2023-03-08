@@ -148,7 +148,7 @@ def _process_message(msg):
                 if "apower" in payload:
                     sensor.power = sign * float(payload.split('"apower":')[1].split(",")[0])
                 if "current" in payload:
-                    sensor.current = sign * float(payload.split('"current":')[1].split(",")[0])
+                    sensor.current = float(payload.split('"current":')[1].split(",")[0])
                 if "voltage" in payload:
                     sensor.voltage = float(payload.split('"voltage":')[1].split(",")[0])
                 sensor.save_changed_fields(persist=True)
