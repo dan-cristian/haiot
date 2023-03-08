@@ -440,9 +440,9 @@
     {"id":44, "name":"solar l3",    "type":"shelly", "sensor_index": 0, "host_name":"shellyem-244CAB431B3A"},
     {"id":45, "name":"heatpump l3", "type":"shelly", "sensor_index": 1, "host_name":"shellyem-244CAB431B3A"},
 
-    {"id":61, "name":"invertermain",  "type":"shelly", "sensor_index": 0, "host_name":"shellyem3-485519C9ED73"},
+    {"id":61, "name":"outdoor l1",    "type":"shelly", "sensor_index": 0, "host_name":"shellyem3-485519C9ED73"},
     {"id":62, "name":"outdoor l2",    "type":"shelly", "sensor_index": 1, "host_name":"shellyem3-485519C9ED73"},
-    {"id":63, "name":"outdoor l1",    "type":"shelly", "sensor_index": 2, "host_name":"shellyem3-485519C9ED73"}
+    {"id":63, "name":"outdoor l3",    "type":"shelly", "sensor_index": 2, "host_name":"shellyem3-485519C9ED73"}
   ],
 
   "TemperatureTarget": [
@@ -684,6 +684,8 @@
   ],
 
   "_disabled": [
+    {"id":61, "name":"invertermain",  "type":"shelly", "sensor_index": 0, "host_name":"shellyem3-485519C9ED73"},
+
     {"id": 1, "name": "APS PLC ORIG", "general_url": "http://192.168.0.10/cgi-bin/home", "panels_url": "", "type": 0},
 
     {"id":1, "name":"dashcam lipo", "type":"ina", "i2c_addr":"0x41", "host_name":"pidash", "max_voltage":4.2, "warn_voltage":3.2, "critical_voltage":3.1, "min_voltage":3, "warn_current":900, "critical_current":1000},

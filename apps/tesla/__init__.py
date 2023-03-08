@@ -193,9 +193,11 @@ def vehicle_update(car_id=1):
                 P.voltage = act_voltage
                 P.teslamate_voltage[car_id] = act_voltage
             P.is_charging[car_id] = (ch['charging_state'] == 'Charging')
+            if P.is_charging[car_id]:
+                P.charging_stopped = False
+            P.charging_status_date = datetime.now()
             L.l.info("Tesla charging status = {}".format(ch['charging_state']))
             L.l.info("Tesla charging amp = {}".format(act_amps))
-            P.charging_status_date = datetime.now()
             if act_amps > 0:
                 if not P.is_charging[car_id]:
                     L.l.error("I was expecting Tesla vehicle to charge")
