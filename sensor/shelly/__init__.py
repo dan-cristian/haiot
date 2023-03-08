@@ -129,6 +129,25 @@ def _process_message(msg):
                     L.l.warning("No shelly sensor {} index={} in config file".format(atoms[1], atoms[3]))
             else:
                 L.l.warning("Invalid sensor topic {}".format(msg.topic))
+    # shelly 2PM Plus
+    if "switch:" in msg.topic:
+        atoms = msg.topic.split('/')
+        if len(atoms) == 4:
+            index = int(atoms[3].split("switch:")[1])
+            sensor = m.PowerMonitor.find_one({m.PowerMonitor.host_name: atoms[1],
+                                              m.PowerMonitor.type: "shelly",
+                                              m.PowerMonitor.sensor_index: index})
+            if sensor is not None:
+                # b'{"id":0, "source":"init", "output":true, "apower":-474.1, "voltage":222.4,
+                # "current":2.164, "pf":-0.97, "aenergy":{"total":495.858},"temperature":{"tC":62.9, "tF":145.2}}'
+                payload = str(msg.payload)
+                if "apower" in payload:
+                    power = float(payload.split('"apower":')[1].split(",")[0])
+                    if sensor.reversed_direction:
+                        sensor.power = -power
+                    else:
+                        sensor.power = power
+                sensor.save_changed_fields(persist=True)
 
 
 def mqtt_on_message(client, userdata, msg):

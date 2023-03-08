@@ -444,7 +444,7 @@
     {"id":62, "name":"outdoor l2",    "type":"shelly", "sensor_index": 1, "host_name":"shellyem3-485519C9ED73"},
     {"id":63, "name":"outdoor l3",    "type":"shelly", "sensor_index": 2, "host_name":"shellyem3-485519C9ED73"},
 
-    {"id":64, "name":"invertermain",  "type":"shelly", "sensor_index": 0, "host_name":"shellyplus2pm-5443b23f8190"}
+    {"id":64, "name":"invertermain",  "type":"shelly", "sensor_index": 0, "host_name":"shellyplus2pm-5443b23f8190", "reversed_direction": true}
   ],
 
   "TemperatureTarget": [

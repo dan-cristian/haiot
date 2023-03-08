@@ -139,6 +139,7 @@ class PowerMonitor(ModelBase):
     current = 0.0  # miliamps
     power = 0.0
     power_factor = 0.0
+    reversed_direction = False  # True if you want current direction to be reversed
     energy = 0.0
     total_energy = 0.0  # total energy consumed
     total_energy_last = 0.0  # total energy consumed
