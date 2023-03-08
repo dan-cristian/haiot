@@ -151,6 +151,14 @@ def _process_message(msg):
                     sensor.current = float(payload.split('"current":')[1].split(",")[0])
                 if "voltage" in payload:
                     sensor.voltage = float(payload.split('"voltage":')[1].split(",")[0])
+                if "aenergy" in payload:
+                    prev_energy = sensor.total_energy_last
+                    en_text = payload.split('aenergy":{"total":')[1].split(",")[0]
+                    en_text = en_text.replace("{", "")
+                    sensor.total_energy_last = float(en_text)
+                    if prev_energy is None:
+                        prev_energy = sensor.total_energy_last
+                    sensor.total_energy_now = sensor.total_energy_last - prev_energy
                 sensor.save_changed_fields(persist=True)
 
 
