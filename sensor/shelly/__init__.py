@@ -141,12 +141,16 @@ def _process_message(msg):
                 # b'{"id":0, "source":"init", "output":true, "apower":-474.1, "voltage":222.4,
                 # "current":2.164, "pf":-0.97, "aenergy":{"total":495.858},"temperature":{"tC":62.9, "tF":145.2}}'
                 payload = str(msg.payload)
+                if sensor.reversed_direction:
+                    sign = -1
+                else:
+                    sign = 1
                 if "apower" in payload:
-                    power = float(payload.split('"apower":')[1].split(",")[0])
-                    if sensor.reversed_direction:
-                        sensor.power = -power
-                    else:
-                        sensor.power = power
+                    sensor.power = sign * float(payload.split('"apower":')[1].split(",")[0])
+                if "current" in payload:
+                    sensor.current = sign * float(payload.split('"current":')[1].split(",")[0])
+                if "voltage" in payload:
+                    sensor.voltage = float(payload.split('"voltage":')[1].split(",")[0])
                 sensor.save_changed_fields(persist=True)
 
 
