@@ -353,6 +353,8 @@ def _process_message(msg):
         if P.teslamate_time_to_full_charge == 0.0:
             L.l.info("Tesla might needs charging, mate soc={}, soc={}, bat mate level={}, level={} full={}".format(
                 P.teslamate_soc, P.charge_limit_soc, P.teslamate_battery_level, P.battery_level, P.battery_full))
+        elif P.teslamate_time_to_full_charge > 0:
+            P.battery_full == False
     if "state" in msg.topic:
         value = "{}".format(msg.payload).replace("b", "").replace("\\", "").replace("'", "")
         P.car_state[car_id] == value
