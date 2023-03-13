@@ -50,7 +50,9 @@ def _process_message(msg):
                 rec.full_capacity = float(msg.payload)
                 rec.save_changed_fields(persist=True)
             elif 'capacity_remaining' in topic:
-                rec.capacity_percent = float(msg.payload)
+                if rec.full_capacity is None:
+                    rec.full_capacity = rec.factory_full_capacity
+                rec.capacity_percent = 100 * float(msg.payload) / rec.full_capacity
                 rec.save_changed_fields(persist=True)
             elif 'power_tube_temperature' in topic:
                 rec.t1 = float(msg.payload)
