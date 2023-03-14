@@ -440,7 +440,7 @@ class P:
         P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=780,  # 725
                                            supports_breaks=True, min_on_interval=6, state_change_interval=3)
         relay = 'waterheater_relay'
-        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=2800,
+        P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=2900,
                                            supports_breaks=True, min_on_interval=1, state_change_interval=3)
 
         if not P.emulate_export:
