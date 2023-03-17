@@ -266,3 +266,23 @@ def heat_relay(name, value):
 def thermostat(zone_name=None, temp_target=None, state=None, mode_manual=None, mode_presence=None):
     L.l.info('Got thermo zone {} temp {} state {} mode_manual={} mode_presence={}'.format(zone_name, temp_target, state,
                                                                                           mode_manual, mode_presence))
+    zone_thermo = m.ZoneThermostat.find_one({m.ZoneThermostat.zone_name: zone_name})
+    if zone_thermo is None:
+        zone = m.Zone.find_one({m.Zone.name: zone_name})
+        if zone:
+            zone_thermo = m.ZoneThermostat()
+            zone_thermo.zone_id = zone.id
+            zone_thermo.zone_name = zone_name
+        else:
+            L.l.warning("Could not find zone from thermo name={}".format(zone_name))
+
+    if zone_thermo:
+        if mode_manual is not None:
+            zone_thermo.is_mode_manual = mode_manual
+        if mode_presence is not None:
+            zone_thermo.mode_presence_auto = mode_presence
+        if state is not None:
+            zone_thermo.heat_is_on = state
+        if temp_target is not None:
+            zone_thermo.heat_target_temperature = temp_target
+        zone_thermo.save_changed_fields(persist=True)

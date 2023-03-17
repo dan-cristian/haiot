@@ -24,6 +24,7 @@ class P:
     season = None
     PRESENCE_SEC = 60 * 60 * 1  # no of secs after a move considered to be presence
     AWAY_SEC = 60 * 60 * 6  # no of secs after no move to be considered away
+    MANUAL_DURATION = 60
     initialised = False
     DEBUG = False
     DEBUG_LOOP = 0
@@ -48,6 +49,7 @@ def _save_heat_state_db(zone, heat_is_on):
         zone_thermo = m.ZoneThermostat()
         zone_thermo.zone_id = zone.id
         zone_thermo.zone_name = zone.name
+        zone_thermo.manual_duration_min = P.MANUAL_DURATION
     if zone_heat_relay is not None:
         zone_heat_relay.heat_is_on = heat_is_on
         # save latest heat state for caching purposes
@@ -62,6 +64,19 @@ def _save_heat_state_db(zone, heat_is_on):
 # triggers heat status update if heat changed
 def _decide_action(zone, current_temperature, target_temperature, force_on=False,
                    force_off=False, zone_thermo=None, direction=1):
+    if current_temperature is None:  # might be on manual mode
+        if zone_thermo is None:
+            return False
+        else:
+            if zone_thermo.is_mode_manual:
+                if zone_thermo.manual_duration_min is None:
+                    zone_thermo.manual_duration_min = P.MANUAL_DURATION
+                if zone_thermo.heat_is_on:
+                    return zone_thermo.heat_is_on
+                else:
+                    return False
+            else:
+                return False
     heat_is_on = None
     if force_on:
         heat_is_on = True
@@ -199,7 +214,9 @@ def _get_heat_on_manual(zone_thermo):
         delta_minutes = (datetime.datetime.now() - zone_thermo.last_manual_set).total_seconds() / 60
         if delta_minutes <= zone_thermo.manual_duration_min:
             manual_temp_target = zone_thermo.manual_temp_target
-            force_on = True
+            force_on = zone_thermo.heat_is_on
+            if force_on is None:
+                force_on = False
             L.l.info("Set heat on due to manual in {}, target={}".format(zone_thermo.zone_name, manual_temp_target))
         else:
             zone_thermo.is_mode_manual = False
@@ -220,6 +237,7 @@ def _update_zone_heat(zone, heat_schedule, sensor):
         zone_thermo = m.ZoneThermostat()
         zone_thermo.zone_id = zone.id
         zone_thermo.zone_name = zone.name
+        zone_thermo.manual_duration_min = P.MANUAL_DURATION
     try:
         schedule_pattern = _get_schedule_pattern(heat_schedule)
         if schedule_pattern:
@@ -235,7 +253,7 @@ def _update_zone_heat(zone, heat_schedule, sensor):
                     force_off = False
                 # stop if source is colder than target or current temp
                 src_sensor = m.Sensor.find_one({m.Sensor.sensor_name: schedule_pattern.activate_condition_temp_sensor})
-                if src_sensor is not None:
+                if src_sensor is not None and sensor is not None:
                     target, code, direction = _get_temp_target(pattern_id=schedule_pattern.id)
                     if src_sensor.temperature < (sensor.temperature + P.threshold):
                         # not enough heat in source, no point to run
@@ -243,8 +261,11 @@ def _update_zone_heat(zone, heat_schedule, sensor):
                             src_sensor.temperature + P.threshold)
                         force_off = True
                 # end stop
-                force_on = _get_heat_on_keep_warm(schedule_pattern=schedule_pattern, temp_code=temp_code,
-                                                  temp_target=std_temp_target, temp_actual=sensor.temperature)
+                if sensor is not None:
+                    force_on = _get_heat_on_keep_warm(schedule_pattern=schedule_pattern, temp_code=temp_code,
+                                                      temp_target=std_temp_target, temp_actual=sensor.temperature)
+                else:
+                    force_on = False
                 P.heat_status += 'keep warm {} '.format(force_on)
                 if not force_on:
                     force_on, manual_temp_target = _get_heat_on_manual(zone_thermo=zone_thermo)
@@ -254,16 +275,25 @@ def _update_zone_heat(zone, heat_schedule, sensor):
                 if zone_thermo.active_heat_schedule_pattern_id != schedule_pattern.id:
                     zone_thermo.active_heat_schedule_pattern_id = schedule_pattern.id
                 zone_thermo.heat_target_temperature = std_temp_target
-                zone_thermo.heat_actual_temperature = sensor.temperature
+                if sensor is not None:
+                    zone_thermo.heat_actual_temperature = sensor.temperature
+                    actual_temp = sensor.temperature
+                else:
+                    actual_temp = None
                 zone_thermo.save_changed_fields()
-                if sensor.temperature is not None:
-                    heat_is_on = _decide_action(zone, sensor.temperature, act_temp_target, force_on=force_on,
-                                                force_off=force_off, zone_thermo=zone_thermo, direction=temp_dir)
+                heat_is_on = _decide_action(zone, actual_temp, act_temp_target, force_on=force_on,
+                                            force_off=force_off, zone_thermo=zone_thermo, direction=temp_dir)
             else:
                 L.l.critical('Unknown temperature pattern code {}'.format(temp_code))
     except Exception as ex:
         L.l.error('Error updatezoneheat, err={}'.format(ex), exc_info=True)
     return heat_is_on, main_source_needed
+
+
+def _loop_heat_schedule():
+    heat_schedule_list = m.HeatSchedule.find({m.HeatSchedule.season: P.season})
+    for schedule in heat_schedule_list:
+        zonesensor_list = m.ZoneSensor.find({m.ZoneSensor.zone_id: schedule.zone_id, m.ZoneSensor.is_main: True})
 
 
 # iterate zones and decide heat state for each zone and also for master zone (main heat system)
@@ -289,18 +319,18 @@ def _loop_zones():
                         sensor = m.Sensor.find_one({m.Sensor.address: zonesensor.sensor_address})
                         if sensor is not None:
                             P.heat_status += 'sensor: {} {} '.format(sensor.address, sensor.sensor_name)
-                            heat_state, main_source_needed = _update_zone_heat(zone, heat_schedule, sensor)
-                            P.heat_status += 'heat on: {} main {},'.format(heat_state, main_source_needed)
-                            if not heat_is_on:
-                                heat_is_on = main_source_needed and heat_state
-                            if zonesensor.zone_id in sensor_processed:
-                                prev_sensor = sensor_processed[zonesensor.zone_id]
-                                L.l.warning('Already processed temp sensor {} in zone {}, duplicate?'.format(
-                                    prev_sensor, zonesensor.zone_id))
-                            else:
-                                sensor_processed[zonesensor.zone_id] = sensor.sensor_name
+                        heat_state, main_source_needed = _update_zone_heat(zone, heat_schedule, sensor)
+                        P.heat_status += 'heat on: {} main {},'.format(heat_state, main_source_needed)
+                        if not heat_is_on:
+                            heat_is_on = main_source_needed and heat_state
+                        if zonesensor.zone_id in sensor_processed:
+                            prev_sensor = sensor_processed[zonesensor.zone_id]
+                            L.l.warning('Already processed temp sensor {} in zone {}, duplicate?'.format(
+                                prev_sensor, zonesensor.zone_id))
                         else:
-                            P.heat_status += ' sensor={}'.format(sensor)
+                            if sensor is not None:
+                                sensor_processed[zonesensor.zone_id] = sensor.sensor_name
+
                     else:
                         P.heat_status += ' sched={} zonesensor={}'.format(heat_schedule, zonesensor)
         # turn on/off the main heating system based on zone heat needs
