@@ -163,6 +163,8 @@ class TinyBase(ModelView, metaclass=OrderedClassMembers):
                         has_listener = True
                     else:
                         has_listener = False
+                        if listeners:
+                            L.l.warning("Listener triggered but none are attached to class {}".format(cls_name))
                     record = None
                     i = 0
                     while record is None and i < 10:
