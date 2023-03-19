@@ -344,7 +344,7 @@
   ],
 
   "AreaThermostat": [
-    {"id":1, "area_id":1}
+    {"id":1, "area_id":1, "manual_duration_min": 60}
   ],
 
   "ZoneCustomRelay": [

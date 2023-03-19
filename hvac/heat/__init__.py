@@ -521,10 +521,12 @@ def _loop_areas():
         if area.is_manual_heat:
             if area.last_manual_heat_set is None:
                 area.last_manual_heat_set = datetime.datetime.now()
-            delta = (datetime.datetime.now() - area.last_manual_heat_set).total_seconds() / 60
-            if delta <= area.manual_duration_min:
+            # todo: implement semiautomatic release for manual mode
+            # delta = (datetime.datetime.now() - area.last_manual_heat_set).total_seconds() / 60
+            # if delta <= area.manual_duration_min:
                 # area still on manual setup, no action required
-                return
+            return
+        # if not manual
         _loop_zones(area.area_id)
 
 
