@@ -298,7 +298,8 @@ def _loop_heat_schedule():
 
 # iterate zones and decide heat state for each zone and also for master zone (main heat system)
 # if one zone requires heat master zone will be on
-def _loop_zones():
+# todo: process only zones in certain area (as per param area_id)
+def _loop_zones(area_id):
     try:
         heat_is_on = False
         P.heat_status = ''
@@ -514,12 +515,32 @@ def _zoneheatrelay_upsert_listener(record, changed_fields):
                 record.heat_pin_name, record.gpio_pin_code, record.relay_type, record.heat_is_on, pin_state))
 
 
+def _loop_areas():
+    areas = m.AreaThermostat.find()
+    for area in areas:
+        if area.is_manual_heat:
+            if area.last_manual_heat_set is None:
+                area.last_manual_heat_set = datetime.datetime.now()
+            delta = (datetime.datetime.now() - area.last_manual_heat_set).total_seconds() / 60
+            if delta <= area.manual_duration_min:
+                # area still on manual setup, no action required
+                return
+        _loop_zones(area.area_id)
+
+
 def _zonethermostat_upsert_listener(record, changed_fields):
     # activate manual mode if set by user in UI
     if hasattr(record, m.ZoneThermostat.is_mode_manual) and record.is_mode_manual is True:
         record.last_manual_set = datetime.datetime.now()
         record.save_changed_fields()
-        L.l.info('Set thermostat manual to active={} zone={}'.format(record.is_mode_manual, record.zone_name))
+        L.l.info('Set zone thermostat manual to active={} zone={}'.format(record.is_mode_manual, record.zone_name))
+
+
+def _areathermostat_upsert_listener(record, changed_fields):
+    if hasattr(record, m.AreaThermostat.is_manual_heat) and record.is_manual_heat is True:
+        record.last_manual_heat_set = datetime.datetime.now()
+        record.save_changed_fields()
+        L.l.info('Set area thermostat manual to active={} zone={}'.format(record.is_manual_heat, record.area_id))
 
 
 def thread_run():
@@ -532,7 +553,7 @@ def thread_run():
     month = datetime.datetime.today().month
     P.season = "summer" if month in range(5, 9) else "winter"
     #_set_main_heat_source()
-    _loop_zones()
+    _loop_areas()
     if P.DEBUG:
         sensor = m.Sensor.find_one({m.Sensor.sensor_name: "living"})
         if sensor is None:
@@ -575,3 +596,4 @@ def init():
     P.initialised = True
     m.ZoneHeatRelay.add_upsert_listener(_zoneheatrelay_upsert_listener)
     m.ZoneThermostat.add_upsert_listener(_zonethermostat_upsert_listener)
+    m.AreaThermostat.add_upsert_listener(_areathermostat_upsert_listener)

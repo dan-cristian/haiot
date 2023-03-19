@@ -1,5 +1,7 @@
 sitemap heat label="Heat" {
 
+Default item=areathermo_mode_manual_house
+
 Frame {
     Group item=LIVING_THERMO {
         Default item=temperature_living

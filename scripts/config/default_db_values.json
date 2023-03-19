@@ -343,6 +343,10 @@
     {"id":301, "area_id":3, "zone_id":2}
   ],
 
+  "AreaThermostat": [
+    {"id":1, "area_id":1}
+  ],
+
   "ZoneCustomRelay": [
     {"relay_pin_name": "back_pump_relay", "zone_id": "39", "gpio_pin_code": "24",          "gpio_host_name": "pi-power", "relay_type": "gpio", "expire":  600},
     {"relay_pin_name": "back_valve_relay", "zone_id": "37", "gpio_pin_code": "4",         "gpio_host_name": "pi-power", "relay_type": "gpio", "expire":  600},

@@ -220,6 +220,15 @@ class ZoneThermostat(ModelBase):
     last_manual_set = datetime.now()
 
 
+class AreaThermostat(ModelBase):
+    id = 0
+    area_id = 0
+    heat_is_on = False
+    is_manual_heat = False
+    manual_duration_min = 0  # period to keep heat on for manual mode
+    last_manual_heat_set = datetime.now()
+
+
 class HeatSchedule(ModelBase):
     id = 0
     zone_id = 0

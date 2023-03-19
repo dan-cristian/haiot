@@ -29,6 +29,8 @@ Switch heat_puffer_gas_valve "Heat puffer gas valve" <switch>       {mqtt="<[mos
 
 Switch relay_boiler "Boiler pwm relay" <switch>                 {mqtt="<[mosquitto:iot/openhab/relay_boiler_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_boiler_relay:command:*:default]", autoupdate="false"}
 
+Switch areathermo_mode_manual_house "House manual mode" <heating>    {mqtt="<[mosquitto:iot/openhab/areathermo_mode_manual_house:state:default],>[mosquitto:iot/openhab/cmd/areathermo_mode_manual_house:command:*:default]", autoupdate="false"}
+
 Group LIVING_THERMO "Living Thermostat" [ "Thermostat", "Celsius" ]
 Number temperature_living "Living [%.1f °C]" <temperature>                 (LIVING_THERMO) [ "CurrentTemperature" ]           {mqtt="<[mosquitto:iot/openhab/temperature_living:state:default]"}
 Number thermo_target_living "Living target [%.1f °C]" <temperature>   (LIVING_THERMO)     [ "TargetTemperature" ]            {mqtt="<[mosquitto:iot/openhab/thermo_target_living:state:default],>[mosquitto:iot/openhab/cmd/thermo_target_living:command:*:default]", autoupdate="false"}

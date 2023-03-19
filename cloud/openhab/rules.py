@@ -1,3 +1,5 @@
+import datetime
+
 import transport.mqtt_io
 from main.logger_helper import L
 from storage.model import m
@@ -16,6 +18,16 @@ def send_mqtt_openhab(subtopic, payload):
     transport.send_message_topic(payload, P.openhab_topic + "/" + subtopic)
 
 #  OUTBOUND RULES START
+
+
+def _get_state(bool_val):
+    if bool_val is None:
+        return None
+    if bool_val:
+        state = 'ON'
+    else:
+        state = 'OFF'
+    return state
 
 
 def rule_openhab_sensor(obj=m.Sensor(), change=None):
@@ -199,6 +211,15 @@ def rule_openhab_thermo(obj=m.ZoneThermostat(), change=None):
     send_mqtt_openhab(subtopic='thermo_mode_presence_' + zone, payload=mode)
 
 
+def rule_openhab_area_thermo(obj=m.AreaThermostat(), change=None):
+    area = m.Area.find_one({m.Area.id: obj.area_id})
+    if area is not None:
+        if hasattr(obj, 'is_manual_heat'):
+            state = _get_state(obj.is_manual_heat)
+            if state is not None:
+                send_mqtt_openhab(subtopic='areathermo_mode_manual_' + area.name, payload=state)
+
+
 def rule_openhab_music(obj=m.Music(), change=None):
     if change is not None:
         zone = obj.zone_name
@@ -286,3 +307,13 @@ def thermostat(zone_name=None, temp_target=None, state=None, mode_manual=None, m
         if temp_target is not None:
             zone_thermo.heat_target_temperature = temp_target
         zone_thermo.save_changed_fields(persist=True)
+
+
+def areathermostat(area_name=None, mode_manual=None):
+    area = m.Area.find_one({m.Area.name: area_name})
+    if area is not None:
+        areath = m.AreaThermostat.find_one({m.AreaThermostat.area_id: area.id})
+        if areath is not None:
+            if mode_manual is not None:
+                areath.is_manual_heat = mode_manual
+            areath.save_changed_fields(persist=True)
