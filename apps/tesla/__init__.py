@@ -183,6 +183,8 @@ def vehicle_update(car_id=1):
             if P.user_charging_mode:
                 L.l.info("Tesla manual user charging detected")
             act_amps = ch['charger_actual_current']
+            if act_amps is None:
+                act_amps = 0
             P.charging_amp[car_id] = act_amps
             if car_id not in P.last_charging_stopped.keys():
                 if act_amps == 0:
@@ -190,6 +192,8 @@ def vehicle_update(car_id=1):
                 else:
                     P.last_charging_stopped[car_id] = None
             act_voltage = ch['charger_voltage']
+            if act_voltage is None:
+                act_voltage = 0
             if act_voltage > 0:
                 P.voltage = act_voltage
                 P.teslamate_voltage[car_id] = act_voltage
