@@ -71,6 +71,9 @@ def can_auto_charge(vehicle_id=1):
     else:
         plugged_in = P.charging_state != 'Disconnected'
     res = (P.can_charge_at_home or P.teslamate_geo_home) and not P.scheduled_charging_mode and plugged_in
+    if res is False and P.can_charge_at_home is None and P.teslamate_geo_home is None and plugged_in:
+        L.l.info("Forcing Tesla auto charge as I miss data, assume I can charge")
+        res = True
     if P.DEBUG and (res is False or res is None):
         L.l.info("Tesla debug auto_charge: at_home={} geo={} scheduled={} plugged_in={} time_full={}".format(
             P.can_charge_at_home, P.teslamate_geo_home, P.scheduled_charging_mode, plugged_in,
