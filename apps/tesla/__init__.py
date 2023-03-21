@@ -81,9 +81,10 @@ def can_auto_charge(vehicle_id=1):
 
 def is_battery_full():
     res = P.battery_full or (P.charge_limit_soc is not None and P.charge_limit_soc == P.battery_level)
-          # (P.teslamate_time_to_full_charge is not None and P.teslamate_time_to_full_charge == 0)
-    # if res is True and P.DEBUG:
-    #    L.l.info("Tesla battery is full, time={}".format(P.teslamate_time_to_full_charge))
+    # (P.teslamate_time_to_full_charge is not None and P.teslamate_time_to_full_charge == 0)
+    if res is True and P.DEBUG:
+        L.l.info("Tesla battery P.full={}, limit={} level={}".format(
+            P.battery_full, P.charge_limit_soc, P.battery_level))
     return res
 
 
@@ -351,9 +352,12 @@ def _process_message(msg):
         P.teslamate_time_to_full_charge = float(msg.payload)
         L.l.info("Tesla time to full charge={}".format(P.teslamate_time_to_full_charge))
         if P.teslamate_time_to_full_charge == 0.0:
-            L.l.info("Tesla might needs charging, mate soc={}, soc={}, bat mate level={}, level={} full={}".format(
+            L.l.info("Tesla might need charging, mate soc={}, soc={}, bat mate level={}, level={} full={}".format(
                 P.teslamate_soc, P.charge_limit_soc, P.teslamate_battery_level, P.battery_level, P.battery_full))
-        elif P.teslamate_time_to_full_charge > 0:
+            if P.battery_level is not None and P.teslamate_soc is not None and P.battery_level < P.teslamate_soc:
+                P.battery_full = False
+                L.l.info("Set Tesla battery as not full")
+        if P.teslamate_time_to_full_charge > 0:
             P.battery_full == False
     if "state" in msg.topic:
         value = "{}".format(msg.payload).replace("b", "").replace("\\", "").replace("'", "")
