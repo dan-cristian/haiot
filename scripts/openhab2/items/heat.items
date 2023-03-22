@@ -26,6 +26,7 @@ Switch heat_gas_heat "Heat gas" <fire>                                      {mqt
 Switch heat_puffer_boiler "Heat puffer boiler" <switch>                     {mqtt="<[mosquitto:iot/openhab/heat_puffer boiler:state:default],>[mosquitto:iot/openhab/cmd/heat_puffer boiler:command:*:default]", autoupdate="false"}
 Switch heat_puffer_heat "Heat puffer heat" <switch>                 {mqtt="<[mosquitto:iot/openhab/heat_puffer heat:state:default],>[mosquitto:iot/openhab/cmd/heat_puffer heat:command:*:default]", autoupdate="false"}
 Switch heat_puffer_gas_valve "Heat puffer gas valve" <switch>       {mqtt="<[mosquitto:iot/openhab/heat_puffer gas valve:state:default],>[mosquitto:iot/openhab/cmd/heat_puffer gas valve:command:*:default]", autoupdate="false"}
+Switch heat_puffer_gas_boiler_valve "Heat puffer gas boiler valve" <switch>       {mqtt="<[mosquitto:iot/openhab/heat_puffer gas boiler valve:state:default],>[mosquitto:iot/openhab/cmd/heat_puffer gas boiler valve:command:*:default]", autoupdate="false"}
 
 Switch relay_boiler "Boiler pwm relay" <switch>                 {mqtt="<[mosquitto:iot/openhab/relay_boiler_relay:state:default],>[mosquitto:iot/openhab/cmd/relay_boiler_relay:command:*:default]", autoupdate="false"}
 

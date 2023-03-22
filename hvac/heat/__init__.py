@@ -509,7 +509,7 @@ def _zoneheatrelay_upsert_listener(record, changed_fields):
         #    L.l.info('Debug 2 {} ---- {}'.format(record, changed_fields))
         pin_state = gpio.set_relay_state(
             pin_code=record.gpio_pin_code, relay_is_on=record.heat_is_on, relay_type=record.relay_type,
-            relay_index=None)  # fixme: warning, heat relays do not support tasmota with multiple relay pins
+            relay_index=record.relay_index)
         if P.verbose:
             L.l.info("Setting heat pin {}:{}:{} to {} returned {}".format(
                 record.heat_pin_name, record.gpio_pin_code, record.relay_type, record.heat_is_on, pin_state))

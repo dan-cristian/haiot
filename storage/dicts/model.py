@@ -271,6 +271,7 @@ class ZoneHeatRelay(ModelBase):
     zone_id = 0
     gpio_pin_code = ''  # user friendly format, e.g. P8_11
     relay_type = ''
+    relay_index = 0  # index for multi relay control like sonoff ch4. starts with 1
     gpio_host_name = ''
     heat_is_on = False
     is_main_heat_source = False
