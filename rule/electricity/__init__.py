@@ -294,29 +294,34 @@ class InverterRelay(Relaydevice):
 class BatteryCharger(Relaydevice):
     voltage_sensor_name = None
     voltage_max_limit = None
+    voltage_max_floor = None
+    voltage_max_floor_reached = True
 
     def __init__(self, relay_name, avg_consumption, supports_breaks, min_on_interval, state_change_interval,
-                 voltage_sensor_name, voltage_max_limit):
+                 voltage_sensor_name, voltage_max_limit, voltage_max_floor):
         Relaydevice.__init__(self, relay_name=relay_name, supports_breaks=supports_breaks,
                              min_on_interval=min_on_interval,
                              state_change_interval=state_change_interval, avg_consumption=avg_consumption)
         self.voltage_max_limit = voltage_max_limit
         self.voltage_sensor_name = voltage_sensor_name
+        self.voltage_max_floor = voltage_max_floor
 
     def grid_updated(self, grid_watts):
         voltage_sensor = m.PowerMonitor.find_one({m.PowerMonitor.name: self.voltage_sensor_name})
         if voltage_sensor is None:
             L.l.warning("Could not find voltage sensor {} for battery charger {}".format(
                 self.voltage_sensor_name, self.RELAY_NAME))
-        if voltage_sensor is not None and voltage_sensor.voltage is not None \
-                and voltage_sensor.voltage > self.voltage_max_limit:
-            L.l.info("Reached max voltage {} for battery charger {}, stop charge".format(
-                voltage_sensor.voltage, self.RELAY_NAME))
-            super().set_power_status(power_is_on=False)
-            # allow turn off for other devices
-            return False
-        else:
-            return super().grid_updated(grid_watts)
+        if voltage_sensor is not None and voltage_sensor.voltage is not None:
+            if voltage_sensor.voltage <= self.voltage_max_floor:
+                self.voltage_max_floor_reached = True
+            if voltage_sensor.voltage > self.voltage_max_limit and self.voltage_max_floor_reached:
+                L.l.info("Reached max voltage {} for battery charger {}, stop charge".format(
+                    voltage_sensor.voltage, self.RELAY_NAME))
+                self.voltage_max_floor_reached = False
+                super().set_power_status(power_is_on=False)
+                # allow turn off for other devices
+                return False
+        return super().grid_updated(grid_watts)
 
 
 class TeslaCharger(Relaydevice):
@@ -460,19 +465,23 @@ class P:
         relay = 'batterychargectrl_1'  # index 1, right, stable
         P.device_list[relay] = BatteryCharger(relay_name=relay, avg_consumption=780,  # 730
                                               supports_breaks=True, min_on_interval=6, state_change_interval=3,
-                                              voltage_sensor_name="house battery", voltage_max_limit=28.6)
+                                              voltage_sensor_name="house battery",
+                                              voltage_max_limit=28.6, voltage_max_floor=28)
         relay = 'batterychargectrl_3'  # index 3, right, stable
         P.device_list[relay] = BatteryCharger(relay_name=relay, avg_consumption=780,  # 735
                                               supports_breaks=True, min_on_interval=6, state_change_interval=3,
-                                              voltage_sensor_name="house battery", voltage_max_limit=28.6)
+                                              voltage_sensor_name="house battery",
+                                              voltage_max_limit=28.6, voltage_max_floor=28)
         relay = 'batterychargectrl_4'  # index 4, left, somewhat stable
         P.device_list[relay] = BatteryCharger(relay_name=relay, avg_consumption=780,  # 730
                                               supports_breaks=True, min_on_interval=6, state_change_interval=3,
-                                              voltage_sensor_name="house battery", voltage_max_limit=28.6)
+                                              voltage_sensor_name="house battery",
+                                              voltage_max_limit=28.6, voltage_max_floor=28)
         relay = 'batterychargectrl_2'  # index 2, flaky
         P.device_list[relay] = BatteryCharger(relay_name=relay, avg_consumption=780,  # 725
                                               supports_breaks=True, min_on_interval=6, state_change_interval=3,
-                                              voltage_sensor_name="house battery", voltage_max_limit=28.6)
+                                              voltage_sensor_name="house battery",
+                                              voltage_max_limit=28.6, voltage_max_floor=28)
         relay = 'waterheater_relay'
         P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=2900,
                                            supports_breaks=True, min_on_interval=1, state_change_interval=3)
