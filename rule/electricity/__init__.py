@@ -292,7 +292,7 @@ class InverterRelay(Relaydevice):
 
 
 class BatteryCharger(Relaydevice):
-    voltage_sensor = None
+    voltage_sensor_name = None
     voltage_max_limit = None
 
     def __init__(self, relay_name, avg_consumption, supports_breaks, min_on_interval, state_change_interval,
@@ -301,16 +301,17 @@ class BatteryCharger(Relaydevice):
                              min_on_interval=min_on_interval,
                              state_change_interval=state_change_interval, avg_consumption=avg_consumption)
         self.voltage_max_limit = voltage_max_limit
-        self.voltage_sensor = m.PowerMonitor.find_one({m.PowerMonitor.name: voltage_sensor_name})
-        if self.voltage_sensor is None:
-            L.l.warning("Could not find voltage sensor {} for battery charger {}".format(
-                voltage_sensor_name, relay_name))
+        self.voltage_sensor_name = voltage_sensor_name
 
     def grid_updated(self, grid_watts):
-        if self.voltage_sensor is not None and self.voltage_sensor.voltage is not None \
-                and self.voltage_sensor.voltage > self.voltage_max_limit:
+        voltage_sensor = m.PowerMonitor.find_one({m.PowerMonitor.name: self.voltage_sensor_name})
+        if voltage_sensor is None:
+            L.l.warning("Could not find voltage sensor {} for battery charger {}".format(
+                self.voltage_sensor_name, self.RELAY_NAME))
+        if voltage_sensor is not None and voltage_sensor.voltage is not None \
+                and voltage_sensor.voltage > self.voltage_max_limit:
             L.l.info("Reached max voltage {} for battery charger {}, stop charge".format(
-                self.voltage_sensor.voltage, self.RELAY_NAME))
+                voltage_sensor.voltage, self.RELAY_NAME))
             super().set_power_status(power_is_on=False)
             # allow turn off for other devices
             return False
