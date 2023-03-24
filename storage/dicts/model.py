@@ -119,6 +119,7 @@ class AirSensor(ModelBase):
     """key=address
     history=co2:20"""
     id = 0
+    name = ''
     address = ''
     co2 = 0
     temperature = 0
@@ -127,6 +128,7 @@ class AirSensor(ModelBase):
     gas = 0  # for BME680
     radon = 0
     zone_id = 0
+    is_main = False  # which is reference if multiple sensors in same location
     updated_on = datetime.now()
 
 

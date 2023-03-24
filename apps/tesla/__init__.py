@@ -74,8 +74,11 @@ def can_auto_charge(vehicle_id=1):
     if res is False and P.can_charge_at_home is None and P.teslamate_geo_home is None and plugged_in:
         L.l.info("Forcing Tesla auto charge as I miss data, assume I can charge")
         res = True
+    if res is None and plugged_in:
+        # force a charge to trigger charge status
+        res = True
     if P.DEBUG and (res is False or res is None):
-        L.l.info("Tesla debug auto_charge: at_home={} geo={} scheduled={} plugged_in={} time_full={}".format(
+        L.l.info("Tesla debug auto_charge: at_home={} geo={} sched={} plugged_in={} time_full={}".format(
             P.can_charge_at_home, P.teslamate_geo_home, P.scheduled_charging_mode, plugged_in,
             P.teslamate_time_to_full_charge
         ))
@@ -83,7 +86,11 @@ def can_auto_charge(vehicle_id=1):
 
 
 def is_battery_full():
-    res = P.battery_full or (P.charge_limit_soc is not None and P.charge_limit_soc == P.battery_level)
+    if P.charge_limit_soc is not None:
+        soc_full = P.battery_level >= P.charge_limit_soc
+        res = soc_full
+    else:
+        res = P.battery_full
     # (P.teslamate_time_to_full_charge is not None and P.teslamate_time_to_full_charge == 0)
     if res is True and P.DEBUG:
         L.l.info("Tesla battery P.full={}, limit={} level={}".format(
@@ -169,7 +176,7 @@ def vehicle_update(car_id=1):
         P.car_state[car_id] = vehicle['state']
         if vehicle['state'] in ['asleep', 'offline']:
             # fixme: do no wake the car
-            vehicle.sync_wake_up()
+            # vehicle.sync_wake_up()
             P.api_requests += 1
         if vehicle['state'] == 'online':
             vehicle_data = vehicle.get_vehicle_data()

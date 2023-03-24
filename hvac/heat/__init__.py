@@ -252,7 +252,7 @@ def _update_zone_heat(zone, heat_schedule, sensor):
                 else:
                     force_off = False
                 # stop if source is colder than target or current temp
-                src_sensor = m.Sensor.find_one({m.Sensor.sensor_name: schedule_pattern.activate_condition_temp_sensor})
+                src_sensor = m.AirSensor.find_one({m.AirSensor.name: schedule_pattern.activate_condition_temp_sensor})
                 if src_sensor is not None and sensor is not None:
                     target, code, direction = _get_temp_target(pattern_id=schedule_pattern.id)
                     if src_sensor.temperature < (sensor.temperature + P.threshold):
@@ -317,9 +317,9 @@ def _loop_zones(area_id):
                     heat_schedule, len(zone_list))
                 for zonesensor in zonesensor_list:
                     if heat_schedule is not None and zonesensor is not None:
-                        sensor = m.Sensor.find_one({m.Sensor.address: zonesensor.sensor_address})
+                        sensor = m.AirSensor.find_one({m.AirSensor.address: zonesensor.sensor_address})
                         if sensor is not None:
-                            P.heat_status += 'sensor: {} {} '.format(sensor.address, sensor.sensor_name)
+                            P.heat_status += 'sensor: {} {} '.format(sensor.address, sensor.name)
                         heat_state, main_source_needed = _update_zone_heat(zone, heat_schedule, sensor)
                         P.heat_status += 'heat on: {} main {},'.format(heat_state, main_source_needed)
                         if not heat_is_on:
@@ -330,8 +330,7 @@ def _loop_zones(area_id):
                                 prev_sensor, zonesensor.zone_id))
                         else:
                             if sensor is not None:
-                                sensor_processed[zonesensor.zone_id] = sensor.sensor_name
-
+                                sensor_processed[zonesensor.zone_id] = sensor.name
                     else:
                         P.heat_status += ' sched={} zonesensor={}'.format(heat_schedule, zonesensor)
         # turn on/off the main heating system based on zone heat needs
@@ -397,8 +396,8 @@ def get_valid_heat_source_relay():
     if heat_source_relay is not None:
         up_limit = P.temp_limit + P.threshold
         if heat_source_relay.temp_sensor_name is not None:
-            temp_rec = m.Sensor.find_one({m.Sensor.sensor_name: heat_source_relay.temp_sensor_name})
-            if temp_rec is not None:
+            temp_rec = m.AirSensor.find_one({m.AirSensor.name: heat_source_relay.temp_sensor_name})
+            if temp_rec is not None and temp_rec.temperature is not None:
                 # alternate source is valid as temp rise above threshold
                 if temp_rec.temperature >= up_limit:
                     L.l.info("Heat source is alternate, above threshold")
@@ -434,7 +433,7 @@ def _set_main_heat_source():
         #    L.l.info('Debug 1 {}'.format(heat_source_relay))
         # is there is a temp sensor defined, consider this source as possible alternate source
         if heat_source_relay.temp_sensor_name is not None:
-            temp_rec = m.Sensor.find_one({m.Sensor.sensor_name: heat_source_relay.temp_sensor_name})
+            temp_rec = m.AirSensor.find_one({m.AirSensor.name: heat_source_relay.temp_sensor_name})
             # if alternate source is valid
             # fixok: add temp threshold to avoid quick on/offs
             if temp_rec is not None \
@@ -557,20 +556,20 @@ def thread_run():
     #_set_main_heat_source()
     _loop_areas()
     if P.DEBUG:
-        sensor = m.Sensor.find_one({m.Sensor.sensor_name: "living"})
+        sensor = m.AirSensor.find_one({m.AirSensor.name: "living"})
         if sensor is None:
-            sensor = m.Sensor()
+            sensor = m.AirSensor()
             sensor.address = "41000003BE099C28"
-            sensor.sensor_name = "living"
+            sensor.name = "living"
         sensor.temperature = P.DEBUG_LIVING_TEMP[P.DEBUG_LOOP]
         sensor.updated_on = utils.get_base_location_now_date()
         sensor.save_changed_fields(broadcast=False, persist=True)
 
-        sensor = m.Sensor.find_one({m.Sensor.sensor_name: "puffer sus"})
+        sensor = m.AirSensor.find_one({m.AirSensor.name: "puffer sus"})
         if sensor is None:
-            sensor = m.Sensor()
+            sensor = m.AirSensor()
             sensor.address = "AE000003BDFFB928"
-            sensor.sensor_name = "puffer sus"
+            sensor.name = "puffer sus"
         sensor.temperature = P.DEBUG_PUFFER_TEMP[P.DEBUG_LOOP]
         sensor.updated_on = utils.get_base_location_now_date()
         sensor.save_changed_fields(broadcast=False, persist=True)

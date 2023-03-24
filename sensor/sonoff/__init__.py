@@ -197,7 +197,10 @@ def _process_message(msg):
             # "MHZ19B":{"Model":"B","CarbonDioxide":473,"Temperature":26.0},"TempUnit":"C"
             for k, v in obj.items():
                 if k.startswith('BME') or k.startswith('BMP') or k.startswith('MHZ19') or k.startswith('DS18B20'):
-                    sensor_address = '{}_{}'.format(sensor_name, k.lower())
+                    if 'Id' in v:
+                        sensor_address = v['Id']
+                    else:
+                        sensor_address = '{}_{}'.format(sensor_name, k.lower())
                     zone_sensor, sensor = _get_air_sensor(sensor_address=sensor_address, sensor_type=k)
                     if 'Temperature' in v:
                         sensor.temperature = v['Temperature']

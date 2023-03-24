@@ -515,6 +515,7 @@ def _update_devices():
         elif P.grid_importing:
             dev_list = reversed(P.device_list.values())
         for device in dev_list:
+            P.thread_pool_status = 'update {}'.format(device.RELAY_NAME)
             changed = device.grid_updated(P.grid_watts)
             if changed:  # exit to allow main meter to update and recheck if more power changes are needed
                 # L.l.info('Done change action for device {}'.format(device))
