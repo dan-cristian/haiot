@@ -8,7 +8,7 @@ import transport
 
 class P:
     openhab_topic = None
-    ignored_fields = ['updated_on', 'id']
+    ignored_fields = ['updated_on', 'id', 'source_host']
 
     def __init__(self):
         pass
@@ -74,7 +74,11 @@ def rule_openhab_airsensor(obj=m.AirSensor(), change=None):
                 if hasattr(obj, key):
                     val = getattr(obj, key)
                     address = address.replace(":", "_")  # safety conversion for openhab
-                    send_mqtt_openhab(subtopic='airsensor_' + key + '_' + address, payload=val)
+                    if obj.name is None:
+                        name = address
+                    else:
+                        name = obj.name
+                    send_mqtt_openhab(subtopic='airsensor_' + key + '_' + name, payload=val)
                 else:
                     L.l.warning('Field {} in airsensor change list but not in obj={}'.format(key, obj))
 
