@@ -546,7 +546,7 @@
     {"zone_id":52 , "sensor_address": "000003BDFE5D", "sensor_name": "boiler sus", "is_main":true, "target_material": "water", "alt_address": ""},
     {"zone_id":25 , "sensor_address": "000004F296DD", "sensor_name": "boiler mijloc", "target_material": "water", "alt_address": ""},
     {"zone_id":25 , "sensor_address": "000004F28B07", "sensor_name": "boiler jos", "target_material": "water", "alt_address": ""},
-    {"zone_id":2 ,  "sensor_address": "41000003BE099C28", "sensor_name": "living", "is_main":true, "target_material": "air", "alt_address": "28.9C09BE030000"},
+    {"zone_id":2 ,  "sensor_address": "000003BE099C", "sensor_name": "living", "is_main":true, "target_material": "air", "alt_address": "28.9C09BE030000"},
     {"zone_id":8 ,  "sensor_address": "01000001CEF4B326", "sensor_name": "parter", "target_material": "air", "alt_address": ""},
     {"zone_id":1 ,  "sensor_address": "AA000003BDE6C728", "sensor_name": "bucatarie", "is_main":true, "target_material": "air", "alt_address": ""},
     {"zone_id":27 , "sensor_address": "E400000155E72D26", "sensor_name": "pod fata", "target_material": "air", "alt_address": ""},
@@ -674,8 +674,9 @@
     {"id": 20, "name": "gas heater", "address": "000003BDD49D", "zone_id": 19},
     {"id": 21, "name": "gas boiler", "address": "000003BE088E", "zone_id": 19},
     {"id": 22, "name": "solar jos", "address": "000003BE088E", "zone_id": 48},
-    {"id": 25, "name": "front garden", "address": "0516A1CB95FF", "zone_id": 7}
+    {"id": 25, "name": "front garden", "address": "0516A1CB95FF", "zone_id": 7},
 
+    {"id": 30, "name": "living", "address": "000003BE099C", "zone_id": 2, "is_main": true}
   ],
 
   "Pwm": [
