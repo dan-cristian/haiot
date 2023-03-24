@@ -1,7 +1,7 @@
 Number humidity_garden_soil "Soil humidity [%.0f]" <humidity>                                       {mqtt="<[mosquitto:iot/openhab/vad_frontgarden_a0:state:default]"}
 Number humidity_garden_air "Garden air humidity [%.0f]" <humidity>                                  {mqtt="<[mosquitto:iot/openhab/airsensor_humidity_wemoscurteair_bme280:state:default]"}
 Number temperature_garden_air_ex "Garden air temperature ex [%.0f]" <temperature>                   {mqtt="<[mosquitto:iot/openhab/airsensor_temperature_wemoscurteair_bme280:state:default]"}
-Number temperature_garden_air "Garden air temperature [%.0f]" <temperature>                         {mqtt="<[mosquitto:iot/openhab/airsensor_temperature_frontgarden_ds18b20:state:default]"}
+Number temperature_garden_air "Garden air temperature [%.0f]" <temperature>                         {mqtt="<[mosquitto:iot/openhab/airsensor_temperature_front garden:state:default]"}
 
 Number gas_co_curte "Gas CO curte [%.0f]" <gas>                                                     {mqtt="<[mosquitto:iot/openhab/vad_curte_CO:state:default]"}
 Number pressure_curte "Psi curte [%.0f hPa]" <pressure>                                             {mqtt="<[mosquitto:iot/openhab/airsensor_pressure_wemoscurteair_bme280:state:default]"}
