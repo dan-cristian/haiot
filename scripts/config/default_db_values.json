@@ -675,7 +675,7 @@
     {"id": 21, "name": "gas boiler", "address": "000003BE088E", "zone_id": 19},
     {"id": 22, "name": "solar jos", "address": "000003BE088E", "zone_id": 48},
     {"id": 25, "name": "front garden", "address": "0516A1CB95FF", "zone_id": 7},
-
+    {"id": 28, "name": "batterychargectrl", "address": "0516A1E8A6FF", "zone_id": 8},
     {"id": 30, "name": "living", "address": "000003BE099C", "zone_id": 2, "is_main": true}
   ],
 
