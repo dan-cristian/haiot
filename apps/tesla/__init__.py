@@ -91,9 +91,12 @@ def is_battery_full():
         res = soc_full
     else:
         res = P.battery_full
+    if P.battery_full is None and res:
+        L.l.info("Tesla battery state conflicting, force start charge")
+        res = False
     # (P.teslamate_time_to_full_charge is not None and P.teslamate_time_to_full_charge == 0)
     if res is True and P.DEBUG:
-        L.l.info("Tesla battery P.full={}, limit={} level={}".format(
+        L.l.info("Tesla battery seems full P.full={}, limit={} level={}".format(
             P.battery_full, P.charge_limit_soc, P.battery_level))
     return res
 
