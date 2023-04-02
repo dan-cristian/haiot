@@ -322,13 +322,16 @@ class BatteryCharger(Relaydevice):
                 return False
             elif voltage_sensor.voltage <= self.voltage_max_floor:
                 # battery discharged under resting floor, can restart charging
+                L.l.info("Battery charger {} discharged under max, continue".format(self.RELAY_NAME))
                 return super().grid_updated(grid_watts)
             else:
                 # not fully charged
                 if not self.voltage_max_peak_reached:
+                    L.l.info("Battery charger {} full not reached, continue".format(self.RELAY_NAME))
                     return super().grid_updated(grid_watts)
                 else:
                     # battery is resting, don't do anything
+                    L.l.info("Battery charger {} is resting, nothing to do".format(self.RELAY_NAME))
                     return False
         else:
             # not enough voltage data, assume needs charging

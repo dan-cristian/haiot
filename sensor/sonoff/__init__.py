@@ -175,7 +175,7 @@ def _process_message(msg):
                     relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.gpio_pin_code: sensor_name,
                                                         m.ZoneCustomRelay.relay_index: index})
                     if relay is not None:
-                        L.l.info("Got multiple relay {} state={}".format(sensor_name, power_is_on))
+                        L.l.info("Got multiple relay {} indx={} state={}".format(sensor_name, index, power_is_on))
                         relay.relay_is_on = power_is_on
                         # set listeners to false as otherwise on reboot sonoff relays that were on will power- cycle
                         relay.save_changed_fields(broadcast=False, persist=True, listeners=False)
