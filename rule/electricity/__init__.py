@@ -90,7 +90,8 @@ class Relaydevice:
         # get relay status to check for user forced start
         power_on = self.is_power_on()
         if power_on is None:
-            power_on = False
+            # assume charger is on fixme read real status
+            power_on = True
         if grid_watts <= 0:
             # start device if exporting and there is enough surplus
             export_watts = -grid_watts

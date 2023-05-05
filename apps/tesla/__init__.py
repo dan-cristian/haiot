@@ -87,7 +87,8 @@ def can_auto_charge(vehicle_id=1):
 
 def is_battery_full():
     if P.charge_limit_soc is not None:
-        soc_full = P.battery_level >= P.charge_limit_soc
+        soc_full = (P.battery_level is not None) and (P.battery_level >= P.charge_limit_soc) or \
+                   (P.teslamate_battery_level is not None) and (P.teslamate_battery_level >= P.teslamate_soc)
         res = soc_full
     else:
         res = P.battery_full
@@ -96,8 +97,8 @@ def is_battery_full():
         res = False
     # (P.teslamate_time_to_full_charge is not None and P.teslamate_time_to_full_charge == 0)
     if res is True and P.DEBUG:
-        L.l.info("Tesla battery seems full P.full={}, limit={} level={}".format(
-            P.battery_full, P.charge_limit_soc, P.battery_level))
+        L.l.info("Tesla battery seems full P.full={}, limit={} level={} mate_level={}".format(
+            P.battery_full, P.charge_limit_soc, P.battery_level, P.teslamate_battery_level))
     return res
 
 
@@ -375,7 +376,10 @@ def _process_message(msg):
                 P.battery_full = False
                 L.l.info("Set Tesla battery as not full")
         if P.teslamate_time_to_full_charge > 0:
+            L.l.info("Set tesla battery level to None to force charge")
             P.battery_full == False
+            P.battery_level = None
+            P.teslamate_battery_level = None
     if "state" in msg.topic:
         value = "{}".format(msg.payload).replace("b", "").replace("\\", "").replace("'", "")
         P.car_state[car_id] == value
