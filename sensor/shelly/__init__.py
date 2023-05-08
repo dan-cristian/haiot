@@ -98,7 +98,7 @@ def _process_message(msg):
                             sensor.total_energy_day_start = sensor.total_energy
                             P.total_energy_day_update[sensor.name] = datetime.datetime.now().day  #
                         if sensor.total_energy_last is not None:
-                            sensor.total_energy_now = sensor.total_energy - sensor.total_energy_last
+                            sensor.total_energy_now = max(0, sensor.total_energy - sensor.total_energy_last)
                         sensor.total_energy_last = sensor.total_energy
                     elif atoms[4] == "returned_energy":
                         sensor.energy_export = float(val)
@@ -117,7 +117,7 @@ def _process_message(msg):
                             P.total_energy_returned_day_update[sensor.name] = datetime.datetime.now().day
                         if sensor.total_energy_returned_last is not None:
                             sensor.total_energy_returned_now = \
-                                sensor.total_energy_returned - sensor.total_energy_returned_last
+                                max(0, sensor.total_energy_returned - sensor.total_energy_returned_last)
                         sensor.total_energy_returned_last = sensor.total_energy_returned
                     elif atoms[4] == "reactive_power":
                         sensor.reactive_power = float(val)
@@ -158,7 +158,7 @@ def _process_message(msg):
                     sensor.total_energy_last = float(en_text)
                     if prev_energy is None:
                         prev_energy = sensor.total_energy_last
-                    sensor.total_energy_now = sensor.total_energy_last - prev_energy
+                    sensor.total_energy_now = max(0, sensor.total_energy_last - prev_energy)
                 sensor.save_changed_fields(persist=True)
 
 
