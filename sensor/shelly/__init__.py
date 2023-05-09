@@ -158,6 +158,7 @@ def _process_message(msg):
                     sensor.total_energy_last = float(en_text)
                     if prev_energy is None:
                         prev_energy = sensor.total_energy_last
+                    # might be a  bug, negative value returned after power loss
                     sensor.total_energy_now = max(0, sensor.total_energy_last - prev_energy)
                 sensor.save_changed_fields(persist=True)
 

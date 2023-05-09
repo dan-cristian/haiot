@@ -87,8 +87,10 @@ def can_auto_charge(vehicle_id=1):
 
 def is_battery_full():
     if P.charge_limit_soc is not None:
-        soc_full = (P.battery_level is not None) and (P.battery_level >= P.charge_limit_soc) or \
-                   (P.teslamate_battery_level is not None) and (P.teslamate_battery_level >= P.teslamate_soc)
+        soc_full = (P.battery_level is not None and P.charge_limit_soc is not None) and\
+                   (P.battery_level >= P.charge_limit_soc) or \
+                   (P.teslamate_battery_level is not None and P.teslamate_soc is not None) and\
+                   (P.teslamate_battery_level >= P.teslamate_soc)
         res = soc_full
     else:
         res = P.battery_full
