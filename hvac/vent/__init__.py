@@ -72,7 +72,8 @@ def adjust():
             return
 
     # adjust vent system power based on CO2 levels
-    if vent.mode == vent_atrea.P.mode_automatic or vent.mode == vent_atrea.P.mode_default:
+    # vent.mode == vent_atrea.P.mode_automatic or
+    if vent.mode == vent_atrea.P.mode_default:
         co2_vals = []
         co2_ids = []
         co2_sensors = {}
