@@ -497,7 +497,7 @@ class P:
         relay = 'batterycharge_4'  # index 2, flaky
         P.device_list[relay] = BatteryCharger(relay_name=relay, avg_consumption=700,  # 725
                                               supports_breaks=True, min_on_interval=6, state_change_interval=3,
-                                              voltage_sensor_name="batterycharge monitor 3",
+                                              voltage_sensor_name="house battery",
                                               voltage_max_limit=28.6, voltage_max_floor=27.2)
         relay = 'waterheater_relay'
         P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=2900,
