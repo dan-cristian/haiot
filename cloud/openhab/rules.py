@@ -15,7 +15,7 @@ class P:
 
 
 def send_mqtt_openhab(subtopic, payload):
-    transport.send_message_topic(payload, P.openhab_topic + "/" + subtopic)
+    transport.send_message_topic(topic=P.openhab_topic + "/" + subtopic, json=payload)
 
 #  OUTBOUND RULES START
 

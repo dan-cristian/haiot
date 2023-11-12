@@ -204,7 +204,7 @@
     {"id":696, "active":true, "start_order":596, "name":"rule.electricity", "host_name":"tuf"},
 
     {"id":703, "active":true, "start_order":3, "name":"health_monitor", "host_name":"nvr"},
-    {"id":709, "active":true, "start_order":9, "name":"hvac.heat", "host_name":"nvr"},
+    {"id":709, "active":false, "start_order":9, "name":"hvac.heat", "host_name":"nvr"},
     {"id":719, "active":true, "start_order":19, "name":"cloud.ddns", "host_name":"nvr"},
     {"id":727, "active":true, "start_order":27, "name":"node", "host_name":"nvr"},
     {"id":733, "active":true, "start_order":33, "name":"utility", "host_name":"nvr"},
@@ -449,12 +449,10 @@
     {"relay_pin_name": "batterycharge_4", "zone_id": "8", "gpio_pin_code": "shellyuni-C45BBE5F46B4", "relay_type": "shelly", "relay_index": 1},
 
     {"relay_pin_name": "batterycharge_5", "zone_id": "8", "gpio_pin_code": "shellyuni-C45BBE5F74DA", "relay_type": "shelly", "relay_index": 0},
-    {"relay_pin_name": "batteryfan_1",    "zone_id": "8", "gpio_pin_code": "shellyuni-C45BBE5F74DA", "relay_type": "shelly", "relay_index": 1}
+    {"relay_pin_name": "chargerfan_1",    "zone_id": "8", "gpio_pin_code": "shellyuni-C45BBE5F74DA", "relay_type": "shelly", "relay_index": 1}
   ],
 
   "PowerMonitor": [
-
-    {"id":15, "name":"house battery", "type":"ina", "host_name":"batterychargectrl", "min_voltage":10},
 
     {"id":20, "name":"living ozone", "type":"ina", "host_name":"wemoslivingair"},
     {"id":21, "name":"airfiltered nox", "type":"ina", "host_name":"airfiltered"},
@@ -479,7 +477,7 @@
 
     {"id":65, "name":"batterycharge monitor 1", "type":"shelly", "sensor_index": 0, "host_name":"shellyuni-98CDAC2516CF"},
     {"id":66, "name":"batterycharge monitor 2", "type":"shelly", "sensor_index": 0, "host_name":"shellyuni-C45BBE5F46B4"},
-    {"id":67, "name":"batterycharge monitor 3", "type":"shelly", "sensor_index": 0, "host_name":"shellyuni-C45BBE5F74DA"},
+    {"id":67, "name":"house battery", "type":"shelly", "sensor_index": 0, "host_name":"shellyuni-C45BBE5F74DA"},
 
     {"id":70, "name":"invertermain",  "type":"shelly", "sensor_index": 0, "host_name":"shellyplus2pm-5443b23f8190", "reversed_direction": true}
   ],
@@ -707,7 +705,7 @@
     {"id": 22, "name": "solar jos", "address": "000003BE088E", "zone_id": 48},
     {"id": 25, "name": "front garden", "address": "0516A1CB95FF", "zone_id": 7},
     {"id": 28, "name": "batterycharger_1", "address": "shellyuni-C45BBE5F74DA", "zone_id": 8},
-    {"id": 29, "name": "batterycharger_3", "address": "shellyuni-C45BBE5F74DA", "zone_id": 8},
+    {"id": 29, "name": "batterycharger_3", "address": "shellyuni-98CDAC2516CF", "zone_id": 8},
     {"id": 30, "name": "living", "address": "000003BE099C", "zone_id": 2, "is_main": true}
   ],
 

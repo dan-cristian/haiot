@@ -36,7 +36,7 @@ def send_message_json(json=''):
     #    P.send_thread_lock.release()
 
 
-def send_message_topic(json='', topic=None):
+def send_message_topic(topic, json):
     P.send_json_queue.append([json, topic])
     if P.recv_thread_lock.locked():
         P.recv_thread_lock.release()

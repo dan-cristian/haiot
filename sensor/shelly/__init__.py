@@ -69,7 +69,7 @@ def _process_message(msg):
     # L.l.info("Topic={} payload={}".format(msg.topic, msg.payload))
     atoms = msg.topic.split('/')
     if "adc" in msg.topic:
-        if len(atoms) == 4:
+        if len(atoms) > 2:
             if atoms[2] == "adc":
                 sensor = m.PowerMonitor.find_one({m.PowerMonitor.host_name: atoms[1],
                                                   m.PowerMonitor.type: "shelly",
@@ -77,13 +77,30 @@ def _process_message(msg):
                 if sensor is not None:
                     sensor.voltage = float(msg.payload)
                     sensor.save_changed_fields(broadcast=False, persist=True)
-    if "ext_temperature":
-        if len(atoms) == 4:
+                else:
+                    L.l.warning("Shelly sensor {} not defined in PowerMonitor config, adc={}".format(
+                        atoms[1], msg.payload))
+    if "ext_temperature" in msg.topic:
+        if len(atoms) > 2:
             if atoms[2] == "ext_temperature":
                 airsensor = m.AirSensor.find_one({m.AirSensor.address: atoms[1]})
                 if airsensor is not None:
                     airsensor.temperature = float(msg.payload)
                     airsensor.save_changed_fields(broadcast=False, persist=True)
+                else:
+                    L.l.warning("Shelly sensor {} not defined in AirSensor config, temp={}".format(
+                        atoms[1], msg.payload))
+    if "relay" in msg.topic:
+        if len(msg.topic) > 2:
+            if atoms[2] == "relay":
+                relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.gpio_pin_code: atoms[1]})
+                if relay is not None:
+                    state_on = "{}".format(msg.payload) == "on"
+                    relay.relay_is_on = state_on
+                    relay.save_changed_fields(broadcast=False, persist=True)
+                else:
+                    L.l.warning("Shelly sensor {} not defined in Relay config, state={}".format(
+                        atoms[1], msg.payload))
     if "emeter" in msg.topic:
         if len(atoms) == 5:
             if atoms[2] == "emeter":
@@ -197,15 +214,16 @@ def set_relay_state(relay_name, relay_is_on, relay_index):
     else:
         payload = "off"
     topic = "{}/{}/relay/{}/command".format(P.shelly_topic, relay_name, relay_index)
-    transport.send_message_topic(payload, topic)
+    transport.send_message_topic(topic=topic, json=payload)
+    L.l.info("Set shelly relay {}:{} to on={}".format(relay_name, relay_index, relay_is_on))
     return None
 
 
 def _get_relay_status(relay_name, relay_index):
-    payload = ""
-    topic = "{}/{}/relay/{}".format(P.shelly_topic, relay_name, relay_index)
-    transport.send_message_topic(payload, topic)
-
+    # payload = "off"
+    # topic = "{}/{}/relay/{}".format(P.shelly_topic, relay_name, relay_index)
+    # transport.send_message_topic(payload, topic)
+    pass
 
 def post_init():
     if P.initialised:
@@ -214,7 +232,10 @@ def post_init():
         # m.ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME,
         for relay in relays:
             L.l.info('Reading shelly sensor {}'.format(relay.gpio_pin_code))
-            _get_relay_status(relay.gpio_pin_code, relay.relay_index)
+            if relay.relay_pin_name == "chargerfan_1":
+                set_relay_state(relay.gpio_pin_code, True, relay.relay_index)
+            else:
+                set_relay_state(relay.gpio_pin_code, False, relay.relay_index)
 
 
 def thread_run():

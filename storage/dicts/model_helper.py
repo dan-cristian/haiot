@@ -361,7 +361,7 @@ class ModelBase(metaclass=OrderedClassMembers):
                 # mqtt_topic = out_rec[P.mqtt_pub_topic_field]
                 L.l.info("Mqtt broadcast {} on non-default topic {}".format(class_name, mqtt_topic))
                 # send to limited traffic topic for low cpu devices etc
-                transport.send_message_topic(json=js, topic=mqtt_topic)
+                transport.send_message_topic(topic=mqtt_topic, json=js)
             else:
                 # send to main topic
                 transport.send_message_json(json=js)

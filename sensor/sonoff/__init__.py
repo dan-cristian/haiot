@@ -311,13 +311,13 @@ def set_relay_state(relay_name, relay_is_on, relay_index=None):
     else:
         relay_suffix = str(relay_index)
     L.l.info('Set sonoff relay {} to {}'.format(relay_name, relay_is_on))
-    transport.send_message_topic(payload, topic + 'cmnd/' + relay_name + '/POWER' + relay_suffix)
+    transport.send_message_topic(topic=topic + 'cmnd/' + relay_name + '/POWER' + relay_suffix, json=payload)
     return relay_is_on
 
 
 def _get_relay_status(relay_name):
     topic = P.sonoff_topic.replace('#', '')
-    transport.send_message_topic('', topic + 'cmnd/' + relay_name + '/Power1')
+    transport.send_message_topic(topic=topic + 'cmnd/' + relay_name + '/Power1', json='')
 
 
 '''Read all mac addresses from config files'''
