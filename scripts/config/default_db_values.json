@@ -3,6 +3,7 @@
     {"id":1,  "priority": 10, "name":"netbook", "machine_type":"raspberry"},
     {"id":2,  "priority": 12, "name":"tuf", "machine_type":"raspberry"},
     {"id":3,  "priority": 3, "name":"pi-face", "machine_type":"raspberry"},
+    {"id":4,  "priority": 15, "name":"nvr", "machine_type":"linux"},
     {"id":6,  "priority": 6, "name":"pi-power", "machine_type":"raspberry"},
     {"id":7,  "priority": 7, "name":"pidash", "machine_type":"raspberry"},
     {"id":8,  "priority": 8, "name":"pizero", "machine_type":"raspberry"},
@@ -202,6 +203,28 @@
     {"id":695, "active":true, "start_order":595, "name":"rule", "host_name":"tuf"},
     {"id":696, "active":true, "start_order":596, "name":"rule.electricity", "host_name":"tuf"},
 
+    {"id":703, "active":true, "start_order":3, "name":"health_monitor", "host_name":"nvr"},
+    {"id":709, "active":true, "start_order":9, "name":"hvac.heat", "host_name":"nvr"},
+    {"id":719, "active":true, "start_order":19, "name":"cloud.ddns", "host_name":"nvr"},
+    {"id":727, "active":true, "start_order":27, "name":"node", "host_name":"nvr"},
+    {"id":733, "active":true, "start_order":33, "name":"utility", "host_name":"nvr"},
+    {"id":741, "active":false, "start_order":41, "name":"cloud.alexa", "host_name":"nvr"},
+    {"id":745, "active":true, "start_order":45, "name":"cloud.openhab", "host_name":"nvr"},
+    {"id":746, "active":true, "start_order":46, "name":"cloud.owntracks", "host_name":"nvr"},
+    {"id":751, "active":true, "start_order":51, "name":"sensor.solar_aps", "host_name":"nvr"},
+    {"id":757, "active":true, "start_order":57, "name":"sensor.sonoff", "host_name":"nvr"},
+    {"id":761, "active":true, "start_order":61, "name":"sensor.shelly", "host_name":"nvr"},
+    {"id":770, "active":true, "start_order":70, "name":"music", "host_name":"nvr"},
+    {"id":775, "active":true, "start_order":75, "name":"devices.vent_atrea", "host_name":"nvr"},
+    {"id":720, "active":true, "start_order":20, "name":"test", "host_name":"nvr"},
+    {"id":773, "active":true, "start_order":73, "name":"apps.air_sensor_upload", "host_name":"nvr"},
+    {"id":777, "active":false, "start_order":77, "name":"sensor.radoneye", "host_name":"nvr"},
+    {"id":779, "active":false, "start_order":79, "name":"hvac.vent", "host_name":"nvr"},
+    {"id":781, "active":false, "start_order":81, "name":"devices.smartbms", "host_name":"nvr"},
+    {"id":782, "active":true, "start_order":82, "name":"devices.esphome", "host_name":"nvr"},
+    {"id":792, "active":false, "start_order":92, "name":"apps.tesla", "host_name":"nvr"},
+    {"id":795, "active":true, "start_order":595, "name":"rule", "host_name":"nvr"},
+    {"id":796, "active":true, "start_order":596, "name":"rule.electricity", "host_name":"nvr"},
 
     {"id":809, "active":true, "start_order":9, "name":"hvac.heat", "host_name":"homew"},
     {"id":819, "active":true, "start_order":19, "name":"cloud.ddns", "host_name":"homew"},
@@ -419,10 +442,14 @@
     {"relay_pin_name": "front_gate_relay_test_2", "zone_id": "7", "gpio_pin_code": "0:out:1", "gpio_host_name": "netbook", "relay_type": "piface", "expire":  2},
     {"relay_pin_name": "blackwater_pump_relay_test", "zone_id": "9", "gpio_pin_code": "sonoff-basic-3", "relay_type": "sonoff"},
 
-    {"relay_pin_name": "batterychargectrl_1", "zone_id": "8", "gpio_pin_code": "batterychargectrl", "relay_type": "sonoff", "relay_index": 1},
-    {"relay_pin_name": "batterychargectrl_2", "zone_id": "8", "gpio_pin_code": "batterychargectrl", "relay_type": "sonoff", "relay_index": 2},
-    {"relay_pin_name": "batterychargectrl_3", "zone_id": "8", "gpio_pin_code": "batterychargectrl", "relay_type": "sonoff", "relay_index": 3},
-    {"relay_pin_name": "batterychargectrl_4", "zone_id": "8", "gpio_pin_code": "batterychargectrl", "relay_type": "sonoff", "relay_index": 4}
+    {"relay_pin_name": "batterycharge_1", "zone_id": "8", "gpio_pin_code": "shellyuni-98CDAC2516CF", "relay_type": "shelly", "relay_index": 0},
+    {"relay_pin_name": "batterycharge_2", "zone_id": "8", "gpio_pin_code": "shellyuni-98CDAC2516CF", "relay_type": "shelly", "relay_index": 1},
+
+    {"relay_pin_name": "batterycharge_3", "zone_id": "8", "gpio_pin_code": "shellyuni-C45BBE5F46B4", "relay_type": "shelly", "relay_index": 0},
+    {"relay_pin_name": "batterycharge_4", "zone_id": "8", "gpio_pin_code": "shellyuni-C45BBE5F46B4", "relay_type": "shelly", "relay_index": 1},
+
+    {"relay_pin_name": "batterycharge_5", "zone_id": "8", "gpio_pin_code": "shellyuni-C45BBE5F74DA", "relay_type": "shelly", "relay_index": 0},
+    {"relay_pin_name": "batteryfan_1",    "zone_id": "8", "gpio_pin_code": "shellyuni-C45BBE5F74DA", "relay_type": "shelly", "relay_index": 1}
   ],
 
   "PowerMonitor": [
@@ -446,11 +473,15 @@
     {"id":44, "name":"solar l3",    "type":"shelly", "sensor_index": 0, "host_name":"shellyem-244CAB431B3A"},
     {"id":45, "name":"heatpump l3", "type":"shelly", "sensor_index": 1, "host_name":"shellyem-244CAB431B3A"},
 
-    {"id":61, "name":"outdoor l1",    "type":"shelly", "sensor_index": 0, "host_name":"shellyem3-485519C9ED73"},
-    {"id":62, "name":"outdoor l2",    "type":"shelly", "sensor_index": 1, "host_name":"shellyem3-485519C9ED73"},
-    {"id":63, "name":"outdoor l3",    "type":"shelly", "sensor_index": 2, "host_name":"shellyem3-485519C9ED73"},
+    {"id":61, "name":"outdoor l1", "type":"shelly", "sensor_index": 0, "host_name":"shellyem3-485519C9ED73"},
+    {"id":62, "name":"outdoor l2", "type":"shelly", "sensor_index": 1, "host_name":"shellyem3-485519C9ED73"},
+    {"id":63, "name":"outdoor l3", "type":"shelly", "sensor_index": 2, "host_name":"shellyem3-485519C9ED73"},
 
-    {"id":64, "name":"invertermain",  "type":"shelly", "sensor_index": 0, "host_name":"shellyplus2pm-5443b23f8190", "reversed_direction": true}
+    {"id":65, "name":"batterycharge monitor 1", "type":"shelly", "sensor_index": 0, "host_name":"shellyuni-98CDAC2516CF"},
+    {"id":66, "name":"batterycharge monitor 2", "type":"shelly", "sensor_index": 0, "host_name":"shellyuni-C45BBE5F46B4"},
+    {"id":67, "name":"batterycharge monitor 3", "type":"shelly", "sensor_index": 0, "host_name":"shellyuni-C45BBE5F74DA"},
+
+    {"id":70, "name":"invertermain",  "type":"shelly", "sensor_index": 0, "host_name":"shellyplus2pm-5443b23f8190", "reversed_direction": true}
   ],
 
   "TemperatureTarget": [
@@ -675,7 +706,8 @@
     {"id": 21, "name": "gas boiler", "address": "000003BE088E", "zone_id": 19},
     {"id": 22, "name": "solar jos", "address": "000003BE088E", "zone_id": 48},
     {"id": 25, "name": "front garden", "address": "0516A1CB95FF", "zone_id": 7},
-    {"id": 28, "name": "batterychargectrl", "address": "0516A1E8A6FF", "zone_id": 8},
+    {"id": 28, "name": "batterycharger_1", "address": "shellyuni-C45BBE5F74DA", "zone_id": 8},
+    {"id": 29, "name": "batterycharger_3", "address": "shellyuni-C45BBE5F74DA", "zone_id": 8},
     {"id": 30, "name": "living", "address": "000003BE099C", "zone_id": 2, "is_main": true}
   ],
 

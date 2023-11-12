@@ -7,7 +7,7 @@ from common import Constant
 from common import utils
 from pydispatch import dispatcher
 from main import thread_pool
-from sensor import sonoff
+from sensor import sonoff, shelly
 from gpio import io_common
 # from gpio import std_gpio
 from gpio import pcf8574_gpio
@@ -113,6 +113,8 @@ def relay_set(gpio_pin_index_bcm=None, gpio_pin_type=None, gpio_board_index=None
 def set_relay_state(pin_code, relay_is_on, relay_type, relay_index):
     if relay_type == Constant.GPIO_PIN_TYPE_SONOFF and sonoff.P.initialised:
         res = sonoff.set_relay_state(relay_name=pin_code, relay_is_on=relay_is_on, relay_index=relay_index)
+    elif relay_type == Constant.GPIO_PIN_TYPE_SHELLY and shelly.P.initialised:
+        res = shelly.set_relay_state(relay_name=pin_code, relay_is_on=relay_is_on, relay_index=relay_index)
     elif relay_type == Constant.GPIO_PIN_TYPE_PI_PCF8574 and pcf8574_gpio.P.initialised:
         res = pcf8574_gpio.set_pin_value(pin_index=int(pin_code), pin_value=not relay_is_on)
     elif P.has_zwave and relay_type == Constant.GPIO_PIN_TYPE_ZWAVE and zwave.P.initialised:

@@ -67,8 +67,24 @@ def _get_air_sensor(sensor_address, sensor_type):
 # http://192.168.0.31/settings?mqtt_update_period=2
 def _process_message(msg):
     # L.l.info("Topic={} payload={}".format(msg.topic, msg.payload))
+    atoms = msg.topic.split('/')
+    if "adc" in msg.topic:
+        if len(atoms) == 4:
+            if atoms[2] == "adc":
+                sensor = m.PowerMonitor.find_one({m.PowerMonitor.host_name: atoms[1],
+                                                  m.PowerMonitor.type: "shelly",
+                                                  m.PowerMonitor.sensor_index: int(atoms[3])})
+                if sensor is not None:
+                    sensor.voltage = float(msg.payload)
+                    sensor.save_changed_fields(broadcast=False, persist=True)
+    if "ext_temperature":
+        if len(atoms) == 4:
+            if atoms[2] == "ext_temperature":
+                airsensor = m.AirSensor.find_one({m.AirSensor.address: atoms[1]})
+                if airsensor is not None:
+                    airsensor.temperature = float(msg.payload)
+                    airsensor.save_changed_fields(broadcast=False, persist=True)
     if "emeter" in msg.topic:
-        atoms = msg.topic.split('/')
         if len(atoms) == 5:
             if atoms[2] == "emeter":
                 val = "{}".format(msg.payload).replace("b", "").replace("\\", "").replace("'", "")
@@ -131,7 +147,6 @@ def _process_message(msg):
                 L.l.warning("Invalid sensor topic {}".format(msg.topic))
     # shelly 2PM Plus
     if "switch:" in msg.topic:
-        atoms = msg.topic.split('/')
         if len(atoms) == 4:
             index = int(atoms[3].split("switch:")[1])
             sensor = m.PowerMonitor.find_one({m.PowerMonitor.host_name: atoms[1],
@@ -175,18 +190,31 @@ def mqtt_on_message(client, userdata, msg):
         threading.current_thread().name = "idle_mqtt_shelly"
 
 
-def set_relay_state(relay_name, relay_is_on):
+def set_relay_state(relay_name, relay_is_on, relay_index):
+    # shellies/shellyuni-<deviceid>/relay/<i>/command accepts on, off or toggle
+    if relay_is_on:
+        payload = "on"
+    else:
+        payload = "off"
+    topic = "{}/{}/relay/{}/command".format(P.shelly_topic, relay_name, relay_index)
+    transport.send_message_topic(payload, topic)
     return None
 
 
-def _get_relay_status(relay_name):
-    # topic = P.shelly_topic.replace('#', '')
-    # transport.send_message_topic('', topic + 'cmnd/' + relay_name + '/Power1')
-    pass
+def _get_relay_status(relay_name, relay_index):
+    payload = ""
+    topic = "{}/{}/relay/{}".format(P.shelly_topic, relay_name, relay_index)
+    transport.send_message_topic(payload, topic)
 
 
 def post_init():
-    pass
+    if P.initialised:
+        # force sonoff sensors to send their status
+        relays = m.ZoneCustomRelay.find({m.ZoneCustomRelay.relay_type: Constant.GPIO_PIN_TYPE_SHELLY})
+        # m.ZoneCustomRelay.gpio_host_name: Constant.HOST_NAME,
+        for relay in relays:
+            L.l.info('Reading shelly sensor {}'.format(relay.gpio_pin_code))
+            _get_relay_status(relay.gpio_pin_code, relay.relay_index)
 
 
 def thread_run():
@@ -204,7 +232,7 @@ def unload():
 
 def init():
     L.l.info('Shelly module initialising')
-    P.shelly_topic = str(get_json_param(Constant.P_MQTT_TOPIC_SHELLY)) + "/#"
-    mqtt_io.add_message_callback(P.shelly_topic, mqtt_on_message)
+    P.shelly_topic = str(get_json_param(Constant.P_MQTT_TOPIC_SHELLY))
+    mqtt_io.add_message_callback(P.shelly_topic + "/#", mqtt_on_message)
     # thread_pool.add_interval_callable(thread_run, P.check_period)
     P.initialised = True

@@ -186,6 +186,7 @@ class Constant:
     GPIO_PIN_TYPE_PI_PCF8574 = 'pcf8574'
     GPIO_PIN_TYPE_ZWAVE = 'zwave'
     GPIO_PIN_TYPE_SONOFF = 'sonoff'
+    GPIO_PIN_TYPE_SHELLY = 'shelly'
     GPIO_PIN_DIRECTION_IN = 'in'
     GPIO_PIN_DIRECTION_OUT = 'out'
 
