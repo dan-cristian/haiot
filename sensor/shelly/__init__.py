@@ -99,8 +99,9 @@ def _process_message(msg):
                     relay.relay_is_on = state_on
                     relay.save_changed_fields(broadcast=False, persist=True)
                 else:
-                    L.l.warning("Shelly sensor {} not defined in Relay config, state={}".format(
-                        atoms[1], msg.payload))
+                    #L.l.warning("Shelly sensor {} not defined in Relay config, state={}".format(
+                    #    atoms[1], msg.payload))
+                    pass
     if "emeter" in msg.topic:
         if len(atoms) == 5:
             if atoms[2] == "emeter":
