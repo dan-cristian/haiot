@@ -6,7 +6,7 @@ for reuse and refreshed automatically. The vehicle option codes are loaded from
 
 # Author: Tim Dorssers
 
-__version__ = '2.4.0'
+__version__ = '2.8.0'
 
 import os
 import ast
@@ -16,11 +16,14 @@ import base64
 import hashlib
 import logging
 import pkgutil
+import datetime
 import webbrowser
+import stat
 try:
     from urlparse import urljoin
 except ImportError:
     from urllib.parse import urljoin
+from collections import defaultdict, namedtuple
 import requests
 from requests_oauthlib import OAuth2Session
 from requests.exceptions import *
@@ -34,6 +37,7 @@ BASE_URL = 'https://owner-api.teslamotors.com/'
 SSO_BASE_URL = 'https://auth.tesla.com/'
 SSO_CLIENT_ID = 'ownerapi'
 STREAMING_BASE_URL = 'wss://streaming.vn.teslamotors.com/'
+APP_USER_AGENT = 'TeslaApp/4.10.0'
 
 # Setup module logging
 logger = logging.getLogger(__name__)
@@ -62,13 +66,18 @@ class Tesla(OAuth2Session):
     cache_dumper: (optional) Function with one argument, the cache dict.
     sso_base_url: (optional) URL of SSO service, set to `https://auth.tesla.cn/`
                   if your email is registered in another region.
-    kwargs: (optional) Extra arguments for the Session constructor.
+    code_verifier (optional): PKCE code verifier string.
+    app_user_agent (optional): X-Tesla-User-Agent string.
+
+    Extra keyword arguments to pass to OAuth2Session constructor using `kwargs`:
+    state (optional): A state string for CSRF protection.
     """
 
     def __init__(self, email, verify=True, proxy=None, retry=0, timeout=10,
                  user_agent=__name__ + '/' + __version__, authenticator=None,
                  cache_file='cache.json', cache_loader=None, cache_dumper=None,
-                 sso_base_url=None, **kwargs):
+                 sso_base_url=None, code_verifier=None,
+                 app_user_agent=APP_USER_AGENT, **kwargs):
         super(Tesla, self).__init__(client_id=SSO_CLIENT_ID, **kwargs)
         if not email:
             raise ValueError('`email` is not set')
@@ -81,7 +90,7 @@ class Tesla(OAuth2Session):
         self.endpoints = {}
         self.sso_base_url = sso_base_url or SSO_BASE_URL
         self._auto_refresh_url = None
-        self.code_verifier = None
+        self.code_verifier = code_verifier
         # Set OAuth2Session properties
         self.scope = ('openid', 'email', 'offline_access')
         self.redirect_uri = SSO_BASE_URL + 'void/callback'
@@ -90,6 +99,7 @@ class Tesla(OAuth2Session):
         self.token_updater = self._token_updater
         self.mount('https://', requests.adapters.HTTPAdapter(max_retries=retry))
         self.headers.update({'Content-Type': 'application/json',
+                             'X-Tesla-User-Agent': app_user_agent,
                              'User-Agent': user_agent})
         self.verify = verify
         if proxy:
@@ -151,28 +161,48 @@ class Tesla(OAuth2Session):
             return response.json(object_hook=JsonDict)
         return response.text
 
-    def authorization_url(self, url='oauth2/v3/authorize', **kwargs):
+    @staticmethod
+    def new_code_verifier():
+        """ Generate code verifier for PKCE as per RFC 7636 section 4.1 """
+        result = base64.urlsafe_b64encode(os.urandom(32)).rstrip(b'=')
+        logger.debug('Generated new code verifier %s.',
+                     result.decode() if isinstance(result, bytes) else result)
+        return result
+
+    def authorization_url(self, url='oauth2/v3/authorize',
+                          code_verifier=None, **kwargs):
         """ Overriddes base method to form an authorization URL with PKCE
-        extension for Tesla's SSO service. Raises HTTPError.
+        extension for Tesla's SSO service.
 
         url (optional): Authorization endpoint url.
+        code_verifier (optional): PKCE code verifier string.
 
         Extra keyword arguments to pass to base method using `kwargs`:
         state (optional): A state string for CSRF protection.
 
-        Return type: String
+        Return type: String or None
         """
         if self.authorized:
             return None
         # Generate code verifier and challenge for PKCE (RFC 7636)
-        self.code_verifier = base64.urlsafe_b64encode(os.urandom(32)).rstrip(b'=')
+        self.code_verifier = code_verifier or self.new_code_verifier()
         unencoded_digest = hashlib.sha256(self.code_verifier).digest()
         code_challenge = base64.urlsafe_b64encode(unencoded_digest).rstrip(b'=')
         # Prepare for OAuth 2 Authorization Code Grant flow
         url = urljoin(self.sso_base_url, url)
         kwargs['code_challenge'] = code_challenge
         kwargs['code_challenge_method'] = 'S256'
-        return super(Tesla, self).authorization_url(url, **kwargs)[0]
+        without_hint, state = super(Tesla, self).authorization_url(url, **kwargs)
+        # Detect account's registered region
+        kwargs['login_hint'] = self.email
+        kwargs['state'] = state
+        with_hint = super(Tesla, self).authorization_url(url, **kwargs)[0]
+        response = self.get(with_hint, allow_redirects=False)
+        if response.is_redirect:
+            with_hint = response.headers['Location']
+            self.sso_base_url = urljoin(with_hint, '/')
+            logger.debug('New SSO service URL %s', self.sso_base_url)
+        return with_hint if response.ok else without_hint
 
     def fetch_token(self, token_url='oauth2/v3/token', **kwargs):
         """ Overriddes base method to sign into Tesla's SSO service using
@@ -182,6 +212,7 @@ class Tesla(OAuth2Session):
 
         Extra keyword arguments to pass to base method using `kwargs`:
         authorization_response (optional): Authorization response URL.
+        code_verifier (optional): Code verifier cryptographic random string.
 
         Return type: dict
         """
@@ -230,7 +261,7 @@ class Tesla(OAuth2Session):
 
         sign_out (optional): sign out using system's default web browser.
 
-        Return type: String
+        Return type: String or None
         """
         if not self.authorized:
             return None
@@ -262,7 +293,9 @@ class Tesla(OAuth2Session):
         try:
             with open(self.cache_file) as infile:
                 cache = json.load(infile)
-        except (IOError, ValueError):
+        except (IOError, ValueError) as e:
+            logger.warning('Cannot load cache: %s',
+                           self.cache_file, exc_info=True)
             cache = {}
         return cache
 
@@ -271,14 +304,16 @@ class Tesla(OAuth2Session):
         try:
             with open(self.cache_file, 'w') as outfile:
                 json.dump(cache, outfile)
-        except IOError as ioex:
-            logger.error('Cache not updated, {}, curdir={}'.format(ioex, os.getcwd()))
+            os.chmod(self.cache_file, (stat.S_IWUSR | stat.S_IRUSR | stat.S_IRGRP))
+        except IOError:
+            logger.error('Cache not updated')
         else:
             logger.debug('Updated cache')
 
     def _token_updater(self, token=None):
         """ Handles token persistency. Raises ValueError. """
-        self.token = token or self.token
+        if token:
+            return  # Don't update token twice when auto refreshing
         cache = self.cache_loader()
         if not isinstance(cache, dict):
             raise ValueError('`cache_loader` must return dict')
@@ -288,7 +323,7 @@ class Tesla(OAuth2Session):
             self.cache_dumper(cache)
         # Read token from cache
         elif self.email in cache:
-            self.sso_base_url = cache[self.email].get('url', SSO_BASE_URL)
+            self.sso_base_url = cache[self.email].get('url', self.sso_base_url)
             self.token = cache[self.email].get('sso', {})
             if not self.token:
                 return
@@ -501,13 +536,16 @@ class Vehicle(JsonDict):
 
     def option_code_list(self):
         """ Returns a list of known vehicle option code titles """
+        codes = self['option_codes'] if self['option_codes'] else ''
         return list(filter(None, [self.decode_option(code)
-                                  for code in self['option_codes'].split(',')]))
+                                  for code in codes.split(',')]))
 
     def get_vehicle_data(self):
         """ A rollup of all the data request endpoints plus vehicle config.
         Raises HTTPError when vehicle is not online. """
-        self.update(self.api('VEHICLE_DATA')['response'])
+        self.update(self.api('VEHICLE_DATA', endpoints='location_data;'
+                             'charge_state;climate_state;vehicle_state;'
+                             'gui_settings;vehicle_config')['response'])
         self.timestamp = time.time()
         return self
 
@@ -526,18 +564,6 @@ class Vehicle(JsonDict):
         """ Lists vehicle charging history data points """
         return self.api('VEHICLE_CHARGE_HISTORY')['response']
 
-    def get_user(self, device_country='US', device_language='EN'):
-        """ Retrieve user account data """
-        return self.tesla.api('USER', vin=self['vin'],
-                              deviceCountry=device_country,
-                              deviceLanguage=device_language)['data']
-
-    def get_user_details(self, device_country='US', device_language='EN'):
-        """ Retrieve user account details """
-        return self.tesla.api('USER_ACCOUNT_GET_DETAILS', vin=self['vin'],
-                              deviceCountry=device_country,
-                              deviceLanguage=device_language)['data']
-
     def mobile_enabled(self):
         """ Checks if the Mobile Access setting is enabled in the car. Raises
         HTTPError when vehicle is in service or not online. """
@@ -548,9 +574,8 @@ class Vehicle(JsonDict):
     def compose_image(self, view='STUD_3QTR', size=640, options=None):
         """ Returns a PNG formatted composed vehicle image. Valid views are:
         STUD_3QTR, STUD_SEAT, STUD_SIDE, STUD_REAR and STUD_WHEEL """
-        if options is None:
-            logger.warning('`compose_image` requires `options` to be set for '
-                           'an accurate image')
+        if options is None and self['option_codes'] is None:
+            raise ValueError('`compose_image` requires `options` to be set')
         # Derive model from VIN and other properties from (given) option codes
         params = {'model': 'm' + self['vin'][3].lower(),
                   'bkba_opt': 1, 'view': view, 'size': size,
@@ -563,14 +588,13 @@ class Vehicle(JsonDict):
         return response.content
 
     def __missing__(self, key):
-        """ Get all the data request endpoints on-the-fly. Raises KeyError. """
+        """ Get cached data when accessed. Raises KeyError on invalid key. """
         if key not in self.get_vehicle_data():
             raise KeyError(key)
         return self[key]
 
     def dist_units(self, miles, speed=False):
-        """ Format and convert distance or speed to GUI setting units. Raises
-        HTTPError when vehicle is not online. """
+        """ Format and convert distance or speed to GUI setting units """
         if miles is None:
             return None
         # Lookup GUI settings of the vehicle
@@ -579,14 +603,35 @@ class Vehicle(JsonDict):
         return '%.1f %s' % (miles, 'mph' if speed else 'mi')
 
     def temp_units(self, celcius):
-        """ Format and convert temperature to GUI setting units. Raises
-        HTTPError when vehicle is not online. """
+        """ Format and convert temperature to GUI setting units """
         if celcius is None:
             return None
         # Lookup GUI settings of the vehicle
         if 'F' in self['gui_settings']['gui_temperature_units']:
             return '%.1f F' % (celcius * 1.8 + 32)
         return '%.1f C' % celcius
+
+    def gui_time(self, timestamp_ms=0):
+        """ Returns timestamp or current time formatted to GUI setting """
+        tm = time.localtime(timestamp_ms / 1000 or None)
+        # Lookup GUI settings of the vehicle
+        if self['gui_settings']['gui_24_hour_time']:
+            return time.strftime('%H:%M:%S', tm)
+        return time.strftime('%I:%M:%S %p', tm)
+
+    def last_seen(self):
+        """ Returns vehicle last seen natural time. """
+        units = ((60, 'a second'), (60, 'a minute'), (24, 'an hour'),
+                 (7, 'a day'), (4.35, 'a week'), (12, 'a month'), (0, 'a year'))
+        diff = time.time() - self['charge_state']['timestamp'] / 1000
+        if diff >= 1:
+            for length, unit in units:
+                if diff < length or not length:
+                    if diff > 1.5:
+                        unit = '%d %ss' % (round(diff), unit.split()[1])
+                    return unit + ' ago'
+                diff /= length
+        return 'just now'
 
     def decode_vin(self):
         """ Returns decoded VIN as dict """
@@ -663,12 +708,22 @@ class Product(JsonDict):
         self.tesla = tesla
 
     def api(self, name, **kwargs):
-        """ Endpoint request with battery_id or site_id path variable """
-        pathvars = {'battery_id': self['id'], 'site_id': self['energy_site_id']}
-        return self.tesla.api(name, pathvars, **kwargs)
+        """ Endpoint request with site_id path variable """
+        path_vars = {'site_id': self['energy_site_id']}
+        return self.tesla.api(name, path_vars, **kwargs)
+
+    def get_site_info(self):
+        """ Retrieve current site/battery information """
+        self.update(self.api('SITE_CONFIG')['response'])
+        return self
+
+    def get_site_data(self):
+        """ Retrieve current site/battery live status """
+        self.update(self.api('SITE_DATA')['response'])
+        return self
 
     def get_calendar_history_data(
-            self, kind='savings', period='day', start_date=None,
+            self, kind='energy', period='day', start_date=None,
             end_date=time.strftime('%Y-%m-%dT%H:%M:%S.000Z'),
             installation_timezone=None, timezone=None, tariff=None):
         """ Retrieve live status of product
@@ -686,14 +741,13 @@ class Product(JsonDict):
         """
         return self.api('CALENDAR_HISTORY_DATA', kind=kind, period=period,
                         start_date=start_date, end_date=end_date,
-                        timezone=timezone,
                         installation_timezone=installation_timezone,
-                        tariff=tariff)['response']
+                        timezone=timezone, tariff=tariff)['response']
 
     def get_history_data(
-            self, kind='savings', period='day', start_date=None,
+            self, kind='energy', period='day', start_date=None,
             end_date=time.strftime('%Y-%m-%dT%H:%M:%S.000Z'),
-            installation_timezone=None, timezone=None, tariff=None):
+            installation_timezone=None, timezone=None):
         """ Retrieve live status of product
         kind: A telemetry type of 'backup', 'energy', 'power',
               'self_consumption', 'time_of_use_energy', and
@@ -705,13 +759,11 @@ class Product(JsonDict):
         start_date: The state date in the data requested in the json format
                     '2021-02-27T07:59:59.999Z'
         installation_timezone: Timezone of installation location for 'savings'
-        tariff: Unclear format use in 'savings' only
         """
         return self.api('HISTORY_DATA', kind=kind, period=period,
                         start_date=start_date, end_date=end_date,
-                        timezone=timezone,
                         installation_timezone=installation_timezone,
-                        tariff=tariff)['response']
+                        timezone=timezone)['response']
 
     def command(self, name, **kwargs):
         """ Wrapper method for product command response error handling """
@@ -721,28 +773,158 @@ class Product(JsonDict):
         raise ProductError(response.get('message'))
 
 
+class BatteryTariffPeriodCost(
+        namedtuple('BatteryTariffPeriodCost', ['buy', 'sell', 'name'])):
+    """ Represents the costs of a tariff period
+    buy: A float containing the import price
+    sell: A float containing the export price
+    name: The name for the period, must be 'ON_PEAK', 'PARTIAL_PEAK', 'OFF_PEAK',
+    or 'SUPER_OFF_PEAK'
+    """
+    __slots__ = ()
+
+
+class BatteryTariffPeriod(
+        namedtuple('BatteryTariffPeriod', ['cost', 'start', 'end'])):
+    """ Represents a time period of a tariff
+    cost: A BatteryTariffPeriodCost object representing the cost for this
+    time period
+    start: A datetime.time object representing the start time of the period
+    end: A datetime.time object representing the end time of the period
+    """
+    __slots__ = ()
+
+
 class Battery(Product):
     """ Powerwall class """
 
-    def get_battery_data(self):
-        """ Retrieve detailed state and configuration of the battery """
-        self.update(self.api('BATTERY_DATA')['response'])
-        return self
-
     def set_operation(self, mode):
         """ Set battery operation to self_consumption, backup or autonomous """
-        return self.command('BATTERY_OPERATION_MODE', default_real_mode=mode)
+        return self.command('OPERATION_MODE', default_real_mode=mode)
 
     def set_backup_reserve_percent(self, percent):
         """ Set the minimum backup reserve percent for that battery """
         return self.command('BACKUP_RESERVE',
                             backup_reserve_percent=int(percent))
 
+    def set_import_export(
+            self, allow_grid_charging=None, allow_battery_export=None):
+        """ Sets the battery grid import and export settings
+        allow_grid_charging: Optional bool argument indicating if charging from
+        the grid is allowed.
+        allow_battery_export: Optional bool argument indicating if export to the
+        grid is allowed.
+        """
+        params = {}
+        if allow_grid_charging is not None:
+            val = not allow_grid_charging
+            params['disallow_charge_from_grid_with_solar_installed'] = val
+        if allow_battery_export is not None:
+            val = 'battery_ok' if allow_battery_export else 'pv_only'
+            params['customer_preferred_export_rule'] = val
+        # This endpoint returns an empty responce instead of a result code, so
+        # api() is called instead of using command()
+        self.api('ENERGY_SITE_IMPORT_EXPORT_CONFIG', **params)
+
+    def get_tariff(self):
+        """ Get the tariff rate data """
+        return self.api('SITE_TARIFF')['response']
+
+    def set_tariff(self, tariff_data):
+        """ Set the tariff rate data. The data can be created manually, or
+        generated by create_tariff """
+        return self.command('TIME_OF_USE_SETTINGS',
+                            tou_settings={"tariff_content": tariff_data})
+
+    @staticmethod
+    def create_tariff(default_price, periods, provider, plan):
+        """ Creates a correctly formatted dictionary of tariff data
+        default_price: A BatteryTariffPeriodCost object representing the price
+        of the background time period
+        periods: A list of BatteryTariffPeriod objects representing times with
+        higher prices than the background time period
+        provider: The name of the energy provider
+        plan: The name of the plan
+        """
+        midnight_start_time = datetime.time(hour=0)
+        midnight_end_time = datetime.time(hour=23, minute=59, second=59)
+        background_time = [[midnight_start_time, midnight_end_time]]
+
+        # Subtract each of the time periods from the background time
+        costs = defaultdict(list)
+        for period in periods:
+            slot_found = False
+            # go through items in the background time searching for a slot that
+            # completely encompas the period we're trying to add
+            for (index, bg_period) in enumerate(background_time[:]):
+                if bg_period[0] <= period.start and period.end <= bg_period[1]:
+                    slot_found = True
+                    # If the period matches the start/end times, then we just
+                    # need to adjust the existing background time slot. Otherwise
+                    # we need to split it.
+                    if bg_period[0] == period.start:
+                        background_time[index][0] = period.end
+                    elif bg_period[1] == period.end:
+                        background_time[index][1] = period.start
+                    else:
+                        background_time.append([period.end, bg_period[1]])
+                        background_time[index][1] = period.start
+            if not slot_found:
+                return None
+            # Update the list of prices
+            costs[period.cost].append(period)
+
+            # The loop above can leave background time slots with zero duration.
+            # It's difficult to filter them out above as the list indexes can get
+            # out of sync as we end up modifying the array being iterated over.
+            # As a result it's easier to filter out invalid background slots now.
+            background_time = list(filter(lambda t: t[0] != t[1],
+                                          background_time))
+
+        # add the background time slots to the costs array
+        costs[default_price] = [BatteryTariffPeriod(default_price, x[0], x[1])
+                                for x in background_time]
+
+        tou_periods = {}
+        buy_price_info = {}
+        sell_price_info = {}
+        for cost in sorted(costs, reverse=True):
+            name = cost.name
+            buy_price_info[name] = cost.buy
+            sell_price_info[name] = cost.sell
+            periods_for_cost = []
+            for period in costs[cost]:
+                # Map the second before midnight back to midnight, after
+                # the time comparisons. This is required to get the json
+                # in the right format
+                if period.end == midnight_end_time:
+                    period = period._replace(end=midnight_start_time)
+                periods_for_cost.append({
+                    "fromDayOfWeek": 0, "fromHour": period.start.hour,
+                    "fromMinute": period.start.minute, "toDayOfWeek": 6,
+                    "toHour": period.end.hour,
+                    "toMinute": period.end.minute})
+            tou_periods[name] = periods_for_cost
+
+        # Build the final dict
+        demand_changes = {"ALL": {"ALL": 0}, "Summer": {}, "Winter": {}}
+        daily_charges = [{"name":   "Charge", "amount": 0}]
+        seasons = {"Summer": {"fromMonth": 1, "fromDay": 1, "toDay": 31,
+                              "toMonth": 12, "tou_periods": tou_periods},
+                   "Winter": {"tou_periods": {}}}
+        return JsonDict(
+            daily_charges=daily_charges, demand_charges=demand_changes,
+            name=plan, utility=provider, seasons=seasons,
+            energy_charges={"ALL": {"ALL": 0}, "Summer": buy_price_info,
+                            "Winter": {}},
+            sell_tariff={"daily_charges": daily_charges,
+                         "demand_charges": demand_changes, "name": plan,
+                         "utility": provider, "seasons": seasons,
+                         "energy_charges": {"ALL": {"ALL": 0},
+                                            "Summer": sell_price_info,
+                                            "Winter": {}}})
+
 
 class SolarPanel(Product):
     """ Solar panel class """
-
-    def get_site_data(self):
-        """ Retrieve current site generation data """
-        self.update(self.api('SITE_DATA')['response'])
-        return self
+    pass

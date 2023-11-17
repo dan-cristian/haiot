@@ -231,13 +231,16 @@ def vehicle_update(car_id=1):
                 car.save_changed_fields(broadcast=False, persist=True)
             ds = vehicle_data['drive_state']
             if ds is not None:
-                P.car_latitude[car_id] = ds['latitude']
-                P.car_longitude[car_id] = ds['longitude']
-                if (abs(P.home_latitude - P.car_latitude[1]) < 0.0002) \
-                        and (abs(P.home_longitude - P.car_longitude[1]) < 0.0002):
-                    P.can_charge_at_home = True
+                if 'latitude' in ds and 'longitude' in ds:
+                    P.car_latitude[car_id] = ds['latitude']
+                    P.car_longitude[car_id] = ds['longitude']
+                    if (abs(P.home_latitude - P.car_latitude[1]) < 0.0002) \
+                            and (abs(P.home_longitude - P.car_longitude[1]) < 0.0002):
+                        P.can_charge_at_home = True
+                    else:
+                        P.can_charge_at_home = False
                 else:
-                    P.can_charge_at_home = False
+                    L.l.warning("Cannot find latitude/longitude in Tesla response, got this:{}".format(ds))
             return act_amps
         else:
             L.l.error("Tesla not online, state={}".format(vehicle['state']))
@@ -350,10 +353,11 @@ def _process_message(msg):
         P.teslamate_plugged_in[car_id] = (value == b'true')
         L.l.info("Tesla is plugged in={}".format(P.teslamate_plugged_in[car_id]))
     if "charger_actual_current" in msg.topic:
-        value = int(msg.payload)
-        P.teslamate_charging_amp[car_id] = value
-        P.teslamate_last_charging_update = datetime.now()
-        L.l.info("Tesla charger actual current = {}".format(value))
+        if msg.payload != b'':
+            value = int(msg.payload)
+            P.teslamate_charging_amp[car_id] = value
+            P.teslamate_last_charging_update = datetime.now()
+        L.l.info("Tesla charger actual current = {}".format(msg.payload))
     if "charger_power" in msg.topic:
         value = int(msg.payload)
         P.is_charging[car_id] = (value == 1)

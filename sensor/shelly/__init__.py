@@ -95,9 +95,10 @@ def _process_message(msg):
             if atoms[2] == "relay":
                 relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.gpio_pin_code: atoms[1]})
                 if relay is not None:
-                    state_on = "{}".format(msg.payload) == "on"
+                    state_on = msg.payload == b'on'
                     relay.relay_is_on = state_on
-                    relay.save_changed_fields(broadcast=False, persist=True)
+                    # disable listeners as mqtt updates come late and relay will toggle
+                    relay.save_changed_fields(broadcast=False, persist=True, listeners=False)
                 else:
                     #L.l.warning("Shelly sensor {} not defined in Relay config, state={}".format(
                     #    atoms[1], msg.payload))

@@ -64,8 +64,9 @@ def _process_message(msg):
                 rec.t2 = float(msg.payload)
                 rec.save_changed_fields(persist=True)
             elif 'charging_cycles' in topic:
-                rec.cycles = int(msg.payload)
-                rec.save_changed_fields(persist=True)
+                if msg.payload != b'nan':
+                    rec.cycles = int(msg.payload)
+                    rec.save_changed_fields(persist=True)
             elif 'balancing_current' in topic:
                 pass
                 # rec.t2 = float(msg.payload)

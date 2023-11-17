@@ -214,6 +214,7 @@
     {"id":751, "active":true, "start_order":51, "name":"sensor.solar_aps", "host_name":"nvr"},
     {"id":757, "active":true, "start_order":57, "name":"sensor.sonoff", "host_name":"nvr"},
     {"id":761, "active":true, "start_order":61, "name":"sensor.shelly", "host_name":"nvr"},
+    {"id":765, "active":true, "start_order":65, "name":"gpio", "host_name":"nvr"},
     {"id":770, "active":true, "start_order":70, "name":"music", "host_name":"nvr"},
     {"id":775, "active":true, "start_order":75, "name":"devices.vent_atrea", "host_name":"nvr"},
     {"id":720, "active":true, "start_order":20, "name":"test", "host_name":"nvr"},

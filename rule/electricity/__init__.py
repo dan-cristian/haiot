@@ -60,6 +60,7 @@ class Relaydevice:
             if valid_power_status:
                 self.last_state_on = datetime.now()
 
+
     def is_power_on(self):
         self.power_is_on = rule_common.get_custom_relay(self.RELAY_NAME)
         if self.state == DeviceState.AUTO_STOP and self.power_is_on:
@@ -91,7 +92,7 @@ class Relaydevice:
         power_on = self.is_power_on()
         if power_on is None:
             # assume charger is on fixme read real status
-            power_on = True
+            power_on = False
         if grid_watts <= 0:
             # start device if exporting and there is enough surplus
             export_watts = -grid_watts
@@ -323,7 +324,7 @@ class BatteryCharger(Relaydevice):
                 return False
             elif voltage_sensor.voltage <= self.voltage_max_floor:
                 # battery discharged under resting floor, can restart charging
-                L.l.info("Battery charger {} discharged under max, continue".format(self.RELAY_NAME))
+                # L.l.info("Battery charger {} discharged under max, continue".format(self.RELAY_NAME))
                 self.voltage_max_peak_reached = False
                 return super().grid_updated(grid_watts)
             else:
@@ -537,7 +538,7 @@ def rule_energy_export(obj=m.PowerMonitor(), change=None):
         # L.l.info('Got power {} change={}'.format(obj.name, change))
         if obj.name == 'main l1':
             if P.emulate_export is True:
-                P.grid_watts = random.randint(-800, -300)
+                P.grid_watts = random.randint(-900, -800)
             else:
                 P.grid_watts = obj.power
                 P.grid_watts_last_update = datetime.now()
