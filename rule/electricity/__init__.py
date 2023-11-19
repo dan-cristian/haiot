@@ -442,6 +442,7 @@ class TeslaCharger(Relaydevice):
 class P:
     initialised = False
     grid_watts = None
+    inverter_watts = 0  # power produced by inverter, to be subtracted from house power
     grid_watts_last_update = datetime.min  # used to detect if main meter is down, to switch to secondary
     grid_importing = None
     grid_exporting = None
@@ -523,7 +524,7 @@ def _update_devices():
             dev_list = reversed(P.device_list.values())
         for device in dev_list:
             P.thread_pool_status = 'update {}'.format(device.RELAY_NAME)
-            changed = device.grid_updated(P.grid_watts)
+            changed = device.grid_updated(P.grid_watts + P.inverter_watts)
             if changed:  # exit to allow main meter to update and recheck if more power changes are needed
                 # L.l.info('Done change action for device {}'.format(device))
                 if P.emulate_export is True:
@@ -534,6 +535,9 @@ def _update_devices():
 
 # energy rule
 def rule_energy_export(obj=m.PowerMonitor(), change=None):
+    if change is not None and 'power' in change:
+        if obj.name == 'invertermain':
+            P.inverter_watts = max(0, obj.power)  # keep only positive values
     if change is not None and 'power' in change:
         # L.l.info('Got power {} change={}'.format(obj.name, change))
         if obj.name == 'main l1':

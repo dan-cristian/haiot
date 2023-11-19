@@ -91,11 +91,17 @@ def _process_message(msg):
                     L.l.warning("Shelly sensor {} not defined in AirSensor config, temp={}".format(
                         atoms[1], msg.payload))
     if "relay" in msg.topic:
-        if len(msg.topic) > 2:
+        if len(atoms) > 3:
             if atoms[2] == "relay":
-                relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.gpio_pin_code: atoms[1]})
+                if atoms[3].isnumeric():
+                    relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.gpio_pin_code: atoms[1],
+                                                        m.ZoneCustomRelay.relay_index: int(atoms[3])})
+                else:
+                    relay = None
                 if relay is not None:
                     state_on = msg.payload == b'on'
+                    L.l.info("Relay {}:{} is {}, state_on={}".format(relay.relay_pin_name, atoms[3],
+                                                                     msg.payload, state_on))
                     relay.relay_is_on = state_on
                     # disable listeners as mqtt updates come late and relay will toggle
                     relay.save_changed_fields(broadcast=False, persist=True, listeners=False)
@@ -194,6 +200,17 @@ def _process_message(msg):
                         prev_energy = sensor.total_energy_last
                     # might be a  bug, negative value returned after power loss
                     sensor.total_energy_now = max(0, sensor.total_energy_last - prev_energy)
+                if "output" in payload:
+                    switch_state_on = payload.split('"output":')[1].split(",")[0] == "true"
+                    relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.gpio_pin_code: atoms[1],
+                                                        m.ZoneCustomRelay.relay_index: index})
+                    if relay is not None:
+                        relay.relay_is_on = switch_state_on
+                        # disable listeners as mqtt updates come late and relay will toggle
+                        relay.save_changed_fields(broadcast=False, persist=True, listeners=False)
+                    else:
+                        # relay not define in config
+                        pass
                 sensor.save_changed_fields(persist=True)
 
 
