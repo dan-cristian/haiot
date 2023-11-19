@@ -223,7 +223,7 @@
     {"id":779, "active":false, "start_order":79, "name":"hvac.vent", "host_name":"nvr"},
     {"id":781, "active":false, "start_order":81, "name":"devices.smartbms", "host_name":"nvr"},
     {"id":782, "active":true, "start_order":82, "name":"devices.esphome", "host_name":"nvr"},
-    {"id":792, "active":false, "start_order":92, "name":"apps.tesla", "host_name":"nvr"},
+    {"id":792, "active":true, "start_order":92, "name":"apps.tesla", "host_name":"nvr"},
     {"id":795, "active":true, "start_order":595, "name":"rule", "host_name":"nvr"},
     {"id":796, "active":true, "start_order":596, "name":"rule.electricity", "host_name":"nvr"},
 
