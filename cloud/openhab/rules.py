@@ -248,6 +248,18 @@ def rule_openhab_powermonitor(obj=m.PowerMonitor(), change=None):
                     L.l.warning('Field {} in power change list but not in obj={}'.format(key, obj))
 
 
+def rule_openhab_solarpanel(obj=m.SolarPanel(), change=None):
+    if change is not None:
+        id = obj.id
+        for key in change:
+            if key not in P.ignored_fields:
+                if hasattr(obj, key):
+                    val = getattr(obj, key)
+                    send_mqtt_openhab(subtopic='solarpanel_' + key + '_' + id, payload=val)
+                else:
+                    L.l.warning('Field {} in solarpanel change list but not in obj={}'.format(key, obj))
+
+
 def rule_openhab_musicloved(obj=m.MusicLoved(), change=None):
     if change is not None:
         for key in change:

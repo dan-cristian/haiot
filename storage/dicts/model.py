@@ -562,9 +562,15 @@ class Inverter(ModelBase):
 class SolarPanel(ModelBase):
     """key=id"""
     id = ''  # 408000059274-1
+    ecu_type = ''
+    panel_max_watts = 0
+    ecu_max_watts = 0
+    panel_angle = 0
+    panel_orientation = 0
+    location = ''  # where is the solar panel physically located
     power = 0
     voltage = 0
     temperature = 0
-    grid_frequency = 0
+    grid_frequency = 0.0
     grid_voltage = 0
     updated_on = datetime.now()

@@ -1,0 +1,23 @@
+sitemap music label="Solar" {
+
+Frame {
+    Default item=power_408000059274-1
+    Default item=power_408000059274-2
+    Default item=voltage_408000059274-1
+    Default item=voltage_408000059274-2
+    Default item=temp_408000059274-1
+    Default item=temp_408000059274-2
+    Default item=freq_408000059274-1
+    Default item=freq_408000059274-2
+
+    Default item=power_403000301504-A
+    Default item=power_403000301504-B
+    Default item=voltage_403000301504-A
+    Default item=voltage_403000301504-B
+    Default item=temp_403000301504-A
+    Default item=temp_403000301504-B
+    Default item=freq_403000301504-A
+    Default item=freq_403000301504-B
+}
+
+}

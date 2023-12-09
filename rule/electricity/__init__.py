@@ -538,7 +538,6 @@ def rule_energy_export(obj=m.PowerMonitor(), change=None):
     if change is not None and 'power' in change:
         if obj.name == 'invertermain':
             P.inverter_watts = max(0, obj.power)  # keep only positive values
-    if change is not None and 'power' in change:
         # L.l.info('Got power {} change={}'.format(obj.name, change))
         if obj.name == 'main l1':
             if P.emulate_export is True:
@@ -548,9 +547,14 @@ def rule_energy_export(obj=m.PowerMonitor(), change=None):
                 P.grid_watts_last_update = datetime.now()
             # L.l.info('Got rule main watts {}'.format(P.grid_watts))
             _update_devices()
-    else:
-        # L.l.info('Got alternate power {} change={}'.format(obj.name, change))
-        pass
+    if change is not None and 'voltage' in change:
+        if obj.name == 'batterycharge monitor 1':
+            # start inverter if battery has enough voltage
+            if obj.voltage is not None:
+                relay = m.ZoneCustomRelay.find_one({"relay_pin_name": "invertermain_relay"})
+                if relay is not None:
+                    relay.relay_is_on = obj.voltage > 24
+                    relay.save_changed_fields()
 
 
 def rule_energy_utility(obj=m.Utility(), change=None):

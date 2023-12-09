@@ -227,12 +227,22 @@ def mqtt_on_message(client, userdata, msg):
 
 
 def set_relay_state(relay_name, relay_is_on, relay_index):
-    # shellies/shellyuni-<deviceid>/relay/<i>/command accepts on, off or toggle
-    if relay_is_on:
-        payload = "on"
+    if "shellyplus2pm" in relay_name:
+        # 2pm has different mqtt api
+        # https://shelly-api-docs.shelly.cloud/gen2/General/RPCChannels/
+        switch_on = str(relay_is_on).lower()
+        payload = '{"id":123, "src":"user_1", "method":"Switch.Set", "params":{"id":<index>,"on":<on>}}}'
+        payload = payload.replace("<index>", str(relay_index))
+        payload = payload.replace("<on>", switch_on)
+        topic = "{}/{}/rpc".format(P.shelly_topic, relay_name)
     else:
-        payload = "off"
-    topic = "{}/{}/relay/{}/command".format(P.shelly_topic, relay_name, relay_index)
+        # gen 1 API
+        # shellies/shellyuni-<deviceid>/relay/<i>/command accepts on, off or toggle
+        if relay_is_on:
+            payload = "on"
+        else:
+            payload = "off"
+        topic = "{}/{}/relay/{}/command".format(P.shelly_topic, relay_name, relay_index)
     transport.send_message_topic(topic=topic, json=payload)
     L.l.info("Set shelly relay {}:{} to on={}".format(relay_name, relay_index, relay_is_on))
     return None

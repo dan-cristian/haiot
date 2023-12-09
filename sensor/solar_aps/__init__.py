@@ -68,43 +68,28 @@ def parse_panels(inverter):
             next_panel, end_index = utils.parse_text(
                 aps_text, P.start_next_panel[index], P.end_panel[index], start_index=end_index, return_end_index=True)
             found_panel = next_panel is not None
-            if found_panel:
+            panel = m.SolarPanel.find_one({"id": next_panel})
+            if found_panel and panel is not None:
                 watts, ind = utils.parse_text(aps_text, "<td>", " </td>",
                                               start_index=end_index, return_end_index=True)
-                if watts == "-":
-                    watts = None
+                if watts != "-":
+                    panel.power = int(watts.replace("W", "").strip())
                 hertz, ind = utils.parse_text(aps_text, "middle;\\'>", " </td>",
                                              start_index=ind, return_end_index=True)
-                if hertz == "-":
-                    hertz = None
-                else:
-                    hertz = hertz.split(" ")[0]
+                if hertz != "-":
+                    panel.grid_frequency = float(hertz.replace("Hz", "").strip())
                 volt, ind = utils.parse_text(aps_text, "<td>", " </td>",
                                              start_index=ind, return_end_index=True)
-                if volt == "-":
-                    volt = None
-                else:
-                    volt = volt.split(" ")[0]
+                if volt != "-":
+                    panel.voltage = int(volt.replace("V", "").strip())
                 temp, ind = utils.parse_text(aps_text, "middle;\\'>", " </td>",
                                              start_index=ind, return_end_index=True)
-                if temp == "-":
-                    temp = None
-                else:
-                    temp = temp.split(" ")[0]
-                panel = m.SolarPanel.find_one({"id": next_panel})
-                if panel is None:
-                    panel = m.SolarPanel()
-                    panel.id = next_panel
-                if watts is not None:
-                    panel.power = watts
-                if volt is not None:
-                    panel.voltage = volt
-                if hertz is not None:
-                    panel.grid_frequency = hertz
-                if temp is not None:
-                    panel.temperature = temp
-                if watts or volt or hertz or temp:
-                    panel.save_changed_fields(persist=True)
+                if temp != "-":
+                    panel.temperature = temp.replace("&#176;C", "").strip()
+
+                panel.save_changed_fields(persist=True)
+            if panel is None:
+                L.l.warning("No panel found in config with id {}".format(next_panel))
     except Exception as ex:
         L.l.error("Exception on inverter {} panels run, ex={}".format(inverter.name, ex), exc_info=True)
 
