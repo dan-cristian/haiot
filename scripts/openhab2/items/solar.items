@@ -84,6 +84,14 @@ Number grid_voltage_704000184512_2 "Grid Voltage 512-2 [%.0f V]" <energy>   {mqt
 Number temp_704000184512_1 "Temperature 512-1 [%.1f °C]" <temperature>   {mqtt="<[mosquitto:iot/openhab/solarpanel_temperature_704000184512-1:state:default]"}
 Number freq_704000184512_1 "Frequency 512-1 [%.0f Hz]" <energy>   {mqtt="<[mosquitto:iot/openhab/solarpanel_grid_frequency_704000184512-1:state:default]"}
 
+Number power_704000285624_1 "Power 624-1 [%.0f W]" <energy>   {mqtt="<[mosquitto:iot/openhab/solarpanel_power_704000285624-1:state:default]"}
+Number power_704000285624_2 "Power 624-2 [%.0f W]" <energy>   {mqtt="<[mosquitto:iot/openhab/solarpanel_power_704000285624-2:state:default]"}
+Number panel_voltage_704000285624_1 "Panel Voltage 624-1 [%.0f V]" <energy>   {mqtt="<[mosquitto:iot/openhab/solarpanel_panel_voltage_704000285624-1:state:default]"}
+Number panel_voltage_704000285624_2 "Panel Voltage 624-2 [%.0f V]" <energy>   {mqtt="<[mosquitto:iot/openhab/solarpanel_panel_voltage_704000285624-2:state:default]"}
+Number grid_voltage_704000285624_1 "Grid Voltage 624-1 [%.0f V]" <energy>   {mqtt="<[mosquitto:iot/openhab/solarpanel_grid_voltage_704000285624-1:state:default]"}
+Number grid_voltage_704000285624_2 "Grid Voltage 624-2 [%.0f V]" <energy>   {mqtt="<[mosquitto:iot/openhab/solarpanel_grid_voltage_704000285624-2:state:default]"}
+Number temp_704000285624_1 "Temperature 624-1 [%.1f °C]" <temperature>   {mqtt="<[mosquitto:iot/openhab/solarpanel_temperature_704000285624-1:state:default]"}
+Number freq_704000285624_1 "Frequency 624-1 [%.0f Hz]" <energy>   {mqtt="<[mosquitto:iot/openhab/solarpanel_grid_frequency_704000285624-1:state:default]"}
 
 Number power_403000301504_A "Power 504-A [%.0f W]" <energy>   {mqtt="<[mosquitto:iot/openhab/solarpanel_power_403000301504-A:state:default]"}
 Number power_403000301504_B "Power 504-B [%.0f W]" <energy>   {mqtt="<[mosquitto:iot/openhab/solarpanel_power_403000301504-B:state:default]"}
