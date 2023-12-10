@@ -132,7 +132,7 @@ def parse_panels(inverter):
                 # use different start pattern for row 2nd onwards
                 next_panel, end_index = utils.parse_text(aps_text, "<td>", " </td>",
                                                          start_index=end_index, return_end_index=True)
-                found_panel = next_panel is not None
+                found_panel = next_panel is not None and panel is not None
             if panel is None:
                 L.l.warning("No panel found in config with id {}".format(next_panel))
     except Exception as ex:
