@@ -14,6 +14,8 @@ class P:
     end_keyword_ecu = {}
     start_keyword_now_ecu = {}
     end_keyword_now_ecu = {}
+    start_keyword_day_ecu = {}
+    end_keyword_day_ecu = {}
     start_first_panel = {}
     end_panel = {}
     start_next_panel = {}
@@ -36,11 +38,15 @@ class P:
     end_keyword_ecu[1] = ' kWh </td>'
     start_keyword_now_ecu[1] = 'Last System Power</th>\\r\\n        <td>'
     end_keyword_now_ecu[1] = ' W </td>'
+    start_keyword_day_ecu[1] = 'Generation of Current Day</th>\\r\\n        <td>'
+    end_keyword_day_ecu[1] = ' kWh </td>'
 
     start_keyword_ecu[2] = 'Lifetime generation</th>\\r\\n        <td>'
     end_keyword_ecu[2] = ' kWh </td>'
     start_keyword_now_ecu[2] = 'Last System Power</th>\\r\\n        <td>'
     end_keyword_now_ecu[2] = ' W </td>'
+    start_keyword_day_ecu[2] = 'Generation of Current Day</th>\\r\\n        <td>'
+    end_keyword_day_ecu[2] = ' kWh </td>'
 
     start_first_panel[1] = "Reporting Time</th>\\r\\n      </tr>\\r\\n    </thead>\\r\\n    <tbody>\\r\\n        <div>\\r\\n            <tr class=\\'active\\'>\\r\\n        <td>"
     end_panel[1] = " </td>"
@@ -62,10 +68,12 @@ def parse_general(inverter):
         aps_text = str(urllib.request.urlopen(inverter.general_url).read())
         last_power = utils.parse_text(aps_text, P.start_keyword_now_ecu[index], P.end_keyword_now_ecu[index])
         production = utils.parse_text(aps_text, P.start_keyword_ecu[index], P.end_keyword_ecu[index])
+        day_production = utils.parse_text(aps_text, P.start_keyword_day_ecu[index], P.end_keyword_day_ecu[index])
         if production is not None:
             production = production.replace(",", "")
         inverter.last_power = int(last_power)
         inverter.lifetime_generation = float(production)
+        inverter.day_generation = float(day_production)
         inverter.save_changed_fields()
     except Exception as ex:
         L.l.error("Exception on inverter {} general run, ex={}".format(inverter.name, ex))
