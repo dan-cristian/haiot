@@ -120,7 +120,7 @@ def parse_panels(inverter):
                     rep_time, ind = utils.parse_text(aps_text, ">", " </td>",
                                                      start_index=ind, return_end_index=True)
                 end_index = ind
-                panel.save_changed_fields(persist=True)
+                panel.save_changed_fields()
                 # use different start pattern for row 2nd onwards
                 next_panel, end_index = utils.parse_text(aps_text, "<td>", " </td>",
                                                          start_index=end_index, return_end_index=True)
