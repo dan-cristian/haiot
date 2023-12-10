@@ -732,9 +732,9 @@
     {"id": 1, "name": "YCE"}
   ],
 
-  "Inverter": [
-    {"id": 2, "name": "APS PLC ECU", "general_url": "http://192.168.0.40/index.php/home", "panels_url": "http://192.168.0.40/index.php/realtimedata", "type": 1, "enabled": true},
-    {"id": 3, "name": "APS ZIGBEE ECU", "general_url": "http://192.168.0.41/index.php/home", "panels_url": "http://192.168.0.41/index.php/realtimedata", "type": 1, "enabled": true}
+  "MicroInverter": [
+    {"id": 2, "name": "APS PLC", "general_url": "http://192.168.0.40/index.php/home", "panels_url": "http://192.168.0.40/index.php/realtimedata", "type": 1, "enabled": true},
+    {"id": 3, "name": "APS ZIGBEE", "general_url": "http://192.168.0.41/index.php/home", "panels_url": "http://192.168.0.41/index.php/realtimedata", "type": 2, "enabled": true}
   ],
 
   "SolarPanel": [

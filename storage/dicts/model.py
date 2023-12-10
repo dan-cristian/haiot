@@ -549,10 +549,13 @@ class ElectricCar(ModelBase):
     time_to_full_charge = 0  # minutes
 
 
-class Inverter(ModelBase):
+class MicroInverter(ModelBase):
     """key=id"""
     id = 0
     name = ''
+    last_power = 0  # W
+    lifetime_generation = 0.0  # kWh
+    day_generation = 0.0  # kWh
     general_url = ''
     panels_url = ''
     type = ''
@@ -569,7 +572,8 @@ class SolarPanel(ModelBase):
     panel_orientation = 0
     location = ''  # where is the solar panel physically located
     power = 0
-    voltage = 0
+    panel_voltage = 0
+    grid_voltage = 0
     temperature = 0
     grid_frequency = 0.0
     grid_voltage = 0

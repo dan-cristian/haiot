@@ -260,6 +260,18 @@ def rule_openhab_solarpanel(obj=m.SolarPanel(), change=None):
                     L.l.warning('Field {} in solarpanel change list but not in obj={}'.format(key, obj))
 
 
+def rule_openhab_microinverter(obj=m.MicroInverter(), change=None):
+    if change is not None:
+        id = obj.name
+        for key in change:
+            if key not in P.ignored_fields:
+                if hasattr(obj, key):
+                    val = getattr(obj, key)
+                    send_mqtt_openhab(subtopic='microinverter_' + key + '_' + id, payload=val)
+                else:
+                    L.l.warning('Field {} in MicroInverter change list but not in obj={}'.format(key, obj))
+
+
 def rule_openhab_musicloved(obj=m.MusicLoved(), change=None):
     if change is not None:
         for key in change:

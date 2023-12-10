@@ -1,23 +1,54 @@
 sitemap music label="Solar" {
 
 Frame {
+    Default item=power_last_aps_zigbee
+    Default item=power_last_aps_plc
+    Default item=energy_day_aps_zigbee
+    Default item=energy_day_aps_plc
+}
+
+Frame {
     Default item=power_408000059274-1
     Default item=power_408000059274-2
-    Default item=voltage_408000059274-1
-    Default item=voltage_408000059274-2
+    Default item=panel_voltage_408000059274-1
+    Default item=panel_voltage_408000059274-2
+    Default item=grid_voltage_408000059274-1
+    Default item=grid_voltage_408000059274-2
     Default item=temp_408000059274-1
     Default item=temp_408000059274-2
     Default item=freq_408000059274-1
     Default item=freq_408000059274-2
+    
+    Default item=power_704000184512-1
+    Default item=power_704000184512-2
+    Default item=panel_voltage_704000184512-1
+    Default item=panel_voltage_704000184512-2
+    Default item=grid_voltage_704000184512-1
+    Default item=grid_voltage_704000184512-2
+    Default item=temp_704000184512-1
+    Default item=temp_704000184512-2
+    Default item=freq_704000184512-1
+    Default item=freq_704000184512-2
+    
+    
 
     Default item=power_403000301504-A
     Default item=power_403000301504-B
-    Default item=voltage_403000301504-A
-    Default item=voltage_403000301504-B
+    Default item=grid_voltage_403000301504-A
+    Default item=grid_voltage_403000301504-B
     Default item=temp_403000301504-A
     Default item=temp_403000301504-B
     Default item=freq_403000301504-A
     Default item=freq_403000301504-B
+    
+    Default item=power_403000302077-A
+    Default item=power_403000302077-B
+    Default item=grid_voltage_403000302077-A
+    Default item=grid_voltage_403000302077-B
+    Default item=temp_403000302077-A
+    Default item=temp_403000302077-B
+    Default item=freq_403000302077-A
+    Default item=freq_403000302077-B
 }
 
 }
