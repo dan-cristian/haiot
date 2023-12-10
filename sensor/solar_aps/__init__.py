@@ -94,7 +94,10 @@ def parse_panels(inverter):
             if found_panel:
                 row_count += 1
             panel = m.SolarPanel.find_one({"id": next_panel})
-            if found_panel and panel is not None:
+            is_dummy_panel = panel is None
+            if panel is None:
+                panel = m.SolarPanel()
+            if found_panel:
                 watts, ind = utils.parse_text(aps_text, "<td>", " </td>",
                                               start_index=end_index, return_end_index=True)
                 if watts != "-":
@@ -128,13 +131,15 @@ def parse_panels(inverter):
                     rep_time, ind = utils.parse_text(aps_text, ">", " </td>",
                                                      start_index=ind, return_end_index=True)
                 end_index = ind
-                panel.save_changed_fields()
+                if not is_dummy_panel:
+                    panel.save_changed_fields()
                 # use different start pattern for row 2nd onwards
                 next_panel, end_index = utils.parse_text(aps_text, "<td>", " </td>",
                                                          start_index=end_index, return_end_index=True)
-                found_panel = next_panel is not None and panel is not None
+                found_panel = next_panel is not None
             if panel is None:
                 L.l.warning("No panel found in config with id {}".format(next_panel))
+
     except Exception as ex:
         L.l.error("Exception on inverter {} panels run, ex={}".format(inverter.name, ex))
 
