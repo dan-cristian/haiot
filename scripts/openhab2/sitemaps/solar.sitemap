@@ -1,4 +1,4 @@
-sitemap music label="Solar" {
+sitemap solar label="Solar" {
 
 Frame {
     Default item=power_last_aps_zigbee
