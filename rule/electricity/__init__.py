@@ -553,7 +553,7 @@ def rule_energy_export(obj=m.PowerMonitor(), change=None):
             if obj.voltage is not None:
                 relay = m.ZoneCustomRelay.find_one({"relay_pin_name": "invertermain_relay"})
                 if relay is not None:
-                    relay.relay_is_on = obj.voltage > 24
+                    relay.relay_is_on = obj.voltage > 24.4
                     relay.save_changed_fields()
 
 
