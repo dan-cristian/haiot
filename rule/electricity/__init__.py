@@ -453,6 +453,8 @@ class P:
     emulate_export = False # used to test export energy scenarios
     last_state_change = datetime.min
     system_wait_time = 0  # seconds to wait until any device can change state (some relays have latency)
+    bms_min_cell_voltage_list = {}  # dict with all min cell voltages
+    bms_min_cell_voltage = None  # minimum cell voltage in all bms'es
 
     thread_pool_status = None
 
@@ -550,11 +552,12 @@ def rule_energy_export(obj=m.PowerMonitor(), change=None):
     if change is not None and 'voltage' in change:
         if obj.name == 'batterycharge monitor 1':
             # start inverter if battery has enough voltage
-            if obj.voltage is not None:
-                relay = m.ZoneCustomRelay.find_one({"relay_pin_name": "invertermain_relay"})
-                if relay is not None:
-                    relay.relay_is_on = obj.voltage > 24.4
-                    relay.save_changed_fields()
+            #if obj.voltage is not None:
+            #    relay = m.ZoneCustomRelay.find_one({"relay_pin_name": "invertermain_relay"})
+            #    if relay is not None:
+            #        relay.relay_is_on = obj.voltage > 24.4
+            #        relay.save_changed_fields()
+            pass  # replaced with cell voltage monitoring
 
 
 def rule_energy_utility(obj=m.Utility(), change=None):
@@ -574,6 +577,22 @@ def rule_energy_utility(obj=m.Utility(), change=None):
                 P.grid_watts = obj.units_2_delta
                 L.l.info('Using backup sensor for rule main watts={}'.format(P.grid_watts))
                 _update_devices()
+
+
+# energy rule
+def rule_energy_bms_cell(obj=m.Bms(), change=None):
+    if change is not None and change[0].startswith('v0'):
+        min_volt = min(value for value in [obj.v01, obj.v02, obj.v03, obj.v04, obj.v05, obj.v06, obj.v07, obj.v08]
+                       if value is not None)
+        P.bms_min_cell_voltage_list[obj.name] = min_volt
+        for min_val in P.bms_min_cell_voltage_list.values():
+            min_volt = min(min_volt, min_val)
+        if min_volt != P.bms_min_cell_voltage:
+            P.bms_min_cell_voltage = min_volt
+            relay = m.ZoneCustomRelay.find_one({"relay_pin_name": "invertermain_relay"})
+            if relay is not None:
+                relay.relay_is_on = P.bms_min_cell_voltage > 3
+                relay.save_changed_fields()
 
 
 def init():
