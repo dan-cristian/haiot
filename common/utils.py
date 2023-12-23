@@ -293,7 +293,7 @@ def get_my_network_ip_list():
                                                                             socket.SOCK_DGRAM)]][0][1]]) if l][0][0])
     ip_ar = ip.split('.')
     net_addr = ip.replace(ip_ar[len(ip_ar) - 1], "0/24")
-    net_addr = net_addr.replace('10/', '').repplace('/24', '')
+    net_addr = net_addr.replace('10/', '').replace('/24', '')
     # pings all hosts in my network
     try:
         ip_net = ipaddress.ip_network(net_addr)
