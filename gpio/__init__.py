@@ -14,7 +14,7 @@ from gpio import pcf8574_gpio
 import threading
 import prctl
 from gpio import rpi_gpio
-from gpio import pigpio_gpio
+#from gpio import pigpio_gpio
 from storage.model import m
 
 
@@ -208,7 +208,7 @@ def unload():
         # bbb_io.unload()
         piface.unload()
         rpi_gpio.unload()
-        pigpio_gpio.unload()
+        #pigpio_gpio.unload()
         pcf8574_gpio.unload()
     except Exception as ex:
         L.l.error('Error unloading gpio, ex={}'.format(ex), exc_info=True)
@@ -323,13 +323,13 @@ def init():
         # piface.init()
         rpi_gpio.init()
 
-    pigpio_gpio.init()
+    #pigpio_gpio.init()
 
     # if Constant.IS_MACHINE_BEAGLEBONE:
         # bbb_io.init()
         # std_gpio.init()
-    if Constant.is_os_windows():
-        pigpio_gpio.init()
+    #if Constant.is_os_windows():
+    #    pigpio_gpio.init()
     # init last after RPI
     piface.init()
     # init IO Sensors
