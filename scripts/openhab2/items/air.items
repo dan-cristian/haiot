@@ -98,7 +98,6 @@ Number air_humidity_bedroom "Living [%.0f %%]" <humidity>                       
 Number air_temperature_bedroom_ex "Living [%.0f %%]" <temperature>                       {mqtt="<[mosquitto:iot/openhab/airsensor_temperature_wemosbedroomair_bme680:state:default]"}
 
 Number temperature_curte_fata "Curte fata [%.1f °C]" <garden> ["CurrentTemperature"]                {mqtt="<[mosquitto:iot/openhab/temperature_curte fata:state:default]"}
-Number temperature_birou "Birou [%.1f °C]" <temperature>      ["CurrentTemperature"]                {mqtt="<[mosquitto:iot/openhab/temperature_birou:state:default]"}
 Number temperature_bucatarie "Bucatarie [%.1f °C]" <temperature> ["CurrentTemperature"]             {mqtt="<[mosquitto:iot/openhab/temperature_bucatarie:state:default]"}
 Number temperature_dormitor_spate "Dormitor spate [%.1f °C]" <temperature>  ["CurrentTemperature"]  {mqtt="<[mosquitto:iot/openhab/temperature_dormitor spate:state:default]"}
 Number temperature_pod_fata "Pod fata [%.1f °C]" <temperature> ["CurrentTemperature"]               {mqtt="<[mosquitto:iot/openhab/temperature_pod fata:state:default]"}
