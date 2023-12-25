@@ -80,7 +80,7 @@ def rule_openhab_airsensor(obj=m.AirSensor(), change=None):
                         name = obj.name
                     subtopic = 'airsensor_' + key + '_' + name
                     send_mqtt_openhab(subtopic=subtopic, payload=val)
-                    L.l.info("Sent AirSensor openhab {}={}".format(subtopic, val))
+                    # L.l.info("Sent AirSensor openhab {}={}".format(subtopic, val))
                 else:
                     L.l.warning('Field {} in airsensor change list but not in obj={}'.format(key, obj))
 
