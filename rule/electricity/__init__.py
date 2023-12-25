@@ -464,7 +464,7 @@ class P:
     critical_charger_name = "batterycharge_4"  # charger used to recover cells
 
     bms_cell_min_inverter_voltage_protection = 3  # inverter is stopped when a cell reaches this limit
-    bms_cell_inverter_topup_voltage = 3.2
+    bms_cell_inverter_topup_voltage = 3.3
     bms_cell_charge_topup_reached = False  # cell was charged from low voltage to a safety level, inverter can start
     inverter_relay_name = "invertermain_relay"
 
@@ -615,7 +615,7 @@ def rule_energy_bms_cell(obj=m.Bms(), change=None):
                     P.bms_cell_charge_topup_reached = True
                     inverter_relay.relay_is_on = True
                     inverter_relay.save_changed_fields()
-                    L.l.info("Inverter on, min cell voltage>{}".format(P.bms_cell_min_inverter_voltage_protection))
+                    L.l.info("Inverter on, cell voltage reached top-up {}".format(P.bms_cell_inverter_topup_voltage))
 
             # start or stop the charger to maintain cells above safe level
             if P.bms_min_cell_voltage <= P.bms_cell_min_voltage_critical:
