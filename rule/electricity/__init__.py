@@ -634,7 +634,7 @@ def rule_energy_bms_cell(obj=m.Bms(), change=None):
                 charge_relay.relay_is_on = False
                 charge_relay.save_changed_fields()
                 P.bms_cell_critical_charge_recovery_started = False
-                L.l.info("Charge relay {} set to off as recovery cell done".format(charge_relay.pin_name))
+                L.l.info("Charge relay {} set to off as recovery cell done".format(charge_relay.relay_pin_name))
 
 
 def init():
