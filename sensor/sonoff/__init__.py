@@ -351,7 +351,7 @@ def _tasmota_config(config_file, device_name, ip):
                 if "<day>" in line:
                     line = line.replace("<day>", str(utils.get_base_location_now_date().day))
                 line = utils.encode_url_request(line)
-                #line = line.replace(" ", "%20").replace(";", "%3B")
+                # line = line.replace(" ", "%20").replace(";", "%3B")
                 request = tasmota_url.format(ip, line)
                 done = False
                 for i in range(0, 5):
