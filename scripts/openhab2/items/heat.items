@@ -40,7 +40,7 @@ Switch thermo_mode_manual_living "Manual mode" <heating>                       (
 Switch thermo_mode_presence_living "Presence mode" <presence>                       (LIVING_THERMO)                                {mqtt="<[mosquitto:iot/openhab/thermo_mode_presence_living:state:default],>[mosquitto:iot/openhab/cmd/thermo_mode_presence_living:command:*:default]", autoupdate="false"}
 
 Group BIROU_THERMO "Birou Thermostat" [ "Thermostat", "Celsius" ]
-Number temperature_birou "Birou [%.1f °C]" <temperature>                 (BIROU_THERMO) [ "CurrentTemperature" ]           {mqtt="<[mosquitto:iot/openhab/temperature_birou:state:default]"}
+Number temperature_birou "Birou [%.1f °C]" <temperature>                 (BIROU_THERMO) [ "CurrentTemperature" ]           {mqtt="<[mosquitto:iot/openhab/airsensor_temperature_birou:state:default]"}
 Number thermo_target_birou "Birou target [%.1f °C]" <temperature>   (BIROU_THERMO)     [ "TargetTemperature" ]            {mqtt="<[mosquitto:iot/openhab/thermo_target_birou:state:default],>[mosquitto:iot/openhab/cmd/thermo_target_birou:command:*:default]", autoupdate="false"}
 Switch thermo_state_birou "Birou status" <fire>                       (BIROU_THERMO) [ "homekit:HeatingCoolingMode" ]   {mqtt="<[mosquitto:iot/openhab/thermo_state_birou:state:default],>[mosquitto:iot/openhab/cmd/thermo_state_birou:command:*:default]", autoupdate="false"}
 Switch thermo_mode_manual_birou "Manual mode" <heating>                       (BIROU_THERMO)                                {mqtt="<[mosquitto:iot/openhab/thermo_mode_manual_birou:state:default],>[mosquitto:iot/openhab/cmd/thermo_mode_manual_birou:command:*:default]", autoupdate="false"}
