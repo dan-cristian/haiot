@@ -79,7 +79,6 @@ Number ventilation_mode "Ventilation mode [%.0f]" <fan>             {mqtt="<[mos
 Number ventilation_power "Ventilation power [%.0f]" <fan_ceiling>   {mqtt="<[mosquitto:iot/openhab/ventilation_power_level_atrea:state:default]"}
 
 Number air_radon "Radon [%.0f bq/m3]" <smoke>             {mqtt="<[mosquitto:iot/openhab/airsensor_radon_D6_DE_FC_37_8E_F6:state:default]"}
-Number air_co2_living "CO2 living [%.0f ppm]" <carbondioxide>             {mqtt="<[mosquitto:iot/openhab/airsensor_co2_wemoslivingair_mhz19b:state:default]"}
 
 Number air_gas_living "Gas living [%.2f kOhm]" <smoke>                       {mqtt="<[mosquitto:iot/openhab/airsensor_gas_wemoslivingair_bme680:state:default]"}
 Number air_co2_living "CO2 living [%.0f ppm]" <carbondioxide>                       {mqtt="<[mosquitto:iot/openhab/airsensor_co2_wemoslivingair_mhz19b:state:default]"}
