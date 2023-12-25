@@ -602,7 +602,7 @@ def rule_energy_bms_cell(obj=m.Bms(), change=None):
 
         if min_volt != P.bms_min_cell_voltage:
             P.bms_min_cell_voltage = min_volt
-
+            L.l.info("Minimum bms cell voltage is {}".format(P.bms_min_cell_voltage))
             # start or stop the inverter
             inverter_relay = m.ZoneCustomRelay.find_one({"relay_pin_name": P.inverter_relay_name})
             if inverter_relay is not None:
@@ -610,18 +610,23 @@ def rule_energy_bms_cell(obj=m.Bms(), change=None):
                     P.bms_cell_charge_topup_reached = False
                     inverter_relay.relay_is_on = False
                     inverter_relay.save_changed_fields()
+                    L.l.info("Inverter off, min cell voltage<{}".format(P.bms_cell_min_inverter_voltage_protection))
                 if P.bms_min_cell_voltage >= P.bms_cell_inverter_topup_voltage:
                     P.bms_cell_charge_topup_reached = True
                     inverter_relay.relay_is_on = True
                     inverter_relay.save_changed_fields()
+                    L.l.info("Inverter on, min cell voltage>{}".format(P.bms_cell_min_inverter_voltage_protection))
 
             # start or stop the charger to maintain cells above safe level
             if P.bms_min_cell_voltage <= P.bms_cell_min_voltage_critical:
+                L.l.info("Cell voltage {} reached minimum critical level {}".format(P.bms_min_cell_voltage,
+                                                                                    P.bms_cell_min_voltage_critical))
                 P.bms_cell_critical_charge_recovery_started = True
                 charge_relay = m.ZoneCustomRelay.find_one({"relay_pin_name": P.critical_charger_name})
                 if charge_relay is not None:
                     charge_relay.relay_is_on = True
                     charge_relay.save_changed_fields()
+                    L.l.info("Charge relay {} set to on to recover cell".format(charge_relay.pin_name))
             elif (P.bms_cell_critical_charge_recovery_started
                   and P.bms_min_cell_voltage >= P.bms_cell_voltage_critical_recovery):
                 # stop charge once cell is over recovery level
@@ -629,6 +634,7 @@ def rule_energy_bms_cell(obj=m.Bms(), change=None):
                 charge_relay.relay_is_on = False
                 charge_relay.save_changed_fields()
                 P.bms_cell_critical_charge_recovery_started = False
+                L.l.info("Charge relay {} set to off as recovery cell done".format(charge_relay.pin_name))
 
 
 def init():
