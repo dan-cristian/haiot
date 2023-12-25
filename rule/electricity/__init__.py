@@ -327,7 +327,10 @@ class BatteryCharger(Relaydevice):
                 # L.l.info("Battery charger {} discharged under max, continue".format(self.RELAY_NAME))
                 self.voltage_max_peak_reached = False
                 # skip any actions if the charger is currently charging a critical cell (otherwise it will stop charge)
-                if P.bms_cell_critical_charge_recovery_started and self.RELAY_NAME != P.critical_charger_name:
+                if P.bms_cell_critical_charge_recovery_started and self.RELAY_NAME == P.critical_charger_name:
+                    # skip charger actions
+                    return False
+                else:
                     return super().grid_updated(grid_watts)
             else:
                 # not fully charged but over max floor
@@ -444,7 +447,9 @@ class TeslaCharger(Relaydevice):
 class P:
     initialised = False
     grid_watts = None
+    grid_amps = None
     inverter_watts = 0  # power produced by inverter, to be subtracted from house power
+    inverter_amps = 0
     grid_watts_last_update = datetime.min  # used to detect if main meter is down, to switch to secondary
     grid_importing = None
     grid_exporting = None
@@ -549,7 +554,7 @@ def _update_devices():
 
 # energy rule
 def rule_energy_export(obj=m.PowerMonitor(), change=None):
-    if change is not None and 'power' in change:
+    if change is not None and 'current' in change or 'power' in change:
         if obj.name == 'invertermain':
             P.inverter_watts = max(0, obj.power)  # keep only positive values
         # L.l.info('Got power {} change={}'.format(obj.name, change))
@@ -558,6 +563,7 @@ def rule_energy_export(obj=m.PowerMonitor(), change=None):
                 P.grid_watts = random.randint(-900, -800)
             else:
                 P.grid_watts = obj.power
+                P.grid_amps = obj.current
                 P.grid_watts_last_update = datetime.now()
             # L.l.info('Got rule main watts {}'.format(P.grid_watts))
             _update_devices()

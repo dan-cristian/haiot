@@ -119,8 +119,13 @@ def _process_message(msg):
                 if sensor is not None:
                     if atoms[4] == "power":
                         sensor.power = float(val)
+                        if sensor.voltage is not None:
+                            # calculate current as it is not reported sometimes
+                            sensor.current = sensor.power / sensor.voltage
                     elif atoms[4] == "voltage":
                         sensor.voltage = float(val)
+                        if sensor.power is not None:
+                            sensor.current = sensor.power / sensor.voltage
                     elif atoms[4] == "pf":
                         sensor.power_factor = float(val)
                     elif atoms[4] == 'current':
