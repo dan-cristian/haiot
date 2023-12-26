@@ -701,7 +701,7 @@
     {"id": 18, "name": "puffer jos", "address": "000004F34285", "zone_id": 38},
     {"id": 20, "name": "gas heater", "address": "000003BDD49D", "zone_id": 19},
     {"id": 21, "name": "gas boiler", "address": "000003BE088E", "zone_id": 19},
-    {"id": 22, "name": "solar jos", "address": "000003BE088E", "zone_id": 48},
+    {"id": 22, "name": "solar jos",  "address": "000004F3BFA4", "zone_id": 48},
     {"id": 25, "name": "front garden", "address": "3CE1D443623F", "zone_id": 7},
     {"id": 28, "name": "batterycharger_1", "address": "shellyuni-C45BBE5F74DA", "zone_id": 8},
     {"id": 29, "name": "batterycharger_3", "address": "shellyuni-98CDAC2516CF", "zone_id": 8},
