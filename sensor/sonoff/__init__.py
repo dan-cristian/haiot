@@ -207,7 +207,7 @@ def _process_message(msg):
                     if 'Pressure' in v:
                         sensor.pressure = v['Pressure']
                     if 'Humidity' in v:
-                        if 0 < v['Humidity'] < 100:
+                        if 0 < v['Humidity'] <= 100:
                             sensor.humidity = v['Humidity']
                     if 'Gas' in v:
                         sensor.gas = v['Gas']
