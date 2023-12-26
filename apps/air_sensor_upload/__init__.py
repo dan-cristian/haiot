@@ -110,7 +110,7 @@ def upload_sensor():
             pm10 = dust_sensor.pm_10
             P.pm25_updated_on = dust_sensor.updated_on
 
-        air_sensor = m.AirSensor.find_one({m.AirSensor.address: "wemoscurteair_bme280"})
+        air_sensor = m.AirSensor.find_one({m.AirSensor.address: "wemoscurteair_bme680"})
         if air_sensor is not None and P.humidity_updated_on != air_sensor.updated_on:
             # pressure = air_sensor.pressure
             humidity = air_sensor.humidity
@@ -121,7 +121,7 @@ def upload_sensor():
             pressure = air_sensor.pressure
             P.pressure_updated_on = air_sensor.updated_on
 
-        air_sensor2 = m.AirSensor.find_one({m.AirSensor.address: "front_garden_we_ds18b20"})
+        air_sensor2 = m.AirSensor.find_one({m.AirSensor.address: "wemoscurteair_ds18b20"})
         if air_sensor2 is not None and P.temp_updated_on != air_sensor2.updated_on:
             temp = air_sensor2.temperature
             P.temp_updated_on = air_sensor2.updated_on
