@@ -141,6 +141,7 @@ def parse_panels(inverter):
             if panel is None:
                 L.l.warning("No panel found in config with id {}".format(next_panel))
             safe_count += 1
+        L.l.info("APS Solar panel iterations = {}".format(safe_count))
 
     except Exception as ex:
         L.l.error("Exception on inverter {} panels run, ex={}".format(inverter.name, ex))
