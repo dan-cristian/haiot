@@ -90,7 +90,8 @@ def parse_panels(inverter):
         next_panel, end_index = utils.parse_text(
             aps_text, P.start_next_panel[index], P.end_panel[index], start_index=end_index, return_end_index=True)
         found_panel = next_panel is not None
-        while found_panel:
+        safe_count = 0
+        while found_panel or safe_count < 100:
             if found_panel:
                 row_count += 1
             panel = m.SolarPanel.find_one({"id": next_panel})
@@ -139,6 +140,7 @@ def parse_panels(inverter):
                 found_panel = next_panel is not None
             if panel is None:
                 L.l.warning("No panel found in config with id {}".format(next_panel))
+            safe_count += 1
 
     except Exception as ex:
         L.l.error("Exception on inverter {} panels run, ex={}".format(inverter.name, ex))
