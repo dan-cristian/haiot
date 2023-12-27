@@ -28,7 +28,7 @@ while True:
         if not fix_module(iex):
             break
     except Exception as ex:
-        L.l.info('Error importing, ex={}'.format(ex))
+        L.l.info('Error importing rpi-gpio, ex={}'.format(ex))
         break
 
 

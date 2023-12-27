@@ -44,7 +44,7 @@
     {"name": "MQTT_HOST_3", "value": "iot.eclipse.org"},
     {"name": "MQTT_PORT_3", "value": "1883"},
     {"name": "P_PLOTLY_ALTERNATE_CONFIG", "value": "../private_config/.credentials/.plotly.credentials"},
-    {"name": "P_FLASK_WEB_PORT", "value": "8080"},
+    {"name": "P_FLASK_WEB_PORT", "value": "8081"},
     {"name": "P_MOTION_VIDEO_PATH", "value": "/media/temp/motion"},
     {"name": "P_YOUTUBE_CREDENTIAL_FILE", "value": "../private_config/.credentials/.youtube.credentials"},
     {"name": "GMAIL_NOTIFY_FROM_EMAIL", "value": "antonio.gaudi33@gmail.com"},
