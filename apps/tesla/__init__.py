@@ -25,6 +25,8 @@ class P:
     api_requests = 0
     refresh_request_pause = 30  # seconds between each status update request
     stop_charge_interval = 300  # seconds interval with amps set to 0 after which charging is stopped
+    last_too_many_requests_date = datetime.min
+    too_many_request_pause_interval = 60  # wait until making next API req
     last_refresh_request = datetime.min
     scheduled_charging_mode = None
     user_charging_mode = False  # True is user started the charging, so don't run automatic charging setup
@@ -142,15 +144,18 @@ def set_charging_amps(amps, car_id=1):
     if vehicle_valid(car_id):
         if amps <= P.MAX_AMP:
             try:
-                P.vehicles[car_id - 1].command('CHARGING_AMPS', charging_amps=amps)
-                P.charging_amp[car_id] = amps
-                P.api_requests += 1
-                if amps == 0:
-                    if P.last_charging_stopped[car_id] is None:  # only update if previously was charging
-                        P.last_charging_stopped[car_id] = datetime.now()
+                if can_run_api_cmd():
+                    P.vehicles[car_id - 1].command('CHARGING_AMPS', charging_amps=amps)
+                    P.charging_amp[car_id] = amps
+                    P.api_requests += 1
+                    if amps == 0:
+                        if P.last_charging_stopped[car_id] is None:  # only update if previously was charging
+                            P.last_charging_stopped[car_id] = datetime.now()
+                    else:
+                        P.last_charging_stopped[car_id] = None  # reset timestamp
+                    return True
                 else:
-                    P.last_charging_stopped[car_id] = None  # reset timestamp
-                return True
+                    L.l.warning("Skipping set Tesla charging amps due to too many requests")
             except Exception as ex:
                 L.l.error("Unable to set Tesla charging amps: {}".format(ex))
                 try_connection_recovery(car_id)
@@ -292,7 +297,8 @@ def stop_charge(car_id=1):
     if vehicle_valid(car_id):
         L.l.info("Stopping Tesla charging")
         try:
-            P.vehicles[car_id - 1].command('STOP_CHARGE')
+            run_api_cmd(P.vehicles[car_id - 1], 'STOP_CHARGE')
+            # P.vehicles[car_id - 1].command('STOP_CHARGE')
             P.is_charging[car_id] = False
             P.last_charging_stopped[car_id] = None
             P.api_requests += 1
@@ -310,12 +316,25 @@ def stop_charge(car_id=1):
         return False
 
 
+def can_run_api_cmd():
+    return (datetime.now() - P.last_too_many_requests_date).total_seconds() > P.too_many_request_pause_interval
+
+
+def run_api_cmd(vehicle, command):
+    if can_run_api_cmd():
+        vehicle.command(command)
+    else:
+        L.l.warning("Skipping Tesla API call, waiting due to many requests error")
+        raise Exception("Not making Tesla API call")
+
+
 def start_charge(car_id=1):
     if vehicle_valid(car_id):
         L.l.info("Starting Tesla charging")
         vehicle = P.vehicles[car_id - 1]
         try:
-            vehicle.command('START_CHARGE')
+            run_api_cmd(vehicle, 'START_CHARGE')
+            # vehicle.command('START_CHARGE')
             P.api_requests += 1
             P.charging_stopped = False
             P.charging_status_date = datetime.now()
@@ -339,6 +358,9 @@ def start_charge(car_id=1):
             if "vehicle unavailable" in "{}".format(ex):
                 L.l.warning("Tesla unavailable on start charge, trying to wake")
                 vehicle.sync_wake_up()
+            if "Too Many Requests" in "{}".format(ex):
+                L.l.warning("Tesla API error, too many requests: {}".format(ex))
+                P.last_too_many_requests_date = datetime.now()
             L.l.error("Got error when trying to start Tesla charging, err={}".format(ex))
         return False
 
@@ -383,7 +405,7 @@ def _process_message(msg):
                 L.l.info("Set Tesla battery as not full")
         if P.teslamate_time_to_full_charge > 0:
             L.l.info("Set tesla battery level to None to force charge")
-            P.battery_full == False
+            P.battery_full = False
             P.battery_level = None
             P.teslamate_battery_level = None
     if "state" in msg.topic:

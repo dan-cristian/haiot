@@ -91,7 +91,7 @@ def parse_panels(inverter):
             aps_text, P.start_next_panel[index], P.end_panel[index], start_index=end_index, return_end_index=True)
         found_panel = next_panel is not None
         safe_count = 0
-        while found_panel or safe_count < 100:
+        while found_panel and safe_count < 100:
             if found_panel:
                 row_count += 1
             panel = m.SolarPanel.find_one({"id": next_panel})

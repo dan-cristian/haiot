@@ -329,6 +329,7 @@ class BatteryCharger(Relaydevice):
                 # skip any actions if the charger is currently charging a critical cell (otherwise it will stop charge)
                 if P.bms_cell_critical_charge_recovery_started and self.RELAY_NAME == P.critical_charger_name:
                     # skip charger actions
+                    L.l.info("Keeping charger on as cell level is still critical")
                     return False
                 else:
                     return super().grid_updated(grid_watts)
@@ -402,6 +403,7 @@ class TeslaCharger(Relaydevice):
             P.thread_pool_status = "Tesla grid_updated grid export"
             # check if charging is started before changing amps
             if not apps.tesla.is_charging(self.vehicle_id):
+                #fixme do not start charging if car is disconnected from plug
                 P.thread_pool_status = 'tesla.start_charge 3'
                 res = apps.tesla.start_charge(self.vehicle_id)
                 if not res:
