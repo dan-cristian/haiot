@@ -506,17 +506,17 @@ class P:
                                               voltage_sensor_name="house battery",
                                               voltage_max_limit=28.6, voltage_max_floor=27.2)
         relay = 'batterycharge_2'  # index 3, right, stable
-        P.device_list[relay] = BatteryCharger(relay_name=relay, avg_consumption=700,  # 735
+        P.device_list[relay] = BatteryCharger(relay_name=relay, avg_consumption=750,  # 735
                                               supports_breaks=True, min_on_interval=6, state_change_interval=3,
                                               voltage_sensor_name="house battery",
                                               voltage_max_limit=28.6, voltage_max_floor=27.2)
         relay = 'batterycharge_3'  # index 4, left, somewhat stable
-        P.device_list[relay] = BatteryCharger(relay_name=relay, avg_consumption=700,  # 730
+        P.device_list[relay] = BatteryCharger(relay_name=relay, avg_consumption=750,  # 730
                                               supports_breaks=True, min_on_interval=6, state_change_interval=3,
                                               voltage_sensor_name="house battery",
                                               voltage_max_limit=28.6, voltage_max_floor=27.2)
         relay = 'batterycharge_4'  # index 2, flaky
-        P.device_list[relay] = BatteryCharger(relay_name=relay, avg_consumption=700,  # 725
+        P.device_list[relay] = BatteryCharger(relay_name=relay, avg_consumption=750,  # 725
                                               supports_breaks=True, min_on_interval=6, state_change_interval=3,
                                               voltage_sensor_name="house battery",
                                               voltage_max_limit=28.6, voltage_max_floor=27.2)
