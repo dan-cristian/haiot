@@ -24,7 +24,7 @@ class P:
     season = None
     PRESENCE_SEC = 60 * 60 * 1  # no of secs after a move considered to be presence
     AWAY_SEC = 60 * 60 * 6  # no of secs after no move to be considered away
-    MANUAL_DURATION = 60
+    MANUAL_DURATION = 120
     initialised = False
     DEBUG = False
     DEBUG_LOOP = 0
@@ -213,7 +213,7 @@ def _get_heat_on_manual(zone_thermo):
     if zone_thermo.last_manual_set is not None and zone_thermo.is_mode_manual:
         delta_minutes = (datetime.datetime.now() - zone_thermo.last_manual_set).total_seconds() / 60
         if delta_minutes <= zone_thermo.manual_duration_min:
-            manual_temp_target = zone_thermo.manual_temp_target
+            manual_temp_target = zone_thermo.heat_manual_target_temperature
             force_on = zone_thermo.heat_is_on
             if force_on is None:
                 force_on = False
@@ -312,28 +312,29 @@ def _loop_zones(area_id):
                 L.l.warning('Multiple heat schedules for this zone, iterating')
             # todo: fix needed to avoid multiple state changes on same relays rapidly, on multiple schedules
             for heat_schedule in heat_schedule_list:
-                zonesensor_list = m.ZoneSensor.find({m.ZoneSensor.zone_id: zone.id, m.ZoneSensor.is_main: True})
+                # zonesensor_list = m.ZoneSensor.find({m.ZoneSensor.zone_id: zone.id, m.ZoneSensor.is_main: True})
+                zonesensor_list = m.AirSensor.find({m.AirSensor.zone_id: zone.id, m.AirSensor.is_main: True})
                 sensor_processed = {}
                 P.heat_status += 'zone=' + zone.name + ': heat_sched {} sensors_count {} '.format(
                     heat_schedule, len(zone_list))
-                for zonesensor in zonesensor_list:
-                    if heat_schedule is not None and zonesensor is not None:
-                        sensor = m.AirSensor.find_one({m.AirSensor.address: zonesensor.sensor_address})
+                for sensor in zonesensor_list:
+                    if heat_schedule is not None:
+                        # sensor = m.AirSensor.find_one({m.AirSensor.address: zonesensor.sensor_address})
                         if sensor is not None:
                             P.heat_status += 'sensor: {} {} '.format(sensor.address, sensor.name)
                         heat_state, main_source_needed = _update_zone_heat(zone, heat_schedule, sensor)
                         P.heat_status += 'heat on: {} main {},'.format(heat_state, main_source_needed)
                         if not heat_is_on:
                             heat_is_on = main_source_needed and heat_state
-                        if zonesensor.zone_id in sensor_processed:
-                            prev_sensor = sensor_processed[zonesensor.zone_id]
+                        if sensor.zone_id in sensor_processed:
+                            prev_sensor = sensor_processed[sensor.zone_id]
                             L.l.warning('Already processed temp sensor {} in zone {}, duplicate?'.format(
-                                prev_sensor, zonesensor.zone_id))
+                                prev_sensor, sensor.zone_id))
                         else:
                             if sensor is not None:
-                                sensor_processed[zonesensor.zone_id] = sensor.name
+                                sensor_processed[sensor.zone_id] = sensor.name
                     else:
-                        P.heat_status += ' sched={} zonesensor={}'.format(heat_schedule, zonesensor)
+                        P.heat_status += ' sched={} sensor={}'.format(heat_schedule, sensor)
 
         # set heat source zone (main or alternate)
         heat_source_relay = get_valid_heat_source_relay()

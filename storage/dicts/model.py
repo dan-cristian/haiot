@@ -219,7 +219,7 @@ class ZoneThermostat(ModelBase):
     last_presence_set = datetime.now()
     is_mode_manual = False
     manual_duration_min = 0  # period to keep heat on for manual mode
-    manual_temp_target = 0.0
+    # manual_temp_target = 0.0
     last_manual_set = datetime.now()
 
 
