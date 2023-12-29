@@ -9,6 +9,9 @@ Frame  {
     Default item=dust_vent_pm2_5
  	Chart item=dust_vent_pm2_5 period=D
 
+    Default item=dust_bucatarie_pm2_5
+ 	Chart item=dust_bucatarie_pm2_5 period=D
+
     Default item=dust_living_pm2_5
  	Chart item=dust_living_pm2_5 period=D
 

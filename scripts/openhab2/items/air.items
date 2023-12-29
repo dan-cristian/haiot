@@ -1,3 +1,6 @@
+Number dust_bucatarie_pm1 "Dust bucatarie PM1 [%.0f ug/m3]" <smoke>            {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_1_wemosbucatarieair_pms5003:state:default]"}
+Number dust_bucatarie_pm2_5 "Dust bucatarie PM2.5 [%.0f ug/m3]" <smoke>        {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_2_5_wemosbucatarieair_pms5003:state:default]"}
+
 
 Number dust_living_pm1 "Dust living PM1 [%.0f ug/m3]" <smoke>            {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_1_wemoslivingair_pms5003:state:default]"}
 Number dust_living_pm2_5 "Dust living PM2.5 [%.0f ug/m3]" <smoke>        {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_2_5_wemoslivingair_pms5003:state:default]"}
