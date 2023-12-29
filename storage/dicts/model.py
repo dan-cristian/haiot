@@ -214,6 +214,7 @@ class ZoneThermostat(ModelBase):
     last_heat_status_update = datetime.now()
     heat_actual_temperature = 0.0
     heat_target_temperature = 0.0
+    heat_manual_target_temperature = 0.0
     mode_presence_auto = False
     last_presence_set = datetime.now()
     is_mode_manual = False

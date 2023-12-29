@@ -335,7 +335,8 @@ def thermostat(zone_name=None, temp_target=None, state=None, mode_manual=None, m
         if state is not None:
             zone_thermo.heat_is_on = state
         if temp_target is not None:
-            zone_thermo.heat_target_temperature = temp_target
+            zone_thermo.heat_manual_target_temperature = temp_target
+            L.l.info("Set heat manual target temperature in {} to {}".format(zone_thermo.zone_name, temp_target))
         zone_thermo.save_changed_fields(persist=True)
 
 
