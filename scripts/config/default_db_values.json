@@ -687,9 +687,9 @@
     {"id": 25, "name": "front garden", "address": "3CE1D443623F", "zone_id": 7},
     {"id": 28, "name": "batterycharger_1", "address": "shellyuni-C45BBE5F74DA", "zone_id": 8},
     {"id": 29, "name": "batterycharger_3", "address": "shellyuni-98CDAC2516CF", "zone_id": 8},
-    {"id": 30, "name": "living",  "address": "000003BE099C", "zone_id": 2, "is_main": true},
-    {"id": 31, "name": "birou",   "address": "000003BDE6C7", "zone_id": 47, "is_main": true},
-    {"id": 32, "name": "dormitor","address": "000004F3BF34", "zone_id": 4, "is_main": true},
+    {"id": 30, "name": "living",  "address": "3CE1D443BDD5", "zone_id": 2, "is_main": true},
+    {"id": 31, "name": "birou",   "address": "3CE1D44386A5", "zone_id": 47, "is_main": true},
+    {"id": 32, "name": "dormitor","address": "3CE1D443663D", "zone_id": 4, "is_main": true},
     {"id": 33, "name": "bucatarie","address": "3CE1D443B740", "zone_id": 1, "is_main": true}
   ],
 
