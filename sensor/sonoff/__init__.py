@@ -204,11 +204,13 @@ def _process_message(msg):
                     zone_sensor, sensor = _get_air_sensor(sensor_address=sensor_address, sensor_type=k)
                     if 'Temperature' in v:
                         temp = v['Temperature']
-                        if k.startswith('DS18B20') and temp == 85.0:
-                            # ignore invalid value
-                            pass
-                        else:
-                            sensor.temperature = temp
+                        if temp > -100:
+                            # ignore invalid vals
+                            if k.startswith('DS18B20') and temp == 85.0:
+                                # ignore invalid value
+                                pass
+                            else:
+                                sensor.temperature = temp
                     if 'Pressure' in v:
                         sensor.pressure = v['Pressure']
                     if 'Humidity' in v:
