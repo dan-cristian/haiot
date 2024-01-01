@@ -33,6 +33,9 @@ Number air_temperature_bme_vent "Temp vent [%.1f °C]" <temperature>  {mqtt="<[m
 Number air_pressure_bme_vent "Pressure vent [%.0f hPa]" <pressure>  {mqtt="<[mosquitto:iot/openhab/airsensor_pressure_ventair_bme680:state:default]"}
 Number air_humidity_bme_vent "Humidity vent [%.0f %%]" <humidity>  {mqtt="<[mosquitto:iot/openhab/airsensor_humidity_ventair_bme680:state:default]"}
 
+Number air_humidity_wcparter "Humidity wc parter [%.0f %%]" <humidity>  {mqtt="<[mosquitto:iot/openhab/airsensor_humidity_fanwcparter_bme280:state:default]"}
+Number air_temperature_wcparter "Temp wc parter [%.1f °C]" <temperature>  {mqtt="<[mosquitto:iot/openhab/airsensor_temperature_fanwcparter_bme280:state:default]"}
+
 Number dust_air_filtered_pm1 "Vent filtered PM1 [%.0f ug/m3]" <smoke>   {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_1_airfiltered_pms5003:state:default]"}
 Number dust_air_filtered_pm2_5 "Vent filtered PM2.5 [%.0f ug/m3]" <smoke>   {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_2_5_airfiltered_pms5003:state:default]"}
 Number dust_air_filtered_pm10 "Vent filtered PM10 [%.0f ug/m3]" <smoke>     {mqtt="<[mosquitto:iot/openhab/dustsensor_pm_10_airfiltered_pms5003:state:default]"}

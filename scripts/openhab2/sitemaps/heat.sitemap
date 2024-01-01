@@ -64,6 +64,8 @@ Frame {
 	Default item=temperature_solar_back
 	Default item=temperature_soba_beci
     Default item=temperature_horn
+    Default item=air_temperature_wcparter
+    Default item=air_humidity_wcparter
 
     Default item=relay_recirculation_pump
     Default item=relay_other_heat
