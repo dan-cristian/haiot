@@ -10,6 +10,7 @@ from storage.model import m
 class P:
     initialised = False
     interval = 60
+    thread_pool_status = None
     start_keyword_ecu = {}
     end_keyword_ecu = {}
     start_keyword_now_ecu = {}
@@ -65,6 +66,7 @@ class P:
 def parse_general(inverter):
     index = inverter.type
     try:
+        P.thread_pool_status = "Parsing inverter {}".format(inverter.name)
         aps_text = str(urllib.request.urlopen(inverter.general_url).read())
         last_power = utils.parse_text(aps_text, P.start_keyword_now_ecu[index], P.end_keyword_now_ecu[index])
         production = utils.parse_text(aps_text, P.start_keyword_ecu[index], P.end_keyword_ecu[index])
@@ -83,65 +85,61 @@ def parse_panels(inverter):
     index = inverter.type
     try:
         aps_text = str(urllib.request.urlopen(inverter.panels_url).read())
-        found_panel = True
         end_index = 0
         row_count = 0
         # use exact start pattern for first row
         next_panel, end_index = utils.parse_text(
             aps_text, P.start_next_panel[index], P.end_panel[index], start_index=end_index, return_end_index=True)
         found_panel = next_panel is not None
-        safe_count = 0
-        while found_panel and safe_count < 100:
-            if found_panel:
-                row_count += 1
+        while found_panel and row_count < 100:
+            row_count += 1
             panel = m.SolarPanel.find_one({"id": next_panel})
+            P.thread_pool_status = "Parsing panel {} row {} inverter {} ".format(panel, row_count, inverter.name)
             is_dummy_panel = panel is None
             if panel is None:
-                panel = m.SolarPanel()
-            if found_panel:
-                watts, ind = utils.parse_text(aps_text, "<td>", " </td>",
-                                              start_index=end_index, return_end_index=True)
-                if watts != "-":
-                    panel.power = int(watts.replace("W", "").strip())
-
-                if inverter.type == 2:
-                    # additional column with DC voltage
-                    dc_volt, ind = utils.parse_text(aps_text, "<td>", " </td>",
-                                                 start_index=ind, return_end_index=True)
-                    if dc_volt != "-":
-                        panel.panel_voltage = int(dc_volt.replace("V", "").strip())
-
-                if row_count%2 != 0:
-                    hertz, ind = utils.parse_text(aps_text, ">", " </td>",
-                                                 start_index=ind, return_end_index=True)
-                    if hertz != "-" and hertz is not None:
-                        panel.grid_frequency = float(hertz.replace("Hz", "").strip())
-
-                grid_volt, ind = utils.parse_text(aps_text, "<td>", " </td>",
-                                             start_index=ind, return_end_index=True)
-                if grid_volt != "-":
-                    panel.grid_voltage = int(grid_volt.replace("V", "").strip())
-
-                if row_count % 2 != 0:
-                    temp, ind = utils.parse_text(aps_text, ">", " </td>",
-                                                 start_index=ind, return_end_index=True)
-                    if temp != "-":
-                        panel.temperature = temp.replace("&#176;C", "").strip()
-
-                    # not used, but needed to parse correctly
-                    rep_time, ind = utils.parse_text(aps_text, ">", " </td>",
-                                                     start_index=ind, return_end_index=True)
-                end_index = ind
-                if not is_dummy_panel:
-                    panel.save_changed_fields()
-                # use different start pattern for row 2nd onwards
-                next_panel, end_index = utils.parse_text(aps_text, "<td>", " </td>",
-                                                         start_index=end_index, return_end_index=True)
-                found_panel = next_panel is not None
-            if panel is None:
                 L.l.warning("No panel found in config with id {}".format(next_panel))
-            safe_count += 1
-        L.l.info("APS Solar panel iterations = {}".format(safe_count))
+                panel = m.SolarPanel()
+            # if found_panel:
+            watts, ind = utils.parse_text(aps_text, "<td>", " </td>",
+                                          start_index=end_index, return_end_index=True)
+            if watts != "-":
+                panel.power = int(watts.replace("W", "").strip())
+
+            if inverter.type == 2:
+                # additional column with DC voltage
+                dc_volt, ind = utils.parse_text(aps_text, "<td>", " </td>",
+                                             start_index=ind, return_end_index=True)
+                if dc_volt != "-":
+                    panel.panel_voltage = int(dc_volt.replace("V", "").strip())
+
+            if row_count % 2 != 0:
+                hertz, ind = utils.parse_text(aps_text, ">", " </td>",
+                                             start_index=ind, return_end_index=True)
+                if hertz != "-" and hertz is not None:
+                    panel.grid_frequency = float(hertz.replace("Hz", "").strip())
+
+            grid_volt, ind = utils.parse_text(aps_text, "<td>", " </td>",
+                                         start_index=ind, return_end_index=True)
+            if grid_volt != "-":
+                panel.grid_voltage = int(grid_volt.replace("V", "").strip())
+
+            if row_count % 2 != 0:
+                temp, ind = utils.parse_text(aps_text, ">", " </td>",
+                                             start_index=ind, return_end_index=True)
+                if temp != "-":
+                    panel.temperature = temp.replace("&#176;C", "").strip()
+
+                # not used, but needed to parse correctly
+                rep_time, ind = utils.parse_text(aps_text, ">", " </td>",
+                                                 start_index=ind, return_end_index=True)
+            end_index = ind
+            if not is_dummy_panel:
+                panel.save_changed_fields()
+            # use different start pattern for row 2nd onwards
+            next_panel, end_index = utils.parse_text(aps_text, "<td>", " </td>",
+                                                     start_index=end_index, return_end_index=True)
+            found_panel = next_panel is not None
+        L.l.info("APS Solar panel iterations = {}".format(row_count))
 
     except Exception as ex:
         L.l.error("Exception on inverter {} panels run, ex={}".format(inverter.name, ex))
@@ -162,3 +160,4 @@ def unload():
 def init():
     L.l.info("Starting solar_aps module")
     thread_pool.add_interval_callable(thread_run, run_interval_second=P.interval)
+    P.thread_pool_status = "APS Initialised"
