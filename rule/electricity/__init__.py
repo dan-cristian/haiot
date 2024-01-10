@@ -545,7 +545,7 @@ def _update_devices():
             dev_list = reversed(P.device_list.values())
         for device in dev_list:
             P.thread_pool_status = 'update {}'.format(device.RELAY_NAME)
-            changed = device.grid_updated(P.grid_watts + P.inverter_watts)
+            changed = device.grid_updated(P.grid_watts)
             if changed:  # exit to allow main meter to update and recheck if more power changes are needed
                 # L.l.info('Done change action for device {}'.format(device))
                 if P.emulate_export is True:
@@ -564,7 +564,7 @@ def rule_energy_export(obj=m.PowerMonitor(), change=None):
             if P.emulate_export is True:
                 P.grid_watts = random.randint(-900, -800)
             else:
-                P.grid_watts = obj.power
+                P.grid_watts = obj.power + P.inverter_watts
                 P.grid_amps = obj.current
                 P.grid_watts_last_update = datetime.now()
             # L.l.info('Got rule main watts {}'.format(P.grid_watts))
