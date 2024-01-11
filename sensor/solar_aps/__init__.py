@@ -68,8 +68,11 @@ def parse_general(inverter):
     try:
         P.thread_pool_status = "Parsing inverter {}".format(inverter.name)
         aps_text = str(urllib.request.urlopen(inverter.general_url).read())
+        P.thread_pool_status = "Parsing inverter {} last_power".format(inverter.name)
         last_power = utils.parse_text(aps_text, P.start_keyword_now_ecu[index], P.end_keyword_now_ecu[index])
+        P.thread_pool_status = "Parsing inverter {} production".format(inverter.name)
         production = utils.parse_text(aps_text, P.start_keyword_ecu[index], P.end_keyword_ecu[index])
+        P.thread_pool_status = "Parsing inverter {} day production".format(inverter.name)
         day_production = utils.parse_text(aps_text, P.start_keyword_day_ecu[index], P.end_keyword_day_ecu[index])
         if production is not None:
             production = production.replace(",", "")
