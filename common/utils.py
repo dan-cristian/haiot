@@ -291,6 +291,11 @@ def get_my_network_ip_list():
                                                               s.getsockname()[0], s.close()) for s in
                                                              [socket.socket(socket.AF_INET,
                                                                             socket.SOCK_DGRAM)]][0][1]]) if l][0][0])
+
+    #s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    #s.connect(("8.8.8.8", 80))
+    #ip_ar = s.getsockname()[0]
+
     ip_ar = ip.split('.')
     net_addr = ip.replace(ip_ar[len(ip_ar) - 1], "0/24")
     net_addr = net_addr.replace('10/', '').replace('/24', '')

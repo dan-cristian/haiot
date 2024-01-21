@@ -9,7 +9,7 @@ from storage.model import m
 
 class P:
     initialised = False
-    interval = 60
+    interval = 120
     thread_pool_status = None
     start_keyword_ecu = {}
     end_keyword_ecu = {}
@@ -67,21 +67,22 @@ def parse_general(inverter):
     index = inverter.type
     try:
         P.thread_pool_status = "Parsing inverter {}".format(inverter.name)
-        aps_text = str(urllib.request.urlopen(inverter.general_url).read())
+        aps_text = str(urllib.request.urlopen(url=inverter.general_url, timeout=15).read())
         P.thread_pool_status = "Parsing inverter {} last_power".format(inverter.name)
         last_power = utils.parse_text(aps_text, P.start_keyword_now_ecu[index], P.end_keyword_now_ecu[index])
         P.thread_pool_status = "Parsing inverter {} production".format(inverter.name)
         production = utils.parse_text(aps_text, P.start_keyword_ecu[index], P.end_keyword_ecu[index])
-        # P.thread_pool_status = "Parsing inverter {} day production".format(inverter.name)
-        # day_production = utils.parse_text(aps_text, P.start_keyword_day_ecu[index], P.end_keyword_day_ecu[index])
+        P.thread_pool_status = "Parsing inverter {} day production".format(inverter.name)
+        day_production = utils.parse_text(aps_text, P.start_keyword_day_ecu[index], P.end_keyword_day_ecu[index])
         if production is not None:
             production = production.replace(",", "")
         inverter.last_power = int(last_power)
         inverter.lifetime_generation = float(production)
-        # inverter.day_generation = float(day_production)
+        inverter.day_generation = float(day_production)
         inverter.save_changed_fields()
     except Exception as ex:
         L.l.error("Exception on inverter {} general run, ex={}".format(inverter.name, ex))
+        P.thread_pool_status = "Parsing inverter {} exception {}".format(inverter.name, ex)
 
 
 def parse_panels(inverter):

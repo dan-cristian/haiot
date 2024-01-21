@@ -391,7 +391,7 @@ def _tasmota_discovery():
     net_hosts = utils.get_my_network_ip_list()
     for ip in net_hosts:
         try:
-            # L.l.info("Tasmota discovery IP {}".format(ip))
+            L.l.info("Tasmota discovery IP {}".format(ip))
             dev_name = utils.parse_http(url="http://{}/cm?cmnd=friendlyname1".format(ip),
                                         start_key='{"FriendlyName1":"', end_key='"}', timeout=3, silent=True)
             if dev_name is not None:
