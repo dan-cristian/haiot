@@ -459,14 +459,14 @@ class P:
     utility_list = {}
     MIN_WATTS_THRESHOLD = 200  # variation allowed for import/export
     IDLE_WATTS = 200  # use high value, as the inverter compensates from batteries. without inverter keep low, at 70.
-    emulate_export = False # used to test export energy scenarios
+    emulate_export = False  # used to test export energy scenarios
     last_state_change = datetime.min
     system_wait_time = 0  # seconds to wait until any device can change state (some relays have latency)
     bms_min_cell_voltage_list = {}  # dict with all min cell voltages
     bms_min_cell_voltage = None  # minimum cell voltage in all bms'es
 
     bms_cell_min_voltage_critical = 2.7  # charger is started here to increase cell voltage
-    bms_cell_critical_charge_recovery_started = True  # cell was charged from low voltage to recovery voltage
+    bms_cell_critical_charge_recovery_started = False  # cell was charged from low voltage to recovery voltage
     bms_cell_voltage_critical_recovery = 2.9  # charger is stopped here as cell has recovered
     critical_charger_name = "batterycharge_4"  # charger used to recover cells
 

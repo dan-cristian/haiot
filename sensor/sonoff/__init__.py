@@ -3,6 +3,7 @@ import glob
 import errno
 import threading
 import time
+import ipaddress
 from socket import timeout
 from ipaddress import IPv4Address
 from urllib.error import HTTPError, URLError
@@ -15,7 +16,7 @@ from main import thread_pool
 from transport import mqtt_io
 from storage.model import m
 import python_arptable
-
+import getmac
 
 class P:
     initialised = False
@@ -388,41 +389,45 @@ def _tasmota_config(config_file, device_name, ip):
 def _tasmota_discovery():
     # try to connect assuming is a tasmota device
     L.l.info("Begin tasmota network scan")
-    net_hosts = utils.get_my_network_ip_list()
+    # net_hosts = utils.get_my_network_ip_list(net_ip='192.168.0.0')
+    net_hosts = []
+    for i in range(255):
+        net_hosts.append(ipaddress.ip_address('192.168.0.{}'.format(i+1)))
     for ip in net_hosts:
         try:
             L.l.info("Tasmota discovery IP {}".format(ip))
             dev_name = utils.parse_http(url="http://{}/cm?cmnd=friendlyname1".format(ip),
                                         start_key='{"FriendlyName1":"', end_key='"}', timeout=3, silent=True)
             if dev_name is not None:
-                arp = python_arptable.get_arp_table()
-                for entry in arp:
-                    if IPv4Address(entry["IP address"]) == ip:
-                        mac = entry["HW address"]
-                        if mac in P.mac_list:
-                            config_file = P.mac_list[mac]
-                            file_name = os.path.basename(config_file)
-                            # dev_name = utils.parse_http(url="http://{}/cm?cmnd=friendlyname1".format(ip),
-                            #                            start_key='{"FriendlyName1":"', end_key='"}')
-                            mqtt_topic = utils.parse_http(url="http://{}/cm?cmnd=Topic".format(ip),
-                                                          start_key='{"Topic":"', end_key='"}', timeout=3)
-                            last_update = utils.parse_http(url="http://{}/cm?cmnd=friendlyname2".format(ip),
-                                                            start_key='{"FriendlyName2":"', end_key='"}', timeout=3)
-                            if dev_name != file_name or mqtt_topic != file_name \
-                                    or last_update != str(utils.get_base_location_now_date().day):
-                                # tasmota device is not configured
-                                L.l.info("Configuring tasmota device {} as {}".format(ip, file_name))
-                                _tasmota_config(config_file=P.TASMOTA_CONFIG, device_name=file_name, ip=ip)
-                                _tasmota_config(config_file=config_file, device_name=file_name, ip=ip)
-                                mqtt_topic = utils.parse_http(url="http://{}/cm?cmnd=Topic".format(ip),
-                                                              start_key='{"Topic":"', end_key='"}', timeout=3)
-                                if mqtt_topic != file_name:
-                                    L.l.error("Failed to set mqtt topic {}, actual={}".format(file_name, mqtt_topic))
-                        else:
-                            L.l.warning("Found tasmota device {} {} without config file".format(dev_name, ip))
-                        break
+                #arp = python_arptable.get_arp_table()
+                #for entry in arp:
+                    #if IPv4Address(entry["IP address"]) == ip:
+                        #mac = entry["HW address"]
+                mac = getmac.get_mac_address(ip=ip.compressed, network_request=True)
+                if mac in P.mac_list:
+                    config_file = P.mac_list[mac]
+                    file_name = os.path.basename(config_file)
+                    # dev_name = utils.parse_http(url="http://{}/cm?cmnd=friendlyname1".format(ip),
+                    #                            start_key='{"FriendlyName1":"', end_key='"}')
+                    mqtt_topic = utils.parse_http(url="http://{}/cm?cmnd=Topic".format(ip),
+                                                  start_key='{"Topic":"', end_key='"}', timeout=3)
+                    last_update = utils.parse_http(url="http://{}/cm?cmnd=friendlyname2".format(ip),
+                                                    start_key='{"FriendlyName2":"', end_key='"}', timeout=3)
+                    if dev_name != file_name or mqtt_topic != file_name \
+                            or last_update != str(utils.get_base_location_now_date().day):
+                        # tasmota device is not configured
+                        L.l.info("Configuring tasmota device {} as {}".format(ip, file_name))
+                        _tasmota_config(config_file=P.TASMOTA_CONFIG, device_name=file_name, ip=ip)
+                        _tasmota_config(config_file=config_file, device_name=file_name, ip=ip)
+                        mqtt_topic = utils.parse_http(url="http://{}/cm?cmnd=Topic".format(ip),
+                                                      start_key='{"Topic":"', end_key='"}', timeout=3)
+                        if mqtt_topic != file_name:
+                            L.l.error("Failed to set mqtt topic {}, actual={}".format(file_name, mqtt_topic))
                 else:
-                    L.l.info("Tasmota scan: IP {} not responding".format(ip))
+                    L.l.warning("Found tasmota device {} {} but no config file, mac={}".format(dev_name, ip, mac))
+                        #break
+            else:
+                L.l.info("Tasmota scan: IP {} not responding or not a tasmota".format(ip))
         except Exception as ex:
             L.l.info("Tasmota scan: IP {} failed".format(ip))
             pass
