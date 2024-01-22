@@ -415,7 +415,7 @@ def _tasmota_discovery():
                                                   start_key='{"Topic":"', end_key='"}', timeout=3)
                     last_update = utils.parse_http(url="http://{}/cm?cmnd=friendlyname2".format(ip),
                                                     start_key='{"FriendlyName2":"', end_key='"}', timeout=3)
-                    if dev_name != file_name or mqtt_topic != file_name:
+                    if True: #dev_name != file_name or mqtt_topic != file_name:
                             #or last_update != str(utils.get_base_location_now_date().day):
                         # tasmota device is not configured
                         L.l.info("Configuring tasmota device {} as {}".format(ip, file_name))
