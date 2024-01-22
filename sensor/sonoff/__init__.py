@@ -375,7 +375,7 @@ def _tasmota_config(config_file, device_name, ip):
                             L.l.info("Set {}: {}={}".format(device_name, request, response))
                             break
                         else:
-                            L.l.warning("Unexpected response setting tasmota param {}".format(response))
+                            L.l.warning("Unexpected response={} for tasmota cmd={}".format(response, request))
                     except IOError as eio:
                         L.l.error("Tasmota config IO error {}".format(eio))
                     except (URLError, HTTPError, timeout) as et:
