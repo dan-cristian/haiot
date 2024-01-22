@@ -380,7 +380,7 @@ def _tasmota_config(config_file, device_name, ip):
                         L.l.error("Tasmota config IO error {}".format(eio))
                     except (URLError, HTTPError, timeout) as et:
                         L.l.error("Tasmota timeout error {}".format(et))
-                        time.sleep(10)
+                        time.sleep(15)
                     except Exception as ex:
                         L.l.error("Tasmota config exception {}".format(ex))
 
