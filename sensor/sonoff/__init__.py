@@ -393,8 +393,8 @@ def _tasmota_discovery():
     L.l.info("Begin tasmota network scan")
     # net_hosts = utils.get_my_network_ip_list(net_ip='192.168.0.0')
     net_hosts = []
-    for i in range(255):
-        net_hosts.append(ipaddress.ip_address('192.168.0.{}'.format(i+1)))
+    for i in range(205):
+        net_hosts.append(ipaddress.ip_address('192.168.0.{}'.format(i+50)))
     for ip in net_hosts:
         try:
             L.l.info("Tasmota discovery IP {}".format(ip))
@@ -415,12 +415,12 @@ def _tasmota_discovery():
                                                   start_key='{"Topic":"', end_key='"}', timeout=3)
                     last_update = utils.parse_http(url="http://{}/cm?cmnd=friendlyname2".format(ip),
                                                     start_key='{"FriendlyName2":"', end_key='"}', timeout=3)
-                    if dev_name != file_name or mqtt_topic != file_name \
-                            or last_update != str(utils.get_base_location_now_date().day):
+                    if dev_name != file_name or mqtt_topic != file_name:
+                            #or last_update != str(utils.get_base_location_now_date().day):
                         # tasmota device is not configured
                         L.l.info("Configuring tasmota device {} as {}".format(ip, file_name))
-                        _tasmota_config(config_file=P.TASMOTA_CONFIG, device_name=file_name, ip=ip)
                         _tasmota_config(config_file=config_file, device_name=file_name, ip=ip)
+                        _tasmota_config(config_file=P.TASMOTA_CONFIG, device_name=file_name, ip=ip)
                         mqtt_topic = utils.parse_http(url="http://{}/cm?cmnd=Topic".format(ip),
                                                       start_key='{"Topic":"', end_key='"}', timeout=3)
                         if mqtt_topic != file_name:
