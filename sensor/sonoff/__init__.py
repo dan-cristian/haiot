@@ -349,7 +349,7 @@ def _tasmota_config(config_file, device_name, ip):
     # init common parameters
 
     # init specific device parameters
-    with (open(config_file) as f):
+    with open(config_file) as f:
         for line in f:
             line = line.rstrip("\n").rstrip("\r")
             if not line.lower().startswith('#') and line.strip():
