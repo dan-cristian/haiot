@@ -349,7 +349,7 @@ def _tasmota_config(config_file, device_name, ip):
     # init common parameters
 
     # init specific device parameters
-    with open(config_file) as f:
+    with (((open(config_file) as f))):
         for line in f:
             line = line.rstrip("\n").rstrip("\r")
             if not line.lower().startswith('#') and line.strip():
@@ -365,19 +365,16 @@ def _tasmota_config(config_file, device_name, ip):
                 for i in range(0, 5):
                     try:
                         response = utils.get_url_content(url=request, timeout=10, silent=True)
-                        if response is None:
+                        if response is None or command in response.lower() or "b'{}'" in response \
+                                or '{"WARNING":"Enable weblog 2 if response expected"}' in response:
                             L.l.warning("Set {}: {}={}".format(device_name, request, response))
                             break
-                        if command in response.lower():
-                            L.l.info("Set {}: {}={}".format(device_name, request, response))
+                        elif ' "Command":"Error" ' in response:
+                            L.l.warning("Error setting param {}".format(request))
                             break
-                        elif '{"WARNING":"Enable weblog 2 if response expected"}' in response:
-                            L.l.info("Set {}: {}={}".format(device_name, request, response))
-                            break
-                        elif "b'{}'" in response:
-                            pass
                         else:
                             L.l.warning("Unexpected response={} for tasmota cmd={}".format(response, request))
+                            break
                     except IOError as eio:
                         L.l.error("Tasmota config IO error {}".format(eio))
                     except (URLError, HTTPError, timeout) as et:
