@@ -374,6 +374,8 @@ def _tasmota_config(config_file, device_name, ip):
                         elif '{"WARNING":"Enable weblog 2 if response expected"}' in response:
                             L.l.info("Set {}: {}={}".format(device_name, request, response))
                             break
+                        elif "b'{}'" in response:
+                            pass
                         else:
                             L.l.warning("Unexpected response={} for tasmota cmd={}".format(response, request))
                     except IOError as eio:
@@ -423,6 +425,8 @@ def _tasmota_discovery():
                                                       start_key='{"Topic":"', end_key='"}', timeout=3)
                         if mqtt_topic != file_name:
                             L.l.error("Failed to set mqtt topic {}, actual={}".format(file_name, mqtt_topic))
+                    else:
+                        L.l.info("Tasmota device {} already configured in day {}".format(dev_name, last_update))
                 else:
                     L.l.warning("Found tasmota device {} {} but no config file, mac={}".format(dev_name, ip, mac))
                         #break
