@@ -138,6 +138,8 @@ def try_connection_recovery(car_id):
             L.l.info("Tesla is {}, nothing to do on recovery".format(state))
     except Exception as ex:
         L.l.error("Unable to recover Tesla connection, er={}".format(ex))
+        if "Too Many Requests" in "{}".format(ex):
+            P.last_too_many_requests_date = datetime.now()
 
 
 def set_charging_amps(amps, car_id=1):

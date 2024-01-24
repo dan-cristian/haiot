@@ -9,11 +9,11 @@ except Exception:
     class L:
         class l:
             @staticmethod
-            def info(msg): print msg
+            def info(msg): print(msg)
             @staticmethod
-            def warning(msg): print msg
+            def warning(msg): print(msg)
             @staticmethod
-            def error(msg): print msg
+            def error(msg): print(msg)
 
 
 __author__ = 'Dan Cristian<dan.cristian@gmail.com>'
@@ -59,7 +59,7 @@ def _get_usb_audio(camera):
                 else:
                     #L.l.info("Could not map camera {} to audio record entry {}".format(camera.name, line))
                     pass
-    except Exception, ex:
+    except Exception as ex:
         L.l.info("Got error when looking for audio interface, ex={}".format(ex))
     camera.audio = res
     return res
@@ -136,7 +136,7 @@ def get_usb_camera_list():
                     _set_cam_attrib(camera)
                     res[camera.name] = camera
                     #L.l.info("Cam is {}".format(camera))
-    except Exception, ex:
+    except Exception as ex:
         L.l.info("Unable to detect USB cameras, er={}".format(ex))
     return res
 
@@ -151,14 +151,14 @@ def reset_usb(dev_name):
             res = subprocess.check_output(['sudo', 'python', path, dev_name])
             L.l.info('Reset returned {}'.format(res))
             res = True
-        except Exception, ex:
+        except Exception as ex:
             L.l.error("Error for device=[{}] on reset_usb {}".format(dev_name, ex))
     return res
 
 
 if __name__ == '__main__':
     for cam in get_usb_camera_list().itervalues():
-        print cam
+        print(cam)
 
 
 # Bus 001 Device 049: ID 046d:081b Logitech, Inc. Webcam C310
