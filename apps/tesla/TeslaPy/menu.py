@@ -71,7 +71,7 @@ def show_vehicle_data(vehicle):
                                 window.get(ve.get('fp_window'))),
                      window.get(ve.get('rd_window')),
                      window.get(ve.get('rp_window'))))
-    fmt = 'Front Trunk: {} Rear Trunk: {}'
+    fmt = 'Front Trunk: {:25} Rear Trunk: {}'
     print(fmt.format(door.get(ve['ft']), door.get(ve['rt'])))
     fmt = 'Remote Start: {:24} Is User Present: {}'
     print(fmt.format(str(ve['remote_start']), str(ve['is_user_present'])))
@@ -140,26 +140,23 @@ def show_charging_sites(vehicle):
                          site['available_stalls'], site['total_stalls']))
 
 def show_charging_history(data):
-    try:
-        print(data['screen_title'])
-        print('-' * 80)
-        print('%s\t%s %s' % (data['total_charged']['title'],
-                             data['total_charged']['value'],
-                             data['total_charged']['after_adornment']))
-        print('-' * 80)
-        for point in data['charging_history_graph']['data_points']:
-            if point['values'][0].get('raw_value', 0) <= 0:
-                continue
-            print('%s\t%s %s\t%s' % (point['timestamp']['display_string'],
-                                     point['values'][0]['value'],
-                                     point['values'][0]['after_adornment'],
-                                     point['values'][0]['sub_title']))
-        print('-' * 80)
-        for item in data['total_charged_breakdown'].values():
-            print('%s %s %s' % (item['value'], item['after_adornment'],
-                                item['sub_title']))
-    except Exception as ex:
-        print("Error %s" % ex)
+    print(data['screen_title'])
+    print('-' * 80)
+    print('%s\t%s %s' % (data['total_charged']['title'],
+                         data['total_charged']['value'],
+                         data['total_charged']['after_adornment']))
+    print('-' * 80)
+    for point in data['charging_history_graph']['data_points']:
+        if point['values'][0].get('raw_value', 0) <= 0:
+            continue
+        print('%s\t%s %s\t%s' % (point['timestamp']['display_string'],
+                                 point['values'][0]['value'],
+                                 point['values'][0]['after_adornment'],
+                                 point['values'][0]['sub_title']))
+    print('-' * 80)
+    for item in data['total_charged_breakdown'].values():
+        print('%s %s %s' % (item['value'], item['after_adornment'],
+                            item['sub_title']))
 
 def menu(vehicle):
     lst = ['Refresh', 'Charging history', 'Wake up', 'Nearby charging sites',
@@ -279,12 +276,18 @@ def custom_auth(url):
             result[0] = window.get_current_url()
             if 'void/callback' in result[0].split('?')[0]:
                 window.destroy()
-        window.loaded += on_loaded
+        try:
+            window.events.loaded += on_loaded
+        except AttributeError:
+            window.loaded += on_loaded
         webview.start()
         return result[0]
     # Use selenium to control specified web browser
-    with [webdriver.Chrome, webdriver.Edge, webdriver.Firefox, webdriver.Opera,
-          webdriver.Safari][args.web]() as browser:
+    options = [webdriver.chrome, webdriver.opera,
+               webdriver.edge][args.web].options.Options()
+    options.add_argument('--disable-blink-features=AutomationControlled')
+    with [webdriver.Chrome, webdriver.Opera,
+          webdriver.Edge][args.web](options=options) as browser:
         logging.info('Selenium opened %s', browser.capabilities['browserName'])
         browser.get(url)
         WebDriverWait(browser, 300).until(EC.url_contains('void/callback'))
@@ -301,8 +304,7 @@ def main():
         ctx.verify_mode = ssl.CERT_NONE
         geopy.geocoders.options.default_ssl_context = ctx
     email = raw_input('Enter email: ')
-    with Tesla(email, cache_file="../private_config/.credentials/tesla_cache.json",
-               verify=args.verify, proxy=args.proxy,
+    with Tesla(email, verify=args.verify, proxy=args.proxy,
                sso_base_url=args.url) as tesla:
         if (webdriver and args.web is not None) or webview:
             tesla.authenticator = custom_auth
@@ -318,8 +320,11 @@ def main():
         print('-' * 80)
         idx = int(raw_input("Select vehicle: "))
         print('-' * 80)
+        fmt = '{} last seen {} at {} % SoC'
+        print(fmt.format(vehicles[0]['display_name'], vehicles[0].last_seen(),
+                         vehicles[0]['charge_state']['battery_level']))
+        print('-' * 80)
         print('VIN decode:', ', '.join(vehicles[idx].decode_vin().values()))
-        print('Option codes:', ', '.join(vehicles[idx].option_code_list()))
         print('-' * 80)
         menu(vehicles[idx])
 
@@ -332,11 +337,14 @@ if __name__ == "__main__":
                         help='disable verify SSL certificate')
     parser.add_argument('--timeout', type=int, help='connect/read timeout')
     if webdriver:
-        for c, s in enumerate(('chrome', 'edge', 'firefox', 'opera', 'safari')):
-            d, h = (0, ' (default)') if not webview and c == 0 else (None, '')
-            parser.add_argument('--' + s, action='store_const', dest='web',
-                                help='use %s browser' % s.title() + h,
-                                const=c, default=d)
+        h = 'use Chrome browser' if webview else 'use Chrome browser (default)'
+        parser.add_argument('--chrome', action='store_const', dest='web',
+                            help=h, const=0, default=None if webview else 0)
+        parser.add_argument('--opera', action='store_const', dest='web',
+                                help='use Opera browser', const=1)
+        if hasattr(webdriver.edge, 'options'):
+            parser.add_argument('--edge', action='store_const', dest='web',
+                                help='use Edge browser', const=2)
     parser.add_argument('--proxy', help='proxy server URL')
     args = parser.parse_args()
     main()

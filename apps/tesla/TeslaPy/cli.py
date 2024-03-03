@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """ Tesla Owner API CLI application using TeslaPy module """
 
 # Author: Tim Dorssers
@@ -21,25 +20,33 @@ from teslapy import Tesla, Vehicle, Battery, SolarPanel
 
 raw_input = vars(__builtins__).get('raw_input', input)  # Py2/3 compatibility
 
+
 def custom_auth(url):
-    # Use pywebview if no web browser specified
+    """ Use pywebview if no web browser specified """
     if webview and not (webdriver and args.web is not None):
         result = ['']
         window = webview.create_window('Login', url)
+
         def on_loaded():
             result[0] = window.get_current_url()
             if 'void/callback' in result[0].split('?')[0]:
                 window.destroy()
-        window.loaded += on_loaded
+        try:
+            window.events.loaded += on_loaded
+        except AttributeError:
+            window.loaded += on_loaded
         webview.start()
         return result[0]
     # Use selenium to control specified web browser
-    with [webdriver.Chrome, webdriver.Edge, webdriver.Firefox, webdriver.Opera,
-          webdriver.Safari][args.web]() as browser:
+    options = [webdriver.chrome, webdriver.edge][args.web].options.Options()
+    options.add_argument('--disable-blink-features=AutomationControlled')
+    with [webdriver.Chrome,
+          webdriver.Edge][args.web](options=options) as browser:
         logging.info('Selenium opened %s', browser.capabilities['browserName'])
         browser.get(url)
         WebDriverWait(browser, 300).until(EC.url_contains('void/callback'))
         return browser.current_url
+
 
 def main():
     default_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -53,7 +60,7 @@ def main():
             tesla.timeout = args.timeout
         if args.refresh:
             tesla.refresh_token(refresh_token=args.refresh)
-        selected = prod = tesla.vehicle_list() + tesla.battery_list()
+        selected = prod = tesla.vehicle_list() + tesla.battery_list() + tesla.solar_list()
         if args.filter:
             selected = [p for p in prod for v in p.values() if v == args.filter]
         logging.info('%d product(s), %d selected', len(prod), len(selected))
@@ -63,14 +70,16 @@ def main():
             if args.list:
                 print(product)
             if isinstance(product, Vehicle):
-                if args.option:
-                    print(', '.join(product.option_code_list()))
                 if args.vin:
                     print(product.decode_vin())
                 if args.wake:
                     product.sync_wake_up()
                 if args.get:
                     print(product.get_vehicle_data())
+                if args.location:
+                    print(product.get_vehicle_location_data())
+                if args.basic:
+                    print(product.get_vehicle_data(endpoints=''))
                 if args.nearby:
                     print(product.get_nearby_charging_sites())
                 if args.mobile:
@@ -107,14 +116,13 @@ def main():
                         print(product.api(command, **command_data))
                 else:
                     print(product.command(args.command, **data))
-            if args.user:
-                print(product.get_user_details())
         if args.logout:
             if webview and not (webdriver and args.web is not None):
                 window = webview.create_window('Logout', tesla.logout())
                 webview.start()
             else:
                 tesla.logout(not (webdriver and args.web is not None))
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Tesla Owner API CLI')
@@ -132,8 +140,6 @@ if __name__ == "__main__":
     parser.add_argument('-U', dest='url', help='SSO service base URL')
     parser.add_argument('-l', '--list', action='store_true',
                         help='list all selected vehicles/batteries')
-    parser.add_argument('-o', '--option', action='store_true',
-                        help='list vehicle option codes')
     parser.add_argument('-v', '--vin', action='store_true',
                         help='vehicle identification number decode')
     parser.add_argument('-w', '--wake', action='store_true',
@@ -156,17 +162,20 @@ if __name__ == "__main__":
                         help='get service self scheduling eligibility')
     parser.add_argument('-H', '--history', action='store_true',
                         help='get charging history data')
+    parser.add_argument('-B', '--basic', action='store_true',
+                        help='get basic vhicle data only')
+    parser.add_argument('-G', '--location', action='store_true',
+                        help='get location (GPS) data, wake as needed')
     parser.add_argument('-V', '--verify', action='store_false',
                         help='disable verify SSL certificate')
     parser.add_argument('-L', '--logout', action='store_true',
                         help='clear token from cache and logout')
-    parser.add_argument('-u', '--user', action='store_true',
-                        help='get user account details')
     if webdriver:
-        for c, s in enumerate(('chrome', 'edge', 'firefox', 'opera', 'safari')):
-            d, h = (0, ' (default)') if not webview and c == 0 else (None, '')
-            parser.add_argument('--' + s, action='store_const', dest='web',
-                                help='use %s WebDriver' % s.title() + h,
-                                const=c, default=d)
+        h = 'use Chrome browser' if webview else 'use Chrome browser (default)'
+        parser.add_argument('--chrome', action='store_const', dest='web',
+                            help=h, const=0, default=None if webview else 0)
+        if hasattr(webdriver.edge, 'options'):
+            parser.add_argument('--edge', action='store_const', dest='web',
+                                help='use Edge browser', const=1)
     args = parser.parse_args()
     main()

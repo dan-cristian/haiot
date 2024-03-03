@@ -2,12 +2,16 @@
 
 A Python implementation based on [unofficial documentation](https://tesla-api.timdorr.com/) of the client side interface to the Tesla Motors Owner API, which provides functionality to monitor and control Tesla products remotely.
 
+The Owner API will [stop working](https://developer.tesla.com/docs/fleet-api#2023-11-17-vehicle-commands-endpoint-deprecation-timeline-action-required) as vehicles begin requiring end-to-end command authentication using the Tesla Vehicle Command Protocol. Pre-2021 Model S and X vehicles do not support this new protocol and remain controllable using TeslaPy.
+
 [![Version](https://img.shields.io/pypi/v/TeslaPy)](https://pypi.org/project/TeslaPy)
-[![Downloads](https://pepy.tech/badge/TeslaPy/month)](https://pepy.tech/project/TeslaPy)
+[![Downloads](https://static.pepy.tech/badge/TeslaPy/month)](https://pepy.tech/project/TeslaPy)
 
 ## Overview
 
-This module depends on Python [requests](https://pypi.org/project/requests/), [requests_oauthlib](https://pypi.org/project/requests-oauthlib/) and [websocket-client](https://pypi.org/project/websocket-client/). The `Tesla` class extends `requests_oauthlib.OAuth2Session` which extends `requests.Session` and therefore inherits methods like `get()` and `post()` that can be used to perform API calls. Module characteristics:
+This module depends on Python [requests](https://pypi.org/project/requests/), [requests_oauthlib](https://pypi.org/project/requests-oauthlib/) and [websocket-client](https://pypi.org/project/websocket-client/). It requires Python 3.10+ when using urllib3 2.0, which comes with requests 2.30.0+, or you can pin urllib3 to 1.26.x by installing `urllib3<2`.
+
+The `Tesla` class extends `requests_oauthlib.OAuth2Session` which extends `requests.Session` and therefore inherits methods like `get()` and `post()` that can be used to perform API calls. Module characteristics:
 
 * It implements Tesla's new [OAuth 2](https://oauth.net/2/) Single Sign-On service.
 * Acquired tokens are stored in current working directory in *cache.json* file for persistence by default.
@@ -33,6 +37,9 @@ TeslaPy 2.0.0+ no longer implements headless authentication. The constructor dif
 | `cache_loader` | (optional) function that returns the cache dict |
 | `cache_dumper` | (optional) function with one argument, the cache dict |
 | `sso_base_url` | (optional) URL of SSO service, set to `https://auth.tesla.cn/` if your email is registered in another region |
+| `state` | (optional) state string for CSRF protection |
+| `code_verifier` | (optional) PKCE code verifier string |
+| `app_user_agent` | (optional) X-Tesla-User-Agent string |
 
 TeslaPy 2.1.0+ no longer implements [RFC 7523](https://tools.ietf.org/html/rfc7523) and uses the SSO token for all API requests.
 
@@ -43,15 +50,17 @@ The convenience method `api()` uses named endpoints listed in *endpoints.json* t
 | Call | Description |
 | --- | --- |
 | `request()` | performs API call using relative or absolute URL, serialization and error message handling |
-| `authorization_url()` | forms authorization URL with [PKCE](https://oauth.net/2/pkce/) extension |
+| `new_code_verifier()` | generates code verifier for [PKCE](https://oauth.net/2/pkce/) |
+| `authorization_url()` | forms authorization URL with [PKCE](https://oauth.net/2/pkce/) extension and tries to detect the accounts registered region |
 | `fetch_token()` | requests an SSO token using Authorization Code grant with [PKCE](https://oauth.net/2/pkce/) extension |
 | `refresh_token()` | requests an SSO token using [Refresh Token](https://oauth.net/2/grant-types/refresh-token/) grant |
+| `close()` | remove all requests adapter instances |
 | `logout()` | removes token from cache, returns logout URL and optionally signs out using system's default web browser |
 | `vehicle_list()` | returns a list of Vehicle objects |
 | `battery_list()` | returns a list of Battery objects |
 | `solar_list()` | returns a list of SolarPanel objects |
 
-The `Vehicle` class extends `dict` and stores vehicle data returned by the Owner API, which is a pull API. The streaming API pushes vehicle data on-change after subscription. The `stream()` method takes an optional argument, a callback function that is called with one argument, a dict holding the changed data. The `Vehicle` object is always updated with the pushed data. If there are no changes within 10 seconds, the vehicle stops streaming data. The `stream()` method has two more optional arguments to control restarting. Additionally, the class implements the following methods:
+The `Vehicle` class extends `dict` and stores vehicle data returned by the Owner API, which is a pull API. The `get_vehicle_summary()` and `get_vehicle_data()` calls update the `Vehicle` instance, merging data. The streaming API pushes vehicle data on-change after subscription. The `stream()` method takes an optional argument, a callback function that is called with one argument, a dict holding the changed data. The `Vehicle` object is always updated with the pushed data. If there are no changes within 10 seconds, the vehicle stops streaming data. The `stream()` method has two more optional arguments to control restarting. Additionally, the class implements the following methods:
 
 | Call | Online | Description |
 | --- | --- | --- |
@@ -61,28 +70,29 @@ The `Vehicle` class extends `dict` and stores vehicle data returned by the Owner
 | `sync_wake_up()` | No | wakes up and waits for the vehicle to come online |
 | `decode_option()` | No | lookup option code description (read from *option_codes.json*) |
 | `option_code_list()` <sup>1</sup> | No | lists known descriptions of the vehicle option codes |
-| `get_vehicle_data()` | Yes | gets a rollup of all the data request endpoints plus vehicle config |
+| `get_vehicle_data()` | Yes | get vehicle data for selected endpoints, defaults to all endpoints|
+| `get_vehicle_location_data()` | Yes | gets the basic and location data for the vehicle|
 | `get_nearby_charging_sites()` | Yes | lists nearby Tesla-operated charging stations |
 | `get_service_scheduling_data()` | No | retrieves next service appointment for this vehicle |
 | `get_charge_history()` <sup>2</sup> | No | lists vehicle charging history data points |
-| `get_user()` | No | gets user account data |
-| `get_user_details()` | No | get user account details |
 | `mobile_enabled()` | Yes | checks if the Mobile Access setting is enabled in the car |
 | `compose_image()` <sup>3</sup> | No | composes a vehicle image based on vehicle option codes |
-| `dist_units()` | Yes | converts distance or speed units to GUI setting of the vehicle |
-| `temp_units()` | Yes | converts temperature units to GUI setting of the vehicle |
+| `dist_units()` | No | converts distance or speed units to GUI setting of the vehicle |
+| `temp_units()` | No | converts temperature units to GUI setting of the vehicle |
+| `gui_time()` | No | returns timestamp or current time formatted to GUI setting |
+| `last_seen()` | No | returns vehicle last seen natural time |
 | `decode_vin()` | No | decodes the vehicle identification number to a dict |
 | `command()` | Yes | wrapper around `api()` for vehicle command response error handling |
 
-<sup>1</sup> Option codes appear to be deprecated. Vehicles return a generic set of codes related to a Model 3.
+<sup>1</sup> Option codes appear to be deprecated.
 
 <sup>2</sup> Car software version 2021.44.25 or higher required, Data Sharing must be enabled and you must be the primary vehicle owner.
 
-<sup>3</sup> Pass vehicle option codes to this method or the image may not be accurate.
+<sup>3</sup> Pass vehicle option codes to this method now options codes are deprecated.
 
 Only methods with *No* in the *Online* column are available when the vehicle is asleep or offline. These methods will not prevent your vehicle from sleeping. Other methods and API calls require the vehicle to be brought online by using `sync_wake_up()` and can prevent your vehicle from sleeping if called within too short a period.
 
-The `Product` class extends `dict` and stores product data of Powerwalls and solar panels returned by the API. Additionally, the class implements the following methods:
+The `Product` class extends `dict` and is initialized with product data of Powerwalls and solar panels returned by the API. Additionally, the class implements the following methods:
 
 | Call | Description |
 | --- | --- |
@@ -91,15 +101,19 @@ The `Product` class extends `dict` and stores product data of Powerwalls and sol
 | `get_calendar_history_data()` | Retrieve live status of product |
 | `command()` | wrapper around `api()` for battery command response error handling |
 
-The `Battery` class extends `Product` and stores Powerwall data returned by the API. Additionally, the class implements the following methods:
+The `Battery` class extends `Product` and stores Powerwall data returned by the API, updated by `get_battery_data()`. Additionally, the class implements the following methods:
 
 | Call | Description |
 | --- | --- |
 | `get_battery_data()` | Retrieve detailed state and configuration of the battery |
 | `set_operation()` | Set battery operation to self_consumption, backup or autonomous |
 | `set_backup_reserve_percent()` | Set the minimum backup reserve percent for that battery |
+| `set_import_export()` | Sets the battery grid import and export settings |
+| `get_tariff()` | Get the tariff rate data |
+| `set_tariff()` | Set the tariff rate data. The data can be created manually, or generated by create_tariff |
+| `create_tariff()` | Creates a correctly formatted dictionary of tariff data |
 
-The `SolarPanel` class extends `Product` and stores solar panel data returned by the API. Additionally, the class implements the following methods:
+The `SolarPanel` class extends `Product` and stores solar panel data returned by the API, updated by `get_site_data()`. Additionally, the class implements the following methods:
 
 | Call | Description |
 | --- | --- |
@@ -112,17 +126,26 @@ Basic usage of the module:
 ```python
 import teslapy
 with teslapy.Tesla('elon@tesla.com') as tesla:
-	vehicles = tesla.vehicle_list()
-	vehicles[0].sync_wake_up()
-	vehicles[0].command('ACTUATE_TRUNK', which_trunk='front')
-	print(vehicles[0].get_vehicle_data()['vehicle_state']['car_version'])
+    vehicles = tesla.vehicle_list()
+    vehicles[0].sync_wake_up()
+    vehicles[0].command('ACTUATE_TRUNK', which_trunk='front')
+    vehicles[0].get_vehicle_data()
+    print(vehicles[0]['vehicle_state']['car_version'])
 ```
 
-TeslaPy 2.4.0+ automatically calls `get_vehicle_data()` when a key is not found, allowing you to omit an initial `get_vehicle_data()` call:
+TeslaPy 2.4.0 and 2.5.0 automatically calls `get_vehicle_data()` and TeslaPy 2.6.0+ automatically calls `get_latest_vehicle_data()` when a key is not found. This example works for TeslaPy 2.6.0+:
 
 ```python
-print(vehicles[0]['vehicle_state']['car_version'])
+import teslapy
+with teslapy.Tesla('elon@tesla.com') as tesla:
+    vehicles = tesla.vehicle_list()
+    print(vehicles[0]['display_name'] + ' last seen ' + vehicles[0].last_seen() +
+          ' at ' + str(vehicles[0]['charge_state']['battery_level']) + '% SoC')
 ```
+
+Example output:
+
+`Tim's Tesla last seen 6 hours ago at 87% SoC`
 
 ### Authentication
 
@@ -153,7 +176,7 @@ with teslapy.Tesla('elon@tesla.com', authenticator=custom_auth) as tesla:
 
 #### selenium
 
-Example using selenium to automate web browser interaction.
+Example using selenium to automate web browser interaction. The SSO page returns a 403 when `navigator.webdriver` is set and currently only Chrome, Opera and Edge Chromium can prevent this.
 
 ```python
 import teslapy
@@ -162,7 +185,9 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 def custom_auth(url):
-    with webdriver.Chrome() as browser:
+    options = webdriver.ChromeOptions()
+    options.add_argument("--disable-blink-features=AutomationControlled")
+    with webdriver.Chrome(chrome_options=options) as browser:
         browser.get(url)
         WebDriverWait(browser, 300).until(EC.url_contains('void/callback'))
         return browser.current_url
@@ -187,6 +212,29 @@ print(vehicles[0])
 tesla.close()
 ```
 
+#### Alternative staged
+
+Support for staged authorization has been added to TeslaPy 2.5.0. The keyword arguments `state` and `code_verifier` are accepted by the `Tesla` class constructor, the `authorization_url()` method and the `fetch_token()` method.
+
+```python
+import teslapy
+# First stage
+tesla = teslapy.Tesla('elon@tesla.com')
+if not tesla.authorized:
+    state = tesla.new_state()
+    code_verifier = tesla.new_code_verifier()
+    print('Use browser to login. Page Not Found will be shown at success.')
+    print('Open: ' + tesla.authorization_url(state=state, code_verifier=code_verifier))
+tesla.close()
+# Second stage
+tesla = teslapy.Tesla('elon@tesla.com', state=state, code_verifier=code_verifier)
+if not tesla.authorized:
+    tesla.fetch_token(authorization_response=input('Enter URL after authentication: '))
+vehicles = tesla.vehicle_list()
+print(vehicles[0])
+tesla.close()
+```
+
 #### 3rd party authentication apps
 
 TeslaPy 2.4.0+ supports usage of a refresh token obtained by 3rd party [authentication apps](https://teslascope.com/help/generating-tokens). The refresh token is used to obtain an access token and both are cached for persistence, so you only need to supply the refresh token only once.
@@ -196,8 +244,8 @@ import teslapy
 with teslapy.Tesla('elon@tesla.com') as tesla:
     if not tesla.authorized:
         tesla.refresh_token(refresh_token=input('Enter SSO refresh token: '))
-	vehicles = tesla.vehicle_list()
-	print(vehicles[0])
+    vehicles = tesla.vehicle_list()
+    print(vehicles[0])
 ```
 
 #### Logout
@@ -268,6 +316,29 @@ with Tesla('elon@tesla.com') as tesla:
                                  'deviceCountry': 'US', 'timezone': 'UTC'}))
 ```
 
+### Robustness
+
+TeslaPy uses an adjustable connect and read timeout of 10 seconds by default. Refer to the [timeouts](https://requests.readthedocs.io/en/master/user/advanced/#timeouts) section for more details. TeslaPy does not retry failed or timed out connections by default, which can be enabled with the `retry` parameter.
+
+```python
+tesla = teslapy.Tesla('elon@tesla.com', retry=2, timeout=15)
+```
+
+A robust program accounting for network failures has a retry strategy, that includes the total number of retry attempts to make, the HTTP response codes to retry on and optionally a backoff factor. Refer to the [retry](https://urllib3.readthedocs.io/en/latest/reference/urllib3.util.html#module-urllib3.util.retry) module for more details.
+
+Be aware that Tesla may temporarily block your account if you are hammering the servers too much.
+
+```python
+import teslapy
+retry = teslapy.Retry(total=2, status_forcelist=(500, 502, 503, 504))
+with teslapy.Tesla('elon@tesla.com', retry=retry) as tesla:
+    vehicles = tesla.vehicle_list()
+    print(vehicles[0])
+vehicles[0].command('FLASH_LIGHTS')  # Raises exception
+```
+
+The line after the context manager will raise an exception when using TeslaPy 2.5.0+ because it explicitly closes the [requests](https://pypi.org/project/requests/) connection handler when the context manager exits. Earlier versions would not raise an exception and retries would not work.
+
 Take a look at [cli.py](https://github.com/tdorssers/TeslaPy/blob/master/cli.py), [menu.py](https://github.com/tdorssers/TeslaPy/blob/master/menu.py) or [gui.py](https://github.com/tdorssers/TeslaPy/blob/master/gui.py) for more code examples.
 
 ## Commands
@@ -284,10 +355,14 @@ These are the major commands:
 | CLIMATE_OFF | | |
 | MAX_DEFROST | `on` | `true` or `false` |
 | CHANGE_CLIMATE_TEMPERATURE_SETTING | `driver_temp`, `passenger_temp` | temperature in celcius |
+| SET_CLIMATE_KEEPER_MODE | `climate_keeper_mode` | 0=off, 1=on, 2=dog, 3=camp |
+| HVAC_BIOWEAPON_MODE | `on` | `true` or `false` |
 | SCHEDULED_DEPARTURE <sup>1</sup> | `enable`, `departure_time`, `preconditioning_enabled`, `preconditioning_weekdays_only`, `off_peak_charging_enabled`, `off_peak_charging_weekdays_only`, `end_off_peak_time` | `true` or `false`, minutes past midnight |
 | SCHEDULED_CHARGING <sup>1</sup> | `enable`, `time` | `true` or `false`, minutes past midnight |
 | CHARGING_AMPS <sup>1</sup> | `charging_amps` | between 0-32 |
+| SET_CABIN_OVERHEAT_PROTECTION | `on`, `fan_only` | `true` or `false` |
 | CHANGE_CHARGE_LIMIT | `percent` | percentage |
+| SET_VEHICLE_NAME | `vehicle_name` | name |
 | CHANGE_SUNROOF_STATE | `state` | `vent` or `close` |
 | WINDOW_CONTROL <sup>2</sup> | `command`, `lat`, `lon` | `vent` or `close`, `0`, `0` |
 | ACTUATE_TRUNK | `which_trunk` | `rear` or `front` |
@@ -297,6 +372,7 @@ These are the major commands:
 | CHARGE_PORT_DOOR_CLOSE | | |
 | START_CHARGE | | |
 | STOP_CHARGE | | |
+| SET_COP_TEMP | `temp` | temperature in celcius |
 | MEDIA_TOGGLE_PLAYBACK | | |
 | MEDIA_NEXT_TRACK | | |
 | MEDIA_PREVIOUS_TRACK | | |
@@ -314,9 +390,11 @@ These are the major commands:
 | CANCEL_SOFTWARE_UPDATE | | |
 | SET_SENTRY_MODE | `on` | `true` or `false` |
 | REMOTE_SEAT_HEATER_REQUEST | `heater`, `level` | seat 0-5, level 0-3 |
+| REMOTE_AUTO_SEAT_CLIMATE_REQUEST | `auto_seat_position`, `auto_climate_on` | 1-2, `true` or `false` |
+| REMOTE_SEAT_COOLING_REQUEST | `seat_position`, `seat_cooler_level` | |
 | REMOTE_STEERING_WHEEL_HEATER_REQUEST | `on` | `true` or `false` |
 
-<sup>1</sup> requires car version 2021.36 or higher. CHARGING_AMPS can be set to less than 5, by calling the API twice. Special thanks to [themonomers](https://github.com/themonomers) and [purcell-lab](https://github.com/purcell-lab).
+<sup>1</sup> requires car version 2021.36 or higher. Setting `charging_amps` to 2 or 3 results in 3A and setting to 0 or 1 results in 2A.
 
 <sup>2</sup> `close` requires `lat` and `lon` values to be near the current location of the car.
 
@@ -341,7 +419,7 @@ As of September 3, 2021, Tesla has added ReCaptcha to the login form. This cause
 
 As of January 12, 2022, Tesla has deprecated the use of [RFC 7523](https://tools.ietf.org/html/rfc7523) tokens and requires the SSO tokens to be used for API access. If you get a `requests.exceptions.HTTPError: 401 Client Error: Unauthorized for url: https://owner-api.teslamotors.com/api/1/vehicles` and you are using correct credentials then you are probably using an old version of this module.
 
-As of March 1, 2022, Tesla no longer supports the login_hint parameter in the V3 authorization URL. If you get a `requests.exceptions.HTTPError: 500 Server Error: Internal Server Error for url: https://auth.tesla.com/oauth2/v3/authorize` then you are probably using an old version of this module.
+As of January 7, 2024, Tesla has removed the VEHICLE_LIST endpoint. If you get a `requests.exceptions.HTTPError: 412 Client Error: Endpoint is only available on fleetapi. Visit https://developer.tesla.com/docs for more info` then you are probably using an old version of this module.
 
 ## Demo applications
 
@@ -353,7 +431,7 @@ The source repository contains three demo applications that *optionally* use [py
 usage: cli.py [-h] -e EMAIL [-f FILTER] [-a API [KEYVALUE ...]] [-k KEYVALUE]
               [-c COMMAND] [-t TIMEOUT] [-p PROXY] [-R REFRESH] [-U URL] [-l]
               [-o] [-v] [-w] [-g] [-b] [-n] [-m] [-s] [-d] [-r] [-S] [-H] [-V]
-              [-L] [-u] [--chrome] [--edge] [--firefox] [--opera] [--safari]
+              [-L] [-u] [--chrome] [--edge]
 
 Tesla Owner API CLI
 
@@ -382,14 +460,13 @@ optional arguments:
   -r, --stream          receive streaming vehicle data on-change
   -S, --service         get service self scheduling eligibility
   -H, --history         get charging history data
+  -B, --basic           get basic vehicle data only
+  -G, --location        get location (GPS) data, wake as needed
   -V, --verify          disable verify SSL certificate
   -L, --logout          clear token from cache and logout
   -u, --user            get user account details
   --chrome              use Chrome WebDriver
   --edge                use Edge WebDriver
-  --firefox             use Firefox WebDriver
-  --opera               use Opera WebDriver
-  --safari              use Safari WebDriver
 ```
 
 Example usage of [cli.py](https://github.com/tdorssers/TeslaPy/blob/master/cli.py):
@@ -426,7 +503,7 @@ Example output of `get_vehicle_data()` or `python cli.py -e elon@tesla.com -w -g
     "vehicle_id": 1234567890,
     "vin": "5YJ3E111111111111",
     "display_name": "Tim's Tesla",
-    "option_codes": "AD15,MDL3,PBSB,RENA,BT37,ID3W,RF3G,S3PB,DRLH,DV2W,W39B,APF0,COUS,BC3B,CH07,PC30,FC3P,FG31,GLFR,HL31,HM31,IL31,LTPB,MR31,FM3B,RS3H,SA3P,STCP,SC04,SU3C,T3CA,TW00,TM00,UT3P,WR00,AU3P,APH3,AF00,ZCST,MI00,CDM0",
+    "option_codes": null,
     "color": null,
     "tokens": [
         "1234567890abcdef",
@@ -567,7 +644,7 @@ Example output of `get_vehicle_data()` or `python cli.py -e elon@tesla.com -w -g
         "center_display_state": 2,
         "df": 0,
         "dr": 0,
-		"fd_window": 0,
+        "fd_window": 0,
         "fp_window": 0,
         "ft": 0,
         "is_user_present": true,
@@ -580,11 +657,11 @@ Example output of `get_vehicle_data()` or `python cli.py -e elon@tesla.com -w -g
         "parsed_calendar_supported": true,
         "pf": 0,
         "pr": 0,
-		"rd_window": 0,
+        "rd_window": 0,
         "remote_start": false,
         "remote_start_enabled": true,
         "remote_start_supported": true,
-		"rp_window": 0,
+        "rp_window": 0,
         "rt": 0,
         "sentry_mode": false,
         "sentry_mode_available": true,
@@ -688,11 +765,52 @@ Example output of `get_battery_data()` or `python cli.py -e elon@tesla.com -b` b
 }
 ```
 
+## Energy site data
+
+Example output of `get_site_data()` or `python cli.py -e elon@tesla.com -s` below:
+
+```json
+{
+    "energy_site_id": 111110110110,
+    "resource_type": "solar",
+    "id": "111aaa00-111a-11a1-00aa-00a1aa1aa0aa",
+    "asset_site_id": "a1100111-1a11-1aaa-a111-1a0011aa1111",
+    "solar_power": 11892.01953125,
+    "solar_type": "pv_panel",
+    "storm_mode_enabled": null,
+    "powerwall_onboarding_settings_set": null,
+    "sync_grid_alert_enabled": false,
+    "breaker_alert_enabled": false,
+    "components": {
+        "battery": false,
+        "solar": true,
+        "solar_type": "pv_panel",
+        "grid": true,
+        "load_meter": true,
+        "market_type": "residential"
+    },
+    "energy_left": 0,
+    "total_pack_energy": 1,
+    "percentage_charged": 0,
+    "battery_power": 0,
+    "load_power": 0,
+    "grid_status": "Unknown",
+    "grid_services_active": false,
+    "grid_power": -11892.01953125,
+    "grid_services_power": 0,
+    "generator_power": 0,
+    "island_status": "island_status_unknown",
+    "storm_mode_active": false,
+    "timestamp": "2022-08-15T17:12:26Z",
+    "wall_connectors": null
+}
+```
+
 ## Installation
 
 TeslaPy is available on PyPI:
 
-`python -m pip install teslapy`
+`python -m pip install teslapy 'urllib3<2'`
 
 Make sure you have [Python](https://www.python.org/) 2.7+ or 3.5+ installed on your system. Alternatively, clone the repository to your machine and run demo application [cli.py](https://github.com/tdorssers/TeslaPy/blob/master/cli.py), [menu.py](https://github.com/tdorssers/TeslaPy/blob/master/menu.py) or [gui.py](https://github.com/tdorssers/TeslaPy/blob/master/gui.py) to get started, after installing [requests_oauthlib](https://pypi.org/project/requests-oauthlib/) 0.8.0+, [geopy](https://pypi.org/project/geopy/) 1.14.0+, [pywebview](https://pypi.org/project/pywebview/) 3.0+ (optional), [selenium](https://pypi.org/project/selenium/) 3.13.0+ (optional) and [websocket-client](https://pypi.org/project/websocket-client/) 0.59+ using [PIP](https://pypi.org/project/pip/) as follows:
 
@@ -701,7 +819,3 @@ Make sure you have [Python](https://www.python.org/) 2.7+ or 3.5+ installed on y
 and install [ChromeDriver](https://sites.google.com/chromium.org/driver/) to use Selenium or on Ubuntu as follows:
 
 `sudo apt-get install python3-requests-oauthlib python3-geopy python3-webview python3-selenium python3-websocket`
-
-If you prefer Firefox, install [GeckoDriver](https://github.com/mozilla/geckodriver/releases) or on Ubuntu as follows:
-
-`sudo apt-get install firefox-geckodriver`
