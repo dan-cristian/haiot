@@ -80,9 +80,11 @@ def parse_general(inverter):
         inverter.lifetime_generation = float(production)
         inverter.day_generation = float(day_production)
         inverter.save_changed_fields()
+        return True
     except Exception as ex:
         L.l.error("Exception on inverter {} general run, ex={}".format(inverter.name, ex))
         P.thread_pool_status = "Parsing inverter {} exception {}".format(inverter.name, ex)
+        return False
 
 
 def parse_panels(inverter):
@@ -152,8 +154,8 @@ def parse_panels(inverter):
 def thread_run():
     inverters = m.MicroInverter.find({"enabled": True})
     for inv in inverters:
-        parse_general(inv)
-        parse_panels(inv)
+        if parse_general(inv):
+            parse_panels(inv)
 
 
 def unload():
