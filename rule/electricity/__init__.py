@@ -498,9 +498,6 @@ class P:
         #P.device_list[relay] = InverterRelay(relay_name=relay, avg_consumption=-500,
         #                                   supports_breaks=True, min_on_interval=60, state_change_interval=120)
 
-        if apps.tesla.P.initialised:
-            relay = 'tesla_charger'
-            P.device_list[relay] = TeslaCharger(relay_name=relay, vehicle_id=1, state_change_interval=15)
 
         relay = 'batterycharge_1'  # index 1, right, stable
         P.device_list[relay] = BatteryCharger(relay_name=relay, avg_consumption=700,  # 730
@@ -522,6 +519,10 @@ class P:
                                               supports_breaks=True, min_on_interval=6, state_change_interval=3,
                                               voltage_sensor_name="house battery",
                                               voltage_max_limit=28.6, voltage_max_floor=27.2)
+        if apps.tesla.P.initialised:
+            relay = 'tesla_charger'
+            P.device_list[relay] = TeslaCharger(relay_name=relay, vehicle_id=1, state_change_interval=15)
+
         relay = 'waterheater_relay'
         P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=2900,
                                            supports_breaks=True, min_on_interval=1, state_change_interval=3)
