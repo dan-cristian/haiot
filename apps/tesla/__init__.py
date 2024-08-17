@@ -158,6 +158,9 @@ def set_charging_amps(amps, car_id=1):
                     return True
                 else:
                     L.l.warning("Skipping set Tesla charging amps due to too many requests")
+            except VehicleError as vex:
+                L.l.error("VehicleError, cannot set Tesla charging amps: {}".format(vex))
+                P.last_too_many_requests_date = datetime.now()
             except Exception as ex:
                 L.l.error("Unable to set Tesla charging amps: {}".format(ex))
                 try_connection_recovery(car_id)
