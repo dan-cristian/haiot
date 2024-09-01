@@ -329,7 +329,8 @@ class BatteryCharger(Relaydevice):
                 # skip any actions if the charger is currently charging a critical cell (otherwise it will stop charge)
                 if P.bms_cell_critical_charge_recovery_started and self.RELAY_NAME == P.critical_charger_name:
                     # skip charger actions
-                    L.l.info("Keeping charger on as cell level is still critical")
+                    L.l.info("Keeping charger on as cell level is still critical, voltage={}".format(
+                        voltage_sensor.voltage))
                     return False
                 else:
                     return super().grid_updated(grid_watts)
