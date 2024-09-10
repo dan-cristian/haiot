@@ -618,8 +618,10 @@ def rule_energy_bms_cell(obj=m.Bms(), change=None):
             if inverter_relay is not None:
                 if P.bms_min_cell_voltage <= P.bms_cell_min_inverter_voltage_protection:
                     P.bms_cell_charge_topup_reached = False
-                    inverter_relay.relay_is_on = False
-                    inverter_relay.save_changed_fields()
+                    L.l.info("Inverter off DISABLED, min cell voltage<{}".format(
+                        P.bms_cell_min_inverter_voltage_protection))
+                    #inverter_relay.relay_is_on = False
+                    #inverter_relay.save_changed_fields()
                     L.l.info("Inverter off, min cell voltage<{}".format(P.bms_cell_min_inverter_voltage_protection))
                 if P.bms_min_cell_voltage >= P.bms_cell_inverter_topup_voltage:
                     P.bms_cell_charge_topup_reached = True
