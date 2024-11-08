@@ -352,6 +352,7 @@ class BatteryCharger(Relaydevice):
 class TeslaCharger(Relaydevice):
     vehicle_id = None
     DEBUG = True
+    DEFAULT_AMPS_ON_STOP = 13  # default amps when charging is stopped to allow battery heating from grid
 
     def __init__(self, relay_name, vehicle_id, state_change_interval):
         self.vehicle_id = vehicle_id
@@ -394,6 +395,8 @@ class TeslaCharger(Relaydevice):
                 if apps.tesla.should_stop_charge(self.vehicle_id):
                     P.thread_pool_status = 'tesla.stop_charge'
                     apps.tesla.stop_charge(self.vehicle_id)
+                    # set default amps to allow car to heat battery etc from grid
+                    apps.tesla.set_charging_amps(TeslaCharger.DEFAULT_AMPS_ON_STOP)
                 # is_charging = apps.tesla.is_charging(self.vehicle_id)
                 # if is_charging:
                 #    L.l.info("Car is charging, stopping")
