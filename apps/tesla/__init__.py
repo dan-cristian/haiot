@@ -58,6 +58,8 @@ class P:
     car_state = dict()
     last_charging_stopped = dict()  # timestamps when car charging was stopped
     DEBUG = True
+    last_debug = datetime.now()
+    DEBUG_DELTA = 60  # sec
 
     def __init__(self):
         pass
@@ -66,6 +68,12 @@ class P:
 def can_refresh():
     return (datetime.now() - P.last_refresh_request).total_seconds() >= P.refresh_request_pause
 
+
+def can_print_debug():
+    res = P.DEBUG and (datetime.now() - P.last_debug).total_seconds() > P.DEBUG_DELTA
+    if res:
+        P.last_debug = datetime.now()
+    return res
 
 # allow variable charging when car is at home and scheduling is not enabled
 # when scheduling is enabled the car charging parameters will not change - allows manual user adjustments only
@@ -90,7 +98,7 @@ def can_auto_charge(vehicle_id=1):
     if res is None and plugged_in:
         # force a charge to trigger charge status
         res = True
-    if P.DEBUG and (res is False or res is None):
+    if can_print_debug() and (res is False or res is None):
         L.l.info("Tesla debug auto_charge: home={} geo={} sched={} plugged={} time_full={} precond={} clim={}".format(
             P.can_charge_at_home, P.teslamate_geo_home, P.scheduled_charging_mode, plugged_in,
             P.teslamate_time_to_full_charge, is_preconditioning, is_climate_on
