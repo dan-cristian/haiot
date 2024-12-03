@@ -50,6 +50,7 @@ class P:
     battery_full = None
     # save car params
     is_charging = dict()
+    is_preconditioning = dict()
     charging_amp = dict()
     car_latitude = dict()
     car_longitude = dict()
@@ -387,8 +388,14 @@ def _process_message(msg):
         L.l.info("Tesla charger actual current = {}".format(msg.payload))
     if "charger_power" in msg.topic:
         value = int(msg.payload)
-        P.is_charging[car_id] = (value == 1)
-        L.l.info("Tesla is charging power={}".format(value))
+        if value == 1:
+            P.is_charging[car_id] = True
+            L.l.info("Tesla is charging")
+        elif value == 2:
+            P.is_preconditioning[car_id] = True
+            L.l.info("Tesla is preconditioning")
+        else:
+            L.l.info("Tesla charging power={}, unknown state".format(value))
     if "charger_voltage" in msg.topic:
         value = int(msg.payload)
         P.teslamate_voltage[car_id] = value
