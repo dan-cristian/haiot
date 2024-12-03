@@ -73,7 +73,13 @@ def can_auto_charge(vehicle_id=1):
         plugged_in = P.teslamate_plugged_in[vehicle_id]
     else:
         plugged_in = P.charging_state != 'Disconnected'
-    res = (P.can_charge_at_home or P.teslamate_geo_home) and not P.scheduled_charging_mode and plugged_in
+    if vehicle_id in P.is_preconditioning.keys():
+        is_preconditioning = P.is_preconditioning[vehicle_id]
+    else:
+        is_preconditioning = False
+
+    res = (P.can_charge_at_home or P.teslamate_geo_home) and not P.scheduled_charging_mode \
+          and plugged_in and (is_preconditioning is not True)
     if res is False and P.can_charge_at_home is None and P.teslamate_geo_home is None and plugged_in:
         L.l.info("Forcing Tesla auto charge as I miss data, assume I can charge")
         res = True
@@ -81,18 +87,18 @@ def can_auto_charge(vehicle_id=1):
         # force a charge to trigger charge status
         res = True
     if P.DEBUG and (res is False or res is None):
-        L.l.info("Tesla debug auto_charge: at_home={} geo={} sched={} plugged_in={} time_full={}".format(
+        L.l.info("Tesla debug auto_charge: at_home={} geo={} sched={} plugged_in={} time_full={} precond={}".format(
             P.can_charge_at_home, P.teslamate_geo_home, P.scheduled_charging_mode, plugged_in,
-            P.teslamate_time_to_full_charge
+            P.teslamate_time_to_full_charge, is_preconditioning
         ))
     return res
 
 
 def is_battery_full():
     if P.charge_limit_soc is not None:
-        soc_full = (P.battery_level is not None and P.charge_limit_soc is not None) and\
+        soc_full = (P.battery_level is not None and P.charge_limit_soc is not None) and \
                    (P.battery_level >= P.charge_limit_soc) or \
-                   (P.teslamate_battery_level is not None and P.teslamate_soc is not None) and\
+                   (P.teslamate_battery_level is not None and P.teslamate_soc is not None) and \
                    (P.teslamate_battery_level >= P.teslamate_soc)
         res = soc_full
     else:
@@ -206,7 +212,7 @@ def vehicle_update(car_id=1):
             P.charge_limit_soc = ch['charge_limit_soc']
             P.battery_level = ch['battery_level']
             L.l.info('Tesla user charging request={}, schedule mode={}'.format(P.user_charging_mode,
-                                                                         P.scheduled_charging_mode))
+                                                                               P.scheduled_charging_mode))
             if P.user_charging_mode:
                 L.l.info("Tesla manual user charging detected")
             act_amps = ch['charger_actual_current']
@@ -286,7 +292,7 @@ def is_charging(car_id=1):
 
     if voltage_charge:
         # dbl check if really charging
-        last_delta = (datetime.now()-P.charging_status_date).total_seconds()
+        last_delta = (datetime.now() - P.charging_status_date).total_seconds()
         L.l.info("Tesla on charge check charge_stopped={}, last update={}s".format(P.charging_stopped, last_delta))
         return True
     else:
@@ -388,12 +394,18 @@ def _process_message(msg):
         L.l.info("Tesla charger actual current = {}".format(msg.payload))
     if "charger_power" in msg.topic:
         value = int(msg.payload)
-        if value == 1:
+        if value == 0:
+            P.is_charging[car_id] = False
+            L.l.info("Tesla stopped charging")
+        elif value == 1:
             P.is_charging[car_id] = True
-            L.l.info("Tesla is charging")
+            L.l.info("Tesla started charging")
         elif value == 2:
             P.is_preconditioning[car_id] = True
-            L.l.info("Tesla is preconditioning")
+            L.l.info("Tesla started preconditioning")
+        elif value == 3:
+            P.is_preconditioning[car_id] = False
+            L.l.info("Tesla stopped preconditioning")
         else:
             L.l.info("Tesla charging power={}, unknown state".format(value))
     if "charger_voltage" in msg.topic:
