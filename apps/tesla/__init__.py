@@ -51,6 +51,7 @@ class P:
     # save car params
     is_charging = dict()
     is_preconditioning = dict()
+    is_climate_on = dict()
     charging_amp = dict()
     car_latitude = dict()
     car_longitude = dict()
@@ -77,9 +78,12 @@ def can_auto_charge(vehicle_id=1):
         is_preconditioning = P.is_preconditioning[vehicle_id]
     else:
         is_preconditioning = False
-
+    if vehicle_id in P.is_climate_on.keys():
+        is_climate_on = P.is_climate_on[vehicle_id]
+    else:
+        is_climate_on = False
     res = (P.can_charge_at_home or P.teslamate_geo_home) and not P.scheduled_charging_mode \
-          and plugged_in and (is_preconditioning is not True)
+          and plugged_in and (is_preconditioning is False) and (is_climate_on is False)
     if res is False and P.can_charge_at_home is None and P.teslamate_geo_home is None and plugged_in:
         L.l.info("Forcing Tesla auto charge as I miss data, assume I can charge")
         res = True
@@ -87,9 +91,9 @@ def can_auto_charge(vehicle_id=1):
         # force a charge to trigger charge status
         res = True
     if P.DEBUG and (res is False or res is None):
-        L.l.info("Tesla debug auto_charge: at_home={} geo={} sched={} plugged_in={} time_full={} precond={}".format(
+        L.l.info("Tesla debug auto_charge: home={} geo={} sched={} plugged={} time_full={} precond={} clim={}".format(
             P.can_charge_at_home, P.teslamate_geo_home, P.scheduled_charging_mode, plugged_in,
-            P.teslamate_time_to_full_charge, is_preconditioning
+            P.teslamate_time_to_full_charge, is_preconditioning, is_climate_on
         ))
     return res
 
@@ -400,12 +404,6 @@ def _process_message(msg):
         elif value == 1:
             P.is_charging[car_id] = True
             L.l.info("Tesla started charging")
-        elif value == 2:
-            P.is_preconditioning[car_id] = True
-            L.l.info("Tesla started preconditioning")
-        elif value == 3:
-            P.is_preconditioning[car_id] = False
-            L.l.info("Tesla stopped preconditioning")
         else:
             L.l.info("Tesla charging power={}, unknown state".format(value))
     if "charger_voltage" in msg.topic:
@@ -448,12 +446,21 @@ def _process_message(msg):
         L.l.info("Tesla battery level={}".format(value))
     if "power" in msg.topic:
         value = int(msg.payload)
+        L.l.info("Tesla battery power={}".format(value))
         if value == -1:  # charging started
             # refresh vehicle state to detect if user started the charging
             # temporarily set user charging to true to avoid automatic stop
             P.user_charging_mode = True
             vehicle_update(car_id)
         L.l.info("Tesla_mate power={}".format(value))
+    if "is_climate_on" in msg.topic:
+        value = bool(msg.payload)
+        L.l.info("Tesla climate on={}".format(value))
+        P.is_climate_on[car_id] = value
+    if "is_preconditioning" in msg.topic:
+        value = bool(msg.payload)
+        L.l.info("Tesla is preconditioning={}".format(value))
+        P.is_preconditioning[car_id] = value
     if "user_charge_enable_request" in msg.topic:  # not working
         value = "{}".format(msg.payload).replace("b", "").replace("\\", "").replace("'", "")
         P.user_charging_mode = value == "True"
