@@ -91,7 +91,7 @@ def can_auto_charge(vehicle_id=1):
     else:
         is_climate_on = False
     res = (P.can_charge_at_home or P.teslamate_geo_home) and not P.scheduled_charging_mode \
-          and plugged_in and (is_preconditioning is False) and (is_climate_on is False)
+          and plugged_in # and (is_preconditioning is False) and (is_climate_on is False)
     if res is False and P.can_charge_at_home is None and P.teslamate_geo_home is None and plugged_in:
         L.l.info("Forcing Tesla auto charge as I miss data, assume I can charge")
         res = True
