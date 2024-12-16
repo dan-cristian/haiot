@@ -742,7 +742,10 @@
     {"id": "704000184512-2", "panel_max_watts":450, "ecu_max_watts":440, "location": ""},
     {"id": "704000285624-1", "panel_max_watts":450, "ecu_max_watts":440, "location": ""},
     {"id": "704000285624-2", "panel_max_watts":450, "ecu_max_watts":440, "location": ""},
-
+    {"id": "704000158282-1", "location": ""},
+    {"id": "704000158282-2", "location": ""},
+    {"id": "704000285353-1", "location": ""},
+    {"id": "704000285353-2", "location": ""},
     {"id": "403000301504-A", "location": ""},
     {"id": "403000301504-B", "location": ""},
     {"id": "404000225631-A", "location": ""},
