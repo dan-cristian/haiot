@@ -208,7 +208,7 @@ class Constant:
 
 def _install(package):
     print('Installing missing module {}'.format(package))
-    return subprocess.call([sys.executable, "-m", "pip", "install", package])
+    return subprocess.call([sys.executable, "-m", "pip3", "install", package])
 
 
 def _install_apt(apt_list):
