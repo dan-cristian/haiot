@@ -354,13 +354,12 @@ class BatteryCharger(Relaydevice):
 class PwmBatteryCharger(Relaydevice):
     rpig = None
     pwm_port = None
-    min_consumption = [40, 150]
-    max_consumption = [255, 3000]
-    m = (max_consumption[1] - min_consumption[1]) / (max_consumption[0] - min_consumption[0])  # slope
-    b = min_consumption[1] - (m * min_consumption[0])  # y-intercept
+    idle_duty = 40  # about 15W
+    max_duty = 255
+    duty_jump = 10
 
     def __init__(self, relay_name, avg_consumption, relay_id=None, supports_breaks=True, min_on_interval=0,
-                 state_change_interval=0, max_consumption=0, pwm_port=None):
+                 state_change_interval=0.1, max_consumption=0, pwm_port=None, meter_relay=None):
         Relaydevice.__init__(self, relay_name=relay_name, supports_breaks=supports_breaks,
                              min_on_interval=min_on_interval,
                              state_change_interval=state_change_interval, avg_consumption=avg_consumption)
@@ -370,35 +369,36 @@ class PwmBatteryCharger(Relaydevice):
             L.l.error("Unable to connect to pigpio remote ip={}".format(relay_id))
         else:
             L.l.info("Connected to pigpio remote ip={}".format(relay_id))
-            self.rpig.set_PWM_frequency(self.pwm_port, 4000)
+            self.rpig.set_PWM_frequency(self.pwm_port, 8000)
 
     def grid_updated(self, grid_watts):
-        if self.rpig.connected:
-            duty = self.rpig.get_PWM_dutycycle(self.pwm_port)
-            calc_watts = self.m * duty + self.b
-            L.l.info("Pwm duty for {} port {}={}, calc_watts={}".format(self.RELAY_ID, self.pwm_port, duty, calc_watts))
-
+        if self.can_state_change() and self.rpig.connected:
+            existing_duty = self.rpig.get_PWM_dutycycle(self.pwm_port)
+            # L.l.info("Pwm duty for {} port {}={}".format(self.RELAY_ID, self.pwm_port, existing_duty))
             if grid_watts <= 0:
                 # start device if exporting and there is enough surplus
                 export_watts = -grid_watts
                 # only trigger power on if over treshold
                 if export_watts > P.MIN_WATTS_THRESHOLD \
                         and self.AVG_CONSUMPTION <= (export_watts + P.MIN_WATTS_THRESHOLD):
-                    calc_duty = round((export_watts - self.b) / self.m)
-                    L.l.info("Set pwm charger to duty {} for export watts={}".format(calc_duty, export_watts))
-                    self.rpig.set_PWM_dutycycle(self.pwm_port, calc_duty)
+                    next_duty = existing_duty + self.duty_jump
+                    next_duty = min(next_duty, self.max_duty)
+                    if next_duty != existing_duty:
+                        L.l.info("Increase pwm charger duty {}, export watts={}".format(next_duty, export_watts))
+                        self.rpig.set_PWM_dutycycle(self.pwm_port, next_duty)
+                        self.power_status_changed()
             else:
-                import_watts = grid_watts
                 # todo reduce duty to decrease consumption. check actual consumption from meter?
-                new_target_watts = calc_watts - import_watts
-                if new_target_watts > 0:
-                    calc_duty = round((new_target_watts - self.b) / self.m)
-                    L.l.info("Reduce pwm charger to duty {} for import watts={}".format(calc_duty, import_watts))
-                    self.rpig.set_PWM_dutycycle(self.pwm_port, calc_duty)
-                else:  # stop charging
-                    L.l.info("Stop pwm charger for import watts={}".format(import_watts))
-                    self.rpig.set_PWM_dutycycle(self.pwm_port, 0)
-
+                if existing_duty > self.idle_duty:
+                    next_duty = existing_duty - self.duty_jump
+                    if next_duty < self.idle_duty:
+                        next_duty = self.idle_duty
+                    L.l.info("Reduce pwm charger duty {}, import watts={}".format(next_duty, grid_watts))
+                    self.rpig.set_PWM_dutycycle(self.pwm_port, next_duty)
+                    self.power_status_changed()
+                #else:  # stop charging
+                #    L.l.info("Idle pwm charger for import watts={}".format(grid_watts))
+                #    self.rpig.set_PWM_dutycycle(self.pwm_port, self.idle_duty)
 
 
 class TeslaCharger(Relaydevice):
@@ -550,23 +550,23 @@ class P:
         # P.device_list[relay] = InverterRelay(relay_name=relay, avg_consumption=-500,
         #                                   supports_breaks=True, min_on_interval=60, state_change_interval=120)
 
-        #relay = 'batterycharge_1'  # index 1, right, stable
-        #P.device_list[relay] = BatteryCharger(relay_name=relay, avg_consumption=700,  # 730
+        # relay = 'batterycharge_1'  # index 1, right, stable
+        # P.device_list[relay] = BatteryCharger(relay_name=relay, avg_consumption=700,  # 730
         #                                      supports_breaks=True, min_on_interval=6, state_change_interval=3,
         #                                      voltage_sensor_name="house battery",
         #                                      voltage_max_limit=28.6, voltage_max_floor=27.2)
-        #relay = 'batterycharge_2'  # index 3, right, stable
-        #P.device_list[relay] = BatteryCharger(relay_name=relay, avg_consumption=750,  # 735
+        # relay = 'batterycharge_2'  # index 3, right, stable
+        # P.device_list[relay] = BatteryCharger(relay_name=relay, avg_consumption=750,  # 735
         #                                      supports_breaks=True, min_on_interval=6, state_change_interval=3,
         #                                      voltage_sensor_name="house battery",
         #                                      voltage_max_limit=28.6, voltage_max_floor=27.2)
-        #relay = 'batterycharge_3'  # index 4, left, somewhat stable
-        #P.device_list[relay] = BatteryCharger(relay_name=relay, avg_consumption=750,  # 730
+        # relay = 'batterycharge_3'  # index 4, left, somewhat stable
+        # P.device_list[relay] = BatteryCharger(relay_name=relay, avg_consumption=750,  # 730
         #                                      supports_breaks=True, min_on_interval=6, state_change_interval=3,
         #                                      voltage_sensor_name="house battery",
         #                                      voltage_max_limit=28.6, voltage_max_floor=27.2)
-        #relay = 'batterycharge_4'  # index 2, flaky
-        #P.device_list[relay] = BatteryCharger(relay_name=relay, avg_consumption=750,  # 725
+        # relay = 'batterycharge_4'  # index 2, flaky
+        # P.device_list[relay] = BatteryCharger(relay_name=relay, avg_consumption=750,  # 725
         #                                      supports_breaks=True, min_on_interval=6, state_change_interval=3,
         #                                      voltage_sensor_name="house battery",
         #                                      voltage_max_limit=28.6, voltage_max_floor=27.2)
@@ -579,8 +579,8 @@ class P:
             relay = 'tesla_charger'
             P.device_list[relay] = TeslaCharger(relay_name=relay, vehicle_id=1, state_change_interval=15)
 
-        #relay = 'waterheater_relay'
-        #P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=2900,
+        # relay = 'waterheater_relay'
+        # P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=2900,
         #                                   supports_breaks=True, min_on_interval=1, state_change_interval=3)
 
         if not P.emulate_export:
