@@ -189,7 +189,7 @@
     {"id":661, "active":true, "start_order":61, "name":"sensor.shelly", "host_name":"nas"},
     {"id":665, "active":true, "start_order":65, "name":"gpio", "host_name":"nas"},
     {"id":667, "active":true, "start_order":67, "name":"alarm", "host_name":"nas"},
-    {"id":670, "active":true, "start_order":70, "name":"music", "host_name":"nas"},
+    {"id":670, "active":false, "start_order":70, "name":"music", "host_name":"nas"},
     {"id":675, "active":true, "start_order":75, "name":"devices.vent_atrea", "host_name":"nas"},
     {"id":620, "active":true, "start_order":20, "name":"test", "host_name":"nas"},
     {"id":673, "active":true, "start_order":73, "name":"apps.air_sensor_upload", "host_name":"nas"},
