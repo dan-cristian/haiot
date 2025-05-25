@@ -1,6 +1,7 @@
 __author__ = 'Dan Cristian <dan.cristian@gmail.com>'
 
 import urllib.request
+import traceback
 from main.logger_helper import L
 from common import Constant, utils, get_json_param
 from main import thread_pool
@@ -98,7 +99,12 @@ def parse_panels(inverter):
         # use exact start pattern for first row
         next_panel, end_index = utils.parse_text(
             aps_text, P.start_next_panel[index], P.end_panel[index], start_index=end_index, return_end_index=True)
-        found_panel = next_panel is not None
+        if next_panel is None \
+                or not ("-A" in next_panel or "-B" in next_panel or "-1" in next_panel or "-2" in next_panel):
+            L.l.warning("Unexpected keyword {} instead of panel name".format(next_panel))
+            found_panel = False
+        else:
+            found_panel = True
         while found_panel and row_count < 100:
             row_count += 1
             panel = m.SolarPanel.find_one({"id": next_panel})
@@ -111,7 +117,10 @@ def parse_panels(inverter):
             watts, ind = utils.parse_text(aps_text, "<td>", " </td>",
                                           start_index=end_index, return_end_index=True)
             if watts != "-":
-                panel.power = int(watts.replace("W", "").strip())
+                if "W" not in watts:
+                    L.l.warning("Could not find keyword W in {}".format(watts))
+                else:
+                    panel.power = int(watts.replace("W", "").strip())
 
             if inverter.type == 2:
                 # additional column with DC voltage
@@ -119,22 +128,37 @@ def parse_panels(inverter):
                                              start_index=ind, return_end_index=True)
                 if dc_volt != "-":
                     panel.panel_voltage = int(dc_volt.replace("V", "").strip())
-
+            hertz_miss = False
+            hertz = ""
             if row_count % 2 != 0:
-                hertz, ind = utils.parse_text(aps_text, ">", " </td>",
-                                             start_index=ind, return_end_index=True)
-                if hertz != "-" and hertz is not None:
-                    panel.grid_frequency = float(hertz.replace("Hz", "").strip())
-
-            grid_volt, ind = utils.parse_text(aps_text, "<td>", " </td>",
+                try:
+                    orig_ind = ind
+                    hertz, ind = utils.parse_text(aps_text, ">", " </td>",
+                                                 start_index=ind, return_end_index=True)
+                    if hertz != "-" and hertz is not None:
+                        if "Hz" not in hertz:
+                            # L.l.warning("Could not find Hz keyword in string {}".format(hertz))
+                            hertz_miss = True
+                        else:
+                            panel.grid_frequency = float(hertz.replace("Hz", "").strip())
+                except Exception as exh:
+                    L.l.warning("Error parsing hertz, {}".format(exh))
+            orig_ind = ind
+            if hertz_miss:
+                grid_volt = hertz
+            else:
+                grid_volt, ind = utils.parse_text(aps_text, "<td>", " </td>",
                                          start_index=ind, return_end_index=True)
             if grid_volt != "-":
-                panel.grid_voltage = int(grid_volt.replace("V", "").strip())
+                if "V" not in grid_volt:
+                    L.l.warning("Unexpected keyword {} instead of V".format(grid_volt))
+                else:
+                    panel.grid_voltage = int(grid_volt.replace("V", "").strip())
 
             if row_count % 2 != 0:
                 temp, ind = utils.parse_text(aps_text, ">", " </td>",
                                              start_index=ind, return_end_index=True)
-                if temp != "-":
+                if temp is not None and temp != "-":
                     panel.temperature = temp.replace("&#176;C", "").strip()
 
                 # not used, but needed to parse correctly
@@ -146,11 +170,18 @@ def parse_panels(inverter):
             # use different start pattern for row 2nd onwards
             next_panel, end_index = utils.parse_text(aps_text, "<td>", " </td>",
                                                      start_index=end_index, return_end_index=True)
-            found_panel = next_panel is not None
+
+            if next_panel is None or \
+                    not ("-A" in next_panel or "-B" in next_panel or "-1" in next_panel or "-2" in next_panel):
+                L.l.warning("Unexpected keyword {} instead of panel name".format(next_panel))
+                found_panel = False
+            else:
+                found_panel = True
         L.l.info("APS Solar panel iterations = {}".format(row_count))
 
     except Exception as ex:
         L.l.error("Exception on inverter {} panels run, ex={}".format(inverter.name, ex))
+        print(traceback.format_exc())
 
 
 def thread_run():
