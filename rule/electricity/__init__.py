@@ -359,7 +359,7 @@ class PwmBatteryCharger(Relaydevice):
     duty_jump = 10
 
     def __init__(self, relay_name, avg_consumption, relay_id=None, supports_breaks=True, min_on_interval=0,
-                 state_change_interval=0.1, max_consumption=0, pwm_port=None, meter_relay=None):
+                 state_change_interval=0.05, max_consumption=0, pwm_port=None, meter_relay=None):
         Relaydevice.__init__(self, relay_name=relay_name, supports_breaks=supports_breaks,
                              min_on_interval=min_on_interval,
                              state_change_interval=state_change_interval, avg_consumption=avg_consumption)
@@ -502,7 +502,7 @@ class TeslaCharger(Relaydevice):
 
 class P:
     initialised = False
-    grid_watts = None
+    grid_watts = 0
     grid_amps = None
     inverter_watts = 0  # power produced by inverter, to be subtracted from house power
     inverter_amps = 0
@@ -621,6 +621,8 @@ def rule_energy_export(obj=m.PowerMonitor(), change=None):
             if P.emulate_export is True:
                 P.grid_watts = random.randint(-900, -800)
             else:
+                if obj.power < -50 and P.inverter_watts > 50:
+                    L.l.info("Inverter injecting power {} on grid export {}".format(P.inverter_watts, obj.power))
                 P.grid_watts = obj.power + P.inverter_watts
                 P.grid_amps = obj.current
                 P.grid_watts_last_update = datetime.now()

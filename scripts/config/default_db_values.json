@@ -164,7 +164,7 @@
     {"id":561, "active":true, "start_order":61, "name":"sensor.shelly", "host_name":"netbook"},
     {"id":565, "active":true, "start_order":65, "name":"gpio", "host_name":"netbook"},
     {"id":567, "active":true, "start_order":67, "name":"alarm", "host_name":"netbook"},
-    {"id":570, "active":true, "start_order":70, "name":"music", "host_name":"netbook"},
+    {"id":570, "active":false, "start_order":70, "name":"music", "host_name":"netbook"},
     {"id":575, "active":true, "start_order":75, "name":"devices.vent_atrea", "host_name":"netbook"},
     {"id":520, "active":true, "start_order":20, "name":"test", "host_name":"netbook"},
     {"id":573, "active":true, "start_order":73, "name":"apps.air_sensor_upload", "host_name":"netbook"},
