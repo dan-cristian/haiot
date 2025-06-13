@@ -354,6 +354,7 @@ class BatteryCharger(Relaydevice):
 class PwmBatteryCharger(Relaydevice):
     rpig = None
     pwm_port = None
+    relay_id = None
     idle_duty = 40  # about 15W
     max_duty = 255
     duty_jump = 10
@@ -363,42 +364,56 @@ class PwmBatteryCharger(Relaydevice):
         Relaydevice.__init__(self, relay_name=relay_name, supports_breaks=supports_breaks,
                              min_on_interval=min_on_interval,
                              state_change_interval=state_change_interval, avg_consumption=avg_consumption)
-        self.rpig = pigpio.pi(host=relay_id)
         self.pwm_port = pwm_port
+        self.relay_id = relay_id
+        self.connect_rpig()
+
+    def connect_rpig(self):
+        self.rpig = pigpio.pi(host=self.relay_id)
+        self.pwm_port = self.pwm_port
         if not self.rpig.connected:
-            L.l.error("Unable to connect to pigpio remote ip={}".format(relay_id))
+            L.l.error("Unable to connect to pigpio remote ip={}".format(self.relay_id))
         else:
-            L.l.info("Connected to pigpio remote ip={}".format(relay_id))
+            L.l.info("Connected to pigpio remote ip={}".format(self.relay_id))
             self.rpig.set_PWM_frequency(self.pwm_port, 8000)
 
+
     def grid_updated(self, grid_watts):
+        if not self.rpig.connected:
+            self.connect_rpig()
+
         if self.can_state_change() and self.rpig.connected:
             existing_duty = self.rpig.get_PWM_dutycycle(self.pwm_port)
             # L.l.info("Pwm duty for {} port {}={}".format(self.RELAY_ID, self.pwm_port, existing_duty))
-            if grid_watts <= 0:
-                # start device if exporting and there is enough surplus
-                export_watts = -grid_watts
-                # only trigger power on if over treshold
-                if export_watts > P.MIN_WATTS_THRESHOLD \
-                        and self.AVG_CONSUMPTION <= (export_watts + P.MIN_WATTS_THRESHOLD):
-                    next_duty = existing_duty + self.duty_jump
-                    next_duty = min(next_duty, self.max_duty)
-                    if next_duty != existing_duty:
-                        L.l.info("Increase pwm charger duty {}, export watts={}".format(next_duty, export_watts))
+            if P.bms_cell_charge_max_reached and (existing_duty > self.idle_duty):
+                L.l.info("Stop pwm charger as cell full, grid watts={}".format(grid_watts))
+                self.rpig.set_PWM_dutycycle(self.pwm_port, self.idle_duty)
+                self.power_status_changed()
+            else:
+                if grid_watts <= 0:
+                    # start device if exporting and there is enough surplus
+                    export_watts = -grid_watts
+                    # only trigger power on if over treshold
+                    if export_watts > P.MIN_WATTS_THRESHOLD \
+                            and self.AVG_CONSUMPTION <= (export_watts + P.MIN_WATTS_THRESHOLD):
+                        next_duty = existing_duty + self.duty_jump
+                        next_duty = min(next_duty, self.max_duty)
+                        if next_duty != existing_duty:
+                            L.l.info("Increase pwm charger duty {}, export watts={}".format(next_duty, export_watts))
+                            self.rpig.set_PWM_dutycycle(self.pwm_port, next_duty)
+                            self.power_status_changed()
+                else:
+                    # todo reduce duty to decrease consumption. check actual consumption from meter?
+                    if existing_duty > self.idle_duty:
+                        next_duty = existing_duty - self.duty_jump
+                        if next_duty < self.idle_duty:
+                            next_duty = self.idle_duty
+                        L.l.info("Reduce pwm charger duty {}, import watts={}".format(next_duty, grid_watts))
                         self.rpig.set_PWM_dutycycle(self.pwm_port, next_duty)
                         self.power_status_changed()
-            else:
-                # todo reduce duty to decrease consumption. check actual consumption from meter?
-                if existing_duty > self.idle_duty:
-                    next_duty = existing_duty - self.duty_jump
-                    if next_duty < self.idle_duty:
-                        next_duty = self.idle_duty
-                    L.l.info("Reduce pwm charger duty {}, import watts={}".format(next_duty, grid_watts))
-                    self.rpig.set_PWM_dutycycle(self.pwm_port, next_duty)
-                    self.power_status_changed()
-                #else:  # stop charging
-                #    L.l.info("Idle pwm charger for import watts={}".format(grid_watts))
-                #    self.rpig.set_PWM_dutycycle(self.pwm_port, self.idle_duty)
+                    #else:  # stop charging
+                    #    L.l.info("Idle pwm charger for import watts={}".format(grid_watts))
+                    #    self.rpig.set_PWM_dutycycle(self.pwm_port, self.idle_duty)
 
 
 class TeslaCharger(Relaydevice):
@@ -517,7 +532,9 @@ class P:
     last_state_change = datetime.min
     system_wait_time = 0  # seconds to wait until any device can change state (some relays have latency)
     bms_min_cell_voltage_list = {}  # dict with all min cell voltages
+    bms_max_cell_voltage_list = {}  # dict with all max cell voltages
     bms_min_cell_voltage = None  # minimum cell voltage in all bms'es
+    bms_max_cell_voltage = None  # minimum cell voltage in all bms'es
 
     bms_cell_min_voltage_critical = 2.7  # charger is started here to increase cell voltage
     bms_cell_critical_charge_recovery_started = False  # cell was charged from low voltage to recovery voltage
@@ -527,6 +544,10 @@ class P:
     bms_cell_min_inverter_voltage_protection = 3  # inverter is stopped when a cell reaches this limit
     bms_cell_inverter_topup_voltage = 3.3
     bms_cell_charge_topup_reached = False  # cell was charged from low voltage to a safety level, inverter can start
+    bms_cell_charge_max_reached = False  # cell was charged from low voltage to max level, charger should stop
+    bms_cell_max_voltage_level = 3.6  # stop chargin when reaching this level
+    bms_cell_max_voltage_resume_charge = 3.5  # resume charging when cell reach this level
+
     inverter_relay_name = "invertermain_relay"
 
     thread_pool_status = None
@@ -663,9 +684,26 @@ def rule_energy_bms_cell(obj=m.Bms(), change=None):
     if change is not None and change[0].startswith('v0'):
         min_volt = min(value for value in [obj.v01, obj.v02, obj.v03, obj.v04, obj.v05, obj.v06, obj.v07, obj.v08]
                        if value is not None)
+        max_volt = max(value for value in [obj.v01, obj.v02, obj.v03, obj.v04, obj.v05, obj.v06, obj.v07, obj.v08]
+                       if value is not None)
         P.bms_min_cell_voltage_list[obj.name] = min_volt
+        P.bms_max_cell_voltage_list[obj.name] = max_volt
         for min_val in P.bms_min_cell_voltage_list.values():
             min_volt = min(min_volt, min_val)
+
+        for max_val in P.bms_max_cell_voltage_list.values():
+            max_volt = max(max_volt, max_val)
+
+        if max_volt != P.bms_max_cell_voltage:
+            P.bms_max_cell_voltage = max_volt
+            L.l.info("Max bms cell voltage is {}".format(P.bms_max_cell_voltage))
+            if (P.bms_max_cell_voltage >= P.bms_cell_max_voltage_level) and (P.bms_cell_charge_max_reached == False):
+                P.bms_cell_charge_max_reached = True
+                L.l.info("Max bms cell voltage reached {}, charge should stop".format(P.bms_max_cell_voltage))
+            elif P.bms_max_cell_voltage <= P.bms_cell_max_voltage_resume_charge and P.bms_cell_charge_max_reached:
+                P.bms_cell_charge_max_reached = False
+                L.l.info("Max bms cell voltage back to safe level {}, charge should resume".format(
+                    P.bms_max_cell_voltage))
 
         if min_volt != P.bms_min_cell_voltage:
             P.bms_min_cell_voltage = min_volt
