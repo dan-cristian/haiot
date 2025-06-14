@@ -385,10 +385,14 @@ class PwmBatteryCharger(Relaydevice):
         if self.can_state_change() and self.rpig.connected:
             existing_duty = self.rpig.get_PWM_dutycycle(self.pwm_port)
             # L.l.info("Pwm duty for {} port {}={}".format(self.RELAY_ID, self.pwm_port, existing_duty))
-            if P.bms_cell_charge_max_reached and (existing_duty > self.idle_duty):
-                L.l.info("Stop pwm charger as cell full, grid watts={}".format(grid_watts))
-                self.rpig.set_PWM_dutycycle(self.pwm_port, self.idle_duty)
-                self.power_status_changed()
+            if P.bms_cell_charge_max_reached and (existing_duty >= self.idle_duty):
+                if existing_duty > self.idle_duty:
+                    L.l.info("Stop pwm charger as cell full, grid watts={}".format(grid_watts))
+                    self.rpig.set_PWM_dutycycle(self.pwm_port, self.idle_duty)
+                    self.power_status_changed()
+                else:
+                    # do nothing, cell is full
+                    pass
             else:
                 if grid_watts <= 0:
                     # start device if exporting and there is enough surplus
