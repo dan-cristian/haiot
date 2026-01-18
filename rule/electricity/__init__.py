@@ -378,6 +378,7 @@ class PwmBatteryCharger(Relaydevice):
             else:
                 L.l.info("Connected to pigpio remote ip={}".format(self.relay_id))
                 self.rpig.set_PWM_frequency(self.pwm_port, 8000)
+                self.rpig.set_PWM_dutycycle(self.pwm_port, 0)
         except Exception as ex:
             L.l.warning("Unable to connect to pigpio {}, err={}".format(self.relay_id, ex))
             self.rpig = None
@@ -429,6 +430,7 @@ class PwmBatteryCharger(Relaydevice):
                         #    self.rpig.set_PWM_dutycycle(self.pwm_port, self.idle_duty)
         except Exception as ex:
             L.l.warning("Cannot update grid, pwm error {}".format(ex))
+            self.rpig = None
             return False
         return True
 
