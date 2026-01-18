@@ -369,56 +369,68 @@ class PwmBatteryCharger(Relaydevice):
         self.connect_rpig()
 
     def connect_rpig(self):
-        self.rpig = pigpio.pi(host=self.relay_id)
-        self.pwm_port = self.pwm_port
-        if not self.rpig.connected:
-            L.l.error("Unable to connect to pigpio remote ip={}".format(self.relay_id))
-        else:
-            L.l.info("Connected to pigpio remote ip={}".format(self.relay_id))
-            self.rpig.set_PWM_frequency(self.pwm_port, 8000)
+        try:
+            self.rpig = pigpio.pi(host=self.relay_id)
+            self.pwm_port = self.pwm_port
+            if not self.rpig.connected:
+                L.l.error("Unable to connect to pigpio remote ip={}".format(self.relay_id))
+                self.rpig = None
+            else:
+                L.l.info("Connected to pigpio remote ip={}".format(self.relay_id))
+                self.rpig.set_PWM_frequency(self.pwm_port, 8000)
+        except Exception as ex:
+            L.l.warning("Unable to connect to pigpio {}, err={}".format(self.relay_id, ex))
+            self.rpig = None
 
 
     def grid_updated(self, grid_watts):
-        if not self.rpig.connected:
+        if self.rpig is None or (not self.rpig.connected):
             self.connect_rpig()
-
-        if self.can_state_change() and self.rpig.connected:
-            existing_duty = self.rpig.get_PWM_dutycycle(self.pwm_port)
-            # L.l.info("Pwm duty for {} port {}={}".format(self.RELAY_ID, self.pwm_port, existing_duty))
-            if P.bms_cell_charge_max_reached and (existing_duty >= self.idle_duty):
-                if existing_duty > self.idle_duty:
-                    L.l.info("Stop pwm charger as cell full, grid watts={}".format(grid_watts))
-                    self.rpig.set_PWM_dutycycle(self.pwm_port, self.idle_duty)
-                    self.power_status_changed()
+            if self.rpig is None or (not self.rpig.connected):
+                # cannot connect to rpig, unable to process power updates
+                return
+        try:
+            if self.can_state_change() and self.rpig.connected:
+                existing_duty = self.rpig.get_PWM_dutycycle(self.pwm_port)
+                # L.l.info("Pwm duty for {} port {}={}".format(self.RELAY_ID, self.pwm_port, existing_duty))
+                if P.bms_cell_charge_max_reached and (existing_duty >= self.idle_duty):
+                    if existing_duty > self.idle_duty:
+                        L.l.info("Stop pwm charger as cell full, grid watts={}".format(grid_watts))
+                        self.rpig.set_PWM_dutycycle(self.pwm_port, self.idle_duty)
+                        self.power_status_changed()
+                    else:
+                        # do nothing, cell is full
+                        return False
                 else:
-                    # do nothing, cell is full
-                    pass
-            else:
-                if grid_watts <= 0:
-                    # start device if exporting and there is enough surplus
-                    export_watts = -grid_watts
-                    # only trigger power on if over treshold
-                    if export_watts > P.MIN_WATTS_THRESHOLD \
-                            and self.AVG_CONSUMPTION <= (export_watts + P.MIN_WATTS_THRESHOLD):
-                        next_duty = existing_duty + self.duty_jump
-                        next_duty = min(next_duty, self.max_duty)
-                        if next_duty != existing_duty:
-                            L.l.info("Increase pwm charger duty {}, export watts={}".format(next_duty, export_watts))
+                    if grid_watts <= 0:
+                        # start device if exporting and there is enough surplus
+                        export_watts = -grid_watts
+                        # only trigger power on if over treshold
+                        if export_watts > P.MIN_WATTS_THRESHOLD \
+                                and self.AVG_CONSUMPTION <= (export_watts + P.MIN_WATTS_THRESHOLD):
+                            next_duty = existing_duty + self.duty_jump
+                            next_duty = min(next_duty, self.max_duty)
+                            if next_duty != existing_duty:
+                                L.l.info("Increase pwm charger duty {}, export watts={}".format(next_duty, export_watts))
+                                self.rpig.set_PWM_dutycycle(self.pwm_port, next_duty)
+                                self.power_status_changed()
+                            return False
+                    else:
+                        # todo reduce duty to decrease consumption. check actual consumption from meter?
+                        if existing_duty > self.idle_duty:
+                            next_duty = existing_duty - self.duty_jump
+                            if next_duty < self.idle_duty:
+                                next_duty = self.idle_duty
+                            L.l.info("Reduce pwm charger duty {}, import watts={}".format(next_duty, grid_watts))
                             self.rpig.set_PWM_dutycycle(self.pwm_port, next_duty)
                             self.power_status_changed()
-                else:
-                    # todo reduce duty to decrease consumption. check actual consumption from meter?
-                    if existing_duty > self.idle_duty:
-                        next_duty = existing_duty - self.duty_jump
-                        if next_duty < self.idle_duty:
-                            next_duty = self.idle_duty
-                        L.l.info("Reduce pwm charger duty {}, import watts={}".format(next_duty, grid_watts))
-                        self.rpig.set_PWM_dutycycle(self.pwm_port, next_duty)
-                        self.power_status_changed()
-                    #else:  # stop charging
-                    #    L.l.info("Idle pwm charger for import watts={}".format(grid_watts))
-                    #    self.rpig.set_PWM_dutycycle(self.pwm_port, self.idle_duty)
-
+                        #else:  # stop charging
+                        #    L.l.info("Idle pwm charger for import watts={}".format(grid_watts))
+                        #    self.rpig.set_PWM_dutycycle(self.pwm_port, self.idle_duty)
+        except Exception as ex:
+            L.l.warning("Cannot update grid, pwm error {}".format(ex))
+            return False
+        return True
 
 class TeslaCharger(Relaydevice):
     vehicle_id = None
@@ -550,7 +562,7 @@ class P:
     bms_cell_charge_topup_reached = False  # cell was charged from low voltage to a safety level, inverter can start
     bms_cell_charge_max_reached = False  # cell was charged from low voltage to max level, charger should stop
     bms_cell_max_voltage_level = 3.6  # stop chargin when reaching this level
-    bms_cell_max_voltage_resume_charge = 3.5  # resume charging when cell reach this level
+    bms_cell_max_voltage_resume_charge = 3.5  # resume charging when cell voltage decreases to this level
 
     inverter_relay_name = "invertermain_relay"
 
@@ -596,13 +608,15 @@ class P:
         #                                      voltage_sensor_name="house battery",
         #                                      voltage_max_limit=28.6, voltage_max_floor=27.2)
 
+        if apps.tesla.P.initialised:
+            relay = 'tesla_charger'
+            P.device_list[relay] = TeslaCharger(relay_name=relay, vehicle_id=1, state_change_interval=15)
+
+
         relay = 'mainbatterycharger'
         P.device_list[relay] = PwmBatteryCharger(relay_name=relay, relay_id='192.168.0.15', avg_consumption=150,
                                                  max_consumption=3000, pwm_port=18)
 
-        if apps.tesla.P.initialised:
-            relay = 'tesla_charger'
-            P.device_list[relay] = TeslaCharger(relay_name=relay, vehicle_id=1, state_change_interval=15)
 
         # relay = 'waterheater_relay'
         # P.device_list[relay] = Relaydevice(relay_name=relay, avg_consumption=2900,
