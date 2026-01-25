@@ -389,7 +389,7 @@ class PwmBatteryCharger(Relaydevice):
             self.connect_rpig()
             if self.rpig is None or (not self.rpig.connected):
                 # cannot connect to rpig, unable to process power updates
-                return
+                return False
         try:
             if self.can_state_change() and self.rpig.connected:
                 existing_duty = self.rpig.get_PWM_dutycycle(self.pwm_port)
@@ -399,6 +399,7 @@ class PwmBatteryCharger(Relaydevice):
                         L.l.info("Stop pwm charger as cell full, grid watts={}".format(grid_watts))
                         self.rpig.set_PWM_dutycycle(self.pwm_port, self.idle_duty)
                         self.power_status_changed()
+                        return True
                     else:
                         # do nothing, cell is full
                         return False
@@ -415,6 +416,7 @@ class PwmBatteryCharger(Relaydevice):
                                 L.l.info("Increase pwm charger duty {}, export watts={}".format(next_duty, export_watts))
                                 self.rpig.set_PWM_dutycycle(self.pwm_port, next_duty)
                                 self.power_status_changed()
+                                return True
                             return False
                     else:
                         # todo reduce duty to decrease consumption. check actual consumption from meter?
@@ -425,6 +427,7 @@ class PwmBatteryCharger(Relaydevice):
                             L.l.info("Reduce pwm charger duty {}, import watts={}".format(next_duty, grid_watts))
                             self.rpig.set_PWM_dutycycle(self.pwm_port, next_duty)
                             self.power_status_changed()
+                            return True
                         #else:  # stop charging
                         #    L.l.info("Idle pwm charger for import watts={}".format(grid_watts))
                         #    self.rpig.set_PWM_dutycycle(self.pwm_port, self.idle_duty)
@@ -432,7 +435,7 @@ class PwmBatteryCharger(Relaydevice):
             L.l.warning("Cannot update grid, pwm error {}".format(ex))
             self.rpig = None
             return False
-        return True
+        return False
 
 class TeslaCharger(Relaydevice):
     vehicle_id = None
