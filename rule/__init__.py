@@ -1,5 +1,4 @@
 from inspect import getmembers, isfunction
-import imp
 import os
 import threading
 import prctl
