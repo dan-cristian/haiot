@@ -48,6 +48,7 @@ def parse_rules(obj, change):
             change = obj.last_commit_field_changed_list
         else:
             change = change
+        #iterate all rule functions
         if P.func_list:
             for func in P.func_list:
                 if func[1].__defaults__ and len(func[1].__defaults__) > 0:
