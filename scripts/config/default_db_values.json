@@ -243,7 +243,7 @@
     {"id":859, "active":false, "start_order":59, "name":"sensor.i2c", "host_name":"homew"},
     {"id":861, "active":true, "start_order":61, "name":"sensor.shelly", "host_name":"homew"},
     {"id":865, "active":true, "start_order":65, "name":"gpio", "host_name":"homew"},
-    {"id":867, "active":true, "start_order":67, "name":"alarm", "host_name":"homew"},
+    {"id":867, "active":false, "start_order":67, "name":"alarm", "host_name":"homew"},
     {"id":870, "active":false, "start_order":70, "name":"music", "host_name":"homew"},
     {"id":873, "active":true, "start_order":73, "name":"apps.air_sensor_upload", "host_name":"homew"},
     {"id":875, "active":true, "start_order":75, "name":"devices.vent_atrea", "host_name":"homew"},
