@@ -37,7 +37,7 @@ def parse_rules(obj, change):
         else:
             change = change
         #generate standard messages for home_assistant
-        print(change)
+        #print(change)
     except Exception as ex:
         L.l.exception('Error parsing ha rules, ex={}'.format(ex))
 
