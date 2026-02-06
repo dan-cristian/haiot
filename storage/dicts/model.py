@@ -2,6 +2,18 @@ from datetime import datetime
 from storage.dicts.model_helper import ModelBase
 
 
+# https://www.home-assistant.io/integrations/mqtt/#discovery-payload
+class HADiscoverableDevice:
+    ha_name = None
+    ha_device_class = ""
+    ha_state_topic = ""
+    ha_command_topic = ""
+    ha_unique_id = ""
+    ha_unit_of_measurement = ""
+    ha_value_template = ""
+    ha_discovery_sent_on = datetime.min
+
+
 class Module(ModelBase):
     """key=id"""
     id = 0
@@ -11,7 +23,7 @@ class Module(ModelBase):
     host_name = ''
 
 
-class Pwm(ModelBase):
+class Pwm(ModelBase, HADiscoverableDevice):
     """key=name"""
     id = 0
     name = ''
@@ -77,7 +89,7 @@ class ZoneSensor(ModelBase):
     is_main = False  # is main temperature sensor for heat reference
 
 
-class ZoneCustomRelay(ModelBase):
+class ZoneCustomRelay(ModelBase, HADiscoverableDevice):
     relay_pin_name = ''
     id = 0
     zone_id = 0
@@ -99,7 +111,7 @@ class Zone(ModelBase):
     is_outdoor_heated = False
 
 
-class DustSensor(ModelBase):
+class DustSensor(ModelBase, HADiscoverableDevice):
     """key=address"""
     id = 0
     address = ''
@@ -115,7 +127,7 @@ class DustSensor(ModelBase):
     updated_on = datetime.now()
 
 
-class AirSensor(ModelBase):
+class AirSensor(ModelBase, HADiscoverableDevice):
     """key=address
     history=co2:20"""
     id = 0
@@ -131,8 +143,15 @@ class AirSensor(ModelBase):
     is_main = False  # which is reference if multiple sensors in same location
     updated_on = datetime.now()
 
+    def get_ha_unique_id(self):
+        return self.__class__.__name__ + self.address
 
-class PowerMonitor(ModelBase):
+    @classmethod
+    def get_device_class(cls):
+        return {"temperature", "pressure", "humidity"}
+
+
+class PowerMonitor(ModelBase, HADiscoverableDevice):
     id = 0
     name = ''
     type = ''  # INA, etc
@@ -170,6 +189,13 @@ class PowerMonitor(ModelBase):
     subtracted_sensor_id_list = ''  # comma separated sensor ids, total voltage to be subtracted
     updated_on = datetime.now()
 
+    def get_ha_unique_id(self):
+        return self.__class__.__name__ + self.name
+
+    @staticmethod
+    def get_device_class():
+        return {"voltage", "current", "power"}
+
 
 class SystemDisk(ModelBase):
     id = 0
@@ -204,7 +230,7 @@ class SystemMonitor(ModelBase):
     updated_on = datetime.now()
 
 
-class ZoneThermostat(ModelBase):
+class ZoneThermostat(ModelBase, HADiscoverableDevice):
     """key=zone_id"""
     id = 0
     zone_id = 0
@@ -232,7 +258,7 @@ class AreaThermostat(ModelBase):
     last_manual_heat_set = datetime.now()
 
 
-class HeatSchedule(ModelBase):
+class HeatSchedule(ModelBase, HADiscoverableDevice):
     id = 0
     zone_id = 0
     # zone = db.relationship('Zone', backref=db.backref('heat schedule zone', lazy='dynamic'))
@@ -266,7 +292,7 @@ class TemperatureTarget(ModelBase):
     direction = 1  # > 0 is a heating zone, < 0 is a cooling zone (fridge)
 
 
-class ZoneHeatRelay(ModelBase):
+class ZoneHeatRelay(ModelBase, HADiscoverableDevice):
     """key=zone_id"""
     id = 0
     # friendly display name for pin mapping
@@ -478,7 +504,7 @@ class Ups(ModelBase):
     updated_on = datetime.now()
 
 
-class Ventilation(ModelBase):
+class Ventilation(ModelBase, HADiscoverableDevice):
     """key=id"""
     id = 0
     name = ''
@@ -498,7 +524,7 @@ class Vent(ModelBase):
     updated_on = datetime.now()
 
 
-class Bms(ModelBase):
+class Bms(ModelBase, HADiscoverableDevice):
     """key=id"""
     id = 0
     name = ''
@@ -550,7 +576,7 @@ class ElectricCar(ModelBase):
     time_to_full_charge = 0  # minutes
 
 
-class MicroInverter(ModelBase):
+class MicroInverter(ModelBase, HADiscoverableDevice):
     """key=id"""
     id = 0
     name = ''
@@ -563,7 +589,7 @@ class MicroInverter(ModelBase):
     enabled = False
 
 
-class SolarPanel(ModelBase):
+class SolarPanel(ModelBase, HADiscoverableDevice):
     """key=id"""
     id = ''  # 408000059274-1
     ecu_type = ''
