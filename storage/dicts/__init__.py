@@ -20,7 +20,7 @@ def load_db():
     sorted_keys = sorted(cls_dict)
     for cls_name in sorted_keys:
         cls = model.__dict__[cls_name]
-        if cls_name is not 'ModelBase' and issubclass(cls, ModelBase):
+        if (cls_name is not 'ModelBase') and (cls_name is not 'HADiscoverableDevice') and issubclass(cls, ModelBase):
             obj = cls()
             _populate_db(cls, obj)
             cls.reset_usage()

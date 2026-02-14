@@ -126,7 +126,10 @@ class DictTable:
         if len(self.index) > 0:
             L.l.info('Invalidating all indexes {} on insert'.format(self.model_class.__name__))
             self.index.clear()  # delete key from index
-        self.table[doc[key]] = doc
+        try:
+            self.table[doc[key]] = doc
+        except Exception as ex:
+            L.l.error("Cannot insert record {}".format(ex))
         res = self.model_class({**doc})  # duplicate
         res.reference = self.table[doc[key]]
         return res
@@ -217,7 +220,7 @@ class ModelBase(metaclass=OrderedClassMembers):
                     target._listener_executed = None
                 target.reference = None
         except Exception as ex:
-            L.l.error('Duplicate error er={}'.format(ex), exc_info=True)
+            L.l.error('Duplication error er={}'.format(ex), exc_info=True)
 
     @classmethod
     def get_key(cls, record):
@@ -262,7 +265,10 @@ class ModelBase(metaclass=OrderedClassMembers):
     def insert_one(cls, doc, bypass_document_validation=False):
         if not cls._is_used_in_module:
             cls._is_used_in_module = True
-        table = cls._table_list[cls.__name__]
+        try:
+            table = cls._table_list[cls.__name__]
+        except KeyError as ex:
+            print(ex)
         key = cls._main_key
         rec = table.insert_one(key=key, doc=doc, bypass_document_validation=bypass_document_validation)
         if rec is not None:
@@ -473,7 +479,7 @@ class ModelBase(metaclass=OrderedClassMembers):
             for attr in obj_fields:
                 if attr is not '__doc__':
                     cls._column_type_list[attr] = type(getattr(cls, attr))
-                    setattr(cls, attr, attr)
+                    setattr(cls, attr, attr) # fixme why do I do this assignment?
                     cls._column_list += (attr,)
             cls.source_host = 'source_host'
             # add manually to column list
@@ -490,8 +496,13 @@ class ModelBase(metaclass=OrderedClassMembers):
                         for pair in fields.split(','):
                             atoms = pair.split(':')
                             cls.enable_history(atoms[0], int(atoms[1]))
+                    elif '=' in strip:
+                        atoms = strip.split('=')
+                        setattr(cls, atoms[0], atoms[1])
             else:
                 cls._main_key = obj_fields[0]
+        else:
+            pass
 
         for attr in obj_fields:
             if attr is not '__doc__':

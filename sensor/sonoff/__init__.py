@@ -56,6 +56,7 @@ def _get_dust_sensor(sensor_address, sensor_type):
     if sensor is None:
         sensor = m.DustSensor()
         sensor.address = sensor_address
+        sensor.name = sensor_address
     return zone_sensor, sensor
 
 
@@ -65,6 +66,7 @@ def _get_air_sensor(sensor_address, sensor_type):
     if sensor is None:
         sensor = m.AirSensor()
         sensor.address = sensor_address
+        sensor.name = sensor_address
     return zone_sensor, sensor
 
 
