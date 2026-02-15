@@ -78,18 +78,22 @@ def _get_variables(obj):
 
 def parse_rules(obj, change):
     """ running rule method corresponding with obj type """
-    # executed on all db value changes
-    device_name, device_type, availability_topic = _get_variables(obj)
-    for item in change:
-        if item != 'updated_on' and item != 'source_host':
-            sensor_unique_id = device_name + '_' + item
-            topic = "{}{}/{}/state".format(P.ha_topic, device_type, sensor_unique_id)
-            value = "{}".format(getattr(obj, item))
-            # payload = P.sensor_template.replace("<device_class>", item).replace("<sensor_value>", value)
-            payload = value
-            send_mqtt_ha(topic=topic, payload=payload)
-            send_mqtt_ha(topic=availability_topic, payload="online")
-            P.availability_timestamps[device_name] = datetime.datetime.now()
+    if issubclass(type(obj), HADiscoverableDevice):
+        # executed on all db value changes
+        device_name, device_type, availability_topic = _get_variables(obj)
+        if device_name not in P.discovery_timestamps.keys():
+            L.l.info("Detected realtime new object not in config, {}".format(device_name))
+            announce_discovery(obj)
+        for item in change:
+            if item != 'updated_on' and item != 'source_host':
+                sensor_unique_id = device_name + '_' + item
+                topic = "{}{}/{}/state".format(P.ha_topic, device_type, sensor_unique_id)
+                value = "{}".format(getattr(obj, item))
+                # payload = P.sensor_template.replace("<device_class>", item).replace("<sensor_value>", value)
+                payload = value
+                send_mqtt_ha(topic=topic, payload=payload)
+                send_mqtt_ha(topic=availability_topic, payload="online")
+                P.availability_timestamps[device_name] = datetime.datetime.now()
 
 def send_mqtt_ha(topic, payload):
     transport.send_message_topic(topic=topic, json=payload)
