@@ -672,7 +672,7 @@
   ],
 
   "AirSensor": [
-    {"id": 0, "name": "living 2", "address": "D6:DE:FC:37:8E:F6", "zone_id": 2},
+    {"id": 0, "name": "living radon", "address": "D6:DE:FC:37:8E:F6", "zone_id": 2},
     {"id": 1, "name": "kids mhz", "address": "wemoskidsair_mhz19b", "zone_id": 6},
     {"id": 2, "name": "living 3", "address": "wemoslivingair_mhz19b", "zone_id": 2},
     {"id": 3, "name": "bedroom mhz", "address": "wemosbedroomair_mhz19b", "zone_id": 4},
