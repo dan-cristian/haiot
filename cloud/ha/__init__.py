@@ -139,7 +139,7 @@ def announce_discovery(obj, fields=None):
                     '"unit_of_measurement":""', '')
             send_mqtt_ha(topic=subtopic_discovery, payload=payload)
             L.l.info("Published HA discovery to {}, payload={}".format(subtopic_discovery, payload))
-            P.discovery_timestamps[sensor_name] = datetime.datetime.now()
+            P.discovery_timestamps[sensor_unique_id] = datetime.datetime.now()
         index += 1
 
 def discovery():
