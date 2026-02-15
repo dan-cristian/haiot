@@ -83,11 +83,11 @@ def parse_rules(obj, change):
     for item in change:
         if item != 'updated_on' and item != 'source_host':
             sensor_unique_id = device_name + '_' + item
-            subtopic = "{}/{}/state".format(device_type, sensor_unique_id)
+            topic = "{}{}/{}/state".format(P.ha_topic, device_type, sensor_unique_id)
             value = "{}".format(getattr(obj, item))
             # payload = P.sensor_template.replace("<device_class>", item).replace("<sensor_value>", value)
             payload = value
-            send_mqtt_ha(topic=subtopic, payload=payload)
+            send_mqtt_ha(topic=topic, payload=payload)
             send_mqtt_ha(topic=availability_topic, payload="online")
             P.availability_timestamps[device_name] = datetime.datetime.now()
 
@@ -120,7 +120,7 @@ def announce_discovery(obj):
             device_unit = device_class_unit_list[index]
             sensor_unique_id = device_name + '_' + ha_field
             sensor_name = device_name + ' ' + ha_field
-            subtopic_discovery = "{}/{}/{}/config".format(device_type, device_name, sensor_unique_id)
+            subtopic_discovery = "{}{}/{}/{}/config".format(P.ha_topic, device_type, device_name, sensor_unique_id)
             state_topic = TemplateSensorDiscovery.state_topic.replace(
                 "<ha_mqtt_prefix>", P.ha_topic).replace(
                 "<device_type>", device_type).replace(
@@ -139,7 +139,7 @@ def announce_discovery(obj):
             if ',"device_class":"",' in payload:
                 payload = payload.replace(',"device_class":"",', '').replace(
                     '"unit_of_measurement":""', '')
-            send_mqtt_ha(topic=P.ha_topic + subtopic_discovery, payload=payload)
+            send_mqtt_ha(topic=subtopic_discovery, payload=payload)
             L.l.info("Published HA discovery to {}, payload={}".format(subtopic_discovery, payload))
             index += 1
         # else:

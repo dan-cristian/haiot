@@ -336,8 +336,7 @@
     {"id":54, "name":"pod", "is_indoor": true},
     {"id":56, "name":"baie parter", "is_indoor": true},
     {"id":58, "name":"camara beci", "is_indoor": true},
-    {"id":59, "name":"puffer gas valve boiler"},
-    {"id":200, "name":"car octavia", "is_outdoor": true}
+    {"id":59, "name":"puffer gas valve boiler"}
   ],
 
   "Area": [
@@ -363,7 +362,6 @@
     {"id":10, "area_id":1, "zone_id":11},
     {"id":11, "area_id":1, "zone_id":29},
     {"id":12, "area_id":1, "zone_id":47},
-    {"id":13, "area_id":50, "zone_id":200},
     {"id":14, "area_id":6, "zone_id":7},
     {"id":200, "area_id":2, "zone_id":3},
     {"id":201, "area_id":2, "zone_id":9},
@@ -644,11 +642,6 @@
 
     {"id":27, "zone_id":7 ,  "gpio_pin_code":"0:in:6", "gpio_host_name": "pi-power", "alarm_pin_name": "unused 6", "sensor_type": "contact", "relay_type": "piface"},
     {"id":28, "zone_id":7 ,  "gpio_pin_code":"0:in:7", "gpio_host_name": "pi-power", "alarm_pin_name": "unused 7", "sensor_type": "contact", "relay_type": "piface"},
-
-    {"id":30, "zone_id":200 , "gpio_pin_code":"23", "gpio_host_name": "pidash", "alarm_pin_name": "car vibrate", "sensor_type": "contact", "relay_type": "gpio"},
-    {"id":31, "zone_id":200 , "gpio_pin_code":"17", "gpio_host_name": "pidash", "alarm_pin_name": "pidash battery low", "sensor_type": "contact", "relay_type": "gpio"},
-    {"id":32, "zone_id":200 , "gpio_pin_code":"24", "gpio_host_name": "pidash", "alarm_pin_name": "car sound", "sensor_type": "contact", "relay_type": "gpio"},
-    {"id":33, "zone_id":200 , "gpio_pin_code":"25", "gpio_host_name": "pidash", "alarm_pin_name": "switch", "sensor_type": "contact", "relay_type": "gpio"},
 
     {"id":40, "zone_id":8 ,  "gpio_pin_code":"F7655E", "gpio_host_name": "homew", "alarm_pin_name": "intrare", "sensor_type": "pir", "relay_type": "sonoff"},
     {"id":41, "zone_id":8 ,  "gpio_pin_code":"F6D1FE", "gpio_host_name": "homew", "alarm_pin_name": "curte fata", "sensor_type": "pir", "relay_type": "sonoff"}

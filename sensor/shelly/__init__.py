@@ -8,7 +8,7 @@ from main.logger_helper import L
 from main import thread_pool
 from transport import mqtt_io
 from storage.model import m
-
+import traceback
 
 class P:
     initialised = False
@@ -67,156 +67,159 @@ def _get_air_sensor(sensor_address, sensor_type):
 # http://192.168.0.31/settings?mqtt_update_period=2
 def _process_message(msg):
     # L.l.info("Topic={} payload={}".format(msg.topic, msg.payload))
-    atoms = msg.topic.split('/')
-    if "adc" in msg.topic:
-        if len(atoms) > 2:
-            if atoms[2] == "adc":
-                sensor = m.PowerMonitor.find_one({m.PowerMonitor.host_name: atoms[1],
-                                                  m.PowerMonitor.type: "shelly",
-                                                  m.PowerMonitor.sensor_index: int(atoms[3])})
-                if sensor is not None:
-                    sensor.voltage = float(msg.payload)
-                    sensor.save_changed_fields(broadcast=False, persist=True)
-                else:
-                    L.l.warning("Shelly sensor {} not defined in PowerMonitor config, adc={}".format(
-                        atoms[1], msg.payload))
-    if "ext_temperature" in msg.topic:
-        if len(atoms) > 2:
-            if atoms[2] == "ext_temperature":
-                airsensor = m.AirSensor.find_one({m.AirSensor.address: atoms[1]})
-                if airsensor is not None:
-                    airsensor.temperature = float(msg.payload)
-                    airsensor.save_changed_fields(broadcast=False, persist=True)
-                else:
-                    L.l.warning("Shelly sensor {} not defined in AirSensor config, temp={}".format(
-                        atoms[1], msg.payload))
-    if "relay" in msg.topic:
-        if len(atoms) > 3:
-            if atoms[2] == "relay":
-                if atoms[3].isnumeric():
-                    relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.gpio_pin_code: atoms[1],
-                                                        m.ZoneCustomRelay.relay_index: int(atoms[3])})
-                else:
-                    relay = None
-                if relay is not None:
-                    state_on = msg.payload == b'on'
-                    L.l.info("Relay {}:{} is {}, state_on={}".format(relay.relay_pin_name, atoms[3],
-                                                                     msg.payload, state_on))
-                    relay.relay_is_on = state_on
-                    # disable listeners as mqtt updates come late and relay will toggle
-                    relay.save_changed_fields(broadcast=False, persist=True, listeners=False)
-                else:
-                    #L.l.warning("Shelly sensor {} not defined in Relay config, state={}".format(
-                    #    atoms[1], msg.payload))
-                    pass
-    if "emeter" in msg.topic:
-        if len(atoms) == 5:
-            if atoms[2] == "emeter":
-                val = "{}".format(msg.payload).replace("b", "").replace("\\", "").replace("'", "")
-                sensor = m.PowerMonitor.find_one({m.PowerMonitor.host_name: atoms[1],
-                                                  m.PowerMonitor.type: "shelly",
-                                                  m.PowerMonitor.sensor_index: int(atoms[3])})
-                if sensor is not None:
-                    if atoms[4] == "power":
-                        sensor.power = float(val)
-                        if sensor.voltage is not None and sensor.voltage != 0:
-                            # calculate current as it is not reported sometimes
-                            sensor.current = sensor.power / sensor.voltage
-                    elif atoms[4] == "voltage":
-                        sensor.voltage = float(val)
-                        if sensor.power is not None and sensor.voltage != 0:
-                            sensor.current = sensor.power / sensor.voltage
-                    elif atoms[4] == "pf":
-                        sensor.power_factor = float(val)
-                    elif atoms[4] == 'current':
-                        sensor.current = float(val)
-                    elif atoms[4] == 'energy':
-                        sensor.energy = float(val)
-                    elif atoms[4] == "total":
-                        sensor.total_energy = float(val)
-                        if sensor.total_energy_day_start is None:
-                            sensor.total_energy_day_start = sensor.total_energy
-                        if sensor.name not in P.total_energy_day_update.keys():
-                            P.total_energy_day_update[sensor.name] = datetime.datetime.now().day
-                        sensor.total_energy_daily = sensor.total_energy - sensor.total_energy_day_start
-                        if P.total_energy_day_update[sensor.name] != datetime.datetime.now().day:  #
-                            sensor.total_energy_day_end = sensor.total_energy - sensor.total_energy_day_start
-                            sensor.total_energy_day_start = sensor.total_energy
-                            P.total_energy_day_update[sensor.name] = datetime.datetime.now().day  #
-                        if sensor.total_energy_last is not None:
-                            sensor.total_energy_now = max(0, sensor.total_energy - sensor.total_energy_last)
-                        sensor.total_energy_last = sensor.total_energy
-                    elif atoms[4] == "returned_energy":
-                        sensor.energy_export = float(val)
-                    elif atoms[4] == "total_returned":
-                        sensor.total_energy_returned = float(val)
-                        if sensor.total_energy_returned_day_start is None:
-                            sensor.total_energy_returned_day_start = sensor.total_energy_returned
-                        if sensor.name not in P.total_energy_returned_day_update.keys():
-                            P.total_energy_returned_day_update[sensor.name] = datetime.datetime.now().day
-                        sensor.total_energy_returned_daily = \
-                            sensor.total_energy_returned - sensor.total_energy_returned_day_start
-                        if P.total_energy_returned_day_update[sensor.name] != datetime.datetime.now().day:
-                            sensor.total_energy_returned_day_end = sensor.total_energy_returned - \
-                                                                   sensor.total_energy_returned_day_start
-                            sensor.total_energy_returned_day_start = sensor.total_energy_returned
-                            P.total_energy_returned_day_update[sensor.name] = datetime.datetime.now().day
-                        if sensor.total_energy_returned_last is not None:
-                            sensor.total_energy_returned_now = \
-                                max(0, sensor.total_energy_returned - sensor.total_energy_returned_last)
-                        sensor.total_energy_returned_last = sensor.total_energy_returned
-                    elif atoms[4] == "reactive_power":
-                        sensor.reactive_power = float(val)
+    try:
+        atoms = msg.topic.split('/')
+        if "adc" in msg.topic:
+            if len(atoms) > 2:
+                if atoms[2] == "adc":
+                    sensor = m.PowerMonitor.find_one({m.PowerMonitor.host_name: atoms[1],
+                                                      m.PowerMonitor.type: "shelly",
+                                                      m.PowerMonitor.sensor_index: int(atoms[3])})
+                    if sensor is not None:
+                        sensor.voltage = float(msg.payload)
+                        sensor.save_changed_fields(broadcast=False, persist=True)
                     else:
-                        L.l.warning("Unprocessed shelly value {}".format(atoms[4]))
-                    # L.l.info("Shelly {} {}={}".format(sensor.name, atoms[4], val))
-                    sensor.save_changed_fields(broadcast=False, persist=True)
-                else:
-                    L.l.warning("No shelly sensor {} index={} in config file".format(atoms[1], atoms[3]))
-            else:
-                L.l.warning("Invalid sensor topic {}".format(msg.topic))
-    # shelly 2PM Plus
-    if "switch:" in msg.topic:
-        if len(atoms) == 4:
-            index = int(atoms[3].split("switch:")[1])
-            sensor = m.PowerMonitor.find_one({m.PowerMonitor.host_name: atoms[1],
-                                              m.PowerMonitor.type: "shelly",
-                                              m.PowerMonitor.sensor_index: index})
-            if sensor is not None:
-                # b'{"id":0, "source":"init", "output":true, "apower":-474.1, "voltage":222.4,
-                # "current":2.164, "pf":-0.97, "aenergy":{"total":495.858},"temperature":{"tC":62.9, "tF":145.2}}'
-                payload = str(msg.payload)
-                if sensor.reversed_direction:
-                    sign = -1
-                else:
-                    sign = 1
-                if "apower" in payload:
-                    sensor.power = sign * float(payload.split('"apower":')[1].split(",")[0])
-                if "current" in payload:
-                    sensor.current = float(payload.split('"current":')[1].split(",")[0])
-                if "voltage" in payload:
-                    sensor.voltage = float(payload.split('"voltage":')[1].split(",")[0])
-                if "aenergy" in payload:
-                    prev_energy = sensor.total_energy_last
-                    en_text = payload.split('aenergy":{"total":')[1].split(",")[0]
-                    en_text = en_text.replace("{", "")
-                    sensor.total_energy_last = float(en_text)
-                    if prev_energy is None:
-                        prev_energy = sensor.total_energy_last
-                    # might be a  bug, negative value returned after power loss
-                    sensor.total_energy_now = max(0, sensor.total_energy_last - prev_energy)
-                if "output" in payload:
-                    switch_state_on = payload.split('"output":')[1].split(",")[0] == "true"
-                    relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.gpio_pin_code: atoms[1],
-                                                        m.ZoneCustomRelay.relay_index: index})
+                        L.l.warning("Shelly sensor {} not defined in PowerMonitor config, adc={}".format(
+                            atoms[1], msg.payload))
+        if "ext_temperature" in msg.topic:
+            if len(atoms) > 2:
+                if atoms[2] == "ext_temperature":
+                    airsensor = m.AirSensor.find_one({m.AirSensor.address: atoms[1]})
+                    if airsensor is not None:
+                        airsensor.temperature = float(msg.payload)
+                        airsensor.save_changed_fields(broadcast=False, persist=True)
+                    else:
+                        L.l.warning("Shelly sensor {} not defined in AirSensor config, temp={}".format(
+                            atoms[1], msg.payload))
+        if "relay" in msg.topic:
+            if len(atoms) > 3:
+                if atoms[2] == "relay":
+                    if atoms[3].isnumeric():
+                        relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.gpio_pin_code: atoms[1],
+                                                            m.ZoneCustomRelay.relay_index: int(atoms[3])})
+                    else:
+                        relay = None
                     if relay is not None:
-                        relay.relay_is_on = switch_state_on
+                        state_on = msg.payload == b'on'
+                        L.l.info("Relay {}:{} is {}, state_on={}".format(relay.relay_pin_name, atoms[3],
+                                                                         msg.payload, state_on))
+                        relay.relay_is_on = state_on
                         # disable listeners as mqtt updates come late and relay will toggle
                         relay.save_changed_fields(broadcast=False, persist=True, listeners=False)
                     else:
-                        # relay not define in config
+                        #L.l.warning("Shelly sensor {} not defined in Relay config, state={}".format(
+                        #    atoms[1], msg.payload))
                         pass
-                sensor.save_changed_fields(persist=True)
+        if "emeter" in msg.topic:
+            if len(atoms) == 5:
+                if atoms[2] == "emeter":
+                    val = "{}".format(msg.payload).replace("b", "").replace("\\", "").replace("'", "")
+                    sensor = m.PowerMonitor.find_one({m.PowerMonitor.host_name: atoms[1],
+                                                      m.PowerMonitor.type: "shelly",
+                                                      m.PowerMonitor.sensor_index: int(atoms[3])})
+                    if sensor is not None:
+                        if atoms[4] == "power":
+                            sensor.power = float(val)
+                            if sensor.voltage is not None and sensor.voltage != 0:
+                                # calculate current as it is not reported sometimes
+                                sensor.current = sensor.power / sensor.voltage
+                        elif atoms[4] == "voltage":
+                            sensor.voltage = float(val)
+                            if sensor.power is not None and sensor.voltage != 0:
+                                sensor.current = sensor.power / sensor.voltage
+                        elif atoms[4] == "pf":
+                            sensor.power_factor = float(val)
+                        elif atoms[4] == 'current':
+                            sensor.current = float(val)
+                        elif atoms[4] == 'energy':
+                            sensor.energy = float(val)
+                        elif atoms[4] == "total":
+                            sensor.total_energy = float(val)
+                            if sensor.total_energy_day_start is None:
+                                sensor.total_energy_day_start = sensor.total_energy
+                            if sensor.name not in P.total_energy_day_update.keys():
+                                P.total_energy_day_update[sensor.name] = datetime.datetime.now().day
+                            sensor.total_energy_daily = sensor.total_energy - sensor.total_energy_day_start
+                            if P.total_energy_day_update[sensor.name] != datetime.datetime.now().day:  #
+                                sensor.total_energy_day_end = sensor.total_energy - sensor.total_energy_day_start
+                                sensor.total_energy_day_start = sensor.total_energy
+                                P.total_energy_day_update[sensor.name] = datetime.datetime.now().day  #
+                            if sensor.total_energy_last is not None:
+                                sensor.total_energy_now = max(0, sensor.total_energy - sensor.total_energy_last)
+                            sensor.total_energy_last = sensor.total_energy
+                        elif atoms[4] == "returned_energy":
+                            sensor.energy_export = float(val)
+                        elif atoms[4] == "total_returned":
+                            sensor.total_energy_returned = float(val)
+                            if sensor.total_energy_returned_day_start is None:
+                                sensor.total_energy_returned_day_start = sensor.total_energy_returned
+                            if sensor.name not in P.total_energy_returned_day_update.keys():
+                                P.total_energy_returned_day_update[sensor.name] = datetime.datetime.now().day
+                            sensor.total_energy_returned_daily = \
+                                sensor.total_energy_returned - sensor.total_energy_returned_day_start
+                            if P.total_energy_returned_day_update[sensor.name] != datetime.datetime.now().day:
+                                sensor.total_energy_returned_day_end = sensor.total_energy_returned - \
+                                                                       sensor.total_energy_returned_day_start
+                                sensor.total_energy_returned_day_start = sensor.total_energy_returned
+                                P.total_energy_returned_day_update[sensor.name] = datetime.datetime.now().day
+                            if sensor.total_energy_returned_last is not None:
+                                sensor.total_energy_returned_now = \
+                                    max(0, sensor.total_energy_returned - sensor.total_energy_returned_last)
+                            sensor.total_energy_returned_last = sensor.total_energy_returned
+                        elif atoms[4] == "reactive_power":
+                            sensor.reactive_power = float(val)
+                        else:
+                            L.l.warning("Unprocessed shelly value {}".format(atoms[4]))
+                        # L.l.info("Shelly {} {}={}".format(sensor.name, atoms[4], val))
+                        sensor.save_changed_fields(broadcast=False, persist=True)
+                    else:
+                        L.l.warning("No shelly sensor {} index={} in config file".format(atoms[1], atoms[3]))
+                else:
+                    L.l.warning("Invalid sensor topic {}".format(msg.topic))
+        # shelly 2PM Plus
+        if "switch:" in msg.topic:
+            if len(atoms) == 4:
+                index = int(atoms[3].split("switch:")[1])
+                sensor = m.PowerMonitor.find_one({m.PowerMonitor.host_name: atoms[1],
+                                                  m.PowerMonitor.type: "shelly",
+                                                  m.PowerMonitor.sensor_index: index})
+                if sensor is not None:
+                    # b'{"id":0, "source":"init", "output":true, "apower":-474.1, "voltage":222.4,
+                    # "current":2.164, "pf":-0.97, "aenergy":{"total":495.858},"temperature":{"tC":62.9, "tF":145.2}}'
+                    payload = str(msg.payload)
+                    if sensor.reversed_direction:
+                        sign = -1
+                    else:
+                        sign = 1
+                    if "apower" in payload:
+                        sensor.power = sign * float(payload.split('"apower":')[1].split(",")[0])
+                    if "current" in payload:
+                        sensor.current = float(payload.split('"current":')[1].split(",")[0])
+                    if "voltage" in payload:
+                        sensor.voltage = float(payload.split('"voltage":')[1].split(",")[0])
+                    if "aenergy" in payload:
+                        prev_energy = sensor.total_energy_last
+                        en_text = payload.split('aenergy":{"total":')[1].split(",")[0]
+                        en_text = en_text.replace("{", "")
+                        sensor.total_energy_last = float(en_text)
+                        if prev_energy is None:
+                            prev_energy = sensor.total_energy_last
+                        # might be a  bug, negative value returned after power loss
+                        sensor.total_energy_now = max(0, sensor.total_energy_last - prev_energy)
+                    if "output" in payload:
+                        switch_state_on = payload.split('"output":')[1].split(",")[0] == "true"
+                        relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.gpio_pin_code: atoms[1],
+                                                            m.ZoneCustomRelay.relay_index: index})
+                        if relay is not None:
+                            relay.relay_is_on = switch_state_on
+                            # disable listeners as mqtt updates come late and relay will toggle
+                            relay.save_changed_fields(broadcast=False, persist=True, listeners=False)
+                        else:
+                            # relay not define in config
+                            pass
+                    sensor.save_changed_fields(persist=True)
+    except Exception as ex:
+        L.l.error("Err processing shelly msg {}".format(ex))
 
 
 def mqtt_on_message(client, userdata, msg):
