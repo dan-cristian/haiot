@@ -154,9 +154,9 @@ class AirSensor(HADiscoverableDevice):
 class PowerMonitor(HADiscoverableDevice):
     """
     key=name
-    ha_fields=voltage,current,power,energy,power_factor,total_energy_now,total_energy_returned_now,reactive_power
-    ha_device_class=voltage,current,power,energy,power_factor,energy,energy,power
-    ha_device_class_unit=V,A,W,Wh,,Wh,Wh,W
+    ha_fields=voltage,current,power,energy,power_factor,total_energy_now,total_energy_returned_now,reactive_power,total_energy,total_energy_last,total_energy_daily
+    ha_device_class=voltage,current,power,energy,power_factor,energy,energy,power,energy,energy,energy
+    ha_device_class_unit=V,A,W,Wh,,Wh,Wh,W,Wh,Wh,Wh
     ha_device_type=sensor
     """
     id = 0
