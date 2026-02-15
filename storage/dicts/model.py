@@ -529,8 +529,13 @@ class Vent(ModelBase):
     updated_on = datetime.now()
 
 
-class Bms(ModelBase):
-    """key=id"""
+class Bms(HADiscoverableDevice):
+    """key=id
+    ha_fields=name,voltage,t1,t2,power,capacity_percent,voltage_cells,v01,v02,v03,v04,v05,v06,v07,v08
+    ha_device_class=,voltage,temperature,temperature,power,,voltage,voltage,voltage,voltage,voltage,voltage,voltage,voltage,voltage
+    ha_device_class_unit=,V,°C,°C,W,,V,V,V,V,V,V,V,V,V
+    ha_device_type=sensor
+    """
     id = 0
     name = ''
     mac_address = ''  # bms bluetooth mac
