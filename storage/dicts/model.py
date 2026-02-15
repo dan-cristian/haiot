@@ -108,9 +108,9 @@ class Zone(ModelBase):
 class DustSensor(HADiscoverableDevice):
     """
     key=name
-    ha_fields=pm_2_5,pm_10
-    ha_device_class=pm25,pm10
-    ha_device_class_unit=µg/m³,µg/m³
+    ha_fields=pm_2_5,pm_10,p_0_3,p_0_5,p_1
+    ha_device_class=pm25,pm10,,,
+    ha_device_class_unit=µg/m³,µg/m³,,,
     ha_device_type=sensor
     """
     id = 0
