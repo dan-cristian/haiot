@@ -84,11 +84,11 @@ def parse_rules(obj, change):
         for item in change:
             if item != 'updated_on' and item != 'source_host':
                 sensor_unique_id = device_name + '_' + item
-                if sensor_unique_id not in P.discovery_timestamps.keys():
-                    added = announce_discovery(obj, fields=[item])
-                    L.l.info("Detected new object, added={}, {}".format(added, sensor_unique_id))
                 topic = "{}{}/{}/state".format(P.ha_topic, device_type, sensor_unique_id)
                 value = "{}".format(getattr(obj, item))
+                if sensor_unique_id not in P.discovery_timestamps.keys():
+                    added = announce_discovery(obj, fields=[item])
+                    L.l.info("Detected new object, added={}, {}={}".format(added, sensor_unique_id, value))
                 # payload = P.sensor_template.replace("<device_class>", item).replace("<sensor_value>", value)
                 payload = value
                 send_mqtt_ha(topic=topic, payload=payload)
