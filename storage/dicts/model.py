@@ -108,9 +108,9 @@ class Zone(ModelBase):
 class DustSensor(HADiscoverableDevice):
     """
     key=name
-    ha_fields=pm_2_5,pm_10,p_0_3,p_0_5,p_1
-    ha_device_class=pm25,pm10,,,
-    ha_device_class_unit=µg/m³,µg/m³,,,
+    ha_fields=pm_2_5,pm_10,p_0_3,p_0_5,p_1,pm1,p_2_5,p_5
+    ha_device_class=pm25,pm10,,,,,,
+    ha_device_class_unit=µg/m³,µg/m³,,,,,,
     ha_device_type=sensor
     """
     id = 0
@@ -154,9 +154,9 @@ class AirSensor(HADiscoverableDevice):
 class PowerMonitor(HADiscoverableDevice):
     """
     key=name
-    ha_fields=voltage,current,power,energy,power_factor,total_energy_now,total_energy_returned_now,reactive_power,total_energy,total_energy_last,total_energy_daily
-    ha_device_class=voltage,current,power,energy,power_factor,energy,energy,power,energy,energy,energy
-    ha_device_class_unit=V,A,W,Wh,,Wh,Wh,W,Wh,Wh,Wh
+    ha_fields=voltage,current,power,energy,power_factor,total_energy_now,total_energy_returned_now,reactive_power,total_energy,total_energy_last,total_energy_daily,energy_export
+    ha_device_class=voltage,current,power,energy,power_factor,energy,energy,power,energy,energy,energy,energy
+    ha_device_class_unit=V,A,W,Wh,,Wh,Wh,W,Wh,Wh,Wh,Wh
     ha_device_type=sensor
     """
     id = 0
