@@ -85,7 +85,7 @@ def parse_rules(obj, change):
             if item != 'updated_on' and item != 'source_host':
                 sensor_unique_id = device_name + '_' + item
                 if sensor_unique_id not in P.discovery_timestamps.keys():
-                    L.l.info("Detected realtime new object not in config, {}".format(device_name))
+                    L.l.info("Detected realtime new object not in config, {}".format(sensor_unique_id))
                     announce_discovery(obj, fields=[item])
                 topic = "{}{}/{}/state".format(P.ha_topic, device_type, sensor_unique_id)
                 value = "{}".format(getattr(obj, item))
