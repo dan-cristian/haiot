@@ -85,8 +85,8 @@ def parse_rules(obj, change):
             if item != 'updated_on' and item != 'source_host':
                 sensor_unique_id = device_name + '_' + item
                 if sensor_unique_id not in P.discovery_timestamps.keys():
-                    L.l.info("Detected realtime new object not in config, {}".format(sensor_unique_id))
-                    announce_discovery(obj, fields=[item])
+                    added = announce_discovery(obj, fields=[item])
+                    L.l.info("Detected new object, added={}, {}".format(added, sensor_unique_id))
                 topic = "{}{}/{}/state".format(P.ha_topic, device_type, sensor_unique_id)
                 value = "{}".format(getattr(obj, item))
                 # payload = P.sensor_template.replace("<device_class>", item).replace("<sensor_value>", value)
@@ -107,6 +107,7 @@ def mqtt_on_message(client, userdata, msg):
         L.l.error('Error ha mqtt {} ex={}'.format(msg.payload, ex), exc_info=True)
 
 def announce_discovery(obj, fields=None):
+    added_one = False
     device_name, device_type, availability_topic = _get_variables(obj)
     ha_field_list = obj.ha_fields.strip().split(',')
     device_class_list = obj.ha_device_class.strip().split(',')
@@ -140,7 +141,9 @@ def announce_discovery(obj, fields=None):
             send_mqtt_ha(topic=subtopic_discovery, payload=payload)
             L.l.info("Published HA discovery to {}, payload={}".format(subtopic_discovery, payload))
             P.discovery_timestamps[sensor_unique_id] = datetime.datetime.now()
+            added_one = True
         index += 1
+    return added_one
 
 def discovery():
     cls_dict = dict([(name, cls) for name, cls in model.__dict__.items() if isinstance(cls, type)])
