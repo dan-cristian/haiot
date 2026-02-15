@@ -176,7 +176,7 @@ def init():
     P.ha_topic = get_json_param(Constant.P_MQTT_TOPIC_HA_SEND)
     P.mqtt_topic_receive = get_json_param(Constant.P_MQTT_TOPIC_HA_RECEIVE)
     P.mqtt_topic_receive_prefix = P.mqtt_topic_receive.replace('#', '')
-    discovery()
+    #discovery()
     mqtt_io.P.mqtt_client.message_callback_add(P.mqtt_topic_receive, mqtt_on_message)
     mqtt_io.add_message_callback(P.mqtt_topic_receive, mqtt_on_message)
     #thread_pool.add_interval_callable(thread_run, run_interval_second=30)
