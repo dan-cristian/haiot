@@ -108,9 +108,9 @@ class Zone(ModelBase):
 class DustSensor(HADiscoverableDevice):
     """
     key=name
-    ha_fields=pm_2_5,pm_10,p_0_3,p_0_5,p_1,pm1,p_2_5,p_5
-    ha_device_class=pm25,pm10,,,,,,
-    ha_device_class_unit=µg/m³,µg/m³,,,,,,
+    ha_fields=pm_2_5,pm_10,p_0_3,p_0_5,p_1,pm_1,p_2_5,p_5,p_10
+    ha_device_class=pm25,pm10,,,,,,,
+    ha_device_class_unit=µg/m³,µg/m³,,,,,,,
     ha_device_type=sensor
     """
     id = 0
@@ -531,9 +531,9 @@ class Vent(ModelBase):
 
 class Bms(HADiscoverableDevice):
     """key=id
-    ha_fields=name,voltage,t1,t2,power,capacity_percent,voltage_cells,v01,v02,v03,v04,v05,v06,v07,v08
-    ha_device_class=,voltage,temperature,temperature,power,,voltage,voltage,voltage,voltage,voltage,voltage,voltage,voltage,voltage
-    ha_device_class_unit=,V,°C,°C,W,,V,V,V,V,V,V,V,V,V
+    ha_fields=name,voltage,t1,t2,power,capacity_percent,voltage_cells,v01,v02,v03,v04,v05,v06,v07,v08,full_capacity,cycles,current
+    ha_device_class=,voltage,temperature,temperature,power,,voltage,voltage,voltage,voltage,voltage,voltage,voltage,voltage,voltage,,energy
+    ha_device_class_unit=,V,°C,°C,W,,V,V,V,V,V,V,V,V,V,,Wh
     ha_device_type=sensor
     """
     id = 0
