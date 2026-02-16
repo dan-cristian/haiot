@@ -22,6 +22,7 @@ class P:
     discovery_timestamps = {}
     discovery_resent_period = 60*60
     availability_timestamps = {}
+    unique_id_mapping = {} # memory store for all objects defined in ha carrying commands, used for incoming actions
 
     # https://www.home-assistant.io/integrations/mqtt/#sensors
     discovery_template_1=('{"unique_id":"<unique_id>",' +
@@ -52,6 +53,7 @@ class TemplateSensorDiscovery:
     "unique_id":"<unique_sensor_id>",
     "availability_topic":"<availability_topic>",
     "state_topic":"<state_topic>",
+    "command_topic":"<command_topic>",
     "device":{
         "name":"<device_name>",
         "identifiers":["<unique_device_id>"],
@@ -62,86 +64,140 @@ class TemplateSensorDiscovery:
     }"""
     availability_topic = '<ha_mqtt_prefix><device_name>/status'
     state_topic = '<ha_mqtt_prefix><device_type>/<unique_sensor_id>/state'
+    command_topic = '<ha_mqtt_prefix>receive/<device_type>/<unique_sensor_id>/command'
 
 def _get_variables(obj):
     device_name = type(obj).__name__ + "_" + "{}".format(getattr(obj, obj._main_key)).replace(":", "-")
     device_name = device_name.replace(' ', '_')
     # https://www.home-assistant.io/integrations/mqtt/#discovery-payload
-    if hasattr(obj, "ha_device_type"):
-        device_type = obj.ha_device_type
-    else:
-        device_type = "sensor"
+    fields = {}
+    fields_atoms = obj.ha_fields.split(",")
+    for field in fields_atoms:
+        try:
+            key = field.split(":")[0]
+            defs = []
+            remaining = field[len(key)+1:]
+            # [field class-temperature, field unit measurement-Wh, field type-sensor/switch]
+            for atom in remaining.split(":"):
+                defs.append(atom)
+            fields[key] = defs
+        except Exception as ex:
+            L.l.error("Cannot process ha definitions for {}".format(device_name))
     availability_topic = TemplateSensorDiscovery.availability_topic.replace(
         "<ha_mqtt_prefix>", P.ha_topic).replace(
         "<device_name>", device_name)
-    return device_name, device_type, availability_topic
+    return device_name, fields, availability_topic
 
 def parse_rules(obj, change):
     """ running rule method corresponding with obj type """
     if issubclass(type(obj), HADiscoverableDevice):
         # executed on all db value changes
-        device_name, device_type, availability_topic = _get_variables(obj)
+        device_name, ha_fields, availability_topic = _get_variables(obj)
+        index = 0
         for item in change:
             if item != 'updated_on' and item != 'source_host':
                 sensor_unique_id = device_name + '_' + item
+                device_type = None
+                if item in ha_fields.keys():
+                    if len(ha_fields[item]) == 3:
+                        device_type = ha_fields[item][2]
+                    else:
+                        L.l.error("Incorrect ha definition for device {} item {}".format(device_name, item))
+                else:
+                    L.l.info("Missing ha definition for device {} item {}".format(device_name, item))
                 topic = "{}{}/{}/state".format(P.ha_topic, device_type, sensor_unique_id)
                 value = "{}".format(getattr(obj, item))
                 if sensor_unique_id not in P.discovery_timestamps.keys():
                     added = announce_discovery(obj, fields=[item])
                     L.l.info("Detected new object, added={}, {}={}".format(added, sensor_unique_id, value))
                 # payload = P.sensor_template.replace("<device_class>", item).replace("<sensor_value>", value)
-                payload = value
+                if device_type == 'switch':
+                    if value.lower() == 'true':
+                        payload = 'off'
+                    else:
+                        payload = 'on'
+                else:
+                    payload = value
                 send_mqtt_ha(topic=topic, payload=payload)
                 send_mqtt_ha(topic=availability_topic, payload="online")
                 P.availability_timestamps[device_name] = datetime.datetime.now()
-
+            index += 1
 def send_mqtt_ha(topic, payload):
     transport.send_message_topic(topic=topic, json=payload)
 
 def mqtt_on_message(client, userdata, msg):
     try:
         item = msg.topic.split(P.mqtt_topic_receive_prefix)
-        payload = msg.payload.decode('utf-8').lower()
+        unique_id = None
+        if len(item)==2:
+            item = item[1].split("/")
+            if len(item) >= 2:
+                unique_id = item[1]
+        if unique_id is not None:
+            if unique_id in P.unique_id_mapping.keys():
+                obj = P.unique_id_mapping[unique_id][0]
+                field = P.unique_id_mapping[unique_id][1]
+                payload = msg.payload.decode('utf-8').lower()
+                if payload == 'on':
+                    value = True
+                elif payload == 'off':
+                    value = False
+                else:
+                    L.l.warning("Unknown command value {} for id {}".format(payload, unique_id))
+                L.l.info("Got ha command id {} value={}".format(unique_id, value))
+                setattr(obj, field, value)
+                obj.save_changed_fields(broadcast=False, persist=True, listeners=True)
+
+
         # L.l.info('Got ha mqtt {}={}'.format(msg.topic, payload))
     except Exception as ex:
         L.l.error('Error ha mqtt {} ex={}'.format(msg.payload, ex), exc_info=True)
 
 def announce_discovery(obj, fields=None):
     added_one = False
-    device_name, device_type, availability_topic = _get_variables(obj)
-    ha_field_list = obj.ha_fields.strip().split(',')
-    device_class_list = obj.ha_device_class.strip().split(',')
-    device_class_unit_list = obj.ha_device_class_unit.strip().split(',')
+    device_name, ha_fields, availability_topic = _get_variables(obj)
+    ha_field_list = ha_fields.keys()
     index = 0
     for ha_field in ha_field_list:
         if fields is not None and ha_field in fields:
-            device_class = device_class_list[index]
-            device_unit = device_class_unit_list[index]
-            sensor_unique_id = device_name + '_' + ha_field
-            sensor_name = device_name + ' ' + ha_field
-            subtopic_discovery = "{}{}/{}/{}/config".format(P.ha_topic, device_type, device_name, sensor_unique_id)
-            state_topic = TemplateSensorDiscovery.state_topic.replace(
-                "<ha_mqtt_prefix>", P.ha_topic).replace(
-                "<device_type>", device_type).replace(
-                "<unique_sensor_id>", sensor_unique_id)
-            payload = TemplateSensorDiscovery.__doc__.replace(
-                "<sensor_name>", sensor_name).replace(
-                "<unique_sensor_id>", sensor_unique_id).replace(
-                "<availability_topic>", availability_topic).replace(
-                "<state_topic>", state_topic).replace(
-                "<ha_mqtt_prefix>", P.ha_topic).replace(
-                "<device_type>", device_type).replace(
-                "<device_name>", device_name).replace(
-                "<unique_device_id>", device_name).replace(
-                "<device_class>", device_class).replace(
-                "<unit_of_measurement>", device_unit)
-            if ',"device_class":"",' in payload:
-                payload = payload.replace(',"device_class":"",', '').replace(
-                    '"unit_of_measurement":""', '')
-            send_mqtt_ha(topic=subtopic_discovery, payload=payload)
-            L.l.info("Published HA discovery to {}, payload={}".format(subtopic_discovery, payload))
-            P.discovery_timestamps[sensor_unique_id] = datetime.datetime.now()
-            added_one = True
+            if index >= len(ha_field_list):
+                L.l.error("Too many unexpected fields vs ha object definition for {}, {}".format(obj, fields))
+            else:
+                device_class = ha_fields[ha_field][0]
+                device_unit = ha_fields[ha_field][1]
+                device_type = ha_fields[ha_field][2]
+                sensor_unique_id = device_name + '_' + ha_field
+                sensor_name = device_name + ' ' + ha_field
+                topic_discovery = "{}{}/{}/{}/config".format(P.ha_topic, device_type, device_name, sensor_unique_id)
+                state_topic = TemplateSensorDiscovery.state_topic.replace(
+                    "<ha_mqtt_prefix>", P.ha_topic).replace(
+                    "<device_type>", device_type).replace(
+                    "<unique_sensor_id>", sensor_unique_id)
+                payload = TemplateSensorDiscovery.__doc__.replace(
+                    "<sensor_name>", sensor_name).replace(
+                    "<unique_sensor_id>", sensor_unique_id).replace(
+                    "<availability_topic>", availability_topic).replace(
+                    "<state_topic>", state_topic).replace(
+                    "<ha_mqtt_prefix>", P.ha_topic).replace(
+                    "<device_type>", device_type).replace(
+                    "<device_name>", device_name).replace(
+                    "<unique_device_id>", device_name).replace(
+                    "<device_class>", device_class).replace(
+                    "<unit_of_measurement>", device_unit)
+                if ',"device_class":"",' in payload:
+                    payload = payload.replace(',"device_class":"",', '').replace(
+                        '"unit_of_measurement":""', '')
+                if device_type == 'switch':
+                    command_topic = TemplateSensorDiscovery.command_topic.replace(
+                        "<ha_mqtt_prefix>", P.ha_topic).replace(
+                        "<device_type>", device_type).replace(
+                        "<unique_sensor_id>", sensor_unique_id)
+                    P.unique_id_mapping[sensor_unique_id] = [obj, ha_field]
+                    payload = payload.replace("<command_topic>", command_topic)
+                send_mqtt_ha(topic=topic_discovery, payload=payload)
+                L.l.info("Published HA discovery to {}, payload={}".format(topic_discovery, payload))
+                P.discovery_timestamps[sensor_unique_id] = datetime.datetime.now()
+                added_one = True
         index += 1
     return added_one
 

@@ -2,11 +2,11 @@ from datetime import datetime
 from storage.dicts.model_helper import ModelBase
 
 
-# https://www.home-assistant.io/integrations/mqtt/#discovery-payload
-# https://www.home-assistant.io/integrations/sensor/#device-class
+# https:::www.home-assistant.io:integrations:mqtt:#discovery-payload
+# https:::www.home-assistant.io:integrations:sensor:#device-class
 class HADiscoverableDevice(ModelBase):
-    ha_name = None
-
+    ha_name = ''
+    ha_location = ''
 
 class Module(ModelBase):
     """key=id"""
@@ -83,7 +83,10 @@ class ZoneSensor(ModelBase):
     is_main = False  # is main temperature sensor for heat reference
 
 
-class ZoneCustomRelay(ModelBase):
+class ZoneCustomRelay(HADiscoverableDevice):
+    """key=relay_pin_name
+    ha_fields=relay_is_on:::switch
+    """
     relay_pin_name = ''
     id = 0
     zone_id = 0
@@ -108,10 +111,7 @@ class Zone(ModelBase):
 class DustSensor(HADiscoverableDevice):
     """
     key=name
-    ha_fields=pm_2_5,pm_10,p_0_3,p_0_5,p_1,pm_1,p_2_5,p_5,p_10
-    ha_device_class=pm25,pm10,,,,,,,
-    ha_device_class_unit=µg/m³,µg/m³,,,,,,,
-    ha_device_type=sensor
+    ha_fields=pm_2_5:pm25:µg/m³:sensor,pm_10:pm10:µg/m³:sensor,p_0_3:::sensor,p_0_5:::sensor,p_1:::sensor,pm_1:::sensor,p_2_5:::sensor,p_5:::sensor,p_10:::sensor
     """
     id = 0
     name = ''
@@ -131,11 +131,7 @@ class DustSensor(HADiscoverableDevice):
 class AirSensor(HADiscoverableDevice):
     """key=name
     history=co2:20
-    history=co2:20
-    ha_fields=name,co2,gas,temperature,pressure,humidity,radon
-    ha_device_class=,carbon_dioxide,volatile_organic_compounds,temperature,pressure,humidity,sulphur_dioxide
-    ha_device_class_unit=,ppm,µg/m³,°C,bar,%,µg/m³
-    ha_device_type=sensor
+    ha_fields=name:::sensor,co2:carbon_dioxide:ppm:sensor,gas:volatile_organic_compounds:µg/m³:sensor,temperature:temperature:°C:sensor,pressure:pressure:bar:sensor,humidity:humidity:%:sensor,radon:sulphur_dioxide:µg/m³:sensor
     """
     id = 0
     name = ''
@@ -154,10 +150,7 @@ class AirSensor(HADiscoverableDevice):
 class PowerMonitor(HADiscoverableDevice):
     """
     key=name
-    ha_fields=voltage,current,power,energy,power_factor,total_energy_now,total_energy_returned_now,reactive_power,total_energy,total_energy_last,total_energy_daily,energy_export,total_energy_returned,total_energy_returned_last,total_energy_returned_daily
-    ha_device_class=voltage,current,power,energy,power_factor,energy,energy,power,energy,energy,energy,energy,energy,energy,energy
-    ha_device_class_unit=V,A,W,Wh,,Wh,Wh,W,Wh,Wh,Wh,Wh,Wh,Wh,Wh
-    ha_device_type=sensor
+    ha_fields=voltage:voltage:V:sensor,current:current:A:sensor,power:power:W:sensor,energy:energy:Wh:sensor,power_factor:::sensor,total_energy_now:energy:Wh:sensor,total_energy_returned_now:energy:Wh:sensor,reactive_power:power:W:sensor,total_energy:energy:Wh:sensor,total_energy_last:energy:Wh:sensor,total_energy_daily:energy:Wh:sensor,energy_export:energy:Wh:sensor,total_energy_returned:energy:Wh:sensor,total_energy_returned_last:energy:Wh:sensor,total_energy_returned_daily:energy:Wh:sensor,total_energy_day_start:energy:Wh:sensor
     """
     id = 0
     name = ''
@@ -176,7 +169,7 @@ class PowerMonitor(HADiscoverableDevice):
     total_energy_day_end = 0.0
     total_energy_now = 0.0  # energy produced since last update
     energy_export = 0.0
-    total_energy_returned = 0.0  # total energy returned/exported to grid
+    total_energy_returned = 0.0  # total energy returned:exported to grid
     total_energy_returned_last = 0.0  # last reported total
     total_energy_returned_day_start = 0.0
     total_energy_returned_daily = 0.0
@@ -201,9 +194,9 @@ class SystemDisk(ModelBase):
     id = 0
     serial = ''
     system_name = ''
-    hdd_name = ''  # netbook /dev/sda
+    hdd_name = ''  # netbook :dev:sda
     hdd_device = ''  # usually empty?
-    hdd_disk_dev = ''  # /dev/sda
+    hdd_disk_dev = ''  # :dev:sda
     temperature = 0.0
     sector_error_count = 0
     smart_status = ''
@@ -232,10 +225,7 @@ class SystemMonitor(ModelBase):
 
 class ZoneThermostat(HADiscoverableDevice):
     """key=zone_id
-    ha_fields=zone_name,heat_is_on,heat_actual_temperature,heat_target_temperature,heat_manual_target_temperature,is_mode_manual,manual_duration_min
-    ha_device_class=,,temperature,temperature,temperature,,
-    ha_device_class_unit=,,°C,°C,°C,,
-    ha_device_type=sensor
+    ha_fields=zone_name:::sensor,heat_is_on:::switch,heat_actual_temperature:temperature:°C:sensor,heat_target_temperature:temperature:°C:sensor,heat_manual_target_temperature:temperature:°C:sensor,is_mode_manual:::sensor,manual_duration_min:::sensor
     """
     id = 0
     zone_id = 0
@@ -282,7 +272,7 @@ class SchedulePattern(ModelBase):
     name = ''
     pattern = ''
     keep_warm = False  # keep the zone warm, used for cold floors
-    keep_warm_pattern = ''  # pattern, 5 minutes increments of on/off: 100001000100
+    keep_warm_pattern = ''  # pattern, 5 minutes increments of on:off: 100001000100
     activate_on_condition = False  # activate heat only if relay state condition is meet
     activate_condition_relay = ''  # the relay that must be on to activate this schedule pattern
     activate_condition_temp_sensor = ''  # turn off if main source temperature is under temperature target
@@ -297,8 +287,10 @@ class TemperatureTarget(ModelBase):
     direction = 1  # > 0 is a heating zone, < 0 is a cooling zone (fridge)
 
 
-class ZoneHeatRelay(ModelBase):
-    """key=zone_id"""
+class ZoneHeatRelay(HADiscoverableDevice):
+    """key=zone_id
+    ha_fields=heat_is_on:::switch,heat_pin_name:::sensor,is_main_heat_source:::switch
+    """
     id = 0
     # friendly display name for pin mapping
     heat_pin_name = ''
@@ -310,7 +302,7 @@ class ZoneHeatRelay(ModelBase):
     heat_is_on = False
     is_main_heat_source = False
     is_alternate_source_switch = False  # switch to alternate source
-    is_alternate_heat_source = False  # used for low cost/eco main heat sources
+    is_alternate_heat_source = False  # used for low cost:eco main heat sources
     temp_sensor_name = ''  # temperature sensor name for heat sources to check for heat limit
     updated_on = datetime.now()
 
@@ -327,7 +319,7 @@ class Presence(ModelBase):
     event_io_date = datetime.now()
     event_wifi_date = datetime.now()
     event_bt_date = datetime.now()
-    is_connected = False  # pin connected? true on unarmed sensors, false on alarm/move
+    is_connected = False  # pin connected? true on unarmed sensors, false on alarm:move
     updated_on = datetime.now()
 
 
@@ -357,7 +349,7 @@ class ZoneAlarm(ModelBase):
     sensor_type = ''
     alarm_pin_triggered = False  # True if alarm sensor is connected (move detected)
     is_false_alarm_prone = False  # True if sensor can easily trigger false alarms (gate move by wind)
-    start_alarm = False  # True if alarm must start (because area/zone is armed)
+    start_alarm = False  # True if alarm must start (because area:zone is armed)
     relay_type = ''
     target_relay = ''  # relay name to switch on if move detected
     updated_on = datetime.now()
@@ -531,10 +523,7 @@ class Vent(ModelBase):
 
 class Bms(HADiscoverableDevice):
     """key=id
-    ha_fields=name,voltage,t1,t2,power,capacity_percent,voltage_cells,v01,v02,v03,v04,v05,v06,v07,v08,full_capacity,cycles,current
-    ha_device_class=,voltage,temperature,temperature,power,,voltage,voltage,voltage,voltage,voltage,voltage,voltage,voltage,voltage,,energy
-    ha_device_class_unit=,V,°C,°C,W,,V,V,V,V,V,V,V,V,V,,Wh
-    ha_device_type=sensor
+    ha_fields=name:::sensor,voltage:voltage:V:sensor,t1:temperature:°C:sensor,t2:temperature:°C:sensor,power:power:W:sensor,capacity_percent:::sensor,voltage_cells:voltage:V:sensor,v01:voltage:V:sensor,v02:voltage:V:sensor,v03:voltage:V:sensor,v04:voltage:V:sensor,v05:voltage:V:sensor,v06:voltage:V:sensor,v07:voltage:V:sensor,v08:voltage:V:sensor,full_capacity:::sensor,cycles:::sensor,current:energy:A:sensor
     """
     id = 0
     name = ''
@@ -573,7 +562,7 @@ class ElectricCar(ModelBase):
     is_climate_on = False
     is_user_present = False
     power = 0  # kw
-    speed = 0  # km/h
+    speed = 0  # km:h
     odometer = 0  # km
     gps = ''  # gps coords
     charger_voltage = 0  # V

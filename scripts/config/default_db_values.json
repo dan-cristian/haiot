@@ -30,7 +30,7 @@
     {"name": "MQTT_TOPIC_OPENHAB_SEND", "value": "iot/openhab", "description": "openhab integration mqtt channel for sending to openhab"},
     {"name": "MQTT_TOPIC_OPENHAB_RECEIVE", "value": "iot/openhab/cmd/#", "description": "openhab integration mqtt channel for receiving"},
     {"name": "MQTT_TOPIC_HA_SEND", "value": "homeassistant/", "description": "ha integration mqtt channel for sending to ha"},
-    {"name": "MQTT_TOPIC_HA_RECEIVE", "value": "homeassistant/#", "description": "ha integration mqtt channel for receiving"},
+    {"name": "MQTT_TOPIC_HA_RECEIVE", "value": "homeassistant/receive/#", "description": "ha integration mqtt channel for receiving"},
     {"name": "MQTT_TOPIC_OWNTRACKS_RECEIVE", "value": "owntracks/haiot/#", "description": "owntracks integration mqtt channel for receiving"},
     {"name": "MQTT_TOPIC_SONOFF_1", "value": "iot/sonoff/#", "description": "sonoff-tasmota integration mqtt channel"},
     {"name": "MQTT_TOPIC_MICRO", "value": "iot/micro", "description": "mqtt publish channel for micropython devices"},
