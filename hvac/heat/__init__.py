@@ -49,6 +49,7 @@ def _save_heat_state_db(zone, heat_is_on):
         zone_thermo = m.ZoneThermostat()
         zone_thermo.zone_id = zone.id
         zone_thermo.zone_name = zone.name
+        zone_thermo.is_mode_manual = False
         zone_thermo.manual_duration_min = P.MANUAL_DURATION
     if zone_heat_relay is not None:
         zone_heat_relay.heat_is_on = heat_is_on
