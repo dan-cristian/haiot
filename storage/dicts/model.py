@@ -225,7 +225,7 @@ class SystemMonitor(ModelBase):
 
 class ZoneThermostat(HADiscoverableDevice):
     """key=zone_id
-    ha_fields=zone_name:::sensor,heat_is_on:::switch,heat_actual_temperature:temperature:°C:sensor,heat_target_temperature:temperature:°C:sensor,heat_manual_target_temperature:temperature:°C:sensor,is_mode_manual:::sensor,manual_duration_min:::sensor
+    ha_fields=zone_name:::sensor,heat_is_on:::switch,heat_actual_temperature:temperature:°C:sensor,heat_target_temperature:temperature:°C:sensor,heat_manual_target_temperature:temperature:°C:sensor,is_mode_manual:::switch,manual_duration_min:::sensor
     """
     id = 0
     zone_id = 0
