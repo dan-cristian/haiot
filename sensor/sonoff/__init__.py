@@ -451,7 +451,7 @@ def post_init():
 def thread_run():
     prctl.set_name("sonoff")
     threading.current_thread().name = "sonoff"
-    _tasmota_discovery()
+    #_tasmota_discovery()
     prctl.set_name("idle_sonoff")
     threading.current_thread().name = "idle_sonoff"
 
