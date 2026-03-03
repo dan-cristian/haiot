@@ -746,6 +746,8 @@ def rule_energy_bms_cell(obj=m.Bms(), change=None):
                     inverter_relay.relay_is_on = True
                     inverter_relay.save_changed_fields()
                     L.l.info("Inverter on, cell voltage reached top-up {}".format(P.bms_cell_inverter_topup_voltage))
+                else:
+                    L.l.info("Inverter not changed, cell voltage {} under top-up".format(P.bms_min_cell_voltage))
 
             # start or stop the charger to maintain cells above safe level
             if P.bms_min_cell_voltage <= P.bms_cell_min_voltage_critical:
