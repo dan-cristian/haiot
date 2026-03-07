@@ -563,7 +563,7 @@ class P:
     critical_charger_name = "batterycharge_4"  # charger used to recover cells
 
     bms_cell_min_inverter_voltage_protection = 3  # inverter is stopped when a cell reaches this limit
-    bms_cell_inverter_topup_voltage = 3.3
+    bms_cell_inverter_topup_voltage = 3.2
     bms_cell_charge_topup_reached = False  # cell was charged from low voltage to a safety level, inverter can start
     bms_cell_charge_max_reached = False  # cell was charged from low voltage to max level, charger should stop
     bms_cell_max_voltage_level = 3.6  # stop chargin when reaching this level

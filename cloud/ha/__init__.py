@@ -59,8 +59,11 @@ class TemplateSensorDiscovery:
         "identifiers":["<unique_device_id>"],
         "model":"haiot"
         }
-    ,"device_class":"<device_class>",
-    "unit_of_measurement":"<unit_of_measurement>"
+    ,"value_template": "{{ value|<value_type> }}"
+    ,"suggested_area": "haiot"
+    ,"device_class": "<device_class>"
+    ,"unit_of_measurement": "<unit_of_measurement>"
+    <optional>
     }"""
     availability_topic = '<ha_mqtt_prefix><device_name>/status'
     state_topic = '<ha_mqtt_prefix><device_type>/<unique_sensor_id>/state'
@@ -88,6 +91,24 @@ def _get_variables(obj):
         "<device_name>", device_name)
     return device_name, fields, availability_topic
 
+def _get_ha_measurements(obj):
+    measurement = {}
+    if hasattr(obj, "ha_state_class_measurement"):
+        fields_atoms = obj.ha_state_class_measurement.split(",")
+        for field in fields_atoms:
+            measurement[field] = None
+    total_increasing = {}
+    if hasattr(obj, "ha_state_class_total_increasing"):
+        fields_atoms = obj.ha_state_class_total_increasing.split(",")
+        for field in fields_atoms:
+            total_increasing[field] = None
+    total = {}
+    if hasattr(obj, "ha_state_class_total"):
+        fields_atoms = obj.ha_state_class_total.split(",")
+        for field in fields_atoms:
+            total[field] = None
+    return measurement, total_increasing, total
+
 def parse_rules(obj, change):
     """ running rule method corresponding with obj type """
     if issubclass(type(obj), HADiscoverableDevice):
@@ -108,7 +129,7 @@ def parse_rules(obj, change):
                 topic = "{}{}/{}/state".format(P.ha_topic, device_type, sensor_unique_id)
                 value = "{}".format(getattr(obj, item))
                 if sensor_unique_id not in P.discovery_timestamps.keys():
-                    added = announce_discovery(obj, fields=[item])
+                    added = announce_discovery(obj, field=item)
                     L.l.info("Detected new object, added={}, {}={}".format(added, sensor_unique_id, value))
                 # payload = P.sensor_template.replace("<device_class>", item).replace("<sensor_value>", value)
                 if device_type == 'switch':
@@ -153,13 +174,14 @@ def mqtt_on_message(client, userdata, msg):
     except Exception as ex:
         L.l.error('Error ha mqtt {} ex={}'.format(msg.payload, ex), exc_info=True)
 
-def announce_discovery(obj, fields=None):
+def announce_discovery(obj, field=None):
     added_one = False
     device_name, ha_fields, availability_topic = _get_variables(obj)
+    state_measurement, state_total_increasing, state_total = _get_ha_measurements(obj)
     ha_field_list = ha_fields.keys()
     index = 0
     for ha_field in ha_field_list:
-        if fields is not None and ha_field in fields:
+        if field is not None and ha_field == field:
             if index >= len(ha_field_list):
                 L.l.error("Too many unexpected fields vs ha object definition for {}, {}".format(obj, fields))
             else:
@@ -168,6 +190,17 @@ def announce_discovery(obj, fields=None):
                 device_type = ha_fields[ha_field][2]
                 sensor_unique_id = device_name + '_' + ha_field
                 sensor_name = device_name + ' ' + ha_field
+                value_type = type(getattr(obj, field)).__name__
+                if value_type == 'str':
+                    value_type='string'
+                if field in state_measurement.keys():
+                    optional_value = ',"state_class": "measurement"'
+                elif field in state_total_increasing.keys():
+                    optional_value = ',"state_class": "total_increasing"'
+                elif field in state_total.keys():
+                    optional_value = ',"state_class": "total"'
+                else:
+                    optional_value = ""
                 topic_discovery = "{}{}/{}/{}/config".format(P.ha_topic, device_type, device_name, sensor_unique_id)
                 state_topic = TemplateSensorDiscovery.state_topic.replace(
                     "<ha_mqtt_prefix>", P.ha_topic).replace(
@@ -183,10 +216,12 @@ def announce_discovery(obj, fields=None):
                     "<device_name>", device_name).replace(
                     "<unique_device_id>", device_name).replace(
                     "<device_class>", device_class).replace(
-                    "<unit_of_measurement>", device_unit)
-                if ',"device_class":"",' in payload:
-                    payload = payload.replace(',"device_class":"",', '').replace(
-                        '"unit_of_measurement":""', '')
+                    "<unit_of_measurement>", device_unit).replace(
+                    "<value_type>", value_type).replace(
+                    "<optional>", optional_value)
+                if ',"device_class": ""' in payload:
+                    payload = payload.replace(',"device_class": ""', '').replace(
+                        ',"unit_of_measurement": ""', '')
                 if device_type == 'switch':
                     command_topic = TemplateSensorDiscovery.command_topic.replace(
                         "<ha_mqtt_prefix>", P.ha_topic).replace(

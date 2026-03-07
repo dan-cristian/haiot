@@ -151,6 +151,9 @@ class PowerMonitor(HADiscoverableDevice):
     """
     key=name
     ha_fields=voltage:voltage:V:sensor,current:current:A:sensor,power:power:W:sensor,energy:energy:Wh:sensor,power_factor:::sensor,total_energy_now:energy:Wh:sensor,total_energy_returned_now:energy:Wh:sensor,reactive_power:power:W:sensor,total_energy:energy:Wh:sensor,total_energy_last:energy:Wh:sensor,total_energy_daily:energy:Wh:sensor,energy_export:energy:Wh:sensor,total_energy_returned:energy:Wh:sensor,total_energy_returned_last:energy:Wh:sensor,total_energy_returned_daily:energy:Wh:sensor,total_energy_day_start:energy:Wh:sensor
+    ha_state_class_measurement=total_energy_now,total_energy_returned_now
+    ha_state_class_total_increasing=total_energy_daily,total_energy_returned_daily
+    ha_state_class_total=total_energy,total_energy_returned
     """
     id = 0
     name = ''
@@ -523,7 +526,7 @@ class Vent(ModelBase):
 
 class Bms(HADiscoverableDevice):
     """key=id
-    ha_fields=name:::sensor,voltage:voltage:V:sensor,t1:temperature:°C:sensor,t2:temperature:°C:sensor,power:power:W:sensor,capacity_percent:::sensor,voltage_cells:voltage:V:sensor,v01:voltage:V:sensor,v02:voltage:V:sensor,v03:voltage:V:sensor,v04:voltage:V:sensor,v05:voltage:V:sensor,v06:voltage:V:sensor,v07:voltage:V:sensor,v08:voltage:V:sensor,full_capacity:::sensor,cycles:::sensor,current:energy:A:sensor
+    ha_fields=name:::sensor,voltage:voltage:V:sensor,t1:temperature:°C:sensor,t2:temperature:°C:sensor,power:power:W:sensor,capacity_percent:::sensor,voltage_cells:voltage:V:sensor,v01:voltage:V:sensor,v02:voltage:V:sensor,v03:voltage:V:sensor,v04:voltage:V:sensor,v05:voltage:V:sensor,v06:voltage:V:sensor,v07:voltage:V:sensor,v08:voltage:V:sensor,full_capacity:::sensor,cycles:::sensor,current:current:A:sensor
     """
     id = 0
     name = ''
