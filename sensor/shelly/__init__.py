@@ -198,14 +198,25 @@ def _process_message(msg):
                     if "voltage" in payload:
                         sensor.voltage = float(payload.split('"voltage":')[1].split(",")[0])
                     if "aenergy" in payload:
-                        prev_energy = sensor.total_energy_last
+                        prev_energy = sensor.total_energy
                         en_text = payload.split('aenergy":{"total":')[1].split(",")[0]
                         en_text = en_text.replace("{", "")
-                        sensor.total_energy_last = float(en_text)
+                        sensor.total_energy = float(en_text)
                         if prev_energy is None:
-                            prev_energy = sensor.total_energy_last
-                        # might be a  bug, negative value returned after power loss
-                        sensor.total_energy_now = max(0, sensor.total_energy_last - prev_energy)
+                            prev_energy = sensor.total_energy
+                        # might be a bug, negative value returned after power loss
+                        sensor.total_energy_now = max(0, sensor.total_energy - prev_energy)
+                    if "ret_aenergy" in payload:
+                        prev_ret_energy = sensor.total_energy_returned_last
+                        ret_en_text = payload.split('ret_aenergy":{"total":')[1].split(",")[0]
+                        ret_en_text = en_text.replace("{", "")
+                        sensor.total_energy_returned = float(ret_en_text)
+                        if prev_ret_energy is None:
+                            prev_ret_energy = sensor.total_energy_returned
+                        sensor.total_energy_returned_now = max(0, sensor.total_energy_returned - prev_ret_energy)
+                    if "temperature" in payload:
+                        temp = payload.split('"temperature":{"tC":')[1].split(",")[0]
+                        sensor.temperature = float(temp)
                     if "output" in payload:
                         switch_state_on = payload.split('"output":')[1].split(",")[0] == "true"
                         relay = m.ZoneCustomRelay.find_one({m.ZoneCustomRelay.gpio_pin_code: atoms[1],
