@@ -151,7 +151,7 @@ class PowerMonitor(HADiscoverableDevice):
     """
     key=name
     ha_fields=voltage:voltage:V:sensor,current:current:A:sensor,power:power:W:sensor,energy:energy:Wh:sensor,power_factor:::sensor,total_energy_now:energy:Wh:sensor,total_energy_returned_now:energy:Wh:sensor,reactive_power:power:W:sensor,total_energy:energy:Wh:sensor,total_energy_last:energy:Wh:sensor,total_energy_daily:energy:Wh:sensor,energy_export:energy:Wh:sensor,total_energy_returned:energy:Wh:sensor,total_energy_returned_last:energy:Wh:sensor,total_energy_returned_daily:energy:Wh:sensor,total_energy_day_start:energy:Wh:sensor,temperature:temperature:°C:sensor
-    ha_state_class_measurement=total_energy_now,total_energy_returned_now,temperature
+    ha_state_class_measurement=total_energy_now,total_energy_returned_now,temperature,power,current,voltage,power_factor
     ha_state_class_total_increasing=total_energy_daily,total_energy_returned_daily
     ha_state_class_total=total_energy,total_energy_returned
     """
