@@ -60,7 +60,7 @@ def thread_run_send():
                 L.l.info('Failed to send mqtt message, res={}'.format(res))
         P.mqtt_send_lock.release()
         end_len = len(P.send_json_queue)
-        if end_len > 10:
+        if end_len > 50:
             L.l.warning("{} messages are pending for transport, start was {}".format(end_len, start_len))
     else:
         elapsed = (utils.get_base_location_now_date() - mqtt_io.P.last_connect_attempt).total_seconds()
